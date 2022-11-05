@@ -7,7 +7,7 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 
 project(
-    libtcod-vcpkg-template  # Project name, change this as needed.
+    dialetics
     LANGUAGES C CXX
 )
 
@@ -49,10 +49,21 @@ endif()
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
+find_package(Lua REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE
+        ${LUA_INCLUDE_DIR}
+)
+
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
         SDL2::SDL2
         SDL2::SDL2main
         libtcod::libtcod
+        ${LUA_LIBRARIES}
+        sol2
 )

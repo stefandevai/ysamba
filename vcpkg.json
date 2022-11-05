@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-  "name": "libtcod-template",
+  "name": "dialetics",
   "version-semver": "0.0.0",
   "dependencies": [
     {
@@ -13,6 +13,8 @@
         "zlib"
       ]
     },
-    "sdl2"
+    "sdl2",
+    "lua",
+    "sol2"
   ]
 }

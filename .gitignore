@@ -120,3 +120,4 @@ Temporary Items
 ## Custom
 # Default build directory
 build
+vcpkg_installed
