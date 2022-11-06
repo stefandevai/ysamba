@@ -42,10 +42,20 @@ namespace dl
     {
       for (int j = 0; j < local_height; ++j)
       {
-        const auto& tile = m_tile_data[m_map_chunk[local_width * j + i]];
+        const auto& tile = m_tile_data[m_map_chunk[m_width * j + i]];
         tcod::print(console, {i, j}, tile.symbol, TCOD_white, std::nullopt);
       }
     }
+  }
+
+  const TileData Tilemap::get(const int x, const int y, const int z)
+  {
+    if (x > m_width || x < 0 || y > m_height || y < 0)
+    {
+      return m_null_tile;
+    }
+
+    return m_tile_data[m_map_chunk[m_width * y + x]];
   }
 
   void Tilemap::m_load()

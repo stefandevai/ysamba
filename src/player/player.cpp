@@ -2,13 +2,21 @@
 #include "./player.hpp"
 #include "../core/input_manager.hpp"
 
-
 namespace dl
 {
   static auto input_manager = InputManager::get_instance();
 
+  Player::Player()
+  {
+    m_load();
+  }
+
+  Player::~Player() {  }
+
   void Player::update(const uint32_t delta)
   {
+    m_should_advance_turn = false;
+
     if (m_delta_since_move < 50)
     {
       m_delta_since_move += delta;
@@ -20,49 +28,63 @@ namespace dl
     }
   }
 
+  void Player::m_load()
+  {
+    body.position.x = 10;
+    body.position.y = 10;
+    body.position.z = 0;
+  }
+
   void Player::m_move()
   {
     if (input_manager->is_action_down("move_right"))
     {
-      m_position.x += 1;
+      body.velocity.x = 1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_left"))
     {
-      m_position.x -= 1;
+      body.velocity.x = -1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_bottom"))
     {
-      m_position.y += 1;
+      body.velocity.y = 1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_top"))
     {
-      m_position.y -= 1;
+      body.velocity.y = -1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_bottom_left"))
     {
-      m_position.x -= 1;
-      m_position.y += 1;
+      body.velocity.x = -1;
+      body.velocity.y = 1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_bottom_right"))
     {
-      m_position.x += 1;
-      m_position.y += 1;
+      body.velocity.x = 1;
+      body.velocity.y = 1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_top_left"))
     {
-      m_position.x -= 1;
-      m_position.y -= 1;
+      body.velocity.x = -1;
+      body.velocity.y = -1;
+      m_should_advance_turn = true;
     }
     else if (input_manager->is_action_down("move_top_right"))
     {
-      m_position.x += 1;
-      m_position.y -= 1;
+      body.velocity.x = 1;
+      body.velocity.y = -1;
+      m_should_advance_turn = true;
     }
   }
 
   void Player::render(TCOD_Console& console)
   {
-    tcod::print(console, {m_position.x, m_position.y}, "@", TCOD_white, std::nullopt);
+    tcod::print(console, {body.position.x, body.position.y}, "@", TCOD_white, std::nullopt);
   }
 }
-

@@ -2,7 +2,7 @@ tiles = {
   {
     id = 0,
     name = "grass",
-    symbol = ".",
+    symbol = "",
     walkable = true,
   },
   {

@@ -1,19 +1,27 @@
 #pragma once
 
-#include "../components/position.hpp"
+#include <libtcod.hpp>
+#include "../physics/body.hpp"
 
 namespace dl
 {
   class Player
   {
     public:
+      Body body;
+
+      Player();
+      ~Player();
+
       void update(const uint32_t delta);
       void render(TCOD_Console& console);
+      inline bool should_advance_turn() const { return m_should_advance_turn; }
 
     private:
-      Position m_position{10,10,0};
       uint32_t m_delta_since_move = 0;
+      bool m_should_advance_turn = false;
 
+      void m_load();
       void m_move();
   };
 }
