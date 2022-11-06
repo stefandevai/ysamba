@@ -1,0 +1,96 @@
+#include "./world.hpp"
+
+#include <random>
+
+namespace dl
+{
+  World::World()
+  {
+    m_load_tile_data();
+  }
+
+  World::~World() {  }
+
+  void World::generate(const int width, const int height)
+  {
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(1,3);
+
+    for (auto d = m_depth_min; d < m_depth_max; ++ d)
+    {
+      std::vector<int> tiles(width * height);
+
+      for (auto i = 0; i < width; ++i)
+      {
+        for (auto j = 0; j < height; ++j)
+        {
+          tiles[j*width + i] = dist(rng);
+        }
+      }
+
+      auto tilemap = std::make_shared<Tilemap>(tiles, width, height);
+
+      m_tilemaps.push_back(tilemap);
+    }
+
+    /* m_write(tilemap); */
+  }
+
+  void World::load(const std::string& key)
+  {
+
+  }
+
+  void World::update(const uint32_t delta)
+  {
+
+  }
+
+  void World::render(TCOD_Console& console)
+  {
+    const int screen_tiles_width = 40;
+    const int screen_tiles_height = 25;
+
+    for (int i = 0; i < screen_tiles_width; ++i)
+    {
+      for (int j = 0; j < screen_tiles_height; ++j)
+      {
+        const auto& tile = get(i, j, 0);
+        console.at(i, j).ch = tile.symbol[0];
+      }
+    }
+  }
+
+  const TileData World::get(const int x, const int y, const int z)
+  {
+    const int tile_index = m_tilemaps[z - m_depth_min]->get(x, y);
+
+    return m_tile_data[tile_index];
+  }
+
+  void World::m_write(const std::vector<int>& tilemap)
+  {
+
+  }
+
+  void World::m_load_tile_data()
+  {
+    // Load tile data
+    m_lua.load("tilemap/tiles.lua");
+    const auto tiles = m_lua.get_variable<std::vector<sol::table>>("tiles");
+
+    for (const auto& tile : tiles)
+    {
+      auto tile_data = TileData();
+
+      tile_data.id = tile["id"];
+      tile_data.name = tile["name"];
+      tile_data.symbol = tile["symbol"];
+      tile_data.walkable = tile["walkable"];
+
+      m_tile_data[tile_data.id] = tile_data;
+    }
+  }
+}
+

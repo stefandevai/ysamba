@@ -2,22 +2,22 @@
 
 #include <vector>
 #include "../player/player.hpp"
-#include "../tilemap/tilemap.hpp"
+#include "../world/world.hpp"
 #include "./body.hpp"
 
 namespace dl
 {
-  class World
+  class PhysicsLayer
   {
     public:
-      World(Tilemap& tilemap);
-      ~World();
+      PhysicsLayer(World& world);
+      ~PhysicsLayer();
 
       void add(Body* body);
       void update(const uint32_t delta);
 
     private:
-      Tilemap& m_tilemap;
+      World& m_world;
       std::vector<Body*> m_bodies;
 
       void m_move(Body* body);

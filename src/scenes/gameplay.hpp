@@ -4,8 +4,8 @@
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
 #include "../player/player.hpp"
-#include "../tilemap/tilemap.hpp"
-#include "../physics/world.hpp"
+#include "../world/world.hpp"
+#include "../physics/physics_layer.hpp"
 
 namespace dl
 {
@@ -21,7 +21,7 @@ namespace dl
 
     private:
       Player m_player;
-      Tilemap m_tilemap;
-      World m_world {m_tilemap};
+      World m_world;
+      PhysicsLayer m_physics_layer {m_world};
   };
 }

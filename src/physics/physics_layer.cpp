@@ -1,21 +1,21 @@
-#include "./world.hpp"
+#include "./physics_layer.hpp"
 
 namespace dl
 {
-  World::World(Tilemap& tilemap)
-    : m_tilemap(tilemap)
+  PhysicsLayer::PhysicsLayer(World& world)
+    : m_world(world)
   {
 
   }
 
-  World::~World() {}
+  PhysicsLayer::~PhysicsLayer() {}
 
-  void World::add(Body* body)
+  void PhysicsLayer::add(Body* body)
   {
     m_bodies.push_back(body);
   }
 
-  void World::update(const uint32_t delta)
+  void PhysicsLayer::update(const uint32_t delta)
   {
     for (auto& body : m_bodies)
     {
@@ -26,12 +26,12 @@ namespace dl
     }
   }
 
-  void World::m_move(Body* body)
+  void PhysicsLayer::m_move(Body* body)
   {
     const int x_candidate = body->position.x + body->velocity.x;
     const int y_candidate = body->position.y + body->velocity.y;
 
-    const auto& target_tile = m_tilemap.get(x_candidate, y_candidate, body->position.z);
+    const auto& target_tile = m_world.get(x_candidate, y_candidate, body->position.z);
 
     if (target_tile.walkable)
     {
