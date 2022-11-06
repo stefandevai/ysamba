@@ -27,7 +27,6 @@ namespace dl
       LuaAPI m_lua;
       std::vector<std::shared_ptr<Tilemap>> m_tilemaps;
       std::map<int, TileData> m_tile_data;
-      TileData m_null_tile{-1, "", "", false};
       const int m_depth_min = 0;
       const int m_depth_max = 1;
 

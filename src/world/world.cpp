@@ -54,7 +54,8 @@ namespace dl
       for (int j = 0; j < camera.size.h; ++j)
       {
         const auto& tile = get(camera.position.x + i, camera.position.y + j, camera.position.z);
-        console.at(i, j).ch = tile.symbol[0];
+        console.at(i, j).ch = tile.symbol;
+        console.at(i, j).fg = { tile.r, tile.g, tile.b, tile.a };
       }
     }
   }
@@ -90,6 +91,10 @@ namespace dl
       tile_data.name = tile["name"];
       tile_data.symbol = tile["symbol"];
       tile_data.walkable = tile["walkable"];
+      tile_data.r = tile["r"];
+      tile_data.g = tile["g"];
+      tile_data.b = tile["b"];
+      tile_data.a = tile["a"];
 
       m_tile_data[tile_data.id] = tile_data;
     }

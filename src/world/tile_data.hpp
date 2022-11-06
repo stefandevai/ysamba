@@ -8,7 +8,8 @@ namespace dl
   {
     int id;
     std::string name;
-    std::string symbol;
+    int symbol;
     bool walkable;
+    uint8_t r, g, b, a;
   };
 }
