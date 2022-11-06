@@ -4,6 +4,7 @@
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
 #include "../player/player.hpp"
+#include "../tilemap/tilemap.hpp"
 
 namespace dl
 {
@@ -19,5 +20,6 @@ namespace dl
 
     private:
       Player m_player;
+      Tilemap m_tilemap;
   };
 }

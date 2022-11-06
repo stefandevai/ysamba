@@ -16,11 +16,13 @@ namespace dl
 
   void Gameplay::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
   {
+    m_tilemap.update(delta);
     m_player.update(delta);
   }
 
   void Gameplay::render(TCOD_Console& console)
   {
+    m_tilemap.render(console);
     m_player.render(console);
   }
 }

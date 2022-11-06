@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/components/position.hpp"
+#include "../components/position.hpp"
 
 namespace dl
 {
