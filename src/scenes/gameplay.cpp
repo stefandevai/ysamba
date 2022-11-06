@@ -14,6 +14,8 @@ namespace dl
 
     m_world.generate(100, 100);
     m_physics_layer.add(&m_player.body);
+    m_camera.size.w = m_lua.get_variable<int>("camera_width");
+    m_camera.size.h = m_lua.get_variable<int>("camera_height");
     m_has_loaded = true;
   }
 
@@ -25,6 +27,7 @@ namespace dl
     }
 
     m_player.update(delta);
+    m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
 
     if (m_player.should_advance_turn())
     {
@@ -40,8 +43,8 @@ namespace dl
       return;
     }
 
-    m_world.render(console);
-    m_player.render(console);
+    m_world.render(console, m_camera);
+    m_player.render(console, m_camera);
   }
 }
 

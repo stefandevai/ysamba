@@ -2,9 +2,11 @@
 
 #include <vector>
 #include <map>
+#include "../core/lua_api.hpp"
+#include "../components/size.hpp"
 #include "./tile_data.hpp"
 #include "./tilemap.hpp"
-#include "../core/lua_api.hpp"
+#include "./camera.hpp"
 
 namespace dl
 {
@@ -17,8 +19,9 @@ namespace dl
       void generate(const int width, const int height);
       void load(const std::string& key);
       void update(const uint32_t delta);
-      void render(TCOD_Console& console);
+      void render(TCOD_Console& console, const Camera& camera);
       const TileData get(const int x, const int y, const int z);
+      Size get_tilemap_size(const int z);
 
     private:
       LuaAPI m_lua;

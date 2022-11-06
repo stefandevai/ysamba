@@ -47,16 +47,13 @@ namespace dl
 
   }
 
-  void World::render(TCOD_Console& console)
+  void World::render(TCOD_Console& console, const Camera& camera)
   {
-    const int screen_tiles_width = 40;
-    const int screen_tiles_height = 25;
-
-    for (int i = 0; i < screen_tiles_width; ++i)
+    for (int i = 0; i < camera.size.w; ++i)
     {
-      for (int j = 0; j < screen_tiles_height; ++j)
+      for (int j = 0; j < camera.size.h; ++j)
       {
-        const auto& tile = get(i, j, 0);
+        const auto& tile = get(camera.position.x + i, camera.position.y + j, camera.position.z);
         console.at(i, j).ch = tile.symbol[0];
       }
     }
@@ -67,6 +64,11 @@ namespace dl
     const int tile_index = m_tilemaps[z - m_depth_min]->get(x, y);
 
     return m_tile_data[tile_index];
+  }
+
+  Size World::get_tilemap_size(const int z)
+  {
+    return m_tilemaps[z - m_depth_min]->get_size();
   }
 
   void World::m_write(const std::vector<int>& tilemap)

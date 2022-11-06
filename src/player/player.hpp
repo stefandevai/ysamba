@@ -2,6 +2,7 @@
 
 #include <libtcod.hpp>
 #include "../physics/body.hpp"
+#include "../world/camera.hpp"
 
 namespace dl
 {
@@ -14,7 +15,7 @@ namespace dl
       ~Player();
 
       void update(const uint32_t delta);
-      void render(TCOD_Console& console);
+      void render(TCOD_Console& console, const Camera& camera);
       inline bool should_advance_turn() const { return m_should_advance_turn; }
 
     private:

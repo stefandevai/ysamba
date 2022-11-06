@@ -83,8 +83,20 @@ namespace dl
     }
   }
 
-  void Player::render(TCOD_Console& console)
+  void Player::render(TCOD_Console& console, const Camera& camera)
   {
-    tcod::print(console, {body.position.x, body.position.y}, "@", TCOD_white, std::nullopt);
+    int player_x = camera.size.w / 2;
+    int player_y = camera.size.h / 2;
+
+    if (camera.is_fixed_x())
+    {
+      player_x = body.position.x - camera.position.x;
+    }
+    if (camera.is_fixed_y())
+    {
+      player_y = body.position.y - camera.position.y;
+    }
+
+    tcod::print(console, {player_x, player_y}, "@", TCOD_white, std::nullopt);
   }
 }

@@ -5,6 +5,7 @@
 #include "../core/input_manager.hpp"
 #include "../player/player.hpp"
 #include "../world/world.hpp"
+#include "../world/camera.hpp"
 #include "../physics/physics_layer.hpp"
 
 namespace dl
@@ -22,6 +23,7 @@ namespace dl
     private:
       Player m_player;
       World m_world;
+      Camera m_camera;
       PhysicsLayer m_physics_layer {m_world};
   };
 }

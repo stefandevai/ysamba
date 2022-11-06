@@ -19,4 +19,9 @@ namespace dl
 
     return m_tiles[m_width * y + x];
   }
+
+  Size Tilemap::get_size() const
+  {
+    return Size{m_width, m_height, 0};
+  }
 }
