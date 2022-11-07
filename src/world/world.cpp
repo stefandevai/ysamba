@@ -15,6 +15,8 @@ namespace dl
     std::mt19937 rng(dev());
     std::uniform_int_distribution<std::mt19937::result_type> dist(1,3);
 
+    m_tilemaps.clear();
+
     for (auto d = m_depth_min; d < m_depth_max; ++ d)
     {
       std::vector<int> tiles(width * height);
@@ -31,22 +33,7 @@ namespace dl
 
       m_tilemaps.push_back(tilemap);
     }
-
-    /* m_write("./world.dl"); */
   }
-
-  /* void World::m_write(const std::string& file_path) */
-  /* { */
-  /*   std::ofstream output_stream(file_path); */
-  /*   cereal::BinaryOutputArchive archive (output_stream); */
-  /*   archive(CEREAL_NVP(m_tilemaps)); */
-  /* } */
-
-
-  /* void World::load(const std::string& key) */
-  /* { */
-
-  /* } */
 
   void World::update(const uint32_t delta)
   {
@@ -101,4 +88,3 @@ namespace dl
     }
   }
 }
-

@@ -16,7 +16,6 @@ namespace dl
       void operator=(InputManager const&) {};
 
       static std::shared_ptr<InputManager> get_instance();
-      void load_key_bindings();
       void update();
       bool is_action_down(const std::string& action);
       bool is_key_down(int key);

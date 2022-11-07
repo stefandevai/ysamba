@@ -35,8 +35,8 @@ namespace dl
       return;
     }
 
-    tcod::print(console, {0, 0}, m_game_title, TCOD_white, std::nullopt);
-    tcod::print(console, {0, 2}, m_instructions, TCOD_white, std::nullopt);
+    tcod::print(console, {2, 8}, m_game_title, TCOD_white, std::nullopt);
+    tcod::print(console, {2, 10}, m_instructions, TCOD_white, std::nullopt);
   }
 }
 

@@ -18,7 +18,6 @@ namespace dl
       World();
 
       void generate(const int width, const int height);
-      /* void load(const std::string& key); */
       void update(const uint32_t delta);
       void render(TCOD_Console& console, const Camera& camera);
       const TileData get(const int x, const int y, const int z);
@@ -37,7 +36,6 @@ namespace dl
       int m_depth_min = 0;
       int m_depth_max = 1;
 
-      /* void m_write(const std::string& file_path); */
       void m_load_tile_data();
   };
 }

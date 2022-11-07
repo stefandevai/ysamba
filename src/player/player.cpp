@@ -95,6 +95,7 @@ namespace dl
       player_y = body.position.y - camera.position.y;
     }
 
-    tcod::print(console, {player_x, player_y}, "@", TCOD_white, std::nullopt);
+    console.at(player_x, player_y).ch = '@';
+    console.at(player_x, player_y).fg = { 255, 255, 255, 255 };
   }
 }

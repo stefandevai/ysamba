@@ -19,11 +19,6 @@ namespace dl
     return m_instance;
   }
 
-  void InputManager::load_key_bindings()
-  {
-
-  }
-
   void InputManager::update()
   {
     m_sdl_input_wrapper->update();
