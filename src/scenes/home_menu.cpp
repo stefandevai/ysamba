@@ -6,8 +6,6 @@ namespace dl
     : Scene("scenes/home_menu.lua")
   { }
 
-  HomeMenu::~HomeMenu() { }
-
   void HomeMenu::load()
   {
     Scene::load();

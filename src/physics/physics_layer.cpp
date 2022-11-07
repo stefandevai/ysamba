@@ -8,8 +8,6 @@ namespace dl
 
   }
 
-  PhysicsLayer::~PhysicsLayer() {}
-
   void PhysicsLayer::add(Body* body)
   {
     m_bodies.push_back(body);

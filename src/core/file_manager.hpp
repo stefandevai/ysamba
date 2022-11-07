@@ -9,7 +9,6 @@ namespace dl
   {
     public:
       FileManager();
-      ~FileManager();
 
       // Removing copy-constructor and assignment operator
       FileManager(FileManager const&) {};

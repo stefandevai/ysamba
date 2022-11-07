@@ -11,8 +11,6 @@ namespace dl
     m_load();
   }
 
-  Player::~Player() {  }
-
   void Player::update(const uint32_t delta)
   {
     m_should_advance_turn = false;

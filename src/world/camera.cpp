@@ -4,10 +4,7 @@
 
 namespace dl
 {
-  Camera::Camera()
-  {
-
-  }
+  Camera::Camera() { }
 
   void Camera::update(const Position& target, const Size& tilemap_size)
   {

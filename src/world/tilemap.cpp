@@ -4,11 +4,11 @@
 
 namespace dl
 {
+  Tilemap::Tilemap() { }
+
   Tilemap::Tilemap(std::vector<int> tiles, const int width, const int height)
     : m_tiles(tiles), m_width(width), m_height(height)
   { }
-
-  Tilemap::~Tilemap() { }
 
   int Tilemap::get(const int x, const int y) const
   {

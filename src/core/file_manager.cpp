@@ -5,8 +5,6 @@ namespace dl
 {
   FileManager::FileManager() { }
 
-  FileManager::~FileManager() { }
-
   std::filesystem::path FileManager::get_data_dir()
   {
     static auto root_directory = std::filesystem::path{"."};  // Begin at the working directory.

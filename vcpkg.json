@@ -15,6 +15,7 @@
     },
     "sdl2",
     "lua",
-    "sol2"
+    "sol2",
+    "cereal"
   ]
 }

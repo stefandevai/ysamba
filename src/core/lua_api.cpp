@@ -14,8 +14,6 @@ namespace dl
     load (script_path);
   }
 
-  LuaAPI::~LuaAPI() {}
-
   void LuaAPI::load (const std::string& script_path)
   {
     try

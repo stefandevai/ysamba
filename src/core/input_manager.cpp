@@ -9,8 +9,6 @@ namespace dl
 
   InputManager::InputManager() { }
 
-  InputManager::~InputManager() { }
-
   std::shared_ptr<InputManager> InputManager::get_instance()
   {
     if (m_instance == nullptr)

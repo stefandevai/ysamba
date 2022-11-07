@@ -10,7 +10,6 @@ namespace dl
   {
     public:
       InputManager();
-      ~InputManager();
 
       // Removing copy-constructor and assignment operator
       InputManager(InputManager const&) {};

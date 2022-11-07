@@ -11,7 +11,6 @@ namespace dl
   {
     public:
       PhysicsLayer(World& world);
-      ~PhysicsLayer();
 
       void add(Body* body);
       void update(const uint32_t delta);

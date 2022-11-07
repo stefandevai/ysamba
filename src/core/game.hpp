@@ -12,7 +12,6 @@ namespace dl
   {
     public:
       Game();
-      ~Game();
 
       void load(int argc, char* argv[]);
       void run();

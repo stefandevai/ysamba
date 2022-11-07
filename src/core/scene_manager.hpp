@@ -18,7 +18,6 @@ namespace dl
   {
     public:
       SceneManager();
-      ~SceneManager();
 
       static void set_scene(const std::string& key);
       void update(const uint32_t delta);

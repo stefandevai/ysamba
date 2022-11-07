@@ -51,6 +51,7 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
+find_package(cereal CONFIG REQUIRED)
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -66,4 +67,5 @@ target_link_libraries(
         libtcod::libtcod
         ${LUA_LIBRARIES}
         sol2
+        cereal::cereal
 )

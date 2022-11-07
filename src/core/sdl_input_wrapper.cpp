@@ -7,8 +7,6 @@ namespace dl
 
   SDLInputWrapper::SDLInputWrapper() { }
 
-  SDLInputWrapper::~SDLInputWrapper() { }
-
   std::shared_ptr<SDLInputWrapper> SDLInputWrapper::get_instance()
   {
     if (m_instance == nullptr)

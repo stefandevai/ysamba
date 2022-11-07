@@ -9,8 +9,6 @@ namespace dl
     m_load_tile_data();
   }
 
-  World::~World() {  }
-
   void World::generate(const int width, const int height)
   {
     std::random_device dev;
@@ -34,13 +32,21 @@ namespace dl
       m_tilemaps.push_back(tilemap);
     }
 
-    /* m_write(tilemap); */
+    /* m_write("./world.dl"); */
   }
 
-  void World::load(const std::string& key)
-  {
+  /* void World::m_write(const std::string& file_path) */
+  /* { */
+  /*   std::ofstream output_stream(file_path); */
+  /*   cereal::BinaryOutputArchive archive (output_stream); */
+  /*   archive(CEREAL_NVP(m_tilemaps)); */
+  /* } */
 
-  }
+
+  /* void World::load(const std::string& key) */
+  /* { */
+
+  /* } */
 
   void World::update(const uint32_t delta)
   {
@@ -70,11 +76,6 @@ namespace dl
   Size World::get_tilemap_size(const int z)
   {
     return m_tilemaps[z - m_depth_min]->get_size();
-  }
-
-  void World::m_write(const std::vector<int>& tilemap)
-  {
-
   }
 
   void World::m_load_tile_data()

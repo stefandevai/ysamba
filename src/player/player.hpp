@@ -12,7 +12,6 @@ namespace dl
       Body body;
 
       Player();
-      ~Player();
 
       void update(const uint32_t delta);
       void render(TCOD_Console& console, const Camera& camera);

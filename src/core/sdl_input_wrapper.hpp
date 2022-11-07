@@ -9,7 +9,6 @@ namespace dl
   {
     public:
       SDLInputWrapper();
-      ~SDLInputWrapper();
 
       // Removing copy-constructor and assignment operator
       SDLInputWrapper(SDLInputWrapper const&) {};

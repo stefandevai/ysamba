@@ -13,7 +13,6 @@ namespace dl
       bool is_static = false;
 
       Body();
-      ~Body();
   };
 }
 

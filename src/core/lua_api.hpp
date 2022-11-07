@@ -14,7 +14,6 @@ namespace dl
   public:
     LuaAPI();
     LuaAPI (const std::string& script_path);
-    ~LuaAPI();
 
     void load (const std::string& script_path);
     void run_function (const std::string& function_name);

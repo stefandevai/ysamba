@@ -16,8 +16,6 @@ namespace dl
     m_load();
   }
 
-  SceneManager::~SceneManager() { }
-
   void SceneManager::set_scene(const std::string& key)
   {
     const auto it = m_scenes_data.find(key);

@@ -1,18 +1,11 @@
 #include "game.hpp"
+
 #include "./clock.hpp"
 #include "./file_manager.hpp"
 
 namespace dl
 {
-  Game::Game()
-  {
-
-  }
-
-  Game::~Game()
-  {
-
-  }
+  Game::Game() { }
 
   void Game::load(int argc, char* argv[])
   {
