@@ -1,6 +1,7 @@
 #include "./gameplay.hpp"
 
 #include <fstream>
+#include <SDL.h>
 #include <cereal/archives/binary.hpp>
 
 namespace dl
@@ -62,6 +63,67 @@ namespace dl
 
     m_world.render(console, m_camera);
     m_player.render(console, m_camera);
+  }
+
+  void Gameplay::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
+  {
+    int w, h;
+    auto renderer = context.get_sdl_renderer();
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+    const auto tilemap_size_in_tiles = m_world.get_tilemap_size(m_player.body.position.z);
+
+    // TODO: Replace hardcoded tile pixel sizes
+    const int tilemap_w = tilemap_size_in_tiles.w * 16;
+    const int tilemap_h = tilemap_size_in_tiles.h * 16;
+
+    SDL_Surface *main_surface = SDL_CreateRGBSurface(0, tilemap_w, tilemap_h, 32, 0, 0, 0, 0);
+    SDL_Surface *surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+
+    // Save original camera position
+    const auto original_camera_x = m_camera.position.x;
+    const auto original_camera_y = m_camera.position.y;
+
+    for (auto i = 0; i < tilemap_w; i += w)
+    {
+      for (auto j = 0; j < tilemap_h; j += h)
+      {
+        // TODO: Replace hardcoded tile pixel sizes
+        m_camera.position.x = i / 16;
+        m_camera.position.y = j / 16;
+
+        // For some reason the first 3 / 4 screens are only saved with this warm up and delay,
+        // otherwise they're black.
+        for (auto k = 0; k < 24; ++k)
+        {
+          m_world.render(console, m_camera);
+          context.present(console);
+        }
+
+        SDL_Delay(500);
+
+        m_world.render(console, m_camera);
+        context.present(console);
+
+        SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888, surface->pixels, surface->pitch);
+
+        SDL_Rect destination_rect;
+        destination_rect.x = i;
+        destination_rect.y = j;
+        destination_rect.w = w;
+        destination_rect.h = h;
+
+        SDL_BlitSurface(surface, nullptr, main_surface, &destination_rect);
+      }
+    }
+
+    // Restore original camera position
+    m_camera.position.x = original_camera_x;
+    m_camera.position.y = original_camera_y;
+
+    SDL_SaveBMP(main_surface, (filename + ".bmp").c_str());
+
+    SDL_FreeSurface(surface);
+    SDL_FreeSurface(main_surface);
   }
 
   void Gameplay::save_world(const std::string& file_path)

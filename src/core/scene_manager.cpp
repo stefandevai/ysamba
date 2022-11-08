@@ -65,6 +65,11 @@ namespace dl
     m_current_scene->render(console);
   }
 
+  void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
+  {
+    m_current_scene->screenshot(context, console, filename);
+  }
+
   void SceneManager::m_load()
   {
     m_inital_scene_key = m_lua.get_variable<std::string>("initial_scene");

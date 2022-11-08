@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <libtcod.hpp>
 #include "./input_manager.hpp"
 
 namespace dl
@@ -19,6 +20,9 @@ namespace dl
 
   void SDLInputWrapper::update()
   {
+    // Block until events exist
+    SDL_WaitEvent(nullptr);
+
     // Reset keys
     for (auto& it : m_key_down)
     {

@@ -26,6 +26,15 @@ namespace dl
         for (auto j = 0; j < height; ++j)
         {
           tiles[j*width + i] = dist(rng);
+
+          /* if (j == 0 || i == 0 || j == height - 1 || i == width - 1) */
+          /* { */
+          /*   tiles[j*width + i] = dist(rng); */
+          /* } */
+          /* else */
+          /* { */
+          /*   tiles[j*width + i] = 3; */
+          /* } */
         }
       }
 

@@ -51,14 +51,15 @@ namespace dl
     {
       clock.tick();
 
-      m_scene_manager.update(clock.delta);
+      if (m_input_manager->is_key_down(20))
+      {
+        m_scene_manager.screenshot(m_context, m_console, "world_map");
+      }
 
+      m_scene_manager.update(clock.delta);
       m_console.clear();
       m_scene_manager.render(m_console);
       m_context.present(m_console);
-
-      // Block until events exist
-      SDL_WaitEvent(nullptr);
 
       m_input_manager->update();
     }
