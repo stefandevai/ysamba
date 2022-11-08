@@ -21,6 +21,11 @@ namespace dl
 
   void InputManager::update()
   {
+    if(is_action_down("quit"))
+    {
+      quit();
+    }
+
     m_sdl_input_wrapper->update();
   }
 

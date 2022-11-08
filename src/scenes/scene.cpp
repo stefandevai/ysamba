@@ -22,6 +22,8 @@ namespace dl
 
   void Scene::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
   {
+    (void)console;
+
     int w, h;
     auto renderer = context.get_sdl_renderer();
     SDL_GetRendererOutputSize(renderer, &w, &h);

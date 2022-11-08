@@ -7,3 +7,5 @@ move_top_left = { 28 }
 move_top_right = { 24 }
 move_bottom_left = { 5 }
 move_bottom_right = { 17 }
+
+quit = { 20 }

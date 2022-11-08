@@ -51,7 +51,7 @@ namespace dl
     {
       clock.tick();
 
-      if (m_input_manager->is_key_down(20))
+      if (m_input_manager->is_key_down(26))
       {
         m_scene_manager.screenshot(m_context, m_console, "world_map");
       }

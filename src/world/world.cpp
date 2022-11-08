@@ -1,6 +1,6 @@
 #include "./world.hpp"
 
-#include <random>
+#include "./generators/terrain_generator.hpp"
 
 namespace dl
 {
@@ -11,42 +11,42 @@ namespace dl
 
   void World::generate(const int width, const int height)
   {
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(1,3);
-
     m_tilemaps.clear();
 
-    for (auto d = m_depth_min; d < m_depth_max; ++ d)
-    {
-      std::vector<int> tiles(width * height);
+    /* std::vector<int> tiles(width * height); */
+    auto tiles = TerrainGenerator::generate(width, height);
+    auto tilemap = std::make_shared<Tilemap>(tiles, width, height);
+    m_tilemaps.push_back(tilemap);
 
-      for (auto i = 0; i < width; ++i)
-      {
-        for (auto j = 0; j < height; ++j)
-        {
-          tiles[j*width + i] = dist(rng);
+    /* for (auto d = m_depth_min; d < m_depth_max; ++ d) */
+    /* { */
+    /*   std::vector<int> tiles(width * height); */
 
-          /* if (j == 0 || i == 0 || j == height - 1 || i == width - 1) */
-          /* { */
-          /*   tiles[j*width + i] = dist(rng); */
-          /* } */
-          /* else */
-          /* { */
-          /*   tiles[j*width + i] = 3; */
-          /* } */
-        }
-      }
+    /*   for (auto i = 0; i < width; ++i) */
+    /*   { */
+    /*     for (auto j = 0; j < height; ++j) */
+    /*     { */
+    /*       tiles[j*width + i] = dist(rng); */
 
-      auto tilemap = std::make_shared<Tilemap>(tiles, width, height);
+    /*       /1* if (j == 0 || i == 0 || j == height - 1 || i == width - 1) *1/ */
+    /*       /1* { *1/ */
+    /*       /1*   tiles[j*width + i] = dist(rng); *1/ */
+    /*       /1* } *1/ */
+    /*       /1* else *1/ */
+    /*       /1* { *1/ */
+    /*       /1*   tiles[j*width + i] = 3; *1/ */
+    /*       /1* } *1/ */
+    /*     } */
+    /*   } */
 
-      m_tilemaps.push_back(tilemap);
-    }
+
+    /*   m_tilemaps.push_back(tilemap); */
+    /* } */
   }
 
   void World::update(const uint32_t delta)
   {
-
+    (void)delta;
   }
 
   void World::render(TCOD_Console& console, const Camera& camera)

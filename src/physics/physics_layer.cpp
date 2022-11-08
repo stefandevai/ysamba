@@ -15,6 +15,8 @@ namespace dl
 
   void PhysicsLayer::update(const uint32_t delta)
   {
+    (void)delta;
+
     for (auto& body : m_bodies)
     {
       if (!body->is_static && (body->velocity.x != 0 || body->velocity.y != 0))

@@ -23,6 +23,8 @@ namespace dl
 
   void Gameplay::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
   {
+    (void)set_scene;
+
     if (!has_loaded())
     {
       return;

@@ -1,2 +1,2 @@
-camera_width = 40
-camera_height = 25
+camera_width = 64
+camera_height = 36

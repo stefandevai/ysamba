@@ -7,7 +7,7 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 
 project(
-    dialetics
+    dialectics
     LANGUAGES C CXX
 )
 
