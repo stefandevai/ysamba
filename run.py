@@ -14,8 +14,7 @@ def main():
 
     os.chdir(build_path)
     # os.system('cmake ..')
-    # os.system('make -j 4')
-
+    os.system('make -j 4')
 
     os.chdir(target_path)
     os.system(f'./dialectics')

@@ -13,35 +13,9 @@ namespace dl
   {
     m_tilemaps.clear();
 
-    /* std::vector<int> tiles(width * height); */
     auto tiles = TerrainGenerator::generate(width, height);
     auto tilemap = std::make_shared<Tilemap>(tiles, width, height);
     m_tilemaps.push_back(tilemap);
-
-    /* for (auto d = m_depth_min; d < m_depth_max; ++ d) */
-    /* { */
-    /*   std::vector<int> tiles(width * height); */
-
-    /*   for (auto i = 0; i < width; ++i) */
-    /*   { */
-    /*     for (auto j = 0; j < height; ++j) */
-    /*     { */
-    /*       tiles[j*width + i] = dist(rng); */
-
-    /*       /1* if (j == 0 || i == 0 || j == height - 1 || i == width - 1) *1/ */
-    /*       /1* { *1/ */
-    /*       /1*   tiles[j*width + i] = dist(rng); *1/ */
-    /*       /1* } *1/ */
-    /*       /1* else *1/ */
-    /*       /1* { *1/ */
-    /*       /1*   tiles[j*width + i] = 3; *1/ */
-    /*       /1* } *1/ */
-    /*     } */
-    /*   } */
-
-
-    /*   m_tilemaps.push_back(tilemap); */
-    /* } */
   }
 
   void World::update(const uint32_t delta)

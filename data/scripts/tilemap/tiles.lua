@@ -20,14 +20,15 @@ tiles = {
     symbol = 94,
     walkable = true,
     -- r = 186, g = 78, b = 71, a = 255,
-    r = 186, g = 139, b = 99, a = 255,
+    r = 18, g = 163, b = 83, a = 255,
   },
   {
     id = 3,
-    name = "grass",
+    name = "sand",
     -- symbol = 46,
     symbol = 35,
     walkable = true,
-    r = 18, g = 163, b = 83, a = 255,
+    -- r = 18, g = 163, b = 83, a = 255,
+    r = 186, g = 139, b = 99, a = 255,
   },
 }
