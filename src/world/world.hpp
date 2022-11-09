@@ -17,7 +17,7 @@ namespace dl
     public:
       World();
 
-      void generate(const int width, const int height);
+      void generate(const int width, const int height, const int seed);
       void update(const uint32_t delta);
       void render(TCOD_Console& console, const Camera& camera);
       const TileData get(const int x, const int y, const int z);

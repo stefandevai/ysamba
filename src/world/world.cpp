@@ -9,11 +9,11 @@ namespace dl
     m_load_tile_data();
   }
 
-  void World::generate(const int width, const int height)
+  void World::generate(const int width, const int height, const int seed)
   {
     m_tilemaps.clear();
 
-    auto tiles = TerrainGenerator::generate(width, height);
+    auto tiles = TerrainGenerator::generate(width, height, seed);
     auto tilemap = std::make_shared<Tilemap>(tiles, width, height);
     m_tilemaps.push_back(tilemap);
   }

@@ -31,4 +31,25 @@ tiles = {
     -- r = 18, g = 163, b = 83, a = 255,
     r = 186, g = 139, b = 99, a = 255,
   },
+  {
+    id = 4,
+    name = "mountain_top_1",
+    symbol = 35,
+    walkable = true,
+    r = 183, g = 219, b = 232, a = 255,
+  },
+  {
+    id = 5,
+    name = "mountain_top_2",
+    symbol = 35,
+    walkable = true,
+    r = 66, g = 85, b = 107, a = 255,
+  },
+  {
+    id = 6,
+    name = "mountain_top_3",
+    symbol = 35,
+    walkable = true,
+    r = 74, g = 181, b = 133, a = 255,
+  },
 }

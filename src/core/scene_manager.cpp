@@ -1,4 +1,6 @@
 #include "./scene_manager.hpp"
+
+#include <memory>
 #include "../scenes/home_menu.hpp"
 #include "../scenes/gameplay.hpp"
 
@@ -55,14 +57,25 @@ namespace dl
     m_current_scene->update(delta, SceneManager::set_scene);
   }
 
-  void SceneManager::render(TCOD_Console& console)
+  void SceneManager::render(tcod::Context& context, TCOD_Console& console)
   {
     if (m_current_scene == nullptr)
     {
       return;
     }
 
-    m_current_scene->render(console);
+    auto gameplay_scene = std::dynamic_pointer_cast<Gameplay>(m_current_scene);
+
+    if (gameplay_scene != nullptr)
+    {
+      gameplay_scene->render_map(context);
+    }
+    else
+    {
+      console.clear();
+      m_current_scene->render(console);
+      context.present(console);
+    }
   }
 
   void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)

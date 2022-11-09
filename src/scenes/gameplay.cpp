@@ -1,6 +1,8 @@
 #include "./gameplay.hpp"
 
 #include <fstream>
+#include <random>
+#include <climits>
 #include <SDL.h>
 #include <cereal/archives/binary.hpp>
 
@@ -14,7 +16,7 @@ namespace dl
   {
     Scene::load();
 
-    m_world.generate(1000, 1000);
+    m_generate_map();
     m_physics_layer.add(&m_player.body);
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
     m_camera.size.h = m_lua.get_variable<int>("camera_height");
@@ -33,7 +35,12 @@ namespace dl
     // If G is pressed
     if (m_input_manager->is_key_down(10))
     {
-      m_world.generate(1000, 1000);
+      m_generate_map();
+    }
+    // If R is pressed
+    if (m_input_manager->is_key_down(21))
+    {
+      m_refresh_map();
     }
     // If S is pressed
     else if (m_input_manager->is_key_down(22))
@@ -67,9 +74,34 @@ namespace dl
     m_player.render(console, m_camera);
   }
 
-  void Gameplay::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
+  void Gameplay::render_map(tcod::Context& context)
   {
     int w, h;
+    auto window = context.get_sdl_window();
+    const auto tilemap_size = m_world.get_tilemap_size(m_player.body.position.z);
+
+    SDL_GetWindowSize(window, &w, &h);
+
+    if (w != tilemap_size.w || h != tilemap_size.h)
+    {
+      SDL_SetWindowSize(window, tilemap_size.w, tilemap_size.h);
+    }
+
+    auto renderer = context.get_sdl_renderer();
+
+    auto texture = SDL_CreateTextureFromSurface(renderer, m_surface);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+  }
+
+  void Gameplay::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
+  {
+    (void)context;
+    (void)console;
+
     const auto tilemap_size = m_world.get_tilemap_size(m_player.body.position.z);
     SDL_Surface *surface = SDL_CreateRGBSurface(0, tilemap_size.w, tilemap_size.h, 32, 0, 0, 0, 0);
 
@@ -84,36 +116,18 @@ namespace dl
         rect.h = 1;
 
         const auto tile = m_world.get(i, j, m_player.body.position.z);
-
-        auto color = SDL_MapRGB(surface->format, 0, 0, 0);
-
-        switch(tile.symbol)
-        {
-          case 126:
-            color = SDL_MapRGB(surface->format, 38, 131, 173);
-            break;
-
-          case 94:
-            color = SDL_MapRGB(surface->format, 18, 163, 83);
-            break;
-
-          case 35:
-            color = SDL_MapRGB(surface->format, 186, 139, 99);
-            break;
-
-          default:
-            break;
-        }
+        const auto color = SDL_MapRGB(surface->format, tile.r, tile.g, tile.b);
 
         SDL_FillRect(surface, &rect, color);
       }
     }
 
-    auto error = SDL_SaveBMP(surface, (filename + ".bmp").c_str());
+    SDL_SaveBMP(surface, (filename + ".bmp").c_str());
 
     SDL_FreeSurface(surface);
   }
 
+  // Take real screenshot of tiles
   /* void Gameplay::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
   /* { */
   /*   int w, h; */
@@ -188,6 +202,56 @@ namespace dl
     cereal::BinaryInputArchive archive (input_stream);
     archive(m_world);
     m_has_loaded = true;
+  }
+
+  void Gameplay::m_generate_map()
+  {
+    const int map_width = m_lua.get_variable<int>("map_width");
+    const int map_height = m_lua.get_variable<int>("map_height");
+
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(0, INT_MAX);
+
+    m_seed = dist(rng);
+    m_world.generate(map_width, map_height, m_seed);
+    m_create_surface(map_width, map_height);
+  }
+
+  void Gameplay::m_refresh_map()
+  {
+    const int map_width = m_lua.get_variable<int>("map_width");
+    const int map_height = m_lua.get_variable<int>("map_height");
+
+    m_world.generate(map_width, map_height, m_seed);
+    m_create_surface(map_width, map_height);
+  }
+
+  void Gameplay::m_create_surface(const int width, const int height)
+  {
+    if (m_surface != nullptr)
+    {
+      SDL_FreeSurface(m_surface);
+    }
+
+    m_surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+
+    for (auto i = 0; i < width; ++i)
+    {
+      for (auto j = 0; j < height; ++j)
+      {
+        SDL_Rect rect;
+        rect.x = i;
+        rect.y = j;
+        rect.w = 1;
+        rect.h = 1;
+
+        const auto tile = m_world.get(i, j, m_player.body.position.z);
+        const auto color = SDL_MapRGB(m_surface->format, tile.r, tile.g, tile.b);
+
+        SDL_FillRect(m_surface, &rect, color);
+      }
+    }
   }
 }
 

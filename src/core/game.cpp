@@ -43,32 +43,28 @@ namespace dl
 
   void Game::run()
   {
-  try
-  {
-    dl::Clock clock{};
-
-    while (!m_input_manager->should_quit())
+    try
     {
-      clock.tick();
+      dl::Clock clock{};
 
-      if (m_input_manager->is_key_down(26))
+      while (!m_input_manager->should_quit())
       {
-        m_scene_manager.screenshot(m_context, m_console, "world_map");
+        clock.tick();
+
+        if (m_input_manager->is_key_down(26))
+        {
+          m_scene_manager.screenshot(m_context, m_console, "world_map");
+        }
+
+        m_scene_manager.update(clock.delta);
+        m_scene_manager.render(m_context, m_console);
+        m_input_manager->update();
       }
-
-      m_scene_manager.update(clock.delta);
-      m_console.clear();
-      m_scene_manager.render(m_console);
-      m_context.present(m_console);
-
-      m_input_manager->update();
     }
-  }
-  catch (const std::exception& exc)
-  {
-    std::cerr << exc.what() << "\n";
-    throw;
-  }
-
+    catch (const std::exception& exc)
+    {
+      std::cerr << exc.what() << "\n";
+      throw;
+    }
   }
 }
