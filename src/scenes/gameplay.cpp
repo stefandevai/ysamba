@@ -214,6 +214,7 @@ namespace dl
     std::uniform_int_distribution<std::mt19937::result_type> dist(0, INT_MAX);
 
     m_seed = dist(rng);
+    /* m_seed = 112; */
     m_world.generate(map_width, map_height, m_seed);
     m_create_surface(map_width, map_height);
   }
