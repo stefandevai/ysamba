@@ -47,5 +47,11 @@ namespace dl
     {
       return m_lua.get<T> (name);
     }
+
+    template<typename T>
+    inline sol::optional<T> get_optional_variable (const std::string& name)
+    {
+      return m_lua.get<sol::optional<T>> (name);
+    }
   };
 } // namespace dl

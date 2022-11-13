@@ -22,22 +22,22 @@ namespace dl
   {
     m_lua.load("generators/terrain.lua");
 
-    std::cout << "========================================\n";
-    std::cout << "= STARTING DIALECTICS WORLD GENERATION =\n";
-    std::cout << "========================================\n\n";
+    std::cout << "=============================\n";
+    std::cout << "= STARTING WORLD GENERATION =\n";
+    std::cout << "=============================\n\n";
 
     std::vector<int> tiles(width * height);
 
-    std::cout << "[*] Generating world silhouette\n";
+    std::cout << "[*] Generating world silhouette...\n";
 
     m_generate_silhouette(tiles, width, height, seed);
 
-    std::cout << "[*] Adjusting islands\n";
+    std::cout << "[*] Adjusting islands...\n";
 
     // Get a vector with remaining islands in crescent order (last element is the main island)
     const auto islands = m_adjust_and_get_islands(tiles, width, height);
 
-    std::cout << "[*] Identifying coastline\n";
+    std::cout << "[*] Identifying coastline...\n";
 
     auto coastline = m_get_coastline(tiles, width, height, islands.back());
 
@@ -45,18 +45,18 @@ namespace dl
 
     const auto bays = m_get_bays(coastline, islands.back(), width, height);
 
-    std::cout << "[*] Building main island geometry\n";
+    std::cout << "[*] Building main island geometry...\n";
 
     const auto main_island_geometry = m_get_island_geometry(width, height, islands.back());
 
-    /* for (const auto& geometry_point : main_island_geometry) */
-    /* { */
-    /*   tiles[geometry_point.point.y*width + geometry_point.point.x] = 5; */
-    /*   tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5; */
-    /*   tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5; */
-    /*   tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5; */
-    /*   tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5; */
-    /* } */
+    for (const auto& geometry_point : main_island_geometry)
+    {
+      tiles[geometry_point.point.y*width + geometry_point.point.x] = 5;
+      tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5;
+      tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5;
+      tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5;
+      tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5;
+    }
 
     for (const auto& bay : bays)
     {
@@ -69,7 +69,7 @@ namespace dl
 
     /* m_generate_main_river(tiles, width, height, main_island_geometry); */
 
-    std::cout << "[*] World generation finished\n\n";
+    std::cout << "[*] World generation finished!\n\n";
 
     return tiles;
   }
@@ -294,7 +294,7 @@ namespace dl
     return !(point.x < 0 || point.y < 0 || point.x >= width || point.y >= height);
   }
 
-  /* void TerrainGenerator::m_generate_main_river(std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint>& geometry) */
+  /* void TerrainGenerator::m_generate_main_river(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint>& geometry) */
   /* { */
   /*   // Search bay */
 
@@ -313,7 +313,7 @@ namespace dl
             geometry_point.bottom_left == nullptr || geometry_point.bottom == nullptr || geometry_point.bottom_right == nullptr);
   }
 
-  std::vector<Point> TerrainGenerator::m_get_coastline(std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island)
+  std::vector<Point> TerrainGenerator::m_get_coastline(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island)
   {
     std::vector<Point> coastline;
     std::vector<uint32_t> mask(width * height, 0);
@@ -850,7 +850,7 @@ namespace dl
     return bays;
   }
 
-  bool TerrainGenerator::m_has_land_intersection(const Point& point_a, const Point& point_b, std::vector<int>& tiles, const uint32_t width)
+  bool TerrainGenerator::m_has_land_intersection(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width)
   {
     const uint32_t middle_x = (point_a.x + point_b.x)/2;
     const uint32_t middle_y = (point_a.y + point_b.y)/2;
@@ -889,7 +889,7 @@ namespace dl
     return false;
   }
 
-  BayData TerrainGenerator::m_get_bay_data(const Point& point_a, const Point& point_b, std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask)
+  BayData TerrainGenerator::m_get_bay_data(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask)
   {
     Point bay_point(point_a.x, point_b.y);
 

@@ -34,8 +34,7 @@ namespace dl
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       int m_seed = 110;
 
-      void m_generate_map();
-      void m_refresh_map();
+      void m_generate_map(const int seed = 0);
       void m_create_surface(const int width, const int height);
   };
 }

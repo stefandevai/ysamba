@@ -59,7 +59,7 @@ namespace dl
       static std::vector<Point> m_get_island(const std::vector<int>& tiles, std::vector<int>& mask, const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height);
       static bool m_valid_coord(const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height);
       static bool m_valid_point(const Point& point, const uint32_t width, const uint32_t height);
-      static std::vector<Point> m_get_coastline(std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island);
+      static std::vector<Point> m_get_coastline(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island);
       static std::vector<GeometryPoint> m_get_island_geometry(const uint32_t width, const uint32_t height, const std::vector<Point>& island);
       static Point m_get_first_coastline_point(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island);
       static int m_get_point_value(const Point& point, const uint32_t width, const std::vector<int>& tiles);
@@ -70,7 +70,7 @@ namespace dl
       static bool m_boders_water(const GeometryPoint& geometry_point);
       static void m_flood_fill(const int value, const uint32_t x, const uint32_t y, std::vector<int>& tiles, const uint32_t width, const uint32_t height);
       static std::vector<Point> m_get_bays(std::vector<Point>& coastline, const std::vector<Point>& island, const uint32_t width, const uint32_t height);
-      static bool m_has_land_intersection(const Point& point_a, const Point& point_b, std::vector<int>& tiles, const uint32_t width);
-      static BayData m_get_bay_data(const Point& point_a, const Point& point_b, std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask);
+      static bool m_has_land_intersection(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width);
+      static BayData m_get_bay_data(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask);
   };
 }

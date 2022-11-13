@@ -16,7 +16,17 @@ namespace dl
   {
     Scene::load();
 
-    m_generate_map();
+    const auto seed = m_lua.get_optional_variable<int>("seed");
+
+    if (seed)
+    {
+      m_generate_map(seed.value());
+    }
+    else
+    {
+      m_generate_map();
+    }
+
     m_physics_layer.add(&m_player.body);
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
     m_camera.size.h = m_lua.get_variable<int>("camera_height");
@@ -32,25 +42,25 @@ namespace dl
       return;
     }
 
-    // If G is pressed
-    if (m_input_manager->is_key_down(10))
+    if (m_input_manager->is_key_down(SDL_SCANCODE_G))
     {
       m_generate_map();
     }
-    // If R is pressed
-    if (m_input_manager->is_key_down(21))
+    else if (m_input_manager->is_key_down(SDL_SCANCODE_R))
     {
-      m_refresh_map();
+      m_generate_map(m_seed);
     }
-    // If S is pressed
-    else if (m_input_manager->is_key_down(22))
+    else if (m_input_manager->is_key_down(SDL_SCANCODE_S))
     {
       save_world("./world.dl");
     }
-    // If C is pressed
-    else if (m_input_manager->is_key_down(6))
+    else if (m_input_manager->is_key_down(SDL_SCANCODE_C))
     {
       load_world("./world.dl");
+    }
+    else if (m_input_manager->is_key_down(SDL_SCANCODE_X))
+    {
+      std::cout << "SEED: " << m_seed << '\n';
     }
 
     m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
@@ -204,25 +214,23 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void Gameplay::m_generate_map()
+  void Gameplay::m_generate_map(const int seed)
   {
     const int map_width = m_lua.get_variable<int>("map_width");
     const int map_height = m_lua.get_variable<int>("map_height");
 
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(0, INT_MAX);
+    if (seed != 0)
+    {
+      m_seed = seed;
+    }
+    else
+    {
+      std::random_device dev;
+      std::mt19937 rng(dev());
+      std::uniform_int_distribution<int> dist(1, INT_MAX);
 
-    m_seed = dist(rng);
-    /* m_seed = 112; */
-    m_world.generate(map_width, map_height, m_seed);
-    m_create_surface(map_width, map_height);
-  }
-
-  void Gameplay::m_refresh_map()
-  {
-    const int map_width = m_lua.get_variable<int>("map_width");
-    const int map_height = m_lua.get_variable<int>("map_height");
+      m_seed = dist(rng);
+    }
 
     m_world.generate(map_width, map_height, m_seed);
     m_create_surface(map_width, map_height);
