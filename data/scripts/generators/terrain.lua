@@ -10,3 +10,8 @@ islands_to_keep = 4
 
 island_polygon_segment_h = 8
 island_polygon_segment_v = 8
+
+coast_min_area = 100
+coast_points_min_distance = 30
+coast_points_max_distance = 100
+min_land_distance_delta = 5

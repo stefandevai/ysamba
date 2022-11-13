@@ -22,128 +22,54 @@ namespace dl
   {
     m_lua.load("generators/terrain.lua");
 
+    std::cout << "========================================\n";
+    std::cout << "= STARTING DIALECTICS WORLD GENERATION =\n";
+    std::cout << "========================================\n\n";
+
     std::vector<int> tiles(width * height);
+
+    std::cout << "[*] Generating world silhouette\n";
 
     m_generate_silhouette(tiles, width, height, seed);
 
-    std::cout << "[*] World silhouette generated\n";
+    std::cout << "[*] Adjusting islands\n";
 
     // Get a vector with remaining islands in crescent order (last element is the main island)
     const auto islands = m_adjust_and_get_islands(tiles, width, height);
 
+    std::cout << "[*] Identifying coastline\n";
+
     auto coastline = m_get_coastline(tiles, width, height, islands.back());
 
-    /* m_has_land_intersection(Point(459, 81), Point(449, 76), tiles, width, true); */
+    std::cout << "[*] Identifying bays\n";
 
-    std::vector<std::pair<Point, Point>> candidates;
-    Point* coast_point_a = nullptr;
-    Point* coast_point_b = nullptr;
+    const auto bays = m_get_bays(coastline, islands.back(), width, height);
 
-    std::vector<int> area_mask(width*height, 0);
-
-    /* for (auto& point_a : coastline) */
-    for (uint32_t n = 0; n < coastline.size(); ++n)
-    {
-      bool found_candidate = false;
-
-      /* for (auto& point_b : coastline) */
-      for (uint32_t m = 0; m < coastline.size(); ++m)
-      {
-        if (n == m)
-        {
-          continue;
-        }
-
-        auto& point_a = coastline[n];
-        auto& point_b = coastline[m];
-
-        const int distance_x = point_a.x - point_b.x;
-        const int distance_y = point_a.y - point_b.y;
-        const float distance = sqrt(distance_x*distance_x + distance_y*distance_y);
-
-        if (distance < 30.f || distance > 200.f)
-        {
-          continue;
-        }
-
-        if (!m_has_land_intersection(point_a, point_b, tiles, width))
-        {
-          found_candidate = true;
-          coast_point_a = &point_a;
-          coast_point_b = &point_b;
-
-          /* std::cout << point_a.x << point_a.y << point_b.x << point_b.y << '\n'; */
-          /* const auto coastline_length = m_get_coastline_length(point_a, point_b, tiles, width, height); */
-
-          /* const float sinuosity = coastline_length / distance; */
-
-          /* if (sinuosity > 1.2f) */
-          /* { */
-            /* std::cout << point_a.x << point_a.y << point_b.x << point_b.y << '\n'; */
-            /* tiles[point_a.y*width + point_a.x] = 5; */
-            /* tiles[point_a.left().y*width + point_a.left().x] = 5; */
-            /* tiles[point_a.right().y*width + point_a.right().x] = 5; */
-            /* tiles[point_a.bottom().y*width + point_a.bottom().x] = 5; */
-            /* tiles[point_a.top().y*width + point_a.top().x] = 5; */
-
-            /* tiles[point_b.y*width + point_b.x] = 5; */
-            /* tiles[point_b.left().y*width + point_b.left().x] = 5; */
-            /* tiles[point_b.right().y*width + point_b.right().x] = 5; */
-            /* tiles[point_b.bottom().y*width + point_b.bottom().x] = 5; */
-            /* tiles[point_b.top().y*width + point_b.top().x] = 5; */
-          /* } */
-        }
-        else if (found_candidate && coast_point_a != nullptr && coast_point_b != nullptr)
-        {
-          const auto area = m_get_bay_area(*coast_point_a, *coast_point_b, tiles, width, height, 350, area_mask);
-
-          if (area >= 350)
-          {
-            candidates.push_back({ *coast_point_a, *coast_point_b });
-          }
-
-          found_candidate = false;
-
-          /* if ((m - 1) > n) */
-          /* { */
-          /*   n = m - 1; */
-          /* } */
-          break;
-        }
-      }
-    }
-
-    for (const auto& candidate : candidates)
-    {
-      int x = candidate.first.x;
-      int y = candidate.first.y;
-
-      TCOD_bresenham_data_t bresenham_data;
-      TCOD_line_init_mt(x, y, candidate.second.x, candidate.second.y, &bresenham_data);
-
-      do
-      {
-        tiles[y*width + x] = 5;
-      }
-      while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
-    }
-
-    /* std::cout << "[*] Islands adjusted\n"; */
+    std::cout << "[*] Building main island geometry\n";
 
     const auto main_island_geometry = m_get_island_geometry(width, height, islands.back());
 
-    for (const auto& geometry_point : main_island_geometry)
+    /* for (const auto& geometry_point : main_island_geometry) */
+    /* { */
+    /*   tiles[geometry_point.point.y*width + geometry_point.point.x] = 5; */
+    /*   tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5; */
+    /*   tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5; */
+    /*   tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5; */
+    /*   tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5; */
+    /* } */
+
+    for (const auto& bay : bays)
     {
-      tiles[geometry_point.point.y*width + geometry_point.point.x] = 5;
-      tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5;
-      tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5;
-      tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5;
-      tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5;
+      tiles[bay.y*width + bay.x] = 4;
+      tiles[bay.left().y*width + bay.left().x] = 4;
+      tiles[bay.right().y*width + bay.right().x] = 4;
+      tiles[bay.bottom().y*width + bay.bottom().x] = 4;
+      tiles[bay.top().y*width + bay.top().x] = 4;
     }
 
-    std::cout << "[*] Built main island geometry\n";
-
     /* m_generate_main_river(tiles, width, height, main_island_geometry); */
+
+    std::cout << "[*] World generation finished\n\n";
 
     return tiles;
   }
@@ -368,136 +294,17 @@ namespace dl
     return !(point.x < 0 || point.y < 0 || point.x >= width || point.y >= height);
   }
 
-  void TerrainGenerator::m_generate_main_river(std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint>& geometry)
-  {
-    /* std::vector<const GeometryPoint*> coastline; */
+  /* void TerrainGenerator::m_generate_main_river(std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint>& geometry) */
+  /* { */
+  /*   // Search bay */
 
-    /* // Search bay */
-    /* for (const GeometryPoint& geometry_point : geometry) */
-    /* { */
-    /*   if (!m_boders_water(geometry_point)) */
-    /*   { */
-    /*     continue; */
-    /*   } */
+  /*   // Get random point in mainland biased to the center and with a minimum distance to bay point */
 
-    /*   coastline.push_back(&geometry_point); */
-
-    /*   bool two_left = false; */
-    /*   bool two_top = false; */
-    /*   bool two_right = false; */
-    /*   bool two_bottom = false; */
-
-    /*   if (geometry_point.left != nullptr && geometry_point.left->left != nullptr) */
-    /*   { */
-    /*     two_left = true; */
-    /*   } */
-    /*   if (geometry_point.top != nullptr && geometry_point.top->top != nullptr) */
-    /*   { */
-    /*     two_top = true; */
-    /*   } */
-    /*   if (geometry_point.right != nullptr && geometry_point.right->right != nullptr) */
-    /*   { */
-    /*     two_right = true; */
-    /*   } */
-    /*   if (geometry_point.bottom != nullptr && geometry_point.bottom->bottom != nullptr) */
-    /*   { */
-    /*     two_bottom = true; */
-    /*   } */
-
-    /*   bool found_bay = false; */
-
-    /*   if (two_left && two_top && geometry_point.top_left == nullptr) */
-    /*   { */
-    /*     found_bay = true; */
-    /*   } */
-    /*   if (two_left && two_bottom && geometry_point.bottom_left == nullptr) */
-    /*   { */
-    /*     found_bay = true; */
-    /*   } */
-    /*   if (two_right && two_top && geometry_point.top_right == nullptr) */
-    /*   { */
-    /*     found_bay = true; */
-    /*   } */
-    /*   if (two_right && two_bottom && geometry_point.bottom_right == nullptr) */
-    /*   { */
-    /*     found_bay = true; */
-    /*   } */
-
-    /*   if (found_bay) */
-    /*   { */
-    /*     tiles[geometry_point.point.y*width + geometry_point.point.x] = 4; */
-    /*     tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 4; */
-    /*     tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 4; */
-    /*     tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 4; */
-    /*     tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 4; */
-    /*   } */
-    /*   else */
-    /*   { */
-    /*     tiles[geometry_point.point.y*width + geometry_point.point.x] = 5; */
-    /*     tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5; */
-    /*     tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5; */
-    /*     tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5; */
-    /*     tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5; */
-    /*   } */
-    /* } */
-
-    /* int found1 = 0; */
-
-    /* for (auto coast_ptr : coastline) */
-    /* { */
-    /*   for (auto coast_ptr_aux : coastline) */
-    /*   { */
-    /*     if (coast_ptr->point == coast_ptr_aux->point) */
-    /*     { */
-    /*       continue; */
-    /*     } */
-
-    /*     if (!m_has_land_intersection(coast_ptr->point, coast_ptr_aux->point, tiles, width)) */
-    /*     { */
-    /*       /1* std::cout << "POSSIBLE BAY: (" << coast_ptr->point.x << ", " << coast_ptr->point.y << ") (" << coast_ptr_aux->point.x << ", " << coast_ptr_aux->point.y << ")\n"; *1/ */
-
-    /*     tiles[coast_ptr->point.y*width + coast_ptr->point.x] = 5; */
-    /*     tiles[coast_ptr->point.left().y*width + coast_ptr->point.left().x] = 5; */
-    /*     tiles[coast_ptr->point.right().y*width + coast_ptr->point.right().x] = 5; */
-    /*     tiles[coast_ptr->point.bottom().y*width + coast_ptr->point.bottom().x] = 5; */
-    /*     tiles[coast_ptr->point.top().y*width + coast_ptr->point.top().x] = 5; */
-
-    /*     tiles[coast_ptr_aux->point.y*width + coast_ptr_aux->point.x] = 4; */
-    /*     tiles[coast_ptr_aux->point.left().y*width + coast_ptr_aux->point.left().x] = 4; */
-    /*     tiles[coast_ptr_aux->point.right().y*width + coast_ptr_aux->point.right().x] = 4; */
-    /*     tiles[coast_ptr_aux->point.bottom().y*width + coast_ptr_aux->point.bottom().x] = 4; */
-    /*     tiles[coast_ptr_aux->point.top().y*width + coast_ptr_aux->point.top().x] = 4; */
-
-    /*     found1++; */
-
-    /*     if (found1 == 2) */
-    /*     { */
-    /*       break; */
-    /*     } */
-
-    /*       /1* const auto sinuosity = m_get_sinuosity(); *1/ */
-
-    /*       /1* if (sinuosity > 1.2f) *1/ */
-    /*       /1* { *1/ */
-    /*       /1*   // BAY *1/ */
-    /*       /1* } *1/ */
-    /*     } */
-    /*   } */
-
-    /*     if (found1 == 2) */
-    /*     { */
-    /*       break; */
-    /*     } */
-    /* } */
-
-
-    // Get random point in mainland biased to the center and with a minimum distance to bay point
-
-    // Build trajectory and meanders
+  /*   // Build trajectory and meanders */
     
-    // Check that river doesn't join a lake or the sea
-    // If it happens, search another random mainland point
-  }
+  /*   // Check that river doesn't join a lake or the sea */
+  /*   // If it happens, search another random mainland point */
+  /* } */
 
   bool TerrainGenerator::m_boders_water(const GeometryPoint& geometry_point)
   {
@@ -518,8 +325,6 @@ namespace dl
     {
       return coastline;
     }
-
-    std::cout << "First point found: " << first_point.x << ' ' << first_point.y << '\n';
 
     std::queue<Point> point_queue;
     point_queue.push(first_point);
@@ -551,8 +356,6 @@ namespace dl
       manipulate_point(bottom_point);
       manipulate_point(top_point);
     }
-
-    std::cout << "Costline identified: " << coastline.size() << '\n';
 
     return coastline;
   }
@@ -938,6 +741,115 @@ namespace dl
     return m_valid_point(point, width, height) && m_get_point_value(point, width, tiles) == 1;
   }
 
+  std::vector<Point> TerrainGenerator::m_get_bays(std::vector<Point>& coastline, const std::vector<Point>& island, const uint32_t width, const uint32_t height)
+  {
+    std::vector<Point> bays;
+
+    const auto minimum_area = m_lua.get_variable<int>("coast_min_area");
+    const auto points_min_distance = m_lua.get_variable<int>("coast_points_min_distance");
+    const auto points_max_distance = m_lua.get_variable<int>("coast_points_max_distance");
+
+    std::vector<std::pair<Point, Point>> candidates;
+    Point* coast_point_a = nullptr;
+    Point* coast_point_b = nullptr;
+
+    std::vector<int> main_insland_mask(width*height, 1);
+    std::vector<int> area_mask(width*height, 0);
+
+    for (const auto& point : island)
+    {
+      main_insland_mask[point.y * width + point.x] = 2;
+    }
+
+    for (uint32_t n = 0; n < coastline.size(); ++n)
+    {
+      bool found_candidate = false;
+
+      for (uint32_t m = 0; m < coastline.size(); ++m)
+      {
+        if (n == m)
+        {
+          continue;
+        }
+
+        auto& point_a = coastline[n];
+        auto& point_b = coastline[m];
+
+        const int distance_x = point_a.x - point_b.x;
+        const int distance_y = point_a.y - point_b.y;
+        const float distance = sqrt(distance_x*distance_x + distance_y*distance_y);
+
+        if (distance < points_min_distance || distance > points_max_distance)
+        {
+          continue;
+        }
+
+        if (!m_has_land_intersection(point_a, point_b, main_insland_mask, width))
+        {
+          found_candidate = true;
+          coast_point_a = &point_a;
+          coast_point_b = &point_b;
+        }
+        else if (found_candidate && coast_point_a != nullptr && coast_point_b != nullptr)
+        {
+          const auto bay_data = m_get_bay_data(*coast_point_a, *coast_point_b, main_insland_mask, width, height, minimum_area, area_mask);
+
+          if (bay_data.area >= minimum_area)
+          {
+            bays.push_back(bay_data.point);
+            /* candidates.push_back({ *coast_point_a, *coast_point_b }); */
+          }
+
+          found_candidate = false;
+
+          /* if ((m - 1) > n) */
+          /* { */
+          /*   n = m - 1; */
+          /* } */
+          break;
+        }
+
+        /* if (candidates.size() > 0) */
+        /* { */
+        /*   break; */
+        /* } */
+      }
+    }
+
+    /* int count = 0; */
+
+    /* for (const auto& candidate : candidates) */
+    /* { */
+    /*   tiles[candidate.first.y*width + candidate.first.x] = 5; */
+    /*   tiles[candidate.first.left().y*width + candidate.first.left().x] = 5; */
+    /*   tiles[candidate.first.right().y*width + candidate.first.right().x] = 5; */
+    /*   tiles[candidate.first.bottom().y*width + candidate.first.bottom().x] = 5; */
+    /*   tiles[candidate.first.top().y*width + candidate.first.top().x] = 5; */
+
+    /*   tiles[candidate.second.y*width + candidate.second.x] = 5; */
+    /*   tiles[candidate.second.left().y*width + candidate.second.left().x] = 5; */
+    /*   tiles[candidate.second.right().y*width + candidate.second.right().x] = 5; */
+    /*   tiles[candidate.second.bottom().y*width + candidate.second.bottom().x] = 5; */
+    /*   tiles[candidate.second.top().y*width + candidate.second.top().x] = 5; */
+
+    /*   int x = candidate.first.x; */
+    /*   int y = candidate.first.y; */
+
+    /*   TCOD_bresenham_data_t bresenham_data; */
+    /*   TCOD_line_init_mt(x, y, candidate.second.x, candidate.second.y, &bresenham_data); */
+
+    /*   do */
+    /*   { */
+    /*     tiles[y*width + x] = 5; */
+    /*   } */
+    /*   while (!TCOD_line_step_mt(&x, &y, &bresenham_data)); */
+
+    /*   count++; */
+    /* } */
+
+    return bays;
+  }
+
   bool TerrainGenerator::m_has_land_intersection(const Point& point_a, const Point& point_b, std::vector<int>& tiles, const uint32_t width)
   {
     const uint32_t middle_x = (point_a.x + point_b.x)/2;
@@ -962,11 +874,6 @@ namespace dl
         continue;
       }
 
-      /* if (should_print) */
-      /* { */
-      /*   tiles[y*width + x] = 5; */
-      /* } */
-
       if (tiles[y*width + x] != 1)
       {
         --tolerance;
@@ -982,57 +889,9 @@ namespace dl
     return false;
   }
 
-  int TerrainGenerator::m_get_coastline_length(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height)
+  BayData TerrainGenerator::m_get_bay_data(const Point& point_a, const Point& point_b, std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask)
   {
-    int length = 0;
-    std::vector<uint32_t> mask(width * height, 0);
-
-    std::queue<Point> point_queue;
-    point_queue.push(point_a);
-
-    while(!point_queue.empty())
-    {
-      const auto current_point = point_queue.front();
-      point_queue.pop();
-
-      length++;
-      mask[current_point.y*width + current_point.x] = 1;
-
-      if (current_point == point_b)
-      {
-        break; 
-      }
-
-      const auto left_point = current_point.left();
-      const auto right_point = current_point.right();
-      const auto bottom_point = current_point.bottom();
-      const auto top_point = current_point.top();
-
-      auto manipulate_point = [width, height, &mask, &point_queue, &tiles](const Point& point)
-      {
-        if (m_valid_point(point, width, height) && m_is_coast_point(point, width, height, tiles) && mask[point.y*width + point.x] == 0)
-        {
-          point_queue.push(point);
-        }
-      };
-
-      manipulate_point(left_point);
-      manipulate_point(right_point);
-      manipulate_point(bottom_point);
-      manipulate_point(top_point);
-    }
-
-    /* std::cout << "Coastline length: " << length << '\n'; */
-
-    return length;
-  }
-
-  int TerrainGenerator::m_get_bay_area(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask)
-  {
-    /* for (auto i = 0; i < mask.size(); ++i) */
-    /* { */
-    /*   mask[i] = 0; */
-    /* } */
+    Point bay_point(point_a.x, point_b.y);
 
     {
       int x = point_a.x;
@@ -1045,7 +904,7 @@ namespace dl
       {
         if(mask[y*width + x] == 1)
         {
-          return 0;
+          return BayData(0, bay_point);
         }
 
         mask[y*width + x] = 1;
@@ -1054,18 +913,114 @@ namespace dl
     }
 
     int start_x, start_y;
+    const uint32_t middle_x = (point_a.x + point_b.x)/2;
+    const uint32_t middle_y = (point_a.y + point_b.y)/2;
 
+    // Find perpendicular line
     {
-      const uint32_t center_x = width / 2; 
-      const uint32_t center_y = height / 2; 
-      const uint32_t middle_x = (point_a.x + point_b.x)/2;
-      const uint32_t middle_y = (point_a.y + point_b.y)/2;
+      const int delta_x = point_b.x - point_a.x;
+      const int delta_y = point_b.y - point_a.y;
 
-      TCOD_bresenham_data_t bresenham_data;
-      TCOD_line_init_mt(middle_x, middle_y, center_x, center_y, &bresenham_data);
-      TCOD_line_step_mt(&start_x, &start_y, &bresenham_data);
+      int steps_direction_1 = 0;
+      int steps_direction_2 = 0;
+
+      Point candidate_a(middle_x, middle_y);
+      Point candidate_b(middle_x, middle_y);
+
+      // Ignore vertical and horizontal lines for simplicity
+      if (delta_x == 0 || delta_y == 0)
+      {
+        return BayData(0, bay_point);
+      }
+      else
+      {
+        const float a = (delta_y) / static_cast<float>((delta_x));
+        const float b = -1.f;
+        const float d = b*middle_x - a*middle_y;
+
+        /* auto perpendicular_x = [a, b, d](int y) */
+        /* { */
+        /*   (a*y + d) / static_cast<float>(b); */
+        /* }; */
+
+        // Find y in function of x
+        auto perpendicular_y = [a, b, d](int x)
+        {
+          return (b*x - d) / static_cast<float>(a);
+        };
+
+        for (auto px = middle_x + 1; px < width; ++px)
+        {
+          ++steps_direction_1;
+          const auto py = static_cast<int>(std::round(perpendicular_y(px)));
+
+          if (py >= 0 && static_cast<uint32_t>(py) < height && tiles[py*width + px] != 1)
+          {
+            if (mask[py*width + px] != 0)
+            {
+              return BayData(0, bay_point);
+            }
+
+            // Get previous point
+            candidate_a.x = px - 1;
+            candidate_a.y = static_cast<int>(std::round(perpendicular_y(px - 1)));
+            break;
+          }
+          else if (py < 2 || static_cast<uint32_t>(py) >= height)
+          {
+            steps_direction_1 = height + 1;
+            break;
+          }
+        }
+        for (auto px = middle_x - 1; px > 0; --px)
+        {
+          ++steps_direction_2;
+          const auto py = static_cast<int>(std::round(perpendicular_y(px)));
+
+          if (py >= 0 && static_cast<uint32_t>(py) < height && tiles[py*width + px] != 1)
+          {
+            if (mask[py*width + px] != 0)
+            {
+              return BayData(0, bay_point);
+            }
+
+            candidate_b.x = px + 1;
+            candidate_b.y = static_cast<int>(std::round(perpendicular_y(px + 1)));
+            break;
+          }
+          else if (py < 2 || static_cast<uint32_t>(py) >= height || px < 2)
+          {
+            steps_direction_2 = height + 1;
+            break;
+          }
+        }
+      }
+
+      if (steps_direction_1 < steps_direction_2)
+      {
+        start_x = candidate_a.x;
+        start_y = candidate_a.y;
+        bay_point = candidate_a;
+      }
+      else
+      {
+        start_x = candidate_b.x;
+        start_y = candidate_b.y;
+        bay_point = candidate_b;
+      }
     }
 
+    const auto delta_candidate_x = std::abs(static_cast<int>(start_x) - static_cast<int>(middle_x));
+    const auto delta_candidate_y = std::abs(static_cast<int>(start_y) - static_cast<int>(middle_y));
+    const auto min_land_distance_delta = m_lua.get_variable<int>("min_land_distance_delta");
+
+    // Ignore when land is found very close to the center point
+    if (delta_candidate_x < min_land_distance_delta && delta_candidate_y < min_land_distance_delta)
+    {
+      return BayData(0, bay_point);
+    }
+
+    // Flood fill ocean area between line and land
     int area = 0;
     std::queue<Point> coord_queue;
 
@@ -1127,7 +1082,7 @@ namespace dl
       }
     }
 
-    return area;
+    return BayData(area, bay_point);
   }
 }
 
