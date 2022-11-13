@@ -4,7 +4,7 @@ tiles = {
     name = "null",
     symbol = 0,
     walkable = false,
-    r = 0, g = 0, b = 0, a = 0,
+    r = 0, g = 0, b = 0, a = 255,
   },
   {
     id = 1,
@@ -33,7 +33,13 @@ tiles = {
     name = "wall",
     symbol = 35,
     walkable = true,
-    -- r = 186, g = 139, b = 99, a = 255,
     r = 196, g = 79, b = 53, a = 255,
+  },
+  {
+    id = 5,
+    name = "wall2",
+    symbol = 35,
+    walkable = true,
+    r = 226, g = 155, b = 31, a = 255,
   },
 }

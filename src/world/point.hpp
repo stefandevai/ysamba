@@ -9,10 +9,22 @@ namespace dl
 
     Point(const unsigned int x, const unsigned int y);
 
+    void operator=(const Point& b)
+    {
+      x = b.x;
+      y = b.y;
+    }
+
+    bool operator==(const Point& b) const
+    {
+      return (x == b.x && y == b.y);
+    }
+
     bool operator!=(const Point& b) const
     {
       return (x != b.x || y != b.y);
     }
+
 
     Point left() const;
     Point right() const;
