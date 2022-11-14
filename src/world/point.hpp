@@ -1,13 +1,18 @@
 #pragma once
 
+#include <tuple>
+
 namespace dl
 {
-  struct Point
+  template <typename T = unsigned int>
+  class Point
   {
-    unsigned int x;
-    unsigned int y;
+  public:
+    T x;
+    T y;
 
-    Point(const unsigned int x, const unsigned int y);
+    Point(const T x, const T y) : x(x), y(y) {}
+    Point() : x(0), y(0) {}
 
     void operator=(const Point& b)
     {
@@ -25,15 +30,49 @@ namespace dl
       return (x != b.x || y != b.y);
     }
 
+    bool operator < (Point const& p) const
+    {
+      return std::tie(x, y) < std::tie(p.x, p.y);
+    }
 
-    Point left() const;
-    Point right() const;
-    Point bottom() const;
-    Point top() const;
+    Point left() const
+    {
+      return Point(x - 1, y);
+    }
 
-    Point top_left() const;
-    Point top_right() const;
-    Point bottom_right() const;
-    Point bottom_left() const;
+    Point right() const
+    {
+      return Point(x + 1, y);
+    }
+
+    Point bottom() const
+    {
+      return Point(x, y - 1);
+    }
+
+    Point top() const
+    {
+      return Point(x, y + 1);
+    }
+
+    Point top_left() const
+    {
+      return Point(x - 1, y + 1);
+    }
+
+    Point top_right() const
+    {
+      return Point(x + 1, y + 1);
+    }
+
+    Point bottom_right() const
+    {
+      return Point(x + 1, y - 1);
+    }
+
+    Point bottom_left() const
+    {
+      return Point(x - 1, y - 1);
+    }
   };
 }

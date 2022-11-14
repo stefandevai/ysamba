@@ -15,3 +15,5 @@ coast_min_area = 100
 coast_points_min_distance = 30
 coast_points_max_distance = 100
 min_land_distance_delta = 5
+
+poisson_disk_sampling_radius = 5.0

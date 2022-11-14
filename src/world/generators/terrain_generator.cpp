@@ -4,6 +4,9 @@
 #include <utility>
 #include <functional>
 #include <libtcod.hpp>
+#include "./lib/poisson_disk_sampling.hpp"
+#include "./lib/sweepline.hpp"
+#include "MyGAL/FortuneAlgorithm.h"
 
 // TEMP
 #include <iostream>
@@ -47,25 +50,36 @@ namespace dl
 
     std::cout << "[*] Building main island geometry...\n";
 
-    const auto main_island_geometry = m_get_island_geometry(width, height, islands.back());
+    const auto main_island_structure = m_get_island_structure(width, height, islands.back(), tiles);
 
-    for (const auto& geometry_point : main_island_geometry)
-    {
-      tiles[geometry_point.point.y*width + geometry_point.point.x] = 5;
-      tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5;
-      tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5;
-      tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5;
-      tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5;
-    }
+    /* const auto main_island_geometry = m_get_island_geometry(width, height, islands.back()); */
 
-    for (const auto& bay : bays)
-    {
-      tiles[bay.y*width + bay.x] = 4;
-      tiles[bay.left().y*width + bay.left().x] = 4;
-      tiles[bay.right().y*width + bay.right().x] = 4;
-      tiles[bay.bottom().y*width + bay.bottom().x] = 4;
-      tiles[bay.top().y*width + bay.top().x] = 4;
-    }
+    /* for (const auto& geometry_point : main_island_geometry) */
+    /* { */
+    /*   tiles[geometry_point.point.y*width + geometry_point.point.x] = 5; */
+    /*   tiles[geometry_point.point.left().y*width + geometry_point.point.left().x] = 5; */
+    /*   tiles[geometry_point.point.right().y*width + geometry_point.point.right().x] = 5; */
+    /*   tiles[geometry_point.point.bottom().y*width + geometry_point.point.bottom().x] = 5; */
+    /*   tiles[geometry_point.point.top().y*width + geometry_point.point.top().x] = 5; */
+    /* } */
+
+    /* for (const auto& point : main_island_structure) */
+    /* { */
+    /*   tiles[point.y*width + point.x] = 5; */
+    /*   tiles[point.left().y*width + point.left().x] = 5; */
+    /*   tiles[point.right().y*width + point.right().x] = 5; */
+    /*   tiles[point.bottom().y*width + point.bottom().x] = 5; */
+    /*   tiles[point.top().y*width + point.top().x] = 5; */
+    /* } */
+
+    /* for (const auto& bay : bays) */
+    /* { */
+    /*   tiles[bay.y*width + bay.x] = 4; */
+    /*   tiles[bay.left().y*width + bay.left().x] = 4; */
+    /*   tiles[bay.right().y*width + bay.right().x] = 4; */
+    /*   tiles[bay.bottom().y*width + bay.bottom().x] = 4; */
+    /*   tiles[bay.top().y*width + bay.top().x] = 4; */
+    /* } */
 
     /* m_generate_main_river(tiles, width, height, main_island_geometry); */
 
@@ -163,7 +177,7 @@ namespace dl
     return 1.f - static_cast<float>(distance_to_edge) / (width / 2.0f);
   }
 
-  std::vector<std::vector<Point>> TerrainGenerator::m_adjust_and_get_islands(std::vector<int>& tiles, const int width, const int height)
+  std::vector<std::vector<Point<unsigned int>>> TerrainGenerator::m_adjust_and_get_islands(std::vector<int>& tiles, const int width, const int height)
   {
     auto all_islands = m_get_islands(tiles, width, height);
 
@@ -185,11 +199,11 @@ namespace dl
     // Keep remaining islands in a vector
     // As we ordered the priority queue in crescent order, the last
     // island will be the main island
-    std::vector<std::vector<Point>> islands(all_islands.size());
+    std::vector<std::vector<Point<unsigned int>>> islands(all_islands.size());
 
     while(!all_islands.empty())
     {
-      islands.push_back(std::move(const_cast<std::vector<Point>&>(all_islands.top())));
+      islands.push_back(std::move(const_cast<std::vector<Point<unsigned int>>&>(all_islands.top())));
       all_islands.pop();
     }
 
@@ -220,14 +234,14 @@ namespace dl
     return islands;
   }
 
-  std::vector<Point> TerrainGenerator::m_get_island(const std::vector<int>& tiles, std::vector<int>& mask, const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height)
+  std::vector<Point<unsigned int>> TerrainGenerator::m_get_island(const std::vector<int>& tiles, std::vector<int>& mask, const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height)
   {
     assert(m_valid_coord(x, y, width, height));
 
-    std::vector<Point> island{Point(x, y)};
-    std::queue<Point> coord_queue;
+    std::vector<Point<unsigned int>> island{Point<unsigned int>(x, y)};
+    std::queue<Point<unsigned int>> coord_queue;
 
-    coord_queue.push(Point(x, y));
+    coord_queue.push(Point<unsigned int>(x, y));
 
     while (!coord_queue.empty())
     {
@@ -246,8 +260,8 @@ namespace dl
       if (m_valid_coord(x0, yt, width, height) && tiles[top_coord] != 1 && mask[top_coord] == 0)
       {
         mask[top_coord] = 1;
-        island.push_back(Point(x0, yt));
-        coord_queue.push(Point(x0, yt));
+        island.push_back(Point<unsigned int>(x0, yt));
+        coord_queue.push(Point<unsigned int>(x0, yt));
       }
 
       // Bottom coord
@@ -256,8 +270,8 @@ namespace dl
       if (m_valid_coord(x0, yb, width, height) && tiles[bottom_coord] != 1 && mask[bottom_coord] == 0)
       {
         mask[bottom_coord] = 1;
-        island.push_back(Point(x0, yb));
-        coord_queue.push(Point(x0, yb));
+        island.push_back(Point<unsigned int>(x0, yb));
+        coord_queue.push(Point<unsigned int>(x0, yb));
       }
 
       // Left coord
@@ -266,8 +280,8 @@ namespace dl
       if (m_valid_coord(xl, y0, width, height) && tiles[left_coord] != 1 && mask[left_coord] == 0)
       {
         mask[left_coord] = 1;
-        island.push_back(Point(xl, y0));
-        coord_queue.push(Point(xl, y0));
+        island.push_back(Point<unsigned int>(xl, y0));
+        coord_queue.push(Point<unsigned int>(xl, y0));
       }
 
       // Right coord
@@ -276,8 +290,8 @@ namespace dl
       if (m_valid_coord(xr, y0, width, height) && tiles[right_coord] != 1 && mask[right_coord] == 0)
       {
         mask[right_coord] = 1;
-        island.push_back(Point(xr, y0));
-        coord_queue.push(Point(xr, y0));
+        island.push_back(Point<unsigned int>(xr, y0));
+        coord_queue.push(Point<unsigned int>(xr, y0));
       }
     }
 
@@ -289,12 +303,12 @@ namespace dl
     return !(x < 0 || y < 0 || x >= width || y >= height);
   }
 
-  bool TerrainGenerator::m_valid_point(const Point& point, const uint32_t width, const uint32_t height)
+  bool TerrainGenerator::m_valid_point(const Point<unsigned int>& point, const uint32_t width, const uint32_t height)
   {
     return !(point.x < 0 || point.y < 0 || point.x >= width || point.y >= height);
   }
 
-  /* void TerrainGenerator::m_generate_main_river(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint>& geometry) */
+  /* void TerrainGenerator::m_generate_main_river(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint<unsigned int>>& geometry) */
   /* { */
   /*   // Search bay */
 
@@ -306,16 +320,16 @@ namespace dl
   /*   // If it happens, search another random mainland point */
   /* } */
 
-  bool TerrainGenerator::m_boders_water(const GeometryPoint& geometry_point)
-  {
-    return (geometry_point.top_left == nullptr || geometry_point.top == nullptr || geometry_point.top_right == nullptr ||
-            geometry_point.left == nullptr || geometry_point.right == nullptr ||
-            geometry_point.bottom_left == nullptr || geometry_point.bottom == nullptr || geometry_point.bottom_right == nullptr);
-  }
+  /* bool TerrainGenerator::m_boders_water(const GeometryPoint<unsigned int>& geometry_point) */
+  /* { */
+  /*   return (geometry_point.top_left == nullptr || geometry_point.top == nullptr || geometry_point.top_right == nullptr || */
+  /*           geometry_point.left == nullptr || geometry_point.right == nullptr || */
+  /*           geometry_point.bottom_left == nullptr || geometry_point.bottom == nullptr || geometry_point.bottom_right == nullptr); */
+  /* } */
 
-  std::vector<Point> TerrainGenerator::m_get_coastline(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island)
+  std::vector<Point<unsigned int>> TerrainGenerator::m_get_coastline(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point<unsigned int>>& main_island)
   {
-    std::vector<Point> coastline;
+    std::vector<Point<unsigned int>> coastline;
     std::vector<uint32_t> mask(width * height, 0);
 
     const auto first_point = m_get_first_coastline_point(tiles, width, height, main_island);
@@ -326,7 +340,7 @@ namespace dl
       return coastline;
     }
 
-    std::queue<Point> point_queue;
+    std::queue<Point<unsigned int>> point_queue;
     point_queue.push(first_point);
 
     while(!point_queue.empty())
@@ -343,7 +357,7 @@ namespace dl
       const auto bottom_point = current_point.bottom();
       const auto top_point = current_point.top();
 
-      auto manipulate_point = [width, height, &mask, &point_queue, &tiles](const Point& point)
+      auto manipulate_point = [width, height, &mask, &point_queue, &tiles](const Point<unsigned int>& point)
       {
         if (m_valid_point(point, width, height) && m_is_coast_point(point, width, height, tiles) && mask[point.y*width + point.x] == 0)
         {
@@ -360,154 +374,274 @@ namespace dl
     return coastline;
   }
 
-  std::vector<GeometryPoint> TerrainGenerator::m_get_island_geometry(const uint32_t width, const uint32_t height, const std::vector<Point>& island)
+  /* std::vector<GeometryPoint<unsigned int>> TerrainGenerator::m_get_island_geometry(const uint32_t width, const uint32_t height, const std::vector<Point<unsigned int>>& island) */
+  /* { */
+  /*   assert(island.size() > 0 && "Main island size is empty"); */
+
+  /*   std::vector<Point<unsigned int>> coastline{}; */
+  /*   const auto segment_width_h = m_lua.get_variable<uint32_t>("island_polygon_segment_h"); */
+  /*   const auto segment_width_v = m_lua.get_variable<uint32_t>("island_polygon_segment_v"); */
+
+  /*   std::vector<int> island_mask(width * height, 0); */
+  /*   Point<unsigned int> top_left = island[0]; */
+  /*   Point<unsigned int> bottom_right = island[0]; */
+
+  /*   for (const auto& point : island) */
+  /*   { */
+  /*     // Create mask */
+  /*     island_mask[point.y*width + point.x] = 1; */
+
+  /*     // Get top left and bottom right points */
+  /*     top_left.x = std::min(top_left.x, point.x); */
+  /*     top_left.y = std::min(top_left.y, point.y); */
+  /*     bottom_right.x = std::max(bottom_right.x, point.x); */
+  /*     bottom_right.y = std::max(bottom_right.y, point.y); */
+  /*   } */
+
+  /*   bool found_first_point = false; */
+  /*   Point<unsigned int> first_point(0, 0); */
+
+  /*   // Horizontal top line */
+  /*   for (uint32_t j = top_left.y; j < bottom_right.y; j += segment_width_v) */
+  /*   { */
+  /*     for (uint32_t i = top_left.x; i < bottom_right.x; i += segment_width_h) */
+  /*     { */
+  /*       auto current_point = Point<unsigned int>(i, j); */
+
+  /*       if (island_mask[current_point.y*width + current_point.x] == 0) */
+  /*       /1* if (!m_contains_island_area(current_point, segment_width_h, segment_width_v, width, height, island_mask)) *1/ */
+  /*       { */
+  /*         continue; */
+  /*       } */
+
+  /*       first_point.x = i; */
+  /*       first_point.y = j; */
+  /*       found_first_point = true; */
+  /*       break; */
+  /*     } */
+
+  /*     if (found_first_point) */
+  /*     { */
+  /*       break; */
+  /*     } */
+  /*   } */
+
+  /*   std::vector<GeometryPoint<unsigned int>> geometry; */
+  /*   std::queue<Point<unsigned int>> point_queue; */
+  /*   point_queue.push(first_point); */
+
+  /*   while(!point_queue.empty()) */
+  /*   { */
+  /*     const auto current_point = point_queue.front(); */
+  /*     const Point<unsigned int> top_left(current_point.x - segment_width_h, current_point.y - segment_width_v); */
+  /*     const Point<unsigned int> top(current_point.x, current_point.y - segment_width_v); */
+  /*     const Point<unsigned int> top_right(current_point.x + segment_width_h, current_point.y - segment_width_v); */
+  /*     const Point<unsigned int> left(current_point.x - segment_width_h, current_point.y); */
+  /*     const Point<unsigned int> right(current_point.x + segment_width_h, current_point.y); */
+  /*     const Point<unsigned int> bottom_left(current_point.x - segment_width_h, current_point.y + segment_width_v); */
+  /*     const Point<unsigned int> bottom(current_point.x, current_point.y + segment_width_v); */
+  /*     const Point<unsigned int> bottom_right(current_point.x + segment_width_h, current_point.y + segment_width_v); */
+
+  /*     point_queue.pop(); */
+
+  /*     auto check_water = [width, height, &island_mask, &point_queue, &geometry](const Point<unsigned int>& point) */
+  /*     { */
+  /*       const auto index = point.y*width + point.x; */
+
+  /*       if (m_valid_point(point, width, height) && island_mask[index] != 0) */
+  /*       { */
+  /*         if (island_mask[index] == 1) */
+  /*         { */
+  /*           island_mask[index] = 2; */
+  /*           point_queue.push(point); */
+  /*           geometry.push_back(GeometryPoint<unsigned int>(point)); */
+  /*         } */
+  /*       } */
+  /*     }; */
+
+  /*     check_water(top_left); */
+  /*     check_water(top); */
+  /*     check_water(top_right); */
+  /*     check_water(left); */
+  /*     check_water(right); */
+  /*     check_water(bottom_left); */
+  /*     check_water(bottom); */
+  /*     check_water(bottom_right); */
+  /*   } */
+
+  /*   // Add vertice data */
+  /*   for (auto& geometry_point : geometry) */
+  /*   { */
+  /*     const Point<unsigned int> top_left(geometry_point.point.x - segment_width_h, geometry_point.point.y - segment_width_v); */
+  /*     const Point<unsigned int> top(geometry_point.point.x, geometry_point.point.y - segment_width_v); */
+  /*     const Point<unsigned int> top_right(geometry_point.point.x + segment_width_h, geometry_point.point.y - segment_width_v); */
+  /*     const Point<unsigned int> left(geometry_point.point.x - segment_width_h, geometry_point.point.y); */
+  /*     const Point<unsigned int> right(geometry_point.point.x + segment_width_h, geometry_point.point.y); */
+  /*     const Point<unsigned int> bottom_left(geometry_point.point.x - segment_width_h, geometry_point.point.y + segment_width_v); */
+  /*     const Point<unsigned int> bottom(geometry_point.point.x, geometry_point.point.y + segment_width_v); */
+  /*     const Point<unsigned int> bottom_right(geometry_point.point.x + segment_width_h, geometry_point.point.y + segment_width_v); */
+
+  /*     for (auto& geometry_point_aux : geometry) */
+  /*     { */
+  /*       if (geometry_point_aux.point == top_left) */
+  /*       { */
+  /*         geometry_point.top_left = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == top) */
+  /*       { */
+  /*         geometry_point.top = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == top_right) */
+  /*       { */
+  /*         geometry_point.top_right = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == left) */
+  /*       { */
+  /*         geometry_point.left = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == right) */
+  /*       { */
+  /*         geometry_point.right = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == bottom_left) */
+  /*       { */
+  /*         geometry_point.bottom_left = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == bottom) */
+  /*       { */
+  /*         geometry_point.bottom = &geometry_point_aux; */
+  /*       } */
+  /*       else if (geometry_point_aux.point == bottom_right) */
+  /*       { */
+  /*         geometry_point.bottom_right = &geometry_point_aux; */
+  /*       } */
+  /*     } */
+  /*   } */
+
+  /*   return geometry; */
+  /* } */
+
+  std::vector<Point<unsigned int>> TerrainGenerator::m_get_island_structure(const uint32_t width, const uint32_t height, const std::vector<Point<unsigned int>>& island, std::vector<int>& tiles)
   {
     assert(island.size() > 0 && "Main island size is empty");
 
-    std::vector<Point> coastline{};
-    const auto segment_width_h = m_lua.get_variable<uint32_t>("island_polygon_segment_h");
-    const auto segment_width_v = m_lua.get_variable<uint32_t>("island_polygon_segment_v");
+    std::vector<Point<unsigned int>> seeds{};
 
     std::vector<int> island_mask(width * height, 0);
-    Point top_left = island[0];
-    Point bottom_right = island[0];
+    Point<unsigned int> top_left = island[0];
+    Point<unsigned int> bottom_right = island[0];
 
+    // Find top left and bottom right points
     for (const auto& point : island)
     {
       // Create mask
       island_mask[point.y*width + point.x] = 1;
 
-      // Get top left and bottom right points
       top_left.x = std::min(top_left.x, point.x);
       top_left.y = std::min(top_left.y, point.y);
       bottom_right.x = std::max(bottom_right.x, point.x);
       bottom_right.y = std::max(bottom_right.y, point.y);
     }
 
-    bool found_first_point = false;
-    Point first_point(0, 0);
+    std::array<float, 2> min_point = {static_cast<float>(top_left.x), static_cast<float>(top_left.y)};
+    std::array<float, 2> max_point = {static_cast<float>(bottom_right.x), static_cast<float>(bottom_right.y)};
 
-    // Horizontal top line
-    for (uint32_t j = top_left.y; j < bottom_right.y; j += segment_width_v)
+    const auto poisson_disk_sampling_radius = m_lua.get_variable<float>("poisson_disk_sampling_radius");
+    const auto poisson_points = thinks::PoissonDiskSampling(poisson_disk_sampling_radius, min_point, max_point);
+    std::vector<mygal::Vector2<double>> points{};
+
+    // Normalize points
+    for (const auto& point : poisson_points)
     {
-      for (uint32_t i = top_left.x; i < bottom_right.x; i += segment_width_h)
-      {
-        auto current_point = Point(i, j);
+      const auto x = static_cast<uint32_t>(std::round(point[0]));
+      const auto y = static_cast<uint32_t>(std::round(point[1]));
 
-        if (island_mask[current_point.y*width + current_point.x] == 0)
-        /* if (!m_contains_island_area(current_point, segment_width_h, segment_width_v, width, height, island_mask)) */
+      if (island_mask[y*width + x] != 0)
+      {
+        double normalized_x = point[0] / static_cast<double>(width);
+        double normalized_y = point[1] / static_cast<double>(height);
+
+        points.push_back(mygal::Vector2{normalized_x, normalized_y});
+
+        /* points.push_back(Point<double>(point[0], point[1])); */
+        /* seeds.push_back(Point<unsigned int>(x, y)); */
+      }
+    }
+
+    auto algorithm = mygal::FortuneAlgorithm<double>(points);
+    algorithm.construct();
+
+    auto diagram = algorithm.getDiagram();
+    const double offset = 1.0f;
+
+    auto draw_line = [width, height, &island_mask, &tiles](const mygal::Vector2<double>& origin, const mygal::Vector2<double>& destination)
+    {
+      int x = static_cast<int>(std::round(origin.x * width));
+      int y = static_cast<int>(std::round(origin.y * height));
+
+      int dest_x = static_cast<int>(std::round(destination.x * width));
+      int dest_y = static_cast<int>(std::round(destination.y * height));
+
+      TCOD_bresenham_data_t bresenham_data;
+      TCOD_line_init_mt(x, y, dest_x, dest_y, &bresenham_data);
+
+      do
+      {
+        if (x < 0 || y < 0 || x > static_cast<int>(width) - 1 || y > static_cast<int>(height) - 1 || island_mask[y*width + x] == 0)
         {
           continue;
         }
 
-        first_point.x = i;
-        first_point.y = j;
-        found_first_point = true;
-        break;
+        tiles[y*width + x] = 5;
       }
+      while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
+    };
 
-      if (found_first_point)
-      {
-        break;
-      }
-    }
-
-    std::vector<GeometryPoint> geometry;
-    std::queue<Point> point_queue;
-    point_queue.push(first_point);
-
-    while(!point_queue.empty())
+    for (const auto& site : diagram.getSites())
     {
-      const auto current_point = point_queue.front();
-      const Point top_left(current_point.x - segment_width_h, current_point.y - segment_width_v);
-      const Point top(current_point.x, current_point.y - segment_width_v);
-      const Point top_right(current_point.x + segment_width_h, current_point.y - segment_width_v);
-      const Point left(current_point.x - segment_width_h, current_point.y);
-      const Point right(current_point.x + segment_width_h, current_point.y);
-      const Point bottom_left(current_point.x - segment_width_h, current_point.y + segment_width_v);
-      const Point bottom(current_point.x, current_point.y + segment_width_v);
-      const Point bottom_right(current_point.x + segment_width_h, current_point.y + segment_width_v);
+      auto center = site.point;
+      auto face = site.face;
+      auto half_edge = face->outerComponent;
 
-      point_queue.pop();
-
-      auto check_water = [width, height, &island_mask, &point_queue, &geometry](const Point& point)
+      if (half_edge == nullptr)
       {
-        const auto index = point.y*width + point.x;
+        continue;
+      }
 
-        if (m_valid_point(point, width, height) && island_mask[index] != 0)
-        {
-          if (island_mask[index] == 1)
-          {
-            island_mask[index] = 2;
-            point_queue.push(point);
-            geometry.push_back(GeometryPoint(point));
-          }
-        }
-      };
-
-      check_water(top_left);
-      check_water(top);
-      check_water(top_right);
-      check_water(left);
-      check_water(right);
-      check_water(bottom_left);
-      check_water(bottom);
-      check_water(bottom_right);
-    }
-
-    // Add vertice data
-    for (auto& geometry_point : geometry)
-    {
-      const Point top_left(geometry_point.point.x - segment_width_h, geometry_point.point.y - segment_width_v);
-      const Point top(geometry_point.point.x, geometry_point.point.y - segment_width_v);
-      const Point top_right(geometry_point.point.x + segment_width_h, geometry_point.point.y - segment_width_v);
-      const Point left(geometry_point.point.x - segment_width_h, geometry_point.point.y);
-      const Point right(geometry_point.point.x + segment_width_h, geometry_point.point.y);
-      const Point bottom_left(geometry_point.point.x - segment_width_h, geometry_point.point.y + segment_width_v);
-      const Point bottom(geometry_point.point.x, geometry_point.point.y + segment_width_v);
-      const Point bottom_right(geometry_point.point.x + segment_width_h, geometry_point.point.y + segment_width_v);
-
-      for (auto& geometry_point_aux : geometry)
+      while (half_edge->prev != nullptr)
       {
-        if (geometry_point_aux.point == top_left)
+        half_edge = half_edge->prev;
+
+        if (half_edge == face->outerComponent)
         {
-          geometry_point.top_left = &geometry_point_aux;
+          break;
         }
-        else if (geometry_point_aux.point == top)
+      }
+
+      auto start = half_edge;
+
+      while (half_edge != nullptr)
+      {
+        if (half_edge->origin != nullptr && half_edge->destination != nullptr)
         {
-          geometry_point.top = &geometry_point_aux;
+          auto origin = (half_edge->origin->point - center) * offset + center;
+          auto destination = (half_edge->destination->point - center) * offset + center;
+          draw_line(origin, destination);
         }
-        else if (geometry_point_aux.point == top_right)
+
+        half_edge = half_edge->next;
+
+        if (half_edge == start)
         {
-          geometry_point.top_right = &geometry_point_aux;
-        }
-        else if (geometry_point_aux.point == left)
-        {
-          geometry_point.left = &geometry_point_aux;
-        }
-        else if (geometry_point_aux.point == right)
-        {
-          geometry_point.right = &geometry_point_aux;
-        }
-        else if (geometry_point_aux.point == bottom_left)
-        {
-          geometry_point.bottom_left = &geometry_point_aux;
-        }
-        else if (geometry_point_aux.point == bottom)
-        {
-          geometry_point.bottom = &geometry_point_aux;
-        }
-        else if (geometry_point_aux.point == bottom_right)
-        {
-          geometry_point.bottom_right = &geometry_point_aux;
+          break;
         }
       }
     }
 
-    return geometry;
+    return seeds;
   }
 
-  bool TerrainGenerator::m_contains_island_area(const Point& point, const float segment_width_h, const float segment_width_v, const uint32_t width, const uint32_t height, const std::vector<int>& island_mask)
+  bool TerrainGenerator::m_contains_island_area(const Point<unsigned int>& point, const float segment_width_h, const float segment_width_v, const uint32_t width, const uint32_t height, const std::vector<int>& island_mask)
   {
     const auto top_left_x = std::max(static_cast<int>(point.x - std::round(segment_width_h)), 0);
     const auto top_left_y = std::max(static_cast<int>(point.y - std::round(segment_width_v)), 0);
@@ -533,10 +667,10 @@ namespace dl
     assert(m_valid_coord(x, y, width, height));
 
     const int original_value = tiles[y*width + x];
-    std::queue<Point> coord_queue;
+    std::queue<Point<unsigned int>> coord_queue;
     std::vector<int> mask(width * height, 0);
 
-    coord_queue.push(Point(x, y));
+    coord_queue.push(Point<unsigned int>(x, y));
     tiles[y*width + x] = value;
 
     while (!coord_queue.empty())
@@ -554,7 +688,7 @@ namespace dl
       {
         mask[top_coord] = 1;
         tiles[top_coord] = value;
-        coord_queue.push(Point(x0, yt));
+        coord_queue.push(Point<unsigned int>(x0, yt));
       }
 
       // Bottom coord
@@ -564,7 +698,7 @@ namespace dl
       {
         mask[bottom_coord] = 1;
         tiles[bottom_coord] = value;
-        coord_queue.push(Point(x0, yb));
+        coord_queue.push(Point<unsigned int>(x0, yb));
       }
 
       // Left coord
@@ -574,7 +708,7 @@ namespace dl
       {
         mask[left_coord] = 1;
         tiles[left_coord] = value;
-        coord_queue.push(Point(xl, y0));
+        coord_queue.push(Point<unsigned int>(xl, y0));
       }
 
       // Right coord
@@ -584,12 +718,12 @@ namespace dl
       {
         mask[right_coord] = 1;
         tiles[right_coord] = value;
-        coord_queue.push(Point(xr, y0));
+        coord_queue.push(Point<unsigned int>(xr, y0));
       }
     }
   }
 
-  Point TerrainGenerator::m_get_first_coastline_point(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point>& main_island)
+  Point<unsigned int> TerrainGenerator::m_get_first_coastline_point(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<Point<unsigned int>>& main_island)
   {
     for (const auto& point : main_island)
     {
@@ -683,15 +817,15 @@ namespace dl
     }
 
     // Error: could't find coastline point
-    return Point(width, height);
+    return Point<unsigned int>(width, height);
   }
 
-  int TerrainGenerator::m_get_point_value(const Point& point, const uint32_t width, const std::vector<int>& tiles)
+  int TerrainGenerator::m_get_point_value(const Point<unsigned int>& point, const uint32_t width, const std::vector<int>& tiles)
   {
     return tiles[point.y*width + point.x];
   }
 
-  bool TerrainGenerator::m_is_coast_point(const Point& point, const uint32_t width, const uint32_t height, const std::vector<int>& tiles)
+  bool TerrainGenerator::m_is_coast_point(const Point<unsigned int>& point, const uint32_t width, const uint32_t height, const std::vector<int>& tiles)
   {
     // If point is water
     if (m_get_point_value(point, width, tiles) == 1)
@@ -736,22 +870,22 @@ namespace dl
     return false;
   }
 
-  bool TerrainGenerator::m_is_water(const Point& point, const int width, const uint32_t height, const std::vector<int>& tiles)
+  bool TerrainGenerator::m_is_water(const Point<unsigned int>& point, const int width, const uint32_t height, const std::vector<int>& tiles)
   {
     return m_valid_point(point, width, height) && m_get_point_value(point, width, tiles) == 1;
   }
 
-  std::vector<Point> TerrainGenerator::m_get_bays(std::vector<Point>& coastline, const std::vector<Point>& island, const uint32_t width, const uint32_t height)
+  std::vector<Point<unsigned int>> TerrainGenerator::m_get_bays(std::vector<Point<unsigned int>>& coastline, const std::vector<Point<unsigned int>>& island, const uint32_t width, const uint32_t height)
   {
-    std::vector<Point> bays;
+    std::vector<Point<unsigned int>> bays;
 
     const auto minimum_area = m_lua.get_variable<int>("coast_min_area");
     const auto points_min_distance = m_lua.get_variable<int>("coast_points_min_distance");
     const auto points_max_distance = m_lua.get_variable<int>("coast_points_max_distance");
 
-    std::vector<std::pair<Point, Point>> candidates;
-    Point* coast_point_a = nullptr;
-    Point* coast_point_b = nullptr;
+    std::vector<std::pair<Point<unsigned int>, Point<unsigned int>>> candidates;
+    Point<unsigned int>* coast_point_a = nullptr;
+    Point<unsigned int>* coast_point_b = nullptr;
 
     std::vector<int> main_insland_mask(width*height, 1);
     std::vector<int> area_mask(width*height, 0);
@@ -850,7 +984,7 @@ namespace dl
     return bays;
   }
 
-  bool TerrainGenerator::m_has_land_intersection(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width)
+  bool TerrainGenerator::m_has_land_intersection(const Point<unsigned int>& point_a, const Point<unsigned int>& point_b, const std::vector<int>& tiles, const uint32_t width)
   {
     const uint32_t middle_x = (point_a.x + point_b.x)/2;
     const uint32_t middle_y = (point_a.y + point_b.y)/2;
@@ -889,9 +1023,9 @@ namespace dl
     return false;
   }
 
-  BayData TerrainGenerator::m_get_bay_data(const Point& point_a, const Point& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask)
+  BayData TerrainGenerator::m_get_bay_data(const Point<unsigned int>& point_a, const Point<unsigned int>& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask)
   {
-    Point bay_point(point_a.x, point_b.y);
+    Point<unsigned int> bay_point(point_a.x, point_b.y);
 
     {
       int x = point_a.x;
@@ -924,8 +1058,8 @@ namespace dl
       int steps_direction_1 = 0;
       int steps_direction_2 = 0;
 
-      Point candidate_a(middle_x, middle_y);
-      Point candidate_b(middle_x, middle_y);
+      Point<unsigned int> candidate_a(middle_x, middle_y);
+      Point<unsigned int> candidate_b(middle_x, middle_y);
 
       // Ignore vertical and horizontal lines for simplicity
       if (delta_x == 0 || delta_y == 0)
@@ -1022,9 +1156,9 @@ namespace dl
 
     // Flood fill ocean area between line and land
     int area = 0;
-    std::queue<Point> coord_queue;
+    std::queue<Point<unsigned int>> coord_queue;
 
-    coord_queue.push(Point(start_x, start_y));
+    coord_queue.push(Point<unsigned int>(start_x, start_y));
     mask[start_y*width + start_x] = 1;
     area++;
 
@@ -1042,7 +1176,7 @@ namespace dl
       if (m_valid_coord(x0, yt, width, height) && tiles[top_coord] == 1 && mask[top_coord] == 0)
       {
         mask[top_coord] = 1;
-        coord_queue.push(Point(x0, yt));
+        coord_queue.push(Point<unsigned int>(x0, yt));
         area++;
       }
 
@@ -1052,7 +1186,7 @@ namespace dl
       if (m_valid_coord(x0, yb, width, height) && tiles[bottom_coord] == 1 && mask[bottom_coord] == 0)
       {
         mask[bottom_coord] = 1;
-        coord_queue.push(Point(x0, yb));
+        coord_queue.push(Point<unsigned int>(x0, yb));
         area++;
       }
 
@@ -1062,7 +1196,7 @@ namespace dl
       if (m_valid_coord(xl, y0, width, height) && tiles[left_coord] == 1 && mask[left_coord] == 0)
       {
         mask[left_coord] = 1;
-        coord_queue.push(Point(xl, y0));
+        coord_queue.push(Point<unsigned int>(xl, y0));
         area++;
       }
 
@@ -1072,7 +1206,7 @@ namespace dl
       if (m_valid_coord(xr, y0, width, height) && tiles[right_coord] == 1 && mask[right_coord] == 0)
       {
         mask[right_coord] = 1;
-        coord_queue.push(Point(xr, y0));
+        coord_queue.push(Point<unsigned int>(xr, y0));
         area++;
       }
 
