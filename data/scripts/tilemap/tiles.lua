@@ -18,6 +18,7 @@ tiles = {
     name = "mountain",
     symbol = 94,
     walkable = true,
+    -- r = 186, g = 139, b = 99, a = 255,
     r = 18, g = 163, b = 83, a = 255,
   },
   {
@@ -25,8 +26,8 @@ tiles = {
     name = "sand",
     symbol = 35,
     walkable = true,
-    -- r = 186, g = 139, b = 99, a = 255,
-    r = 18, g = 163, b = 83, a = 255,
+    r = 186, g = 139, b = 99, a = 255,
+    -- r = 18, g = 163, b = 83, a = 255,
   },
   {
     id = 4,
