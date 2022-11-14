@@ -3,6 +3,7 @@
 #include <cmath>
 #include <utility>
 #include <functional>
+#include <chrono>
 #include <libtcod.hpp>
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./lib/sweepline.hpp"
@@ -31,6 +32,10 @@ namespace dl
     std::cout << "= STARTING WORLD GENERATION =\n";
     std::cout << "=============================\n\n";
 
+    // TEMP
+    auto start = std::chrono::high_resolution_clock::now();
+    // TEMP
+
     std::vector<int> tiles(width * height);
 
     std::cout << "[*] Generating world silhouette...\n";
@@ -55,6 +60,11 @@ namespace dl
 
     m_get_island_structure(width, height, islands.back(), tiles);
 
+    // TEMP
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::microseconds>(stop - start);
+    // TEMP
+
     /* // Display bays */
     /* for (const auto& bay : bays) */
     /* { */
@@ -72,7 +82,7 @@ namespace dl
 
     /* m_generate_main_river(tiles, width, height, main_island_geometry); */
 
-    std::cout << "[*] World generation finished!\n\n";
+    std::cout << "[*] World generation finished! It took " << duration.count() << " microseconds\n\n";
 
     return tiles;
   }
