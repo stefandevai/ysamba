@@ -1,6 +1,6 @@
 draw_features = true
-draw_coastline = false
-draw_bays = false
+draw_coastline = true
+draw_bays = true
 draw_structure = true
 
 simplex_freq = 0.005

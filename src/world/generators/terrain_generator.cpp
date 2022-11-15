@@ -643,6 +643,8 @@ namespace dl
 
     std::vector<int> area_mask(width*height, 0);
 
+    std::cout << coastline.size() << '\n';
+
     for (uint32_t n = 0; n < coastline.size(); ++n)
     {
       bool found_candidate = false;
@@ -682,7 +684,6 @@ namespace dl
           }
 
           found_candidate = false;
-          break;
         }
       }
     }
