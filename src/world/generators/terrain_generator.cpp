@@ -371,7 +371,6 @@ namespace dl
 
       coastline.push_back(current_point);
       mask[current_point.y*width + current_point.x] = 1;
-      /* tiles[current_point.y*width + current_point.x] = 4; */
 
       const auto left_point = current_point.left();
       const auto right_point = current_point.right();
@@ -642,8 +641,6 @@ namespace dl
     Point<std::uint32_t>* coast_point_b = nullptr;
 
     std::vector<int> area_mask(width*height, 0);
-
-    std::cout << coastline.size() << '\n';
 
     for (uint32_t n = 0; n < coastline.size(); ++n)
     {
