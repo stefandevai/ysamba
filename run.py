@@ -15,11 +15,11 @@ def build(build_path):
     if os.path.isdir(build_path) == False:
         os.mkdir(build_path)
     os.chdir(build_path)
-    os.system('cmake ..')
+    return os.system('cmake ..')
 
 def make(build_path):
     os.chdir(build_path)
-    os.system('make -j 4')
+    return os.system('make -j 4')
 
 def run(target_path):
     os.chdir(target_path)
@@ -32,11 +32,24 @@ def main():
     target_path = f'{build_path}/bin'
 
     if args.build:
-        build(build_path)
-        make(build_path)
+        status = build(build_path)
+        if status != 0:
+            sys.exit()
+        status = make(build_path)
+        if status != 0:
+            sys.exit()
+
     if args.make:
-        make(build_path)
+        status = make(build_path)
+        if status != 0:
+            sys.exit()
     if args.run:
+        run(target_path)
+
+    if len(sys.argv) < 2:
+        status = build(build_path)
+        if status != 0:
+            sys.exit()
         run(target_path)
 
     os.chdir(old_cwd)
