@@ -1,3 +1,8 @@
+draw_features = true
+draw_coastline = false
+draw_bays = false
+draw_structure = true
+
 simplex_freq = 0.005
 simplex_octaves = 4
 simplex_lacunarity = 3.2
@@ -17,5 +22,3 @@ coast_points_max_distance = 100
 min_land_distance_delta = 5
 
 poisson_disk_sampling_radius = 10.0
-
-temp_n = 7000

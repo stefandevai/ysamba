@@ -31,10 +31,9 @@ namespace dl
     std::cout << "=============================\n";
     std::cout << "= STARTING WORLD GENERATION =\n";
     std::cout << "=============================\n\n";
+    std::cout << "SEED: " << seed << "\n\n";
 
-    // TEMP
     auto start = std::chrono::high_resolution_clock::now();
-    // TEMP
 
     std::vector<int> tiles(width * height);
 
@@ -58,31 +57,54 @@ namespace dl
 
     std::cout << "[*] Building main island geometry...\n";
 
-    m_get_island_structure(width, height, islands.back(), tiles);
+    m_build_island_structure(main_island, width, height);
 
-    // TEMP
     auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = duration_cast<std::chrono::microseconds>(stop - start);
-    // TEMP
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-    /* // Display bays */
-    /* for (const auto& bay : bays) */
-    /* { */
-    /*   tiles[bay.y*width + bay.x] = 4; */
-    /*   tiles[bay.left().y*width + bay.left().x] = 4; */
-    /*   tiles[bay.right().y*width + bay.right().x] = 4; */
-    /*   tiles[bay.bottom().y*width + bay.bottom().x] = 4; */
-    /*   tiles[bay.top().y*width + bay.top().x] = 4; */
+    const auto draw_features = m_lua.get_variable<bool>("draw_features");
 
-    /*   tiles[bay.top_left().y*width + bay.top_left().x] = 4; */
-    /*   tiles[bay.top_right().y*width + bay.top_right().x] = 4; */
-    /*   tiles[bay.bottom_left().y*width + bay.bottom_left().x] = 4; */
-    /*   tiles[bay.bottom_right().y*width + bay.bottom_right().x] = 4; */
-    /* } */
+    if (draw_features)
+    {
+      // Draw structure
+      const auto draw_structure = m_lua.get_variable<bool>("draw_structure");
+      if (draw_structure)
+      {
+        for (const auto& site : main_island.structure.sites)
+        {
+          m_draw_big_point(site.center, 5, tiles, width);
+
+          for (const auto& edge : site.edges)
+          {
+            m_draw_line(edge.first, edge.second, 5, tiles, width, height);
+          }
+        }
+      }
+
+      // Draw coastline
+      const auto draw_coastline = m_lua.get_variable<bool>("draw_coastline");
+      if (draw_coastline)
+      {
+        for (const auto& coastline_point : coastline)
+        {
+          m_draw_point(coastline_point, 4, tiles, width);
+        }
+      }
+
+      // Draw bays
+      const auto draw_bays = m_lua.get_variable<bool>("draw_bays");
+      if (draw_bays)
+      {
+        for (const auto& bay : bays)
+        {
+          m_draw_big_point(bay, 0, tiles, width);
+        }
+      }
+    }
 
     /* m_generate_main_river(tiles, width, height, main_island_geometry); */
 
-    std::cout << "[*] World generation finished! It took " << duration.count() << " microseconds\n\n";
+    std::cout << "[*] World generation finished! It took " << duration.count() << " milliseconds\n\n";
 
     return tiles;
   }
@@ -243,6 +265,10 @@ namespace dl
     std::queue<Point<std::uint32_t>> coord_queue;
 
     coord_queue.push(Point<std::uint32_t>(x, y));
+    island_data.top_left.x = x;
+    island_data.top_left.y = y;
+    island_data.bottom_right.x = x;
+    island_data.bottom_right.y = y;
 
     while (!coord_queue.empty())
     {
@@ -255,8 +281,8 @@ namespace dl
       island_data.points.push_back(Point<std::uint32_t>(x0, y0));
       island_data.top_left.x = std::min(x0, island_data.top_left.x);
       island_data.top_left.y = std::min(y0, island_data.top_left.y);
-      island_data.bottom_right.x = std::min(x0, island_data.bottom_right.x);
-      island_data.bottom_right.y = std::min(y0, island_data.bottom_right.y);
+      island_data.bottom_right.x = std::max(x0, island_data.bottom_right.x);
+      island_data.bottom_right.y = std::max(y0, island_data.bottom_right.y);
 
       coord_queue.pop();
 
@@ -899,7 +925,7 @@ namespace dl
     return BayData(area, bay_point);
   }
 
-  void TerrainGenerator::m_get_island_structure(const uint32_t width, const uint32_t height, IslandData& island, std::vector<int>& tiles)
+  void TerrainGenerator::m_build_island_structure(IslandData& island, const uint32_t width, const uint32_t height)
   {
     assert(island.points.size() > 0 && "Main island size is empty");
 
@@ -913,19 +939,10 @@ namespace dl
     // Normalize points to [0.0, 1.0]
     for (const auto& point : poisson_points)
     {
-      /* const auto x = static_cast<uint32_t>(std::round(point[0])); */
-      /* const auto y = static_cast<uint32_t>(std::round(point[1])); */
+      double normalized_x = point[0] / static_cast<double>(width);
+      double normalized_y = point[1] / static_cast<double>(height);
 
-      /* if (island_mask[y*width + x] != 0) */
-      /* { */
-        double normalized_x = point[0] / static_cast<double>(width);
-        double normalized_y = point[1] / static_cast<double>(height);
-
-        points.push_back(mygal::Vector2{normalized_x, normalized_y});
-
-        /* points.push_back(Point<double>(point[0], point[1])); */
-        /* seeds.push_back(Point<std::uint32_t>(x, y)); */
-      /* } */
+      points.push_back(mygal::Vector2{normalized_x, normalized_y});
     }
 
     auto algorithm = mygal::FortuneAlgorithm<double>(points);
@@ -933,35 +950,16 @@ namespace dl
 
     auto diagram = algorithm.getDiagram();
 
-    auto draw_line = [width, height, &tiles](const mygal::Vector2<double>& origin, const mygal::Vector2<double>& destination)
-    {
-      int x = static_cast<int>(std::round(origin.x * width));
-      int y = static_cast<int>(std::round(origin.y * height));
-
-      int dest_x = static_cast<int>(std::round(destination.x * width));
-      int dest_y = static_cast<int>(std::round(destination.y * height));
-
-      TCOD_bresenham_data_t bresenham_data;
-      TCOD_line_init_mt(x, y, dest_x, dest_y, &bresenham_data);
-
-      do
-      {
-        /* if (x < 0 || y < 0 || x > static_cast<int>(width) - 1 || y > static_cast<int>(height) - 1 || island.mask[y*width + x] == 0) */
-        if (x < 0 || y < 0 || x > static_cast<int>(width) - 1 || y > static_cast<int>(height) - 1)
-        {
-          continue;
-        }
-
-        tiles[y*width + x] = 5;
-      }
-      while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
-    };
-
-    int n = 0;
-    const int temp_n = m_lua.get_variable<int>("temp_n");
-
     for (const auto& site : diagram.getSites())
     {
+      const auto center_x = static_cast<std::uint32_t>(std::round(site.point.x * width));
+      const auto center_y = static_cast<std::uint32_t>(std::round(site.point.y * height));
+
+      if (island.mask[center_y*width + center_x] == 0)
+      {
+        continue;
+      }
+
       const auto face = site.face;
       auto half_edge = face->outerComponent;
 
@@ -970,13 +968,29 @@ namespace dl
         continue;
       }
 
+      while (half_edge->prev != nullptr)
+      {
+        half_edge = half_edge->prev;
+
+        if (half_edge == face->outerComponent)
+        {
+          break;
+        }
+      }
+
       const auto start = half_edge;
+
+      Site copy_site;
+      copy_site.center.x = center_x;
+      copy_site.center.y = center_y;
 
       while (half_edge != nullptr)
       {
         if (half_edge->origin != nullptr && half_edge->destination != nullptr)
         {
-          draw_line(half_edge->origin->point, half_edge->destination->point);
+          Point origin(static_cast<std::uint32_t>(std::round(half_edge->origin->point.x * width)), static_cast<std::uint32_t>(std::round(half_edge->origin->point.y * height)));
+          Point destination(static_cast<std::uint32_t>(std::round(half_edge->destination->point.x * width)), static_cast<std::uint32_t>(std::round(half_edge->destination->point.y * height)));
+          copy_site.edges.push_back({origin, destination});
         }
 
         half_edge = half_edge->next;
@@ -987,11 +1001,45 @@ namespace dl
         }
       }
 
-      if (n == temp_n)
-      {
-        break;
-      }
-      ++n;
+      island.structure.sites.push_back(copy_site);
     }
+  }
+
+  void TerrainGenerator::m_draw_point(const Point<std::uint32_t>& point, const int value, std::vector<int>& tiles, const std::uint32_t width)
+  {
+    tiles[point.y*width + point.x] = value;
+  }
+
+  void TerrainGenerator::m_draw_big_point(const Point<std::uint32_t>& point, const int value, std::vector<int>& tiles, const std::uint32_t width)
+  {
+    tiles[point.y*width + point.x] = value;
+    tiles[point.left().y*width + point.left().x] = value;
+    tiles[point.right().y*width + point.right().x] = value;
+    tiles[point.bottom().y*width + point.bottom().x] = value;
+    tiles[point.top().y*width + point.top().x] = value;
+    /* tiles[point.top_left().y*width + point.top_left().x] = value; */
+    /* tiles[point.top_right().y*width + point.top_right().x] = value; */
+    /* tiles[point.bottom_left().y*width + point.bottom_left().x] = value; */
+    /* tiles[point.bottom_right().y*width + point.bottom_right().x] = value; */
+  }
+
+  void TerrainGenerator::m_draw_line(const Point<std::uint32_t>& origin, const Point<std::uint32_t>& destination, const int value, std::vector<int>& tiles, const uint32_t width, const uint32_t height)
+  {
+    int x = origin.x;
+    int y = origin.y;
+
+    TCOD_bresenham_data_t bresenham_data;
+    TCOD_line_init_mt(x, y, destination.x, destination.y, &bresenham_data);
+
+    do
+    {
+      if (x < 0 || y < 0 || x > static_cast<int>(width) - 1 || y > static_cast<int>(height) - 1)
+      {
+        continue;
+      }
+
+      tiles[y*width + x] = value;
+    }
+    while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
   }
 }

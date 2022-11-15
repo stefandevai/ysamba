@@ -53,6 +53,11 @@ namespace dl
       static std::vector<Point<std::uint32_t>> m_get_bays(std::vector<Point<std::uint32_t>>& coastline, const IslandData& island, const uint32_t width, const uint32_t height);
       static bool m_has_land_intersection(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b, const std::vector<int>& tiles, const uint32_t width, const int water_value);
       static BayData m_get_bay_data(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask, const int water_value);
-      static void m_get_island_structure(const uint32_t width, const uint32_t height, IslandData& island, std::vector<int>& tiles);
+      static void m_build_island_structure(IslandData& island, const uint32_t width, const uint32_t height);
+
+      // Debug functions
+      static void m_draw_point(const Point<std::uint32_t>& point, const int value, std::vector<int>& tiles, const std::uint32_t width);
+      static void m_draw_big_point(const Point<std::uint32_t>& point, const int value, std::vector<int>& tiles, const std::uint32_t width);
+      static void m_draw_line(const Point<std::uint32_t>& origin, const Point<std::uint32_t>& destination, const int value, std::vector<int>& tiles, const uint32_t width, const uint32_t height);
   };
 }
