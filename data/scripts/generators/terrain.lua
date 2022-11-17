@@ -1,8 +1,8 @@
 -- Debug
-draw_features = false
+draw_features = true
 draw_coastline = false
-draw_bays = false
-draw_structure = true
+draw_bays = true
+draw_structure = false
 
 -- Silhouette
 simplex_freq = 0.005

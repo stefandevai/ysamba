@@ -1111,7 +1111,7 @@ namespace dl
 
   void TerrainGenerator::m_generate_main_river(IslandData& island, std::vector<Point<std::uint32_t>>& bays, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height, const int seed)
   {
-    const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, height, seed);
+    const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, width, height, seed);
     const auto river = m_get_river_segments(source, mouth, tiles, width, seed);
 
     m_draw_line(source, river[0]->point, 1, tiles, width, height);
@@ -1129,7 +1129,7 @@ namespace dl
     }
   }
 
-  std::pair<Point<std::uint32_t>, Point<std::uint32_t>> TerrainGenerator::m_get_river_source_and_mouth(IslandData& island, std::vector<Point<std::uint32_t>>& bays, const std::uint32_t height, const int seed)
+  std::pair<Point<std::uint32_t>, Point<std::uint32_t>> TerrainGenerator::m_get_river_source_and_mouth(IslandData& island, std::vector<Point<std::uint32_t>>& bays, const std::uint32_t width, const std::uint32_t height, const int seed)
   {
     assert(bays.size() > 0 && "There are no bays identified");
 
@@ -1147,6 +1147,37 @@ namespace dl
     bool has_reached_first_limit = false;
     bool has_reached_second_limit = false;
     std::uint32_t tries = 0;
+
+    // Check if line crosses sea water to avoid unrealistic rivers
+    auto intersects_water = [&island, width](const Point<std::uint32_t>& source, const Point<std::uint32_t>& mouth)
+    {
+      int tolerance = 4;
+      int x = source.x;
+      int y = source.y;
+
+      TCOD_bresenham_data_t bresenham_data;
+      TCOD_line_init_mt(x, y, mouth.x, mouth.y, &bresenham_data);
+
+      do
+      {
+        if(island.mask[y*width + x] == 0)
+        {
+          --tolerance;
+
+          if (tolerance <= 0)
+          {
+            break;
+          }
+        }
+      }
+      while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
+
+      if (tolerance <= 0)
+      {
+        return true;
+      }
+      return false;
+    };
 
     while (!found_river_points)
     {
@@ -1184,12 +1215,22 @@ namespace dl
 
         if (distance_x >= min_source_mouth_distance_x && distance_y >= min_source_mouth_distance_y && bay.y > source_point.y)
         {
+          if (intersects_water(source_point, bay))
+          {
+            continue;
+          }
+
           mouth_point = bays[i];
           found_river_points = true;
           break;
         }
         else if (has_reached_first_limit && bay.y > source_point.y && (distance_x >= min_source_mouth_distance_x || distance_y >= min_source_mouth_distance_y))
         {
+          if (intersects_water(source_point, bay))
+          {
+            continue;
+          }
+
           const float distance = m_distance(source_point, bay);
 
           if (distance > max_mouth_source_distance)
@@ -1200,6 +1241,11 @@ namespace dl
         }
         else if (has_reached_second_limit)
         {
+          if (intersects_water(source_point, bay))
+          {
+            continue;
+          }
+
           const float distance = m_distance(source_point, bay);
 
           if (distance > max_mouth_source_distance)
