@@ -12,6 +12,7 @@ namespace dl
   {
     Point<std::uint32_t> center;
     std::vector<Edge> edges;
+    bool is_coast = false;
   };
 
   struct IslandData
@@ -19,6 +20,8 @@ namespace dl
     struct Structure
     {
       std::vector<Site> sites;
+      std::vector<std::uint32_t> coast_indexes;
+      std::vector<std::uint32_t> land_indexes;
     };
 
     std::vector<Point<std::uint32_t>> points;

@@ -4,6 +4,7 @@
 #include <utility>
 #include <functional>
 #include <chrono>
+#include <random>
 #include <libtcod.hpp>
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./lib/sweepline.hpp"
@@ -19,9 +20,6 @@
 
 namespace dl
 {
-  FastNoiseLite TerrainGenerator::m_noise = FastNoiseLite{1337};
-  LuaAPI TerrainGenerator::m_lua = LuaAPI{"generators/terrain.lua"};
-
   std::vector<int> TerrainGenerator::generate(const uint32_t width, const uint32_t height, const int seed)
   {
     // TEMP
@@ -53,11 +51,15 @@ namespace dl
 
     std::cout << "[*] Identifying bays...\n";
 
-    const auto bays = m_get_bays(coastline, main_island, width, height);
+    auto bays = m_get_bays(coastline, main_island, width, height);
 
     std::cout << "[*] Building main island geometry...\n";
 
     m_build_island_structure(main_island, width, height);
+
+    std::cout << "[*] Generating main river...\n";
+
+    m_generate_main_river(main_island, bays, tiles, width, height, seed);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -71,7 +73,15 @@ namespace dl
       if (draw_structure)
       {
         for (const auto& site : main_island.structure.sites)
+        /* for (const auto index : main_island.structure.coast_indexes) */
         {
+          /* m_draw_big_point(main_island.structure.sites[index].center, 5, tiles, width); */
+
+          /* for (const auto& edge : main_island.structure.sites[index].edges) */
+          /* { */
+          /*   m_draw_line(edge.first, edge.second, 5, tiles, width, height); */
+          /* } */
+
           m_draw_big_point(site.center, 5, tiles, width);
 
           for (const auto& edge : site.edges)
@@ -101,8 +111,6 @@ namespace dl
         }
       }
     }
-
-    /* m_generate_main_river(tiles, width, height, main_island_geometry); */
 
     std::cout << "[*] World generation finished! It took " << duration.count() << " milliseconds\n\n";
 
@@ -335,18 +343,6 @@ namespace dl
   {
     return !(point.x < 0 || point.y < 0 || point.x >= width || point.y >= height);
   }
-
-  /* void TerrainGenerator::m_generate_main_river(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const std::vector<GeometryPoint<std::uint32_t>>& geometry) */
-  /* { */
-  /*   // Search bay */
-
-  /*   // Get random point in mainland biased to the center and with a minimum distance to bay point */
-
-  /*   // Build trajectory and meanders */
-    
-  /*   // Check that river doesn't join a lake or the sea */
-  /*   // If it happens, search another random mainland point */
-  /* } */
 
   std::vector<Point<std::uint32_t>> TerrainGenerator::m_get_coastline(const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const IslandData& island)
   {
@@ -656,9 +652,7 @@ namespace dl
         auto& point_a = coastline[n];
         auto& point_b = coastline[m];
 
-        const int distance_x = point_a.x - point_b.x;
-        const int distance_y = point_a.y - point_b.y;
-        const float distance = sqrt(distance_x*distance_x + distance_y*distance_y);
+        const float distance = m_distance(point_a, point_b);
 
         if (distance < points_min_distance || distance > points_max_distance)
         {
@@ -953,6 +947,7 @@ namespace dl
       const auto center_x = static_cast<std::uint32_t>(std::round(site.point.x * width));
       const auto center_y = static_cast<std::uint32_t>(std::round(site.point.y * height));
 
+      // Center is outside island
       if (island.mask[center_y*width + center_x] == 0)
       {
         continue;
@@ -989,6 +984,12 @@ namespace dl
           Point origin(static_cast<std::uint32_t>(std::round(half_edge->origin->point.x * width)), static_cast<std::uint32_t>(std::round(half_edge->origin->point.y * height)));
           Point destination(static_cast<std::uint32_t>(std::round(half_edge->destination->point.x * width)), static_cast<std::uint32_t>(std::round(half_edge->destination->point.y * height)));
           copy_site.edges.push_back({origin, destination});
+
+          // If any of the edges points lays on water annotate it as coast
+          if (island.mask[origin.y*width + origin.x] == 0 || island.mask[destination.y*width + destination.y] == 0)
+          {
+            copy_site.is_coast = true;
+          }
         }
 
         half_edge = half_edge->next;
@@ -999,8 +1000,251 @@ namespace dl
         }
       }
 
+      // Re check if it's a coast site if any of the edges points lays on water
+      if (!copy_site.is_coast)
+      {
+        copy_site.is_coast = m_center_is_coast(copy_site.center, island.mask, width, height);
+      }
+
       island.structure.sites.push_back(copy_site);
+      const std::uint32_t site_index = island.structure.sites.size() - 1;
+
+      if (copy_site.is_coast)
+      {
+        island.structure.coast_indexes.push_back(site_index);
+      }
+      else
+      {
+        island.structure.land_indexes.push_back(site_index);
+      }
+
     }
+  }
+
+  bool TerrainGenerator::m_center_is_coast(const Point<std::uint32_t>& center, const std::vector<int>& island_mask, const uint32_t width, const uint32_t height)
+  {
+    assert(island_mask[center.y*width + center.x] == 1 && "Center must not be in water");
+
+    std::uint32_t distance_to_water = 0;
+
+    // Check to the left of center
+    for (std::uint32_t n = 0; (center.x - n) >= 0; ++n)
+    {
+      if (island_mask[center.y*width + (center.x - n)] == 0)
+      {
+        distance_to_water = n;
+        break;
+      }
+    }
+    // Check to the right of center
+    for (std::uint32_t n = 0; (center.x + n) < width; ++n)
+    {
+      if (island_mask[center.y*width + (center.x + n)] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+    // Check to the bottom of center
+    for (std::uint32_t n = 0; (center.y + n) < height; ++n)
+    {
+      if (island_mask[(center.y + n) * width + center.x] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+    // Check to the top of center
+    for (std::uint32_t n = 0; (center.y - n) >= 0; ++n)
+    {
+      if (island_mask[(center.y - n) * width + center.x] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+    // Check to the top left of center
+    for (std::uint32_t n = 0; (center.y - n) >= 0 && (center.x - n) >= 0; ++n)
+    {
+      if (island_mask[(center.y - n) * width + (center.x - n)] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+    // Check to the top right of center
+    for (std::uint32_t n = 0; (center.y - n) >= 0 && (center.x + n) < width; ++n)
+    {
+      if (island_mask[(center.y - n) * width + (center.x + n)] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+    // Check to the bottom right of center
+    for (std::uint32_t n = 0; (center.y + n) < height && (center.x + n) < width; ++n)
+    {
+      if (island_mask[(center.y + n) * width + (center.x + n)] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+    // Check to the bottom left of center
+    for (std::uint32_t n = 0; (center.y + n) < height && (center.x - n) >= 0; ++n)
+    {
+      if (island_mask[(center.y + n) * width + (center.x - n)] == 0)
+      {
+        distance_to_water = std::min(distance_to_water, n);
+        break;
+      }
+    }
+
+    const auto coast_length = m_lua.get_variable<std::uint32_t>("coast_length");
+    if (distance_to_water <= coast_length)
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  void TerrainGenerator::m_generate_main_river(IslandData& island, std::vector<Point<std::uint32_t>>& bays, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height, const int seed)
+  {
+    assert(bays.size() > 0 && "There are no bays identified");
+
+    std::mt19937 rng(seed);
+    std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_indexes.size() - 1);
+    std::uniform_int_distribution<unsigned int> bay_indexes_dist(0, bays.size() - 1);
+    const auto min_source_mouth_distance_x = m_lua.get_variable<int>("min_source_mouth_distance_x");
+    const auto min_source_mouth_distance_y = m_lua.get_variable<int>("min_source_mouth_distance_y");
+
+    std::uint32_t source_index = 0;
+    auto& source_point = island.structure.sites[0].center;
+    auto& mouth_point = bays[0];
+
+    bool found_river_points = false;
+    bool has_reached_first_limit = false;
+    bool has_reached_second_limit = false;
+    std::uint32_t tries = 0;
+
+    while (!found_river_points)
+    {
+      ++tries;
+
+      if (tries > island.structure.land_indexes.size() * 2)
+      {
+        has_reached_second_limit = true;
+        std::cout << "SECOND LIMIT\n";
+      }
+      else if (tries > island.structure.land_indexes.size())
+      {
+        has_reached_first_limit = true;
+        std::cout << "FIRST LIMIT\n";
+      }
+
+      source_index = island.structure.land_indexes[land_indexes_dist(rng)];
+      source_point = island.structure.sites[source_index].center;
+
+      // Make sure that source point is on the upper part of the island
+      if (!has_reached_first_limit && source_point.y > height / 2)
+      {
+        continue;
+      }
+
+      std::vector<std::uint32_t> bay_candidates;
+      float max_mouth_source_distance = 0.f;
+      int optimal_bay_index = -1;
+
+      for (std::uint32_t i = 0; i < bays.size() - 1; ++i)
+      {
+        const auto& bay = bays[i];
+
+        const int distance_x = std::abs(static_cast<int>(bay.x - source_point.x));
+        const int distance_y = std::abs(static_cast<int>(bay.y - source_point.y));
+
+        if (distance_x >= min_source_mouth_distance_x && distance_y >= min_source_mouth_distance_y && bay.y > source_point.y)
+        {
+          /* std::cout << "SOURCE: "<< source_point.x << ' ' << source_point.y << '\n'; */
+          /* std::cout << "MOUTH: "<< bay.x << ' ' << bay.y << '\n'; */
+          mouth_point = bays[i];
+          found_river_points = true;
+          break;
+          /* bay_candidates.push_back(i); */
+        }
+        else if (has_reached_first_limit && bay.y > source_point.y && (distance_x >= min_source_mouth_distance_x || distance_y >= min_source_mouth_distance_y))
+        {
+          std::cout << "BAY: " << bay.x << ' ' << bay.y;
+          std::cout << "SOURCE: " << source_point.x << ' ' << source_point.y;
+          const float distance = m_distance(source_point, bay);
+
+          if (distance > max_mouth_source_distance)
+          {
+            max_mouth_source_distance = distance;
+            optimal_bay_index = i;
+          }
+        }
+        else if (has_reached_second_limit)
+        {
+          const float distance = m_distance(source_point, bay);
+
+          if (distance > max_mouth_source_distance)
+          {
+            max_mouth_source_distance = distance;
+            optimal_bay_index = i;
+          }
+        }
+      }
+
+      if (optimal_bay_index != -1 && (has_reached_first_limit || has_reached_second_limit))
+      {
+        mouth_point = bays[optimal_bay_index];
+        found_river_points = true;
+        break;
+      }
+
+      /* if (bay_candidates.size() == 0) */
+      /* { */
+      /*   continue; */
+      /* } */
+      /* else if (bay_candidates.size() == 1) */
+      /* { */
+      /*   mouth_point = bays[bay_candidates[0]]; */
+      /*   found_river_points = true; */
+      /*   break; */
+      /* } */
+      /* else */
+      /* { */
+      /*   float max_mouth_source_distance = 0.f; */
+      /*   int optimal_bay_index = 0; */
+
+      /*   for (std::uint32_t i = 0; i < bays.size() - 1; ++i) */
+      /*   { */
+      /*     const auto& bay = bays[i]; */
+      /*     const float distance = m_distance(source_point, bay); */
+
+      /*     if (distance > max_mouth_source_distance) */
+      /*     { */
+      /*       max_mouth_source_distance = distance; */
+      /*       optimal_bay_index = i; */
+      /*     } */
+      /*   } */
+
+      /*   mouth_point = bays[optimal_bay_index]; */
+      /*   found_river_points = true; */
+      /*   break; */
+      /* } */
+    }
+
+    m_draw_big_point(mouth_point, 4, tiles, width);
+    m_draw_big_point(source_point, 4, tiles, width);
+  }
+
+  float TerrainGenerator::m_distance(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b)
+  {
+    const int distance_x = point_a.x - point_b.x;
+    const int distance_y = point_a.y - point_b.y;
+    return sqrt(distance_x*distance_x + distance_y*distance_y);
   }
 
   void TerrainGenerator::m_draw_point(const Point<std::uint32_t>& point, const int value, std::vector<int>& tiles, const std::uint32_t width)

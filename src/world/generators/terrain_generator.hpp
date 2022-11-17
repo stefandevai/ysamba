@@ -20,7 +20,7 @@ namespace dl
 
   struct BayData
   {
-    explicit BayData(const int area, const Point<std::uint32_t>& point) : area(area), point(point) {}
+    BayData(const int area, const Point<std::uint32_t>& point) : area(area), point(point) {}
     int area = 0;
     Point<std::uint32_t> point = Point<std::uint32_t>(0, 0);
   };
@@ -33,8 +33,8 @@ namespace dl
       static std::vector<int> generate(const uint32_t width, const uint32_t height, const int seed);
 
     private:
-      static LuaAPI m_lua;
-      static FastNoiseLite m_noise;
+      static inline FastNoiseLite m_noise = FastNoiseLite{1337};
+      static inline LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
 
       static void m_generate_silhouette(std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int seed);
       static float m_get_rectangle_gradient_value(const int x, const int y, const int width, const int height);
@@ -54,6 +54,9 @@ namespace dl
       static bool m_has_land_intersection(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b, const std::vector<int>& tiles, const uint32_t width, const int water_value);
       static BayData m_get_bay_data(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b, const std::vector<int>& tiles, const uint32_t width, const uint32_t height, const int minimum, std::vector<int>& mask, const int water_value);
       static void m_build_island_structure(IslandData& island, const uint32_t width, const uint32_t height);
+      static bool m_center_is_coast(const Point<std::uint32_t>& center, const std::vector<int>& island_mask, const uint32_t width, const uint32_t height);
+      static void m_generate_main_river(IslandData& island, std::vector<Point<std::uint32_t>>& bays, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height, const int seed = 0);
+      static float m_distance(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b);
 
       // Debug functions
       static void m_draw_point(const Point<std::uint32_t>& point, const int value, std::vector<int>& tiles, const std::uint32_t width);
