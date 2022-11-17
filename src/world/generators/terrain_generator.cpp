@@ -1111,6 +1111,26 @@ namespace dl
 
   void TerrainGenerator::m_generate_main_river(IslandData& island, std::vector<Point<std::uint32_t>>& bays, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height, const int seed)
   {
+    const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, height, seed);
+    const auto river = m_get_river_segments(source, mouth, tiles, width, seed);
+
+    m_draw_line(source, river[0]->point, 1, tiles, width, height);
+
+    for (const auto& segment : river)
+    {
+      if (segment->next != nullptr)
+      {
+        m_draw_line(segment->point, segment->next->point, 1, tiles, width, height);
+      }
+      else
+      {
+        m_draw_line(segment->point, mouth, 1, tiles, width, height);
+      }
+    }
+  }
+
+  std::pair<Point<std::uint32_t>, Point<std::uint32_t>> TerrainGenerator::m_get_river_source_and_mouth(IslandData& island, std::vector<Point<std::uint32_t>>& bays, const std::uint32_t height, const int seed)
+  {
     assert(bays.size() > 0 && "There are no bays identified");
 
     std::mt19937 rng(seed);
@@ -1132,15 +1152,14 @@ namespace dl
     {
       ++tries;
 
+      // Relax constraints with a high number of tries
       if (tries > island.structure.land_indexes.size() * 2)
       {
         has_reached_second_limit = true;
-        std::cout << "SECOND LIMIT\n";
       }
       else if (tries > island.structure.land_indexes.size())
       {
         has_reached_first_limit = true;
-        std::cout << "FIRST LIMIT\n";
       }
 
       source_index = island.structure.land_indexes[land_indexes_dist(rng)];
@@ -1165,17 +1184,12 @@ namespace dl
 
         if (distance_x >= min_source_mouth_distance_x && distance_y >= min_source_mouth_distance_y && bay.y > source_point.y)
         {
-          /* std::cout << "SOURCE: "<< source_point.x << ' ' << source_point.y << '\n'; */
-          /* std::cout << "MOUTH: "<< bay.x << ' ' << bay.y << '\n'; */
           mouth_point = bays[i];
           found_river_points = true;
           break;
-          /* bay_candidates.push_back(i); */
         }
         else if (has_reached_first_limit && bay.y > source_point.y && (distance_x >= min_source_mouth_distance_x || distance_y >= min_source_mouth_distance_y))
         {
-          std::cout << "BAY: " << bay.x << ' ' << bay.y;
-          std::cout << "SOURCE: " << source_point.x << ' ' << source_point.y;
           const float distance = m_distance(source_point, bay);
 
           if (distance > max_mouth_source_distance)
@@ -1202,42 +1216,76 @@ namespace dl
         found_river_points = true;
         break;
       }
-
-      /* if (bay_candidates.size() == 0) */
-      /* { */
-      /*   continue; */
-      /* } */
-      /* else if (bay_candidates.size() == 1) */
-      /* { */
-      /*   mouth_point = bays[bay_candidates[0]]; */
-      /*   found_river_points = true; */
-      /*   break; */
-      /* } */
-      /* else */
-      /* { */
-      /*   float max_mouth_source_distance = 0.f; */
-      /*   int optimal_bay_index = 0; */
-
-      /*   for (std::uint32_t i = 0; i < bays.size() - 1; ++i) */
-      /*   { */
-      /*     const auto& bay = bays[i]; */
-      /*     const float distance = m_distance(source_point, bay); */
-
-      /*     if (distance > max_mouth_source_distance) */
-      /*     { */
-      /*       max_mouth_source_distance = distance; */
-      /*       optimal_bay_index = i; */
-      /*     } */
-      /*   } */
-
-      /*   mouth_point = bays[optimal_bay_index]; */
-      /*   found_river_points = true; */
-      /*   break; */
-      /* } */
     }
 
-    m_draw_big_point(mouth_point, 4, tiles, width);
-    m_draw_big_point(source_point, 4, tiles, width);
+    return {source_point, mouth_point};
+  }
+
+  std::vector<std::shared_ptr<RiverSegment>> TerrainGenerator::m_get_river_segments(const Point<std::uint32_t>& source, const Point<std::uint32_t>& mouth, const std::vector<int>& tiles, const std::uint32_t width, const int seed)
+  {
+    std::vector<std::shared_ptr<RiverSegment>> river;
+
+    const auto river_noise_freq = m_lua.get_variable<float>("river_noise_freq");
+    const auto river_noise_octaves = m_lua.get_variable<int>("river_noise_octaves");
+    const auto river_noise_lacunarity = m_lua.get_variable<float>("river_noise_lacunarity");
+    const auto river_noise_gain = m_lua.get_variable<float>("river_noise_gain");
+    const auto river_noise_weighted_strength = m_lua.get_variable<float>("river_noise_weighted_strength");
+    const int river_noise_weight = m_lua.get_variable<int>("river_noise_weight");
+
+    m_noise.SetSeed(seed);
+    m_noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
+    m_noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXYPlanes);
+    m_noise.SetFrequency(river_noise_freq);
+    m_noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm);
+    m_noise.SetFractalOctaves(river_noise_octaves);
+    m_noise.SetFractalLacunarity(river_noise_lacunarity);
+    m_noise.SetFractalGain(river_noise_gain);
+    m_noise.SetFractalWeightedStrength(river_noise_weighted_strength);
+
+    int x = source.x;
+    int y = source.y;
+    std::shared_ptr<RiverSegment> last_segment = nullptr;
+
+    TCOD_bresenham_data_t bresenham_data;
+    TCOD_line_init_mt(x, y, mouth.x, mouth.y, &bresenham_data);
+
+    do
+    {
+      const float noise_value_x = static_cast<int>(std::round(m_noise.GetNoise(static_cast<float>(x), static_cast<float>(y)) * river_noise_weight));
+      const float noise_value_y = static_cast<int>(std::round(m_noise.GetNoise(-static_cast<float>(x), -static_cast<float>(y)) * river_noise_weight));
+
+      auto segment = std::make_shared<RiverSegment>();
+
+      if (noise_value_x > 0.5)
+      {
+        segment->point.x = x - noise_value_x;
+      }
+      else
+      {
+        segment->point.x = x + noise_value_x;
+      }
+
+      if (noise_value_y > 0.5)
+      {
+        segment->point.y = y - noise_value_y;
+      }
+      else
+      {
+        segment->point.y = y + noise_value_y;
+      }
+
+      river.push_back(segment);
+      const auto current_index = river.size() - 1;
+
+      if (last_segment != nullptr)
+      {
+        last_segment->next = river[current_index];
+      }
+      last_segment = river[current_index];
+    }
+    while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
+
+    return river;
   }
 
   float TerrainGenerator::m_distance(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b)

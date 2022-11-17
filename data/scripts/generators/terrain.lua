@@ -1,7 +1,7 @@
 -- Debug
 draw_features = false
-draw_coastline = true
-draw_bays = true
+draw_coastline = false
+draw_bays = false
 draw_structure = true
 
 -- Silhouette
@@ -19,8 +19,14 @@ coast_points_min_distance = 30
 coast_points_max_distance = 100
 min_land_distance_delta = 5
 poisson_disk_sampling_radius = 10.0
-coast_length = 23
+coast_length = 53
 
 -- River
 min_source_mouth_distance_x = 30
 min_source_mouth_distance_y = 100
+river_noise_freq = 0.015
+river_noise_octaves = 3
+river_noise_lacunarity = 2.2
+river_noise_gain = 0.7
+river_noise_weighted_strength = 0.1
+river_noise_weight = 10
