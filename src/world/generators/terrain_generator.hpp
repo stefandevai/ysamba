@@ -64,6 +64,7 @@ namespace dl
       static void m_generate_main_river(IslandData& island, std::vector<Point<std::uint32_t>>& bays, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height, const int seed = 0);
       static std::pair<Point<std::uint32_t>, Point<std::uint32_t>> m_get_river_source_and_mouth(IslandData& island, std::vector<Point<std::uint32_t>>& bays, const std::uint32_t width, const std::uint32_t height, const int seed);
       static std::vector<std::shared_ptr<RiverSegment>> m_get_river_segments(const Point<std::uint32_t>& source, const Point<std::uint32_t>& mouth, const std::vector<int>& tiles, const std::uint32_t width, const int seed);
+      static void m_create_meanders(std::vector<std::shared_ptr<RiverSegment>>& river, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height);
       static float m_distance(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b);
 
       // Debug functions

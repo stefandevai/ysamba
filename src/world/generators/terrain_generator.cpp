@@ -1112,8 +1112,10 @@ namespace dl
   void TerrainGenerator::m_generate_main_river(IslandData& island, std::vector<Point<std::uint32_t>>& bays, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height, const int seed)
   {
     const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, width, height, seed);
-    const auto river = m_get_river_segments(source, mouth, tiles, width, seed);
+    auto river = m_get_river_segments(source, mouth, tiles, width, seed);
+    m_create_meanders(river, tiles, width, height);
 
+    // Draw river
     m_draw_line(source, river[0]->point, 1, tiles, width, height);
 
     for (const auto& segment : river)
@@ -1302,22 +1304,30 @@ namespace dl
 
       auto segment = std::make_shared<RiverSegment>();
 
-      if (noise_value_x > 0.5)
+      if (noise_value_x > 0.66f)
       {
         segment->point.x = x - noise_value_x;
       }
-      else
+      else if (noise_value_x > 0.33f)
       {
         segment->point.x = x + noise_value_x;
       }
+      else
+      {
+        segment->point.x = x;
+      }
 
-      if (noise_value_y > 0.5)
+      if (noise_value_y > 0.66f)
       {
         segment->point.y = y - noise_value_y;
       }
-      else
+      else if (noise_value_y > 0.33f)
       {
         segment->point.y = y + noise_value_y;
+      }
+      else
+      {
+        segment->point.y = y;
       }
 
       river.push_back(segment);
@@ -1332,6 +1342,44 @@ namespace dl
     while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
 
     return river;
+  }
+
+  void TerrainGenerator::m_create_meanders(std::vector<std::shared_ptr<RiverSegment>>& river, std::vector<int>& tiles, const std::uint32_t width, const std::uint32_t height)
+  {
+    std::vector<std::pair<Point<double>, Point<double>>> normals;
+
+    for (auto& segment : river)
+    {
+      if (segment->next == nullptr)
+      {
+        continue;
+      }
+
+
+      const double middle_x = (segment->next->point.x + segment->point.x)/2.0;
+      const double middle_y = (segment->next->point.y + segment->point.y)/2.0;
+
+      const auto dx = static_cast<double>(segment->next->point.x) - segment->point.x;
+      const auto dy = static_cast<double>(segment->next->point.y) - segment->point.y;
+
+      if (dx != 0.0 && dy != 0.0)
+      {
+        const auto negaive_reciprocal = (dx / dy) * -1.0;
+        const auto b = middle_y - negaive_reciprocal*middle_x;
+
+        Point normal(middle_x - 10.0, negaive_reciprocal*(middle_x - 10.0) + b);
+        m_draw_line(Point<std::uint32_t>(middle_x, middle_y), Point<std::uint32_t>(normal.x, normal.y), 4, tiles, width, height);
+      }
+
+
+      /* std::cout << "MIDDLE: " << middle_x << ' ' << middle_y << '\n'; */
+      /* std::cout << "1: " << x1 << ' ' << y1 << '\n'; */
+      /* std::cout << "2: " << x2 << ' ' << y2 << '\n'; */
+      /* std::cout << "ORIGIN: " << middle_x << ' ' << middle_y << '\n'; */
+      /* std::cout << "DELTA: " << -dx << ' ' << dy << '\n'; */
+      /* std::cout << '\n'; */
+
+    }
   }
 
   float TerrainGenerator::m_distance(const Point<std::uint32_t>& point_a, const Point<std::uint32_t>& point_b)
