@@ -6,11 +6,11 @@
 
 namespace dl
 {
-  using Edge = std::pair<Point<std::uint32_t>, Point<std::uint32_t>>;
+  using Edge = std::pair<Point<int>, Point<int>>;
 
   struct Site
   {
-    Point<std::uint32_t> center;
+    Point<int> center;
     std::vector<Edge> edges;
     bool is_coast = false;
   };
@@ -20,14 +20,14 @@ namespace dl
     struct Structure
     {
       std::vector<Site> sites;
-      std::vector<std::uint32_t> coast_indexes;
-      std::vector<std::uint32_t> land_indexes;
+      std::vector<int> coast_indexes;
+      std::vector<int> land_indexes;
     };
 
-    std::vector<Point<std::uint32_t>> points;
+    std::vector<Point<int>> points;
     std::vector<int> mask;
     Structure structure;
-    Point<std::uint32_t> top_left;
-    Point<std::uint32_t> bottom_right;
+    Point<int> top_left;
+    Point<int> bottom_right;
   };
 }

@@ -29,4 +29,4 @@ river_noise_octaves = 3
 river_noise_lacunarity = 2.2
 river_noise_gain = 0.7
 river_noise_weighted_strength = 0.1
-river_noise_weight = 10
+river_noise_weight = 40
