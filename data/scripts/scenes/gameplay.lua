@@ -5,9 +5,7 @@ camera_width = 64
 camera_height = 36
 
 -- Almost square island
--- seed = 340683964
-
-seed = 1889453490
+seed = 340683964
 
 -- River crossing water
 -- seed = 700862761

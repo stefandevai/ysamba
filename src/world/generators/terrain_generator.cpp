@@ -348,8 +348,10 @@ namespace dl
   {
     std::vector<Point<int>> coastline;
     std::vector<int> mask(width * height, 0);
+    const std::size_t mask_size = mask.size();
 
     const auto first_point = m_get_first_coastline_point(tiles, width, height, island);
+    mask[first_point.y*width + first_point.x] = 1;
 
     // TODO: Handle not found
     if (first_point.x == 0 && first_point.y == 0)
@@ -373,11 +375,59 @@ namespace dl
       const auto bottom_point = current_point.bottom();
       const auto top_point = current_point.top();
 
-      auto manipulate_point = [width, height, &mask, &point_queue, &tiles](const Point<int>& point)
+      auto manipulate_point = [width, height, mask_size, &mask, &point_queue, &tiles](const Point<int>& point)
       {
         if (m_valid_point(point, width, height) && m_is_coast_point(point, width, height, tiles) && mask[point.y*width + point.x] == 0)
         {
-          point_queue.push(point);
+          int neighbours = 0;
+
+          const std::size_t top_left_coord = (point.y - 1)*width + point.x - 1;
+          const std::size_t top_coord = (point.y - 1)*width + point.x;
+          const std::size_t top_right_coord = (point.y - 1)*width + point.x + 1;
+          const std::size_t left_coord = point.y*width + point.x - 1;
+          const std::size_t right_coord = point.y*width + point.x + 1;
+          const std::size_t bottom_left_coord = (point.y + 1)*width + point.x - 1;
+          const std::size_t bottom_coord = (point.y + 1)*width + point.x;
+          const std::size_t bottom_right_coord = (point.y + 1)*width + point.x + 1;
+
+          // Top left
+          if (top_left_coord < mask_size && mask[top_left_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (top_coord < mask_size && mask[top_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (top_right_coord < mask_size && mask[top_right_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (left_coord < mask_size && mask[left_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (right_coord < mask_size && mask[right_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (bottom_left_coord < mask_size && mask[bottom_left_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (bottom_coord < mask_size && mask[bottom_coord] == 1)
+          {
+            ++neighbours;
+          }
+          if (bottom_right_coord < mask_size && mask[bottom_right_coord] == 1)
+          {
+            ++neighbours;
+          }
+
+          if (neighbours < 3)
+          {
+            point_queue.push(point);
+          }
         }
       };
 
