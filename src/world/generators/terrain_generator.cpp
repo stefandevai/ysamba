@@ -210,7 +210,7 @@ namespace dl
   {
     auto all_islands = m_get_island_queue(tiles, width, height);
 
-    const int number_of_islands_to_keep = m_lua.get_variable<std::uint32_t>("islands_to_keep");
+    const auto number_of_islands_to_keep = m_lua.get_variable<std::uint32_t>("islands_to_keep");
 
     while (all_islands.size() > number_of_islands_to_keep)
     {
@@ -1296,21 +1296,60 @@ namespace dl
 
     TCOD_bresenham_data_t bresenham_data;
     TCOD_line_init_mt(x, y, mouth.x, mouth.y, &bresenham_data);
+    int count = 0;
+    float deviation_x = 0.f;
+    float deviation_y = 0.f;
 
     do
     {
+      ++count;
+      if (count % 4 != 0)
+      {
+        continue;
+      }
       const float noise_value_x = static_cast<int>(std::round(m_noise.GetNoise(static_cast<float>(x), static_cast<float>(y)) * river_noise_weight));
       const float noise_value_y = static_cast<int>(std::round(m_noise.GetNoise(-static_cast<float>(x), -static_cast<float>(y)) * river_noise_weight));
 
       auto segment = std::make_shared<RiverSegment>();
 
+      /* if (noise_value_x > 0.66f) */
+      /* { */
+      /*   deviation_x = 3.f; */
+      /* } */
+      /* else if (noise_value_y > 0.33f) */
+      /* { */
+      /*   deviation_x = -3.f; */
+      /* } */
+      /* else */
+      /* { */
+      /*   deviation_x = 0.f; */
+      /* } */
+
+      /* if (noise_value_y > 0.66f) */
+      /* { */
+      /*   deviation_y = 3.f; */
+      /* } */
+      /* else if (noise_value_y > 0.33f) */
+      /* { */
+      /*   deviation_y = -3.f; */
+      /* } */
+      /* else */
+      /* { */
+      /*   deviation_y = 0.f; */
+      /* } */
+
+      /* segment->point.x = x + deviation_x; */
+      /* segment->point.y = y + deviation_y; */
+
+      /* std::cout << "DEVIATION: " << deviation_x << ' ' << deviation_y << '\n'; */
+
       if (noise_value_x > 0.66f)
       {
-        segment->point.x = x - noise_value_x;
+        segment->point.x = x - 5.f;
       }
       else if (noise_value_x > 0.33f)
       {
-        segment->point.x = x + noise_value_x;
+        segment->point.x = x + 5.f;
       }
       else
       {
@@ -1319,11 +1358,11 @@ namespace dl
 
       if (noise_value_y > 0.66f)
       {
-        segment->point.y = y - noise_value_y;
+        segment->point.y = y - 5.f;
       }
       else if (noise_value_y > 0.33f)
       {
-        segment->point.y = y + noise_value_y;
+        segment->point.y = y + 5.f;
       }
       else
       {
@@ -1335,59 +1374,45 @@ namespace dl
 
       if (last_segment != nullptr)
       {
+        // Add pointers between segments
         last_segment->next = river[current_index];
         river[current_index]->previous = last_segment;
 
+        // Calculate center point and normal vector
         const auto& p1 = last_segment->point;
         const auto& p2 = river[current_index]->point;
 
-        const double middle_x = (p1.x + p2.x)/2.0;
-        const double middle_y = (p1.y + p2.y)/2.0;
+        const double center_x = (p1.x + p2.x)/2.0;
+        const double center_y = (p1.y + p2.y)/2.0;
 
         const double raw_normal_x = - (p2.y - p1.y);
         const double raw_normal_y = p2.x - p1.x;
 
-        const double distance = m_distance(p1, p2);
-        const double normal_x = raw_normal_x / distance;
-        const double normal_y = raw_normal_y / distance;
+        const double length = m_distance(p1, p2);
 
-        Point<int> origin(static_cast<int>(middle_x), static_cast<int>(middle_y));
-        Point<int> destination(static_cast<int>(middle_x + 10.0*normal_x), static_cast<int>(middle_y + 10.0*normal_y));
+        last_segment->length = length;
 
-          std::cout << "POINTS: " << p1.x << ' ' << p1.y << ", " << p2.x << ' ' << p2.y << '\n';
-        std::cout << "MIDDLE: " << middle_x << ' ' << middle_y << '\n';
-        std::cout << "DISTANCE: " << distance << '\n';
-        std::cout << "RAW NORMAL: " << raw_normal_x << ' ' << raw_normal_y << '\n';
-        std::cout << "NORMAL: " << normal_x << ' ' << normal_y << '\n';
-          std::cout << "POINTS: " << origin.x << ' ' << origin.y << ", " << destination.x << ' ' << destination.y << '\n';
-        std::cout << '\n';
+        if (length != 0.0)
+        {
+          const double normal_x = raw_normal_x / length;
+          const double normal_y = raw_normal_y / length;
 
-        m_draw_line(origin, destination, 4, tiles, width, 512);
+          last_segment->center = Point<double>(center_x, center_y);
+          last_segment->normal = Point<double>(normal_x, normal_y);
 
-        /* const auto dx = static_cast<double>(river[current_index]->point.x) - last_segment->point.x; */
-        /* const auto dy = static_cast<double>(river[current_index]->point.y) - last_segment->point.y; */
+          /* Point<int> origin(static_cast<int>(center_x), static_cast<int>(center_y)); */
+          /* Point<int> destination(static_cast<int>(center_x + 1.0*normal_x), static_cast<int>(center_y + 1.0*normal_y)); */
 
-        /* if (dx != 0.0 && dy != 0.0) */
-        /* { */
-        /*   /1* const auto negaive_reciprocal = (dx / dy) * -1.0; *1/ */
-        /*   /1* const auto b = middle_y - negaive_reciprocal*middle_x; *1/ */
-        /*   /1* const auto distance = m_distance(Point(middle_x, middle_y), Point(normal.x, normal.y)); *1/ */
+          /* std::cout << "POINTS: " << p1.x << ' ' << p1.y << ", " << p2.x << ' ' << p2.y << '\n'; */
+          /* std::cout << "MIDDLE: " << center_x << ' ' << center_y << '\n'; */
+          /* std::cout << "DISTANCE: " << length << '\n'; */
+          /* std::cout << "RAW NORMAL: " << raw_normal_x << ' ' << raw_normal_y << '\n'; */
+          /* std::cout << "NORMAL: " << normal_x << ' ' << normal_y << '\n'; */
+          /* std::cout << "POINTS: " << origin.x << ' ' << origin.y << ", " << destination.x << ' ' << destination.y << '\n'; */
+          /* std::cout << '\n'; */
 
-        /*   /1* normal.x /= distance; *1/ */
-        /*   /1* normal.y /= distance; *1/ */
-
-        /*   /1* std::cout << "MIDDLE: " << middle_x << ' ' << middle_y << '\n'; *1/ */
-        /*   /1* std::cout << "NORMAL: " << normal.x << ' ' << normal.y << '\n'; *1/ */
-        /*   /1* std::cout << "DISTANCE: " << m_distance(Point(middle_x, middle_y), Point(normal.x, normal.y)) << '\n'; *1/ */
-
-        /*   Point normal1(-dy, dx); */
-        /*   Point normal2(dy, -dx); */
-
-        /*   std::cout << "NORMALS: " << normal1.x << ' ' << normal1.y << ", " << normal2.x << ' ' << normal2.y << '\n'; */
-
-        /*   /1* Point normal(middle_x - 10.0, middle_y - 10.0); *1/ */
-        /*   m_draw_line(Point<int>(normal1.x, normal1.y), Point<int>(normal2.x, normal2.y), 4, tiles, width, 512); */
-        /* } */
+          /* m_draw_line(origin, destination, 4, tiles, width, 512); */
+        }
       }
 
       last_segment = river[current_index];
@@ -1403,36 +1428,35 @@ namespace dl
 
     for (auto& segment : river)
     {
-      if (segment->next == nullptr || segment->previous == nullptr)
+      if (segment->next == nullptr || segment->previous == nullptr || segment->length == 0.0 || segment->previous->length == 0.0)
+      {
+        continue;
+      }
+      // Get curvature
+      auto curvature = m_menger_curvature(segment->previous->point, segment->point, segment->next->point, segment->previous->length, segment->length, m_distance(segment->previous->point, segment->next->point));
+
+      if (std::isnan(curvature))
       {
         continue;
       }
 
-      /* /1* const double middle_x = (segment->next->point.x + segment->point.x)/2.0; *1/ */
-      /* /1* const double middle_y = (segment->next->point.y + segment->point.y)/2.0; *1/ */
-      /* const double x1 = segment->point.x; */
-      /* const double y1 = segment->point.y; */
-
-      /* const auto dx = static_cast<double>(segment->next->point.x) - segment->point.x; */
-      /* const auto dy = static_cast<double>(segment->next->point.y) - segment->point.y; */
-
-      /* if (dx != 0.0 && dy != 0.0) */
-      /* { */
-      /*   const auto negaive_reciprocal = (dx / dy) * -1.0; */
-      /*   const auto b = y1 - negaive_reciprocal*x1; */
-
-      /*   Point normal(x1 - 10.0, negaive_reciprocal*(x1 - 10.0) + b); */
-      /*   m_draw_line(Point<int>(x1, y1), Point<int>(normal.x, normal.y), 4, tiles, width, height); */
-      /* } */
+      if (curvature < 0)
+      {
+        curvature = std::min(curvature, -0.1);
+        curvature = std::max(curvature, -0.8);
+      }
+      else
+      {
+        curvature = std::max(curvature, 0.1);
+        curvature = std::min(curvature, 0.8);
+      }
+      /* std::cout << "CURVATURE: " << curvature << '\n'; */
 
 
-      /* std::cout << "MIDDLE: " << middle_x << ' ' << middle_y << '\n'; */
-      /* std::cout << "1: " << x1 << ' ' << y1 << '\n'; */
-      /* std::cout << "2: " << x2 << ' ' << y2 << '\n'; */
-      /* std::cout << "ORIGIN: " << middle_x << ' ' << middle_y << '\n'; */
-      /* std::cout << "DELTA: " << -dx << ' ' << dy << '\n'; */
-      /* std::cout << '\n'; */
-
+      double normal_length = 40.0*curvature*-1.0;
+      Point<int> normal_origin(static_cast<int>(segment->center.x), static_cast<int>(segment->center.y));
+      Point<int> normal_destination(static_cast<int>(segment->center.x + normal_length*segment->normal.x), static_cast<int>(segment->center.y + normal_length*segment->normal.y));
+      m_draw_line(normal_origin, normal_destination, 4, tiles, width, height);
     }
   }
 
@@ -1448,6 +1472,11 @@ namespace dl
     const int distance_x = point_a.x - point_b.x;
     const int distance_y = point_a.y - point_b.y;
     return sqrt(distance_x*distance_x + distance_y*distance_y);
+  }
+
+  double TerrainGenerator::m_menger_curvature(const Point<int>& point_a, const Point<int>& point_b, const Point<int>& point_c, const double length_1, const double length_2, const double length_3)
+  {
+    return 2.0 * ((point_b.x - point_a.x)*(point_c.y - point_a.y) - (point_b.y - point_a.y)*(point_c.x - point_a.x)) / (length_1 * length_2 * length_3);
   }
 
   void TerrainGenerator::m_draw_point(const Point<int>& point, const int value, std::vector<int>& tiles, const int width)

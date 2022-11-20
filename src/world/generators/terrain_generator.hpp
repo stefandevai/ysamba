@@ -28,6 +28,9 @@ namespace dl
   struct RiverSegment
   {
     Point<int> point;
+    Point<double> center;
+    Point<double> normal;
+    double length = 0.0;
     std::shared_ptr<RiverSegment> previous;
     std::shared_ptr<RiverSegment> next;
   };
@@ -68,6 +71,7 @@ namespace dl
       static void m_create_meanders(std::vector<std::shared_ptr<RiverSegment>>& river, std::vector<int>& tiles, const int width, const int height);
       static float m_distance(const Point<int>& point_a, const Point<int>& point_b);
       static double m_distance(const Point<double>& point_a, const Point<double>& point_b);
+      static double m_menger_curvature(const Point<int>& point_a, const Point<int>& point_b, const Point<int>& point_c, const double length_1, const double length_2, const double length_3);
 
       // Debug functions
       static void m_draw_point(const Point<int>& point, const int value, std::vector<int>& tiles, const int width);
