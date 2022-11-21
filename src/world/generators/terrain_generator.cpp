@@ -8,7 +8,7 @@
 #include <libtcod.hpp>
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./lib/sweepline.hpp"
-#include "MyGAL/FortuneAlgorithm.h"
+#include "lib/gal/fortune_algorithm.hpp"
 
 // TEMP
 #include <iostream>
@@ -72,9 +72,13 @@ namespace dl
       const auto draw_structure = m_lua.get_variable<bool>("draw_structure");
       if (draw_structure)
       {
-        for (const auto& site : main_island.structure.sites)
-        /* for (const auto index : main_island.structure.coast_indexes) */
+        for (auto site : main_island.structure.coast_sites)
         {
+          m_draw_big_point(Point<int>(site->point.x * width, site->point.y * height), 5, tiles, width);
+        }
+        /* for (const auto& site : main_island.structure.sites) */
+        /* for (const auto index : main_island.structure.coast_indexes) */
+        /* { */
           /* m_draw_big_point(main_island.structure.sites[index].center, 5, tiles, width); */
 
           /* for (const auto& edge : main_island.structure.sites[index].edges) */
@@ -82,13 +86,13 @@ namespace dl
           /*   m_draw_line(edge.first, edge.second, 5, tiles, width, height); */
           /* } */
 
-          m_draw_big_point(site.center, 5, tiles, width);
+          /* m_draw_big_point(site.center, 5, tiles, width); */
 
-          for (const auto& edge : site.edges)
-          {
-            m_draw_line(edge.first, edge.second, 5, tiles, width, height);
-          }
-        }
+          /* for (const auto& edge : site.edges) */
+          /* { */
+          /*   m_draw_line(edge.first, edge.second, 5, tiles, width, height); */
+          /* } */
+        /* } */
       }
 
       // Draw coastline
@@ -976,7 +980,7 @@ namespace dl
 
     const auto poisson_disk_sampling_radius = m_lua.get_variable<float>("poisson_disk_sampling_radius");
     const auto poisson_points = thinks::PoissonDiskSampling(poisson_disk_sampling_radius, min_point, max_point);
-    std::vector<mygal::Vector2<double>> points{};
+    std::vector<gal::Vector2<double>> points{};
 
     // Normalize points to [0.0, 1.0]
     for (const auto& point : poisson_points)
@@ -984,18 +988,22 @@ namespace dl
       double normalized_x = point[0] / static_cast<double>(width);
       double normalized_y = point[1] / static_cast<double>(height);
 
-      points.push_back(mygal::Vector2{normalized_x, normalized_y});
+      points.push_back(gal::Vector2{normalized_x, normalized_y});
     }
 
-    auto algorithm = mygal::FortuneAlgorithm<double>(points);
+    auto algorithm = gal::FortuneAlgorithm<double>(points);
     algorithm.construct();
 
-    auto diagram = algorithm.getDiagram();
+    island.structure.diagram = algorithm.get_diagram();
+    /* auto& diagram = algorithm.get_diagram(); */
+    auto& diagram = island.structure.diagram;
 
-    for (const auto& site : diagram.getSites())
+    for (const auto& site : diagram.get_sites())
     {
-      const auto center_x = static_cast<int>(std::round(site.point.x * width));
-      const auto center_y = static_cast<int>(std::round(site.point.y * height));
+      /* const auto center = island.structure.expand_point(site.point, width, height); */
+      const auto center = site.point.denormalize(width, height);
+      const auto center_x = center.first;
+      const auto center_y = center.second;
 
       // Center is outside island
       if (island.mask[center_y*width + center_x] == 1)
@@ -1022,10 +1030,11 @@ namespace dl
       }
 
       const auto start = half_edge;
+      bool is_coast = false;
 
-      Site copy_site;
-      copy_site.center.x = center_x;
-      copy_site.center.y = center_y;
+      /* Site copy_site; */
+      /* copy_site.center.x = center_x; */
+      /* copy_site.center.y = center_y; */
 
       while (half_edge != nullptr)
       {
@@ -1033,12 +1042,13 @@ namespace dl
         {
           Point origin(static_cast<int>(std::round(half_edge->origin->point.x * width)), static_cast<int>(std::round(half_edge->origin->point.y * height)));
           Point destination(static_cast<int>(std::round(half_edge->destination->point.x * width)), static_cast<int>(std::round(half_edge->destination->point.y * height)));
-          copy_site.edges.push_back({origin, destination});
+          /* copy_site.edges.push_back({origin, destination}); */
 
           // If any of the edges points lays on water annotate it as coast
           if (island.mask[origin.y*width + origin.x] == 1 || island.mask[destination.y*width + destination.y] == 1)
           {
-            copy_site.is_coast = true;
+            /* copy_site.is_coast = true; */
+            is_coast = true;
           }
         }
 
@@ -1051,21 +1061,25 @@ namespace dl
       }
 
       // Re check if it's a coast site if any of the edges points lays on water
-      if (!copy_site.is_coast)
+      /* if (!copy_site.is_coast) */
+      if (!is_coast)
       {
-        copy_site.is_coast = m_center_is_coast(copy_site.center, island.mask, width, height);
+        /* copy_site.is_coast = m_center_is_coast(copy_site.center, island.mask, width, height); */
+        is_coast = m_center_is_coast(Point(center_x, center_y), island.mask, width, height);
       }
 
-      island.structure.sites.push_back(copy_site);
-      const int site_index = island.structure.sites.size() - 1;
+      /* island.structure.sites.push_back(copy_site); */
+      /* const int site_index = island.structure.sites.size() - 1; */
 
-      if (copy_site.is_coast)
+      if (is_coast)
       {
-        island.structure.coast_indexes.push_back(site_index);
+        island.structure.coast_sites.push_back(&site);
+        /* island.structure.coast_indexes.push_back(site_index); */
       }
       else
       {
-        island.structure.land_indexes.push_back(site_index);
+        island.structure.land_sites.push_back(&site);
+        /* island.structure.land_indexes.push_back(site_index); */
       }
 
     }
@@ -1186,13 +1200,14 @@ namespace dl
     assert(bays.size() > 0 && "There are no bays identified");
 
     std::mt19937 rng(seed);
-    std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_indexes.size() - 1);
+    std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_sites.size() - 1);
     std::uniform_int_distribution<unsigned int> bay_indexes_dist(0, bays.size() - 1);
     const auto min_source_mouth_distance_x = m_lua.get_variable<int>("min_source_mouth_distance_x");
     const auto min_source_mouth_distance_y = m_lua.get_variable<int>("min_source_mouth_distance_y");
 
     int source_index = 0;
-    auto& source_point = island.structure.sites[0].center;
+    /* auto& source_point = island.structure.sites[0].center; */
+    auto source_point = Point<int>(island.structure.diagram.get_sites()[0].point.x * width, island.structure.diagram.get_sites()[0].point.y * height);
     auto& mouth_point = bays[0];
 
     bool found_river_points = false;
@@ -1236,17 +1251,17 @@ namespace dl
       ++tries;
 
       // Relax constraints with a high number of tries
-      if (tries > island.structure.land_indexes.size() * 2)
+      if (tries > island.structure.land_sites.size() * 2)
       {
         has_reached_second_limit = true;
       }
-      else if (tries > island.structure.land_indexes.size())
+      else if (tries > island.structure.land_sites.size())
       {
         has_reached_first_limit = true;
       }
 
-      source_index = island.structure.land_indexes[land_indexes_dist(rng)];
-      source_point = island.structure.sites[source_index].center;
+      const auto source_site = island.structure.land_sites[land_indexes_dist(rng)];
+      source_point = Point<int>(source_site->point.x * width, source_site->point.y * height);
 
       // Make sure that source point is on the upper part of the island
       if (!has_reached_first_limit && source_point.y > height / 2)

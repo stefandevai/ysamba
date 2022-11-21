@@ -121,4 +121,4 @@ Temporary Items
 # Default build directory
 build
 vcpkg_installed
-lib
+./lib

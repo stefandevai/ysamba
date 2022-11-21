@@ -2,7 +2,7 @@
 draw_features = true
 draw_coastline = false
 draw_bays = true
-draw_structure = false
+draw_structure = true
 
 -- Silhouette
 simplex_freq = 0.005
