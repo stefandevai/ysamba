@@ -1,6 +1,3 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg.git
-[submodule "lib/gal"]
-	path = lib/gal
-	url = https://github.com/stefandevai/gal
