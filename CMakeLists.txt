@@ -57,7 +57,7 @@ target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
         ${LUA_INCLUDE_DIR}
-        "./lib/MyGAL/include"
+        "./lib/gal/include"
 )
 
 target_link_libraries(

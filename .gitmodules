@@ -4,3 +4,6 @@
 [submodule "lib/MyGAL"]
 	path = lib/MyGAL
 	url = https://github.com/pvigier/MyGAL
+[submodule "lib/gal"]
+	path = lib/gal
+	url = https://github.com/stefandevai/gal
