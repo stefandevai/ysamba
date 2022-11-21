@@ -19,11 +19,6 @@ namespace dl
       Diagram diagram = Diagram({});
       std::vector<const Site*> coast_sites;
       std::vector<const Site*> land_sites;
-
-      static inline Point<int> expand_point(const GALPoint& point, const int width, const int height)
-      {
-        return std::move(Point<int>(std::round(point.x * width), std::round(point.y * height)));
-      }
     };
 
     std::vector<Point<int>> points;

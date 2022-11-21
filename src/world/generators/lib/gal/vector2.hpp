@@ -20,6 +20,7 @@
 // STL
 #include <ostream> // Maybe make it optional
 #include <cmath>
+#include "../../../point.hpp"
 
 /**
  * \brief Namespace of MyGAL
@@ -164,9 +165,9 @@ public:
         return x * other.y - y * other.x;
     }
 
-    std::pair<int, int> denormalize(const int width, const int height) const
+    dl::Point<int> convert(const int width, const int height) const
     {
-        return { std::round(x * width), std::round(y * height) };
+        return std::move(dl::Point<int>{ static_cast<int>(std::round(x * width)), static_cast<int>(std::round(y * height)) });
     }
 };
 

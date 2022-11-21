@@ -995,18 +995,14 @@ namespace dl
     algorithm.construct();
 
     island.structure.diagram = algorithm.get_diagram();
-    /* auto& diagram = algorithm.get_diagram(); */
     auto& diagram = island.structure.diagram;
 
     for (const auto& site : diagram.get_sites())
     {
-      /* const auto center = island.structure.expand_point(site.point, width, height); */
-      const auto center = site.point.denormalize(width, height);
-      const auto center_x = center.first;
-      const auto center_y = center.second;
+      const auto center = site.point.convert(width, height);
 
       // Center is outside island
-      if (island.mask[center_y*width + center_x] == 1)
+      if (island.mask[center.y*width + center.x] == 1)
       {
         continue;
       }
@@ -1032,22 +1028,16 @@ namespace dl
       const auto start = half_edge;
       bool is_coast = false;
 
-      /* Site copy_site; */
-      /* copy_site.center.x = center_x; */
-      /* copy_site.center.y = center_y; */
-
       while (half_edge != nullptr)
       {
         if (half_edge->origin != nullptr && half_edge->destination != nullptr)
         {
-          Point origin(static_cast<int>(std::round(half_edge->origin->point.x * width)), static_cast<int>(std::round(half_edge->origin->point.y * height)));
-          Point destination(static_cast<int>(std::round(half_edge->destination->point.x * width)), static_cast<int>(std::round(half_edge->destination->point.y * height)));
-          /* copy_site.edges.push_back({origin, destination}); */
+          const auto origin = half_edge->origin->point.convert(width, height);
+          const auto destination = half_edge->destination->point.convert(width, height);
 
           // If any of the edges points lays on water annotate it as coast
           if (island.mask[origin.y*width + origin.x] == 1 || island.mask[destination.y*width + destination.y] == 1)
           {
-            /* copy_site.is_coast = true; */
             is_coast = true;
           }
         }
@@ -1061,27 +1051,19 @@ namespace dl
       }
 
       // Re check if it's a coast site if any of the edges points lays on water
-      /* if (!copy_site.is_coast) */
       if (!is_coast)
       {
-        /* copy_site.is_coast = m_center_is_coast(copy_site.center, island.mask, width, height); */
-        is_coast = m_center_is_coast(Point(center_x, center_y), island.mask, width, height);
+        is_coast = m_center_is_coast(center, island.mask, width, height);
       }
-
-      /* island.structure.sites.push_back(copy_site); */
-      /* const int site_index = island.structure.sites.size() - 1; */
 
       if (is_coast)
       {
         island.structure.coast_sites.push_back(&site);
-        /* island.structure.coast_indexes.push_back(site_index); */
       }
       else
       {
         island.structure.land_sites.push_back(&site);
-        /* island.structure.land_indexes.push_back(site_index); */
       }
-
     }
   }
 

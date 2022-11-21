@@ -423,17 +423,17 @@ private:
             if (cellVertices[2 * side] != nullptr)
             {
                 // Link vertices 
-                auto halfEdge = mDiagram.createHalfEdge(mDiagram.getFace(i));
-                halfEdge->origin = cellVertices[2 * side]->vertex;
-                halfEdge->destination = cellVertices[2 * side + 1]->vertex;
-                cellVertices[2 * side]->nextHalfEdge = halfEdge;
-                halfEdge->prev = cellVertices[2 * side]->prevHalfEdge;
+                auto half_edge = mDiagram.createHalfEdge(mDiagram.getFace(i));
+                half_edge->origin = cellVertices[2 * side]->vertex;
+                half_edge->destination = cellVertices[2 * side + 1]->vertex;
+                cellVertices[2 * side]->nextHalfEdge = half_edge;
+                half_edge->prev = cellVertices[2 * side]->prevHalfEdge;
                 if (cellVertices[2 * side]->prevHalfEdge != nullptr)
-                    cellVertices[2 * side]->prevHalfEdge->next = halfEdge;
-                cellVertices[2 * side + 1]->prevHalfEdge = halfEdge;
-                halfEdge->next = cellVertices[2 * side + 1]->nextHalfEdge;
+                    cellVertices[2 * side]->prevHalfEdge->next = half_edge;
+                cellVertices[2 * side + 1]->prevHalfEdge = half_edge;
+                half_edge->next = cellVertices[2 * side + 1]->nextHalfEdge;
                 if (cellVertices[2 * side + 1]->nextHalfEdge != nullptr)
-                    cellVertices[2 * side + 1]->nextHalfEdge->prev = halfEdge;
+                    cellVertices[2 * side + 1]->nextHalfEdge->prev = half_edge;
             }
         }
     }

@@ -218,8 +218,8 @@ public:
         auto verticesToRemove = std::unordered_set<Vertex*>();
         for (const auto& site : mSites)
         {
-            auto halfEdge = site.face->outerComponent;
-            auto inside = box.contains(halfEdge->origin->point);
+            auto half_edge = site.face->outerComponent;
+            auto inside = box.contains(half_edge->origin->point);
             auto outerComponentDirty = !inside;
             auto incomingHalfEdge = static_cast<HalfEdge*>(nullptr); // First half edge coming in the box
             auto outgoingHalfEdge = static_cast<HalfEdge*>(nullptr); // Last half edge going out the box
@@ -228,42 +228,42 @@ public:
             do
             {
                 auto intersections = std::array<typename Box<T>::Intersection, 2>{};
-                auto nbIntersections = box.getIntersections(halfEdge->origin->point, halfEdge->destination->point, intersections);
-                auto nextInside = box.contains(halfEdge->destination->point);
-                auto nextHalfEdge = halfEdge->next;
+                auto nbIntersections = box.getIntersections(half_edge->origin->point, half_edge->destination->point, intersections);
+                auto nextInside = box.contains(half_edge->destination->point);
+                auto nextHalfEdge = half_edge->next;
                 // The two points are outside the box 
                 if (!inside && !nextInside)
                 {
                     // The edge is outside the box
                     if (nbIntersections == 0)
                     {
-                        verticesToRemove.emplace(halfEdge->origin);
-                        removeHalfEdge(halfEdge);
+                        verticesToRemove.emplace(half_edge->origin);
+                        removeHalfEdge(half_edge);
                     }
                     // The edge crosses twice the frontiers of the box
                     else if (nbIntersections == 2)
                     {
-                        verticesToRemove.emplace(halfEdge->origin);
-                        if (processedHalfEdges.find(halfEdge->twin) != processedHalfEdges.end())
+                        verticesToRemove.emplace(half_edge->origin);
+                        if (processedHalfEdges.find(half_edge->twin) != processedHalfEdges.end())
                         {
-                            halfEdge->origin = halfEdge->twin->destination;
-                            halfEdge->destination = halfEdge->twin->origin;
+                            half_edge->origin = half_edge->twin->destination;
+                            half_edge->destination = half_edge->twin->origin;
                         }
                         else
                         {
-                            halfEdge->origin = createVertex(intersections[0].point);
-                            halfEdge->destination = createVertex(intersections[1].point);
+                            half_edge->origin = createVertex(intersections[0].point);
+                            half_edge->destination = createVertex(intersections[1].point);
                         }
                         if (outgoingHalfEdge != nullptr)
-                            link(box, outgoingHalfEdge, outgoingSide, halfEdge, intersections[0].side);
+                            link(box, outgoingHalfEdge, outgoingSide, half_edge, intersections[0].side);
                         if (incomingHalfEdge == nullptr)
                         {
-                           incomingHalfEdge = halfEdge;
+                           incomingHalfEdge = half_edge;
                            incomingSide = intersections[0].side;
                         }
-                        outgoingHalfEdge = halfEdge;
+                        outgoingHalfEdge = half_edge;
                         outgoingSide = intersections[1].side;
-                        processedHalfEdges.emplace(halfEdge);
+                        processedHalfEdges.emplace(half_edge);
                     }
                     else
                         success = false;
@@ -274,13 +274,13 @@ public:
                     // We accept >= 1 as a corner can be found twice
                     if (nbIntersections >= 1)
                     {
-                        if (processedHalfEdges.find(halfEdge->twin) != processedHalfEdges.end())
-                            halfEdge->destination = halfEdge->twin->origin;
+                        if (processedHalfEdges.find(half_edge->twin) != processedHalfEdges.end())
+                            half_edge->destination = half_edge->twin->origin;
                         else
-                            halfEdge->destination = createVertex(intersections[0].point);
-                        outgoingHalfEdge = halfEdge;
+                            half_edge->destination = createVertex(intersections[0].point);
+                        outgoingHalfEdge = half_edge;
                         outgoingSide = intersections[0].side;
-                        processedHalfEdges.emplace(halfEdge);
+                        processedHalfEdges.emplace(half_edge);
                     }
                     else
                         success = false;
@@ -291,27 +291,27 @@ public:
                     // We accept >= 1 as a corner can be found twice
                     if (nbIntersections >= 1)
                     {
-                        verticesToRemove.emplace(halfEdge->origin);
-                        if (processedHalfEdges.find(halfEdge->twin) != processedHalfEdges.end())
-                            halfEdge->origin = halfEdge->twin->destination;
+                        verticesToRemove.emplace(half_edge->origin);
+                        if (processedHalfEdges.find(half_edge->twin) != processedHalfEdges.end())
+                            half_edge->origin = half_edge->twin->destination;
                         else
-                            halfEdge->origin = createVertex(intersections[0].point);
+                            half_edge->origin = createVertex(intersections[0].point);
                         if (outgoingHalfEdge != nullptr)
-                            link(box, outgoingHalfEdge, outgoingSide, halfEdge, intersections[0].side);
+                            link(box, outgoingHalfEdge, outgoingSide, half_edge, intersections[0].side);
                         if (incomingHalfEdge == nullptr)
                         {
-                           incomingHalfEdge = halfEdge;
+                           incomingHalfEdge = half_edge;
                            incomingSide = intersections[0].side;
                         }
-                        processedHalfEdges.emplace(halfEdge);
+                        processedHalfEdges.emplace(half_edge);
                     }
                     else
                         success = false;
                 }
-                halfEdge = nextHalfEdge;
+                half_edge = nextHalfEdge;
                 // Update inside
                 inside = nextInside;
-            } while (halfEdge != site.face->outerComponent);
+            } while (half_edge != site.face->outerComponent);
             // Link the last and the first half edges inside the box
             if (outerComponentDirty && incomingHalfEdge != nullptr)
                 link(box, outgoingHalfEdge, outgoingSide, incomingHalfEdge, incomingSide);
@@ -344,15 +344,15 @@ public:
         {
             auto area = static_cast<T>(0.0);
             auto centroid = Vector2<T>();
-            auto halfEdge = face.outerComponent;
+            auto half_edge = face.outerComponent;
             // Compute centroid of the face
             do
             {
-                auto det = halfEdge->origin->point.getDet(halfEdge->destination->point);
+                auto det = half_edge->origin->point.getDet(half_edge->destination->point);
                 area += det;
-                centroid += (halfEdge->origin->point + halfEdge->destination->point) * det;
-                halfEdge = halfEdge->next;
-            } while (halfEdge != face.outerComponent);
+                centroid += (half_edge->origin->point + half_edge->destination->point) * det;
+                half_edge = half_edge->next;
+            } while (half_edge != face.outerComponent);
             area *= 0.5;
             centroid *= 1.0 / (6.0 * area);
             sites.push_back(centroid);
@@ -378,19 +378,19 @@ public:
         for (auto i = std::size_t(0); i < mSites.size(); ++i)
         {
             auto face = mFaces[i];
-            auto halfEdge = face.outerComponent;
-            while (halfEdge->prev != nullptr)
+            auto half_edge = face.outerComponent;
+            while (half_edge->prev != nullptr)
             {
-                halfEdge = halfEdge->prev;
-                if (halfEdge == face.outerComponent)
+                half_edge = half_edge->prev;
+                if (half_edge == face.outerComponent)
                     break;
             }
-            while (halfEdge != nullptr)
+            while (half_edge != nullptr)
             {
-                if (halfEdge->twin != nullptr)
-                    neighbors[i].push_back(halfEdge->twin->incidentFace->site->index);
-                halfEdge = halfEdge->next;
-                if (halfEdge == face.outerComponent)
+                if (half_edge->twin != nullptr)
+                    neighbors[i].push_back(half_edge->twin->incidentFace->site->index);
+                half_edge = half_edge->next;
+                if (half_edge == face.outerComponent)
                     break;
             }
         }
@@ -457,23 +457,23 @@ private:
 
     void link(Box<T> box, HalfEdge* start, typename Box<T>::Side startSide, HalfEdge* end, typename Box<T>::Side endSide)
     {
-        auto halfEdge = start;
+        auto half_edge = start;
         auto side = static_cast<int>(startSide);
         while (side != static_cast<int>(endSide))
         {
             side = (side + 1) % 4;
-            halfEdge->next = createHalfEdge(start->incidentFace);
-            halfEdge->next->prev = halfEdge;
-            halfEdge->next->origin = halfEdge->destination;
-            halfEdge->next->destination = createCorner(box, static_cast<typename Box<T>::Side>(side));
-            halfEdge = halfEdge->next;
+            half_edge->next = createHalfEdge(start->incidentFace);
+            half_edge->next->prev = half_edge;
+            half_edge->next->origin = half_edge->destination;
+            half_edge->next->destination = createCorner(box, static_cast<typename Box<T>::Side>(side));
+            half_edge = half_edge->next;
         }
-        halfEdge->next = createHalfEdge(start->incidentFace);
-        halfEdge->next->prev = halfEdge;
-        end->prev = halfEdge->next;
-        halfEdge->next->next = end;
-        halfEdge->next->origin = halfEdge->destination;
-        halfEdge->next->destination = end->origin;
+        half_edge->next = createHalfEdge(start->incidentFace);
+        half_edge->next->prev = half_edge;
+        end->prev = half_edge->next;
+        half_edge->next->next = end;
+        half_edge->next->origin = half_edge->destination;
+        half_edge->next->destination = end->origin;
     }
 
     void removeVertex(Vertex* vertex)
@@ -481,9 +481,9 @@ private:
         mVertices.erase(vertex->it);
     }
 
-    void removeHalfEdge(HalfEdge* halfEdge)
+    void removeHalfEdge(HalfEdge* half_edge)
     {
-        mHalfEdges.erase(halfEdge->it);
+        mHalfEdges.erase(half_edge->it);
     }
 };
 
