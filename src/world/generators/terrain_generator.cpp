@@ -6,9 +6,12 @@
 #include <chrono>
 #include <random>
 #include <libtcod.hpp>
+#include "./lib/fast_noise_lite.hpp"
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./lib/gal/fortune_algorithm.hpp"
 #include "./lib/bezier.hpp"
+#include "./tile_type.hpp"
+#include "./bay_data.hpp"
 
 // TEMP
 #include <iostream>
@@ -129,15 +132,16 @@ namespace dl
     const auto simplex_gain = m_lua.get_variable<float>("simplex_gain");
     const auto simplex_weighted_strength = m_lua.get_variable<float>("simplex_weighted_strength");
 
-    m_noise.SetSeed(seed);
-    m_noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
-    m_noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXYPlanes);
-    m_noise.SetFrequency(simplex_freq);
-    m_noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm);
-    m_noise.SetFractalOctaves(simplex_octaves);
-    m_noise.SetFractalLacunarity(simplex_lacunarity);
-    m_noise.SetFractalGain(simplex_gain);
-    m_noise.SetFractalWeightedStrength(simplex_weighted_strength);
+    auto noise = FastNoiseLite{seed};
+    noise.SetSeed(seed);
+    noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
+    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXYPlanes);
+    noise.SetFrequency(simplex_freq);
+    noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm);
+    noise.SetFractalOctaves(simplex_octaves);
+    noise.SetFractalLacunarity(simplex_lacunarity);
+    noise.SetFractalGain(simplex_gain);
+    noise.SetFractalWeightedStrength(simplex_weighted_strength);
 
     const auto tier_land = m_lua.get_variable<float>("tier_land");
 
@@ -147,7 +151,7 @@ namespace dl
       {
         const float gradient = m_get_rectangle_gradient_value(i, j, width, height); 
 
-        const float noise_value =  m_noise.GetNoise(static_cast<float>(i), static_cast<float>(j)) - gradient;
+        const float noise_value =  noise.GetNoise(static_cast<float>(i), static_cast<float>(j)) - gradient;
 
         int tile_value;
 
@@ -1422,12 +1426,12 @@ namespace dl
     return 2.0 * ((point_b.x - point_a.x)*(point_c.y - point_a.y) - (point_b.y - point_a.y)*(point_c.x - point_a.x)) / (length_1 * length_2 * length_3);
   }
 
-  void TerrainGenerator::m_draw_point(const Point<int>& point, const TileType value, std::vector<int>& tiles, const int width)
+  void TerrainGenerator::m_draw_point(const Point<int>& point, const int value, std::vector<int>& tiles, const int width)
   {
     tiles[point.y*width + point.x] = value;
   }
 
-  void TerrainGenerator::m_draw_big_point(const Point<int>& point, const TileType value, std::vector<int>& tiles, const int width)
+  void TerrainGenerator::m_draw_big_point(const Point<int>& point, const int value, std::vector<int>& tiles, const int width)
   {
     tiles[point.y*width + point.x] = value;
     tiles[point.left().y*width + point.left().x] = value;
@@ -1440,7 +1444,7 @@ namespace dl
     /* tiles[point.bottom_right().y*width + point.bottom_right().x] = value; */
   }
 
-  void TerrainGenerator::m_draw_line(const Point<int>& origin, const Point<int>& destination, const TileType value, std::vector<int>& tiles, const int width, const int height)
+  void TerrainGenerator::m_draw_line(const Point<int>& origin, const Point<int>& destination, const int value, std::vector<int>& tiles, const int width, const int height)
   {
     int x = origin.x;
     int y = origin.y;

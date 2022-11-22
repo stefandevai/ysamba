@@ -4,19 +4,12 @@
 #include <queue>
 #include "../../core/lua_api.hpp"
 #include "../point.hpp"
-#include "./lib/fast_noise_lite.hpp"
 #include "./island_data.hpp"
+#include "./river_segment.hpp"
 
 namespace dl
 {
-  enum TileType
-  {
-    None,
-    Water,
-    Land,
-    Red,
-    Yellow,
-  };
+  struct BayData;
 
   class CompareVectorSizes
   {
@@ -27,23 +20,6 @@ namespace dl
       }
   };
 
-  struct BayData
-  {
-    BayData(const int area, const Point<int>& point) : area(area), point(point) {}
-    int area = 0;
-    Point<int> point = Point<int>(0, 0);
-  };
-
-  struct RiverSegment
-  {
-    Point<int> point;
-    Point<double> center;
-    Point<double> normal;
-    double length = 0.0;
-    std::shared_ptr<RiverSegment> previous;
-    std::shared_ptr<RiverSegment> next;
-  };
-
   using IslandQueue = std::priority_queue<IslandData, std::vector<IslandData>, CompareVectorSizes>;
 
   class TerrainGenerator
@@ -52,7 +28,6 @@ namespace dl
       static std::vector<int> generate(const int width, const int height, const int seed);
 
     private:
-      static inline FastNoiseLite m_noise = FastNoiseLite{1337};
       static inline LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
 
       static void m_generate_silhouette(std::vector<int>& tiles, const int width, const int height, const int seed);
@@ -83,8 +58,8 @@ namespace dl
       static double m_menger_curvature(const Point<int>& point_a, const Point<int>& point_b, const Point<int>& point_c, const double length_1, const double length_2, const double length_3);
 
       // Debug functions
-      static void m_draw_point(const Point<int>& point, const TileType value, std::vector<int>& tiles, const int width);
-      static void m_draw_big_point(const Point<int>& point, const TileType value, std::vector<int>& tiles, const int width);
-      static void m_draw_line(const Point<int>& origin, const Point<int>& destination, const TileType value, std::vector<int>& tiles, const int width, const int height);
+      static void m_draw_point(const Point<int>& point, const int value, std::vector<int>& tiles, const int width);
+      static void m_draw_big_point(const Point<int>& point, const int value, std::vector<int>& tiles, const int width);
+      static void m_draw_line(const Point<int>& origin, const Point<int>& destination, const int value, std::vector<int>& tiles, const int width, const int height);
   };
 }
