@@ -7,8 +7,8 @@
 #include <random>
 #include <libtcod.hpp>
 #include "./lib/poisson_disk_sampling.hpp"
-#include "./lib/sweepline.hpp"
-#include "lib/gal/fortune_algorithm.hpp"
+#include "./lib/gal/fortune_algorithm.hpp"
+#include "./lib/bezier.hpp"
 
 // TEMP
 #include <iostream>
@@ -72,9 +72,9 @@ namespace dl
       const auto draw_structure = m_lua.get_variable<bool>("draw_structure");
       if (draw_structure)
       {
-        for (auto site : main_island.structure.coast_sites)
+        for (auto site : main_island.structure.diagram.get_sites())
         {
-          m_draw_big_point(Point<int>(site->point.x * width, site->point.y * height), 5, tiles, width);
+          m_draw_big_point(site.point.convert(width, height), 5, tiles, width);
         }
         /* for (const auto& site : main_island.structure.sites) */
         /* for (const auto index : main_island.structure.coast_indexes) */
@@ -1159,7 +1159,7 @@ namespace dl
   {
     const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, width, height, seed);
     auto river = m_get_river_segments(source, mouth, tiles, width, seed);
-    m_create_meanders(river, tiles, width, height);
+    /* m_create_meanders(river, tiles, width, height); */
 
     // Draw river
     m_draw_line(source, river[0]->point, 1, tiles, width, height);
@@ -1180,6 +1180,7 @@ namespace dl
   std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth(IslandData& island, std::vector<Point<int>>& bays, const int width, const int height, const int seed)
   {
     assert(bays.size() > 0 && "There are no bays identified");
+    assert(island.structure.land_sites.size() > 0 && "There are no land sites");
 
     std::mt19937 rng(seed);
     std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_sites.size() - 1);
@@ -1187,9 +1188,8 @@ namespace dl
     const auto min_source_mouth_distance_x = m_lua.get_variable<int>("min_source_mouth_distance_x");
     const auto min_source_mouth_distance_y = m_lua.get_variable<int>("min_source_mouth_distance_y");
 
-    int source_index = 0;
-    /* auto& source_point = island.structure.sites[0].center; */
-    auto source_point = Point<int>(island.structure.diagram.get_sites()[0].point.x * width, island.structure.diagram.get_sites()[0].point.y * height);
+    auto source_site = island.structure.land_sites[0];
+    auto source_point = source_site->point.convert(width, height);
     auto& mouth_point = bays[0];
 
     bool found_river_points = false;
@@ -1242,7 +1242,7 @@ namespace dl
         has_reached_first_limit = true;
       }
 
-      const auto source_site = island.structure.land_sites[land_indexes_dist(rng)];
+      source_site = island.structure.land_sites[land_indexes_dist(rng)];
       source_point = Point<int>(source_site->point.x * width, source_site->point.y * height);
 
       // Make sure that source point is on the upper part of the island
@@ -1344,8 +1344,6 @@ namespace dl
     TCOD_bresenham_data_t bresenham_data;
     TCOD_line_init_mt(x, y, mouth.x, mouth.y, &bresenham_data);
     int count = 0;
-    float deviation_x = 0.f;
-    float deviation_y = 0.f;
 
     do
     {
@@ -1388,7 +1386,6 @@ namespace dl
       /* segment->point.x = x + deviation_x; */
       /* segment->point.y = y + deviation_y; */
 
-      /* std::cout << "DEVIATION: " << deviation_x << ' ' << deviation_y << '\n'; */
 
       if (noise_value_x > 0.66f)
       {

@@ -2,7 +2,7 @@
 draw_features = true
 draw_coastline = false
 draw_bays = true
-draw_structure = true
+draw_structure = false
 
 -- Silhouette
 simplex_freq = 0.005
@@ -30,3 +30,6 @@ river_noise_lacunarity = 2.2
 river_noise_gain = 0.7
 river_noise_weighted_strength = 0.1
 river_noise_weight = 5
+
+-- Temp
+temp_max_n = 6

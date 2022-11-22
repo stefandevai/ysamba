@@ -7,6 +7,9 @@ camera_height = 36
 -- Almost square island
 seed = 340683964
 
+-- No bays identified bug
+-- seed = 1370743690
+
 -- River crossing water
 -- seed = 700862761
 
