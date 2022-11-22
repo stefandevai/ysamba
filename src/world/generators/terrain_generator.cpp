@@ -1162,18 +1162,14 @@ namespace dl
     /* m_create_meanders(river, tiles, width, height); */
 
     // Draw river
-    m_draw_line(source, river[0]->point, 1, tiles, width, height);
-
     for (const auto& segment : river)
     {
-      if (segment->next != nullptr)
+      if (segment->next == nullptr)
       {
-        m_draw_line(segment->point, segment->next->point, 1, tiles, width, height);
+        break;
       }
-      else
-      {
-        m_draw_line(segment->point, mouth, 1, tiles, width, height);
-      }
+
+      m_draw_line(segment->point, segment->next->point, 1, tiles, width, height);
     }
   }
 
@@ -1320,98 +1316,28 @@ namespace dl
   {
     std::vector<std::shared_ptr<RiverSegment>> river;
 
-    const auto river_noise_freq = m_lua.get_variable<float>("river_noise_freq");
-    const auto river_noise_octaves = m_lua.get_variable<int>("river_noise_octaves");
-    const auto river_noise_lacunarity = m_lua.get_variable<float>("river_noise_lacunarity");
-    const auto river_noise_gain = m_lua.get_variable<float>("river_noise_gain");
-    const auto river_noise_weighted_strength = m_lua.get_variable<float>("river_noise_weighted_strength");
-    const int river_noise_weight = m_lua.get_variable<int>("river_noise_weight");
+    const auto step = m_lua.get_variable<float>("river_bezier_step");
+    const auto control1_delta_x = m_lua.get_variable<int>("river_control1_delta_x");
+    const auto control1_delta_y = m_lua.get_variable<int>("river_control1_delta_y");
+    const auto control2_delta_x = m_lua.get_variable<int>("river_control2_delta_x");
+    const auto control2_delta_y = m_lua.get_variable<int>("river_control2_delta_y");
 
-    m_noise.SetSeed(seed);
-    m_noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
-    m_noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXYPlanes);
-    m_noise.SetFrequency(river_noise_freq);
-    m_noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm);
-    m_noise.SetFractalOctaves(river_noise_octaves);
-    m_noise.SetFractalLacunarity(river_noise_lacunarity);
-    m_noise.SetFractalGain(river_noise_gain);
-    m_noise.SetFractalWeightedStrength(river_noise_weighted_strength);
+    const float control1_x = static_cast<float>(((source.x + mouth.x) / 3) + control1_delta_x);
+    const float control1_y = static_cast<float>(((source.y + mouth.y) / 3) + control1_delta_y);
 
-    int x = source.x;
-    int y = source.y;
+    const float control2_x = static_cast<float>((2 * (source.x + mouth.x) / 3) + control2_delta_x);
+    const float control2_y = static_cast<float>((2 * (source.y + mouth.y) / 3) + control2_delta_y);
+
+    Bezier::Bezier<3> cubic_bezier({ {static_cast<float>(source.x), static_cast<float>(source.y)}, {control1_x, control1_y}, {control2_x, control2_y}, {static_cast<float>(mouth.x), static_cast<float>(mouth.y)} });
+
     std::shared_ptr<RiverSegment> last_segment = nullptr;
 
-    TCOD_bresenham_data_t bresenham_data;
-    TCOD_line_init_mt(x, y, mouth.x, mouth.y, &bresenham_data);
-    int count = 0;
-
-    do
+    for (float i = 0.f; i < 1.f; i += step)
     {
-      ++count;
-      if (count % 4 != 0)
-      {
-        continue;
-      }
-      const float noise_value_x = static_cast<int>(std::round(m_noise.GetNoise(static_cast<float>(x), static_cast<float>(y)) * river_noise_weight));
-      const float noise_value_y = static_cast<int>(std::round(m_noise.GetNoise(-static_cast<float>(x), -static_cast<float>(y)) * river_noise_weight));
-
+      const auto point = cubic_bezier.valueAt(i);
       auto segment = std::make_shared<RiverSegment>();
-
-      /* if (noise_value_x > 0.66f) */
-      /* { */
-      /*   deviation_x = 3.f; */
-      /* } */
-      /* else if (noise_value_y > 0.33f) */
-      /* { */
-      /*   deviation_x = -3.f; */
-      /* } */
-      /* else */
-      /* { */
-      /*   deviation_x = 0.f; */
-      /* } */
-
-      /* if (noise_value_y > 0.66f) */
-      /* { */
-      /*   deviation_y = 3.f; */
-      /* } */
-      /* else if (noise_value_y > 0.33f) */
-      /* { */
-      /*   deviation_y = -3.f; */
-      /* } */
-      /* else */
-      /* { */
-      /*   deviation_y = 0.f; */
-      /* } */
-
-      /* segment->point.x = x + deviation_x; */
-      /* segment->point.y = y + deviation_y; */
-
-
-      if (noise_value_x > 0.66f)
-      {
-        segment->point.x = x - 5.f;
-      }
-      else if (noise_value_x > 0.33f)
-      {
-        segment->point.x = x + 5.f;
-      }
-      else
-      {
-        segment->point.x = x;
-      }
-
-      if (noise_value_y > 0.66f)
-      {
-        segment->point.y = y - 5.f;
-      }
-      else if (noise_value_y > 0.33f)
-      {
-        segment->point.y = y + 5.f;
-      }
-      else
-      {
-        segment->point.y = y;
-      }
+      segment->point.x = std::round(point.x);
+      segment->point.y = std::round(point.y);
 
       river.push_back(segment);
       const auto current_index = river.size() - 1;
@@ -1421,47 +1347,20 @@ namespace dl
         // Add pointers between segments
         last_segment->next = river[current_index];
         river[current_index]->previous = last_segment;
-
-        // Calculate center point and normal vector
-        const auto& p1 = last_segment->point;
-        const auto& p2 = river[current_index]->point;
-
-        const double center_x = (p1.x + p2.x)/2.0;
-        const double center_y = (p1.y + p2.y)/2.0;
-
-        const double raw_normal_x = - (p2.y - p1.y);
-        const double raw_normal_y = p2.x - p1.x;
-
-        const double length = m_distance(p1, p2);
-
-        last_segment->length = length;
-
-        if (length != 0.0)
-        {
-          const double normal_x = raw_normal_x / length;
-          const double normal_y = raw_normal_y / length;
-
-          last_segment->center = Point<double>(center_x, center_y);
-          last_segment->normal = Point<double>(normal_x, normal_y);
-
-          /* Point<int> origin(static_cast<int>(center_x), static_cast<int>(center_y)); */
-          /* Point<int> destination(static_cast<int>(center_x + 1.0*normal_x), static_cast<int>(center_y + 1.0*normal_y)); */
-
-          /* std::cout << "POINTS: " << p1.x << ' ' << p1.y << ", " << p2.x << ' ' << p2.y << '\n'; */
-          /* std::cout << "MIDDLE: " << center_x << ' ' << center_y << '\n'; */
-          /* std::cout << "DISTANCE: " << length << '\n'; */
-          /* std::cout << "RAW NORMAL: " << raw_normal_x << ' ' << raw_normal_y << '\n'; */
-          /* std::cout << "NORMAL: " << normal_x << ' ' << normal_y << '\n'; */
-          /* std::cout << "POINTS: " << origin.x << ' ' << origin.y << ", " << destination.x << ' ' << destination.y << '\n'; */
-          /* std::cout << '\n'; */
-
-          /* m_draw_line(origin, destination, 4, tiles, width, 512); */
-        }
       }
 
       last_segment = river[current_index];
     }
-    while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
+
+    assert(!river.empty() && "River curve was not generated");
+
+    // Add connection from last segment to the mouth
+    auto segment = std::make_shared<RiverSegment>();
+    segment->point = mouth;
+    river.push_back(segment);
+    const auto current_index = river.size() - 1;
+    last_segment->next = river[current_index];
+    river[current_index]->previous = last_segment;
 
     return river;
   }

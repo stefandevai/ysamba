@@ -24,12 +24,8 @@ coast_length = 53
 -- River
 min_source_mouth_distance_x = 30
 min_source_mouth_distance_y = 100
-river_noise_freq = 0.015
-river_noise_octaves = 3
-river_noise_lacunarity = 2.2
-river_noise_gain = 0.7
-river_noise_weighted_strength = 0.1
-river_noise_weight = 5
-
--- Temp
-temp_max_n = 6
+river_bezier_step = 0.1
+river_control1_delta_x = 100
+river_control1_delta_y = 100
+river_control2_delta_x = -100
+river_control2_delta_y = -100
