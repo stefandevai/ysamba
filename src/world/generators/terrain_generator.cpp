@@ -10,6 +10,7 @@
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./lib/gal/fortune_algorithm.hpp"
 #include "./lib/bezier.hpp"
+#include "./lib/spline.hpp"
 #include "./tile_type.hpp"
 #include "./bay_data.hpp"
 
@@ -1164,7 +1165,7 @@ namespace dl
   {
     const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, seed);
     auto river = m_get_river_segments(source, mouth);
-    m_create_meanders(river, tiles);
+    /* m_create_meanders(river, tiles); */
 
     // Draw river
     for (const auto& segment : river)
