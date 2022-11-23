@@ -1352,6 +1352,7 @@ namespace dl
       const auto& point = cubic_bezier.valueAt(t);
       const auto previous_point = cubic_bezier.valueAt(t - step);
       const auto normal = cubic_bezier.normalAt(t - step);
+      const auto tangent = cubic_bezier.tangentAt(t - step);
 
       const double center_x = (previous_point.x + point.x)/2.0;
       const double center_y = (previous_point.y + point.y)/2.0;
@@ -1361,6 +1362,7 @@ namespace dl
       segment_a->length = length;
       segment_a->center = Point<double>(center_x, center_y);
       segment_a->normal = Point<double>(normal.x, normal.y);
+      segment_a->tangent = Point<double>(tangent.x, tangent.y);
     };
 
     std::shared_ptr<RiverSegment> last_segment = nullptr;
@@ -1399,6 +1401,7 @@ namespace dl
     const auto min_curvature = m_lua.get_variable<double>("river_min_curvature");
     const auto max_curvature = m_lua.get_variable<double>("river_max_curvature");
     const auto normal_scale = m_lua.get_variable<double>("river_normal_scale");
+    const auto tangent_scale = m_lua.get_variable<double>("river_tangent_scale");
 
     for (auto& segment : river)
     {
@@ -1425,10 +1428,26 @@ namespace dl
         curvature = std::min(curvature, max_curvature);
       }
 
+      /* std::cout << "TANGENT: " << segment->tangent.x << ' ' << segment->tangent.y << '\n'; */
+
       const double normal_length = curvature * normal_scale * -1.0;
-      Point<int> normal_origin(static_cast<int>(std::round(segment->center.x)), static_cast<int>(std::round(segment->center.y)));
-      Point<int> normal_destination(static_cast<int>(std::round(segment->center.x + normal_length*segment->normal.x)), static_cast<int>(std::round(segment->center.y + normal_length*segment->normal.y)));
-      m_draw_line(normal_origin, normal_destination, TileType::Red, tiles);
+      const double new_n_x = segment->normal.x + segment->tangent.x;
+      const double new_n_y = segment->normal.y + segment->tangent.y;
+      /* const double new_t_x = segment->tangent.x; */
+      /* const double new_t_y = segment->tangent.y; */
+      /* const double final_x = sqrt(new_n_x * new_n_x + new_t_x * new_t_x) * normal_length * -1.0; */
+      /* const double final_y = sqrt(new_n_y * new_n_y + new_t_y * new_t_y) * normal_length * -1.0; */
+      const double final_x = new_n_x * normal_length;
+      const double final_y = new_n_y * normal_length;
+
+      Point<int> origin(static_cast<int>(std::round(segment->point.x)), static_cast<int>(std::round(segment->point.y)));
+      Point<int> normal_destination(static_cast<int>(std::round(segment->point.x + normal_length * segment->normal.x)), static_cast<int>(std::round(segment->point.y + normal_length * segment->normal.y)));
+      Point<int> tangent_destination(static_cast<int>(std::round(segment->point.x + tangent_scale * segment->tangent.x)), static_cast<int>(std::round(segment->point.y + tangent_scale * segment->tangent.y)));
+      Point<int> final_destination(static_cast<int>(std::round(segment->point.x + final_x)), static_cast<int>(std::round(segment->point.y + final_y)));
+
+      /* m_draw_line(origin, normal_destination, TileType::Yellow, tiles); */
+      /* m_draw_line(origin, normal_destination, TileType::Red, tiles); */
+      m_draw_line(origin, final_destination, TileType::Red, tiles);
     }
   }
 

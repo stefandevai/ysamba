@@ -7,6 +7,7 @@ namespace dl
     None,
     Water,
     Land,
+    Grass,
     Red,
     Yellow,
   };
