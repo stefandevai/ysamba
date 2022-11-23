@@ -1340,6 +1340,29 @@ namespace dl
 
     Bezier::Bezier<3> cubic_bezier({ {static_cast<float>(source.x), static_cast<float>(source.y)}, {control1_x, control1_y}, {control2_x, control2_y}, {static_cast<float>(mouth.x), static_cast<float>(mouth.y)} });
 
+    auto add_segment_data = [&cubic_bezier, step](std::shared_ptr<RiverSegment> segment_a, std::shared_ptr<RiverSegment> segment_b, const float t)
+    {
+      assert(segment_a != nullptr && segment_b != nullptr && "Segment pointers must not be null");
+
+      // Add pointers between segments
+      segment_a->next = segment_b;
+      segment_b->previous = segment_a;
+
+      // Calculate precise values on the bezier curve
+      const auto& point = cubic_bezier.valueAt(t);
+      const auto previous_point = cubic_bezier.valueAt(t - step);
+      const auto normal = cubic_bezier.normalAt(t - step);
+
+      const double center_x = (previous_point.x + point.x)/2.0;
+      const double center_y = (previous_point.y + point.y)/2.0;
+      const double length = sqrt((previous_point.x - point.x) * (previous_point.x - point.x) + (previous_point.y - point.y) * (previous_point.y - point.y));
+
+      // Assign data to segment A
+      segment_a->length = length;
+      segment_a->center = Point<double>(center_x, center_y);
+      segment_a->normal = Point<double>(normal.x, normal.y);
+    };
+
     std::shared_ptr<RiverSegment> last_segment = nullptr;
 
     for (float i = 0.f; i < 1.f; i += step)
@@ -1349,33 +1372,13 @@ namespace dl
       segment->point.x = point.x;
       segment->point.y = point.y;
 
-      river.push_back(segment);
-      const auto current_index = river.size() - 1;
-
       if (last_segment != nullptr)
       {
-        // Add pointers between segments
-        last_segment->next = river[current_index];
-        river[current_index]->previous = last_segment;
-
-        const auto previous_point = cubic_bezier.valueAt(i - step);
-        const double center_x = (previous_point.x + point.x)/2.0;
-        const double center_y = (previous_point.y + point.y)/2.0;
-        const double raw_normal_x = - (point.y - previous_point.y);
-        const double raw_normal_y = point.x - previous_point.x;
-        const double length = sqrt((previous_point.x - point.x) * (previous_point.x - point.x) + (previous_point.y - point.y) * (previous_point.y - point.y));
-        last_segment->length = length;
-
-        if (length != 0.0)
-        {
-          const double normal_x = raw_normal_x / length;
-          const double normal_y = raw_normal_y / length;
-          last_segment->center = Point<double>(center_x, center_y);
-          last_segment->normal = Point<double>(normal_x, normal_y);
-        }
+        add_segment_data(last_segment, segment, i);
       }
 
-      last_segment = river[current_index];
+      last_segment = segment;
+      river.push_back(segment);
     }
 
     assert(!river.empty() && "River curve was not generated");
@@ -1383,28 +1386,8 @@ namespace dl
     // Add connection from last segment to the mouth
     auto segment = std::make_shared<RiverSegment>();
     segment->point = Point<double>(mouth.x, mouth.y);
+    add_segment_data(last_segment, segment, 1.f);
     river.push_back(segment);
-    const auto current_index = river.size() - 1;
-    last_segment->next = river[current_index];
-    river[current_index]->previous = last_segment;
-
-    /* const auto& p1 = last_segment->point; */
-    /* const auto& p2 = river[current_index]->point; */
-    /* const double center_x = (p1.x + p2.x)/2.0; */
-    /* const double center_y = (p1.y + p2.y)/2.0; */
-    /* const double raw_normal_x = - (p2.y - p1.y); */
-    /* const double raw_normal_y = p2.x - p1.x; */
-    /* const double length = m_distance(p1, p2); */
-
-    /* last_segment->length = length; */
-
-    /* if (length != 0.0) */
-    /* { */
-    /*   const double normal_x = raw_normal_x / length; */
-    /*   const double normal_y = raw_normal_y / length; */
-    /*   last_segment->center = Point<double>(center_x, center_y); */
-    /*   last_segment->normal = Point<double>(normal_x, normal_y); */
-    /* } */
 
     return river;
   }
@@ -1413,13 +1396,17 @@ namespace dl
   {
     std::vector<std::pair<Point<double>, Point<double>>> normals;
 
+    const auto min_curvature = m_lua.get_variable<double>("river_min_curvature");
+    const auto max_curvature = m_lua.get_variable<double>("river_max_curvature");
+    const auto normal_scale = m_lua.get_variable<double>("river_normal_scale");
+
     for (auto& segment : river)
     {
       if (segment->next == nullptr || segment->previous == nullptr || segment->length == 0.0 || segment->previous->length == 0.0)
       {
         continue;
       }
-      // Get curvature
+
       auto curvature = m_menger_curvature(segment->previous->point, segment->point, segment->next->point, segment->previous->length, segment->length, m_distance(segment->previous->point, segment->next->point));
 
       if (std::isnan(curvature))
@@ -1427,25 +1414,20 @@ namespace dl
         continue;
       }
 
-      /* std::cout << "CURVATURE: " << curvature << '\n'; */
-
       if (curvature < 0.0)
       {
-        curvature = std::min(curvature, -0.005);
-        curvature = std::max(curvature, -0.025);
+        curvature = std::min(curvature, -min_curvature);
+        curvature = std::max(curvature, -max_curvature);
       }
       else
       {
-        curvature = std::max(curvature, 0.005);
-        curvature = std::min(curvature, 0.025);
+        curvature = std::max(curvature, min_curvature);
+        curvature = std::min(curvature, max_curvature);
       }
 
-
-      double normal_length = 500.0*curvature*-1.0;
-      Point<int> normal_origin(static_cast<int>(segment->center.x), static_cast<int>(segment->center.y));
-      Point<int> normal_destination(static_cast<int>(segment->center.x + normal_length*segment->normal.x), static_cast<int>(segment->center.y + normal_length*segment->normal.y));
-      /* std::cout << "NORMAL O: " << normal_origin.x << ' ' << normal_origin.y << '\n'; */
-      /* std::cout << "NORMAL D: " << normal_destination.x << ' ' << normal_destination.y << '\n'; */
+      const double normal_length = curvature * normal_scale * -1.0;
+      Point<int> normal_origin(static_cast<int>(std::round(segment->center.x)), static_cast<int>(std::round(segment->center.y)));
+      Point<int> normal_destination(static_cast<int>(std::round(segment->center.x + normal_length*segment->normal.x)), static_cast<int>(std::round(segment->center.y + normal_length*segment->normal.y)));
       m_draw_line(normal_origin, normal_destination, TileType::Red, tiles);
     }
   }

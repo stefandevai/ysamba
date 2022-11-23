@@ -5,8 +5,7 @@ camera_width = 64
 camera_height = 36
 
 -- Almost square island
--- seed = 340683964
-seed = 526526832
+seed = 340683964
 
 -- NOT GENERATING SEEDS
 -- No bays identified bug
