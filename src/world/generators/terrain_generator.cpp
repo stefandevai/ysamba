@@ -10,7 +10,6 @@
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./lib/gal/fortune_algorithm.hpp"
 #include "./lib/bezier.hpp"
-#include "./lib/spline.hpp"
 #include "./tile_type.hpp"
 #include "./bay_data.hpp"
 
@@ -1164,24 +1163,53 @@ namespace dl
   void TerrainGenerator::m_generate_main_river(IslandData& island, std::vector<Point<int>>& bays, std::vector<int>& tiles, const int seed)
   {
     const auto [source, mouth] = m_get_river_source_and_mouth(island, bays, seed);
-    auto river = m_get_river_segments(source, mouth);
+    auto river = m_get_river_segments(source, mouth, tiles);
     /* m_create_meanders(river, tiles); */
 
-    // Draw river
-    for (const auto& segment : river)
+    double p1_x = -1.0;
+    double p1_y = -1.0;
+
+    const auto first_x = source.x < mouth.x ? source.x : mouth.x;
+    const auto second_x = source.x < mouth.x ? mouth.x : source.x;
+
+    m_create_meanders2(river, first_x, second_x, tiles);
+
+    // Draw river spline
+    for (double p2_x = first_x; p2_x < second_x; p2_x += 2.0)
     {
-      if (segment->next == nullptr)
+      const auto p2_y = river(p2_x);
+
+      /* std::cout << "P1: " << p1_x << ' ' << p1_y << '\n'; */
+      /* std::cout << "P2: " << p2_x << ' ' << p2_y << '\n'; */
+
+      if (p1_x < 0.0 || p1_y < 0.0)
       {
-        break;
+        p1_x = p2_x;
+        p1_y = p2_y;
+        continue;
       }
 
-      Point<int> p1, p2;
-      p1.x = static_cast<int>(std::round(segment->point.x));
-      p1.y = static_cast<int>(std::round(segment->point.y));
-      p2.x = static_cast<int>(std::round(segment->next->point.x));
-      p2.y = static_cast<int>(std::round(segment->next->point.y));
-      m_draw_line(p1, p2, TileType::Water, tiles);
+      m_draw_line(Point<int>(std::round(p1_x), std::round(p1_y)), Point<int>(std::round(p2_x), std::round(p2_y)), TileType::Water, tiles);
+
+      p1_x = p2_x;
+      p1_y = p2_y;
     }
+
+    // Draw river
+    /* for (const auto& segment : river) */
+    /* { */
+    /*   if (segment->next == nullptr) */
+    /*   { */
+    /*     break; */
+    /*   } */
+
+    /*   Point<int> p1, p2; */
+    /*   p1.x = static_cast<int>(std::round(segment->point.x)); */
+    /*   p1.y = static_cast<int>(std::round(segment->point.y)); */
+    /*   p2.x = static_cast<int>(std::round(segment->next->point.x)); */
+    /*   p2.y = static_cast<int>(std::round(segment->next->point.y)); */
+    /*   /1* m_draw_line(p1, p2, TileType::Water, tiles); *1/ */
+    /* } */
   }
 
   std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth(IslandData& island, std::vector<Point<int>>& bays, const int seed)
@@ -1323,76 +1351,123 @@ namespace dl
     return {source_point, mouth_point};
   }
 
-  std::vector<std::shared_ptr<RiverSegment>> TerrainGenerator::m_get_river_segments(const Point<int>& source, const Point<int>& mouth)
+  /* std::vector<std::shared_ptr<RiverSegment>> TerrainGenerator::m_get_river_segments(const Point<int>& source, const Point<int>& mouth, std::vector<int>& tiles) */
+  tk::spline TerrainGenerator::m_get_river_segments(const Point<int>& source, const Point<int>& mouth, std::vector<int>& tiles)
   {
-    std::vector<std::shared_ptr<RiverSegment>> river;
+    /* std::vector<std::shared_ptr<RiverSegment>> river; */
 
-    const auto step = m_lua.get_variable<float>("river_bezier_step");
-    const auto control1_delta_x = m_lua.get_variable<int>("river_control1_delta_x");
-    const auto control1_delta_y = m_lua.get_variable<int>("river_control1_delta_y");
-    const auto control2_delta_x = m_lua.get_variable<int>("river_control2_delta_x");
-    const auto control2_delta_y = m_lua.get_variable<int>("river_control2_delta_y");
+    const auto step = m_lua.get_variable<double>("river_bezier_step");
 
-    const float control1_x = static_cast<float>(((source.x + mouth.x) / 3) + control1_delta_x);
-    const float control1_y = static_cast<float>(((source.y + mouth.y) / 3) + control1_delta_y);
+    const auto& first_point = source.x < mouth.x ? source : mouth;
+    const auto& second_point = source.x < mouth.x ? mouth : source;
+    const double distance_x = second_point.x - first_point.x;
+    const double distance_y = second_point.y - first_point.y;
 
-    const float control2_x = static_cast<float>((2 * (source.x + mouth.x) / 3) + control2_delta_x);
-    const float control2_y = static_cast<float>((2 * (source.y + mouth.y) / 3) + control2_delta_y);
+    auto noise = FastNoiseLite{1337};
+    noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
+    noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXYPlanes);
+    noise.SetFrequency(0.015f);
+    noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm);
+    noise.SetFractalOctaves(5);
+    noise.SetFractalLacunarity(2.f);
+    noise.SetFractalGain(0.5f);
+    noise.SetFractalWeightedStrength(0.f);
 
-    Bezier::Bezier<3> cubic_bezier({ {static_cast<float>(source.x), static_cast<float>(source.y)}, {control1_x, control1_y}, {control2_x, control2_y}, {static_cast<float>(mouth.x), static_cast<float>(mouth.y)} });
-
-    auto add_segment_data = [&cubic_bezier, step](std::shared_ptr<RiverSegment> segment_a, std::shared_ptr<RiverSegment> segment_b, const float t)
-    {
-      assert(segment_a != nullptr && segment_b != nullptr && "Segment pointers must not be null");
-
-      // Add pointers between segments
-      segment_a->next = segment_b;
-      segment_b->previous = segment_a;
-
-      // Calculate precise values on the bezier curve
-      const auto& point = cubic_bezier.valueAt(t);
-      const auto previous_point = cubic_bezier.valueAt(t - step);
-      const auto normal = cubic_bezier.normalAt(t - step);
-      const auto tangent = cubic_bezier.tangentAt(t - step);
-
-      const double center_x = (previous_point.x + point.x)/2.0;
-      const double center_y = (previous_point.y + point.y)/2.0;
-      const double length = sqrt((previous_point.x - point.x) * (previous_point.x - point.x) + (previous_point.y - point.y) * (previous_point.y - point.y));
-
-      // Assign data to segment A
-      segment_a->length = length;
-      segment_a->center = Point<double>(center_x, center_y);
-      segment_a->normal = Point<double>(normal.x, normal.y);
-      segment_a->tangent = Point<double>(tangent.x, tangent.y);
-    };
-
-    std::shared_ptr<RiverSegment> last_segment = nullptr;
+    std::vector<double> x_points;
+    std::vector<double> y_points;
 
     for (float i = 0.f; i < 1.f; i += step)
     {
-      const auto point = cubic_bezier.valueAt(i);
-      auto segment = std::make_shared<RiverSegment>();
-      segment->point.x = point.x;
-      segment->point.y = point.y;
+      auto point_x = static_cast<double>(first_point.x + i * distance_x);
+      auto point_y = static_cast<double>(first_point.y + i * distance_y);
 
-      if (last_segment != nullptr)
+      auto noise_value = noise.GetNoise(point_x, point_y);
+
+      if (noise_value < 0.5f)
       {
-        add_segment_data(last_segment, segment, i);
+        point_x += noise_value*10.f;
+        point_y += noise_value*10.f;
+      }
+      else
+      {
+        point_x -= noise_value*10.f;
+        point_y -= noise_value*10.f;
       }
 
-      last_segment = segment;
-      river.push_back(segment);
+      x_points.push_back(point_x);
+      y_points.push_back(point_y);
+
+      /* std::cout << "POINTS: " << point_x << ' ' << point_y << '\n'; */
+      /* m_draw_point(Point<int>(static_cast<int>(point_x), static_cast<int>(point_y)), TileType::Red, tiles); */
     }
 
-    assert(!river.empty() && "River curve was not generated");
+    return tk::spline(x_points, y_points, tk::spline::cspline_hermite);
 
-    // Add connection from last segment to the mouth
-    auto segment = std::make_shared<RiverSegment>();
-    segment->point = Point<double>(mouth.x, mouth.y);
-    add_segment_data(last_segment, segment, 1.f);
-    river.push_back(segment);
+    /* const auto control1_delta_x = m_lua.get_variable<int>("river_control1_delta_x"); */
+    /* const auto control1_delta_y = m_lua.get_variable<int>("river_control1_delta_y"); */
+    /* const auto control2_delta_x = m_lua.get_variable<int>("river_control2_delta_x"); */
+    /* const auto control2_delta_y = m_lua.get_variable<int>("river_control2_delta_y"); */
 
-    return river;
+    /* const float control1_x = static_cast<float>(((source.x + mouth.x) / 3) + control1_delta_x); */
+    /* const float control1_y = static_cast<float>(((source.y + mouth.y) / 3) + control1_delta_y); */
+
+    /* const float control2_x = static_cast<float>((2 * (source.x + mouth.x) / 3) + control2_delta_x); */
+    /* const float control2_y = static_cast<float>((2 * (source.y + mouth.y) / 3) + control2_delta_y); */
+
+    /* Bezier::Bezier<3> cubic_bezier({ {static_cast<float>(source.x), static_cast<float>(source.y)}, {control1_x, control1_y}, {control2_x, control2_y}, {static_cast<float>(mouth.x), static_cast<float>(mouth.y)} }); */
+
+    /* auto add_segment_data = [&cubic_bezier, step](std::shared_ptr<RiverSegment> segment_a, std::shared_ptr<RiverSegment> segment_b, const float t) */
+    /* { */
+    /*   assert(segment_a != nullptr && segment_b != nullptr && "Segment pointers must not be null"); */
+
+    /*   // Add pointers between segments */
+    /*   segment_a->next = segment_b; */
+    /*   segment_b->previous = segment_a; */
+
+    /*   // Calculate precise values on the bezier curve */
+    /*   const auto& point = cubic_bezier.valueAt(t); */
+    /*   const auto previous_point = cubic_bezier.valueAt(t - step); */
+    /*   const auto normal = cubic_bezier.normalAt(t - step); */
+    /*   const auto tangent = cubic_bezier.tangentAt(t - step); */
+
+    /*   const double center_x = (previous_point.x + point.x)/2.0; */
+    /*   const double center_y = (previous_point.y + point.y)/2.0; */
+    /*   const double length = sqrt((previous_point.x - point.x) * (previous_point.x - point.x) + (previous_point.y - point.y) * (previous_point.y - point.y)); */
+
+    /*   // Assign data to segment A */
+    /*   segment_a->length = length; */
+    /*   segment_a->center = Point<double>(center_x, center_y); */
+    /*   segment_a->normal = Point<double>(normal.x, normal.y); */
+    /*   segment_a->tangent = Point<double>(tangent.x, tangent.y); */
+    /* }; */
+
+    /* std::shared_ptr<RiverSegment> last_segment = nullptr; */
+
+    /* for (float i = 0.f; i < 1.f; i += step) */
+    /* { */
+    /*   const auto point = cubic_bezier.valueAt(i); */
+    /*   auto segment = std::make_shared<RiverSegment>(); */
+    /*   segment->point.x = point.x; */
+    /*   segment->point.y = point.y; */
+
+    /*   if (last_segment != nullptr) */
+    /*   { */
+    /*     add_segment_data(last_segment, segment, i); */
+    /*   } */
+
+    /*   last_segment = segment; */
+    /*   river.push_back(segment); */
+    /* } */
+
+    /* assert(!river.empty() && "River curve was not generated"); */
+
+    /* // Add connection from last segment to the mouth */
+    /* auto segment = std::make_shared<RiverSegment>(); */
+    /* segment->point = Point<double>(mouth.x, mouth.y); */
+    /* add_segment_data(last_segment, segment, 1.f); */
+    /* river.push_back(segment); */
+
+    /* return river; */
   }
 
   void TerrainGenerator::m_create_meanders(std::vector<std::shared_ptr<RiverSegment>>& river, std::vector<int>& tiles)
@@ -1520,6 +1595,127 @@ namespace dl
 
         ++increment_index;
       }
+    }
+  }
+
+  void TerrainGenerator::m_create_meanders2(tk::spline& river, const double x_1, const double x_2, std::vector<int>& tiles)
+  {
+    std::vector<std::pair<Point<double>, Point<double>>> normals;
+
+    const auto spline_step = m_lua.get_variable<double>("river_spline_step");
+    const auto min_curvature = m_lua.get_variable<double>("river_min_curvature");
+    const auto max_curvature = m_lua.get_variable<double>("river_max_curvature");
+    const auto normal_scale = m_lua.get_variable<double>("river_normal_scale");
+    const auto tangent_scale = m_lua.get_variable<double>("river_tangent_scale");
+    const auto bitangent_factor = m_lua.get_variable<double>("river_bitangent_factor");
+    const auto n_iterations = m_lua.get_variable<int>("river_n_iterations");
+    const auto curvature_delta = m_lua.get_variable<double>("river_curvature_delta");
+
+    const auto draw_normals = m_lua.get_variable<bool>("temp_draw_normals");
+    const auto draw_tangents = m_lua.get_variable<bool>("temp_draw_tangents");
+    const auto draw_combined = m_lua.get_variable<bool>("temp_draw_combined");
+
+    const int n_points = (x_2 - x_1) / spline_step;
+
+    std::vector<std::shared_ptr<Point<double>>> new_points(n_points, std::make_shared<Point<double>>(0.0, 0.0));
+    std::vector<double> new_points_x(n_points, 0.0);
+    std::vector<double> new_points_y(n_points, 0.0);
+
+    for (int iteration = 0; iteration < n_iterations; ++iteration)
+    {
+      int increment_index = 0;
+
+      for (double current_x = x_1; current_x < x_2 && increment_index < n_points; current_x += spline_step)
+      {
+        const auto current_y = river(current_x);
+
+        const auto previous_x = current_x - curvature_delta;
+        const auto previous_y = river(previous_x);
+        const auto next_x = current_x + curvature_delta;
+        const auto next_y = river(next_x);
+
+        Point<double> previous_point(previous_x, previous_y);
+        Point<double> current_point(current_x, current_y);
+        Point<double> next_point(next_x, next_y);
+
+        const double current_length = m_distance(previous_point, current_point);
+
+        if (current_length <= 0.0)
+        {
+          continue;
+        }
+
+        const double raw_normal_x = -(current_point.y - previous_point.y);
+        const double raw_normal_y = current_point.x - previous_point.x;
+        const double normal_x = raw_normal_x / current_length;
+        const double normal_y = raw_normal_y / current_length;
+        const auto normal = Point<double>(normal_x * tangent_scale, normal_y * tangent_scale);
+        const auto tangent = Point<double>(normal_y * tangent_scale, -normal_x * tangent_scale);
+
+        auto curvature = m_menger_curvature(previous_point, current_point, next_point, current_length, m_distance(current_point, next_point), m_distance(previous_point, next_point));
+
+        if (curvature < 0.0)
+        {
+          curvature = std::min(curvature, -min_curvature);
+          curvature = std::max(curvature, -max_curvature);
+        }
+        else
+        {
+          curvature = std::max(curvature, min_curvature);
+          curvature = std::min(curvature, max_curvature);
+        }
+
+        const double normal_length = curvature * normal_scale;
+        const double combined_x = (normal.x * normal_length * bitangent_factor + tangent.x * (2.0 - bitangent_factor)) * -1.0;
+        const double combined_y = (normal.y * normal_length * bitangent_factor + tangent.y * (2.0 - bitangent_factor)) * -1.0;
+
+        /* std::cout << "TANGENT: " << iteration << ' ' << tangent.x << ' ' << tangent.y << '\n'; */
+        /* std::cout << "NORMAL: " << iteration << ' ' << normal.x << ' ' << normal.y << '\n'; */
+        /* std::cout << "CURVATURE: " << iteration << ' ' << curvature << '\n'; */
+        /* std::cout << "COMBINED: " << iteration << ' ' << combined_x << ' ' << combined_y << '\n'; */
+
+        new_points[increment_index] = std::make_shared<Point<double>>(current_point.x + combined_x, current_point.y + combined_y);
+
+        Point<int> origin(static_cast<int>(std::round(current_point.x)), static_cast<int>(std::round(current_point.y)));
+        Point<int> normal_destination(static_cast<int>(std::round(current_point.x + normal.x * normal_length * -1.0)), static_cast<int>(std::round(current_point.y + normal.y * normal_length * -1.0)));
+        Point<int> tangent_destination(static_cast<int>(std::round(current_point.x + tangent.x)), static_cast<int>(std::round(current_point.y + tangent.y)));
+        Point<int> combined_destination(static_cast<int>(std::round(current_point.x + combined_x)), static_cast<int>(std::round(current_point.y + combined_y)));
+
+        if (iteration == n_iterations - 1)
+        {
+          if (draw_normals)
+          {
+            m_draw_line(origin, normal_destination, TileType::Yellow, tiles);
+          }
+          if (draw_tangents)
+          {
+            m_draw_line(origin, tangent_destination, TileType::Yellow, tiles);
+          }
+          if (draw_combined)
+          {
+            m_draw_line(origin, combined_destination, TileType::Yellow, tiles);
+          }
+        }
+
+        ++increment_index;
+      }
+
+      if (iteration >= n_iterations - 1)
+      {
+        break;
+      }
+
+      std::cout << "HERE\n";
+
+      std::sort(new_points.begin(), new_points.end(), ComparePointsX<double>());
+
+      for (int i = 0; i < n_points; ++i)
+      {
+        new_points_x[i] = new_points[i]->x;
+        new_points_y[i] = new_points[i]->y;
+      }
+
+      river.set_points(new_points_x, new_points_y, tk::spline::cspline_hermite);
     }
   }
 

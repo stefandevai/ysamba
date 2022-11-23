@@ -2,11 +2,12 @@
 
 #include <vector>
 #include <queue>
+#include "./lib/spline.hpp"
 #include "../../core/lua_api.hpp"
+#include "../tilemap.hpp"
 #include "../point.hpp"
 #include "./island_data.hpp"
 #include "./river_segment.hpp"
-#include "../tilemap.hpp"
 
 namespace dl
 {
@@ -18,6 +19,16 @@ namespace dl
       bool operator() (const IslandData& a, const IslandData& b) const
       {
         return a.points.size() > b.points.size();
+      }
+  };
+
+  template <class T>
+  class ComparePointsX
+  {
+    public:
+      bool operator() (const std::shared_ptr<Point<T>>& a, const std::shared_ptr<Point<T>>& b) const
+      {
+        return a->x < b->x;
       }
   };
 
@@ -56,8 +67,10 @@ namespace dl
       bool m_center_is_coast(const Point<int>& center, const std::vector<int>& island_mask);
       void m_generate_main_river(IslandData& island, std::vector<Point<int>>& bays, std::vector<int>& tiles, const int seed = 0);
       std::pair<Point<int>, Point<int>> m_get_river_source_and_mouth(IslandData& island, std::vector<Point<int>>& bays, const int seed);
-      std::vector<std::shared_ptr<RiverSegment>> m_get_river_segments(const Point<int>& source, const Point<int>& mouth);
+      /* std::vector<std::shared_ptr<RiverSegment>> m_get_river_segments(const Point<int>& source, const Point<int>& mouth, std::vector<int>& tiles); */
+      tk::spline m_get_river_segments(const Point<int>& source, const Point<int>& mouth, std::vector<int>& tiles);
       void m_create_meanders(std::vector<std::shared_ptr<RiverSegment>>& river, std::vector<int>& tiles);
+      void m_create_meanders2(tk::spline& river, const double x_1, const double x_2, std::vector<int>& tiles);
       float m_distance(const Point<int>& point_a, const Point<int>& point_b);
       double m_distance(const Point<double>& point_a, const Point<double>& point_b);
       double m_menger_curvature(const Point<double>& point_a, const Point<double>& point_b, const Point<double>& point_c, const double length_1, const double length_2, const double length_3);
