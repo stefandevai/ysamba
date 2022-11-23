@@ -31,5 +31,6 @@ river_control2_delta_x = -20
 river_control2_delta_y = -20
 river_min_curvature = 0.005
 river_max_curvature = 0.025
-river_normal_scale = 500
+river_normal_scale = 100
 river_tangent_scale = 20
+river_bitangent_factor = 1.0

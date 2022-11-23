@@ -1402,11 +1402,18 @@ namespace dl
     const auto max_curvature = m_lua.get_variable<double>("river_max_curvature");
     const auto normal_scale = m_lua.get_variable<double>("river_normal_scale");
     const auto tangent_scale = m_lua.get_variable<double>("river_tangent_scale");
+    const auto bitangent_factor = m_lua.get_variable<double>("river_bitangent_factor");
+    std::vector<double> new_points_x(river.size(), 0.0);
+    std::vector<double> new_points_y(river.size(), 0.0);
+    int increment_index = 0;
 
     for (auto& segment : river)
     {
       if (segment->next == nullptr || segment->previous == nullptr || segment->length == 0.0 || segment->previous->length == 0.0)
       {
+        new_points_x[increment_index] = segment->point.x;
+        new_points_y[increment_index] = segment->point.y;
+        ++increment_index;
         continue;
       }
 
@@ -1414,6 +1421,9 @@ namespace dl
 
       if (std::isnan(curvature))
       {
+        new_points_x[increment_index] = segment->point.x;
+        new_points_y[increment_index] = segment->point.y;
+        ++increment_index;
         continue;
       }
 
@@ -1431,23 +1441,39 @@ namespace dl
       /* std::cout << "TANGENT: " << segment->tangent.x << ' ' << segment->tangent.y << '\n'; */
 
       const double normal_length = curvature * normal_scale * -1.0;
-      const double new_n_x = segment->normal.x + segment->tangent.x;
-      const double new_n_y = segment->normal.y + segment->tangent.y;
-      /* const double new_t_x = segment->tangent.x; */
-      /* const double new_t_y = segment->tangent.y; */
-      /* const double final_x = sqrt(new_n_x * new_n_x + new_t_x * new_t_x) * normal_length * -1.0; */
-      /* const double final_y = sqrt(new_n_y * new_n_y + new_t_y * new_t_y) * normal_length * -1.0; */
-      const double final_x = new_n_x * normal_length;
-      const double final_y = new_n_y * normal_length;
+      const double combined_x = (segment->normal.x * bitangent_factor + segment->tangent.x * (2.0 - bitangent_factor)) * normal_length;
+      const double combined_y = (segment->normal.y * bitangent_factor + segment->tangent.y * (2.0 - bitangent_factor)) * normal_length;
 
       Point<int> origin(static_cast<int>(std::round(segment->point.x)), static_cast<int>(std::round(segment->point.y)));
       Point<int> normal_destination(static_cast<int>(std::round(segment->point.x + normal_length * segment->normal.x)), static_cast<int>(std::round(segment->point.y + normal_length * segment->normal.y)));
       Point<int> tangent_destination(static_cast<int>(std::round(segment->point.x + tangent_scale * segment->tangent.x)), static_cast<int>(std::round(segment->point.y + tangent_scale * segment->tangent.y)));
-      Point<int> final_destination(static_cast<int>(std::round(segment->point.x + final_x)), static_cast<int>(std::round(segment->point.y + final_y)));
+      Point<int> combined_destination(static_cast<int>(std::round(segment->point.x + combined_x)), static_cast<int>(std::round(segment->point.y + combined_y)));
 
       /* m_draw_line(origin, normal_destination, TileType::Yellow, tiles); */
-      /* m_draw_line(origin, normal_destination, TileType::Red, tiles); */
-      m_draw_line(origin, final_destination, TileType::Red, tiles);
+      /* m_draw_line(origin, tangent_destination, TileType::Red, tiles); */
+      /* m_draw_line(origin, combined_destination, TileType::Yellow, tiles); */
+      new_points_x[increment_index] = segment->point.x + combined_x;
+      new_points_y[increment_index] = segment->point.y + combined_y;
+
+      /* std::cout << "COMBINED: " << combined_x << ' ' << combined_y << '\n'; */
+
+      /* segment->point.x += combined_x; */
+      /* segment->point.y += combined_y; */
+      /* segment->previous->point.x += combined_x; */
+      /* segment->previous->point.y += combined_y; */
+      ++increment_index;
+    }
+
+    increment_index = 0;
+    for (auto& segment : river)
+    {
+      segment->point.x = new_points_x[increment_index];
+      segment->point.y = new_points_y[increment_index];
+
+
+      new_points_x[increment_index] = 0.0;
+      new_points_y[increment_index] = 0.0;
+      ++increment_index;
     }
   }
 
