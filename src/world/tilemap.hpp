@@ -1,33 +1,42 @@
 #pragma once
 
-#include <string>
-#include <map>
-#include <libtcod.hpp>
 #include <cereal/types/vector.hpp>
-#include "../core/lua_api.hpp"
 #include "../components/size.hpp"
 #include "./tile_data.hpp"
+#include "./point.hpp"
 
 namespace dl
 {
   class Tilemap
   {
     public:
+      std::vector<int> tiles;
+
       Tilemap();
       Tilemap(std::vector<int> tiles, const int width, const int height);
 
-      int get(const int x, const int y) const;
+      int operator [](int i) const
+      {
+        return tiles[i];
+      }
+
+      int& operator [](int i)
+      {
+        return tiles[i];
+      }
+
+      int at(const int x, const int y) const;
+      int at(const Point<int>& point) const;
+
       Size get_size() const;
 
       template<class Archive> 
       void serialize(Archive& archive)
       {
-        archive(m_tiles, m_width, m_height, m_null_tile);
+        archive(tiles, m_width, m_height, m_null_tile);
       }
 
     private:
-      LuaAPI m_lua;
-      std::vector<int> m_tiles;
       int m_width = 0;
       int m_height = 0;
       int m_null_tile = 0;

@@ -6,7 +6,7 @@ namespace dl
 {
   struct RiverSegment
   {
-    Point<int> point;
+    Point<double> point;
     Point<double> center;
     Point<double> normal;
     double length = 0.0;

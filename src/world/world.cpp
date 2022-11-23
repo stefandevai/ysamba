@@ -1,5 +1,4 @@
 #include "./world.hpp"
-
 #include "./generators/terrain_generator.hpp"
 
 namespace dl
@@ -13,8 +12,10 @@ namespace dl
   {
     m_tilemaps.clear();
 
-    auto tiles = TerrainGenerator::generate(width, height, seed);
-    auto tilemap = std::make_shared<Tilemap>(tiles, width, height);
+    auto generator = TerrainGenerator(width, height);
+    auto tilemap = generator.generate(seed);
+    /* auto tiles = TerrainGenerator::generate(width, height, seed); */
+    /* auto tilemap = std::make_shared<Tilemap>(tiles, width, height); */
     m_tilemaps.push_back(tilemap);
   }
 
@@ -38,14 +39,14 @@ namespace dl
 
   const TileData World::get(const int x, const int y, const int z)
   {
-    const int tile_index = m_tilemaps[z - m_depth_min]->get(x, y);
+    const int tile_index = m_tilemaps[z - m_depth_min].at(x, y);
 
     return m_tile_data[tile_index];
   }
 
   Size World::get_tilemap_size(const int z)
   {
-    return m_tilemaps[z - m_depth_min]->get_size();
+    return m_tilemaps[z - m_depth_min].get_size();
   }
 
   void World::m_load_tile_data()

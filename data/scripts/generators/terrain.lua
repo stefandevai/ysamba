@@ -24,7 +24,7 @@ coast_length = 53
 -- River
 min_source_mouth_distance_x = 30
 min_source_mouth_distance_y = 100
-river_bezier_step = 0.1
+river_bezier_step = 0.02
 river_control1_delta_x = 100
 river_control1_delta_y = 100
 river_control2_delta_x = -100

@@ -4,7 +4,7 @@
 
 namespace dl
 {
-  template <typename T = unsigned int>
+  template <typename T = int>
   class Point
   {
   public:
@@ -73,6 +73,11 @@ namespace dl
     Point bottom_left() const
     {
       return Point(x - 1, y - 1);
+    }
+
+    constexpr int to_index(const int width) const
+    {
+      return y*width + x;
     }
   };
 }

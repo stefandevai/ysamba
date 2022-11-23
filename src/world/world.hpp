@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <libtcod.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
 #include "../core/lua_api.hpp"
@@ -31,7 +32,8 @@ namespace dl
 
     private:
       LuaAPI m_lua;
-      std::vector<std::shared_ptr<Tilemap>> m_tilemaps;
+      /* std::vector<std::shared_ptr<Tilemap>> m_tilemaps; */
+      std::vector<Tilemap> m_tilemaps;
       std::map<int, TileData> m_tile_data;
       int m_depth_min = 0;
       int m_depth_max = 1;

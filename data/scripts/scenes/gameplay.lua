@@ -5,16 +5,13 @@ camera_width = 64
 camera_height = 36
 
 -- Almost square island
-seed = 340683964
+-- seed = 340683964
+seed = 526526832
 
+-- NOT GENERATING SEEDS
 -- No bays identified bug
 -- seed = 1370743690
+-- Stop on river generation
+-- seed = 414466669
 
--- River crossing water
--- seed = 700862761
 
--- Extremely long bay identification (cause: 39933 coastline points in comparison with 2389 from previous seed)
--- seed = 335787142
-
--- Isolated cell case
--- seed = 417360305
