@@ -1403,77 +1403,122 @@ namespace dl
     const auto normal_scale = m_lua.get_variable<double>("river_normal_scale");
     const auto tangent_scale = m_lua.get_variable<double>("river_tangent_scale");
     const auto bitangent_factor = m_lua.get_variable<double>("river_bitangent_factor");
+    const auto n_iterations = m_lua.get_variable<int>("river_n_iterations");
     std::vector<double> new_points_x(river.size(), 0.0);
     std::vector<double> new_points_y(river.size(), 0.0);
-    int increment_index = 0;
 
-    for (auto& segment : river)
+    for (int iteration = 0; iteration < n_iterations; ++iteration)
     {
-      if (segment->next == nullptr || segment->previous == nullptr || segment->length == 0.0 || segment->previous->length == 0.0)
+      int increment_index = 0;
+
+      for (auto& segment : river)
       {
-        new_points_x[increment_index] = segment->point.x;
-        new_points_y[increment_index] = segment->point.y;
+        if (segment->next == nullptr || segment->previous == nullptr || segment->length == 0.0 || segment->previous->length == 0.0)
+        {
+          new_points_x[increment_index] = segment->point.x;
+          new_points_y[increment_index] = segment->point.y;
+          ++increment_index;
+          continue;
+        }
+
+        auto curvature = m_menger_curvature(segment->previous->point, segment->point, segment->next->point, segment->previous->length, segment->length, m_distance(segment->previous->point, segment->next->point));
+
+        if (std::isnan(curvature))
+        {
+          new_points_x[increment_index] = segment->point.x;
+          new_points_y[increment_index] = segment->point.y;
+          ++increment_index;
+          continue;
+        }
+
+        if (curvature < 0.0)
+        {
+          curvature = std::min(curvature, -min_curvature);
+          curvature = std::max(curvature, -max_curvature);
+        }
+        else
+        {
+          curvature = std::max(curvature, min_curvature);
+          curvature = std::min(curvature, max_curvature);
+        }
+
+        /* std::cout << "TANGENT: " << segment->tangent.x << ' ' << segment->tangent.y << '\n'; */
+        /* std::cout << "NORMAL: " << iteration << ' ' << segment->normal.x << ' ' << segment->normal.y << '\n'; */
+
+        const double normal_length = curvature * normal_scale;
+        const double combined_x = (segment->normal.x * normal_length * bitangent_factor + segment->tangent.x * tangent_scale * (2.0 - bitangent_factor)) * -1.0;
+        const double combined_y = (segment->normal.y * normal_length * bitangent_factor + segment->tangent.y * tangent_scale * (2.0 - bitangent_factor)) * -1.0;
+
+        new_points_x[increment_index] = segment->point.x + combined_x;
+        new_points_y[increment_index] = segment->point.y + combined_y;
+
+        Point<int> origin(static_cast<int>(std::round(segment->point.x)), static_cast<int>(std::round(segment->point.y)));
+        Point<int> combined_destination(static_cast<int>(std::round(segment->point.x + combined_x)), static_cast<int>(std::round(segment->point.y + combined_y)));
+
+        if (iteration == n_iterations - 1)
+        {
+          /* m_draw_line(origin, combined_destination, TileType::Yellow, tiles); */
+        }
+
+        /* std::cout << "COMBINED: " << combined_x << ' ' << combined_y << '\n'; */
+
+        /* segment->point.x += combined_x; */
+        /* segment->point.y += combined_y; */
+        /* segment->previous->point.x += combined_x; */
+        /* segment->previous->point.y += combined_y; */
         ++increment_index;
-        continue;
       }
 
-      auto curvature = m_menger_curvature(segment->previous->point, segment->point, segment->next->point, segment->previous->length, segment->length, m_distance(segment->previous->point, segment->next->point));
+      increment_index = 0;
+      Point<double> point;
+      Point<double> previous_point;
 
-      if (std::isnan(curvature))
+      for (auto& segment : river)
       {
-        new_points_x[increment_index] = segment->point.x;
-        new_points_y[increment_index] = segment->point.y;
+        segment->point.x = new_points_x[increment_index];
+        segment->point.y = new_points_y[increment_index];
+
+        if (segment->previous == nullptr)
+        {
+          ++increment_index;
+          continue;
+        }
+
+        point.x = segment->point.x;
+        point.y = segment->point.y;
+        previous_point.x = segment->previous->point.x;
+        previous_point.y = segment->previous->point.y;
+
+        const double center_x = (previous_point.x + point.x)/2.0;
+        const double center_y = (previous_point.y + point.y)/2.0;
+        const double raw_normal_x = - (point.y - previous_point.y);
+        const double raw_normal_y = point.x - previous_point.x;
+        const double length = sqrt((previous_point.x - point.x) * (previous_point.x - point.x) + (previous_point.y - point.y) * (previous_point.y - point.y));
+        segment->previous->length = length;
+
+        if (length != 0.0)
+        {
+          const double normal_x = raw_normal_x / length;
+          const double normal_y = raw_normal_y / length;
+          segment->previous->center = Point<double>(center_x, center_y);
+          segment->previous->normal = Point<double>(normal_x, normal_y);
+          segment->previous->tangent = Point<double>(normal_y, -normal_x);
+        }
+
+        Point<int> origin(static_cast<int>(std::round(segment->point.x)), static_cast<int>(std::round(segment->point.y)));
+        Point<int> normal_destination(static_cast<int>(std::round(segment->point.x + 10.0 * segment->normal.x)), static_cast<int>(std::round(segment->point.y + 10.0 * segment->normal.y)));
+        Point<int> tangent_destination(static_cast<int>(std::round(segment->point.x + tangent_scale * segment->tangent.x)), static_cast<int>(std::round(segment->point.y + tangent_scale * segment->tangent.y)));
+        /* Point<int> combined_destination(static_cast<int>(std::round(segment->point.x + combined_x)), static_cast<int>(std::round(segment->point.y + combined_y))); */
+
+        if (iteration == n_iterations - 1)
+        {
+          /* m_draw_line(origin, normal_destination, TileType::Yellow, tiles); */
+          /* m_draw_line(origin, tangent_destination, TileType::Red, tiles); */
+          /* m_draw_line(origin, combined_destination, TileType::Yellow, tiles); */
+        }
+
         ++increment_index;
-        continue;
       }
-
-      if (curvature < 0.0)
-      {
-        curvature = std::min(curvature, -min_curvature);
-        curvature = std::max(curvature, -max_curvature);
-      }
-      else
-      {
-        curvature = std::max(curvature, min_curvature);
-        curvature = std::min(curvature, max_curvature);
-      }
-
-      /* std::cout << "TANGENT: " << segment->tangent.x << ' ' << segment->tangent.y << '\n'; */
-
-      const double normal_length = curvature * normal_scale * -1.0;
-      const double combined_x = (segment->normal.x * bitangent_factor + segment->tangent.x * (2.0 - bitangent_factor)) * normal_length;
-      const double combined_y = (segment->normal.y * bitangent_factor + segment->tangent.y * (2.0 - bitangent_factor)) * normal_length;
-
-      Point<int> origin(static_cast<int>(std::round(segment->point.x)), static_cast<int>(std::round(segment->point.y)));
-      Point<int> normal_destination(static_cast<int>(std::round(segment->point.x + normal_length * segment->normal.x)), static_cast<int>(std::round(segment->point.y + normal_length * segment->normal.y)));
-      Point<int> tangent_destination(static_cast<int>(std::round(segment->point.x + tangent_scale * segment->tangent.x)), static_cast<int>(std::round(segment->point.y + tangent_scale * segment->tangent.y)));
-      Point<int> combined_destination(static_cast<int>(std::round(segment->point.x + combined_x)), static_cast<int>(std::round(segment->point.y + combined_y)));
-
-      /* m_draw_line(origin, normal_destination, TileType::Yellow, tiles); */
-      /* m_draw_line(origin, tangent_destination, TileType::Red, tiles); */
-      /* m_draw_line(origin, combined_destination, TileType::Yellow, tiles); */
-      new_points_x[increment_index] = segment->point.x + combined_x;
-      new_points_y[increment_index] = segment->point.y + combined_y;
-
-      /* std::cout << "COMBINED: " << combined_x << ' ' << combined_y << '\n'; */
-
-      /* segment->point.x += combined_x; */
-      /* segment->point.y += combined_y; */
-      /* segment->previous->point.x += combined_x; */
-      /* segment->previous->point.y += combined_y; */
-      ++increment_index;
-    }
-
-    increment_index = 0;
-    for (auto& segment : river)
-    {
-      segment->point.x = new_points_x[increment_index];
-      segment->point.y = new_points_y[increment_index];
-
-
-      new_points_x[increment_index] = 0.0;
-      new_points_y[increment_index] = 0.0;
-      ++increment_index;
     }
   }
 
