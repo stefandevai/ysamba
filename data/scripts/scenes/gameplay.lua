@@ -12,5 +12,9 @@ seed = 340683964
 -- seed = 1370743690
 -- Stop on river generation
 -- seed = 414466669
+-- Really small river
+-- seed = 1801590413
+-- River error with t values
+-- seed = 578968167
 
 
