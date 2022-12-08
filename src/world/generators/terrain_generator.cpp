@@ -1407,15 +1407,22 @@ namespace dl
     const auto draw_tangents = m_lua.get_variable<bool>("temp_draw_tangents");
     const auto draw_combined = m_lua.get_variable<bool>("temp_draw_combined");
 
+    int n_points = river.max_length / spline_step;
+    assert(n_points > 3 && "There should be at least 3 river points for spline");
 
+    std::vector<double> new_points_x(n_points, 0.0);
+    std::vector<double> new_points_y(n_points, 0.0);
 
     for (int iteration = 0; iteration < n_iterations; ++iteration)
     {
-      const int n_points = river.max_length / spline_step;
+      n_points = river.max_length / spline_step;
       assert(n_points > 3 && "There should be at least 3 river points for spline");
 
-      std::vector<double> new_points_x(n_points, 0.0);
-      std::vector<double> new_points_y(n_points, 0.0);
+      if (static_cast<std::uint32_t>(n_points) != new_points_x.size())
+      {
+        new_points_x.resize(n_points, 0.0);
+        new_points_y.resize(n_points, 0.0);
+      }
 
       int increment_index = 0;
 
@@ -1504,12 +1511,13 @@ namespace dl
         river.points_t.resize(n_points, 0.0);
       }
 
-      for (int i = 0; i < n_points; ++i)
+      assert(n_points > 0 && "The number of points must be greater than 0");
+
+      river.points_t[0] = 0.0;
+      for (int i = 1; i < n_points; ++i)
       {
-        if (i > 0)
-        {
-          river.points_t[i] = river.points_t[i - 1] + sqrt((new_points_x[i] - new_points_x[i - 1]) * (new_points_x[i] - new_points_x[i - 1]) + (new_points_y[i] - new_points_y[i - 1]) * (new_points_y[i] - new_points_y[i - 1]));
-        }
+        const auto increment = sqrt((new_points_x[i] - new_points_x[i - 1]) * (new_points_x[i] - new_points_x[i - 1]) + (new_points_y[i] - new_points_y[i - 1]) * (new_points_y[i] - new_points_y[i - 1]));
+        river.points_t[i] = river.points_t[i - 1] + std::max(increment, 0.0001);
       }
 
       river.spline_x.set_points(river.points_t, new_points_x, tk::spline::cspline_hermite);
