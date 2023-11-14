@@ -71,18 +71,7 @@ namespace dl
       return;
     }
 
-    /* auto gameplay_scene = std::dynamic_pointer_cast<Gameplay>(m_current_scene); */
-
-    /* if (gameplay_scene != nullptr) */
-    /* { */
-    /*   gameplay_scene->render(console); */
-    /* } */
-    /* else */
-    /* { */
-      /* console.clear(); */
-      m_current_scene->render(context, console);
-      /* context.present(console); */
-    /* } */
+    m_current_scene->render(context, console);
   }
 
   void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)

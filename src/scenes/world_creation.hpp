@@ -4,10 +4,10 @@
 #include <libtcod.hpp>
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
-#include "../player/player.hpp"
+/* #include "../player/player.hpp" */
 #include "../world/world.hpp"
-#include "../world/camera.hpp"
-#include "../physics/physics_layer.hpp"
+/* #include "../world/camera.hpp" */
+/* #include "../physics/physics_layer.hpp" */
 
 namespace dl
 {
@@ -26,10 +26,10 @@ namespace dl
       void load_world(const std::string& file_path);
 
     private:
-      Player m_player;
+      /* Player m_player; */
       World m_world;
-      Camera m_camera;
-      PhysicsLayer m_physics_layer {m_world};
+      /* Camera m_camera; */
+      /* PhysicsLayer m_physics_layer {m_world}; */
       SDL_Surface* m_surface = nullptr;
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       int m_seed = 110;
