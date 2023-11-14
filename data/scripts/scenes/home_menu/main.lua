@@ -1,2 +1,2 @@
 game_title = "DIALECTICS"
-instructions = "Press any key to start the game"
+instructions = "Press 'P' to start the game or 'G' to create a new world."

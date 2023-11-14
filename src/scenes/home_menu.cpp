@@ -32,9 +32,13 @@ namespace dl
     {
       set_scene("gameplay");
     }
+    else if (m_input_manager->poll_action("create_world"))
+    {
+      set_scene("world_creation");
+    }
   }
 
-  void HomeMenu::render(TCOD_Console& console)
+  void HomeMenu::render(tcod::Context& context, TCOD_Console& console)
   {
     if (!has_loaded())
     {

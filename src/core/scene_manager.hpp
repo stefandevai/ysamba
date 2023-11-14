@@ -11,6 +11,7 @@ namespace dl
   enum SceneType
   {
     HOME_MENU,
+    WORLD_CREATION,
     GAMEPLAY,
   };
 

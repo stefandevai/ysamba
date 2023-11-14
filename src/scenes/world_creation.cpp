@@ -1,4 +1,4 @@
-#include "./gameplay.hpp"
+#include "./world_creation.hpp"
 
 #include <fstream>
 #include <random>
@@ -8,11 +8,11 @@
 
 namespace dl
 {
-  Gameplay::Gameplay(const std::string& scene_key)
+  WorldCreation::WorldCreation(const std::string& scene_key)
     : Scene(scene_key)
   { }
 
-  void Gameplay::load()
+  void WorldCreation::load()
   {
     Scene::load();
 
@@ -33,7 +33,7 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void Gameplay::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
+  void WorldCreation::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
   {
     (void)set_scene;
 
@@ -67,28 +67,28 @@ namespace dl
       std::cout << "SEED: " << m_seed << '\n';
     }
 
-    m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
-    m_player.update(delta);
+    /* m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z)); */
+    /* m_player.update(delta); */
 
-    if (m_player.should_advance_turn())
-    {
-      m_physics_layer.update(delta);
-      m_world.update(delta);
-    }
+    /* if (m_player.should_advance_turn()) */
+    /* { */
+    /*   m_physics_layer.update(delta); */
+    /*   m_world.update(delta); */
+    /* } */
   }
 
-  void Gameplay::render(tcod::Context& context, TCOD_Console& console)
-  {
-    if (!has_loaded())
-    {
-      return;
-    }
+  /* void WorldCreation::render(TCOD_Console& console) */
+  /* { */
+  /*   if (!has_loaded()) */
+  /*   { */
+  /*     return; */
+  /*   } */
 
-    m_world.render(console, m_camera);
-    m_player.render(console, m_camera);
-  }
+  /*   m_world.render(console, m_camera); */
+  /*   m_player.render(console, m_camera); */
+  /* } */
 
-  void Gameplay::render_map(tcod::Context& context)
+  void WorldCreation::render(tcod::Context& context, TCOD_Console& console)
   {
     int w, h;
     auto window = context.get_sdl_window();
@@ -111,7 +111,7 @@ namespace dl
     SDL_RenderPresent(renderer);
   }
 
-  void Gameplay::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
+  void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
   {
     (void)context;
     (void)console;
@@ -142,7 +142,7 @@ namespace dl
   }
 
   // Take real screenshot of tiles
-  /* void Gameplay::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
+  /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
   /* { */
   /*   int w, h; */
   /*   auto renderer = context.get_sdl_renderer(); */
@@ -203,14 +203,14 @@ namespace dl
   /*   SDL_FreeSurface(main_surface); */
   /* } */
 
-  void Gameplay::save_world(const std::string& file_path)
+  void WorldCreation::save_world(const std::string& file_path)
   {
     std::ofstream output_stream(file_path);
     cereal::BinaryOutputArchive archive (output_stream);
     archive(m_world);
   }
 
-  void Gameplay::load_world(const std::string& file_path)
+  void WorldCreation::load_world(const std::string& file_path)
   {
     std::ifstream input_stream(file_path);
     cereal::BinaryInputArchive archive (input_stream);
@@ -218,7 +218,7 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void Gameplay::m_generate_map(const int seed)
+  void WorldCreation::m_generate_map(const int seed)
   {
     const int map_width = m_lua.get_variable<int>("map_width");
     const int map_height = m_lua.get_variable<int>("map_height");
@@ -240,7 +240,7 @@ namespace dl
     m_create_surface(map_width, map_height);
   }
 
-  void Gameplay::m_create_surface(const int width, const int height)
+  void WorldCreation::m_create_surface(const int width, const int height)
   {
     if (m_surface != nullptr)
     {

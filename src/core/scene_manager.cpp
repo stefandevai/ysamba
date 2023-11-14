@@ -3,6 +3,7 @@
 #include <memory>
 #include "../scenes/home_menu.hpp"
 #include "../scenes/gameplay.hpp"
+#include "../scenes/world_creation.hpp"
 
 namespace dl
 {
@@ -10,6 +11,7 @@ namespace dl
 
   std::map<std::string, SceneType> SceneManager::m_scenes_data = std::map<std::string, SceneType>{
     {"home_menu", SceneType::HOME_MENU},
+    {"world_creation", SceneType::WORLD_CREATION},
     {"gameplay", SceneType::GAMEPLAY},
   };
 
@@ -24,21 +26,25 @@ namespace dl
 
     if (it == m_scenes_data.end())
     {
+      std::cout << "[x] ERROR: Could not find scene: " << key << '\n';
       return;
     }
 
-    const auto scene_key = it->first;
     const auto scene_type = it->second;
 
     switch(scene_type)
     {
       case SceneType::HOME_MENU:
-        m_current_scene = std::make_shared<HomeMenu>(scene_key);
+        m_current_scene = std::make_shared<HomeMenu>(key);
+        break;
+      case SceneType::WORLD_CREATION:
+        m_current_scene = std::make_shared<WorldCreation>(key);
         break;
       case SceneType::GAMEPLAY:
-        m_current_scene = std::make_shared<Gameplay>(scene_key);
+        m_current_scene = std::make_shared<Gameplay>(key);
         break;
       default:
+        std::cout << "[x] ERROR: Could not find scene: " << key << '\n';
         break;
     }
   }
@@ -74,7 +80,7 @@ namespace dl
     /* else */
     /* { */
       console.clear();
-      m_current_scene->render(console);
+      m_current_scene->render(context, console);
       context.present(console);
     /* } */
   }

@@ -53,6 +53,9 @@ namespace dl
         {
           m_keyboard = SDL_GetKeyboardState(nullptr);
           int index = event.key.keysym.scancode;
+
+          std::cout << "[*] Pressed key code: " << index << '\n';
+
           m_key_down[index] = true;
           m_any_key_down = true;
           break;
