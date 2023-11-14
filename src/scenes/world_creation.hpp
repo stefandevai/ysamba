@@ -19,7 +19,6 @@ namespace dl
       void load() override;
       void update(const uint32_t delta, std::function<void(const std::string&)> set_scene) override;
       void render(tcod::Context& context, TCOD_Console& console) override;
-      void render_map(tcod::Context& context);
       void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override;
 
       void save_world(const std::string& file_path);

@@ -19,8 +19,6 @@ namespace dl
       void load() override;
       void update(const uint32_t delta, std::function<void(const std::string&)> set_scene) override;
       void render(tcod::Context& context, TCOD_Console& console) override;
-      void render_map(tcod::Context& context);
-      void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override;
 
       void save_world(const std::string& file_path);
       void load_world(const std::string& file_path);
@@ -30,11 +28,6 @@ namespace dl
       World m_world;
       Camera m_camera;
       PhysicsLayer m_physics_layer {m_world};
-      SDL_Surface* m_surface = nullptr;
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-      int m_seed = 110;
-
-      void m_generate_map(const int seed = 0);
-      void m_create_surface(const int width, const int height);
   };
 }

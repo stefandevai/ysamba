@@ -23,11 +23,12 @@ namespace dl
       void render(TCOD_Console& console, const Camera& camera);
       const TileData get(const int x, const int y, const int z);
       Size get_tilemap_size(const int z);
+      inline int get_seed() const { return m_seed; };
 
       template<class Archive> 
       void serialize(Archive& archive)
       {
-        archive(m_depth_min, m_depth_max, m_tilemaps);
+        archive(m_depth_min, m_depth_max, m_tilemaps, m_seed);
       }
 
     private:
@@ -37,6 +38,7 @@ namespace dl
       std::map<int, TileData> m_tile_data;
       int m_depth_min = 0;
       int m_depth_max = 1;
+      int m_seed = 0;
 
       void m_load_tile_data();
   };

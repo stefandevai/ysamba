@@ -60,10 +60,11 @@ namespace dl
     else if (m_input_manager->is_key_down(SDL_SCANCODE_C))
     {
       load_world("./world.dl");
+      m_should_update_world_surface = true;
     }
     else if (m_input_manager->is_key_down(SDL_SCANCODE_X))
     {
-      std::cout << "SEED: " << m_seed << '\n';
+      std::cout << "SEED: " << m_world.get_seed() << '\n';
     }
   }
 

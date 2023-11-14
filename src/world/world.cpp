@@ -10,6 +10,7 @@ namespace dl
 
   void World::generate(const int width, const int height, const int seed)
   {
+    m_seed = seed;
     m_tilemaps.clear();
 
     auto generator = TerrainGenerator(width, height);
