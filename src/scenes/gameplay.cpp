@@ -84,8 +84,10 @@ namespace dl
       return;
     }
 
+    console.clear();
     m_world.render(console, m_camera);
     m_player.render(console, m_camera);
+    context.present(console);
   }
 
   void Gameplay::render_map(tcod::Context& context)

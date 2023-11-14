@@ -26,6 +26,7 @@ namespace dl
     {
       m_generate_map();
     }
+    m_should_update_world_surface = true;
 
     m_physics_layer.add(&m_player.body);
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
@@ -49,10 +50,12 @@ namespace dl
     if (m_input_manager->is_key_down(SDL_SCANCODE_G))
     {
       m_generate_map();
+      m_should_update_world_surface = true;
     }
     else if (m_input_manager->is_key_down(SDL_SCANCODE_R))
     {
       m_generate_map(m_seed);
+      m_should_update_world_surface = true;
     }
     else if (m_input_manager->is_key_down(SDL_SCANCODE_S))
     {
@@ -67,14 +70,14 @@ namespace dl
       std::cout << "SEED: " << m_seed << '\n';
     }
 
-    /* m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z)); */
-    /* m_player.update(delta); */
+    m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
+    m_player.update(delta);
 
-    /* if (m_player.should_advance_turn()) */
-    /* { */
-    /*   m_physics_layer.update(delta); */
-    /*   m_world.update(delta); */
-    /* } */
+    if (m_player.should_advance_turn())
+    {
+      m_physics_layer.update(delta);
+      m_world.update(delta);
+    }
   }
 
   /* void WorldCreation::render(TCOD_Console& console) */
@@ -90,19 +93,26 @@ namespace dl
 
   void WorldCreation::render(tcod::Context& context, TCOD_Console& console)
   {
-    int w, h;
-    auto window = context.get_sdl_window();
-    const auto tilemap_size = m_world.get_tilemap_size(m_player.body.position.z);
-
-    SDL_GetWindowSize(window, &w, &h);
-
-    if (w != tilemap_size.w || h != tilemap_size.h)
+    if (m_should_update_world_surface)
     {
-      SDL_SetWindowSize(window, tilemap_size.w, tilemap_size.h);
+      m_create_world_surface(context);
+      m_should_update_world_surface = false;
     }
 
-    auto renderer = context.get_sdl_renderer();
+    /* int w, h; */
+    /* auto window = context.get_sdl_window(); */
+    /* const auto tilemap_size = m_world.get_tilemap_size(m_player.body.position.z); */
 
+    /* SDL_GetWindowSize(window, &w, &h); */
+
+    /* if (w != tilemap_size.w || h != tilemap_size.h) */
+    /* { */
+    /*   SDL_SetWindowSize(window, tilemap_size.w, tilemap_size.h); */
+    /* } */
+
+    /* const */
+
+    auto renderer = context.get_sdl_renderer();
     auto texture = SDL_CreateTextureFromSurface(renderer, m_surface);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -237,21 +247,27 @@ namespace dl
     }
 
     m_world.generate(map_width, map_height, m_seed);
-    m_create_surface(map_width, map_height);
+    /* m_create_surface(map_width, map_height); */
   }
 
-  void WorldCreation::m_create_surface(const int width, const int height)
+  void WorldCreation::m_create_world_surface(tcod::Context& context)
   {
+    int window_width, window_height;
+    auto window = context.get_sdl_window();
+    const auto tilemap_size = m_world.get_tilemap_size(m_player.body.position.z);
+
+    SDL_GetWindowSize(window, &window_width, &window_height);
+
     if (m_surface != nullptr)
     {
       SDL_FreeSurface(m_surface);
     }
 
-    m_surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+    m_surface = SDL_CreateRGBSurface(0, window_width, window_height, 32, 0, 0, 0, 0);
 
-    for (auto i = 0; i < width; ++i)
+    for (auto i = 0; i < tilemap_size.w; ++i)
     {
-      for (auto j = 0; j < height; ++j)
+      for (auto j = 0; j < tilemap_size.h; ++j)
       {
         SDL_Rect rect;
         rect.x = i;

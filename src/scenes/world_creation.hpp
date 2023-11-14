@@ -33,8 +33,9 @@ namespace dl
       SDL_Surface* m_surface = nullptr;
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       int m_seed = 110;
+      bool m_should_update_world_surface = false;
 
       void m_generate_map(const int seed = 0);
-      void m_create_surface(const int width, const int height);
+      void m_create_world_surface(tcod::Context& context);
   };
 }

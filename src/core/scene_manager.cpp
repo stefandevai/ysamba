@@ -79,9 +79,9 @@ namespace dl
     /* } */
     /* else */
     /* { */
-      console.clear();
+      /* console.clear(); */
       m_current_scene->render(context, console);
-      context.present(console);
+      /* context.present(console); */
     /* } */
   }
 
