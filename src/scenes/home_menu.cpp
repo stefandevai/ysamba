@@ -2,8 +2,8 @@
 
 namespace dl
 {
-  HomeMenu::HomeMenu()
-    : Scene("scenes/home_menu.lua")
+  HomeMenu::HomeMenu(const std::string& scene_key)
+    : Scene(scene_key)
   { }
 
   void HomeMenu::load()
@@ -24,7 +24,11 @@ namespace dl
       return;
     }
 
-    if (m_input_manager->is_any_key_down())
+    if (m_input_manager->poll_action("quit"))
+    {
+      m_input_manager->quit();
+    }
+    else if (m_input_manager->poll_action("play"))
     {
       set_scene("gameplay");
     }

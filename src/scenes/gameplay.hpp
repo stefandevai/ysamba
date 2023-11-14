@@ -14,7 +14,7 @@ namespace dl
   class Gameplay : public Scene
   {
     public:
-      Gameplay();
+      Gameplay(const std::string& scene_key);
 
       void load() override;
       void update(const uint32_t delta, std::function<void(const std::string&)> set_scene) override;

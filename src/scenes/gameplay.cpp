@@ -8,8 +8,8 @@
 
 namespace dl
 {
-  Gameplay::Gameplay()
-    : Scene("scenes/gameplay.lua")
+  Gameplay::Gameplay(const std::string& scene_key)
+    : Scene(scene_key)
   { }
 
   void Gameplay::load()
@@ -42,6 +42,10 @@ namespace dl
       return;
     }
 
+    if (m_input_manager->poll_action("quit"))
+    {
+      set_scene("home_menu");
+    }
     if (m_input_manager->is_key_down(SDL_SCANCODE_G))
     {
       m_generate_map();

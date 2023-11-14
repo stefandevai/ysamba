@@ -27,15 +27,16 @@ namespace dl
       return;
     }
 
+    const auto scene_key = it->first;
     const auto scene_type = it->second;
 
     switch(scene_type)
     {
       case SceneType::HOME_MENU:
-        m_current_scene = std::make_shared<HomeMenu>();
+        m_current_scene = std::make_shared<HomeMenu>(scene_key);
         break;
       case SceneType::GAMEPLAY:
-        m_current_scene = std::make_shared<Gameplay>();
+        m_current_scene = std::make_shared<Gameplay>(scene_key);
         break;
       default:
         break;

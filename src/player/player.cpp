@@ -35,45 +35,45 @@ namespace dl
 
   void Player::m_move()
   {
-    if (input_manager->is_action_down("move_right"))
+    if (input_manager->poll_action("move_right"))
     {
       body.velocity.x = 1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_left"))
+    else if (input_manager->poll_action("move_left"))
     {
       body.velocity.x = -1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_bottom"))
+    else if (input_manager->poll_action("move_bottom"))
     {
       body.velocity.y = 1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_top"))
+    else if (input_manager->poll_action("move_top"))
     {
       body.velocity.y = -1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_bottom_left"))
+    else if (input_manager->poll_action("move_bottom_left"))
     {
       body.velocity.x = -1;
       body.velocity.y = 1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_bottom_right"))
+    else if (input_manager->poll_action("move_bottom_right"))
     {
       body.velocity.x = 1;
       body.velocity.y = 1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_top_left"))
+    else if (input_manager->poll_action("move_top_left"))
     {
       body.velocity.x = -1;
       body.velocity.y = -1;
       m_should_advance_turn = true;
     }
-    else if (input_manager->is_action_down("move_top_right"))
+    else if (input_manager->poll_action("move_top_right"))
     {
       body.velocity.x = 1;
       body.velocity.y = -1;

@@ -17,7 +17,8 @@ namespace dl
 
       static std::shared_ptr<InputManager> get_instance();
       void update();
-      bool is_action_down(const std::string& action);
+      void set_context(const std::string& context_key);
+      bool poll_action(const std::string& action);
       bool is_key_down(int key);
       bool is_any_key_down();
       bool is_key_up(int key);
@@ -26,7 +27,9 @@ namespace dl
 
     private:
       static std::shared_ptr<InputManager> m_instance;
+      static std::shared_ptr<sol::table> m_context;
       static std::shared_ptr<SDLInputWrapper> m_sdl_input_wrapper;
+      static std::string m_context_key;
       LuaAPI m_lua{"key_bindings.lua"};
   };
 }

@@ -1,11 +1,12 @@
 #include "./scene.hpp"
 
 #include <SDL.h>
+#include "../core/input_manager.hpp"
 
 namespace dl
 {
-  Scene::Scene(const std::string& scene_path)
-    : m_scene_path(scene_path)
+  Scene::Scene(const std::string& scene_key)
+    : m_scene_key(scene_key), m_scene_dir("scenes/" + scene_key + "/")
   {
 
   }
@@ -17,7 +18,9 @@ namespace dl
 
   void Scene::load()
   {
-    m_lua.load(m_scene_path);
+    auto input_manager = InputManager::get_instance();
+    m_lua.load(m_scene_dir / "main.lua");
+    input_manager->set_context(m_scene_key);
   }
 
   void Scene::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
