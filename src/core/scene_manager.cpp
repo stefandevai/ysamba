@@ -59,23 +59,23 @@ namespace dl
 
   void SceneManager::render(tcod::Context& context, TCOD_Console& console)
   {
-    if (m_current_scene == nullptr)
+    if (m_current_scene == nullptr || !m_current_scene->has_loaded())
     {
       return;
     }
 
-    auto gameplay_scene = std::dynamic_pointer_cast<Gameplay>(m_current_scene);
+    /* auto gameplay_scene = std::dynamic_pointer_cast<Gameplay>(m_current_scene); */
 
-    if (gameplay_scene != nullptr)
-    {
-      gameplay_scene->render_map(context);
-    }
-    else
-    {
+    /* if (gameplay_scene != nullptr) */
+    /* { */
+    /*   gameplay_scene->render(console); */
+    /* } */
+    /* else */
+    /* { */
       console.clear();
       m_current_scene->render(console);
       context.present(console);
-    }
+    /* } */
   }
 
   void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
