@@ -3,7 +3,6 @@
 #include <fstream>
 #include <random>
 #include <climits>
-#include <SDL.h>
 #include <cereal/archives/binary.hpp>
 
 namespace dl
@@ -37,15 +36,15 @@ namespace dl
     {
       set_scene("home_menu");
     }
-    else if (m_input_manager->is_key_down(SDL_SCANCODE_S))
+    else if (m_input_manager->poll_action("save_world"))
     {
       save_world("./world.dl");
     }
-    else if (m_input_manager->is_key_down(SDL_SCANCODE_C))
+    else if (m_input_manager->poll_action("load_world"))
     {
       load_world("./world.dl");
     }
-    else if (m_input_manager->is_key_down(SDL_SCANCODE_X))
+    else if (m_input_manager->poll_action("display_seed"))
     {
       std::cout << "SEED: " << m_world.get_seed() << '\n';
     }
