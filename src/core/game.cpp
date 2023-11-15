@@ -17,7 +17,8 @@ namespace dl
       params.argv = argv;
       params.renderer_type = TCOD_RENDERER_SDL2;
       params.vsync = 1;
-      params.sdl_window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
+      /* params.sdl_window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED; */
+      params.sdl_window_flags = SDL_WINDOW_RESIZABLE;
       params.window_title = m_lua.get_variable<const char*>("title");
 
       const std::string tilesheet_path = m_lua.get_variable<std::string>("tilesheet_path");

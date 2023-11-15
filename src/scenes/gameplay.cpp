@@ -34,18 +34,30 @@ namespace dl
     }
 
     m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
-    m_ecs.update();
     m_player.update(delta);
 
-    if (m_player.should_advance_turn())
+    /* if (m_player.should_advance_turn()) */
+    if (m_current_state == Gameplay::State::PLAYING)
     {
       m_physics_layer.update(delta);
       m_world.update(delta);
+      m_ecs.update(delta);
     }
 
     if (m_input_manager->poll_action("quit"))
     {
       set_scene("home_menu");
+    }
+    else if (m_input_manager->poll_action("toggle_pause"))
+    {
+      if (m_current_state == Gameplay::State::PLAYING)
+      {
+        m_current_state = Gameplay::State::PAUSED;
+      }
+      else
+      {
+        m_current_state = Gameplay::State::PLAYING;
+      }
     }
     else if (m_input_manager->poll_action("save_world"))
     {

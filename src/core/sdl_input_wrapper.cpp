@@ -21,7 +21,7 @@ namespace dl
   void SDLInputWrapper::update()
   {
     // Block until events exist
-    SDL_WaitEvent(nullptr);
+    /* SDL_WaitEvent(nullptr); */
 
     // Reset keys
     for (auto& it : m_key_down)

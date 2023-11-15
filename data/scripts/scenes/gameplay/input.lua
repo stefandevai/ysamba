@@ -1,5 +1,6 @@
 local key_bindings = {
   quit = { 20 },
+  toggle_pause = { 44 },
   move_top = { 82, 14 },
   move_right = { 79, 15 },
   move_bottom = { 81, 13 },

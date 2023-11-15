@@ -9,6 +9,6 @@ namespace dl
     public:
       MovementSystem();
 
-      void update(entt::registry &registry);
+      void update(entt::registry &registry, const uint32_t delta);
   };
 }

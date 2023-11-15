@@ -12,7 +12,7 @@ namespace dl
     public:
       ECS();
       void load();
-      void update();
+      void update(const uint32_t delta);
       void render(TCOD_Console& console);
 
     private:

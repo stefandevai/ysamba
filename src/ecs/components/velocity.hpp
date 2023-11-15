@@ -4,8 +4,8 @@ namespace dl
 {
     struct Velocity
     {
-        double dx;
-        double dy;
-        double dz;
+        double x;
+        double y;
+        double z;
     };
 }

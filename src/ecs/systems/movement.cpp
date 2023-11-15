@@ -9,13 +9,12 @@ namespace dl
 
   }
 
-  void MovementSystem::update(entt::registry &registry)
+  void MovementSystem::update(entt::registry &registry, const uint32_t delta)
   {
-    auto view = registry.view<const Position, const Velocity>();
-    for(auto [entity, pos, vel]: view.each()) {
-    }
-    /* view.each([](auto &position, auto &velocity) { */ 
-
-    /* }); */
+    auto view = registry.view<Position, Velocity>();
+    view.each([delta](auto &position, auto &velocity) {
+      position.x += velocity.x * delta / 1000.0;
+      position.y += velocity.y * delta / 1000.0;
+    });
   }
 }

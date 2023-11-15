@@ -25,11 +25,18 @@ namespace dl
       void load_world(const std::string& file_path);
 
     private:
+      enum State
+      {
+        PLAYING,
+        PAUSED,
+      };
+
       Player m_player;
       World m_world;
       Camera m_camera;
       PhysicsLayer m_physics_layer {m_world};
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       ECS m_ecs;
+      State m_current_state = State::PAUSED;
   };
 }
