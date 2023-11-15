@@ -5,7 +5,7 @@ namespace dl
 {
   LuaAPI::LuaAPI()
   {
-    m_lua.open_libraries (sol::lib::base, sol::lib::package, sol::lib::io);
+    m_lua.open_libraries (sol::lib::base, sol::lib::package);
   }
 
   LuaAPI::LuaAPI (const std::string& script_path)
