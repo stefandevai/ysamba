@@ -52,6 +52,7 @@ find_package(libtcod CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -69,4 +70,5 @@ target_link_libraries(
         ${LUA_LIBRARIES}
         sol2
         cereal::cereal
+        EnTT::EnTT
 )

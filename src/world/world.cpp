@@ -1,5 +1,6 @@
 #include "./world.hpp"
-#include "./generators/terrain_generator.hpp"
+/* #include "./generators/terrain_generator.hpp" */
+#include "./generators/dummy_generator.hpp"
 
 namespace dl
 {
@@ -13,10 +14,9 @@ namespace dl
     m_seed = seed;
     m_tilemaps.clear();
 
-    auto generator = TerrainGenerator(width, height);
+    /* auto generator = TerrainGenerator(width, height); */
+    auto generator = DummyGenerator(width, height);
     auto tilemap = generator.generate(seed);
-    /* auto tiles = TerrainGenerator::generate(width, height, seed); */
-    /* auto tilemap = std::make_shared<Tilemap>(tiles, width, height); */
     m_tilemaps.push_back(tilemap);
   }
 

@@ -17,7 +17,7 @@ namespace dl
       params.argv = argv;
       params.renderer_type = TCOD_RENDERER_SDL2;
       params.vsync = 1;
-      params.sdl_window_flags = SDL_WINDOW_RESIZABLE;
+      params.sdl_window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
       params.window_title = m_lua.get_variable<const char*>("title");
 
       const std::string tilesheet_path = m_lua.get_variable<std::string>("tilesheet_path");
@@ -51,14 +51,9 @@ namespace dl
       {
         clock.tick();
 
-        if (m_input_manager->is_key_down(26))
-        {
-          m_scene_manager.screenshot(m_context, m_console, "world_map");
-        }
-
         m_scene_manager.update(clock.delta);
-        m_scene_manager.render(m_context, m_console);
         m_input_manager->update();
+        m_scene_manager.render(m_context, m_console);
       }
     }
     catch (const std::exception& exc)
