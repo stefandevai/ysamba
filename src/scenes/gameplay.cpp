@@ -20,6 +20,7 @@ namespace dl
     m_physics_layer.add(&m_player.body);
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
     m_camera.size.h = m_lua.get_variable<int>("camera_height");
+    m_ecs.load();
     m_has_loaded = true;
   }
 
@@ -30,6 +31,16 @@ namespace dl
     if (!has_loaded())
     {
       return;
+    }
+
+    m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
+    m_ecs.update();
+    m_player.update(delta);
+
+    if (m_player.should_advance_turn())
+    {
+      m_physics_layer.update(delta);
+      m_world.update(delta);
     }
 
     if (m_input_manager->poll_action("quit"))
@@ -48,15 +59,6 @@ namespace dl
     {
       std::cout << "SEED: " << m_world.get_seed() << '\n';
     }
-
-    m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
-    m_player.update(delta);
-
-    if (m_player.should_advance_turn())
-    {
-      m_physics_layer.update(delta);
-      m_world.update(delta);
-    }
   }
 
   void Gameplay::render(tcod::Context& context, TCOD_Console& console)
@@ -68,6 +70,7 @@ namespace dl
 
     console.clear();
     m_world.render(console, m_camera);
+    m_ecs.render(console);
     m_player.render(console, m_camera);
     context.present(console);
   }
