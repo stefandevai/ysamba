@@ -5,12 +5,12 @@ namespace dl
 {
   LuaAPI::LuaAPI()
   {
-    m_lua.open_libraries (sol::lib::base);
+    m_lua.open_libraries (sol::lib::base, sol::lib::package, sol::lib::io);
   }
 
   LuaAPI::LuaAPI (const std::string& script_path)
   {
-    m_lua.open_libraries (sol::lib::base);
+    m_lua.open_libraries (sol::lib::base, sol::lib::package);
     load (script_path);
   }
 
