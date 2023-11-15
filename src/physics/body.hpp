@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../components/position.hpp"
+#include "../ecs/components/position.hpp"
 #include "../components/velocity.hpp"
 
 namespace dl

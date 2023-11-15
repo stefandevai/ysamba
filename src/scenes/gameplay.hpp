@@ -31,12 +31,12 @@ namespace dl
         PAUSED,
       };
 
-      Player m_player;
+      /* Player m_player; */
       World m_world;
       Camera m_camera;
-      PhysicsLayer m_physics_layer {m_world};
+      /* PhysicsLayer m_physics_layer {m_world}; */
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-      ECS m_ecs;
+      ECS m_ecs{m_camera};
       State m_current_state = State::PAUSED;
   };
 }

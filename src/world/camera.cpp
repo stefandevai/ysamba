@@ -6,7 +6,7 @@ namespace dl
 {
   Camera::Camera() { }
 
-  void Camera::update(const Position& target, const Size& tilemap_size)
+  void Camera::follow(const Position& target, const Size& tilemap_size)
   {
     const int camera_x = target.x - size.w / 2;
     const int camera_y = target.y - size.h / 2;
@@ -34,7 +34,7 @@ namespace dl
     }
   }
 
-  void Camera::move(const int x, const int y, const int z)
+  void Camera::move_to(const int x, const int y, const int z)
   {
     if (x == position.x && y == position.y && z == position.z)
     {

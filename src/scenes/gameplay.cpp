@@ -17,7 +17,7 @@ namespace dl
 
     load_world("./world.dl");
 
-    m_physics_layer.add(&m_player.body);
+    /* m_physics_layer.add(&m_player.body); */
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
     m_camera.size.h = m_lua.get_variable<int>("camera_height");
     m_ecs.load();
@@ -33,13 +33,13 @@ namespace dl
       return;
     }
 
-    m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z));
-    m_player.update(delta);
+    /* m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z)); */
+    /* m_player.update(delta); */
 
     /* if (m_player.should_advance_turn()) */
     if (m_current_state == Gameplay::State::PLAYING)
     {
-      m_physics_layer.update(delta);
+      /* m_physics_layer.update(delta); */
       m_world.update(delta);
       m_ecs.update(delta);
     }
@@ -71,6 +71,22 @@ namespace dl
     {
       std::cout << "SEED: " << m_world.get_seed() << '\n';
     }
+    else if (m_input_manager->poll_action("camera_move_west"))
+    {
+      m_camera.move_west();
+    }
+    else if (m_input_manager->poll_action("camera_move_east"))
+    {
+      m_camera.move_east();
+    }
+    else if (m_input_manager->poll_action("camera_move_south"))
+    {
+      m_camera.move_south();
+    }
+    else if (m_input_manager->poll_action("camera_move_north"))
+    {
+      m_camera.move_north();
+    }
   }
 
   void Gameplay::render(tcod::Context& context, TCOD_Console& console)
@@ -83,7 +99,7 @@ namespace dl
     console.clear();
     m_world.render(console, m_camera);
     m_ecs.render(console);
-    m_player.render(console, m_camera);
+    /* m_player.render(console, m_camera); */
     context.present(console);
   }
 

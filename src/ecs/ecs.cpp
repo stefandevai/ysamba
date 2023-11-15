@@ -2,10 +2,11 @@
 #include "./components/position.hpp"
 #include "./components/velocity.hpp"
 #include "./components/visibility.hpp"
+#include "../world/camera.hpp"
 
 namespace dl
 {
-  ECS::ECS() { }
+  ECS::ECS(const Camera& camera) : m_camera(camera) { }
 
   void ECS::load()
   {
@@ -27,7 +28,7 @@ namespace dl
 
   void ECS::render(TCOD_Console& console)
   {
-    m_render_system.update(m_registry, console);
+    m_render_system.update(m_registry, console, m_camera);
   }
 }
 
