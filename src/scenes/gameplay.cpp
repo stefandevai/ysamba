@@ -4,6 +4,7 @@
 #include <random>
 #include <climits>
 #include <cereal/archives/binary.hpp>
+#include "../world/generators/society_generator.hpp"
 
 namespace dl
 {
@@ -17,10 +18,16 @@ namespace dl
 
     load_world("./world.dl");
 
+    m_ecs.load();
+
     /* m_physics_layer.add(&m_player.body); */
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
     m_camera.size.h = m_lua.get_variable<int>("camera_height");
-    m_ecs.load();
+
+    const auto& society = m_world.get_society("otomi");
+    const auto generator = SocietyGenerator();
+    generator.generate_members(100, society, m_registry);
+
     m_has_loaded = true;
   }
 

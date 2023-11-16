@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <libtcod.hpp>
+#include <entt/entity/registry.hpp>
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
 #include "../player/player.hpp"
@@ -31,12 +32,12 @@ namespace dl
         PAUSED,
       };
 
-      /* Player m_player; */
+      entt::registry m_registry;
       World m_world;
       Camera m_camera;
       /* PhysicsLayer m_physics_layer {m_world}; */
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-      ECS m_ecs{m_camera};
+      ECS m_ecs{m_registry, m_camera};
       State m_current_state = State::PAUSED;
   };
 }

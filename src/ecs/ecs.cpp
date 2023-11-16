@@ -1,24 +1,13 @@
 #include "./ecs.hpp"
-#include "./components/position.hpp"
 #include "./components/velocity.hpp"
-#include "./components/visibility.hpp"
 #include "../world/camera.hpp"
 
 namespace dl
 {
-  ECS::ECS(const Camera& camera) : m_camera(camera) { }
+  ECS::ECS(entt::registry& registry, const Camera& camera) : m_registry(registry), m_camera(camera) { }
 
   void ECS::load()
   {
-    const auto entity1 = m_registry.create();
-    m_registry.emplace<Position>(entity1, 0., 0., 0.);
-    m_registry.emplace<Velocity>(entity1, 1.3, 0., 0.);
-    m_registry.emplace<Visibility>(entity1, 'A', 255, 255, 255);
-
-    const auto entity2 = m_registry.create();
-    m_registry.emplace<Position>(entity2, 3., 3., 0.);
-    m_registry.emplace<Velocity>(entity2, 1., 0., 0.);
-    m_registry.emplace<Visibility>(entity2, 'A', 255, 255, 255);
   }
 
   void ECS::update(const uint32_t delta)

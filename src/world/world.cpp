@@ -1,6 +1,7 @@
 #include "./world.hpp"
 /* #include "./generators/terrain_generator.hpp" */
 #include "./generators/dummy_generator.hpp"
+#include "./generators/society_generator.hpp"
 
 namespace dl
 {
@@ -14,10 +15,14 @@ namespace dl
     m_seed = seed;
     m_tilemaps.clear();
 
-    /* auto generator = TerrainGenerator(width, height); */
-    auto generator = DummyGenerator(width, height);
-    auto tilemap = generator.generate(seed);
+    /* auto tilemap_generator = TerrainGenerator(width, height); */
+    auto tilemap_generator = DummyGenerator(width, height);
+    auto tilemap = tilemap_generator.generate(seed);
     m_tilemaps.push_back(tilemap);
+
+    auto society_generator = SocietyGenerator();
+    auto society = society_generator.generate(seed);
+    m_societies[society.id] = society;
   }
 
   void World::update(const uint32_t delta)
