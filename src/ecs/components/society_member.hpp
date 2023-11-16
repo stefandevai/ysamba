@@ -22,6 +22,7 @@ namespace dl
         Cacique,
     };
 
+
     struct SocietyMember
     {
         std::string id;
@@ -29,6 +30,14 @@ namespace dl
         std::string name;
         SocialClass social_class;
         Metier metiers;
+        State state = State::Idle;
+
+    private:
+        enum class State
+        {
+            Idle,
+            Walking,
+        }
     };
 }
 
