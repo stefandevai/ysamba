@@ -23,21 +23,22 @@ namespace dl
     };
 
 
-    struct SocietyMember
+    struct SocietyAgent
     {
+    private:
+        enum class State
+        {
+            Idle,
+            Walking,
+        };
+
+    public:
         std::string id;
         std::string society_id;
         std::string name;
         SocialClass social_class;
         Metier metiers;
         State state = State::Idle;
-
-    private:
-        enum class State
-        {
-            Idle,
-            Walking,
-        }
     };
 }
 

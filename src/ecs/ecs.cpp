@@ -12,6 +12,7 @@ namespace dl
   void ECS::update(const uint32_t delta)
   {
     m_physics_system.update(m_registry, delta);
+    m_society_system.update(m_registry, delta);
   }
 
   void ECS::render(TCOD_Console& console)

@@ -4,6 +4,7 @@
 #include <libtcod.hpp>
 #include "systems/physics.hpp"
 #include "systems/render.hpp"
+#include "systems/society.hpp"
 
 namespace dl
 {
@@ -24,6 +25,7 @@ namespace dl
       const Camera& m_camera;
       PhysicsSystem m_physics_system{m_world};
       RenderSystem m_render_system;
+      SocietySystem m_society_system;
   };
 }
 
