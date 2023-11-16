@@ -1,5 +1,5 @@
 local key_bindings = {
-  quit = { 20 },
+  quit = { 41 },
   generate_world = { 10 },
   reload_world = { 21 },
   save_world = { 22 },

@@ -4,11 +4,16 @@
 
 namespace dl
 {
-  class MovementSystem
+  class World;
+
+  class PhysicsSystem
   {
     public:
-      MovementSystem();
+      PhysicsSystem(World& world);
 
       void update(entt::registry &registry, const uint32_t delta);
+
+    private:
+      World& m_world;
   };
 }

@@ -1,5 +1,5 @@
 local key_bindings = {
-  quit = { 20 },
+  quit = { 41 },
   toggle_pause = { 44 },
   camera_move_west = { 80, 11 },
   camera_move_east = { 79, 15 },

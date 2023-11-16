@@ -2,7 +2,7 @@
 
 namespace dl
 {
-    enum SocialClass
+    enum class SocialClass
     {
         None,
         Slave,
@@ -10,7 +10,7 @@ namespace dl
         Ruler,
     };
 
-    enum Metier
+    enum class Metier
     {
         None,
         Farmer,
@@ -24,7 +24,9 @@ namespace dl
 
     struct SocietyMember
     {
+        std::string id;
         std::string society_id;
+        std::string name;
         SocialClass social_class;
         Metier metiers;
     };

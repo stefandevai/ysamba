@@ -51,6 +51,40 @@ namespace dl
       m_ecs.update(delta);
     }
 
+    m_update_input(set_scene);
+  }
+
+  void Gameplay::render(tcod::Context& context, TCOD_Console& console)
+  {
+    if (!has_loaded())
+    {
+      return;
+    }
+
+    console.clear();
+    m_world.render(console, m_camera);
+    m_ecs.render(console);
+    /* m_player.render(console, m_camera); */
+    context.present(console);
+  }
+
+  void Gameplay::save_world(const std::string& file_path)
+  {
+    std::ofstream output_stream(file_path);
+    cereal::BinaryOutputArchive archive (output_stream);
+    archive(m_world);
+  }
+
+  void Gameplay::load_world(const std::string& file_path)
+  {
+    std::ifstream input_stream(file_path);
+    cereal::BinaryInputArchive archive (input_stream);
+    archive(m_world);
+    m_has_loaded = true;
+  }
+
+  void Gameplay::m_update_input(std::function<void(const std::string&)>& set_scene)
+  {
     if (m_input_manager->poll_action("quit"))
     {
       set_scene("home_menu");
@@ -94,34 +128,5 @@ namespace dl
     {
       m_camera.move_north();
     }
-  }
-
-  void Gameplay::render(tcod::Context& context, TCOD_Console& console)
-  {
-    if (!has_loaded())
-    {
-      return;
-    }
-
-    console.clear();
-    m_world.render(console, m_camera);
-    m_ecs.render(console);
-    /* m_player.render(console, m_camera); */
-    context.present(console);
-  }
-
-  void Gameplay::save_world(const std::string& file_path)
-  {
-    std::ofstream output_stream(file_path);
-    cereal::BinaryOutputArchive archive (output_stream);
-    archive(m_world);
-  }
-
-  void Gameplay::load_world(const std::string& file_path)
-  {
-    std::ifstream input_stream(file_path);
-    cereal::BinaryInputArchive archive (input_stream);
-    archive(m_world);
-    m_has_loaded = true;
   }
 }
