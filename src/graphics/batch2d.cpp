@@ -1,5 +1,7 @@
 #include "./batch2d.hpp"
 
+#include <iostream>
+#include <spdlog/spdlog.h>
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp> // IWYU pragma: export
 #include "./texture.hpp"
@@ -68,17 +70,26 @@ void Batch2D::render (ShaderProgram& shader)
     return;
   }
 
+  GLenum err;
   for (unsigned int i = 0; i < m_textures.size(); ++i)
   {
     glActiveTexture (GL_TEXTURE0 + i);
     m_textures[i]->bind();
     shader.set_int ("textures[" + std::to_string (i) + "]", i);
+  while((err = glGetError()) != GL_NO_ERROR)
+  {
+    std::cout << err << '\n';
+  }
   }
   glActiveTexture (GL_TEXTURE0);
 
   glBindVertexArray (m_vao);
   glDrawElements (GL_TRIANGLES, m_index_count, GL_UNSIGNED_INT, 0);
   glBindVertexArray (0);
+  while((err = glGetError()) != GL_NO_ERROR)
+  {
+    std::cout << err << '\n';
+  }
   m_index_count = 0;
 }
 
@@ -311,6 +322,12 @@ void Batch2D::init_emplacing()
 {
   glBindBuffer (GL_ARRAY_BUFFER, m_vbo);
   m_vertex_buffer = static_cast<VertexData*> (glMapBuffer (GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+
+  GLenum err;
+  while((err = glGetError()) != GL_NO_ERROR)
+  {
+    std::cout << err << '\n';
+  }
 
   if (m_vertex_buffer == nullptr)
   {

@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 #include <entt/entity/registry.hpp>
-#include "./renderable.hpp"
 
 namespace dl
 {
@@ -12,8 +11,9 @@ typedef int GLsizei;
 
 class Texture;
 class Sprite;
+class ShaderProgram;
 
-class Batch2D : public Renderable
+class Batch2D
 {
 public:
   Batch2D();

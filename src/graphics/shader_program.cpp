@@ -1,5 +1,6 @@
 #include "./shader_program.hpp"
 
+#include <spdlog/spdlog.h>
 #include <glad/glad.h>
 
 namespace dl
@@ -17,7 +18,7 @@ namespace dl
     if (!success)
     {
       glGetShaderInfoLog (vertex_shader, 512, NULL, info_log);
-      /* spdlog::critical ("Vertex Shader compilation failed: {}\n{}", vertex_source, info_log); */
+      spdlog::critical ("Vertex Shader compilation failed: {}\n{}", vertex_source, info_log);
     }
 
     int fragment_shader = glCreateShader (GL_FRAGMENT_SHADER);
@@ -28,7 +29,7 @@ namespace dl
     if (!success)
     {
       glGetShaderInfoLog (fragment_shader, 512, NULL, info_log);
-      /* spdlog::critical ("Fragment Shader compilation failed: {}\n{}", fragment_source, info_log); */
+      spdlog::critical ("Fragment Shader compilation failed: {}\n{}", fragment_source, info_log);
     }
 
     m_program = glCreateProgram();
@@ -40,7 +41,7 @@ namespace dl
     if (!success)
     {
       glGetProgramInfoLog (m_program, 512, NULL, info_log);
-      /* spdlog::critical ("Program linking failed: {} {}\n{}", vertex_source, fragment_source, info_log); */
+      spdlog::critical ("Program linking failed: {} {}\n{}", vertex_source, fragment_source, info_log);
     }
     glDeleteShader (vertex_shader);
     glDeleteShader (fragment_shader);

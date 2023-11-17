@@ -1,5 +1,7 @@
-#include <nlohmann/json.hpp>
 #include "./asset_manager.hpp"
+
+#include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 #include "./texture_loader.hpp"
 #include "./shader_loader.hpp"
 #include "./font_loader.hpp"
@@ -38,7 +40,7 @@ namespace dl
   {
     if (m_json.object[ASSET_OBJECT_ASSETS] == nullptr)
     {
-      /* spdlog::warn ("Project has no assets."); */
+      spdlog::warn ("Project has no assets.");
       return;
     }
 
@@ -56,7 +58,7 @@ namespace dl
       }
       catch (std::out_of_range& e)
       {
-        /* spdlog::warn ("Unknown asset type {}.\n{}", type_tag, e.what()); */
+        spdlog::warn ("Unknown asset type {}.\n{}", type_tag, e.what());
         continue;
       }
 
@@ -69,7 +71,7 @@ namespace dl
           // const auto texture_type = asset_info["textureType"].get<std::string>();
           const auto texture_type = TextureType::DIFFUSE;
 
-          add<TextureLoader> (id, m_base_dir / filepath, texture_type);
+          add<TextureLoader> (id, filepath, texture_type);
         }
         break;
 
@@ -113,7 +115,7 @@ namespace dl
         break;
 
         default:
-          /* spdlog::warn ("Unknown asset type {}", type_tag); */
+          spdlog::warn ("Unknown asset type {}", type_tag);
           break;
       }
     }

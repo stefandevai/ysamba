@@ -2,6 +2,13 @@
     "assets":
     [
         {
+            "id": "tileset",
+            "type": "texture",
+            "path": "textures/tileset.png",
+            "textureType": "diffuse"
+        },
+
+        {
             "id": "spritesheet-tileset",
             "type": "texture-atlas",
             "path": "textures/tileset.png",
@@ -10,6 +17,7 @@
             "horizontalFrames": 8,
             "verticalFrames": 11
         },
+
         {
             "id": "font-1980",
             "type": "font",

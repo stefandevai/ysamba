@@ -1,9 +1,9 @@
 #include "./display.hpp"
 
-/* #include <spdlog/spdlog.h> */
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <spdlog/spdlog.h>
 #include <glad/glad.h>
 
 #if DISABLE_VSYNC == 1
@@ -49,8 +49,7 @@ namespace dl
 
     if (!gladLoadGLLoader (SDL_GL_GetProcAddress))
     {
-      std::cout << "[x] ERROR: Failed to initialize GLAD\n";
-      /* spdlog::critical ("Failed to initialize GLAD"); */
+      spdlog::critical ("Failed to initialize GLAD");
     }
 
     // OpenGL Viewport settings

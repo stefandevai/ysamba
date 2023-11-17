@@ -1,7 +1,7 @@
 #include "./texture.hpp"
 
 #include <glad/glad.h>
-/* #include <spdlog/spdlog.h> */
+#include <spdlog/spdlog.h>
 
 extern "C"
 {
@@ -129,7 +129,7 @@ void Texture::m_load_empty()
   GLenum err;
   while ((err = glGetError()) != GL_NO_ERROR)
   {
-    /* spdlog::critical ("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err); */
+    spdlog::critical ("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
   }
 }
 }

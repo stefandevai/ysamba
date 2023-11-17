@@ -3,14 +3,21 @@
 #include "./clock.hpp"
 #include "./file_manager.hpp"
 
+// TEMP
+#include "../graphics/sprite.hpp"
+// TEMP
+
 namespace dl
 {
   Game::Game() { }
 
   void Game::load(int argc, char* argv[])
   {
+
     try
     {
+      m_camera.set_frustrum (0.0f, 800.f, 600.f, 0.0f);
+
       /* auto params = TCOD_ContextParams{}; */
       /* params.tcod_version = TCOD_COMPILEDVERSION; */
       /* params.argc = argc; */
@@ -54,6 +61,14 @@ namespace dl
 
         m_scene_manager.update(clock.delta);
         m_input_manager->update();
+
+        auto sprite = std::make_shared<Sprite>("tileset");
+
+        m_display.clear();
+        m_world_renderer.init();
+        m_world_renderer.batch(sprite, 0., 0., 0.);
+        m_world_renderer.finalize();
+        m_world_renderer.render(m_camera);
         /* m_scene_manager.render(m_context, m_console); */
         m_display.render();
       }

@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 #include <unordered_map>
-/* #include <spdlog/spdlog.h> */
+#include <spdlog/spdlog.h>
 #include "./asset.hpp"
 #include "./asset_parameters.hpp"
 #include "./json.hpp"
@@ -47,7 +47,7 @@ namespace dl
       catch (std::out_of_range& e)
       {
         // TODO: Add default asset to return
-        /* spdlog::warn ("There's no asset with ID {}.\n{}", id, e.what()); */
+        spdlog::warn ("There's no asset with ID {}.\n{}", id, e.what());
         return nullptr;
       }
 

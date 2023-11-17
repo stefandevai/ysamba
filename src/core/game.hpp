@@ -7,6 +7,8 @@
 #include "./scene_manager.hpp"
 /* #include "../player/player.hpp" */
 #include "../graphics/asset_manager.hpp"
+#include "../graphics/renderer.hpp"
+#include "../graphics/camera.hpp"
 
 namespace dl
 {
@@ -21,6 +23,8 @@ namespace dl
     private:
       Display m_display{800, 600, "Dialetics"};
       AssetManager m_asset_manager{"./data/assets.json"};
+      Renderer m_world_renderer{m_asset_manager};
+      ViewCamera m_camera;
       /* tcod::Console m_console; */
       /* tcod::Context m_context; */
       /* Player m_player; */
