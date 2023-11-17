@@ -6,7 +6,7 @@
 #include FT_FREETYPE_H
 #include <glad/glad.h>
 #include "./texture.hpp"
-#include "./asset.hpp"
+#include "../core/asset.hpp"
 
 namespace dl
 {

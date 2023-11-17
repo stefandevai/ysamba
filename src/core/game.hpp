@@ -6,7 +6,7 @@
 #include "./input_manager.hpp"
 #include "./scene_manager.hpp"
 /* #include "../player/player.hpp" */
-#include "../graphics/asset_manager.hpp"
+#include "./asset_manager.hpp"
 #include "../graphics/renderer.hpp"
 #include "../graphics/camera.hpp"
 

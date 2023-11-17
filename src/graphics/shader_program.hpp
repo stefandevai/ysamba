@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
-#include "./asset.hpp"
+#include "../core/asset.hpp"
 
 namespace dl
 {

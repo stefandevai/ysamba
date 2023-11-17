@@ -1,7 +1,7 @@
 #include "./text.hpp"
 
 #include <spdlog/spdlog.h>
-#include "./asset_manager.hpp"
+#include "../core/asset_manager.hpp"
 #include "./sprite.hpp"
 #include "./font.hpp"
 

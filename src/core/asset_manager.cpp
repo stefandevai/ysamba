@@ -2,9 +2,9 @@
 
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
-#include "./texture_loader.hpp"
-#include "./shader_loader.hpp"
-#include "./font_loader.hpp"
+#include "../graphics/texture_loader.hpp"
+#include "../graphics/shader_loader.hpp"
+#include "../graphics/font_loader.hpp"
 
 namespace dl
 {

@@ -3,13 +3,10 @@
 #include "./shader_program.hpp"
 #include "./camera.hpp"
 #include "./texture.hpp"
-#include "./asset_manager.hpp"
 #include "./shader_loader.hpp"
 #include "./sprite.hpp"
 #include "./text.hpp"
-/* #include "../ecs/components/position.hpp" */
-/* #include "../ecs/components/text.hpp" */
-/* #include "../ecs/components/charcode.hpp" */
+#include "../core/asset_manager.hpp"
 
 namespace dl
 {

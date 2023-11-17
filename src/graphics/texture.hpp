@@ -3,7 +3,7 @@
 #include <string>
 #include <array>
 #include <glm/vec2.hpp>
-#include "./asset.hpp"
+#include "../core/asset.hpp"
 
 namespace dl
 {

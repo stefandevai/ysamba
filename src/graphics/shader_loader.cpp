@@ -1,6 +1,6 @@
 #include "./shader_loader.hpp"
 #include "./shader_program.hpp"
-#include "./fileutils.hpp"
+#include "../core/fileutils.hpp"
 
 namespace dl
 {
