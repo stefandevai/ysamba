@@ -8,7 +8,7 @@ namespace dl
   class Camera
   {
     public:
-      Position position;
+      Position position{0.,0.,0.};
       Size size;
 
       Camera();

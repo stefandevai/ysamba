@@ -21,7 +21,7 @@ namespace dl
     {
       for (int j = 0; j < camera.size.h; ++j)
       {
-        renderer.batch("world", std::make_shared<Sprite>("spritesheet-tileset", 1), (camera.position.x + i)*32, (camera.position.y + j)*32, camera.position.z);
+        renderer.batch("world", std::make_shared<Sprite>("spritesheet-tileset", 1), (i - camera.position.x)*32, (j - camera.position.y)*32, camera.position.z);
         /* const auto& tile = m_world.get(camera.position.x + i, camera.position.y + j, camera.position.z); */
         /* console.at(i, j).ch = tile.symbol; */
         /* console.at(i, j).fg = { tile.r, tile.g, tile.b, tile.a }; */
