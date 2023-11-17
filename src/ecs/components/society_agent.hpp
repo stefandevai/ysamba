@@ -25,14 +25,12 @@ namespace dl
 
     struct SocietyAgent
     {
-    private:
         enum class State
         {
             Idle,
             Walking,
         };
 
-    public:
         std::string id;
         std::string society_id;
         std::string name;
