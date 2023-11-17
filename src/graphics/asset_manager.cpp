@@ -78,7 +78,7 @@ namespace dl
         case AssetType::SHADER:
         {
           const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-          add<ShaderLoader> (id, m_base_dir / filepath);
+          add<ShaderLoader> (id, filepath);
         }
         break;
 

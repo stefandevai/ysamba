@@ -16,10 +16,12 @@ class ShaderProgram;
 class Batch2D
 {
 public:
-  Batch2D();
+  std::shared_ptr<ShaderProgram> shader;
+
+  Batch2D(std::shared_ptr<ShaderProgram> shader);
   ~Batch2D();
 
-  void render (ShaderProgram& shader);
+  void render ();
   void emplace (entt::registry& registry, entt::entity entity);
   void emplace (const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z);
   void init_emplacing();

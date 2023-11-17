@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include "./batch2d.hpp"
@@ -16,30 +16,18 @@ class Renderer
 {
 public:
   Renderer (AssetManager& asset_manager);
-  void init ();
-  void batch (const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z);
-  void finalize ();
+  void init (const std::string& layer_id);
+  void batch (const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z);
+  void finalize (const std::string& layer_id);
   void render (const ViewCamera& camera);
   void batch_sprites (entt::registry& registry);
+  void add_layer (const std::string& layer_id, const std::string shader_id);
 
 private:
-  enum class ShaderType
-  {
-    WORLD2D,
-    GUI,
-  };
-  using ShaderMap = std::unordered_map<ShaderType, std::shared_ptr<ShaderProgram>>;
+  using LayerMap = std::map<std::string, std::shared_ptr<Batch2D>>;
 
   AssetManager& m_asset_manager;
-  Batch2D m_world_batch;
-  Batch2D m_text_batch;
-  ShaderMap m_shaders{
-      {ShaderType::WORLD2D, nullptr},
-      {ShaderType::GUI, nullptr},
-  };
-
-private:
-  void m_init_assets();
+  LayerMap m_layers;
 };
 
 }

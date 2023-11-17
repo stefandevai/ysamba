@@ -1,6 +1,5 @@
 #include <entt/entity/registry.hpp>
 #include "./renderer.hpp"
-#include "./config.hpp"
 #include "./shader_program.hpp"
 #include "./camera.hpp"
 #include "./texture.hpp"
@@ -13,14 +12,19 @@
 
 namespace dl
 {
-Renderer::Renderer (AssetManager& asset_manager) : m_asset_manager (asset_manager) { m_init_assets(); }
+Renderer::Renderer (AssetManager& asset_manager) : m_asset_manager (asset_manager) { }
 
-void Renderer::init()
+void Renderer::add_layer (const std::string& layer_id, const std::string shader_id)
 {
-  m_world_batch.init_emplacing();
+  m_layers.emplace (layer_id, std::make_shared<Batch2D> (m_asset_manager.get<ShaderProgram> (shader_id)));
 }
 
-void Renderer::batch (const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
+void Renderer::init(const std::string& layer_id)
+{
+  m_layers.at(layer_id)->init_emplacing();
+}
+
+void Renderer::batch (const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
 {
   // Load texture if it has not been loaded
   if (sprite->texture == nullptr)
@@ -28,12 +32,12 @@ void Renderer::batch (const std::shared_ptr<Sprite>& sprite, const double x, con
     sprite->texture = m_asset_manager.get<Texture> (sprite->resource_id);
   }
 
-  m_world_batch.emplace (sprite, x, y, z);
+  m_layers.at(layer_id)->emplace(sprite, x, y, z);
 }
 
-void Renderer::finalize()
+void Renderer::finalize(const std::string& layer_id)
 {
-  m_world_batch.finalize_emplacing();
+  m_layers.at(layer_id)->finalize_emplacing();
 }
 
 void Renderer::batch_sprites (entt::registry& registry)
@@ -77,31 +81,15 @@ void Renderer::batch_sprites (entt::registry& registry)
 
 void Renderer::render (const ViewCamera& camera)
 {
-  // Render Sprites
-  auto& shader2d = m_shaders[ShaderType::WORLD2D];
-  shader2d->use();
+  glm::mat4 model_matrix = glm::mat4 (1.0f);
 
-  glm::mat4 model2d = glm::mat4 (1.0f);
-  shader2d->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model2d);
-
-  m_world_batch.render (*shader2d);
-
-  /* // Render GUI */
-  /* auto& shader_gui = m_shaders[ShaderType::GUI]; */
-  /* shader_gui->use(); */
-  /* shader_gui->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model2d); */
-  /* m_text_batch.render (*shader_gui); */
-}
-
-void Renderer::m_init_assets()
-{
-  m_asset_manager.add<ShaderLoader> (WORLD2D_SHADER_NAME, WORLD2D_SHADER_PATH);
-  m_shaders[ShaderType::WORLD2D] = m_asset_manager.get<ShaderProgram> (WORLD2D_SHADER_NAME);
-  assert (m_shaders[ShaderType::WORLD2D] != nullptr);
-
-/*   m_asset_manager.add<ShaderLoader> (GUI_SHADER_NAME, GUI_SHADER_PATH); */
-/*   m_shaders[ShaderType::GUI] = m_asset_manager.get<ShaderProgram> (GUI_SHADER_NAME); */
-/*   assert (m_shaders[ShaderType::GUI] != nullptr); */
+  for (const auto& p : m_layers)
+  {
+    const auto& shader = p.second->shader;
+    shader->use();
+    shader->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model_matrix);
+    p.second->render();
+  }
 }
 }
 

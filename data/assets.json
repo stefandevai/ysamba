@@ -2,6 +2,12 @@
     "assets":
     [
         {
+            "id": "world",
+            "type": "shader",
+            "path": "shaders/world"
+        },
+
+        {
             "id": "tileset",
             "type": "texture",
             "path": "textures/tileset.png",
