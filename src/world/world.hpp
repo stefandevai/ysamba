@@ -16,6 +16,8 @@
 
 namespace dl
 {
+  class Renderer;
+
   class World
   {
     public:
@@ -23,7 +25,7 @@ namespace dl
 
       void generate(const int width, const int height, const int seed);
       void update(const uint32_t delta);
-      void render(TCOD_Console& console, const Camera& camera);
+      void render(Renderer& renderer, const Camera& camera);
       const TileData get(const int x, const int y, const int z);
       Size get_tilemap_size(const int z);
       inline int get_seed() const { return m_seed; };

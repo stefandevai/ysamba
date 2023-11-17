@@ -2,6 +2,7 @@
 /* #include "./generators/terrain_generator.hpp" */
 #include "./generators/dummy_generator.hpp"
 #include "./generators/society_generator.hpp"
+#include "../graphics/renderer.hpp"
 
 namespace dl
 {
@@ -27,20 +28,20 @@ namespace dl
 
   void World::update(const uint32_t delta)
   {
-    (void)delta;
+    /* (void)delta; */
   }
 
-  void World::render(TCOD_Console& console, const Camera& camera)
+  void World::render(Renderer& renderer, const Camera& camera)
   {
-    for (int i = 0; i < camera.size.w; ++i)
-    {
-      for (int j = 0; j < camera.size.h; ++j)
-      {
-        const auto& tile = get(camera.position.x + i, camera.position.y + j, camera.position.z);
-        console.at(i, j).ch = tile.symbol;
-        console.at(i, j).fg = { tile.r, tile.g, tile.b, tile.a };
-      }
-    }
+    /* for (int i = 0; i < camera.size.w; ++i) */
+    /* { */
+    /*   for (int j = 0; j < camera.size.h; ++j) */
+    /*   { */
+        /* const auto& tile = get(camera.position.x + i, camera.position.y + j, camera.position.z); */
+        /* console.at(i, j).ch = tile.symbol; */
+        /* console.at(i, j).fg = { tile.r, tile.g, tile.b, tile.a }; */
+      /* } */
+    /* } */
   }
 
   const TileData World::get(const int x, const int y, const int z)

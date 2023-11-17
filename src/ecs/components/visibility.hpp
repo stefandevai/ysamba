@@ -1,12 +1,17 @@
 #pragma once
 
+#include <string>
+#include "../../graphics/sprite.hpp"
+
 namespace dl
 {
     struct Visibility
     {
-        char ch;
-        uint8_t r;
-        uint8_t g;
-        uint8_t b;
+        std::shared_ptr<Sprite> sprite = nullptr;
+
+        Visibility(const std::string& resource_id, const int frame)
+        {
+            sprite = std::make_shared<Sprite>(resource_id, frame);
+        };
     };
 }

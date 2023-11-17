@@ -2,7 +2,6 @@
 
 #include <map>
 #include <memory>
-#include <libtcod.hpp>
 #include "../scenes/scene.hpp"
 #include "./lua_api.hpp"
 
@@ -15,6 +14,8 @@ namespace dl
     GAMEPLAY,
   };
 
+  class Renderer;
+
   class SceneManager
   {
     public:
@@ -22,8 +23,8 @@ namespace dl
 
       static void set_scene(const std::string& key);
       void update(const uint32_t delta);
-      void render(tcod::Context& context, TCOD_Console& console);
-      void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename);
+      void render(Renderer& renderer);
+      /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
 
       inline std::shared_ptr<Scene> get_current_scene() const { return m_current_scene; };
 

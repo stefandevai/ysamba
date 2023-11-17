@@ -1,5 +1,7 @@
 #include "./home_menu.hpp"
 
+#include "../graphics/renderer.hpp"
+
 namespace dl
 {
   HomeMenu::HomeMenu(const std::string& scene_key)
@@ -38,17 +40,17 @@ namespace dl
     }
   }
 
-  void HomeMenu::render(tcod::Context& context, TCOD_Console& console)
+  void HomeMenu::render(Renderer& renderer)
   {
     if (!has_loaded())
     {
       return;
     }
 
-    console.clear();
-    tcod::print(console, {2, 8}, m_game_title, TCOD_white, std::nullopt);
-    tcod::print(console, {2, 10}, m_instructions, TCOD_white, std::nullopt);
-    context.present(console);
+    /* console.clear(); */
+    /* tcod::print(console, {2, 8}, m_game_title, TCOD_white, std::nullopt); */
+    /* tcod::print(console, {2, 10}, m_instructions, TCOD_white, std::nullopt); */
+    /* context.present(console); */
   }
 }
 

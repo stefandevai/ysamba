@@ -5,6 +5,7 @@
 #include <climits>
 #include <cereal/archives/binary.hpp>
 #include "../world/generators/society_generator.hpp"
+#include "../graphics/renderer.hpp"
 
 namespace dl
 {
@@ -54,18 +55,18 @@ namespace dl
     m_update_input(set_scene);
   }
 
-  void Gameplay::render(tcod::Context& context, TCOD_Console& console)
+  void Gameplay::render(Renderer& renderer)
   {
     if (!has_loaded())
     {
       return;
     }
 
-    console.clear();
-    m_world.render(console, m_camera);
-    m_ecs.render(console);
-    /* m_player.render(console, m_camera); */
-    context.present(console);
+    /* console.clear(); */
+    m_world.render(renderer, m_camera);
+    m_ecs.render(renderer);
+    /* /1* m_player.render(console, m_camera); *1/ */
+    /* context.present(console); */
   }
 
   void Gameplay::save_world(const std::string& file_path)

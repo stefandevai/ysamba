@@ -10,6 +10,7 @@ namespace dl
 {
   class Camera;
   class World;
+  class Renderer;
 
   class ECS
   {
@@ -17,7 +18,7 @@ namespace dl
       ECS(entt::registry& registry, World& world, const Camera& camera);
       void load();
       void update(const uint32_t delta);
-      void render(TCOD_Console& console);
+      void render(Renderer& renderer);
 
     private:
       entt::registry& m_registry;

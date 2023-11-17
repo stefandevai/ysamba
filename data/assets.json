@@ -8,6 +8,12 @@
         },
 
         {
+            "id": "gui",
+            "type": "shader",
+            "path": "shaders/gui"
+        },
+
+        {
             "id": "tileset",
             "type": "texture",
             "path": "textures/tileset.png",

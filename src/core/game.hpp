@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <libtcod.hpp>
+/* #include <libtcod.hpp> */
 #include "./display.hpp"
 #include "./input_manager.hpp"
 #include "./scene_manager.hpp"
@@ -23,7 +23,7 @@ namespace dl
     private:
       Display m_display{800, 600, "Dialetics"};
       AssetManager m_asset_manager{"./data/assets.json"};
-      Renderer m_world_renderer{m_asset_manager};
+      Renderer m_renderer{m_asset_manager};
       ViewCamera m_camera;
       /* tcod::Console m_console; */
       /* tcod::Context m_context; */

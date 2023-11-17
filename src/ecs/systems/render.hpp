@@ -6,12 +6,13 @@
 namespace dl
 {
   class Camera;
+  class Renderer;
 
   class RenderSystem
   {
     public:
       RenderSystem();
 
-      void update(entt::registry &registry, TCOD_Console& console, const Camera& camera);
+      void update(entt::registry &registry, Renderer& renderer, const Camera& camera);
   };
 }

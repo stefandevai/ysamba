@@ -1,5 +1,6 @@
 #include "./ecs.hpp"
 #include "./components/velocity.hpp"
+#include "../graphics/renderer.hpp"
 
 namespace dl
 {
@@ -15,9 +16,9 @@ namespace dl
     m_society_system.update(m_registry, delta);
   }
 
-  void ECS::render(TCOD_Console& console)
+  void ECS::render(Renderer& renderer)
   {
-    m_render_system.update(m_registry, console, m_camera);
+    m_render_system.update(m_registry, renderer, m_camera);
   }
 }
 

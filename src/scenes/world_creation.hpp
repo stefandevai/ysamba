@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <libtcod.hpp>
 #include <entt/entity/registry.hpp>
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
@@ -12,6 +11,8 @@
 
 namespace dl
 {
+  class Renderer;
+
   class WorldCreation : public Scene
   {
     public:
@@ -19,8 +20,8 @@ namespace dl
 
       void load() override;
       void update(const uint32_t delta, std::function<void(const std::string&)> set_scene) override;
-      void render(tcod::Context& context, TCOD_Console& console) override;
-      void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override;
+      void render(Renderer& renderer) override;
+      /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override; */
 
       void save_world(const std::string& file_path);
       void load_world(const std::string& file_path);

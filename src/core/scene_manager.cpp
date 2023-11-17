@@ -64,20 +64,20 @@ namespace dl
     m_current_scene->update(delta, SceneManager::set_scene);
   }
 
-  void SceneManager::render(tcod::Context& context, TCOD_Console& console)
+  void SceneManager::render(Renderer& renderer)
   {
     if (m_current_scene == nullptr || !m_current_scene->has_loaded())
     {
       return;
     }
 
-    m_current_scene->render(context, console);
+    m_current_scene->render(renderer);
   }
 
-  void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename)
-  {
-    m_current_scene->screenshot(context, console, filename);
-  }
+  /* void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
+  /* { */
+  /*   m_current_scene->screenshot(context, console, filename); */
+  /* } */
 
   void SceneManager::m_load()
   {

@@ -17,7 +17,8 @@ namespace dl
     try
     {
       m_camera.set_frustrum (0.0f, 800.f, 600.f, 0.0f);
-      m_world_renderer.add_layer("world", "world");
+      m_renderer.add_layer("world", "world");
+      m_renderer.add_layer("gui", "gui");
 
       /* auto params = TCOD_ContextParams{}; */
       /* params.tcod_version = TCOD_COMPILEDVERSION; */
@@ -66,11 +67,12 @@ namespace dl
         auto sprite = std::make_shared<Sprite>("spritesheet-tileset", 1);
 
         m_display.clear();
-        m_world_renderer.init("world");
-        m_world_renderer.batch("world", sprite, 0., 0., 0.);
-        m_world_renderer.finalize("world");
-        m_world_renderer.render(m_camera);
-        /* m_scene_manager.render(m_context, m_console); */
+        /* m_world_renderer.init("world"); */
+        /* m_world_renderer.batch("world", sprite, 0., 0., 0.); */
+        /* m_world_renderer.finalize("world"); */
+        /* m_world_renderer.render(m_camera); */
+        m_scene_manager.render(m_renderer);
+        m_renderer.render(m_camera);
         m_display.render();
       }
     }
