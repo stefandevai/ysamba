@@ -6,6 +6,7 @@
 #include "./asset_manager.hpp"
 #include "./shader_loader.hpp"
 #include "./sprite.hpp"
+#include "./text.hpp"
 /* #include "../ecs/components/position.hpp" */
 /* #include "../ecs/components/text.hpp" */
 /* #include "../ecs/components/charcode.hpp" */
@@ -33,6 +34,35 @@ void Renderer::batch (const std::string& layer_id, const std::shared_ptr<Sprite>
   }
 
   m_layers.at(layer_id)->emplace(sprite, x, y, z);
+}
+
+void Renderer::batch_text (const std::string& layer_id, Text& text, const double x, const double y, const double z)
+{
+  if (!text.get_has_initialized())
+  {
+    text.initialize(m_asset_manager);
+  }
+
+  for (auto& character : text.characters)
+  {
+    if (character.sprite == nullptr)
+    {
+      continue;
+    }
+    if (character.sprite->texture == nullptr)
+    {
+      character.sprite->texture = m_asset_manager.get<Texture> (character.sprite->resource_id);
+    }
+
+    m_layers.at(layer_id)->emplace(character.sprite, character.x + x, character.y + y, z);
+  }
+  /* // Load texture if it has not been loaded */
+  /* if (sprite->texture == nullptr) */
+  /* { */
+  /*   sprite->texture = m_asset_manager.get<Texture> (sprite->resource_id); */
+  /* } */
+
+  /* m_layers.at(layer_id)->emplace(sprite, x, y, z); */
 }
 
 void Renderer::finalize(const std::string& layer_id)

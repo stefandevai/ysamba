@@ -12,8 +12,16 @@ namespace dl
   {
     Scene::load();
 
-    m_game_title = m_lua.get_variable<std::string>("game_title");
-    m_instructions = m_lua.get_variable<std::string>("instructions");
+    const auto game_title = m_lua.get_variable<std::wstring>("game_title");
+    const auto instructions = m_lua.get_variable<std::wstring>("instructions");
+
+    m_game_title.set_text(game_title);
+    m_game_title.set_font_name("font-1980");
+    m_game_title.set_font_size(32);
+
+    m_instructions.set_text(instructions);
+    m_instructions.set_font_name("font-1980");
+    m_instructions.set_font_size(32);
     m_has_loaded = true;
   }
 
@@ -47,6 +55,10 @@ namespace dl
       return;
     }
 
+    renderer.init("gui");
+    renderer.batch_text("gui", m_game_title, 0, 0, 0);
+    renderer.batch_text("gui", m_instructions, 0, 48, 0);
+    renderer.finalize("gui");
     /* console.clear(); */
     /* tcod::print(console, {2, 8}, m_game_title, TCOD_white, std::nullopt); */
     /* tcod::print(console, {2, 10}, m_instructions, TCOD_white, std::nullopt); */

@@ -90,8 +90,6 @@ void Batch2D::emplace (const std::shared_ptr<Sprite>& sprite, const double x, co
   const std::array<glm::vec2, 4> texcoords = sprite->get_texcoords();
   unsigned int color                       = 4294967295; // Default white color
 
-  /* spdlog::warn("{} {} {} {}", texcoords[0].x, texcoords[1].x, texcoords[2].x, texcoords[3].x); */
-  /* spdlog::warn("{} {} {} {}", texcoords[0].y, texcoords[1].y, texcoords[2].y, texcoords[3].y); */
 
   const std::shared_ptr<Texture>& texture = sprite->texture;
 
@@ -118,6 +116,10 @@ void Batch2D::emplace (const std::shared_ptr<Sprite>& sprite, const double x, co
   {
     texture_index = it - m_textures.begin();
   }
+
+  /* spdlog::warn("{} {} {} {}", texcoords[0].x, texcoords[1].x, texcoords[2].x, texcoords[3].x); */
+  /* spdlog::warn("{} {} {} {}", texcoords[0].y, texcoords[1].y, texcoords[2].y, texcoords[3].y); */
+  /* spdlog::warn("Size: {} {} Color: {} Texture: {}", size.x, size.y, color, texture_index); */
 
   // Get transformations and apply them to the sprite vertices
   auto general_transform = glm::mat4 (1.0f);

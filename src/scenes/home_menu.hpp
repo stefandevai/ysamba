@@ -2,6 +2,7 @@
 
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
+#include "../graphics/text.hpp"
 
 namespace dl
 {
@@ -18,7 +19,7 @@ namespace dl
 
     private:
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-      std::string m_game_title;
-      std::string m_instructions;
+      Text m_game_title;
+      Text m_instructions;
   };
 }
