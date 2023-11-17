@@ -17,6 +17,10 @@
     "lua",
     "sol2",
     "cereal",
-    "entt"
+    "entt",
+    "glm",
+    "nlohmann-json",
+    "freetype",
+    "spdlog"
   ]
 }

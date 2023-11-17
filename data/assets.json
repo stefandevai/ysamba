@@ -1,0 +1,20 @@
+{
+    "assets":
+    [
+        {
+            "id": "spritesheet-tileset",
+            "type": "texture-atlas",
+            "path": "textures/tileset.png",
+            "textureType": "diffuse",
+            "uniform": true,
+            "horizontalFrames": 8,
+            "verticalFrames": 11
+        },
+        {
+            "id": "font-1980",
+            "type": "font",
+            "path": "fonts/1980.ttf",
+            "size": 32
+        }
+    ]
+}

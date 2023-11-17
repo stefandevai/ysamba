@@ -53,6 +53,8 @@ find_package(Lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(freetype CONFIG REQUIRED)
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -71,4 +73,6 @@ target_link_libraries(
         sol2
         cereal::cereal
         EnTT::EnTT
+        nlohmann_json::nlohmann_json
+        freetype
 )
