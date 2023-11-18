@@ -1,15 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <glm/glm.hpp>
 #include <entt/entity/registry.hpp>
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
 #include "../world/world.hpp"
-/* #include "../world/camera.hpp" */
 
 namespace dl
 {
   class Renderer;
+  struct Quad;
 
   class WorldCreation : public Scene
   {
@@ -25,14 +26,14 @@ namespace dl
       void load_world(const std::string& file_path);
 
     private:
+      using WorldRepresentation = std::vector<std::pair<glm::vec2, std::shared_ptr<Quad>>>;
       World m_world;
-      /* Camera m_camera; */
-      /* SDL_Surface* m_surface = nullptr; */
+      WorldRepresentation m_world_representation;
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       int m_seed = 110;
-      bool m_should_update_world_surface = false;
+      bool m_should_update_world_representation = false;
 
       void m_generate_map(const int seed = 0);
-      /* void m_create_world_surface(tcod::Context& context); */
+      void m_create_world_representation();
   };
 }

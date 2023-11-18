@@ -2,14 +2,14 @@
 
 in DATA
 {
-  vec4 color;
   vec2 pos;
+  vec4 color;
 } f_in;
 
 out vec4 color;
 
 void main()
 {
-  color = f_in.color;
+  color = vec4(f_in.color.rgb, 1.f);
 }
 

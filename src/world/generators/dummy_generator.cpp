@@ -15,6 +15,8 @@ namespace dl
     std::cout << "= STARTING DUMMY WORLD GENERATION =\n";
     std::cout << "===================================\n";
     std::cout << "SEED: " << seed << "\n\n";
+    std::cout << "WIDTH: " << m_width << "\n\n";
+    std::cout << "HEIGHT: " << m_height << "\n\n";
 
     std::vector<int> tiles(m_width * m_height);
     Tilemap tilemap{tiles, m_width, m_height};

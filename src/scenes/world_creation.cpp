@@ -29,7 +29,7 @@ namespace dl
     {
       m_generate_map();
     }
-    m_should_update_world_surface = true;
+    m_should_update_world_representation = true;
     m_has_loaded = true;
   }
 
@@ -49,12 +49,12 @@ namespace dl
     else if (m_input_manager->poll_action("generate_world"))
     {
       m_generate_map();
-      m_should_update_world_surface = true;
+      m_should_update_world_representation = true;
     }
     else if (m_input_manager->poll_action("reload_world"))
     {
       m_generate_map(m_seed);
-      m_should_update_world_surface = true;
+      m_should_update_world_representation = true;
     }
     else if (m_input_manager->poll_action("save_world"))
     {
@@ -63,7 +63,7 @@ namespace dl
     else if (m_input_manager->poll_action("load_world"))
     {
       load_world("./world.dl");
-      m_should_update_world_surface = true;
+      m_should_update_world_representation = true;
     }
     else if (m_input_manager->poll_action("display_seed"))
     {
@@ -83,27 +83,18 @@ namespace dl
       renderer.add_layer("color", "quad", Renderer::LayerType::QUAD);
     }
 
+    if (m_should_update_world_representation)
+    {
+      m_create_world_representation();
+      m_should_update_world_representation = false;
+    }
+
     renderer.init("color");
-    auto quad = std::make_shared<Quad>();
-    quad->color = Color("#ffffffff");
-    quad->w = 100;
-    quad->h = 100;
-    renderer.batch("color", quad, 0, 0, 0);
+    for (const auto& [position, quad] : m_world_representation)
+    {
+      renderer.batch("color", quad, position.x, position.y, 0);
+    }
     renderer.finalize("color");
-
-    /* if (m_should_update_world_surface) */
-    /* { */
-    /*   m_create_world_surface(context); */
-    /*   m_should_update_world_surface = false; */
-    /* } */
-
-    /* auto renderer = context.get_sdl_renderer(); */
-    /* auto texture = SDL_CreateTextureFromSurface(renderer, m_surface); */
-
-    /* SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); */
-    /* SDL_RenderClear(renderer); */
-    /* SDL_RenderCopy(renderer, texture, NULL, NULL); */
-    /* SDL_RenderPresent(renderer); */
   }
 
   /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
@@ -172,37 +163,48 @@ namespace dl
     m_world.generate(map_width, map_height, m_seed);
   }
 
-  /* void WorldCreation::m_create_world_surface(tcod::Context& context) */
-  /* { */
-    /* int window_width, window_height; */
-    /* auto window = context.get_sdl_window(); */
-    /* const auto tilemap_size = m_world.get_tilemap_size(0); */
+  void WorldCreation::m_create_world_representation()
+  {
+    const auto tilemap_size = m_world.get_tilemap_size(0);
 
-    /* SDL_GetWindowSize(window, &window_width, &window_height); */
+    const auto tile_width = 3; 
+    const auto tile_height = 3; 
 
-    /* if (m_surface != nullptr) */
-    /* { */
-    /*   SDL_FreeSurface(m_surface); */
-    /* } */
+    const auto representation_w = static_cast<int>(tilemap_size.w / 6);
+    const auto representation_h = static_cast<int>(tilemap_size.h / 6);
 
-    /* m_surface = SDL_CreateRGBSurface(0, window_width, window_height, 32, 0, 0, 0, 0); */
+    for (auto i = 0; i < representation_w; ++i)
+    {
+      for (auto j = 0; j < representation_h; ++j)
+      {
+        const auto tile = m_world.get(i * 6, j * 6, 0);
+        auto quad = std::make_shared<Quad>();
 
-    /* for (auto i = 0; i < tilemap_size.w; ++i) */
-    /* { */
-    /*   for (auto j = 0; j < tilemap_size.h; ++j) */
-    /*   { */
-    /*     SDL_Rect rect; */
-    /*     rect.x = i; */
-    /*     rect.y = j; */
-    /*     rect.w = 1; */
-    /*     rect.h = 1; */
+        switch(tile.id)
+        {
+          case 1:
+            quad->color = Color("#3772ebff");
+            break;
+          case 2:
+            quad->color = Color("#37c737ff");
+            break;
+          case 3:
+            quad->color = Color("#edcb89ff");
+            break;
+          case 4:
+            quad->color = Color("#636b5cff");
+            break;
+          default:
+            quad->color = Color("#000000ff");
+            break;
+        }
+        quad->w = tile_width;
+        quad->h = tile_height;
 
-    /*     const auto tile = m_world.get(i, j, 0); */
-    /*     /1* const auto color = SDL_MapRGB(m_surface->format, tile.r, tile.g, tile.b); *1/ */
+        const auto position = glm::vec2(i * tile_width, j * tile_height);
 
-    /*     /1* SDL_FillRect(m_surface, &rect, color); *1/ */
-    /*   } */
-    /* } */
-  /* } */
+        m_world_representation.push_back(std::make_pair(position, quad));
+      }
+    }
+  }
 }
-

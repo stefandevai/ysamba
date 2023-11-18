@@ -1,6 +1,5 @@
 #include "./color.hpp"
 
-#include <algorithm>
 #include <sstream>
 
 namespace dl
@@ -9,7 +8,6 @@ namespace dl
   {
     std::stringstream ss;
     std::string only_hex_str{hex_color.substr (1)};
-    std::reverse (only_hex_str.begin(), only_hex_str.end());
     ss << std::hex << only_hex_str;
     ss >> int_color;
 

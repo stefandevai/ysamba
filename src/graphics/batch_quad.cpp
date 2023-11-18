@@ -1,5 +1,6 @@
 #include "./batch_quad.hpp"
 
+#include <iostream>
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp> // IWYU pragma: export
@@ -22,12 +23,6 @@ BatchQuad::BatchQuad(std::shared_ptr<ShaderProgram> shader)
   glBufferData (GL_ARRAY_BUFFER, BUFFER_SIZE, NULL, GL_DYNAMIC_DRAW);
   glVertexAttribPointer (POSITION_INDEX, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*) 0);
   glEnableVertexAttribArray (POSITION_INDEX);
-
-  /* glVertexAttribPointer (TEXCOORDS_INDEX, 2, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*) offsetof (VertexData, texcoords)); */
-  /* glEnableVertexAttribArray (TEXCOORDS_INDEX); */
-
-  /* glVertexAttribPointer (TEXTURE_ID_INDEX, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*) offsetof (VertexData, texture_id)); */
-  /* glEnableVertexAttribArray (TEXTURE_ID_INDEX); */
 
   glVertexAttribPointer (COLOR_INDEX, 4, GL_UNSIGNED_BYTE, GL_TRUE, VERTEX_SIZE, (GLvoid*) offsetof (VertexData, color));
   glEnableVertexAttribArray (COLOR_INDEX);
@@ -83,6 +78,8 @@ void BatchQuad::render ()
 
 void BatchQuad::emplace (const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z)
 {
+  assert(m_index_count <= INDICES_SIZE);
+
   const auto quad = std::dynamic_pointer_cast<Quad> (renderable);
 
   if (quad == nullptr)
@@ -158,11 +155,16 @@ void BatchQuad::emplace (const std::shared_ptr<Renderable>& renderable, const do
   /*   general_transform = glm::translate (general_transform, glm::vec3 (x, y, z)); */
   /* } */
 
+  /* std::cout << "HERE1\n"; */
   // Top left vertex
   glm::vec4 transformation_result = general_transform * glm::vec4 (0.f, 0.f, 1.f, 1.f);
+  /* std::cout << "HERE2\n"; */
   m_vertex_buffer->position       = glm::vec3 (transformation_result.x, transformation_result.y, transformation_result.z);
+  /* std::cout << "HERE3\n"; */
   m_vertex_buffer->color          = quad->color.int_color;
+  /* std::cout << "HERE4\n"; */
   m_vertex_buffer++;
+  /* std::cout << "HERE5\n"; */
 
   // Top right vertex
   transformation_result       = general_transform * glm::vec4 (quad->w, 0.f, 1.f, 1.f);

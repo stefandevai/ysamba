@@ -84,6 +84,8 @@ void Batch2D::render ()
 
 void Batch2D::emplace (const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z)
 {
+  assert(m_index_count <= INDICES_SIZE);
+
   const auto sprite = std::dynamic_pointer_cast<Sprite> (renderable);
 
   if (sprite == nullptr)
