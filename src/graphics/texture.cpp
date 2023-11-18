@@ -23,6 +23,13 @@ Texture::Texture (const std::string& filepath, const TextureType type, const int
   load (filepath);
 }
 
+// Load with raw data
+Texture::Texture (const std::vector<unsigned char>& data, const int width, const int height)
+  : m_horizontal_frames (1), m_vertical_frames (1)
+{
+  load (data.data(), width, height, GL_RGBA);
+}
+
 Texture::Texture (const int width, const int height, const TextureType type) : m_type (type), m_horizontal_frames (1), m_vertical_frames (1), m_width (width), m_height (height)
 {
   m_load_empty();
@@ -64,12 +71,19 @@ void Texture::load (const std::string& filepath)
       break;
   }
 
+  load(image_data, width, height, format);
+
+  stbi_image_free (image_data);
+}
+
+void Texture::load (const unsigned char* data, const int width, const int height, unsigned int format)
+{
   m_width  = width;
   m_height = height;
 
   glGenTextures (1, &m_id);
   glBindTexture (GL_TEXTURE_2D, m_id);
-  glTexImage2D (GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, image_data);
+  glTexImage2D (GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap (GL_TEXTURE_2D);
 
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -77,7 +91,6 @@ void Texture::load (const std::string& filepath)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  stbi_image_free (image_data);
   glBindTexture (GL_TEXTURE_2D, 0);
 }
 

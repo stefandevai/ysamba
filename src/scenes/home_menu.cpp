@@ -55,14 +55,10 @@ namespace dl
       return;
     }
 
-    renderer.init("gui");
-    renderer.batch("gui", m_game_title, 0, 0, 0);
-    renderer.batch("gui", m_instructions, 0, 48, 0);
-    renderer.finalize("gui");
-    /* console.clear(); */
-    /* tcod::print(console, {2, 8}, m_game_title, TCOD_white, std::nullopt); */
-    /* tcod::print(console, {2, 10}, m_instructions, TCOD_white, std::nullopt); */
-    /* context.present(console); */
+    renderer.init("text");
+    renderer.batch("text", m_game_title, 60, 60, 0);
+    renderer.batch("text", m_instructions, 60, 108, 0);
+    renderer.finalize("text");
   }
 }
 

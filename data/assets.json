@@ -20,6 +20,12 @@
         },
 
         {
+            "id": "text",
+            "type": "shader",
+            "path": "shaders/text"
+        },
+
+        {
             "id": "tileset",
             "type": "texture",
             "path": "textures/tileset.png",

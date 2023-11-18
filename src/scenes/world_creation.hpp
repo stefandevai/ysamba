@@ -10,6 +10,7 @@
 namespace dl
 {
   class Renderer;
+  class Sprite;
   struct Quad;
 
   class WorldCreation : public Scene
@@ -28,6 +29,7 @@ namespace dl
     private:
       using WorldRepresentation = std::vector<std::pair<glm::vec2, std::shared_ptr<Quad>>>;
       World m_world;
+      std::shared_ptr<Sprite> m_world_sprite;
       WorldRepresentation m_world_representation;
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       int m_seed = 110;

@@ -16,6 +16,7 @@ public:
   std::shared_ptr<Color> color = nullptr;
   std::shared_ptr<Transform> transform = nullptr;
 
+  Sprite () {}
   Sprite (const std::string& resource_id, const int frame = 0) : resource_id (resource_id), m_frame (frame) {}
 
   inline int get_frame () const { return m_frame; };

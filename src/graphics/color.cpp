@@ -11,10 +11,10 @@ namespace dl
     ss << std::hex << only_hex_str;
     ss >> int_color;
 
-    rgba_color.a = (int_color & 0xFF000000) >> 24;
-    rgba_color.b = (int_color & 0x00FF0000) >> 16;
-    rgba_color.g = (int_color & 0x0000FF00) >> 8;
-    rgba_color.r = (int_color & 0x000000FF);
+    rgba_color.r = (int_color & 0xFF000000) >> 24;
+    rgba_color.g = (int_color & 0x00FF0000) >> 16;
+    rgba_color.b = (int_color & 0x0000FF00) >> 8;
+    rgba_color.a = (int_color & 0x000000FF);
   }
 
   Color::Color (const unsigned r, const unsigned g, const unsigned b, const unsigned a)

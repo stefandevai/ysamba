@@ -14,6 +14,8 @@ namespace dl
       m_camera.set_frustrum (0.0f, 1024.f, 576.f, 0.0f);
       m_renderer.add_layer("world", "world");
       m_renderer.add_layer("gui", "gui");
+      m_renderer.add_layer("quad", "quad");
+      m_renderer.add_layer("text", "text");
 
       /* auto params = TCOD_ContextParams{}; */
       /* params.tcod_version = TCOD_COMPILEDVERSION; */

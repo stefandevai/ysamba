@@ -6,8 +6,10 @@
 #include <SDL.h>
 #include <cereal/archives/binary.hpp>
 #include "../graphics/renderer.hpp"
+#include "../graphics/sprite.hpp"
 #include "../graphics/quad.hpp"
 #include "../graphics/color.hpp"
+#include "../graphics/texture.hpp"
 
 namespace dl
 {
@@ -18,6 +20,8 @@ namespace dl
   void WorldCreation::load()
   {
     Scene::load();
+
+    m_world_sprite = std::make_shared<Sprite>();
 
     const auto seed = m_lua.get_optional_variable<int>("seed");
 
@@ -78,10 +82,10 @@ namespace dl
       return;
     }
 
-    if (!renderer.has_layer("color"))
-    {
-      renderer.add_layer("color", "quad", Renderer::LayerType::QUAD);
-    }
+    /* if (!renderer.has_layer("color")) */
+    /* { */
+    /*   renderer.add_layer("color", "quad", Renderer::LayerType::QUAD); */
+    /* } */
 
     if (m_should_update_world_representation)
     {
@@ -89,12 +93,15 @@ namespace dl
       m_should_update_world_representation = false;
     }
 
-    renderer.init("color");
-    for (const auto& [position, quad] : m_world_representation)
-    {
-      renderer.batch("color", quad, position.x, position.y, 0);
-    }
-    renderer.finalize("color");
+    /* renderer.init("color"); */
+    /* for (const auto& [position, quad] : m_world_representation) */
+    /* { */
+    /*   renderer.batch("color", quad, position.x, position.y, 0); */
+    /* } */
+    /* renderer.finalize("color"); */
+    renderer.init("gui");
+    renderer.batch("gui", m_world_sprite, 0, 0, 0);
+    renderer.finalize("gui");
   }
 
   /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
@@ -167,44 +174,92 @@ namespace dl
   {
     const auto tilemap_size = m_world.get_tilemap_size(0);
 
-    const auto tile_width = 3; 
-    const auto tile_height = 3; 
+    std::vector<unsigned char> pixel_data((tilemap_size.w * tilemap_size.h)*4);
 
-    const auto representation_w = static_cast<int>(tilemap_size.w / 6);
-    const auto representation_h = static_cast<int>(tilemap_size.h / 6);
+    const auto water_color = Color("#3772ebff");
+    const auto terrain_color = Color("#37c737ff");
+    const auto sand_color = Color("#edcb89ff");
+    const auto wall_color = Color("#636b5cff");
+    const auto default_color = Color("#000000ff");
 
-    for (auto i = 0; i < representation_w; ++i)
+    for (auto i = 0; i < tilemap_size.w; ++i)
     {
-      for (auto j = 0; j < representation_h; ++j)
+      for (auto j = 0; j < tilemap_size.h; ++j)
       {
-        const auto tile = m_world.get(i * 6, j * 6, 0);
-        auto quad = std::make_shared<Quad>();
+        const auto tile = m_world.get(i, j, 0);
+        /* auto quad = std::make_shared<Quad>(); */
 
         switch(tile.id)
         {
           case 1:
-            quad->color = Color("#3772ebff");
+            pixel_data[j*tilemap_size.w*4 + i*4] = water_color.rgba_color.r;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 1] = water_color.rgba_color.g;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 2] = water_color.rgba_color.b;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 3] = water_color.rgba_color.a;
+            /* quad->color = Color("#3772ebff"); */
             break;
           case 2:
-            quad->color = Color("#37c737ff");
+            pixel_data[j*tilemap_size.w*4 + i*4] = terrain_color.rgba_color.r;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 1] = terrain_color.rgba_color.g;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 2] = terrain_color.rgba_color.b;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 3] = terrain_color.rgba_color.a;
+            /* quad->color = Color("#37c737ff"); */
             break;
           case 3:
-            quad->color = Color("#edcb89ff");
+            pixel_data[j*tilemap_size.w*4 + i*4] = sand_color.rgba_color.r;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 1] = sand_color.rgba_color.g;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 2] = sand_color.rgba_color.b;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 3] = sand_color.rgba_color.a;
+            /* quad->color = Color("#edcb89ff"); */
             break;
           case 4:
-            quad->color = Color("#636b5cff");
+            pixel_data[j*tilemap_size.w*4 + i*4] = wall_color.rgba_color.r;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 1] = wall_color.rgba_color.g;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 2] = wall_color.rgba_color.b;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 3] = wall_color.rgba_color.a;
+            /* quad->color = Color("#636b5cff"); */
             break;
           default:
-            quad->color = Color("#000000ff");
+            pixel_data[j*tilemap_size.w*4 + i*4] = default_color.rgba_color.r;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 1] = default_color.rgba_color.g;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 2] = default_color.rgba_color.b;
+            pixel_data[j*tilemap_size.w*4 + i*4 + 3] = default_color.rgba_color.a;
+            /* quad->color = Color("#000000ff"); */
             break;
         }
-        quad->w = tile_width;
-        quad->h = tile_height;
+        /* quad->w = tile_width; */
+        /* quad->h = tile_height; */
 
-        const auto position = glm::vec2(i * tile_width, j * tile_height);
+        /* const auto position = glm::vec2(i * tile_width, j * tile_height); */
 
-        m_world_representation.push_back(std::make_pair(position, quad));
+        /* m_world_representation.push_back(std::make_pair(position, quad)); */
       }
     }
+
+    /* std::vector<unsigned char> pixel_data{ */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /*   255, 0, 255, 255, */
+    /* }; */
+
+    /* const auto texture = std::make_shared<Texture>(pixel_data, 4, 4); */
+    const auto texture = std::make_shared<Texture>(pixel_data, tilemap_size.w, tilemap_size.h);
+    m_world_sprite->texture = texture;
   }
 }

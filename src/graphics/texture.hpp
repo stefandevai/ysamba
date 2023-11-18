@@ -23,9 +23,12 @@ public:
   Texture (const std::string& filepath, const TextureType type, const int horizontal_frames, const int vertical_frames);
   // Create empty texture in order to load it later
   Texture (const int width, const int height, const TextureType type);
+  // Create texture providing raw data
+  Texture (const std::vector<unsigned char>& data, const int width, const int height);
   ~Texture();
 
   void load (const std::string& filepath);
+  void load (const unsigned char* data, const int width, const int height, unsigned int format);
   void bind();
   void unbind();
   inline unsigned int get_id() const { return m_id; }
@@ -42,7 +45,7 @@ public:
   /* void set_custom_uv (const glm::vec2& uv, const float width, const float height); */
 
 protected:
-  const TextureType m_type;
+  const TextureType m_type = TextureType::DIFFUSE;
   const int m_horizontal_frames;
   const int m_vertical_frames;
   unsigned int m_id = 0;
