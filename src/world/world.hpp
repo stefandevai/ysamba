@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <map>
-#include <libtcod.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>

@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include <libtcod.hpp>
 #include "./input_manager.hpp"
 
 namespace dl

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
-#include <libtcod.hpp>
 #include "systems/physics.hpp"
 #include "systems/render.hpp"
 #include "systems/society.hpp"

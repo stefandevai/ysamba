@@ -1,11 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <libtcod.hpp>
 #include <entt/entity/registry.hpp>
 #include "./scene.hpp"
 #include "../core/input_manager.hpp"
-#include "../player/player.hpp"
 #include "../world/world.hpp"
 #include "../world/camera.hpp"
 #include "../ecs/ecs.hpp"

@@ -157,37 +157,37 @@ namespace dl
     m_world.generate(map_width, map_height, m_seed);
   }
 
-  void WorldCreation::m_create_world_surface(tcod::Context& context)
-  {
-    int window_width, window_height;
-    auto window = context.get_sdl_window();
-    const auto tilemap_size = m_world.get_tilemap_size(0);
+  /* void WorldCreation::m_create_world_surface(tcod::Context& context) */
+  /* { */
+    /* int window_width, window_height; */
+    /* auto window = context.get_sdl_window(); */
+    /* const auto tilemap_size = m_world.get_tilemap_size(0); */
 
-    SDL_GetWindowSize(window, &window_width, &window_height);
+    /* SDL_GetWindowSize(window, &window_width, &window_height); */
 
-    if (m_surface != nullptr)
-    {
-      SDL_FreeSurface(m_surface);
-    }
+    /* if (m_surface != nullptr) */
+    /* { */
+    /*   SDL_FreeSurface(m_surface); */
+    /* } */
 
-    m_surface = SDL_CreateRGBSurface(0, window_width, window_height, 32, 0, 0, 0, 0);
+    /* m_surface = SDL_CreateRGBSurface(0, window_width, window_height, 32, 0, 0, 0, 0); */
 
-    for (auto i = 0; i < tilemap_size.w; ++i)
-    {
-      for (auto j = 0; j < tilemap_size.h; ++j)
-      {
-        SDL_Rect rect;
-        rect.x = i;
-        rect.y = j;
-        rect.w = 1;
-        rect.h = 1;
+    /* for (auto i = 0; i < tilemap_size.w; ++i) */
+    /* { */
+    /*   for (auto j = 0; j < tilemap_size.h; ++j) */
+    /*   { */
+    /*     SDL_Rect rect; */
+    /*     rect.x = i; */
+    /*     rect.y = j; */
+    /*     rect.w = 1; */
+    /*     rect.h = 1; */
 
-        const auto tile = m_world.get(i, j, 0);
-        /* const auto color = SDL_MapRGB(m_surface->format, tile.r, tile.g, tile.b); */
+    /*     const auto tile = m_world.get(i, j, 0); */
+    /*     /1* const auto color = SDL_MapRGB(m_surface->format, tile.r, tile.g, tile.b); *1/ */
 
-        /* SDL_FillRect(m_surface, &rect, color); */
-      }
-    }
-  }
+    /*     /1* SDL_FillRect(m_surface, &rect, color); *1/ */
+    /*   } */
+    /* } */
+  /* } */
 }
 
