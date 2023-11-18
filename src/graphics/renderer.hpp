@@ -1,9 +1,9 @@
 #pragma once
 
 #include <map>
-#include <entt/entity/entity.hpp>
-#include <entt/entity/registry.hpp>
-#include "./batch2d.hpp"
+#include <tuple>
+#include <string>
+#include "./quad.hpp"
 
 namespace dl
 {
@@ -13,22 +13,32 @@ class AssetManager;
 class Sprite;
 class Text;
 class Texture;
+class Layer;
 
 class Renderer
 {
 public:
+  enum class LayerType
+  {
+    SPRITE,
+    QUAD,
+  };
+
   Renderer (AssetManager& asset_manager);
+
   void init (const std::string& layer_id);
   void batch (const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z);
-  void batch_text (const std::string& layer_id, Text& text, const double x, const double y, const double z);
+  void batch (const std::string& layer_id, Text& text, const double x, const double y, const double z);
+  void batch (const std::string& layer_id, const Quad& quad, const double x, const double y, const double z);
   void finalize (const std::string& layer_id);
   void render (const ViewCamera& camera);
-  void batch_sprites (entt::registry& registry);
-  void add_layer (const std::string& layer_id, const std::string shader_id);
+  void add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type = LayerType::SPRITE);
+
   std::shared_ptr<Texture> get_texture (const std::string& resource_id);
+  inline bool has_layer (const std::string& layer_id) const { return m_layers.contains(layer_id); }
 
 private:
-  using LayerMap = std::map<std::string, std::shared_ptr<Batch2D>>;
+  using LayerMap = std::map<std::string, std::shared_ptr<Layer>>;
 
   AssetManager& m_asset_manager;
   LayerMap m_layers;

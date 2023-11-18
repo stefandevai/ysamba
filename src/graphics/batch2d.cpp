@@ -6,14 +6,11 @@
 #include "./texture.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
-/* #include "stella/components/position.hpp" */
-/* #include "stella/components/color.hpp" */
-/* #include "stella/components/transform.hpp" */
 
 namespace dl
 {
 Batch2D::Batch2D(std::shared_ptr<ShaderProgram> shader)
-  : shader(shader)
+  : Layer(shader)
 {
   glGenVertexArrays (1, &m_vao);
   glGenBuffers (1, &m_vbo);
@@ -84,12 +81,19 @@ void Batch2D::render ()
   m_index_count = 0;
 }
 
-void Batch2D::emplace (const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
+
+void Batch2D::emplace (const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z)
 {
+  const auto sprite = std::dynamic_pointer_cast<Sprite> (renderable);
+
+  if (sprite == nullptr)
+  {
+    throw std::runtime_error ("Could not cast Renderable to Sprite");
+  }
+
   const glm::vec2 size                     = sprite->get_size();
   const std::array<glm::vec2, 4> texcoords = sprite->get_texcoords();
   unsigned int color                       = 4294967295; // Default white color
-
 
   const std::shared_ptr<Texture>& texture = sprite->texture;
 
@@ -116,10 +120,6 @@ void Batch2D::emplace (const std::shared_ptr<Sprite>& sprite, const double x, co
   {
     texture_index = it - m_textures.begin();
   }
-
-  /* spdlog::warn("{} {} {} {}", texcoords[0].x, texcoords[1].x, texcoords[2].x, texcoords[3].x); */
-  /* spdlog::warn("{} {} {} {}", texcoords[0].y, texcoords[1].y, texcoords[2].y, texcoords[3].y); */
-  /* spdlog::warn("Size: {} {} Color: {} Texture: {}", size.x, size.y, color, texture_index); */
 
   // Get transformations and apply them to the sprite vertices
   auto general_transform = glm::mat4 (1.0f);
@@ -194,121 +194,6 @@ void Batch2D::emplace (const std::shared_ptr<Sprite>& sprite, const double x, co
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   m_index_count += 6;
-}
-
-void Batch2D::emplace (entt::registry& registry, entt::entity entity)
-{
-  /* const auto& sprite                       = registry.get<component::Sprite> (entity); */
-  /* const auto& position                     = registry.get<component::Position> (entity); */
-  /* const glm::vec2 size                     = sprite.get_size(); */
-  /* const std::array<glm::vec2, 4> texcoords = sprite.get_texcoords(); */
-  /* unsigned int color                       = 4294967295; // Default white color */
-
-  /* /1* spdlog::warn("{} {} {} {}", texcoords[0].x, texcoords[1].x, texcoords[2].x, texcoords[3].x); *1/ */
-  /* /1* spdlog::warn("{} {} {} {}", texcoords[0].y, texcoords[1].y, texcoords[2].y, texcoords[3].y); *1/ */
-
-  /* const std::shared_ptr<Texture>& texture = sprite.texture; */
-
-  /* assert (sprite.texture != nullptr); */
-  /* assert (size.x != 0); */
-  /* assert (size.y != 0); */
-
-  /* if (registry.any_of<component::Color> (entity)) */
-  /* { */
-  /*   const auto& color_component = registry.get<component::Color> (entity); */
-  /*   color                       = color_component.int_color; */
-  /* } */
-
-  /* // Build vector of textures to bind when rendering */
-  /* // texture_index is the index in m_textures that will */
-  /* // be translated to a index in the shader. */
-  /* int texture_index = 0; */
-  /* const auto it     = std::find (m_textures.begin(), m_textures.end(), texture); */
-  /* if (it == m_textures.end()) */
-  /* { */
-  /*   texture_index = m_textures.size(); */
-  /*   m_textures.emplace_back (texture); */
-  /* } */
-  /* else */
-  /* { */
-  /*   texture_index = it - m_textures.begin(); */
-  /* } */
-
-  /* // Get transformations and apply them to the sprite vertices */
-  /* auto general_transform = glm::mat4 (1.0f); */
-  /* if (registry.any_of<component::Transform> (entity)) */
-  /* { */
-  /*   const auto& transform_component = registry.get<component::Transform> (entity); */
-
-  /*   // Translate and add pivot for other transformations */
-  /*   general_transform = glm::translate (general_transform, */
-  /*                                       glm::vec3 (position.x + transform_component.pivot.x, position.y + transform_component.pivot.y, position.z + transform_component.pivot.z)); */
-
-  /*   // Scale only if necessary */
-  /*   if (transform_component.scale.x != 1.f || transform_component.scale.y != 1.f || transform_component.scale.z != 1.f) */
-  /*   { */
-  /*     general_transform = glm::scale (general_transform, transform_component.scale); */
-  /*   } */
-
-  /*   // Rotate only if necessary */
-  /*   if (transform_component.rotation.x != 0.0f) */
-  /*   { */
-  /*     general_transform = glm::rotate (general_transform, glm::radians (transform_component.rotation.x), glm::vec3 (1.f, 0.f, 0.f)); */
-  /*   } */
-  /*   if (transform_component.rotation.y != 0.0f) */
-  /*   { */
-  /*     general_transform = glm::rotate (general_transform, glm::radians (transform_component.rotation.y), glm::vec3 (0.f, 1.f, 0.f)); */
-  /*   } */
-  /*   if (transform_component.rotation.z != 0.0f) */
-  /*   { */
-  /*     general_transform = glm::rotate (general_transform, glm::radians (transform_component.rotation.z), glm::vec3 (0.f, 0.f, 1.f)); */
-  /*   } */
-
-  /*   // Remove the pivot translation if needed */
-  /*   if (transform_component.pivot.x != 0.f || transform_component.pivot.y != 0.f || transform_component.pivot.z != 0.f) */
-  /*   { */
-  /*     general_transform = glm::translate (general_transform, transform_component.pivot * -1.f); */
-  /*   } */
-  /* } */
-  /* else */
-  /* { */
-  /*   general_transform = glm::translate (general_transform, glm::vec3 (position.x, position.y, position.z)); */
-  /* } */
-
-  /* // Top left vertex */
-  /* glm::vec4 transformation_result = general_transform * glm::vec4 (0.f, 0.f, 1.f, 1.f); */
-  /* m_vertex_buffer->position       = glm::vec3 (transformation_result.x, transformation_result.y, transformation_result.z); */
-  /* m_vertex_buffer->texcoords      = texcoords[0]; */
-  /* m_vertex_buffer->texture_id     = texture_index; */
-  /* m_vertex_buffer->color          = color; */
-  /* m_vertex_buffer++; */
-
-  /* // Top right vertex */
-  /* transformation_result       = general_transform * glm::vec4 (size.x, 0.f, 1.f, 1.f); */
-  /* m_vertex_buffer->position   = glm::vec3 (transformation_result.x, transformation_result.y, transformation_result.z); */
-  /* m_vertex_buffer->texcoords  = texcoords[1]; */
-  /* m_vertex_buffer->texture_id = texture_index; */
-  /* m_vertex_buffer->color      = color; */
-  /* m_vertex_buffer++; */
-
-  /* // Bottom right vertex */
-  /* transformation_result       = general_transform * glm::vec4 (size.x, size.y, 1.f, 1.f); */
-  /* m_vertex_buffer->position   = glm::vec3 (transformation_result.x, transformation_result.y, transformation_result.z); */
-  /* m_vertex_buffer->texcoords  = texcoords[2]; */
-  /* m_vertex_buffer->texture_id = texture_index; */
-  /* m_vertex_buffer->color      = color; */
-  /* m_vertex_buffer++; */
-
-  /* // Bottom left vertex */
-  /* transformation_result       = general_transform * glm::vec4 (0.f, size.y, 1.f, 1.f); */
-  /* m_vertex_buffer->position   = glm::vec3 (transformation_result.x, transformation_result.y, transformation_result.z); */
-  /* m_vertex_buffer->texcoords  = texcoords[3]; */
-  /* m_vertex_buffer->texture_id = texture_index; */
-  /* m_vertex_buffer->color      = color; */
-  /* m_vertex_buffer++; */
-
-  /* // Each quad has 6 vertices, we have therefore to increment by 6 each time */
-  /* m_index_count += 6; */
 }
 
 void Batch2D::init_emplacing()

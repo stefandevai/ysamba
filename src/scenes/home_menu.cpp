@@ -56,8 +56,8 @@ namespace dl
     }
 
     renderer.init("gui");
-    renderer.batch_text("gui", m_game_title, 0, 0, 0);
-    renderer.batch_text("gui", m_instructions, 0, 48, 0);
+    renderer.batch("gui", m_game_title, 0, 0, 0);
+    renderer.batch("gui", m_instructions, 0, 48, 0);
     renderer.finalize("gui");
     /* console.clear(); */
     /* tcod::print(console, {2, 8}, m_game_title, TCOD_white, std::nullopt); */

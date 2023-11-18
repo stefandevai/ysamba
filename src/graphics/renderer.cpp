@@ -1,4 +1,8 @@
+#include <iostream>
 #include <entt/entity/registry.hpp>
+#include "./layer.hpp"
+#include "./batch2d.hpp"
+#include "./batch_quad.hpp"
 #include "./renderer.hpp"
 #include "./shader_program.hpp"
 #include "./camera.hpp"
@@ -12,9 +16,22 @@ namespace dl
 {
 Renderer::Renderer (AssetManager& asset_manager) : m_asset_manager (asset_manager) { }
 
-void Renderer::add_layer (const std::string& layer_id, const std::string shader_id)
+void Renderer::add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type)
 {
-  m_layers.emplace (layer_id, std::make_shared<Batch2D> (m_asset_manager.get<ShaderProgram> (shader_id)));
+  const auto shader = m_asset_manager.get<ShaderProgram> (shader_id);
+  std::shared_ptr<Layer> layer;
+
+  switch(layer_type)
+  {
+    case LayerType::SPRITE:
+      layer.reset(new Batch2D(shader));
+      break;
+    case LayerType::QUAD:
+      layer.reset(new BatchQuad(shader));
+      break;
+  }
+
+  m_layers.emplace (layer_id, layer);
 }
 
 std::shared_ptr<Texture> Renderer::get_texture (const std::string& resource_id)
@@ -38,7 +55,7 @@ void Renderer::batch (const std::string& layer_id, const std::shared_ptr<Sprite>
   m_layers.at(layer_id)->emplace(sprite, x, y, z);
 }
 
-void Renderer::batch_text (const std::string& layer_id, Text& text, const double x, const double y, const double z)
+void Renderer::batch (const std::string& layer_id, Text& text, const double x, const double y, const double z)
 {
   if (!text.get_has_initialized())
   {
@@ -58,57 +75,16 @@ void Renderer::batch_text (const std::string& layer_id, Text& text, const double
 
     m_layers.at(layer_id)->emplace(character.sprite, character.x + x, character.y + y, z);
   }
-  /* // Load texture if it has not been loaded */
-  /* if (sprite->texture == nullptr) */
-  /* { */
-  /*   sprite->texture = m_asset_manager.get<Texture> (sprite->resource_id); */
-  /* } */
+}
 
-  /* m_layers.at(layer_id)->emplace(sprite, x, y, z); */
+void Renderer::batch (const std::string& layer_id, const Quad& quad, const double x, const double y, const double z)
+{
+  /* m_layers.at(layer_id)->emplace(vertices, x, y, z); */
 }
 
 void Renderer::finalize(const std::string& layer_id)
 {
   m_layers.at(layer_id)->finalize_emplacing();
-}
-
-void Renderer::batch_sprites (entt::registry& registry)
-{
-  /* auto sprite_view = registry.view<component::Sprite, component::Position> (entt::exclude<component::Charcode>); */
-
-  /* m_world_batch.init_emplacing(); */
-
-  /* for (auto entity : sprite_view) */
-  /* { */
-  /*   auto& sprite = registry.get<component::Sprite> (entity); */
-
-  /*   // Load texture if it has not been loaded */
-  /*   if (sprite.texture == nullptr) */
-  /*   { */
-  /*     sprite.texture = m_asset_manager.get<Texture> (sprite.resource_id); */
-  /*   } */
-
-  /*   m_world_batch.emplace (registry, entity); */
-  /* } */
-
-  /* m_world_batch.finalize_emplacing(); */
-
-  /* auto character_view = registry.view<component::Sprite, component::Position, component::Charcode>(); */
-  /* m_text_batch.init_emplacing(); */
-
-  /* for (auto entity : character_view) */
-  /* { */
-  /*   auto& sprite = registry.get<component::Sprite> (entity); */
-
-  /*   // Load texture if it has not been loaded */
-  /*   if (sprite.texture == nullptr) */
-  /*   { */
-  /*     sprite.texture = m_asset_manager.get<Texture> (sprite.resource_id); */
-  /*   } */
-
-  /*   m_text_batch.emplace (registry, entity); */
-  /* } */
-  /* m_text_batch.finalize_emplacing(); */
 }
 
 void Renderer::render (const ViewCamera& camera)
@@ -118,6 +94,7 @@ void Renderer::render (const ViewCamera& camera)
   for (const auto& p : m_layers)
   {
     const auto& shader = p.second->shader;
+    assert(shader != nullptr);
     shader->use();
     shader->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model_matrix);
     p.second->render();

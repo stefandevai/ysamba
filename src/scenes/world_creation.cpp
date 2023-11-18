@@ -76,6 +76,14 @@ namespace dl
       return;
     }
 
+    /* if (!renderer.has_layer("color")) */
+    /* { */
+    /*   renderer.add_layer("color", "color"); */
+    /* } */
+
+    /* renderer.init("color"); */
+    /* renderer.finalize("color"); */
+
     /* if (m_should_update_world_surface) */
     /* { */
     /*   m_create_world_surface(context); */

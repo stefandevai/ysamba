@@ -1,13 +1,14 @@
 #pragma once
 
 #include <glm/vec2.hpp>
+#include "./renderable.hpp"
 #include "./texture.hpp"
 #include "./color.hpp"
 #include "./transform.hpp"
 
 namespace dl
 {
-class Sprite
+class Sprite : public Renderable
 {
 public:
   std::string resource_id;
