@@ -1,0 +1,30 @@
+{
+  "tiles": [
+    {
+      "id": 0,
+      "name": "void",
+      "flags": []
+    },
+    {
+      "id": 1,
+      "name": "water",
+      "flags": []
+    },
+    {
+      "id": 2,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 3,
+      "name": "sand",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 4,
+      "name": "wall",
+      "flags": []
+    }
+  ]
+}
+

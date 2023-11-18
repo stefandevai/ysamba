@@ -3,20 +3,15 @@
 #include "./clock.hpp"
 #include "./file_manager.hpp"
 
-// TEMP
-#include "../graphics/sprite.hpp"
-// TEMP
-
 namespace dl
 {
   Game::Game() { }
 
   void Game::load(int argc, char* argv[])
   {
-
     try
     {
-      m_camera.set_frustrum (0.0f, 800.f, 600.f, 0.0f);
+      m_camera.set_frustrum (0.0f, 1024.f, 576.f, 0.0f);
       m_renderer.add_layer("world", "world");
       m_renderer.add_layer("gui", "gui");
 
@@ -64,13 +59,7 @@ namespace dl
         m_scene_manager.update(clock.delta);
         m_input_manager->update();
 
-        auto sprite = std::make_shared<Sprite>("spritesheet-tileset", 1);
-
         m_display.clear();
-        /* m_world_renderer.init("world"); */
-        /* m_world_renderer.batch("world", sprite, 0., 0., 0.); */
-        /* m_world_renderer.finalize("world"); */
-        /* m_world_renderer.render(m_camera); */
         m_scene_manager.render(m_renderer);
         m_renderer.render(m_camera);
         m_display.render();

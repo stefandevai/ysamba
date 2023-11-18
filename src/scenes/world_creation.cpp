@@ -183,9 +183,9 @@ namespace dl
         rect.h = 1;
 
         const auto tile = m_world.get(i, j, 0);
-        const auto color = SDL_MapRGB(m_surface->format, tile.r, tile.g, tile.b);
+        /* const auto color = SDL_MapRGB(m_surface->format, tile.r, tile.g, tile.b); */
 
-        SDL_FillRect(m_surface, &rect, color);
+        /* SDL_FillRect(m_surface, &rect, color); */
       }
     }
   }

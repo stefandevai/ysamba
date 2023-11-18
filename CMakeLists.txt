@@ -22,7 +22,7 @@ file(
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 # Ensure the C++17 standard is available.
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 # Enforce UTF-8 encoding on MSVC.
 if (MSVC)

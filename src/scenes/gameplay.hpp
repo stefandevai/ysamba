@@ -8,7 +8,6 @@
 #include "../player/player.hpp"
 #include "../world/world.hpp"
 #include "../world/camera.hpp"
-/* #include "../physics/physics_layer.hpp" */
 #include "../ecs/ecs.hpp"
 
 namespace dl
@@ -37,7 +36,6 @@ namespace dl
       entt::registry m_registry;
       World m_world;
       Camera m_camera;
-      /* PhysicsLayer m_physics_layer {m_world}; */
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
       ECS m_ecs{m_registry, m_world, m_camera};
       State m_current_state = State::PAUSED;

@@ -26,8 +26,8 @@
             "path": "textures/tileset.png",
             "textureType": "diffuse",
             "uniform": true,
-            "horizontalFrames": 8,
-            "verticalFrames": 11
+            "horizontalFrames": 32,
+            "verticalFrames": 32
         },
 
         {

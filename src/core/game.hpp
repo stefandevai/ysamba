@@ -21,7 +21,7 @@ namespace dl
       void run();
 
     private:
-      Display m_display{800, 600, "Dialetics"};
+      Display m_display{1024, 576, "Dialetics"};
       AssetManager m_asset_manager{"./data/assets.json"};
       Renderer m_renderer{m_asset_manager};
       ViewCamera m_camera;

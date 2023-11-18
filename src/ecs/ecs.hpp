@@ -25,7 +25,7 @@ namespace dl
       World& m_world;
       const Camera& m_camera;
       PhysicsSystem m_physics_system{m_world};
-      RenderSystem m_render_system;
+      RenderSystem m_render_system{m_world};
       SocietySystem m_society_system;
   };
 }

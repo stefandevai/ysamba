@@ -17,6 +17,11 @@ void Renderer::add_layer (const std::string& layer_id, const std::string shader_
   m_layers.emplace (layer_id, std::make_shared<Batch2D> (m_asset_manager.get<ShaderProgram> (shader_id)));
 }
 
+std::shared_ptr<Texture> Renderer::get_texture (const std::string& resource_id)
+{
+  return m_asset_manager.get<Texture> (resource_id);
+}
+
 void Renderer::init(const std::string& layer_id)
 {
   m_layers.at(layer_id)->init_emplacing();

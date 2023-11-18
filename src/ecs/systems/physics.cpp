@@ -26,7 +26,7 @@ namespace dl
 
       const auto& target_tile = m_world.get(x_candidate, y_candidate, position.z);
 
-      if (target_tile.walkable)
+      if (target_tile.flags.contains("WALKABLE"))
       {
         position.x = x_candidate;
         position.y = y_candidate;

@@ -12,6 +12,7 @@ class ViewCamera;
 class AssetManager;
 class Sprite;
 class Text;
+class Texture;
 
 class Renderer
 {
@@ -24,6 +25,7 @@ public:
   void render (const ViewCamera& camera);
   void batch_sprites (entt::registry& registry);
   void add_layer (const std::string& layer_id, const std::string shader_id);
+  std::shared_ptr<Texture> get_texture (const std::string& resource_id);
 
 private:
   using LayerMap = std::map<std::string, std::shared_ptr<Batch2D>>;

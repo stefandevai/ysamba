@@ -1,0 +1,24 @@
+{
+    "tiles": [
+        {
+            "frame": 0,
+            "tileId": 0
+        },
+        {
+            "frame": 1,
+            "tileId": 1
+        },
+        {
+            "frame": 2,
+            "tileId": 2
+        },
+        {
+            "frame": 3,
+            "tileId": 3
+        },
+        {
+            "frame": 4,
+            "tileId": 4
+        }
+    ]
+}

@@ -33,14 +33,14 @@ namespace dl
     registry.emplace<SocietyAgent>(member1, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
     registry.emplace<Biology>(member1, 7305, 175, 80000, Sex::Male, "");
     registry.emplace<Position>(member1, 0., 0., 0.);
-    registry.emplace<Visibility>(member1, "spritesheet-tileset", 24);
+    registry.emplace<Visibility>(member1, "spritesheet-tileset", 4);
     registry.emplace<Velocity>(member1, 1.3, 0.7, 0.);
 
     const auto member2 = registry.create();
     registry.emplace<SocietyAgent>(member2, "eve", "otomi", "Eve", SocialClass::None, Metier::None);
     registry.emplace<Biology>(member2, 7305, 164, 70000, Sex::Female, "");
     registry.emplace<Position>(member2, 3., 3., 0.);
-    registry.emplace<Visibility>(member2, "spritesheet-tileset", 24);
+    registry.emplace<Visibility>(member2, "spritesheet-tileset", 4);
     registry.emplace<Velocity>(member2, 1., 0.2, 0.);
   }
 }

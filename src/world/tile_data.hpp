@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include <string>
 
 namespace dl
@@ -8,8 +9,6 @@ namespace dl
   {
     int id;
     std::string name;
-    int symbol;
-    bool walkable;
-    uint8_t r, g, b, a;
+    std::unordered_set<std::string> flags;
   };
 }

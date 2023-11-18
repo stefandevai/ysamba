@@ -21,7 +21,6 @@ namespace dl
 
     m_ecs.load();
 
-    /* m_physics_layer.add(&m_player.body); */
     m_camera.size.w = m_lua.get_variable<int>("camera_width");
     m_camera.size.h = m_lua.get_variable<int>("camera_height");
 
@@ -41,14 +40,8 @@ namespace dl
       return;
     }
 
-    /* m_camera.update(m_player.body.position, m_world.get_tilemap_size(m_player.body.position.z)); */
-    /* m_player.update(delta); */
-
-    /* if (m_player.should_advance_turn()) */
     if (m_current_state == Gameplay::State::PLAYING)
     {
-      /* m_physics_layer.update(delta); */
-      m_world.update(delta);
       m_ecs.update(delta);
     }
 
@@ -62,11 +55,7 @@ namespace dl
       return;
     }
 
-    /* console.clear(); */
-    m_world.render(renderer, m_camera);
     m_ecs.render(renderer);
-    /* /1* m_player.render(console, m_camera); *1/ */
-    /* context.present(console); */
   }
 
   void Gameplay::save_world(const std::string& file_path)

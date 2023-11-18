@@ -8,6 +8,7 @@
 #include <cereal/types/memory.hpp>
 #include <entt/entity/registry.hpp>
 #include "../core/lua_api.hpp"
+#include "../core/json.hpp"
 #include "../components/size.hpp"
 #include "./tile_data.hpp"
 #include "./tilemap.hpp"
@@ -24,8 +25,6 @@ namespace dl
       World();
 
       void generate(const int width, const int height, const int seed);
-      void update(const uint32_t delta);
-      void render(Renderer& renderer, const Camera& camera);
       const TileData get(const int x, const int y, const int z);
       Size get_tilemap_size(const int z);
       inline int get_seed() const { return m_seed; };
@@ -38,7 +37,7 @@ namespace dl
       }
 
     private:
-      LuaAPI m_lua;
+      JSON m_json;
       /* std::vector<std::shared_ptr<Tilemap>> m_tilemaps; */
       std::vector<Tilemap> m_tilemaps;
       std::map<int, TileData> m_tile_data;
