@@ -18,8 +18,9 @@ namespace dl
   class Display
   {
   public:
-    Display (const unsigned int width, const unsigned int height, const std::string& title);
+    Display ();
     ~Display();
+    void load(const unsigned int width, const unsigned int height, const std::string& title);
     bool is_running() const;
     void update();
     void render();

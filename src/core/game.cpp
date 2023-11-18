@@ -11,7 +11,13 @@ namespace dl
   {
     try
     {
-      m_camera.set_frustrum (0.0f, 1024.f, 576.f, 0.0f);
+      m_json.load("./data/game.json");
+      const auto width = m_json.object["width"];
+      const auto height = m_json.object["height"];
+      const auto title = m_json.object["title"];
+
+      m_display.load(width, height, title);
+      m_camera.set_frustrum (0.0f, width, height, 0.0f);
       m_renderer.add_layer("world", "world");
       m_renderer.add_layer("gui", "gui");
       m_renderer.add_layer("quad", "quad");

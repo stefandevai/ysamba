@@ -17,8 +17,14 @@ namespace dl
 {
   double MouseX, MouseY;
 
-  Display::Display (const unsigned int width, const unsigned int height, const std::string& title) : m_width (width), m_height (height), m_title (title)
+  Display::Display () {}
+
+  void Display::load (const unsigned int width, const unsigned int height, const std::string& title)
   {
+    m_width = width;
+    m_height = height;
+    m_title = title;
+
     if (SDL_Init (SDL_INIT_VIDEO) < 0)
     {
       throw std::runtime_error ("It was not possible to initialize SDL2");
