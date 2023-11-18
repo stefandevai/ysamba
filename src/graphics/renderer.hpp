@@ -29,7 +29,7 @@ public:
   void init (const std::string& layer_id);
   void batch (const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z);
   void batch (const std::string& layer_id, Text& text, const double x, const double y, const double z);
-  void batch (const std::string& layer_id, const Quad& quad, const double x, const double y, const double z);
+  void batch (const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z);
   void finalize (const std::string& layer_id);
   void render (const ViewCamera& camera);
   void add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type = LayerType::SPRITE);

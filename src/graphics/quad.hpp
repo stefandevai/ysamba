@@ -7,9 +7,8 @@ namespace dl
 {
   struct Quad : public Renderable
   {
-    Quad() {}
-    Color color;
     int w, h;
+    Color color;
   };
 }
 

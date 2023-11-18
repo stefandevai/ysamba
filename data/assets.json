@@ -14,6 +14,12 @@
         },
 
         {
+            "id": "quad",
+            "type": "shader",
+            "path": "shaders/quad"
+        },
+
+        {
             "id": "tileset",
             "type": "texture",
             "path": "textures/tileset.png",

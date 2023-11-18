@@ -1,8 +1,8 @@
 #include "./world.hpp"
 
 #include <nlohmann/json.hpp>
-#include "./generators/terrain_generator.hpp"
-/* #include "./generators/dummy_generator.hpp" */
+/* #include "./generators/terrain_generator.hpp" */
+#include "./generators/dummy_generator.hpp"
 #include "./generators/society_generator.hpp"
 #include "../graphics/renderer.hpp"
 
@@ -18,8 +18,8 @@ namespace dl
     m_seed = seed;
     m_tilemaps.clear();
 
-    auto tilemap_generator = TerrainGenerator(width, height);
-    /* auto tilemap_generator = DummyGenerator(width, height); */
+    /* auto tilemap_generator = TerrainGenerator(width, height); */
+    auto tilemap_generator = DummyGenerator(width, height);
     auto tilemap = tilemap_generator.generate(seed);
     m_tilemaps.push_back(tilemap);
 

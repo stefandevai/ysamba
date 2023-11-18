@@ -46,17 +46,23 @@ void Renderer::init(const std::string& layer_id)
 
 void Renderer::batch (const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
 {
+  const auto& layer = std::dynamic_pointer_cast<Batch2D>(m_layers.at(layer_id));
+  assert(layer != nullptr);
+
   // Load texture if it has not been loaded
   if (sprite->texture == nullptr)
   {
     sprite->texture = m_asset_manager.get<Texture> (sprite->resource_id);
   }
 
-  m_layers.at(layer_id)->emplace(sprite, x, y, z);
+  layer->emplace(sprite, x, y, z);
 }
 
 void Renderer::batch (const std::string& layer_id, Text& text, const double x, const double y, const double z)
 {
+  const auto& layer = std::dynamic_pointer_cast<Batch2D>(m_layers.at(layer_id));
+  assert(layer != nullptr);
+
   if (!text.get_has_initialized())
   {
     text.initialize(m_asset_manager);
@@ -73,13 +79,16 @@ void Renderer::batch (const std::string& layer_id, Text& text, const double x, c
       character.sprite->texture = m_asset_manager.get<Texture> (character.sprite->resource_id);
     }
 
-    m_layers.at(layer_id)->emplace(character.sprite, character.x + x, character.y + y, z);
+    layer->emplace(character.sprite, character.x + x, character.y + y, z);
   }
 }
 
-void Renderer::batch (const std::string& layer_id, const Quad& quad, const double x, const double y, const double z)
+void Renderer::batch (const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z)
 {
-  /* m_layers.at(layer_id)->emplace(vertices, x, y, z); */
+  const auto& layer = std::dynamic_pointer_cast<BatchQuad>(m_layers.at(layer_id));
+  assert(layer != nullptr);
+
+  layer->emplace(quad, x, y, z);
 }
 
 void Renderer::finalize(const std::string& layer_id)

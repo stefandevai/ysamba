@@ -6,6 +6,8 @@
 #include <SDL.h>
 #include <cereal/archives/binary.hpp>
 #include "../graphics/renderer.hpp"
+#include "../graphics/quad.hpp"
+#include "../graphics/color.hpp"
 
 namespace dl
 {
@@ -76,13 +78,18 @@ namespace dl
       return;
     }
 
-    /* if (!renderer.has_layer("color")) */
-    /* { */
-    /*   renderer.add_layer("color", "color"); */
-    /* } */
+    if (!renderer.has_layer("color"))
+    {
+      renderer.add_layer("color", "quad", Renderer::LayerType::QUAD);
+    }
 
-    /* renderer.init("color"); */
-    /* renderer.finalize("color"); */
+    renderer.init("color");
+    auto quad = std::make_shared<Quad>();
+    quad->color = Color("#ffffffff");
+    quad->w = 100;
+    quad->h = 100;
+    renderer.batch("color", quad, 0, 0, 0);
+    renderer.finalize("color");
 
     /* if (m_should_update_world_surface) */
     /* { */
