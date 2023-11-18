@@ -11,7 +11,6 @@ namespace dl
   {
     try
     {
-      m_json.load("./data/game.json");
       const auto width = m_json.object["width"];
       const auto height = m_json.object["height"];
       const auto title = m_json.object["title"];

@@ -5,6 +5,7 @@
 namespace dl
 {
   JSON::JSON() {}
+  JSON::JSON(const std::string& filepath) { load(filepath); }
 
   void JSON::load (const std::string& filepath)
   {

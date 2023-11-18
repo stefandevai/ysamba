@@ -42,7 +42,6 @@ namespace dl
 
   void World::m_load_tile_data()
   {
-    m_json.load("./data/tilemap/tiles.json");
     const auto tiles = m_json.object["tiles"].get<std::vector<nlohmann::json>>();
 
     for (const auto& tile : tiles)

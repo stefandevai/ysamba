@@ -20,7 +20,7 @@ namespace dl
       void run();
 
     private:
-      JSON m_json;
+      JSON m_json{"./data/game.json"};
       Display m_display;
       AssetManager m_asset_manager{"./data/assets.json"};
       Renderer m_renderer{m_asset_manager};

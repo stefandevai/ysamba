@@ -81,7 +81,7 @@ namespace dl
 
   void SceneManager::m_load()
   {
-    m_inital_scene_key = m_lua.get_variable<std::string>("initial_scene");
+    m_inital_scene_key = m_json.object["initial_scene"];
     set_scene(m_inital_scene_key);
   }
 }

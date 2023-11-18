@@ -36,7 +36,7 @@ namespace dl
       }
 
     private:
-      JSON m_json;
+      JSON m_json{"./data/tilemap/tiles.json"};
       /* std::vector<std::shared_ptr<Tilemap>> m_tilemaps; */
       std::vector<Tilemap> m_tilemaps;
       std::map<int, TileData> m_tile_data;

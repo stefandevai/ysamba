@@ -3,7 +3,7 @@
 #include <map>
 #include <memory>
 #include "../scenes/scene.hpp"
-#include "./lua_api.hpp"
+#include "./json.hpp"
 
 namespace dl
 {
@@ -29,7 +29,7 @@ namespace dl
       inline std::shared_ptr<Scene> get_current_scene() const { return m_current_scene; };
 
     private:
-      LuaAPI m_lua{"scenes/scenes.lua"};
+      JSON m_json{"./data/game.json"};
       std::string m_inital_scene_key;
       static std::shared_ptr<Scene> m_current_scene;
       static std::map<std::string, SceneType> m_scenes_data;

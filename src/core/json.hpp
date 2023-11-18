@@ -12,6 +12,7 @@ namespace dl
 
   public:
     JSON();
+    JSON(const std::string& filepath);
 
     void load (const std::string& filepath);
     void save (const std::string& filepath);
