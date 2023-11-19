@@ -80,6 +80,7 @@ namespace dl
 
     keys.push_back(grid_y*m_horizontal_cells + grid_x);
 
+    // Add adjacent cells if they exist
     if (grid_x > 0)
     {
       keys.push_back(grid_y*m_horizontal_cells + grid_x - 1);

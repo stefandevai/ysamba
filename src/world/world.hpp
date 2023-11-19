@@ -13,6 +13,7 @@
 #include "./tilemap.hpp"
 #include "./camera.hpp"
 #include "./society.hpp"
+#include "./spatial_hash.hpp"
 
 namespace dl
 {
@@ -21,6 +22,8 @@ namespace dl
   class World
   {
     public:
+      SpatialHash spatial_hash{480, 480, 10};
+
       World();
 
       void generate(const int width, const int height, const int seed);

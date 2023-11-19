@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace dl
 {
     struct Position
@@ -7,6 +9,6 @@ namespace dl
         double x;
         double y;
         double z;
-        int spatial_hash_index;
+        uint32_t spatial_hash_index = 99999;
     };
 }

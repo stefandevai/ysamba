@@ -1,7 +1,6 @@
 #pragma once
 
 #include <entt/entt.hpp>
-#include "../../world/spatial_hash.hpp"
 
 namespace dl
 {
@@ -16,6 +15,5 @@ namespace dl
 
     private:
       World& m_world;
-      SpatialHash m_spatial_hash{100, 100, 10};
   };
 }

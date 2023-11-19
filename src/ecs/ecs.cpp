@@ -23,6 +23,7 @@ namespace dl
       m_turn_delay -= delta;
       return;
     }
+    m_game_system.update();
     m_physics_system.update(m_registry, delta);
     m_society_system.update(m_registry, delta);
   }
