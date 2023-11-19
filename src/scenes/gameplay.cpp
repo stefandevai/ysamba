@@ -4,8 +4,10 @@
 #include <random>
 #include <climits>
 #include <cereal/archives/binary.hpp>
+#include <spdlog/spdlog.h>
 #include "../world/generators/society_generator.hpp"
 #include "../graphics/renderer.hpp"
+#include "../ecs/components/selectable.hpp"
 
 namespace dl
 {
@@ -117,6 +119,30 @@ namespace dl
     else if (m_input_manager->poll_action("camera_move_north"))
     {
       m_camera.move_north();
+    }
+    else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
+    {
+      const auto& mouse_position = m_input_manager->get_mouse_position();
+      m_select_entity(mouse_position.first, mouse_position.second);
+    }
+  }
+
+  void Gameplay::m_select_entity(const int x, const int y)
+  {
+    const auto& entities = m_world.spatial_hash.get(x, y);
+
+    for (const auto entity : entities)
+    {
+      if (m_registry.all_of<Selectable, Position>(entity))
+      {
+        auto& position = m_registry.get<Position>(entity);
+        auto& selectable = m_registry.get<Selectable>(entity);
+
+        if (x >= position.x*16 && x <= position.x*16 + 16 && y >= position.y*16 && y <= position.y*16 + 16)
+        {
+          selectable.selected = true;
+        }
+      }
     }
   }
 }

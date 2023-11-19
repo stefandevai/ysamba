@@ -9,6 +9,12 @@ namespace dl
   class InputManager
   {
     public:
+      enum class MouseButton
+      {
+        Left,
+        Right,
+      };
+
       InputManager();
 
       // Removing copy-constructor and assignment operator
@@ -22,6 +28,8 @@ namespace dl
       bool is_key_down(int key);
       bool is_any_key_down();
       bool is_key_up(int key);
+      bool is_clicking(const MouseButton button);
+      std::pair<int, int> get_mouse_position();
       bool should_quit();
       void quit();
 

@@ -68,6 +68,39 @@ namespace dl
           break;
         }
 
+        case SDL_MOUSEMOTION:
+        {
+          m_mouse_position.first = event.motion.x;
+          m_mouse_position.second = event.motion.y;
+          break;
+        }
+
+        case SDL_MOUSEBUTTONDOWN:
+        {
+          if (event.button.button == SDL_BUTTON_LEFT)
+          {
+            m_mouse_state.first = true;
+          }
+          else if (event.button.button == SDL_BUTTON_RIGHT)
+          {
+            m_mouse_state.second = true;
+          }
+          break;
+        }
+
+        case SDL_MOUSEBUTTONUP:
+        {
+          if (event.button.button == SDL_BUTTON_LEFT)
+          {
+            m_mouse_state.first = false;
+          }
+          else if (event.button.button == SDL_BUTTON_RIGHT)
+          {
+            m_mouse_state.second = false;
+          }
+          break;
+        }
+
         default:
           break;
       }

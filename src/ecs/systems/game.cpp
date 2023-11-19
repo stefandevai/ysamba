@@ -19,7 +19,7 @@ namespace dl
   void GameSystem::m_add_to_spatial_hash (entt::registry& registry, entt::entity entity)
   {
     auto& position = registry.get<Position> (entity);
-    m_world.spatial_hash.add(entity, position.x, position.y);
+    m_world.spatial_hash.add(entity, position.x * 16, position.y * 16);
   }
 }
 

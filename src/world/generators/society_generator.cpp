@@ -5,6 +5,7 @@
 #include "../../ecs/components/biology.hpp"
 #include "../../ecs/components/society_agent.hpp"
 #include "../../ecs/components/velocity.hpp"
+#include "../../ecs/components/selectable.hpp"
 
 namespace dl
 {
@@ -29,6 +30,13 @@ namespace dl
 
   void SocietyGenerator::generate_members(const int seed, const Society& society, entt::registry& registry) const
   {
+    const auto member1 = registry.create();
+    registry.emplace<SocietyAgent>(member1, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
+    registry.emplace<Biology>(member1, Sex::Male, 100.);
+    registry.emplace<Position>(member1, 0., 0., 0.);
+    registry.emplace<Visibility>(member1, "spritesheet-tileset", 4);
+    registry.emplace<Selectable>(member1);
+
     const uint32_t number_of_members = 30;
 
     for (uint32_t i = 0; i < number_of_members; ++i)
@@ -38,6 +46,7 @@ namespace dl
       registry.emplace<Biology>(member, Sex::Male, 100.);
       registry.emplace<Position>(member, i, 10., 0.);
       registry.emplace<Visibility>(member, "spritesheet-tileset", 4);
+      registry.emplace<Selectable>(member);
     }
 
     /* const auto member1 = registry.create(); */

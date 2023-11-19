@@ -39,5 +39,6 @@ namespace dl
       State m_current_state = State::PAUSED;
 
       void m_update_input(std::function<void(const std::string&)>& set_scene);
+      void m_select_entity(const int x, const int y);
   };
 }

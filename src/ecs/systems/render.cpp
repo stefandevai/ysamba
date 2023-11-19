@@ -5,6 +5,7 @@
 #include "../../world/camera.hpp"
 #include "../components/position.hpp"
 #include "../components/visibility.hpp"
+#include "../components/selectable.hpp"
 #include "../../graphics/renderer.hpp"
 
 namespace dl
@@ -36,11 +37,16 @@ namespace dl
       }
     }
 
-    auto view = registry.view<const Position, const Visibility>();
-    view.each([&renderer, camera](const auto &position, const auto &visibility) { 
+    auto view = registry.view<const Position, const Visibility, const Selectable>();
+    view.each([&renderer, camera](const auto &position, const auto &visibility, const auto& selectable) { 
       if (visibility.sprite->texture == nullptr)
       {
         visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id);
+      }
+
+      if (selectable.selected)
+      {
+        visibility.sprite->set_frame(1);
       }
 
       const auto sprite_size = visibility.sprite->get_size();

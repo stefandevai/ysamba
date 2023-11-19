@@ -87,6 +87,27 @@ namespace dl
     return m_sdl_input_wrapper->is_key_up(key);
   }
 
+  bool InputManager::is_clicking(const MouseButton button)
+  {
+    const auto& mouse_state = m_sdl_input_wrapper->get_mouse_state();
+
+    if (button == MouseButton::Left)
+    {
+      return mouse_state.first;
+    }
+    else if (button == MouseButton::Right)
+    {
+      return mouse_state.second;
+    }
+
+    return false;
+  }
+
+  std::pair<int, int> InputManager::get_mouse_position()
+  {
+    return m_sdl_input_wrapper->get_mouse_position();
+  }
+
   bool InputManager::should_quit()
   {
     return m_sdl_input_wrapper->should_quit();

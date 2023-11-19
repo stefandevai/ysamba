@@ -8,7 +8,7 @@ namespace dl
   SpatialHash::SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
     : m_width(width), m_height(height), m_cell_dimension(cell_dimension)
   {
-    assert(cell_dimension > 1.f);
+    assert(cell_dimension > 1);
 
     m_horizontal_cells = m_width / cell_dimension;
     m_vertical_cells = m_height / cell_dimension;
@@ -18,6 +18,7 @@ namespace dl
   void SpatialHash::add(const entt::entity object, const int x, const int y)
   {
     const auto key = m_get_key(x, y);
+    spdlog::warn("ADD: {} {} {}", key, x, y);
     m_hash.emplace(key, object);
   }
 
@@ -52,8 +53,11 @@ namespace dl
     std::vector<entt::entity> objects;
     const auto search_keys = m_get_search_keys(x, y);
 
+    spdlog::warn("GET: {} {}", x, y);
+
     for (const auto& key : search_keys)
     {
+      spdlog::warn("{}", key);
       auto range = m_hash.equal_range(key);
       for (auto i = range.first; i != range.second; ++i)
       {
