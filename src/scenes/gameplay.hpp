@@ -19,7 +19,7 @@ class Gameplay : public Scene
   Gameplay(const std::string& scene_key, Camera& camera);
 
   void load() override;
-  void update(const uint32_t delta, SetSceneFunction set_scene) override;
+  void update(const double delta, SetSceneFunction set_scene) override;
   void render(Renderer& renderer) override;
 
   void save_world(const std::string& file_path);

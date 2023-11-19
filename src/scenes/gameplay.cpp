@@ -32,7 +32,7 @@ void Gameplay::load()
   m_has_loaded = true;
 }
 
-void Gameplay::update(const uint32_t delta, SetSceneFunction set_scene)
+void Gameplay::update(const double delta, SetSceneFunction set_scene)
 {
   if (!has_loaded())
   {

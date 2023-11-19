@@ -15,7 +15,7 @@ class HomeMenu : public Scene
   HomeMenu(const std::string& scene_key, Camera& camera);
 
   void load() override;
-  void update(const uint32_t delta, SetSceneFunction set_scene) override;
+  void update(const double delta, SetSceneFunction set_scene) override;
   void render(Renderer& renderer) override;
 
  private:

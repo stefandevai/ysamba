@@ -18,7 +18,7 @@ class ECS
  public:
   ECS(entt::registry& registry, World& world, Camera& camera);
   void load();
-  void update(const uint32_t delta);
+  void update(const double delta);
   void render(Renderer& renderer);
 
  private:
@@ -29,6 +29,6 @@ class ECS
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_world};
   SocietySystem m_society_system;
-  int m_turn_delay{0};
+  double m_turn_delay = 0.0;
 };
 }  // namespace dl

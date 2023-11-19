@@ -13,7 +13,7 @@ namespace dl
 {
 SocietySystem::SocietySystem() {}
 
-void SocietySystem::update(entt::registry& registry, const uint32_t delta)
+void SocietySystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<SocietyAgent, Biology>();
   view.each([this, &registry, delta](auto entity, auto& agent, auto& biology) {
@@ -21,7 +21,7 @@ void SocietySystem::update(entt::registry& registry, const uint32_t delta)
     {
       if (agent.time_to_next_action <= 0)
       {
-        agent.time_to_next_action = 2000;
+        agent.time_to_next_action = 1.0;
         const auto n = m_distribution(m_rng);
 
         if (n < .7f)
@@ -38,7 +38,7 @@ void SocietySystem::update(entt::registry& registry, const uint32_t delta)
     {
       if (agent.time_to_next_action <= 0)
       {
-        agent.time_to_next_action = 2000;
+        agent.time_to_next_action = 1.0;
         const auto n = m_distribution(m_rng);
         if (n < .4f)
         {

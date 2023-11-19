@@ -50,7 +50,7 @@ void SceneManager::set_scene(const std::string& key, Camera& camera)
   }
 }
 
-void SceneManager::update(const uint32_t delta)
+void SceneManager::update(const double delta)
 {
   if (m_current_scene == nullptr)
   {

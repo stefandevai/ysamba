@@ -12,7 +12,7 @@ namespace dl
 {
 PhysicsSystem::PhysicsSystem(World& world) : m_world(world) {}
 
-void PhysicsSystem::update(entt::registry& registry, const uint32_t delta)
+void PhysicsSystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<Position, Velocity>();
   view.each([this, &registry, delta](auto entity, auto& position, auto& velocity) {
@@ -21,10 +21,9 @@ void PhysicsSystem::update(entt::registry& registry, const uint32_t delta)
       return;
     }
 
-    const auto delta_s = delta / 1000.0;
-    const double x_candidate = position.x + velocity.x * delta_s;
-    const double y_candidate = position.y + velocity.y * delta_s;
-    const double z_candidate = position.z + velocity.z * delta_s;
+    const double x_candidate = position.x + velocity.x * delta;
+    const double y_candidate = position.y + velocity.y * delta;
+    const double z_candidate = position.z + velocity.z * delta;
 
     // Check if the tile changed
     if (std::abs(position.x - x_candidate) >= 1.0 || std::abs(position.y - y_candidate) >= 1.0)

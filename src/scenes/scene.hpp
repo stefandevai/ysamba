@@ -18,7 +18,7 @@ class Scene
   virtual ~Scene();
 
   virtual void load();
-  virtual void update(const uint32_t delta, SetSceneFunction set_scene) = 0;
+  virtual void update(const double delta, SetSceneFunction set_scene) = 0;
   virtual void render(Renderer& renderer) = 0;
   /* virtual void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
   inline bool has_loaded() const { return m_has_loaded; };

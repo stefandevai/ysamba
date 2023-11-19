@@ -10,7 +10,7 @@ class SocietySystem
  public:
   SocietySystem();
 
-  void update(entt::registry& registry, const uint32_t delta);
+  void update(entt::registry& registry, const double delta);
 
  private:
   std::random_device m_rd;

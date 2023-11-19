@@ -24,7 +24,7 @@ class SceneManager
   SceneManager(Camera& camera);
 
   static void set_scene(const std::string& key, Camera& camera);
-  void update(const uint32_t delta);
+  void update(const double delta);
   void render(Renderer& renderer);
   /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
 

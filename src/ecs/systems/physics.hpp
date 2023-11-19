@@ -11,7 +11,7 @@ class PhysicsSystem
  public:
   PhysicsSystem(World& world);
 
-  void update(entt::registry& registry, const uint32_t delta);
+  void update(entt::registry& registry, const double delta);
 
  private:
   World& m_world;

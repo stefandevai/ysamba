@@ -24,7 +24,7 @@ void HomeMenu::load()
   m_has_loaded = true;
 }
 
-void HomeMenu::update(const uint32_t delta, SetSceneFunction set_scene)
+void HomeMenu::update(const double delta, SetSceneFunction set_scene)
 {
   (void)delta;
 

@@ -17,11 +17,11 @@ ECS::ECS(entt::registry& registry, World& world, Camera& camera)
 
 void ECS::load() {}
 
-void ECS::update(const uint32_t delta)
+void ECS::update(const double delta)
 {
   if (m_turn_delay <= 0)
   {
-    m_turn_delay = 200;
+    m_turn_delay = 0.5;
   }
   else
   {

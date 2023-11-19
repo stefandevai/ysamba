@@ -38,7 +38,7 @@ void WorldCreation::load()
   m_has_loaded = true;
 }
 
-void WorldCreation::update(const uint32_t delta, SetSceneFunction set_scene)
+void WorldCreation::update(const double delta, SetSceneFunction set_scene)
 {
   (void)delta;
 
