@@ -15,5 +15,7 @@ namespace dl
 
     private:
       World& m_world;
+
+      bool m_collides(entt::registry &registry, const int x, const int y);
   };
 }

@@ -140,6 +140,7 @@ namespace dl
         if (x >= std::round(position.x) && x <= std::round(position.x) + 1.f && y >= std::round(position.y) && y <= std::round(position.y) + 1.f)
         {
           selectable.selected = true;
+          return;
         }
       }
     }
