@@ -24,9 +24,6 @@ namespace dl
 
     m_ecs.load();
 
-    /* m_camera.size.w = m_lua.get_variable<int>("camera_width"); */
-    /* m_camera.size.h = m_lua.get_variable<int>("camera_height"); */
-
     const auto& society = m_world.get_society("otomi");
     const auto generator = SocietyGenerator();
     generator.generate_members(100, society, m_registry);
@@ -105,19 +102,19 @@ namespace dl
     }
     else if (m_input_manager->poll_action("camera_move_west"))
     {
-      /* m_camera.move_west(); */
+      m_camera.move(-1.f, 0.f);
     }
     else if (m_input_manager->poll_action("camera_move_east"))
     {
-      /* m_camera.move_east(); */
+      m_camera.move(1.f, 0.f);
     }
     else if (m_input_manager->poll_action("camera_move_south"))
     {
-      /* m_camera.move_south(); */
+      m_camera.move(0.f, 1.f);
     }
     else if (m_input_manager->poll_action("camera_move_north"))
     {
-      /* m_camera.move_north(); */
+      m_camera.move(0.f, -1.f);
     }
     else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
     {

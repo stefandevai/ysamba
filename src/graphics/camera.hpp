@@ -17,7 +17,7 @@ namespace dl
   public:
     ViewCamera();
 
-    void move (const float x, const float y, const float z);
+    void move (const float x, const float y, const float z = 0.f);
     void update (entt::registry& registry);
     inline const glm::vec3& get_position() const { return m_position; }
     inline glm::mat4 get_view_matrix() const { return glm::lookAt (m_position, m_front, m_up); }
