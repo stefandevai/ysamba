@@ -107,17 +107,17 @@ void Texture::bind() { glBindTexture(GL_TEXTURE_2D, m_id); }
 void Texture::unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
 
 // TODO: Implement irregular frame calculations
-float Texture::get_frame_width(const int frame) const { return (m_width / static_cast<float>(m_horizontal_frames)); }
+float Texture::get_frame_width() const { return (m_width / static_cast<float>(m_horizontal_frames)); }
 
 // TODO: Implement irregular frame calculations
-float Texture::get_frame_height(const int frame) const { return (m_height / static_cast<float>(m_vertical_frames)); }
+float Texture::get_frame_height() const { return (m_height / static_cast<float>(m_vertical_frames)); }
 
 // TODO: Implement irregular frame calculations
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
 std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
 {
-  const auto frame_width = get_frame_width(frame) / static_cast<float>(m_width);
-  const auto frame_height = get_frame_height(frame) / static_cast<float>(m_height);
+  const auto frame_width = get_frame_width() / static_cast<float>(m_width);
+  const auto frame_height = get_frame_height() / static_cast<float>(m_height);
   const int max_frames = m_horizontal_frames * m_vertical_frames;
   const float frame_x = static_cast<float>(frame % m_horizontal_frames);
   const float frame_y = static_cast<float>((frame % max_frames) / m_horizontal_frames);

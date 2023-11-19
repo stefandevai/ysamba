@@ -22,8 +22,8 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Vi
   const auto& camera_dimensions = camera.get_dimensions();
   const auto& world_texture_id = m_world.get_texture_id();
   const auto& world_texture = renderer.get_texture(world_texture_id);
-  const auto tile_width = world_texture->get_frame_width(0);
-  const auto tile_height = world_texture->get_frame_height(0);
+  const auto tile_width = world_texture->get_frame_width();
+  const auto tile_height = world_texture->get_frame_height();
   const auto horizontal_tiles = std::ceil(camera_dimensions.x / tile_width);
   const auto vertical_tiles = std::ceil(camera_dimensions.y / tile_height);
   const int camera_tile_offset_x = (camera_position.x + 1) / tile_width;

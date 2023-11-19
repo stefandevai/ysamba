@@ -39,8 +39,8 @@ class Texture : public Asset
   inline int get_vertical_frames() const { return m_vertical_frames; }
   inline TextureType get_type() const { return m_type; }
   // TODO: Implement irregular frame calculations
-  float get_frame_width(const int frame) const;
-  float get_frame_height(const int frame) const;
+  float get_frame_width() const;
+  float get_frame_height() const;
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
   std::array<glm::vec2, 4> get_frame_coords(const int frame) const;
   /* void set_custom_uv (const glm::vec2& uv, const float width, const float height); */

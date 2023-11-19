@@ -1,19 +1,10 @@
 #include "./camera.hpp"
 
 #include <cmath>
-#include <entt/entt.hpp>
 
 namespace dl
 {
-ViewCamera::ViewCamera() { m_target = entt::null; }
-
-void ViewCamera::update(entt::registry& registry)
-{
-  if (m_target == entt::null)
-  {
-    return;
-  }
-}
+ViewCamera::ViewCamera() { }
 
 void ViewCamera::move(const float x, const float y, const float z)
 {
@@ -47,7 +38,4 @@ void ViewCamera::set_frustrum(const float left, const float right, const float b
   m_frustrum_top = top;
 }
 
-void ViewCamera::set_target(const entt::entity& target) { m_target = target; }
-
-void ViewCamera::remove_target() { m_target = entt::null; }
 }  // namespace dl

@@ -13,6 +13,8 @@ SocietyGenerator::SocietyGenerator() {}
 
 Society SocietyGenerator::generate(const int seed)
 {
+  (void)seed;
+
   Society society{};
 
   society.id = "otomi";
@@ -27,6 +29,9 @@ Society SocietyGenerator::generate(const int seed)
 
 void SocietyGenerator::generate_members(const int seed, const Society& society, entt::registry& registry) const
 {
+  (void)seed;
+  (void)society;
+
   const uint32_t number_of_members = 10;
 
   for (uint32_t i = 0; i < number_of_members; ++i)

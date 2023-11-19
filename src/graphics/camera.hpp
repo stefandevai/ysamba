@@ -1,6 +1,5 @@
 #pragma once
 
-#include <entt/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -18,7 +17,6 @@ class ViewCamera
   ViewCamera();
 
   void move(const float x, const float y, const float z = 0.f);
-  void update(entt::registry& registry);
   inline const glm::vec3& get_position() const { return m_position; }
   inline glm::mat4 get_view_matrix() const { return glm::lookAt(m_position, m_front, m_up); }
   inline glm::mat4 get_default_view_matrix() const { return glm::lookAt({0.f, 0.f, 500.f}, {0.f, 0.f, -1.f}, m_up); }
@@ -35,8 +33,6 @@ class ViewCamera
   inline const glm::vec2& get_dimensions() const { return m_dimensions; }
   void set_position(const float x, const float y, const float z);
   void set_frustrum(const float left, const float right, const float bottom, const float top);
-  void set_target(const entt::entity& target);
-  void remove_target();
   inline void save_position() { m_saved_position = m_position; }
 
  private:
@@ -51,7 +47,6 @@ class ViewCamera
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   glm::vec3 m_saved_position{0.0f};
   glm::vec2 m_dimensions;
-  entt::entity m_target;
   // ViewCameraState m_state = ViewCameraState::IDLE;
 };
 }  // namespace dl

@@ -14,7 +14,7 @@ glm::vec2 Sprite::get_size() const
     return glm::vec2(m_custom_width, m_custom_height);
   }
 
-  return glm::vec2(texture->get_frame_width(m_frame), texture->get_frame_height(m_frame));
+  return glm::vec2(texture->get_frame_width(), texture->get_frame_height());
 }
 
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
@@ -27,8 +27,8 @@ std::array<glm::vec2, 4> Sprite::get_texcoords() const
 
   if (m_has_custom_uv)
   {
-    const auto width = texture->get_frame_width(m_frame);
-    const auto height = texture->get_frame_height(m_frame);
+    const auto width = texture->get_frame_width();
+    const auto height = texture->get_frame_height();
 
     const auto top = m_custom_height / height;
     const auto bottom = m_custom_uv.y / height;
