@@ -7,14 +7,15 @@
 namespace dl
 {
   class Renderer;
+  class ViewCamera;
 
   class HomeMenu : public Scene
   {
     public:
-      HomeMenu(const std::string &scene_key);
+      HomeMenu(const std::string &scene_key, ViewCamera& camera);
 
       void load() override;
-      void update(const uint32_t delta, std::function<void(const std::string&)> set_scene) override;
+      void update(const uint32_t delta, SetSceneFunction set_scene) override;
       void render(Renderer& renderer) override;
 
     private:

@@ -1,12 +1,13 @@
 #include "./scene.hpp"
 
 #include <SDL.h>
+#include "../graphics/camera.hpp"
 #include "../core/input_manager.hpp"
 
 namespace dl
 {
-  Scene::Scene(const std::string& scene_key)
-    : m_scene_key(scene_key), m_scene_dir("scenes/" + scene_key + "/")
+  Scene::Scene(const std::string& scene_key, ViewCamera& camera)
+    : m_scene_key(scene_key), m_scene_dir("scenes/" + scene_key + "/"), m_camera(camera)
   {
 
   }

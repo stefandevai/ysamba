@@ -31,6 +31,7 @@ namespace dl
       Size get_tilemap_size(const int z);
       inline int get_seed() const { return m_seed; };
       inline size_t get_chunk_size() const { return m_chunk_size; };
+      inline const std::string& get_texture_id() const { return m_texture_id; };
       inline Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
 
       template<class Archive> 
@@ -44,10 +45,11 @@ namespace dl
       /* std::vector<std::shared_ptr<Tilemap>> m_tilemaps; */
       std::vector<Tilemap> m_tilemaps;
       std::map<int, TileData> m_tile_data;
+      size_t m_chunk_size = 0;
+      std::string m_texture_id;
       int m_depth_min = 0;
       int m_depth_max = 1;
       int m_seed = 0;
-      size_t m_chunk_size = 0;
       std::map<std::string, Society> m_societies;
 
       void m_load_tile_data();

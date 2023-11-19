@@ -1,5 +1,6 @@
 {
   "chunk_size": 100,
+  "texture_id": "spritesheet-tileset",
   "tiles": [
     {
       "id": 0,

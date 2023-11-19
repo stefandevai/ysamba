@@ -3,10 +3,11 @@
 #include <spdlog/spdlog.h>
 #include "./components/velocity.hpp"
 #include "../graphics/renderer.hpp"
+#include "../graphics/camera.hpp"
 
 namespace dl
 {
-  ECS::ECS(entt::registry& registry, World& world, const Camera& camera) : m_registry(registry), m_world(world), m_camera(camera) { }
+  ECS::ECS(entt::registry& registry, World& world, ViewCamera& camera) : m_registry(registry), m_world(world), m_camera(camera) { }
 
   void ECS::load()
   {

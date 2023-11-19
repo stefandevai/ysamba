@@ -5,6 +5,7 @@
 #include "./generators/dummy_generator.hpp"
 #include "./generators/society_generator.hpp"
 #include "../graphics/renderer.hpp"
+#include "../graphics/sprite.hpp"
 
 namespace dl
 {
@@ -12,6 +13,7 @@ namespace dl
   {
     m_load_tile_data();
     m_chunk_size = m_json.object["chunk_size"];
+    m_texture_id = m_json.object["texture_id"];
   }
 
   void World::generate(const int width, const int height, const int seed)

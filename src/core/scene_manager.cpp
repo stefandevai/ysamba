@@ -1,6 +1,7 @@
 #include "./scene_manager.hpp"
 
 #include <memory>
+#include "../graphics/camera.hpp"
 #include "../scenes/home_menu.hpp"
 #include "../scenes/gameplay.hpp"
 #include "../scenes/world_creation.hpp"
@@ -15,12 +16,13 @@ namespace dl
     {"gameplay", SceneType::GAMEPLAY},
   };
 
-  SceneManager::SceneManager()
+  SceneManager::SceneManager(ViewCamera& camera)
+    : m_camera(camera)
   {
     m_load();
   }
 
-  void SceneManager::set_scene(const std::string& key)
+  void SceneManager::set_scene(const std::string& key, ViewCamera& camera)
   {
     const auto it = m_scenes_data.find(key);
 
@@ -35,13 +37,13 @@ namespace dl
     switch(scene_type)
     {
       case SceneType::HOME_MENU:
-        m_current_scene = std::make_shared<HomeMenu>(key);
+        m_current_scene = std::make_shared<HomeMenu>(key, camera);
         break;
       case SceneType::WORLD_CREATION:
-        m_current_scene = std::make_shared<WorldCreation>(key);
+        m_current_scene = std::make_shared<WorldCreation>(key, camera);
         break;
       case SceneType::GAMEPLAY:
-        m_current_scene = std::make_shared<Gameplay>(key);
+        m_current_scene = std::make_shared<Gameplay>(key, camera);
         break;
       default:
         std::cout << "[x] ERROR: Could not find scene: " << key << '\n';
@@ -82,6 +84,6 @@ namespace dl
   void SceneManager::m_load()
   {
     m_inital_scene_key = m_json.object["initial_scene"];
-    set_scene(m_inital_scene_key);
+    set_scene(m_inital_scene_key, m_camera);
   }
 }

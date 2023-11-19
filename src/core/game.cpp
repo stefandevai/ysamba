@@ -39,9 +39,6 @@ namespace dl
       {
         clock.tick();
 
-        const auto dt = clock.delta / 1000.f;
-        m_camera.move(-20.f*dt, 0.f, 0.f);
-
         m_scene_manager.update(clock.delta);
         m_input_manager->update();
 

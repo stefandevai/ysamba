@@ -6,13 +6,14 @@
 #include <cereal/archives/binary.hpp>
 #include <spdlog/spdlog.h>
 #include "../world/generators/society_generator.hpp"
+#include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
 #include "../ecs/components/selectable.hpp"
 
 namespace dl
 {
-  Gameplay::Gameplay(const std::string& scene_key)
-    : Scene(scene_key)
+  Gameplay::Gameplay(const std::string& scene_key, ViewCamera& camera)
+    : Scene(scene_key, camera)
   { }
 
   void Gameplay::load()
@@ -23,8 +24,8 @@ namespace dl
 
     m_ecs.load();
 
-    m_camera.size.w = m_lua.get_variable<int>("camera_width");
-    m_camera.size.h = m_lua.get_variable<int>("camera_height");
+    /* m_camera.size.w = m_lua.get_variable<int>("camera_width"); */
+    /* m_camera.size.h = m_lua.get_variable<int>("camera_height"); */
 
     const auto& society = m_world.get_society("otomi");
     const auto generator = SocietyGenerator();
@@ -33,10 +34,8 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void Gameplay::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
+  void Gameplay::update(const uint32_t delta, SetSceneFunction set_scene)
   {
-    (void)set_scene;
-
     if (!has_loaded())
     {
       return;
@@ -75,11 +74,11 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void Gameplay::m_update_input(std::function<void(const std::string&)>& set_scene)
+  void Gameplay::m_update_input(SetSceneFunction& set_scene)
   {
     if (m_input_manager->poll_action("quit"))
     {
-      set_scene("home_menu");
+      set_scene("home_menu", m_camera);
     }
     else if (m_input_manager->poll_action("toggle_pause"))
     {
@@ -106,19 +105,19 @@ namespace dl
     }
     else if (m_input_manager->poll_action("camera_move_west"))
     {
-      m_camera.move_west();
+      /* m_camera.move_west(); */
     }
     else if (m_input_manager->poll_action("camera_move_east"))
     {
-      m_camera.move_east();
+      /* m_camera.move_east(); */
     }
     else if (m_input_manager->poll_action("camera_move_south"))
     {
-      m_camera.move_south();
+      /* m_camera.move_south(); */
     }
     else if (m_input_manager->poll_action("camera_move_north"))
     {
-      m_camera.move_north();
+      /* m_camera.move_north(); */
     }
     else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
     {

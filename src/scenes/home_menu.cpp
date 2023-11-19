@@ -1,11 +1,12 @@
 #include "./home_menu.hpp"
 
+#include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
 
 namespace dl
 {
-  HomeMenu::HomeMenu(const std::string& scene_key)
-    : Scene(scene_key)
+  HomeMenu::HomeMenu(const std::string& scene_key, ViewCamera& camera)
+    : Scene(scene_key, camera)
   { }
 
   void HomeMenu::load()
@@ -25,7 +26,7 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void HomeMenu::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
+  void HomeMenu::update(const uint32_t delta, SetSceneFunction set_scene)
   {
     (void)delta;
 
@@ -40,11 +41,11 @@ namespace dl
     }
     else if (m_input_manager->poll_action("play"))
     {
-      set_scene("gameplay");
+      set_scene("gameplay", m_camera);
     }
     else if (m_input_manager->poll_action("create_world"))
     {
-      set_scene("world_creation");
+      set_scene("world_creation", m_camera);
     }
   }
 

@@ -26,6 +26,6 @@ namespace dl
       Renderer m_renderer{m_asset_manager};
       ViewCamera m_camera;
       std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-      SceneManager m_scene_manager;
+      SceneManager m_scene_manager{m_camera};
   };
 }

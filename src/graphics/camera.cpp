@@ -1,5 +1,6 @@
 #include "./camera.hpp"
 
+#include <cmath>
 #include <entt/entt.hpp>
 
 namespace dl
@@ -38,6 +39,8 @@ namespace dl
 
   void ViewCamera::set_frustrum (const float left, const float right, const float bottom, const float top)
   {
+    m_dimensions.x = std::abs(right - left);
+    m_dimensions.y = std::abs(top - bottom);
     m_frustrum_left   = left;
     m_frustrum_right  = right;
     m_frustrum_bottom = bottom;

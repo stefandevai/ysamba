@@ -28,6 +28,7 @@ namespace dl
       return (glm::ortho (m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far) * glm::lookAt (m_position, m_front, m_up));
     }
     inline const glm::vec3& get_saved_position() const { return m_saved_position; }
+    inline const glm::vec2& get_dimensions() const { return m_dimensions; }
     void set_position (const float x, const float y, const float z);
     void set_frustrum (const float left, const float right, const float bottom, const float top);
     void set_target (const entt::entity& target);
@@ -45,6 +46,7 @@ namespace dl
     glm::vec3 m_front{0.0f, 0.0f, -1.0f};
     const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
     glm::vec3 m_saved_position{0.0f};
+    glm::vec2 m_dimensions;
     entt::entity m_target;
     // ViewCameraState m_state = ViewCameraState::IDLE;
   };

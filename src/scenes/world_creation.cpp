@@ -5,6 +5,7 @@
 #include <climits>
 #include <SDL.h>
 #include <cereal/archives/binary.hpp>
+#include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
 #include "../graphics/sprite.hpp"
 #include "../graphics/quad.hpp"
@@ -13,8 +14,8 @@
 
 namespace dl
 {
-  WorldCreation::WorldCreation(const std::string& scene_key)
-    : Scene(scene_key)
+  WorldCreation::WorldCreation(const std::string& scene_key, ViewCamera& camera)
+    : Scene(scene_key, camera)
   { }
 
   void WorldCreation::load()
@@ -37,10 +38,8 @@ namespace dl
     m_has_loaded = true;
   }
 
-  void WorldCreation::update(const uint32_t delta, std::function<void(const std::string&)> set_scene)
+  void WorldCreation::update(const uint32_t delta, SetSceneFunction set_scene)
   {
-    (void)set_scene;
-
     if (!has_loaded())
     {
       return;
@@ -48,7 +47,7 @@ namespace dl
 
     if (m_input_manager->poll_action("quit"))
     {
-      set_scene("home_menu");
+      set_scene("home_menu", m_camera);
     }
     else if (m_input_manager->poll_action("generate_world"))
     {
