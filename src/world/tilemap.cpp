@@ -31,5 +31,5 @@ int Tilemap::at(const Point<int>& point) const
   return tiles[m_width * point.y + point.x];
 }
 
-Size Tilemap::get_size() const { return Size{m_width, m_height, 0}; }
+TilemapSize Tilemap::get_size() const { return TilemapSize{m_width, m_height, 0}; }
 }  // namespace dl

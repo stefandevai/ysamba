@@ -40,7 +40,7 @@ const TileData World::get(const int x, const int y, const int z)
   return m_tile_data[tile_index];
 }
 
-Size World::get_tilemap_size(const int z) { return m_tilemaps[z - m_depth_min].get_size(); }
+TilemapSize World::get_tilemap_size(const int z) { return m_tilemaps[z - m_depth_min].get_size(); }
 
 void World::m_load_tile_data()
 {

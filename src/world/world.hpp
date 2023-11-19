@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 
-#include "../components/size.hpp"
 #include "../core/json.hpp"
 #include "../core/lua_api.hpp"
 #include "./society.hpp"
@@ -27,7 +26,7 @@ class World
 
   void generate(const int width, const int height, const int seed);
   const TileData get(const int x, const int y, const int z);
-  Size get_tilemap_size(const int z);
+  TilemapSize get_tilemap_size(const int z);
   inline int get_seed() const { return m_seed; };
   inline size_t get_chunk_size() const { return m_chunk_size; };
   inline const std::string& get_texture_id() const { return m_texture_id; };

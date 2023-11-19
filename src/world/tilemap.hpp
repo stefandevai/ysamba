@@ -2,12 +2,18 @@
 
 #include <cereal/types/vector.hpp>
 
-#include "../components/size.hpp"
 #include "./point.hpp"
 #include "./tile_data.hpp"
 
 namespace dl
 {
+struct TilemapSize
+{
+  int w = 0;
+  int h = 0;
+  int d = 0;
+};
+
 class Tilemap
 {
  public:
@@ -23,7 +29,7 @@ class Tilemap
   int at(const int x, const int y) const;
   int at(const Point<int>& point) const;
 
-  Size get_size() const;
+  TilemapSize get_size() const;
 
   template <class Archive>
   void serialize(Archive& archive)
