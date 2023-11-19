@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/entity/registry.hpp>
+
 #include "../../world/world.hpp"
 #include "../components/biology.hpp"
 #include "../components/society_agent.hpp"

@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/entity/registry.hpp>
+
 #include "../../world/world.hpp"
 #include "../components/position.hpp"
 #include "../components/velocity.hpp"

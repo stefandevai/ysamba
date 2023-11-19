@@ -1,6 +1,5 @@
 #include "./world_creation.hpp"
 
-#include <SDL.h>
 #include <spdlog/spdlog.h>
 
 #include <cereal/archives/binary.hpp>

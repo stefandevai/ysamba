@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entt.hpp>
+#include <entt/entity/fwd.hpp>
 #include <random>
 
 namespace dl

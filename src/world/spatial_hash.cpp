@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/entity/entity.hpp>
+
 #include "../ecs/components/position.hpp"
 
 namespace dl

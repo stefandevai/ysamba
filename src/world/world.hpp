@@ -3,7 +3,6 @@
 #include <cereal/types/map.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
-#include <entt/entity/registry.hpp>
 #include <map>
 #include <vector>
 

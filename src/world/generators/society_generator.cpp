@@ -1,5 +1,7 @@
 #include "./society_generator.hpp"
 
+#include <entt/entity/registry.hpp>
+
 #include "../../ecs/components/biology.hpp"
 #include "../../ecs/components/position.hpp"
 #include "../../ecs/components/selectable.hpp"

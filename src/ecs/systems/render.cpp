@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include <tgmath.h>
 
+#include <entt/entity/registry.hpp>
+
 #include "../../graphics/camera.hpp"
 #include "../../graphics/renderer.hpp"
 #include "../../world/world.hpp"
