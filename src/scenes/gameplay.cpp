@@ -138,7 +138,7 @@ namespace dl
         auto& position = m_registry.get<Position>(entity);
         auto& selectable = m_registry.get<Selectable>(entity);
 
-        if (x >= position.x*16 && x <= position.x*16 + 16 && y >= position.y*16 && y <= position.y*16 + 16)
+        if (x >= position.x && x <= position.x + 32 && y >= position.y && y <= position.y + 32)
         {
           selectable.selected = true;
         }
