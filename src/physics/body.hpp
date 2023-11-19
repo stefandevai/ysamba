@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../ecs/components/position.hpp"
-#include "../components/velocity.hpp"
+/* #include "../components/velocity.hpp" */
 
 namespace dl
 {
@@ -9,7 +9,7 @@ namespace dl
   {
     public:
       Position position;
-      Velocity velocity;
+      /* Velocity velocity; */
       bool is_static = false;
 
       Body();

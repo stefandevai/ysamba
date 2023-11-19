@@ -1,4 +1,6 @@
 #include "./ecs.hpp"
+
+#include <spdlog/spdlog.h>
 #include "./components/velocity.hpp"
 #include "../graphics/renderer.hpp"
 
@@ -12,6 +14,15 @@ namespace dl
 
   void ECS::update(const uint32_t delta)
   {
+    if (m_turn_delay <= 0)
+    {
+      m_turn_delay = 200;
+    }
+    else
+    {
+      m_turn_delay -= delta;
+      return;
+    }
     m_physics_system.update(m_registry, delta);
     m_society_system.update(m_registry, delta);
   }

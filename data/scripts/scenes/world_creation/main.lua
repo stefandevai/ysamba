@@ -1,5 +1,8 @@
-map_width = 512
-map_height = 512
+-- map_width = 512
+-- map_height = 512
+
+map_width = 30
+map_height = 20
 
 camera_width = 64
 camera_height = 36

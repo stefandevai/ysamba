@@ -26,6 +26,7 @@ namespace dl
       PhysicsSystem m_physics_system{m_world};
       RenderSystem m_render_system{m_world};
       SocietySystem m_society_system;
+      int m_turn_delay{0};
   };
 }
 

@@ -37,6 +37,7 @@ namespace dl
         SocialClass social_class;
         Metier metiers;
         State state = State::Idle;
+        int time_to_next_action = 0;
     };
 }
 

@@ -1,0 +1,120 @@
+#include "./spatial_hash.hpp"
+
+#include <spdlog/spdlog.h>
+#include "../ecs/components/position.hpp"
+
+namespace dl
+{
+  SpatialHash::SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
+    : m_width(width), m_height(height), m_cell_dimension(cell_dimension)
+  {
+    assert(cell_dimension > 1.f);
+
+    m_horizontal_cells = m_width / cell_dimension;
+    m_vertical_cells = m_height / cell_dimension;
+    m_number_of_cells = m_horizontal_cells * m_vertical_cells;
+  }
+
+  void SpatialHash::add(const entt::entity object, const int x, const int y)
+  {
+    const auto key = m_get_key(x, y);
+    m_hash.emplace(key, object);
+  }
+
+  void SpatialHash::remove(const entt::entity object, const uint32_t key)
+  {
+    auto range = m_hash.equal_range(key);
+    for (auto i = range.first; i != range.second; ++i)
+    {
+      if (i->second == object)
+      {
+        m_hash.erase(i);
+        return;
+      }
+    }
+  }
+
+  void SpatialHash::update(const entt::entity object, const int x, const int y, const uint32_t key)
+  {
+    const auto new_key = m_get_key(x, y);
+
+    if (new_key == key)
+    {
+      return;
+    }
+
+    remove(object, key);
+    m_hash.emplace(new_key, object);
+  }
+
+  std::vector<entt::entity> SpatialHash::get(const int x, const int y)
+  {
+    std::vector<entt::entity> objects;
+    const auto search_keys = m_get_search_keys(x, y);
+
+    for (const auto& key : search_keys)
+    {
+      auto range = m_hash.equal_range(key);
+      for (auto i = range.first; i != range.second; ++i)
+      {
+        objects.push_back(i->second);
+      }
+    }
+
+    return objects;
+  }
+
+  uint32_t SpatialHash::m_get_key(const int x, const int y)
+  {
+    const auto grid_x = x / m_cell_dimension;
+    const auto grid_y = y / m_cell_dimension;
+    return grid_y*m_horizontal_cells + grid_x;
+  }
+
+  std::vector<uint32_t> SpatialHash::m_get_search_keys(const int x, const int y)
+  {
+    std::vector<uint32_t> keys;
+
+    const auto grid_x = x / m_cell_dimension;
+    const auto grid_y = y / m_cell_dimension;
+
+    keys.push_back(grid_y*m_horizontal_cells + grid_x);
+
+    if (grid_x > 0)
+    {
+      keys.push_back(grid_y*m_horizontal_cells + grid_x - 1);
+      if (grid_y > 0)
+      {
+        keys.push_back((grid_y - 1)*m_horizontal_cells + grid_x - 1);
+      }
+      if (grid_y < m_vertical_cells)
+      {
+        keys.push_back((grid_y + 1)*m_horizontal_cells + grid_x - 1);
+      }
+    }
+    if (grid_x < m_horizontal_cells)
+    {
+      keys.push_back(grid_y*m_horizontal_cells + grid_x + 1);
+
+      if (grid_y > 0)
+      {
+        keys.push_back((grid_y - 1)*m_horizontal_cells + grid_x + 1);
+      }
+      if (grid_y < m_vertical_cells)
+      {
+        keys.push_back((grid_y + 1)*m_horizontal_cells + grid_x + 1);
+      }
+    }
+    if (grid_y > 0)
+    {
+      keys.push_back((grid_y - 1)*m_horizontal_cells + grid_x);
+    }
+    if (grid_y < m_vertical_cells)
+    {
+      keys.push_back((grid_y + 1)*m_horizontal_cells + grid_x);
+    }
+
+    return keys;
+  }
+}
+
