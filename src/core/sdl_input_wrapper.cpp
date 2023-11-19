@@ -42,6 +42,7 @@ namespace dl
     {
       switch(event.type)
       {
+
         case SDL_QUIT:
         {
           m_should_quit = true;

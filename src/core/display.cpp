@@ -25,10 +25,12 @@ namespace dl
     m_height = height;
     m_title = title;
 
-    if (SDL_Init (SDL_INIT_VIDEO) < 0)
+    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
     {
       throw std::runtime_error ("It was not possible to initialize SDL2");
     }
+
+    /* SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1"); */
 
     /* const SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL); */
     const SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
