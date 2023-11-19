@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description=f'Utils for building and running {T
 parser.add_argument('--run', '-r', action='store_true', help='run an already built binary')
 parser.add_argument('--make', '-m', action='store_true', help='run make in the project')
 parser.add_argument('--build', '-b', action='store_true', help='build dialectics')
+parser.add_argument('--format', '-f', action='store_true', help='format code')
 
 def build(build_path):
     if os.path.isdir(build_path) == False:
@@ -32,6 +33,9 @@ def run(target_path, data_path):
     shutil.copytree(data_path, build_data_path)
     os.chdir(target_path)
     os.system(f'./{TARGET_NAME}')
+
+def format():
+    os.system('find src -not \( -path src/world/generators/lib -prune \) \( -iname \*.hpp -or -name \*.cpp \) | xargs clang-format --verbose -i -style=file')
 
 def main():
     args = parser.parse_args()
@@ -54,6 +58,9 @@ def main():
             sys.exit()
     if args.run:
         run(target_path, data_path)
+
+    if args.format:
+        format()
 
     if len(sys.argv) < 2:
         status = build(build_path)

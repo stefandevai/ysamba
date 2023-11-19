@@ -5,14 +5,13 @@
 
 namespace dl
 {
-  class Body
-  {
-    public:
-      Position position;
-      /* Velocity velocity; */
-      bool is_static = false;
+class Body
+{
+ public:
+  Position position;
+  /* Velocity velocity; */
+  bool is_static = false;
 
-      Body();
-  };
-}
-
+  Body();
+};
+}  // namespace dl

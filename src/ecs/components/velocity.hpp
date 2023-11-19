@@ -2,10 +2,10 @@
 
 namespace dl
 {
-    struct Velocity
-    {
-        double x;
-        double y;
-        double z;
-    };
-}
+struct Velocity
+{
+  double x;
+  double y;
+  double z;
+};
+}  // namespace dl

@@ -1,124 +1,124 @@
 #include "./asset_manager.hpp"
 
-#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
-#include "../graphics/texture_loader.hpp"
-#include "../graphics/shader_loader.hpp"
+
+#include <nlohmann/json.hpp>
+
 #include "../graphics/font_loader.hpp"
+#include "../graphics/shader_loader.hpp"
+#include "../graphics/texture_loader.hpp"
 
 namespace dl
 {
-  AssetManager::AssetManager (const std::filesystem::path& filepath) : m_filepath (filepath)
-  {
-    // Get base dir from the config filepath
-    m_base_dir = filepath.string();
-    m_base_dir.remove_filename();
+AssetManager::AssetManager(const std::filesystem::path& filepath) : m_filepath(filepath)
+{
+  // Get base dir from the config filepath
+  m_base_dir = filepath.string();
+  m_base_dir.remove_filename();
 
-    // Load config file
-    m_json.load (m_filepath);
-    m_init_assets();
+  // Load config file
+  m_json.load(m_filepath);
+  m_init_assets();
+}
+
+template <typename T, typename... Args>
+void AssetManager::add(const std::string& id, const std::string& filepath, Args... args)
+{
+  // TODO: Better handling of existing textures
+  // If the key already exists just return
+  if (m_assets.find(id) != m_assets.end())
+  {
+    return;
   }
 
-  template<typename T, typename... Args>
-  void AssetManager::add (const std::string& id, const std::string& filepath, Args... args)
-  {
-    // TODO: Better handling of existing textures
-    // If the key already exists just return
-    if (m_assets.find (id) != m_assets.end())
-    {
-      return;
-    }
+  auto asset_loader = std::make_unique<T>(m_base_dir / filepath, args...);
+  std::weak_ptr<Asset> asset_ptr;
+  /* assert (asset_loader != nullptr); */
+  /* assert (asset_ptr != nullptr); */
+  m_assets.emplace(id, std::make_pair(std::move(asset_ptr), std::move(asset_loader)));
+}
 
-    auto asset_loader = std::make_unique<T> (m_base_dir / filepath, args...);
-    std::weak_ptr<Asset> asset_ptr;
-    /* assert (asset_loader != nullptr); */
-    /* assert (asset_ptr != nullptr); */
-    m_assets.emplace (id, std::make_pair (std::move (asset_ptr), std::move (asset_loader)));
+void AssetManager::m_init_assets()
+{
+  if (m_json.object[ASSET_OBJECT_ASSETS] == nullptr)
+  {
+    spdlog::warn("Project has no assets.");
+    return;
   }
 
-  void AssetManager::m_init_assets()
+  auto assets = m_json.object[ASSET_OBJECT_ASSETS].get<std::vector<nlohmann::json>>();
+
+  for (auto& asset_info : assets)
   {
-    if (m_json.object[ASSET_OBJECT_ASSETS] == nullptr)
+    const auto id = asset_info[ASSET_PARAMETER_ID].get<std::string>();
+    const auto type_tag = asset_info[ASSET_PARAMETER_TYPE].get<std::string>();
+    AssetType type = AssetType::NONE;
+
+    try
     {
-      spdlog::warn ("Project has no assets.");
-      return;
+      type = m_asset_types.at(type_tag);
+    }
+    catch (std::out_of_range& e)
+    {
+      spdlog::warn("Unknown asset type {}.\n{}", type_tag, e.what());
+      continue;
     }
 
-    auto assets = m_json.object[ASSET_OBJECT_ASSETS].get<std::vector<nlohmann::json>>();
-
-    for (auto& asset_info : assets)
+    switch (type)
     {
-      const auto id       = asset_info[ASSET_PARAMETER_ID].get<std::string>();
-      const auto type_tag = asset_info[ASSET_PARAMETER_TYPE].get<std::string>();
-      AssetType type      = AssetType::NONE;
+    case AssetType::TEXTURE:
+    {
+      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
+      // TODO: Parse all texture types
+      // const auto texture_type = asset_info["textureType"].get<std::string>();
+      const auto texture_type = TextureType::DIFFUSE;
 
-      try
+      add<TextureLoader>(id, filepath, texture_type);
+    }
+    break;
+
+    case AssetType::SHADER:
+    {
+      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
+      add<ShaderLoader>(id, filepath);
+    }
+    break;
+
+    case AssetType::TEXTURE_ATLAS:
+    {
+      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
+      const auto uniform = asset_info[ASSET_PARAMETER_UNIFORM].get<bool>();
+      // TODO: Parse all texture types
+      // const auto texture_type = asset_info["textureType"].get<std::string>();
+      const auto texture_type = TextureType::DIFFUSE;
+
+      if (uniform)
       {
-        type = m_asset_types.at (type_tag);
+        const auto horizontal_frames = asset_info[ASSET_PARAMETER_HORIZONTAL_FRAMES].get<int>();
+        const auto vertical_frames = asset_info[ASSET_PARAMETER_VERTICAL_FRAMES].get<int>();
+
+        add<TextureLoader>(id, filepath, texture_type, horizontal_frames, vertical_frames);
       }
-      catch (std::out_of_range& e)
+      else
       {
-        spdlog::warn ("Unknown asset type {}.\n{}", type_tag, e.what());
-        continue;
+        // TODO: Implement functionality for non uniform texture atlases
       }
+    }
+    break;
 
-      switch (type)
-      {
-        case AssetType::TEXTURE:
-        {
-          const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-          // TODO: Parse all texture types
-          // const auto texture_type = asset_info["textureType"].get<std::string>();
-          const auto texture_type = TextureType::DIFFUSE;
+    case AssetType::FONT:
+    {
+      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
+      const auto size = asset_info[ASSET_PARAMETER_SIZE].get<std::size_t>();
 
-          add<TextureLoader> (id, filepath, texture_type);
-        }
-        break;
+      add<FontLoader>(id, filepath, size);
+    }
+    break;
 
-        case AssetType::SHADER:
-        {
-          const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-          add<ShaderLoader> (id, filepath);
-        }
-        break;
-
-        case AssetType::TEXTURE_ATLAS:
-        {
-          const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-          const auto uniform  = asset_info[ASSET_PARAMETER_UNIFORM].get<bool>();
-          // TODO: Parse all texture types
-          // const auto texture_type = asset_info["textureType"].get<std::string>();
-          const auto texture_type = TextureType::DIFFUSE;
-
-          if (uniform)
-          {
-            const auto horizontal_frames = asset_info[ASSET_PARAMETER_HORIZONTAL_FRAMES].get<int>();
-            const auto vertical_frames   = asset_info[ASSET_PARAMETER_VERTICAL_FRAMES].get<int>();
-
-            add<TextureLoader> (id, filepath, texture_type, horizontal_frames, vertical_frames);
-          }
-          else
-          {
-            // TODO: Implement functionality for non uniform texture atlases
-          }
-        }
-        break;
-
-
-        case AssetType::FONT:
-        {
-          const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-          const auto size     = asset_info[ASSET_PARAMETER_SIZE].get<std::size_t>();
-
-          add<FontLoader> (id, filepath, size);
-        }
-        break;
-
-        default:
-          spdlog::warn ("Unknown asset type {}", type_tag);
-          break;
-      }
+    default:
+      spdlog::warn("Unknown asset type {}", type_tag);
+      break;
     }
   }
 }
-
+}  // namespace dl

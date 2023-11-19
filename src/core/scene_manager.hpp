@@ -2,40 +2,41 @@
 
 #include <map>
 #include <memory>
+
 #include "../scenes/scene.hpp"
 #include "./json.hpp"
 
 namespace dl
 {
-  enum SceneType
-  {
-    HOME_MENU,
-    WORLD_CREATION,
-    GAMEPLAY,
-  };
+enum SceneType
+{
+  HOME_MENU,
+  WORLD_CREATION,
+  GAMEPLAY,
+};
 
-  class Renderer;
-  class ViewCamera;
+class Renderer;
+class ViewCamera;
 
-  class SceneManager
-  {
-    public:
-      SceneManager(ViewCamera& camera);
+class SceneManager
+{
+ public:
+  SceneManager(ViewCamera& camera);
 
-      static void set_scene(const std::string& key, ViewCamera& camera);
-      void update(const uint32_t delta);
-      void render(Renderer& renderer);
-      /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
+  static void set_scene(const std::string& key, ViewCamera& camera);
+  void update(const uint32_t delta);
+  void render(Renderer& renderer);
+  /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
 
-      inline std::shared_ptr<Scene> get_current_scene() const { return m_current_scene; };
+  inline std::shared_ptr<Scene> get_current_scene() const { return m_current_scene; };
 
-    private:
-      ViewCamera& m_camera;
-      JSON m_json{"./data/game.json"};
-      std::string m_inital_scene_key;
-      static std::shared_ptr<Scene> m_current_scene;
-      static std::map<std::string, SceneType> m_scenes_data;
+ private:
+  ViewCamera& m_camera;
+  JSON m_json{"./data/game.json"};
+  std::string m_inital_scene_key;
+  static std::shared_ptr<Scene> m_current_scene;
+  static std::map<std::string, SceneType> m_scenes_data;
 
-      void m_load();
-  };
-}
+  void m_load();
+};
+}  // namespace dl

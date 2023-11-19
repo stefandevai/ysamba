@@ -2,5 +2,5 @@
 
 namespace dl
 {
-  Body::Body() {  }
-}
+Body::Body() {}
+}  // namespace dl

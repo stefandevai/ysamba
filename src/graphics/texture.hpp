@@ -1,8 +1,9 @@
 #pragma once
 
-#include <string>
 #include <array>
 #include <glm/vec2.hpp>
+#include <string>
+
 #include "../core/asset.hpp"
 
 namespace dl
@@ -16,19 +17,19 @@ enum class TextureType
 
 class Texture : public Asset
 {
-public:
+ public:
   // Create single texture
-  Texture (const std::string& filepath, const TextureType type);
+  Texture(const std::string& filepath, const TextureType type);
   // Create uniform texture atlas
-  Texture (const std::string& filepath, const TextureType type, const int horizontal_frames, const int vertical_frames);
+  Texture(const std::string& filepath, const TextureType type, const int horizontal_frames, const int vertical_frames);
   // Create empty texture in order to load it later
-  Texture (const int width, const int height, const TextureType type);
+  Texture(const int width, const int height, const TextureType type);
   // Create texture providing raw data
-  Texture (const std::vector<unsigned char>& data, const int width, const int height);
+  Texture(const std::vector<unsigned char>& data, const int width, const int height);
   ~Texture();
 
-  void load (const std::string& filepath);
-  void load (const unsigned char* data, const int width, const int height, unsigned int format);
+  void load(const std::string& filepath);
+  void load(const unsigned char* data, const int width, const int height, unsigned int format);
   void bind();
   void unbind();
   inline unsigned int get_id() const { return m_id; }
@@ -38,19 +39,19 @@ public:
   inline int get_vertical_frames() const { return m_vertical_frames; }
   inline TextureType get_type() const { return m_type; }
   // TODO: Implement irregular frame calculations
-  float get_frame_width (const int frame) const;
-  float get_frame_height (const int frame) const;
+  float get_frame_width(const int frame) const;
+  float get_frame_height(const int frame) const;
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> get_frame_coords (const int frame) const;
+  std::array<glm::vec2, 4> get_frame_coords(const int frame) const;
   /* void set_custom_uv (const glm::vec2& uv, const float width, const float height); */
 
-protected:
+ protected:
   const TextureType m_type = TextureType::DIFFUSE;
   const int m_horizontal_frames;
   const int m_vertical_frames;
   unsigned int m_id = 0;
-  int m_width       = 0;
-  int m_height      = 0;
+  int m_width = 0;
+  int m_height = 0;
   /* bool m_has_custom_uv = false; */
   /* glm::vec2 m_custom_uv{}; */
   /* float m_frame_width = 0.0f; */
@@ -58,5 +59,4 @@ protected:
 
   void m_load_empty();
 };
-}
-
+}  // namespace dl

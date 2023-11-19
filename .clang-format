@@ -9,7 +9,7 @@ BreakBeforeBraces: Allman
 AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: false
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: None
+AlignConsecutiveAssignments: false
 BinPackArguments: false
 BinPackParameters: false
 AlignTrailingComments: false

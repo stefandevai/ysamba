@@ -2,9 +2,9 @@
 
 namespace dl
 {
-  class Renderable
-  {
-  public:
-    virtual ~Renderable() {}
-  };
-}
+class Renderable
+{
+ public:
+  virtual ~Renderable() {}
+};
+}  // namespace dl

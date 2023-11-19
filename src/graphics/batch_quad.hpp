@@ -1,10 +1,11 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-#include <glm/glm.hpp>
-#include "./quad.hpp"
+
 #include "./layer.hpp"
+#include "./quad.hpp"
 
 namespace dl
 {
@@ -16,16 +17,16 @@ class ShaderProgram;
 
 class BatchQuad : public Layer
 {
-public:
+ public:
   BatchQuad(std::shared_ptr<ShaderProgram> shader);
   ~BatchQuad();
 
-  void render ();
-  void emplace (const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
+  void render();
+  void emplace(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
   void init_emplacing();
   void finalize_emplacing();
 
-private:
+ private:
   using Layer::emplace;
 
   struct VertexData
@@ -40,17 +41,16 @@ private:
     COLOR_INDEX
   };
 
-  static const unsigned MAX_QUADS  = 10000;
-  static const unsigned VERTEX_SIZE  = sizeof (VertexData);
-  static const unsigned QUAD_SIZE  = 4 * VERTEX_SIZE;
-  static const unsigned BUFFER_SIZE  = MAX_QUADS * QUAD_SIZE;
+  static const unsigned MAX_QUADS = 10000;
+  static const unsigned VERTEX_SIZE = sizeof(VertexData);
+  static const unsigned QUAD_SIZE = 4 * VERTEX_SIZE;
+  static const unsigned BUFFER_SIZE = MAX_QUADS * QUAD_SIZE;
   static const unsigned INDICES_SIZE = 6 * MAX_QUADS;
 
-  VertexData* m_vertex_buffer = nullptr; // Needed to write data to the mapped vertex buffer
+  VertexData* m_vertex_buffer = nullptr;  // Needed to write data to the mapped vertex buffer
   unsigned int m_vao;
   unsigned int m_vbo;
   unsigned int m_ebo;
   unsigned int m_index_count = 0;
 };
-}
-
+}  // namespace dl

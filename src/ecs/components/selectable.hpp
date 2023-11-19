@@ -2,9 +2,8 @@
 
 namespace dl
 {
-    struct Selectable
-    {
-        bool selected = false;
-    };
-}
-
+struct Selectable
+{
+  bool selected = false;
+};
+}  // namespace dl

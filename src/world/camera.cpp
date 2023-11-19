@@ -4,45 +4,45 @@
 
 namespace dl
 {
-  Camera::Camera() { }
+Camera::Camera() {}
 
-  void Camera::follow(const Position& target, const Size& tilemap_size)
+void Camera::follow(const Position& target, const Size& tilemap_size)
+{
+  const int camera_x = target.x - size.w / 2;
+  const int camera_y = target.y - size.h / 2;
+
+  position.x = std::min(std::max(camera_x, 0), tilemap_size.w - size.w);
+  position.y = std::min(std::max(camera_y, 0), tilemap_size.h - size.h);
+
+  // Fix camera movement when target is close to bounds
+  if (position.x != camera_x && !m_fixed_x)
   {
-    const int camera_x = target.x - size.w / 2;
-    const int camera_y = target.y - size.h / 2;
-
-    position.x = std::min(std::max(camera_x, 0), tilemap_size.w - size.w);
-    position.y = std::min(std::max(camera_y, 0), tilemap_size.h - size.h);
-
-    // Fix camera movement when target is close to bounds
-    if (position.x != camera_x && !m_fixed_x)
-    {
-      m_fixed_x = true;
-    }
-    else if (m_fixed_x && position.x == camera_x)
-    {
-      m_fixed_x = false;
-    }
-
-    if (position.y != camera_y && !m_fixed_y)
-    {
-      m_fixed_y = true;
-    }
-    else if (m_fixed_y && position.y == camera_y)
-    {
-      m_fixed_y = false;
-    }
+    m_fixed_x = true;
+  }
+  else if (m_fixed_x && position.x == camera_x)
+  {
+    m_fixed_x = false;
   }
 
-  void Camera::move_to(const int x, const int y, const int z)
+  if (position.y != camera_y && !m_fixed_y)
   {
-    if (x == position.x && y == position.y && z == position.z)
-    {
-      return;
-    }
-
-    position.x = x;
-    position.y = y;
-    position.z = z;
+    m_fixed_y = true;
+  }
+  else if (m_fixed_y && position.y == camera_y)
+  {
+    m_fixed_y = false;
   }
 }
+
+void Camera::move_to(const int x, const int y, const int z)
+{
+  if (x == position.x && y == position.y && z == position.z)
+  {
+    return;
+  }
+
+  position.x = x;
+  position.y = y;
+  position.z = z;
+}
+}  // namespace dl

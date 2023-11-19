@@ -1,8 +1,9 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-#include <glm/glm.hpp>
+
 #include "./layer.hpp"
 
 namespace dl
@@ -17,16 +18,16 @@ class ShaderProgram;
 
 class Batch2D : public Layer
 {
-public:
+ public:
   Batch2D(std::shared_ptr<ShaderProgram> shader);
   ~Batch2D();
 
-  void render ();
-  void emplace (const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
+  void render();
+  void emplace(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
   void init_emplacing();
   void finalize_emplacing();
 
-private:
+ private:
   using Layer::emplace;
 
   struct VertexData
@@ -45,17 +46,17 @@ private:
     COLOR_INDEX
   };
 
-  static const unsigned MAX_SPRITES  = 10000;
-  static const unsigned VERTEX_SIZE  = sizeof (VertexData);
-  static const unsigned SPRITE_SIZE  = 4 * VERTEX_SIZE;
-  static const unsigned BUFFER_SIZE  = MAX_SPRITES * SPRITE_SIZE;
+  static const unsigned MAX_SPRITES = 10000;
+  static const unsigned VERTEX_SIZE = sizeof(VertexData);
+  static const unsigned SPRITE_SIZE = 4 * VERTEX_SIZE;
+  static const unsigned BUFFER_SIZE = MAX_SPRITES * SPRITE_SIZE;
   static const unsigned INDICES_SIZE = 6 * MAX_SPRITES;
 
-  VertexData* m_vertex_buffer = nullptr; // Needed to write data to the mapped vertex buffer
+  VertexData* m_vertex_buffer = nullptr;  // Needed to write data to the mapped vertex buffer
   unsigned int m_vao;
   unsigned int m_vbo;
   unsigned int m_ebo;
   unsigned int m_index_count = 0;
   std::vector<std::shared_ptr<Texture>> m_textures;
 };
-}
+}  // namespace dl
