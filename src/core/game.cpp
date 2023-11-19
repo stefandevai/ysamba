@@ -7,7 +7,7 @@ namespace dl
 {
   Game::Game() { }
 
-  void Game::load(int argc, char* argv[])
+  void Game::load()
   {
     try
     {
@@ -18,33 +18,9 @@ namespace dl
       m_display.load(width, height, title);
       m_camera.set_frustrum (0.0f, width, height, 0.0f);
       m_renderer.add_layer("world", "world");
-      m_renderer.add_layer("gui", "gui");
-      m_renderer.add_layer("quad", "quad");
-      m_renderer.add_layer("text", "text");
-
-      /* auto params = TCOD_ContextParams{}; */
-      /* params.tcod_version = TCOD_COMPILEDVERSION; */
-      /* params.argc = argc; */
-      /* params.argv = argv; */
-      /* params.renderer_type = TCOD_RENDERER_SDL2; */
-      /* params.vsync = 1; */
-      /* /1* params.sdl_window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED; *1/ */
-      /* params.sdl_window_flags = SDL_WINDOW_RESIZABLE; */
-      /* params.window_title = m_lua.get_variable<const char*>("title"); */
-
-      /* const std::string tilesheet_path = m_lua.get_variable<std::string>("tilesheet_path"); */
-      /* const int tilesheet_width = m_lua.get_variable<int>("tilesheet_width"); */
-      /* const int tilesheet_height = m_lua.get_variable<int>("tilesheet_height"); */
-      /* auto tileset = tcod::load_tilesheet(dl::FileManager::get_full_path(tilesheet_path), {tilesheet_width, tilesheet_height}, tcod::CHARMAP_TCOD); */
-      /* params.tileset = tileset.get(); */
-
-      /* const int console_width = m_lua.get_variable<int>("console_width"); */
-      /* const int console_height = m_lua.get_variable<int>("console_height"); */
-
-      /* m_console = tcod::Console{console_width, console_height}; */
-      /* params.console = m_console.get(); */
-
-      /* m_context = tcod::Context(params); */
+      m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad);
+      m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true);
+      m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true);
     }
     catch (const std::exception& exc)
     {
@@ -62,6 +38,9 @@ namespace dl
       while (!m_input_manager->should_quit())
       {
         clock.tick();
+
+        const auto dt = clock.delta / 1000.f;
+        m_camera.move(-20.f*dt, 0.f, 0.f);
 
         m_scene_manager.update(clock.delta);
         m_input_manager->update();

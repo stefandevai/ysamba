@@ -30,6 +30,7 @@ namespace dl
       const TileData get(const int x, const int y, const int z);
       Size get_tilemap_size(const int z);
       inline int get_seed() const { return m_seed; };
+      inline size_t get_chunk_size() const { return m_chunk_size; };
       inline Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
 
       template<class Archive> 
@@ -39,13 +40,14 @@ namespace dl
       }
 
     private:
-      JSON m_json{"./data/tilemap/tiles.json"};
+      JSON m_json{"./data/world.json"};
       /* std::vector<std::shared_ptr<Tilemap>> m_tilemaps; */
       std::vector<Tilemap> m_tilemaps;
       std::map<int, TileData> m_tile_data;
       int m_depth_min = 0;
       int m_depth_max = 1;
       int m_seed = 0;
+      size_t m_chunk_size = 0;
       std::map<std::string, Society> m_societies;
 
       void m_load_tile_data();

@@ -1,9 +1,9 @@
 #include "./core/game.hpp"
 
-int main(int argc, char* argv[])
+int main()
 {
   dl::Game game{};
 
-  game.load(argc, argv);
+  game.load();
   game.run();
 }

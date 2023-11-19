@@ -21,7 +21,7 @@ namespace dl
     void update (entt::registry& registry);
     inline const glm::vec3& get_position() const { return m_position; }
     inline glm::mat4 get_view_matrix() const { return glm::lookAt (m_position, m_front, m_up); }
-    // inline glm::mat4 get_projection_matrix() const { return glm::ortho(m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far); }
+    inline glm::mat4 get_default_view_matrix() const { return glm::lookAt ({0.f, 0.f, 500.f}, {0.f, 0.f, -1.f}, m_up); }
     inline glm::mat4 get_projection_matrix() const { return glm::ortho (m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far); }
     inline glm::mat4 get_vp_matrix() const
     {

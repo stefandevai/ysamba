@@ -20,8 +20,8 @@ class Renderer
 public:
   enum class LayerType
   {
-    SPRITE,
-    QUAD,
+    Sprite,
+    Quad,
   };
 
   Renderer (AssetManager& asset_manager);
@@ -32,7 +32,7 @@ public:
   void batch (const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z);
   void finalize (const std::string& layer_id);
   void render (const ViewCamera& camera);
-  void add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type = LayerType::SPRITE);
+  void add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type = LayerType::Sprite, const bool ignore_camera = false);
 
   std::shared_ptr<Texture> get_texture (const std::string& resource_id);
   inline bool has_layer (const std::string& layer_id) const { return m_layers.contains(layer_id); }

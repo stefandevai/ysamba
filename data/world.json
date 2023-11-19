@@ -1,4 +1,5 @@
 {
+  "chunk_size": 100,
   "tiles": [
     {
       "id": 0,

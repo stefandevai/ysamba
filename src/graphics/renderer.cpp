@@ -16,21 +16,22 @@ namespace dl
 {
 Renderer::Renderer (AssetManager& asset_manager) : m_asset_manager (asset_manager) { }
 
-void Renderer::add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type)
+void Renderer::add_layer (const std::string& layer_id, const std::string shader_id, const LayerType layer_type, const bool ignore_camera)
 {
   const auto shader = m_asset_manager.get<ShaderProgram> (shader_id);
   std::shared_ptr<Layer> layer;
 
   switch(layer_type)
   {
-    case LayerType::SPRITE:
+    case LayerType::Sprite:
       layer.reset(new Batch2D(shader));
       break;
-    case LayerType::QUAD:
+    case LayerType::Quad:
       layer.reset(new BatchQuad(shader));
       break;
   }
 
+  layer->set_ignore_camera(ignore_camera);
   m_layers.emplace (layer_id, layer);
 }
 
@@ -100,13 +101,22 @@ void Renderer::render (const ViewCamera& camera)
 {
   glm::mat4 model_matrix = glm::mat4 (1.0f);
 
-  for (const auto& p : m_layers)
+  for (const auto& layer : m_layers)
   {
-    const auto& shader = p.second->shader;
+    const auto& shader = layer.second->shader;
     assert(shader != nullptr);
     shader->use();
-    shader->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model_matrix);
-    p.second->render();
+
+    if (layer.second->get_ignore_camera())
+    {
+      shader->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_default_view_matrix() * model_matrix);
+    }
+    else
+    {
+      shader->set_mat_4 ("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model_matrix);
+    }
+
+    layer.second->render();
   }
 }
 }

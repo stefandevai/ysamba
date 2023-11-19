@@ -11,6 +11,7 @@ namespace dl
   World::World()
   {
     m_load_tile_data();
+    m_chunk_size = m_json.object["chunk_size"];
   }
 
   void World::generate(const int width, const int height, const int seed)
