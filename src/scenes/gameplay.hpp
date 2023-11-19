@@ -4,10 +4,9 @@
 #include <memory>
 
 #include "../core/input_manager.hpp"
+#include "../ecs/ecs.hpp"
 #include "../world/world.hpp"
 #include "./scene.hpp"
-/* #include "../world/camera.hpp" */
-#include "../ecs/ecs.hpp"
 
 namespace dl
 {
@@ -35,7 +34,6 @@ class Gameplay : public Scene
 
   entt::registry m_registry;
   World m_world;
-  /* Camera m_camera; */
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
   ECS m_ecs{m_registry, m_world, m_camera};
   State m_current_state = State::PAUSED;
