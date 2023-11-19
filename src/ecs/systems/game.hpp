@@ -17,6 +17,8 @@ namespace dl
       World& m_world;
 
       void m_add_to_spatial_hash (entt::registry& registry, entt::entity entity);
+      void m_update_spatial_hash (entt::registry& registry, entt::entity entity);
+      void m_remove_from_spatial_hash (entt::registry& registry, entt::entity entity);
   };
 }
 

@@ -14,7 +14,7 @@ namespace dl
   void PhysicsSystem::update(entt::registry &registry, const uint32_t delta)
   {
     auto view = registry.view<Position, Velocity>();
-    view.each([this, delta](auto &position, auto &velocity) {
+    view.each([this, &registry, delta](auto entity, auto &position, auto &velocity) {
       if (velocity.x == 0 && velocity.y == 0)
       {
         return;
@@ -29,8 +29,10 @@ namespace dl
 
       if (target_tile.flags.contains("WALKABLE"))
       {
-        position.x = x_candidate;
-        position.y = y_candidate;
+        registry.patch<Position>(entity, [x_candidate, y_candidate](auto& position) {
+          position.x = x_candidate;
+          position.y = y_candidate;
+        });
       }
 
       velocity.x = 0.;

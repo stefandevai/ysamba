@@ -137,7 +137,7 @@ namespace dl
         auto& position = m_registry.get<Position>(entity);
         auto& selectable = m_registry.get<Selectable>(entity);
 
-        if (x >= position.x && x <= position.x + 1.f && y >= position.y && y <= position.y + 1.f)
+        if (x >= std::round(position.x) && x <= std::round(position.x) + 1.f && y >= std::round(position.y) && y <= std::round(position.y) + 1.f)
         {
           selectable.selected = true;
         }

@@ -24,10 +24,11 @@ namespace dl
     m_number_of_cells = m_horizontal_cells * m_vertical_cells;
   }
 
-  void SpatialHash::add(const entt::entity object, const int x, const int y)
+  uint32_t SpatialHash::add(const entt::entity object, const int x, const int y)
   {
     const auto key = m_get_key(x, y);
     m_hash.emplace(key, object);
+    return key;
   }
 
   void SpatialHash::remove(const entt::entity object, const uint32_t key)
@@ -43,17 +44,18 @@ namespace dl
     }
   }
 
-  void SpatialHash::update(const entt::entity object, const int x, const int y, const uint32_t key)
+  uint32_t SpatialHash::update(const entt::entity object, const int x, const int y, const uint32_t key)
   {
     const auto new_key = m_get_key(x, y);
 
     if (new_key == key)
     {
-      return;
+      return key;
     }
 
     remove(object, key);
     m_hash.emplace(new_key, object);
+    return key;
   }
 
   std::vector<entt::entity> SpatialHash::get(const int x, const int y)
