@@ -10,7 +10,7 @@ enum Sex
 
 struct Biology
 {
-  Biology(const Sex sex, const double base_speed) : sex(sex), base_speed(base_speed), current_speed(base_speed) {}
+  Biology(const Sex sex, const int base_speed) : sex(sex), base_speed(base_speed), speed(base_speed) {}
 
   /* double age_in_days; */
   /* double height_in_cm; */
@@ -19,7 +19,8 @@ struct Biology
 
   // STR:10;END:10;QI:10;SOCIAL:INTRO;
   /* std::string genetics; */
-  double base_speed;
-  double current_speed;
+  int base_speed;
+  int speed;
+  double action_points = 100.0;
 };
 }  // namespace dl

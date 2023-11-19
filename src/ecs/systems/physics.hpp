@@ -16,6 +16,6 @@ class PhysicsSystem
  private:
   World& m_world;
 
-  bool m_collides(entt::registry& registry, const int x, const int y);
+  bool m_collides(entt::registry& registry, entt::entity, const int x, const int y, const int z);
 };
 }  // namespace dl

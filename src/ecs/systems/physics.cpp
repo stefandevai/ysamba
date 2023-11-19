@@ -5,6 +5,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "../../world/world.hpp"
+#include "../components/biology.hpp"
 #include "../components/position.hpp"
 #include "../components/velocity.hpp"
 
@@ -14,48 +15,88 @@ PhysicsSystem::PhysicsSystem(World& world) : m_world(world) {}
 
 void PhysicsSystem::update(entt::registry& registry, const double delta)
 {
-  auto view = registry.view<Position, Velocity>();
-  view.each([this, &registry, delta](auto entity, auto& position, auto& velocity) {
+  auto view = registry.view<Biology, Position, Velocity>();
+  view.each([this, &registry, delta](auto entity, auto& biology, auto& position, auto& velocity) {
     if (velocity.x == 0 && velocity.y == 0)
     {
       return;
     }
 
-    const double x_candidate = position.x + velocity.x * delta;
-    const double y_candidate = position.y + velocity.y * delta;
-    const double z_candidate = position.z + velocity.z * delta;
+    biology.action_points -= biology.speed * 1000.0 * delta;
 
-    // Check if the tile changed
-    if (std::abs(position.x - x_candidate) >= 1.0 || std::abs(position.y - y_candidate) >= 1.0)
+    if (biology.action_points > 0.0)
     {
-      const auto x_round = std::round(x_candidate);
-      const auto y_round = std::round(y_candidate);
-      const auto& target_tile = m_world.get(x_round, y_round, z_candidate);
-      auto can_walk = true;
+      return;
+    }
 
-      if (!target_tile.flags.contains("WALKABLE"))
+    biology.action_points = 200.0;
+
+    const double x_candidate = position.x + velocity.x * (biology.speed / 100.0);
+    const double y_candidate = position.y + velocity.y * (biology.speed / 100.0);
+    const double z_candidate = position.z;
+
+    size_t advance_x = std::abs(x_candidate - position.x);
+    size_t advance_y = std::abs(y_candidate - position.y);
+
+    auto target_x = position.x;
+    auto target_y = position.y;
+
+    size_t counter_x = 0;
+    size_t counter_y = 0;
+
+    // If can't advance advance_x or advance_y, check if it's possible to advance
+    // to the tiles before that one.
+    while (counter_x <= advance_x || counter_y <= advance_y)
+    {
+      if (counter_x <= advance_x)
       {
-        can_walk = false;
+        const auto x = position.x + velocity.x * (biology.speed / 100.0) - counter_x;
+        const auto x_round = std::round(x);
+
+        if (x_round < 0)
+        {
+          target_x = 0;
+          counter_x = advance_x + 1;
+        }
+        else if (m_collides(registry, entity, x_round, std::round(position.y), z_candidate))
+        {
+          ++counter_x;
+        }
+        else
+        {
+          target_x = x;
+          counter_x = advance_x + 1;
+        }
       }
 
-      if (m_collides(registry, x_round, y_round))
+      if (counter_y <= advance_y)
       {
-        can_walk = false;
-      }
+        const auto y = position.y + velocity.y * (biology.speed / 100.0) - counter_y;
+        const auto y_round = std::round(y);
 
-      if (can_walk)
-      {
-        registry.patch<Position>(entity, [x_candidate, y_candidate](auto& position) {
-          position.x = x_candidate;
-          position.y = y_candidate;
-        });
+        if (y_round < 0)
+        {
+          target_y = 0;
+          counter_y = advance_y + 1;
+        }
+        else if (m_collides(registry, entity, std::round(position.x), y_round, z_candidate))
+        {
+          ++counter_y;
+        }
+        else
+        {
+          target_y = y;
+          counter_y = advance_y + 1;
+        }
       }
     }
-    // Tile has not changed
-    else
+
+    if (target_x != position.x || target_y != position.y)
     {
-      position.x = x_candidate;
-      position.y = y_candidate;
+      registry.patch<Position>(entity, [target_x, target_y](auto& position) {
+        position.x = target_x;
+        position.y = target_y;
+      });
     }
 
     velocity.x = 0.;
@@ -63,15 +104,27 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
   });
 }
 
-bool PhysicsSystem::m_collides(entt::registry& registry, const int x, const int y)
+bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, const int x, const int y, const int z)
 {
+  auto& target_tile = m_world.get(x, y, z);
+
+  if (!target_tile.flags.contains("WALKABLE"))
+  {
+    return true;
+  }
+
   const auto& entities = m_world.spatial_hash.get(x, y);
 
-  for (const auto entity : entities)
+  for (const auto e : entities)
   {
-    if (registry.all_of<Position>(entity))
+    if (e == entity)
     {
-      auto& position = registry.get<Position>(entity);
+      continue;
+    }
+
+    if (registry.all_of<Position>(e))
+    {
+      auto& position = registry.get<Position>(e);
 
       if (std::round(position.x) == x && std::round(position.y) == y)
       {
