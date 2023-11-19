@@ -1,5 +1,7 @@
-#include <SDL.h>
 #include "./input_manager.hpp"
+
+#include <SDL.h>
+#include <spdlog/spdlog.h>
 
 namespace dl
 {
@@ -54,7 +56,7 @@ namespace dl
           m_keyboard = SDL_GetKeyboardState(nullptr);
           int index = event.key.keysym.scancode;
 
-          std::cout << "[*] Pressed key code: " << index << '\n';
+          spdlog::debug("Pressed key code: {}", index);
 
           m_key_down[index] = true;
           m_any_key_down = true;

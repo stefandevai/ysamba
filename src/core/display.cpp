@@ -1,6 +1,5 @@
 #include "./display.hpp"
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <spdlog/spdlog.h>

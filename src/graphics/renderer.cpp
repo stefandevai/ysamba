@@ -1,4 +1,3 @@
-#include <iostream>
 #include <entt/entity/registry.hpp>
 #include "./layer.hpp"
 #include "./batch2d.hpp"

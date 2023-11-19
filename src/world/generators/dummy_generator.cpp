@@ -1,22 +1,19 @@
 #include "./dummy_generator.hpp"
 
 #include <vector>
+#include <spdlog/spdlog.h>
 #include "./tile_type.hpp"
-
-// TEMP
-#include <iostream>
-// TEMP
 
 namespace dl
 {
   Tilemap DummyGenerator::generate(const int seed)
   {
-    std::cout << "===================================\n";
-    std::cout << "= STARTING DUMMY WORLD GENERATION =\n";
-    std::cout << "===================================\n";
-    std::cout << "SEED: " << seed << '\n';
-    std::cout << "WIDTH: " << m_width << '\n';
-    std::cout << "HEIGHT: " << m_height << "\n\n";
+    spdlog::info("===================================");
+    spdlog::info("= STARTING DUMMY WORLD GENERATION =");
+    spdlog::info("===================================\n");
+    spdlog::info("SEED: {}", seed);
+    spdlog::info("WIDTH: {}", m_width);
+    spdlog::info("HEIGHT: {}\n", m_height);
 
     std::vector<int> tiles(m_width * m_height);
     Tilemap tilemap{tiles, m_width, m_height};
@@ -34,7 +31,7 @@ namespace dl
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-    std::cout << "[*] World generation finished! It took " << duration.count() << " milliseconds\n\n";
+    spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 
     return tilemap;
   }

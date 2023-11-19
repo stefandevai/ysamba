@@ -1,4 +1,6 @@
 #include "./lua_api.hpp"
+
+#include <spdlog/spdlog.h>
 #include "./file_manager.hpp"
 
 namespace dl
@@ -23,7 +25,7 @@ namespace dl
     }
     catch (const std::exception& exc)
     {
-      std::cerr << exc.what() << "\n";
+      spdlog::critical("{}", exc.what());
     }
   }
 

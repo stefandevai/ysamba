@@ -1,6 +1,8 @@
+#include "./input_manager.hpp"
+
 #include <vector>
 #include <SDL.h>
-#include "./input_manager.hpp"
+#include <spdlog/spdlog.h>
 
 namespace dl
 {
@@ -32,7 +34,7 @@ namespace dl
 
     if (context == sol::lua_nil)
     {
-      std::cout << "[x] ERROR: Could not load context: " << context_key << '\n';
+      spdlog::critical("Could not load context: {}", context_key);
       return;
     }
 
@@ -44,7 +46,7 @@ namespace dl
   {
     if (m_context == nullptr)
     {
-      std::cout << "[x] ERROR: Current context not loaded: " << m_context_key << '\n';
+      spdlog::critical("Current context not loaded: {}", m_context_key);
       return false;
     }
 
@@ -52,7 +54,7 @@ namespace dl
 
     if (action_keys.size() == 0)
     {
-      std::cout << "[x] ERROR: Could not find action in this context: " << action << '\n';
+      spdlog::critical("Could not find action in this context: {}", action);
       return false;
     }
 

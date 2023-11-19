@@ -98,7 +98,7 @@ namespace dl
     }
     else if (m_input_manager->poll_action("display_seed"))
     {
-      std::cout << "SEED: " << m_world.get_seed() << '\n';
+      spdlog::info("SEED: {}", m_world.get_seed());
     }
     else if (m_input_manager->poll_action("camera_move_west"))
     {

@@ -5,6 +5,7 @@
 #include <functional>
 #include <chrono>
 #include <random>
+#include <spdlog/spdlog.h>
 #include <libtcod.hpp>
 #include "./lib/fast_noise_lite.hpp"
 #include "./lib/poisson_disk_sampling.hpp"
@@ -12,10 +13,6 @@
 #include "./lib/bezier.hpp"
 #include "./tile_type.hpp"
 #include "./bay_data.hpp"
-
-// TEMP
-#include <iostream>
-// TEMP
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -29,41 +26,42 @@ namespace dl
     m_lua.load("generators/terrain.lua");
     // TEMP
 
-    std::cout << "=============================\n";
-    std::cout << "= STARTING WORLD GENERATION =\n";
-    std::cout << "=============================\n\n";
-    std::cout << "SEED: " << seed << '\n';
-    std::cout << "WIDTH: " << m_width << '\n';
-    std::cout << "HEIGHT: " << m_height << "\n\n";
+    spdlog::info("=============================");
+    spdlog::info("= STARTING WORLD GENERATION =");
+    spdlog::info("=============================\n");
+    spdlog::info("SEED: {}", seed);
+    spdlog::info("WIDTH: {}", m_width);
+    spdlog::info("HEIGHT: {}\n", m_height);
 
     std::vector<int> tiles(m_width * m_height);
     Tilemap tilemap{tiles, m_width, m_height};
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::cout << "[*] Generating world silhouette...\n";
+    spdlog::info("Generating world silhouette...");
+    spdlog::info("");
 
     m_generate_silhouette(tilemap.tiles, seed);
 
-    std::cout << "[*] Adjusting islands...\n";
+    spdlog::info("Adjusting islands...");
 
     // Get a vector with remaining islands in crescent order (last element is the main island)
     auto islands = m_get_islands(tilemap.tiles);
     auto& main_island = islands.back();
 
-    std::cout << "[*] Identifying coastline...\n";
+    spdlog::info("Identifying coastline...");
 
     auto coastline = m_get_coastline(tilemap.tiles, main_island);
 
-    std::cout << "[*] Identifying bays...\n";
+    spdlog::info("Identifying bays...");
 
     auto bays = m_get_bays(coastline, main_island);
 
-    std::cout << "[*] Building main island geometry...\n";
+    spdlog::info("Building main island geometry...");
 
     m_build_island_structure(main_island);
 
-    std::cout << "[*] Generating main river...\n";
+    spdlog::info("Generating main river...");
 
     m_generate_main_river(main_island, bays, tilemap.tiles, seed);
 
@@ -122,7 +120,7 @@ namespace dl
       }
     }
 
-    std::cout << "[*] World generation finished! It took " << duration.count() << " milliseconds\n\n";
+    spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 
     return tilemap;
   }
@@ -1471,10 +1469,10 @@ namespace dl
         const double combined_x = (normal.x * normal_length * bitangent_factor + tangent.x * (2.0 - bitangent_factor)) * -1.0;
         const double combined_y = (normal.y * normal_length * bitangent_factor + tangent.y * (2.0 - bitangent_factor)) * -1.0;
 
-        /* std::cout << "TANGENT: " << iteration << ' ' << tangent.x << ' ' << tangent.y << '\n'; */
-        /* std::cout << "NORMAL: " << iteration << ' ' << normal.x << ' ' << normal.y << '\n'; */
-        /* std::cout << "CURVATURE: " << iteration << ' ' << curvature << '\n'; */
-        /* std::cout << "COMBINED: " << iteration << ' ' << combined_x << ' ' << combined_y << '\n'; */
+        /* spdlog::warn("TANGENT: {} {} {}", iteration, tangent.x, tangent.y); */
+        /* spdlog::warn("NORMAL: {} {} {}", iteration, normal.x, normal.y); */
+        /* spdlog::warn("CURVATURE: {} {} {}", iteration, curvature.x, curvature.y); */
+        /* spdlog::warn("COMBINED: {} {} {}", iteration, combined_x, combined_y); */
 
         new_points_x[increment_index] = current_point.x + combined_x;
         new_points_y[increment_index] = current_point.y + combined_y;

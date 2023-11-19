@@ -1,5 +1,6 @@
 #include "game.hpp"
 
+#include <spdlog/spdlog.h>
 #include "./clock.hpp"
 #include "./file_manager.hpp"
 
@@ -9,6 +10,8 @@ namespace dl
 
   void Game::load()
   {
+    spdlog::set_level(spdlog::level::debug);
+
     try
     {
       const auto width = m_json.object["width"];
@@ -24,7 +27,7 @@ namespace dl
     }
     catch (const std::exception& exc)
     {
-      std::cerr << exc.what() << "\n";
+      spdlog::critical("{}", exc.what());
       throw;
     }
   }
@@ -50,7 +53,7 @@ namespace dl
     }
     catch (const std::exception& exc)
     {
-      std::cerr << exc.what() << "\n";
+      spdlog::critical("{}", exc.what());
       throw;
     }
   }

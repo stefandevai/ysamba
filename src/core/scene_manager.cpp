@@ -1,6 +1,7 @@
 #include "./scene_manager.hpp"
 
 #include <memory>
+#include <spdlog/spdlog.h>
 #include "../graphics/camera.hpp"
 #include "../scenes/home_menu.hpp"
 #include "../scenes/gameplay.hpp"
@@ -28,7 +29,7 @@ namespace dl
 
     if (it == m_scenes_data.end())
     {
-      std::cout << "[x] ERROR: Could not find scene: " << key << '\n';
+      spdlog::critical("Could not find scene: ", key);
       return;
     }
 
@@ -46,7 +47,7 @@ namespace dl
         m_current_scene = std::make_shared<Gameplay>(key, camera);
         break;
       default:
-        std::cout << "[x] ERROR: Could not find scene: " << key << '\n';
+        spdlog::critical("Could not find scene: ", key);
         break;
     }
   }

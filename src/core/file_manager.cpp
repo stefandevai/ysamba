@@ -1,5 +1,6 @@
-#include <iostream>
 #include "./file_manager.hpp"
+
+#include <spdlog/spdlog.h>
 
 namespace dl
 {
@@ -26,7 +27,7 @@ namespace dl
 
     if (!std::filesystem::exists(potential_path))
     {
-      std::cerr << "The path does not exist: " << potential_path.string() << "\n";
+      spdlog::critical("The path does not exist: {}", potential_path.string());
       throw std::runtime_error("The path does not exist");
     }
 

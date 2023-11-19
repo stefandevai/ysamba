@@ -5,6 +5,7 @@
 #include <climits>
 #include <SDL.h>
 #include <cereal/archives/binary.hpp>
+#include <spdlog/spdlog.h>
 #include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
 #include "../graphics/sprite.hpp"
@@ -70,7 +71,7 @@ namespace dl
     }
     else if (m_input_manager->poll_action("display_seed"))
     {
-      std::cout << "SEED: " << m_world.get_seed() << '\n';
+      spdlog::info("SEED: {}", m_world.get_seed());
     }
   }
 

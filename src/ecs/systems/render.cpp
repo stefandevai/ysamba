@@ -1,6 +1,5 @@
 #include <tgmath.h>
 #include <spdlog/spdlog.h>
-#include <iostream>
 #include "./render.hpp"
 #include "../../world/world.hpp"
 #include "../../world/camera.hpp"
