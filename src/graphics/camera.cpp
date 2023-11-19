@@ -4,7 +4,7 @@
 
 namespace dl
 {
-ViewCamera::ViewCamera() { }
+ViewCamera::ViewCamera() {}
 
 void ViewCamera::move(const float x, const float y, const float z)
 {
