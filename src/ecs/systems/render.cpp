@@ -29,21 +29,19 @@ namespace dl
     const auto tile_height = world_texture->get_frame_height(0);
     const auto horizontal_tiles = std::ceil(camera_dimensions.x / tile_width);
     const auto vertical_tiles = std::ceil(camera_dimensions.y / tile_height);
-    const int camera_offset_x = (camera_position.x + 1) / tile_width;
-    const int camera_offset_y = (camera_position.y + 1) / tile_height;
-
-    /* spdlog::warn("CAMERA POS: {} {}", camera_position.x, camera_position.y); */
+    const int camera_tile_offset_x = (camera_position.x + 1) / tile_width;
+    const int camera_tile_offset_y = (camera_position.y + 1) / tile_height;
+    const int frustum_tile_padding = 1;
 
     renderer.init("world");
 
-    for (int i = 0; i < horizontal_tiles; ++i)
+    for (int i = -frustum_tile_padding; i < horizontal_tiles + frustum_tile_padding; ++i)
     {
-      for (int j = 0; j < vertical_tiles; ++j)
+      for (int j = -frustum_tile_padding; j < vertical_tiles + frustum_tile_padding; ++j)
       {
-        const auto index_x = i + camera_offset_x;
-        const auto index_y = j + camera_offset_y;
+        const auto index_x = i + camera_tile_offset_x;
+        const auto index_y = j + camera_tile_offset_y;
         const auto& tile = m_world.get(index_x, index_y, 0.0);
-        /* const auto& tile = m_world.get(i, j, 0.0); */
         const auto& sprite = std::make_shared<Sprite>(world_texture_id, tile.id);
 
         if (sprite->texture == nullptr)
@@ -51,28 +49,30 @@ namespace dl
           sprite->texture = world_texture;
         }
 
-        renderer.batch("world", sprite, i*tile_width + camera_offset_x*tile_width, j*tile_height + camera_offset_y*tile_height, 0.0);
+        renderer.batch("world", sprite, i*tile_width + camera_tile_offset_x*tile_width, j*tile_height + camera_tile_offset_y*tile_height, 0.0);
       }
     }
 
-    /* auto view = registry.view<const Position, const Visibility, const Selectable>(); */
-    /* view.each([&renderer, camera_position](const auto &position, const auto &visibility, const auto& selectable) { */ 
-    /*   if (visibility.sprite->texture == nullptr) */
-    /*   { */
-    /*     visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id); */
-    /*   } */
+    auto view = registry.view<const Position, const Visibility, const Selectable>();
 
-    /*   if (selectable.selected) */
-    /*   { */
-    /*     visibility.sprite->set_frame(1); */
-    /*   } */
+    view.each([&renderer](const auto &position, const auto &visibility, const auto& selectable) { 
+      if (visibility.sprite->texture == nullptr)
+      {
+        visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id);
+      }
 
-    /*   const auto sprite_size = visibility.sprite->get_size(); */
-    /*   const auto position_x = static_cast<int>(std::round(position.x - camera_position.x)) * sprite_size.x; */
-    /*   const auto position_y = static_cast<int>(std::round(position.y - camera_position.y)) * sprite_size.y; */
+      if (selectable.selected)
+      {
+        visibility.sprite->set_frame(1);
+      }
 
-    /*   renderer.batch("world", visibility.sprite, position_x, position_y, 1.); */
-    /* }); */
+      const auto sprite_size = visibility.sprite->get_size();
+      const auto position_x = position.x * sprite_size.x;
+      const auto position_y = position.y * sprite_size.y;
+
+      renderer.batch("world", visibility.sprite, position_x, position_y, 1.);
+    });
+
     renderer.finalize("world");
   }
 }
