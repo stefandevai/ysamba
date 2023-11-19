@@ -8,13 +8,13 @@
 namespace dl
 {
 class Renderer;
-class ViewCamera;
-using SetSceneFunction = std::function<void(const std::string&, ViewCamera& camera)>;
+class Camera;
+using SetSceneFunction = std::function<void(const std::string&, Camera& camera)>;
 
 class Scene
 {
  public:
-  Scene(const std::string& scene_key, ViewCamera& camera);
+  Scene(const std::string& scene_key, Camera& camera);
   virtual ~Scene();
 
   virtual void load();
@@ -26,7 +26,7 @@ class Scene
  protected:
   const std::string m_scene_key;
   const std::filesystem::path m_scene_dir;
-  ViewCamera& m_camera;
+  Camera& m_camera;
   LuaAPI m_lua;
   bool m_has_loaded = false;
 };

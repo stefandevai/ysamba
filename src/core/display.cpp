@@ -15,8 +15,6 @@
 
 namespace dl
 {
-double MouseX, MouseY;
-
 Display::Display() {}
 
 void Display::load(const unsigned int width, const unsigned int height, const std::string& title)
@@ -25,18 +23,18 @@ void Display::load(const unsigned int width, const unsigned int height, const st
   m_height = height;
   m_title = title;
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
     throw std::runtime_error("It was not possible to initialize SDL2");
   }
 
   /* SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1"); */
 
-  /* const SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED |
-   * SDL_WINDOW_OPENGL); */
-  const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+  const SDL_WindowFlags window_flags =
+      (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL);
   m_window = SDL_CreateWindow(
       m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, window_flags);
+  SDL_SetWindowMinimumSize(m_window, width, height);
 
 #if __APPLE__
   // Always required on Mac
@@ -56,15 +54,17 @@ void Display::load(const unsigned int width, const unsigned int height, const st
   SDL_GL_MakeCurrent(m_window, m_gl_context);
   SDL_GL_SetSwapInterval(1);
 
-  m_running = true;
-
   if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
   {
     spdlog::critical("Failed to initialize GLAD");
   }
 
   // OpenGL Viewport settings
-  glViewport(0, 0, m_width, m_height);
+  int maximized_width, maximized_height;
+  SDL_GetWindowSize(m_window, &maximized_width, &maximized_height);
+  glViewport(0, 0, maximized_width, maximized_height);
+  m_width = maximized_width;
+  m_height = maximized_height;
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -94,14 +94,6 @@ int Display::get_window_height() const
   int width, height;
   SDL_GetWindowSize(m_window, &width, &height);
   return height;
-}
-
-bool Display::is_running() const { return m_running; }
-
-void Display::update()
-{
-  m_update_dt();
-  m_update_input();
 }
 
 void Display::render() { SDL_GL_SwapWindow(m_window); }
@@ -137,96 +129,15 @@ void Display::clear()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Display::quit() { m_running = false; }
-
-void Display::m_update_input()
-{
-  SDL_Event event;
-  while (SDL_PollEvent(&event))
-  {
-    switch (event.type)
-    {
-    case SDL_QUIT:
-    {
-      m_running = false;
-      break;
-    }
-
-    case SDL_WINDOWEVENT:
-    {
-      switch (event.window.event)
-      {
-      case SDL_WINDOWEVENT_RESIZED:
-      case SDL_WINDOWEVENT_SIZE_CHANGED:
-        reset_viewport();
-        break;
-      }
-      break;
-    }
-
-    case SDL_MOUSEMOTION:
-    {
-      MouseX = event.motion.x;
-      MouseY = event.motion.y;
-      break;
-    }
-    }
-  }
-  m_event = event;
-}
-
-bool Display::is_key_down(int key)
-{
-  const Uint8* keys = SDL_GetKeyboardState(NULL);
-  return keys[key];
-}
-
-void Display::m_update_dt()
-{
-  const unsigned int current_time = SDL_GetTicks();
-  m_dt = current_time - m_last_time;
-  m_last_time = current_time;
-}
-
-void Display::get_mouse_pos(double& mx, double& my)
-{
-  mx = MouseX;
-  my = MouseY;
-}
-
-float Display::get_fps() const { return (1.0f / (static_cast<float>(m_dt) / 1000.0f)); }
-
 void Display::reset_viewport() { glViewport(0, 0, m_width, m_height); }
 
 void Display::update_viewport()
 {
   int width, height;
   SDL_GetWindowSize(m_window, &width, &height);
+  m_width = width;
+  m_height = height;
+
   glViewport(0, 0, width, height);
-  m_update_viewport_proportions();
-}
-
-void Display::m_update_viewport_proportions()
-{
-  int vpcoords[4];
-  glGetIntegerv(GL_VIEWPORT, vpcoords);
-
-  const int width = vpcoords[2];
-  const int height = vpcoords[3];
-
-  // 16/9 = 1.77777. Therefore, we check if the new proportions are greater or lower than that
-  const auto factor = width / static_cast<float>(height);
-  if (factor > 1.78f)
-  {  // Height is max and width is adjusted
-    const int new_width = height * 1.77777f;
-    const int left = width - new_width;
-    glViewport(left / 2, 0, new_width, height);
-  }
-  else if (factor < 1.77f)
-  {  // Width is max and height is adjusted
-    const int new_height = (int)width / 1.77f;
-    const int left = height - new_height;
-    glViewport(0, left / 2, width, new_height);
-  }
 }
 }  // namespace dl

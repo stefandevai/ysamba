@@ -5,7 +5,7 @@
 
 namespace dl
 {
-HomeMenu::HomeMenu(const std::string& scene_key, ViewCamera& camera) : Scene(scene_key, camera) {}
+HomeMenu::HomeMenu(const std::string& scene_key, Camera& camera) : Scene(scene_key, camera) {}
 
 void HomeMenu::load()
 {

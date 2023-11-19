@@ -5,14 +5,14 @@
 namespace dl
 {
 class World;
-class ViewCamera;
+class Camera;
 class Renderer;
 
 class RenderSystem
 {
  public:
   RenderSystem(World& world);
-  void update(entt::registry& registry, Renderer& renderer, const ViewCamera& camera);
+  void update(entt::registry& registry, Renderer& renderer, const Camera& camera);
 
  private:
   World& m_world;

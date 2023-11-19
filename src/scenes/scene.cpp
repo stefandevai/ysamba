@@ -7,7 +7,7 @@
 
 namespace dl
 {
-Scene::Scene(const std::string& scene_key, ViewCamera& camera)
+Scene::Scene(const std::string& scene_key, Camera& camera)
     : m_scene_key(scene_key), m_scene_dir("scenes/" + scene_key + "/"), m_camera(camera)
 {
 }

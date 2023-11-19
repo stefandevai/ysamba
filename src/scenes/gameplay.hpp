@@ -12,12 +12,12 @@
 namespace dl
 {
 class Renderer;
-class ViewCamera;
+class Camera;
 
 class Gameplay : public Scene
 {
  public:
-  Gameplay(const std::string& scene_key, ViewCamera& camera);
+  Gameplay(const std::string& scene_key, Camera& camera);
 
   void load() override;
   void update(const uint32_t delta, SetSceneFunction set_scene) override;

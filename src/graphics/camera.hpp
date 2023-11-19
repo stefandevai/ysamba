@@ -5,16 +5,16 @@
 
 namespace dl
 {
-enum class ViewCameraState
+enum class CameraState
 {
   IDLE,
   FOLLOW,
 };
 
-class ViewCamera
+class Camera
 {
  public:
-  ViewCamera();
+  Camera();
 
   void move(const float x, const float y, const float z = 0.f);
   inline const glm::vec3& get_position() const { return m_position; }
@@ -47,6 +47,6 @@ class ViewCamera
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   glm::vec3 m_saved_position{0.0f};
   glm::vec2 m_dimensions;
-  // ViewCameraState m_state = ViewCameraState::IDLE;
+  // CameraState m_state = CameraState::IDLE;
 };
 }  // namespace dl

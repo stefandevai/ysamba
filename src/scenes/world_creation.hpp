@@ -11,14 +11,14 @@
 namespace dl
 {
 class Renderer;
-class ViewCamera;
+class Camera;
 class Sprite;
 struct Quad;
 
 class WorldCreation : public Scene
 {
  public:
-  WorldCreation(const std::string& scene_key, ViewCamera& camera);
+  WorldCreation(const std::string& scene_key, Camera& camera);
 
   void load() override;
   void update(const uint32_t delta, SetSceneFunction set_scene) override;

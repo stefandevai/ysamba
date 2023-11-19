@@ -102,4 +102,8 @@ std::pair<int, int> InputManager::get_mouse_position() { return m_sdl_input_wrap
 bool InputManager::should_quit() { return m_sdl_input_wrapper->should_quit(); }
 
 void InputManager::quit() { m_sdl_input_wrapper->quit(); }
+
+bool InputManager::window_size_changed() const { return m_sdl_input_wrapper->window_size_changed(); }
+
+void InputManager::set_window_size_changed(const bool value) { m_sdl_input_wrapper->set_window_size_changed(value); }
 }  // namespace dl

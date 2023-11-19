@@ -16,14 +16,14 @@ enum SceneType
 };
 
 class Renderer;
-class ViewCamera;
+class Camera;
 
 class SceneManager
 {
  public:
-  SceneManager(ViewCamera& camera);
+  SceneManager(Camera& camera);
 
-  static void set_scene(const std::string& key, ViewCamera& camera);
+  static void set_scene(const std::string& key, Camera& camera);
   void update(const uint32_t delta);
   void render(Renderer& renderer);
   /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
@@ -31,7 +31,7 @@ class SceneManager
   inline std::shared_ptr<Scene> get_current_scene() const { return m_current_scene; };
 
  private:
-  ViewCamera& m_camera;
+  Camera& m_camera;
   JSON m_json{"./data/game.json"};
   std::string m_inital_scene_key;
   static std::shared_ptr<Scene> m_current_scene;

@@ -19,9 +19,9 @@ std::map<std::string, SceneType> SceneManager::m_scenes_data = std::map<std::str
     {"gameplay", SceneType::GAMEPLAY},
 };
 
-SceneManager::SceneManager(ViewCamera& camera) : m_camera(camera) { m_load(); }
+SceneManager::SceneManager(Camera& camera) : m_camera(camera) { m_load(); }
 
-void SceneManager::set_scene(const std::string& key, ViewCamera& camera)
+void SceneManager::set_scene(const std::string& key, Camera& camera)
 {
   const auto it = m_scenes_data.find(key);
 

@@ -21,6 +21,8 @@ class SDLInputWrapper
   bool is_key_up(int key);
   inline std::pair<bool, bool> get_mouse_state() { return m_mouse_state; };
   inline std::pair<int, int> get_mouse_position() { return m_mouse_position; };
+  bool window_size_changed() const { return m_window_size_changed; }
+  void set_window_size_changed(bool value) { m_window_size_changed = value; }
   bool should_quit();
   void quit();
 
@@ -33,5 +35,6 @@ class SDLInputWrapper
   bool m_should_quit = false;
   std::pair<bool, bool> m_mouse_state{false, false};
   std::pair<int, int> m_mouse_position{0, 0};
+  bool m_window_size_changed = false;
 };
 }  // namespace dl

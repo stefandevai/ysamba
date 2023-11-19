@@ -103,6 +103,18 @@ void SDLInputWrapper::update()
       break;
     }
 
+    case SDL_WINDOWEVENT:
+    {
+      switch (event.window.event)
+      {
+      case SDL_WINDOWEVENT_RESIZED:
+      case SDL_WINDOWEVENT_SIZE_CHANGED:
+        m_window_size_changed = true;
+        break;
+      }
+      break;
+    }
+
     default:
       break;
     }

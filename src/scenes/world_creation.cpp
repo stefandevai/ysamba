@@ -17,7 +17,7 @@
 
 namespace dl
 {
-WorldCreation::WorldCreation(const std::string& scene_key, ViewCamera& camera) : Scene(scene_key, camera) {}
+WorldCreation::WorldCreation(const std::string& scene_key, Camera& camera) : Scene(scene_key, camera) {}
 
 void WorldCreation::load()
 {

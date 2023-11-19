@@ -31,6 +31,8 @@ class InputManager
   bool is_key_up(int key);
   bool is_clicking(const MouseButton button);
   std::pair<int, int> get_mouse_position();
+  bool window_size_changed() const;
+  void set_window_size_changed(const bool value);
   bool should_quit();
   void quit();
 

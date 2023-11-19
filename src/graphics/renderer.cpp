@@ -97,7 +97,7 @@ void Renderer::batch(
 
 void Renderer::finalize(const std::string& layer_id) { m_layers.at(layer_id)->finalize_emplacing(); }
 
-void Renderer::render(const ViewCamera& camera)
+void Renderer::render(const Camera& camera)
 {
   glm::mat4 model_matrix = glm::mat4(1.0f);
 

@@ -4,9 +4,9 @@
 
 namespace dl
 {
-ViewCamera::ViewCamera() {}
+Camera::Camera() {}
 
-void ViewCamera::move(const float x, const float y, const float z)
+void Camera::move(const float x, const float y, const float z)
 {
   m_position.x += x;
   m_position.y += y;
@@ -17,7 +17,7 @@ void ViewCamera::move(const float x, const float y, const float z)
   m_front.z += z;
 }
 
-void ViewCamera::set_position(const float x, const float y, const float z)
+void Camera::set_position(const float x, const float y, const float z)
 {
   m_position.x = x;
   m_position.y = y;
@@ -28,7 +28,7 @@ void ViewCamera::set_position(const float x, const float y, const float z)
   m_front.z = z - 501;
 }
 
-void ViewCamera::set_frustrum(const float left, const float right, const float bottom, const float top)
+void Camera::set_frustrum(const float left, const float right, const float bottom, const float top)
 {
   m_dimensions.x = std::abs(right - left);
   m_dimensions.y = std::abs(top - bottom);

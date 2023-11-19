@@ -8,7 +8,7 @@
 
 namespace dl
 {
-ECS::ECS(entt::registry& registry, World& world, ViewCamera& camera)
+ECS::ECS(entt::registry& registry, World& world, Camera& camera)
     : m_registry(registry), m_world(world), m_camera(camera)
 {
 }

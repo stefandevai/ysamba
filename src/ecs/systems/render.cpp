@@ -14,7 +14,7 @@ namespace dl
 {
 RenderSystem::RenderSystem(World& world) : m_world(world) {}
 
-void RenderSystem::update(entt::registry& registry, Renderer& renderer, const ViewCamera& camera)
+void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Camera& camera)
 {
   // TODO: Cache values so we don't have to calculate them every frame
   const auto& camera_position = camera.get_position();
