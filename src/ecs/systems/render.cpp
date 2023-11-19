@@ -5,7 +5,6 @@
 
 #include "../../graphics/camera.hpp"
 #include "../../graphics/renderer.hpp"
-#include "../../world/camera.hpp"
 #include "../../world/world.hpp"
 #include "../components/position.hpp"
 #include "../components/selectable.hpp"

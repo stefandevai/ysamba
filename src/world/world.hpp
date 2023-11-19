@@ -10,7 +10,6 @@
 #include "../components/size.hpp"
 #include "../core/json.hpp"
 #include "../core/lua_api.hpp"
-#include "./camera.hpp"
 #include "./society.hpp"
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"

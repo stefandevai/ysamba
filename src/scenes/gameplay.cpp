@@ -7,6 +7,7 @@
 #include <fstream>
 #include <random>
 
+#include "../ecs/components/position.hpp"
 #include "../ecs/components/selectable.hpp"
 #include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
