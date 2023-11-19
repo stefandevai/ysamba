@@ -5,11 +5,20 @@
 
 namespace dl
 {
-  SpatialHash::SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
-    : m_width(width), m_height(height), m_cell_dimension(cell_dimension)
-  {
-    assert(cell_dimension > 1);
+  SpatialHash::SpatialHash() : m_width(0), m_height(0), m_cell_dimension(0) { }
 
+  SpatialHash::SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
+  {
+    load(width, height, cell_dimension);
+  }
+
+  void SpatialHash::load(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
+  {
+    assert(cell_dimension >= 1);
+
+    m_width = width;
+    m_height = height;
+    m_cell_dimension = cell_dimension;
     m_horizontal_cells = m_width / cell_dimension;
     m_vertical_cells = m_height / cell_dimension;
     m_number_of_cells = m_horizontal_cells * m_vertical_cells;

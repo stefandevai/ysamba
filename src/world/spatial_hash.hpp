@@ -9,8 +9,10 @@ namespace dl
   class SpatialHash
   {
     public:
+      SpatialHash();
       SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension);
 
+      void load(const uint32_t width, const uint32_t height, const uint32_t cell_dimension);
       void add(const entt::entity object, const int x, const int y);
       void remove(const entt::entity object, const uint32_t key);
       void update(const entt::entity object, const int x, const int y, const uint32_t key);

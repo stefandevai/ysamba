@@ -22,7 +22,7 @@ namespace dl
   class World
   {
     public:
-      SpatialHash spatial_hash{480, 480, 48};
+      SpatialHash spatial_hash;
 
       World();
 

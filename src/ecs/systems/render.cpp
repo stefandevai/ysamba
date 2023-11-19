@@ -67,8 +67,8 @@ namespace dl
       }
 
       const auto sprite_size = visibility.sprite->get_size();
-      const auto position_x = position.x * sprite_size.x;
-      const auto position_y = position.y * sprite_size.y;
+      const auto position_x = std::round(position.x) * sprite_size.x;
+      const auto position_y = std::round(position.y) * sprite_size.y;
 
       renderer.batch("world", visibility.sprite, position_x, position_y, 1.);
     });

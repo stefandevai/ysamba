@@ -14,6 +14,8 @@ namespace dl
     m_load_tile_data();
     m_chunk_size = m_json.object["chunk_size"];
     m_texture_id = m_json.object["texture_id"];
+    const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
+    spatial_hash.load(m_chunk_size, m_chunk_size, spatial_hash_cell_size);
   }
 
   void World::generate(const int width, const int height, const int seed)

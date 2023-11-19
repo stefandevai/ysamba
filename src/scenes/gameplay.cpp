@@ -102,30 +102,33 @@ namespace dl
     }
     else if (m_input_manager->poll_action("camera_move_west"))
     {
-      m_camera.move(-1.f, 0.f);
+      m_camera.move(-8.f, 0.f);
     }
     else if (m_input_manager->poll_action("camera_move_east"))
     {
-      m_camera.move(1.f, 0.f);
+      m_camera.move(8.f, 0.f);
     }
     else if (m_input_manager->poll_action("camera_move_south"))
     {
-      m_camera.move(0.f, 1.f);
+      m_camera.move(0.f, 8.f);
     }
     else if (m_input_manager->poll_action("camera_move_north"))
     {
-      m_camera.move(0.f, -1.f);
+      m_camera.move(0.f, -8.f);
     }
     else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
     {
       const auto& mouse_position = m_input_manager->get_mouse_position();
-      m_select_entity(mouse_position.first, mouse_position.second);
+      const auto& camera_position = m_camera.get_position();
+      m_select_entity((mouse_position.first + camera_position.x) / 32.f, (mouse_position.second + camera_position.y) / 32.f);
     }
   }
 
-  void Gameplay::m_select_entity(const int x, const int y)
+  void Gameplay::m_select_entity(const float x, const float y)
   {
-    const auto& entities = m_world.spatial_hash.get(x, y);
+    const auto tile_x = std::floor(x);
+    const auto tile_y = std::floor(y);
+    const auto& entities = m_world.spatial_hash.get(tile_x, tile_y);
 
     for (const auto entity : entities)
     {
@@ -134,7 +137,7 @@ namespace dl
         auto& position = m_registry.get<Position>(entity);
         auto& selectable = m_registry.get<Selectable>(entity);
 
-        if (x >= position.x && x <= position.x + 32 && y >= position.y && y <= position.y + 32)
+        if (x >= position.x && x <= position.x + 1.f && y >= position.y && y <= position.y + 1.f)
         {
           selectable.selected = true;
         }

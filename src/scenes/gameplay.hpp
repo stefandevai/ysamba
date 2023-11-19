@@ -40,6 +40,6 @@ namespace dl
       State m_current_state = State::PAUSED;
 
       void m_update_input(SetSceneFunction& set_scene);
-      void m_select_entity(const int x, const int y);
+      void m_select_entity(const float x, const float y);
   };
 }
