@@ -22,17 +22,18 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       return;
     }
 
-    biology.action_points -= biology.speed * 1000.0 * delta;
+    biology.turn_threshold -= biology.speed * 1000.0 * delta;
 
-    if (biology.action_points > 0.0)
+    if (biology.turn_threshold > 0.0)
     {
       return;
     }
 
-    biology.action_points = 200.0;
+    biology.turn_threshold = 200.0;
 
-    const double x_candidate = position.x + velocity.x * (biology.speed / 100.0);
-    const double y_candidate = position.y + velocity.y * (biology.speed / 100.0);
+    const auto speed_divide_factor = 100.0;
+    const double x_candidate = position.x + velocity.x * (biology.speed / speed_divide_factor);
+    const double y_candidate = position.y + velocity.y * (biology.speed / speed_divide_factor);
     const double z_candidate = position.z;
 
     size_t advance_x = std::abs(x_candidate - position.x);
@@ -44,14 +45,21 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     size_t counter_x = 0;
     size_t counter_y = 0;
 
+    if (advance_x > 1 || advance_y > 1)
+    {
+      // TODO: Check if any collisions happen between the object and the target tile
+      // so the object can't skip past another obstacle.
+      // Use Bresenham algorithm in tcodlib.
+    }
+
     // If can't advance advance_x or advance_y, check if it's possible to advance
     // to the tiles before that one.
     while (counter_x <= advance_x || counter_y <= advance_y)
     {
-      const auto x = position.x + velocity.x * (biology.speed / 100.0) - counter_x;
+      const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x;
       const auto x_round = std::round(x);
       const auto collides_x = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
-      const auto y = position.y + velocity.y * (biology.speed / 100.0) - counter_y;
+      const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y;
       const auto y_round = std::round(y);
       const auto collides_y = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
 

@@ -21,6 +21,6 @@ struct Biology
   /* std::string genetics; */
   int base_speed;
   int speed;
-  double action_points = 100.0;
+  double turn_threshold = 100.0;
 };
 }  // namespace dl

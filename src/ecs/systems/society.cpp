@@ -17,77 +17,75 @@ void SocietySystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<SocietyAgent, Biology>();
   view.each([this, &registry, delta](auto entity, auto& agent, auto& biology) {
-    /* if (agent.state == SocietyAgent::State::Idle) */
-    /* { */
-    /*   if (agent.time_to_next_action <= 0) */
-    /*   { */
-    /*     agent.time_to_next_action = 1.0; */
-    /*     const auto n = m_distribution(m_rng); */
-
-    /*     if (n < .7f) */
-    /*     { */
-    /*       agent.state = SocietyAgent::State::Walking; */
-    /*     } */
-    /*   } */
-    /*   else */
-    /*   { */
-    /*     agent.time_to_next_action -= delta; */
-    /*   } */
-    /* } */
-    /* if (agent.state == SocietyAgent::State::Walking) */
-    /* { */
-    /*   if (agent.time_to_next_action <= 0) */
-    /*   { */
-    /*     agent.time_to_next_action = 1.0; */
-    /*     const auto n = m_distribution(m_rng); */
-    /*     if (n < .4f) */
-    /*     { */
-    /*       agent.state = SocietyAgent::State::Idle; */
-    /*     } */
-    /*   } */
-    /*   else */
-    /*   { */
-    /*     agent.time_to_next_action -= delta; */
-    /*   } */
-
-    /*   const auto x_dir = m_distribution(m_rng); */
-    /*   const auto y_dir = m_distribution(m_rng); */
-
-    /*   auto velocity_x = 0.; */
-    /*   auto velocity_y = 0.; */
-
-    /*   if (x_dir < .33f) */
-    /*   { */
-    /*     velocity_x = -1.0; */
-    /*   } */
-    /*   else if (x_dir < .66f) */
-    /*   { */
-    /*     velocity_x = 1.0; */
-    /*   } */
-
-    /*   if (y_dir < .33f) */
-    /*   { */
-    /*     velocity_y = -1.0; */
-    /*   } */
-    /*   else if (y_dir < .66f) */
-    /*   { */
-    /*     velocity_y = 1.0; */
-    /*   } */
-
-    if (registry.all_of<Velocity>(entity))
+    if (agent.state == SocietyAgent::State::Idle)
     {
-      registry.patch<Velocity>(entity, [](auto& velocity) {
-        velocity.x = 1.0;
-        velocity.y = 0.0;
-        /* velocity.x = velocity_x; */
-        /* velocity.y = velocity_y; */
-      });
+      if (agent.time_to_next_action <= 0)
+      {
+        agent.time_to_next_action = 1.0;
+        const auto n = m_distribution(m_rng);
+
+        if (n < .7f)
+        {
+          agent.state = SocietyAgent::State::Walking;
+        }
+      }
+      else
+      {
+        agent.time_to_next_action -= delta;
+      }
     }
-    else
+    if (agent.state == SocietyAgent::State::Walking)
     {
-      registry.emplace<Velocity>(entity, 0.0, 0.0, 0.);
+      if (agent.time_to_next_action <= 0)
+      {
+        agent.time_to_next_action = 1.0;
+        const auto n = m_distribution(m_rng);
+        if (n < .4f)
+        {
+          agent.state = SocietyAgent::State::Idle;
+        }
+      }
+      else
+      {
+        agent.time_to_next_action -= delta;
+      }
+
+      const auto x_dir = m_distribution(m_rng);
+      const auto y_dir = m_distribution(m_rng);
+
+      auto velocity_x = 0.;
+      auto velocity_y = 0.;
+
+      if (x_dir < .33f)
+      {
+        velocity_x = -1.0;
+      }
+      else if (x_dir < .66f)
+      {
+        velocity_x = 1.0;
+      }
+
+      if (y_dir < .33f)
+      {
+        velocity_y = -1.0;
+      }
+      else if (y_dir < .66f)
+      {
+        velocity_y = 1.0;
+      }
+
+      if (registry.all_of<Velocity>(entity))
+      {
+        registry.patch<Velocity>(entity, [velocity_x, velocity_y](auto& velocity) {
+          velocity.x = velocity_x;
+          velocity.y = velocity_y;
+        });
+      }
+      else
+      {
+        registry.emplace<Velocity>(entity, velocity_x, velocity_y, 0.);
+      }
     }
-    /* } */
   });
 }
 }  // namespace dl
