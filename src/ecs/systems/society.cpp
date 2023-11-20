@@ -77,8 +77,8 @@ void SocietySystem::update(entt::registry& registry, const double delta)
     if (registry.all_of<Velocity>(entity))
     {
       registry.patch<Velocity>(entity, [](auto& velocity) {
-        velocity.x = 0.0;
-        velocity.y = -1.0;
+        velocity.x = 1.0;
+        velocity.y = 0.0;
         /* velocity.x = velocity_x; */
         /* velocity.y = velocity_y; */
       });

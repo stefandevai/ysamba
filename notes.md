@@ -40,3 +40,6 @@ They change according to the geographical location
   - Quantity of slaves
 6. Increase of number of ppl leads to inventions of new technology
 7. Collapse leads to spending materials, loosing ppl and modifying the society towards an equilibrium
+
+TODO:
+  - Consider cases when coord is on negative x or y

@@ -48,17 +48,34 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     // to the tiles before that one.
     while (counter_x <= advance_x || counter_y <= advance_y)
     {
+      const auto x = position.x + velocity.x * (biology.speed / 100.0) - counter_x;
+      const auto x_round = std::round(x);
+      const auto collides_x = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
+      const auto y = position.y + velocity.y * (biology.speed / 100.0) - counter_y;
+      const auto y_round = std::round(y);
+      const auto collides_y = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
+
+      // Stop early if the object advances this frame and collides in any axis.
+      // This avoids the object moving in one axis only only
+      if (advance_x > 0 && advance_y > 0 && (collides_x || collides_y))
+      {
+        break;
+      }
+      // Stop early if the object advances partially this frame and collides in any axis.
+      // This avoids the object moving in one axis only only
+      else if (advance_x <= 0 && advance_y <= 0 && (collides_x || collides_y))
+      {
+        break;
+      }
+
       if (counter_x <= advance_x)
       {
-        const auto x = position.x + velocity.x * (biology.speed / 100.0) - counter_x;
-        const auto x_round = std::round(x);
-
         if (x_round < 0)
         {
           target_x = 0;
           counter_x = advance_x + 1;
         }
-        else if (m_collides(registry, entity, x_round, std::round(position.y), z_candidate))
+        else if (collides_x)
         {
           ++counter_x;
         }
@@ -71,15 +88,12 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
       if (counter_y <= advance_y)
       {
-        const auto y = position.y + velocity.y * (biology.speed / 100.0) - counter_y;
-        const auto y_round = std::round(y);
-
         if (y_round < 0)
         {
           target_y = 0;
           counter_y = advance_y + 1;
         }
-        else if (m_collides(registry, entity, std::round(position.x), y_round, z_candidate))
+        else if (collides_y)
         {
           ++counter_y;
         }
