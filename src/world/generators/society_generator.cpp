@@ -37,7 +37,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   const auto member1 = registry.create();
   registry.emplace<SocietyAgent>(member1, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
   registry.emplace<Biology>(member1, Sex::Male, 100);
-  registry.emplace<Position>(member1, 8., 8., 0.);
+  registry.emplace<Position>(member1, 9., 9., 0.);
   registry.emplace<Visibility>(member1, "spritesheet-characters", 0);
   registry.emplace<Selectable>(member1);
 

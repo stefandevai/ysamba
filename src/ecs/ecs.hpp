@@ -28,7 +28,7 @@ class ECS
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_world};
-  SocietySystem m_society_system;
+  SocietySystem m_society_system{m_world};
   double m_turn_delay = 0.0;
 };
 }  // namespace dl

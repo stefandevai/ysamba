@@ -26,6 +26,7 @@ class Tilemap
 
   int& operator[](int i) { return tiles[i]; }
 
+  void set(const int id, const int x, const int y);
   int at(const int x, const int y) const;
   int at(const Point<int>& point) const;
 

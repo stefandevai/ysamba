@@ -55,18 +55,18 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
     }
   }
 
-  auto view = registry.view<const Position, const Visibility, const Selectable>();
+  auto view = registry.view<const Position, const Visibility>();
 
-  view.each([&renderer](const auto& position, const auto& visibility, const auto& selectable) {
+  view.each([&renderer](const auto& position, const auto& visibility) {
     if (visibility.sprite->texture == nullptr)
     {
       visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id);
     }
 
-    if (selectable.selected)
-    {
-      visibility.sprite->set_frame(1);
-    }
+    /* if (selectable.selected) */
+    /* { */
+    /*   visibility.sprite->set_frame(1); */
+    /* } */
 
     const auto sprite_size = visibility.sprite->get_size();
     const auto position_x = std::round(position.x) * sprite_size.x;

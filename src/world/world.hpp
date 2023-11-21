@@ -16,21 +16,46 @@
 namespace dl
 {
 class Renderer;
+struct TileTarget;
 
 class World
 {
  public:
+  // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
 
+  // Constructor
   World();
 
+  // Generate world
   void generate(const int width, const int height, const int seed);
-  const TileData get(const int x, const int y, const int z);
+
+  // Set tile by coordinates
+  void set(const int tile_id, const int x, const int y, const int z);
+
+  // Get tile data by coordinates
+  const TileData& get(const int x, const int y, const int z) const;
+
+  // Get size of a specific tilemap
   TilemapSize get_tilemap_size(const int z);
+
+  // Get the seed used in this world generation
   int get_seed() const { return m_seed; };
+
+  // Get the size of a loaded chunk
   size_t get_chunk_size() const { return m_chunk_size; };
+
+  // Get the texture id for the tiles used in this world
   const std::string& get_texture_id() const { return m_texture_id; };
+
+  // Get a specific society
   Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
+
+  // Search a nearby tile by flag
+  TileTarget search_by_flag(const std::string& flag, const int x = 0, const int y = 0, const int z = 0) const;
+
+  // Check if a specific tile is adjacent to a position
+  bool adjacent(const int tile_id, const int x = 0, const int y = 0, const int z = 0) const;
 
   template <class Archive>
   void serialize(Archive& archive)
@@ -50,6 +75,7 @@ class World
   int m_seed = 0;
   std::map<std::string, Society> m_societies;
 
+  // Load information about tiles
   void m_load_tile_data();
 };
 }  // namespace dl
