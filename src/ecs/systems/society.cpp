@@ -55,8 +55,8 @@ void SocietySystem::update(entt::registry& registry, const double delta)
 
       auto& target = action_harvest.target;
 
-      // Move towards the target
-      if (!m_world.adjacent(target.id, position.x, position.y, position.z))
+      // If the target tile is not adjacent, move towards the target
+      if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
       {
         // if the target path is empty, that means that the target disappeared.
         // Invalidate the target

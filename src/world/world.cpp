@@ -147,52 +147,24 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
 
 bool World::adjacent(const int tile_id, const int x, const int y, const int z) const
 {
-  const auto& left_tile = get(x - 1, y, z);
-  if (left_tile.id == tile_id)
-  {
-    return true;
-  }
+  const auto displacements = {-1, 0, 1};
 
-  const auto& top_left_tile = get(x - 1, y + 1, z);
-  if (top_left_tile.id == tile_id)
+  for (const auto& x_displacement : displacements)
   {
-    return true;
-  }
+    for (const auto& y_displacement : displacements)
+    {
+      if (x_displacement == 0 && y_displacement == 0)
+      {
+        continue;
+      }
 
-  const auto& top_tile = get(x, y + 1, z);
-  if (top_tile.id == tile_id)
-  {
-    return true;
-  }
+      const auto& tile = get(x + x_displacement, y + y_displacement, z);
 
-  const auto& top_right_tile = get(x + 1, y + 1, z);
-  if (top_right_tile.id == tile_id)
-  {
-    return true;
-  }
-
-  const auto& right_tile = get(x + 1, y, z);
-  if (right_tile.id == tile_id)
-  {
-    return true;
-  }
-
-  const auto& bottom_right_tile = get(x + 1, y - 1, z);
-  if (bottom_right_tile.id == tile_id)
-  {
-    return true;
-  }
-
-  const auto& bottom_tile = get(x, y - 1, z);
-  if (bottom_tile.id == tile_id)
-  {
-    return true;
-  }
-
-  const auto& bottom_left_tile = get(x - 1, y - 1, z);
-  if (bottom_left_tile.id == tile_id)
-  {
-    return true;
+      if (tile.id == tile_id)
+      {
+        return true;
+      }
+    }
   }
 
   return false;

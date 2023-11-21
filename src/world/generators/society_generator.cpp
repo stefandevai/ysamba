@@ -3,7 +3,6 @@
 #include <entt/entity/registry.hpp>
 
 #include "../../ecs/components/biology.hpp"
-#include "../../ecs/components/collidable.hpp"
 #include "../../ecs/components/position.hpp"
 #include "../../ecs/components/selectable.hpp"
 #include "../../ecs/components/society_agent.hpp"
@@ -42,12 +41,12 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   registry.emplace<Visibility>(member1, "spritesheet-characters", 0);
   registry.emplace<Selectable>(member1);
 
-  const auto member2 = registry.create();
-  registry.emplace<SocietyAgent>(member2, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
-  registry.emplace<Biology>(member2, Sex::Male, 100);
-  registry.emplace<Position>(member2, 9., 15., 0.);
-  registry.emplace<Visibility>(member2, "spritesheet-characters", 2);
-  registry.emplace<Selectable>(member2);
+  /* const auto member2 = registry.create(); */
+  /* registry.emplace<SocietyAgent>(member2, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
+  /* registry.emplace<Biology>(member2, Sex::Male, 80); */
+  /* registry.emplace<Position>(member2, 9., 15., 0.); */
+  /* registry.emplace<Visibility>(member2, "spritesheet-characters", 2); */
+  /* registry.emplace<Selectable>(member2); */
 
   /* const uint32_t number_of_members = 10; */
 
