@@ -19,7 +19,7 @@ class ShaderProgram;
 class Batch2D : public Layer
 {
  public:
-  Batch2D(std::shared_ptr<ShaderProgram> shader);
+  Batch2D(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
   ~Batch2D();
 
   void render();

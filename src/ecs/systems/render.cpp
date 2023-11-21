@@ -9,6 +9,7 @@
 #include "../../graphics/renderer.hpp"
 #include "../../world/world.hpp"
 #include "../components/position.hpp"
+#include "../components/rectangle.hpp"
 #include "../components/selectable.hpp"
 #include "../components/visibility.hpp"
 
@@ -76,5 +77,18 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
   });
 
   renderer.finalize("world");
+
+  renderer.init("quad");
+
+  auto quad_view = registry.view<const Position, const Rectangle>();
+
+  quad_view.each([&renderer](const auto& position, const auto& rectangle) {
+    const auto position_x = std::round(position.x) * 32;
+    const auto position_y = std::round(position.y) * 32;
+
+    renderer.batch("quad", rectangle.quad, position_x, position_y, 2.);
+  });
+
+  renderer.finalize("quad");
 }
 }  // namespace dl

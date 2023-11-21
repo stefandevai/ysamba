@@ -18,7 +18,7 @@ class ShaderProgram;
 class BatchQuad : public Layer
 {
  public:
-  BatchQuad(std::shared_ptr<ShaderProgram> shader);
+  BatchQuad(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
   ~BatchQuad();
 
   void render();

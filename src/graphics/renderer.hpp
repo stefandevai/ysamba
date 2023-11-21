@@ -2,8 +2,9 @@
 
 #include <map>
 #include <string>
-#include <tuple>
+#include <vector>
 
+#include "./layer.hpp"
 #include "./quad.hpp"
 
 namespace dl
@@ -14,7 +15,6 @@ class AssetManager;
 class Sprite;
 class Text;
 class Texture;
-class Layer;
 
 class Renderer
 {
@@ -41,7 +41,8 @@ class Renderer
   void add_layer(const std::string& layer_id,
                  const std::string shader_id,
                  const LayerType layer_type = LayerType::Sprite,
-                 const bool ignore_camera = false);
+                 const bool ignore_camera = false,
+                 const int priority = 0);
 
   std::shared_ptr<Texture> get_texture(const std::string& resource_id);
   inline bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
@@ -50,6 +51,7 @@ class Renderer
   using LayerMap = std::map<std::string, std::shared_ptr<Layer>>;
 
   AssetManager& m_asset_manager;
+  std::vector<std::shared_ptr<Layer>> m_ordered_layers;
   LayerMap m_layers;
 };
 

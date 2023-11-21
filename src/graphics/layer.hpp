@@ -12,8 +12,9 @@ class Layer
 {
  public:
   std::shared_ptr<ShaderProgram> shader;
+  int priority = 0;
 
-  Layer(std::shared_ptr<ShaderProgram> shader) : shader(shader) {}
+  Layer(std::shared_ptr<ShaderProgram> shader, const int priority = 0) : shader(shader), priority(priority) {}
   virtual ~Layer() {}
 
   virtual void render() = 0;
@@ -31,4 +32,12 @@ class Layer
   bool m_ignore_camera = false;
   Layer() {}
 };
+
+/* struct LayerPriorityCompare */
+/* { */
+/*   bool operator()(const Layer& lhs, const Layer& rhs) const */
+/*   { */
+/*     return lhs.priority < rhs.priority; */
+/*   } */
+/* }; */
 }  // namespace dl

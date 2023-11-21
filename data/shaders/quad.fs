@@ -10,6 +10,6 @@ out vec4 color;
 
 void main()
 {
-  color = vec4(f_in.color.rgb, 1.f);
+  color = vec4(f_in.color.rgb, f_in.color.a);
 }
 

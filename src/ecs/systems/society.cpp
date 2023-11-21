@@ -8,6 +8,7 @@
 #include "../components/action_harvest.hpp"
 #include "../components/biology.hpp"
 #include "../components/position.hpp"
+#include "../components/rectangle.hpp"
 #include "../components/society_agent.hpp"
 #include "../components/velocity.hpp"
 #include "../components/visibility.hpp"
@@ -41,6 +42,11 @@ void SocietySystem::update(entt::registry& registry, const double delta)
           agent.state = SocietyAgent::State::Idle;
           return;
         }
+
+        const auto target_rectangle = registry.create();
+        registry.emplace<Position>(
+            target_rectangle, action_harvest.target.x, action_harvest.target.y, action_harvest.target.z);
+        registry.emplace<Rectangle>(target_rectangle, 32, 32, "#ff000066");
       }
 
       auto target = action_harvest.target;
@@ -68,8 +74,9 @@ void SocietySystem::update(entt::registry& registry, const double delta)
         registry.emplace<Visibility>(yuca_roots, "spritesheet-tileset", 6);
 
         // Finalize action
-        registry.remove<ActionHarvest>(entity);
-        agent.state = SocietyAgent::State::Walking;
+        action_harvest.target.id = -1;
+        /* registry.remove<ActionHarvest>(entity); */
+        /* agent.state = SocietyAgent::State::Walking; */
       }
     }
     else if (agent.state == SocietyAgent::State::Idle)

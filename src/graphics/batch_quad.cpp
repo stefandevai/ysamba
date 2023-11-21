@@ -11,7 +11,7 @@
 
 namespace dl
 {
-BatchQuad::BatchQuad(std::shared_ptr<ShaderProgram> shader) : Layer(shader)
+BatchQuad::BatchQuad(std::shared_ptr<ShaderProgram> shader, const int priority) : Layer(shader, priority)
 {
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);
