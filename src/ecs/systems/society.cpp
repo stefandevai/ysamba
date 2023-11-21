@@ -15,6 +15,10 @@
 
 namespace dl
 {
+// TEMP
+entt::entity target_rectangle;
+// TEMP
+
 SocietySystem::SocietySystem(World& world) : m_world(world) {}
 
 void SocietySystem::update(entt::registry& registry, const double delta)
@@ -39,21 +43,44 @@ void SocietySystem::update(entt::registry& registry, const double delta)
         if (!action_harvest.target)
         {
           registry.remove<ActionHarvest>(entity);
-          agent.state = SocietyAgent::State::Idle;
+          agent.state = SocietyAgent::State::Walking;
           return;
         }
 
-        const auto target_rectangle = registry.create();
-        registry.emplace<Position>(
-            target_rectangle, action_harvest.target.x, action_harvest.target.y, action_harvest.target.z);
-        registry.emplace<Rectangle>(target_rectangle, 32, 32, "#ff000066");
+        /* target_rectangle = registry.create(); */
+        /* registry.emplace<Position>( */
+        /*     target_rectangle, action_harvest.target.x, action_harvest.target.y, action_harvest.target.z); */
+        /* registry.emplace<Rectangle>(target_rectangle, 32, 32, "#ff000066"); */
       }
 
-      auto target = action_harvest.target;
+      auto& target = action_harvest.target;
 
+      // Move towards the target
       if (!m_world.adjacent(target.id, position.x, position.y, position.z))
       {
-        // Move towards the target
+        auto current_target_position = target.path.top();
+
+        if (std::round(position.x) == current_target_position.first &&
+            std::round(position.y) == current_target_position.second)
+        {
+          target.path.pop();
+          current_target_position = target.path.top();
+        }
+
+        const auto x_dir = current_target_position.first - std::round(position.x);
+        const auto y_dir = current_target_position.second - std::round(position.y);
+
+        if (registry.all_of<Velocity>(entity))
+        {
+          registry.patch<Velocity>(entity, [x_dir, y_dir](auto& velocity) {
+            velocity.x = x_dir;
+            velocity.y = y_dir;
+          });
+        }
+        else
+        {
+          registry.emplace<Velocity>(entity, x_dir, y_dir, 0.);
+        }
         return;
       }
 
@@ -74,7 +101,9 @@ void SocietySystem::update(entt::registry& registry, const double delta)
         registry.emplace<Visibility>(yuca_roots, "spritesheet-tileset", 6);
 
         // Finalize action
+        action_harvest.time_left = 0.05;
         action_harvest.target.id = -1;
+        /* registry.destroy(target_rectangle); */
         /* registry.remove<ActionHarvest>(entity); */
         /* agent.state = SocietyAgent::State::Walking; */
       }

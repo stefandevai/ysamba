@@ -135,25 +135,25 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
     return true;
   }
 
-  const auto& entities = m_world.spatial_hash.get(x, y);
+  /* const auto& entities = m_world.spatial_hash.get(x, y); */
 
-  for (const auto e : entities)
-  {
-    if (e == entity)
-    {
-      continue;
-    }
+  /* for (const auto e : entities) */
+  /* { */
+  /*   if (e == entity) */
+  /*   { */
+  /*     continue; */
+  /*   } */
 
-    if (registry.all_of<Position>(e))
-    {
-      auto& position = registry.get<Position>(e);
+  /*   if (registry.all_of<Position>(e)) */
+  /*   { */
+  /*     auto& position = registry.get<Position>(e); */
 
-      if (std::round(position.x) == x && std::round(position.y) == y)
-      {
-        return true;
-      }
-    }
-  }
+  /*     if (std::round(position.x) == x && std::round(position.y) == y) */
+  /*     { */
+  /*       return true; */
+  /*     } */
+  /*   } */
+  /* } */
 
   return false;
 }

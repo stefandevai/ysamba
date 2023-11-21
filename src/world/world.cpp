@@ -1,6 +1,10 @@
 #include "./world.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <nlohmann/json.hpp>
+#include <queue>
+#include <set>
 /* #include "./generators/terrain_generator.hpp" */
 #include "../graphics/renderer.hpp"
 #include "../graphics/sprite.hpp"
@@ -48,55 +52,104 @@ const TileData& World::get(const int x, const int y, const int z) const
 
 TileTarget World::search_by_flag(const std::string& flag, const int x, const int y, const int z) const
 {
+  std::map<std::pair<int, int>, std::pair<int, int>> paths;
   TileTarget tile_target;
+  std::queue<std::pair<int, int>> position_queue;
+  std::set<std::pair<int, int>> visited;
+  const auto displacements = {-1, 0, 1};
 
-  const auto tile_has_flag = [this, &tile_target, &flag](const int l_x, const int l_y, const int l_z) {
-    const auto& tile = get(l_x, l_y, l_z);
+  /* const auto tile_has_flag = [this, &tile_target, &flag](const int l_x, const int l_y, const int l_z) { */
+  /*   const auto& tile = get(l_x, l_y, l_z); */
 
-    if (tile.flags.contains(flag))
+  /*   if (tile.flags.contains(flag)) */
+  /*   { */
+  /*     tile_target.id = tile.id; */
+  /*     tile_target.x = l_x; */
+  /*     tile_target.y = l_y; */
+  /*     tile_target.z = l_z; */
+  /*     return true; */
+  /*   } */
+
+  /*   return false; */
+  /* }; */
+
+  bool found_tile = false;
+
+  position_queue.push({x, y});
+  visited.insert({x, y});
+
+  while (!position_queue.empty() && !found_tile)
+  {
+    const auto [center_x, center_y] = position_queue.front();
+    spdlog::warn("NEW CENTER: ({}, {})", center_x, center_y);
+    position_queue.pop();
+
+    for (const auto& x_displacement : displacements)
     {
-      tile_target.id = tile.id;
-      tile_target.x = l_x;
-      tile_target.y = l_y;
-      tile_target.z = l_z;
-      return true;
+      for (const auto& y_displacement : displacements)
+      {
+        if (x_displacement == 0 && y_displacement == 0)
+        {
+          continue;
+        }
+
+        const auto current_x = center_x + x_displacement;
+        const auto current_y = center_y + y_displacement;
+
+        if (visited.contains({current_x, current_y}))
+        {
+          continue;
+        }
+
+        const auto position = std::make_pair(current_x, current_y);
+
+        spdlog::debug("VISITING: {} {}", current_x, current_y);
+
+        paths[position] = std::make_pair(center_x, center_y);
+        visited.insert(position);
+
+        const auto& tile = get(current_x, current_y, z);
+
+        if (tile.flags.contains(flag))
+        {
+          tile_target.id = tile.id;
+          tile_target.x = current_x;
+          tile_target.y = current_y;
+          tile_target.z = z;
+          found_tile = true;
+          spdlog::debug("FOUND: {} {}", current_x, current_y);
+
+          const auto start = std::make_pair(x, y);
+          auto step = position;
+          spdlog::info("({}, {})", step.first, step.second);
+
+          while (step != start)
+          {
+            step = paths[step];
+
+            tile_target.path.push(step);
+            spdlog::info("({}, {})", step.first, step.second);
+          }
+
+          /* std::reverse(tile_target.path.begin(), tile_target.path.end()); */
+          break;
+        }
+
+        if (tile.flags.contains("WALKABLE"))
+        {
+          position_queue.push(position);
+        }
+      }
+
+      if (found_tile)
+      {
+        spdlog::debug("FOUND... Breaking");
+        break;
+      }
     }
+  }
 
-    return false;
-  };
-
-  if (tile_has_flag(x - 1, y, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x - 1, y + 1, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x, y + 1, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x + 1, y + 1, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x + 1, y, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x + 1, y - 1, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x, y - 1, z))
-  {
-    return tile_target;
-  }
-  if (tile_has_flag(x - 1, y - 1, z))
-  {
-    return tile_target;
-  }
+  spdlog::debug("RETURNING: {} {}", position_queue.empty(), found_tile);
 
   return tile_target;
 }

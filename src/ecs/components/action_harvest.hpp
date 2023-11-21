@@ -7,6 +7,6 @@ namespace dl
 struct ActionHarvest
 {
   TileTarget target;
-  double time_left = 0.1;
+  double time_left = 0.05;
 };
 }  // namespace dl

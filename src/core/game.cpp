@@ -21,10 +21,10 @@ void Game::load()
 
     m_display.load(width, height, title);
     m_camera.set_frustrum(0.0f, m_display.get_width(), m_display.get_height(), 0.0f);
-    m_renderer.add_layer("world", "world", Renderer::LayerType::Sprite, false, 0);
-    m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, false, 10);
-    m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true);
-    m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true);
+    m_renderer.add_layer("world", "world");
+    m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, false, 1);
+    m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true, 2);
+    m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
   }
   catch (const std::exception& exc)
   {

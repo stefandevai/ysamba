@@ -67,9 +67,8 @@ void Display::load(const unsigned int width, const unsigned int height, const st
   m_height = maximized_height;
 
   glEnable(GL_BLEND);
-  /* glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
-  glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-  /* glEnable(GL_DEPTH_TEST); */
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_DEPTH_TEST);
 }
 
 Display::~Display()

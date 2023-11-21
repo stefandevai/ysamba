@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stack>
+
 namespace dl
 {
 struct TileTarget
@@ -8,6 +10,7 @@ struct TileTarget
   TileTarget() : id(-1), x(0), y(0), z(0) {}
 
   int id, x, y, z;
+  std::stack<std::pair<int, int>> path{};
 
   explicit operator bool() { return id != -1; }
 };
