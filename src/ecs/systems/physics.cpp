@@ -63,6 +63,9 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       const auto y_round = std::round(y);
       const auto collides_y = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
 
+      // TODO: Resolve collision. If the tile has a collidable object, walking is not possible,
+      // otherwise walking is possible
+
       // Stop early if the object advances this frame and collides in any axis.
       // This avoids the object moving in one axis only only
       if (advance_x > 0 && advance_y > 0 && (collides_x || collides_y))
@@ -135,25 +138,25 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
     return true;
   }
 
-  /* const auto& entities = m_world.spatial_hash.get(x, y); */
+  const auto& entities = m_world.spatial_hash.get(x, y);
 
-  /* for (const auto e : entities) */
-  /* { */
-  /*   if (e == entity) */
-  /*   { */
-  /*     continue; */
-  /*   } */
+  for (const auto e : entities)
+  {
+    if (e == entity)
+    {
+      continue;
+    }
 
-  /*   if (registry.all_of<Position>(e)) */
-  /*   { */
-  /*     auto& position = registry.get<Position>(e); */
+    if (registry.all_of<Position, Biology>(e))
+    {
+      auto& position = registry.get<Position>(e);
 
-  /*     if (std::round(position.x) == x && std::round(position.y) == y) */
-  /*     { */
-  /*       return true; */
-  /*     } */
-  /*   } */
-  /* } */
+      if (std::round(position.x) == x && std::round(position.y) == y)
+      {
+        return true;
+      }
+    }
+  }
 
   return false;
 }

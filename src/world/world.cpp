@@ -81,7 +81,6 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
   while (!position_queue.empty() && !found_tile)
   {
     const auto [center_x, center_y] = position_queue.front();
-    spdlog::warn("NEW CENTER: ({}, {})", center_x, center_y);
     position_queue.pop();
 
     for (const auto& x_displacement : displacements)
@@ -103,8 +102,6 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
 
         const auto position = std::make_pair(current_x, current_y);
 
-        spdlog::debug("VISITING: {} {}", current_x, current_y);
-
         paths[position] = std::make_pair(center_x, center_y);
         visited.insert(position);
 
@@ -117,18 +114,15 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
           tile_target.y = current_y;
           tile_target.z = z;
           found_tile = true;
-          spdlog::debug("FOUND: {} {}", current_x, current_y);
 
           const auto start = std::make_pair(x, y);
           auto step = position;
-          spdlog::info("({}, {})", step.first, step.second);
 
           while (step != start)
           {
             step = paths[step];
 
             tile_target.path.push(step);
-            spdlog::info("({}, {})", step.first, step.second);
           }
 
           /* std::reverse(tile_target.path.begin(), tile_target.path.end()); */
@@ -143,13 +137,10 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
 
       if (found_tile)
       {
-        spdlog::debug("FOUND... Breaking");
         break;
       }
     }
   }
-
-  spdlog::debug("RETURNING: {} {}", position_queue.empty(), found_tile);
 
   return tile_target;
 }

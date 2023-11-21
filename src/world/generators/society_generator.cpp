@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "../../ecs/components/biology.hpp"
+#include "../../ecs/components/collidable.hpp"
 #include "../../ecs/components/position.hpp"
 #include "../../ecs/components/selectable.hpp"
 #include "../../ecs/components/society_agent.hpp"
@@ -55,7 +56,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   /*   const auto member = registry.create(); */
   /*   registry.emplace<SocietyAgent>(member, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
   /*   registry.emplace<Biology>(member, Sex::Male, 100.); */
-  /*   registry.emplace<Position>(member, i, 8., 0.); */
+  /*   registry.emplace<Position>(member, i + 7, 8., 0.); */
   /*   registry.emplace<Visibility>(member, "spritesheet-characters", i % 6); */
   /*   registry.emplace<Selectable>(member); */
   /* } */
@@ -64,7 +65,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   /*   const auto member = registry.create(); */
   /*   registry.emplace<SocietyAgent>(member, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
   /*   registry.emplace<Biology>(member, Sex::Male, 100.); */
-  /*   registry.emplace<Position>(member, i, 9., 0.); */
+  /*   registry.emplace<Position>(member, i + 7, 9., 0.); */
   /*   registry.emplace<Visibility>(member, "spritesheet-characters", i % 6); */
   /*   registry.emplace<Selectable>(member); */
   /* } */
@@ -73,7 +74,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   /*   const auto member = registry.create(); */
   /*   registry.emplace<SocietyAgent>(member, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
   /*   registry.emplace<Biology>(member, Sex::Male, 100.); */
-  /*   registry.emplace<Position>(member, i, 10., 0.); */
+  /*   registry.emplace<Position>(member, i + 7, 10., 0.); */
   /*   registry.emplace<Visibility>(member, "spritesheet-characters", i % 6); */
   /*   registry.emplace<Selectable>(member); */
   /* } */
@@ -82,7 +83,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   /*   const auto member = registry.create(); */
   /*   registry.emplace<SocietyAgent>(member, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
   /*   registry.emplace<Biology>(member, Sex::Male, 100.); */
-  /*   registry.emplace<Position>(member, i, 11., 0.); */
+  /*   registry.emplace<Position>(member, i + 7, 11., 0.); */
   /*   registry.emplace<Visibility>(member, "spritesheet-characters", i % 6); */
   /*   registry.emplace<Selectable>(member); */
   /* } */
@@ -91,7 +92,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   /*   const auto member = registry.create(); */
   /*   registry.emplace<SocietyAgent>(member, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
   /*   registry.emplace<Biology>(member, Sex::Male, 100.); */
-  /*   registry.emplace<Position>(member, i, 12., 0.); */
+  /*   registry.emplace<Position>(member, i + 7, 12., 0.); */
   /*   registry.emplace<Visibility>(member, "spritesheet-characters", i % 6); */
   /*   registry.emplace<Selectable>(member); */
   /* } */

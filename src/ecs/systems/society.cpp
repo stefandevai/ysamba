@@ -58,6 +58,14 @@ void SocietySystem::update(entt::registry& registry, const double delta)
       // Move towards the target
       if (!m_world.adjacent(target.id, position.x, position.y, position.z))
       {
+        // if the target path is empty, that means that the target disappeared.
+        // Invalidate the target
+        if (target.path.size() <= 1)
+        {
+          action_harvest.target.id = -1;
+          action_harvest.time_left = 0.05;
+          return;
+        }
         auto current_target_position = target.path.top();
 
         if (std::round(position.x) == current_target_position.first &&
@@ -86,11 +94,17 @@ void SocietySystem::update(entt::registry& registry, const double delta)
 
       // Harvest
       action_harvest.time_left -= delta;
-      spdlog::info("Harvesting: {}", action_harvest.time_left);
 
       if (action_harvest.time_left < 0.0)
       {
-        spdlog::info("Harvested! {} {} {}", target.x, target.y, target.z);
+        // Check if target tile is still there
+        const auto& tile = m_world.get(target.x, target.y, target.z);
+        if (tile.id != target.id)
+        {
+          action_harvest.time_left = 0.05;
+          action_harvest.target.id = -1;
+          return;
+        }
 
         // Replace the plant tile with grass
         m_world.set(2, target.x, target.y, target.z);
