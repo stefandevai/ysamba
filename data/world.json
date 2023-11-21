@@ -27,6 +27,16 @@
       "id": 4,
       "name": "wall",
       "flags": []
+    },
+    {
+      "id": 5,
+      "name": "yuca_plant",
+      "flags": ["HARVESTABLE"]
+    },
+    {
+      "id": 6,
+      "name": "dirt",
+      "flags": ["WALKABLE"]
     }
   ]
 }

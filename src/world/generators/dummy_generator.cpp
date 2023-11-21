@@ -26,6 +26,13 @@ Tilemap DummyGenerator::generate(const int seed)
   {
     for (int i = 0; i < m_width; ++i)
     {
+      const auto render_yuca = m_distribution(m_rng);
+      if (render_yuca < 0.1f)
+      {
+        tilemap.tiles[j * m_width + i] = TileType::Yuca;
+        continue;
+      }
+
       tilemap.tiles[j * m_width + i] = TileType::Land;
     }
   }

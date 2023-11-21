@@ -103,6 +103,11 @@ void Renderer::render(const Camera& camera)
 
   for (const auto& layer : m_layers)
   {
+    if (!layer.second->get_should_render())
+    {
+      continue;
+    }
+
     const auto& shader = layer.second->shader;
     assert(shader != nullptr);
     shader->use();

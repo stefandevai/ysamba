@@ -14,11 +14,19 @@
         },
         {
             "frame": 3,
-            "tileId": 3
+            "tileId": 6
         },
         {
             "frame": 4,
             "tileId": 4
+        },
+        {
+            "frame": 5,
+            "tileId": 5
+        },
+        {
+            "frame": 32,
+            "tileId": 3
         }
     ]
 }

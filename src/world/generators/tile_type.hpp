@@ -4,11 +4,12 @@ namespace dl
 {
 enum TileType
 {
-  None,
-  Water,
-  Land,
-  Grass,
-  Red,
-  Yellow,
+  None = 0,
+  Water = 1,
+  Land = 2,
+  Grass = 3,
+  Red = 4,
+  Yuca = 5,
+  Yellow = 6,
 };
 }

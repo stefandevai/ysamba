@@ -27,10 +27,10 @@ class World
   void generate(const int width, const int height, const int seed);
   const TileData get(const int x, const int y, const int z);
   TilemapSize get_tilemap_size(const int z);
-  inline int get_seed() const { return m_seed; };
-  inline size_t get_chunk_size() const { return m_chunk_size; };
-  inline const std::string& get_texture_id() const { return m_texture_id; };
-  inline Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
+  int get_seed() const { return m_seed; };
+  size_t get_chunk_size() const { return m_chunk_size; };
+  const std::string& get_texture_id() const { return m_texture_id; };
+  Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
 
   template <class Archive>
   void serialize(Archive& archive)

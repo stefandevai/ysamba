@@ -25,6 +25,7 @@ class BatchQuad : public Layer
   void emplace(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
   void init_emplacing();
   void finalize_emplacing();
+  bool get_should_render() { return m_index_count > 0; }
 
  private:
   using Layer::emplace;
