@@ -15,10 +15,6 @@
 
 namespace dl
 {
-// TEMP
-entt::entity target_rectangle;
-// TEMP
-
 SocietySystem::SocietySystem(World& world) : m_world(world) {}
 
 void SocietySystem::update(entt::registry& registry, const double delta)

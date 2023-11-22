@@ -87,7 +87,6 @@ void AssetManager::m_init_assets()
     case AssetType::TEXTURE_ATLAS:
     {
       const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      const auto uniform = asset_info[ASSET_PARAMETER_UNIFORM].get<bool>();
       // TODO: Parse all texture types
       const auto texture_type = TextureType::DIFFUSE;
 
