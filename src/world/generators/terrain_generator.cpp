@@ -6,9 +6,9 @@
 #include <cmath>
 #include <functional>
 #include <libtcod.hpp>
-#include <random>
 #include <utility>
 
+#include "../../core/random.hpp"
 #include "./bay_data.hpp"
 #include "./lib/bezier.hpp"
 #include "./lib/fast_noise_lite.hpp"
@@ -1220,9 +1220,12 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
   assert(bays.size() > 0 && "There are no bays identified");
   assert(island.structure.land_sites.size() > 0 && "There are no land sites");
 
-  std::mt19937 rng(seed);
-  std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_sites.size() - 1);
-  std::uniform_int_distribution<unsigned int> bay_indexes_dist(0, bays.size() - 1);
+  random::rng.seed(seed);
+
+  // Leaving it here in case the new random implementation breaks something
+  /* std::mt19937 rng(seed); */
+  /* std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_sites.size() - 1); */
+  /* std::uniform_int_distribution<unsigned int> bay_indexes_dist(0, bays.size() - 1); */
   const auto min_source_mouth_distance_x = m_lua.get_variable<int>("min_source_mouth_distance_x");
   const auto min_source_mouth_distance_y = m_lua.get_variable<int>("min_source_mouth_distance_y");
 
@@ -1278,7 +1281,9 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
       has_reached_first_limit = true;
     }
 
-    source_site = island.structure.land_sites[land_indexes_dist(rng)];
+    const auto n = random::get_integer(0, island.structure.land_sites.size());
+
+    source_site = island.structure.land_sites[n];
     source_point = Point<int>(source_site->point.x * m_width, source_site->point.y * m_height);
 
     // Make sure that source point is on the upper part of the island

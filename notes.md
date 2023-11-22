@@ -9,6 +9,9 @@ They change according to the geographical location
 - Savants (a lot of old people)
 - Warriors
 
+Nomadic - worse equipment at start but better skills overall
+Sedentary - better equipment but worse skills
+
 # Gameplay
 - Player's society can conquer others by force or by diplomacy
 - Nearby societies have a more similar language and culture than those far away

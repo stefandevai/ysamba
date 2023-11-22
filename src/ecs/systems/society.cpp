@@ -4,6 +4,7 @@
 
 #include <entt/entity/registry.hpp>
 
+#include "../../core/random.hpp"
 #include "../../world/world.hpp"
 #include "../components/action_harvest.hpp"
 #include "../components/biology.hpp"
@@ -20,7 +21,7 @@ SocietySystem::SocietySystem(World& world) : m_world(world) {}
 void SocietySystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<SocietyAgent>();
-  view.each([this, &registry, delta](auto entity, auto& agent) {
+  view.each([&registry, delta](auto entity, auto& agent) {
     if (agent.state == SocietyAgent::State::Harvesting)
     {
       if (!registry.all_of<ActionHarvest>(entity))
@@ -33,7 +34,7 @@ void SocietySystem::update(entt::registry& registry, const double delta)
       if (agent.time_to_next_action <= 0)
       {
         agent.time_to_next_action = 1.0;
-        const auto n = m_distribution(m_rng);
+        const auto n = random::get_real();
 
         if (n < .7f)
         {
@@ -50,7 +51,7 @@ void SocietySystem::update(entt::registry& registry, const double delta)
       if (agent.time_to_next_action <= 0)
       {
         agent.time_to_next_action = 1.0;
-        const auto n = m_distribution(m_rng);
+        const auto n = random::get_real();
         if (n < .4f)
         {
           agent.state = SocietyAgent::State::Idle;
@@ -61,8 +62,8 @@ void SocietySystem::update(entt::registry& registry, const double delta)
         agent.time_to_next_action -= delta;
       }
 
-      const auto x_dir = m_distribution(m_rng);
-      const auto y_dir = m_distribution(m_rng);
+      const auto x_dir = random::get_real();
+      const auto y_dir = random::get_real();
 
       auto velocity_x = 0.;
       auto velocity_y = 0.;

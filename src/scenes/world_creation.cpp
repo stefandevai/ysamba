@@ -5,11 +5,10 @@
 #include <cereal/archives/binary.hpp>
 #include <climits>
 #include <fstream>
-#include <random>
 
+#include "../core/random.hpp"
 #include "../graphics/camera.hpp"
 #include "../graphics/color.hpp"
-#include "../graphics/quad.hpp"
 #include "../graphics/renderer.hpp"
 #include "../graphics/sprite.hpp"
 #include "../graphics/texture.hpp"
@@ -161,11 +160,7 @@ void WorldCreation::m_generate_map(const int seed)
   }
   else
   {
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<int> dist(1, INT_MAX);
-
-    m_seed = dist(rng);
+    m_seed = random::get_integer(1, INT_MAX);
   }
 
   m_world.generate(map_width, map_height, m_seed);
@@ -188,7 +183,6 @@ void WorldCreation::m_create_world_representation()
     for (auto j = 0; j < tilemap_size.h; ++j)
     {
       const auto tile = m_world.get(i, j, 0);
-      /* auto quad = std::make_shared<Quad>(); */
 
       switch (tile.id)
       {

@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include "../../core/random.hpp"
 #include "./tile_type.hpp"
 
 namespace dl
@@ -26,7 +27,7 @@ Tilemap DummyGenerator::generate(const int seed)
   {
     for (int i = 0; i < m_width; ++i)
     {
-      const auto render_yuca = m_distribution(m_rng);
+      const auto render_yuca = random::get_real();
       if (render_yuca < 0.1f)
       {
         tilemap.tiles[j * m_width + i] = TileType::Yuca;
