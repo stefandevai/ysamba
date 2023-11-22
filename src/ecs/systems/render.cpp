@@ -56,25 +56,32 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
     }
   }
 
-  auto view = registry.view<const Position, const Visibility>();
+  auto items_view = registry.view<const Position, const Visibility>();
 
-  view.each([&renderer](const auto& position, const auto& visibility) {
+  for (auto entity : items_view)
+  {
+    const auto& position = registry.get<Position>(entity);
+    const auto& visibility = registry.get<Visibility>(entity);
+
     if (visibility.sprite->texture == nullptr)
     {
       visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id);
-    }
 
-    /* if (selectable.selected) */
-    /* { */
-    /*   visibility.sprite->set_frame(1); */
-    /* } */
+      // Set specific frame according to the texture data loaded in a separated json file.
+      // This allows flexibility by separating the texture frames from game ids.
+      if (visibility.frame_id > 0 && !visibility.frame_type.empty())
+      {
+        const auto frame = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
+        visibility.sprite->set_frame(frame);
+      }
+    }
 
     const auto sprite_size = visibility.sprite->get_size();
     const auto position_x = std::round(position.x) * sprite_size.x;
     const auto position_y = std::round(position.y) * sprite_size.y;
 
     renderer.batch("world", visibility.sprite, position_x, position_y, 1.);
-  });
+  }
 
   renderer.finalize("world");
 

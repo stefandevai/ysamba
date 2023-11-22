@@ -10,17 +10,20 @@
 #include "../graphics/sprite.hpp"
 #include "./generators/dummy_generator.hpp"
 #include "./generators/society_generator.hpp"
+#include "./tile_flag.hpp"
 #include "./tile_target.hpp"
 
 namespace dl
 {
 World::World()
 {
-  m_load_tile_data();
   m_chunk_size = m_json.object["chunk_size"];
   m_texture_id = m_json.object["texture_id"];
   const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
   spatial_hash.load(m_chunk_size, m_chunk_size, spatial_hash_cell_size);
+
+  m_load_tile_data();
+  m_load_item_data();
 }
 
 void World::generate(const int width, const int height, const int seed)
@@ -57,21 +60,6 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
   std::queue<std::pair<int, int>> position_queue;
   std::set<std::pair<int, int>> visited;
   const auto displacements = {-1, 0, 1};
-
-  /* const auto tile_has_flag = [this, &tile_target, &flag](const int l_x, const int l_y, const int l_z) { */
-  /*   const auto& tile = get(l_x, l_y, l_z); */
-
-  /*   if (tile.flags.contains(flag)) */
-  /*   { */
-  /*     tile_target.id = tile.id; */
-  /*     tile_target.x = l_x; */
-  /*     tile_target.y = l_y; */
-  /*     tile_target.z = l_z; */
-  /*     return true; */
-  /*   } */
-
-  /*   return false; */
-  /* }; */
 
   bool found_tile = false;
 
@@ -121,15 +109,12 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
           while (step != start)
           {
             step = paths[step];
-
             tile_target.path.push(step);
           }
-
-          /* std::reverse(tile_target.path.begin(), tile_target.path.end()); */
           break;
         }
 
-        if (tile.flags.contains("WALKABLE"))
+        if (tile.flags.contains(tile_flag::walkable))
         {
           position_queue.push(position);
         }
@@ -172,6 +157,8 @@ bool World::adjacent(const int tile_id, const int x, const int y, const int z) c
 
 TilemapSize World::get_tilemap_size(const int z) { return m_tilemaps[z - m_depth_min].get_size(); }
 
+const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }
+
 void World::m_load_tile_data()
 {
   const auto tiles = m_json.object["tiles"].get<std::vector<nlohmann::json>>();
@@ -182,8 +169,37 @@ void World::m_load_tile_data()
 
     tile_data.id = tile["id"].get<int>();
     tile_data.name = tile["name"].get<std::string>();
-    tile_data.flags = tile["flags"].get<std::unordered_set<std::string>>();
+
+    if (tile.contains("flags"))
+    {
+      tile_data.flags = tile["flags"].get<std::unordered_set<std::string>>();
+    }
+    if (tile.contains("drop_ids"))
+    {
+      tile_data.drop_ids = tile["drop_ids"].get<std::vector<uint32_t>>();
+    }
+    if (tile.contains("after_removed"))
+    {
+      tile_data.after_removed = tile["after_removed"].get<uint32_t>();
+    }
+
     m_tile_data[tile_data.id] = tile_data;
+  }
+}
+
+void World::m_load_item_data()
+{
+  m_json.load("./data/items/cooking.json");
+
+  const auto items = m_json.object.get<std::vector<nlohmann::json>>();
+
+  for (const auto& item : items)
+  {
+    auto item_data = ItemData();
+
+    item_data.id = item["id"].get<uint32_t>();
+    item_data.name = item["name"].get<std::string>();
+    m_item_data[item_data.id] = item_data;
   }
 }
 }  // namespace dl

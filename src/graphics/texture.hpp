@@ -2,9 +2,11 @@
 
 #include <array>
 #include <glm/vec2.hpp>
+#include <map>
 #include <string>
 
 #include "../core/asset.hpp"
+#include "../core/json.hpp"
 
 namespace dl
 {
@@ -45,7 +47,25 @@ class Texture : public Asset
   std::array<glm::vec2, 4> get_frame_coords(const int frame) const;
   /* void set_custom_uv (const glm::vec2& uv, const float width, const float height); */
 
- protected:
+  // Load texture metadata from a json file
+  void load_data(const std::string& filepath);
+
+  // Convert a game id to a texture frame known from a metadata file
+  uint32_t id_to_frame(const uint32_t id, const std::string& type);
+
+ private:
+  struct PairHash
+  {
+    std::size_t operator()(std::pair<uint32_t, std::string> const& p) const
+    {
+      return std::hash<uint32_t>()(p.first) + std::hash<std::string>()(p.second);
+    };
+  };
+
+  using FrameData = std::unordered_map<std::pair<uint32_t, std::string>, uint32_t, PairHash>;
+
+  JSON m_json{};
+  FrameData m_frame_data;
   const TextureType m_type = TextureType::DIFFUSE;
   const int m_horizontal_frames;
   const int m_vertical_frames;

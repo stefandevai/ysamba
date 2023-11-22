@@ -27,99 +27,9 @@ void SocietySystem::update(entt::registry& registry, const double delta)
   view.each([this, &registry, delta](auto entity, auto& agent) {
     if (agent.state == SocietyAgent::State::Harvesting)
     {
-      // If the entity doesn't have a harvest action, add it
       if (!registry.all_of<ActionHarvest>(entity))
       {
         registry.emplace<ActionHarvest>(entity);
-      }
-
-      const auto& position = registry.get<Position>(entity);
-      auto& action_harvest = registry.get<ActionHarvest>(entity);
-
-      if (!action_harvest.target)
-      {
-        action_harvest.target = m_world.search_by_flag("HARVESTABLE", position.x, position.y, position.z);
-
-        if (!action_harvest.target)
-        {
-          registry.remove<ActionHarvest>(entity);
-          agent.state = SocietyAgent::State::Walking;
-          return;
-        }
-
-        /* target_rectangle = registry.create(); */
-        /* registry.emplace<Position>( */
-        /*     target_rectangle, action_harvest.target.x, action_harvest.target.y, action_harvest.target.z); */
-        /* registry.emplace<Rectangle>(target_rectangle, 32, 32, "#ff000066"); */
-      }
-
-      auto& target = action_harvest.target;
-
-      // If the target tile is not adjacent, move towards the target
-      if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
-      {
-        // if the target path is empty, that means that the target disappeared.
-        // Invalidate the target
-        if (target.path.size() <= 1)
-        {
-          action_harvest.target.id = -1;
-          action_harvest.time_left = 0.05;
-          return;
-        }
-        auto current_target_position = target.path.top();
-
-        if (std::round(position.x) == current_target_position.first &&
-            std::round(position.y) == current_target_position.second)
-        {
-          target.path.pop();
-          current_target_position = target.path.top();
-        }
-
-        const auto x_dir = current_target_position.first - std::round(position.x);
-        const auto y_dir = current_target_position.second - std::round(position.y);
-
-        if (registry.all_of<Velocity>(entity))
-        {
-          registry.patch<Velocity>(entity, [x_dir, y_dir](auto& velocity) {
-            velocity.x = x_dir;
-            velocity.y = y_dir;
-          });
-        }
-        else
-        {
-          registry.emplace<Velocity>(entity, x_dir, y_dir, 0.);
-        }
-        return;
-      }
-
-      // Harvest
-      action_harvest.time_left -= delta;
-
-      if (action_harvest.time_left < 0.0)
-      {
-        // Check if target tile is still there
-        const auto& tile = m_world.get(target.x, target.y, target.z);
-        if (tile.id != target.id)
-        {
-          action_harvest.time_left = 0.05;
-          action_harvest.target.id = -1;
-          return;
-        }
-
-        // Replace the plant tile with grass
-        m_world.set(2, target.x, target.y, target.z);
-
-        // Create yuca roots
-        const auto yuca_roots = registry.create();
-        registry.emplace<Position>(yuca_roots, target.x, target.y, target.z);
-        registry.emplace<Visibility>(yuca_roots, "spritesheet-tileset", 6);
-
-        // Finalize action
-        action_harvest.time_left = 0.05;
-        action_harvest.target.id = -1;
-        /* registry.destroy(target_rectangle); */
-        /* registry.remove<ActionHarvest>(entity); */
-        /* agent.state = SocietyAgent::State::Walking; */
       }
     }
     else if (agent.state == SocietyAgent::State::Idle)

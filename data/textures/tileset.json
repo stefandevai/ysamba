@@ -1,32 +1,52 @@
-{
-    "tiles": [
-        {
-            "frame": 0,
-            "tileId": 0
-        },
-        {
-            "frame": 1,
-            "tileId": 1
-        },
-        {
-            "frame": 2,
-            "tileId": 2
-        },
-        {
-            "frame": 3,
-            "tileId": 6
-        },
-        {
-            "frame": 4,
-            "tileId": 4
-        },
-        {
-            "frame": 5,
-            "tileId": 5
-        },
-        {
-            "frame": 32,
-            "tileId": 3
-        }
-    ]
-}
+[
+    {
+        "frame": 0,
+        "id": 0,
+        "type": "tile"
+    },
+    {
+        "frame": 1,
+        "id": 1,
+        "type": "tile"
+    },
+    {
+        "frame": 2,
+        "id": 2,
+        "type": "tile"
+    },
+    {
+        "frame": 3,
+        "id": 6,
+        "type": "tile"
+    },
+    {
+        "frame": 4,
+        "id": 4,
+        "type": "tile"
+    },
+    {
+        "frame": 5,
+        "id": 5,
+        "type": "tile"
+    },
+    {
+        "frame": 6,
+        "id": 1,
+        "type": "item"
+    },
+    {
+        "frame": 7,
+        "id": 2,
+        "type": "item"
+    },
+    {
+        "frame": 8,
+        "id": 3,
+        "type": "item"
+    },
+    {
+        "frame": 32,
+        "id": 3,
+        "type": "tile"
+    }
+]

@@ -153,4 +153,26 @@ void Texture::m_load_empty()
     spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
   }
 }
+
+uint32_t Texture::id_to_frame(const uint32_t id, const std::string& type)
+{
+  return m_frame_data.at(std::make_pair(id, type));
+}
+
+void Texture::load_data(const std::string& filepath)
+{
+  m_json.load(filepath);
+
+  const auto items = m_json.object.get<std::vector<nlohmann::json>>();
+
+  for (const auto& item : items)
+  {
+    const auto game_id = item["id"].get<uint32_t>();
+    const auto type = item["type"].get<std::string>();
+    const auto frame = item["frame"].get<uint32_t>();
+
+    m_frame_data[std::make_pair(game_id, type)] = frame;
+  }
+}
+
 }  // namespace dl

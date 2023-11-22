@@ -21,4 +21,5 @@ const std::string ASSET_PARAMETER_SIZE = "size";
 const std::string ASSET_PARAMETER_UNIFORM = "uniform";
 const std::string ASSET_PARAMETER_HORIZONTAL_FRAMES = "horizontalFrames";
 const std::string ASSET_PARAMETER_VERTICAL_FRAMES = "verticalFrames";
+const std::string ASSET_PARAMETER_DATA_FILEPATH = "data_filepath";
 }  // namespace dl

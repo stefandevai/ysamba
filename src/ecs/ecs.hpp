@@ -3,6 +3,7 @@
 #include <entt/entity/fwd.hpp>
 
 #include "./systems/game.hpp"
+#include "./systems/harvest.hpp"
 #include "./systems/physics.hpp"
 #include "./systems/render.hpp"
 #include "./systems/society.hpp"
@@ -29,6 +30,7 @@ class ECS
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_world};
   SocietySystem m_society_system{m_world};
+  HarvestSystem m_harvest_system{m_world};
   double m_turn_delay = 0.0;
 };
 }  // namespace dl

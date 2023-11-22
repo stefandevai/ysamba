@@ -31,6 +31,7 @@ void ECS::update(const double delta)
   m_game_system.update();
   m_physics_system.update(m_registry, delta);
   m_society_system.update(m_registry, delta);
+  m_harvest_system.update(m_registry, delta);
 }
 
 void ECS::render(Renderer& renderer) { m_render_system.update(m_registry, renderer, m_camera); }

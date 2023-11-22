@@ -8,6 +8,7 @@
 
 #include "../core/json.hpp"
 #include "../core/lua_api.hpp"
+#include "./item_data.hpp"
 #include "./society.hpp"
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"
@@ -51,11 +52,14 @@ class World
   // Get a specific society
   Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
 
-  // Search a nearby tile by flag
+  // Get a nearby tile containing a flag
   TileTarget search_by_flag(const std::string& flag, const int x = 0, const int y = 0, const int z = 0) const;
 
   // Check if a specific tile is adjacent to a position
   bool adjacent(const int tile_id, const int x = 0, const int y = 0, const int z = 0) const;
+
+  // Get information about a tile with id
+  const TileData& get_tile_data(const uint32_t id) const;
 
   template <class Archive>
   void serialize(Archive& archive)
@@ -65,9 +69,9 @@ class World
 
  private:
   JSON m_json{"./data/world.json"};
-  /* std::vector<std::shared_ptr<Tilemap>> m_tilemaps; */
   std::vector<Tilemap> m_tilemaps;
-  std::map<int, TileData> m_tile_data;
+  std::unordered_map<uint32_t, TileData> m_tile_data;
+  std::unordered_map<uint32_t, ItemData> m_item_data;
   size_t m_chunk_size = 0;
   std::string m_texture_id;
   int m_depth_min = 0;
@@ -77,5 +81,8 @@ class World
 
   // Load information about tiles
   void m_load_tile_data();
+
+  // Load information about items
+  void m_load_item_data();
 };
 }  // namespace dl

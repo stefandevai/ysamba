@@ -52,4 +52,5 @@ void Sprite::set_custom_uv(const float left, const float top, const float width,
   m_custom_height = height;
   m_has_custom_uv = true;
 }
+
 }  // namespace dl

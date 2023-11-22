@@ -31,7 +31,9 @@
     {
       "id": 5,
       "name": "yuca_plant",
-      "flags": ["HARVESTABLE"]
+      "flags": ["HARVESTABLE"],
+      "drop_ids": [1],
+      "after_removed": 2
     },
     {
       "id": 6,
