@@ -1,13 +1,9 @@
 #pragma once
 
+#include "../../world/sex.hpp"
+
 namespace dl
 {
-enum Sex
-{
-  Male,
-  Female,
-};
-
 struct Biology
 {
   Biology(const Sex sex, const int base_speed) : sex(sex), base_speed(base_speed), speed(base_speed) {}

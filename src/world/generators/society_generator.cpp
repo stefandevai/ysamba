@@ -1,5 +1,7 @@
 #include "./society_generator.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <entt/entity/registry.hpp>
 
 #include "../../core/random.hpp"
@@ -30,9 +32,9 @@ Society SocietyGenerator::generate(const int seed)
   return society;
 }
 
-void SocietyGenerator::generate_members(const int seed, const Society& society, entt::registry& registry) const
+void SocietyGenerator::generate_members(const int seed, Society& society, entt::registry& registry)
 {
-  rng.seed(seed);
+  random::rng.seed(seed);
 
   switch (society.mode_of_production)
   {
@@ -40,7 +42,7 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
     m_generate_primitive_communism_members(society, registry);
     break;
   case ModeOfProduction::Slavery:
-    m_generate_slavery_members(society, registry);
+    /* m_generate_slavery_members(society, registry); */
     break;
   default:
     break;
@@ -78,30 +80,64 @@ void SocietyGenerator::generate_members(const int seed, const Society& society, 
   /* } */
 }
 
-void SocietyGenerator::m_generate_primitive_communism_members(const Society& society, entt : registry& registry)
+void SocietyGenerator::m_generate_primitive_communism_members(Society& society, entt::registry& registry)
 {
-  const auto number_of_families = random::get_int(1, 6);
-  const auto cacique = registry.create();
+  /* const auto first_generation_members = random::get_integer(1, 2); */
+  const auto first_generation_members = 1;
+  /* const auto cacique = registry.create(); */
 
-  const auto sex;
-
-  if (society.predominance == Predominance::Patriarchy)
+  for (auto i = 0; i < first_generation_members; ++i)
   {
-    sex = Sex::Male;
-  }
-  else
-  {
-    sex = Sex::Female;
-  }
+    const auto first_member_id = society.add_first_member(Sex::Male);
+    const auto first_member_spouse_id = society.add_spouse(first_member_id);
 
-  const auto member1 = registry.create();
-  registry.emplace<SocietyAgent>(member1, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
-  registry.emplace<Biology>(member1, Sex::Male, 100);
-  registry.emplace<Position>(member1, 9., 16., 0.);
-  registry.emplace<Visibility>(member1, "spritesheet-characters", 0);
-  registry.emplace<Selectable>(member1);
+    m_create_person_entity(registry, society, first_member_id);
+    m_create_person_entity(registry, society, first_member_spouse_id);
+
+    const auto number_of_sons = 1;
+
+    for (auto j = 0; j < number_of_sons; ++j)
+    {
+      const auto son = society.add_son(first_member_id);
+      m_create_person_entity(registry, society, son);
+    }
+
+    const auto number_of_daughters = 1;
+
+    for (auto j = 0; j < number_of_daughters; ++j)
+    {
+      const auto daughter = society.add_daughter(first_member_id);
+      m_create_person_entity(registry, society, daughter);
+    }
+  }
 }
 
-void SocietyGenerator::m_generate_slavery_members(const Society& society, entt : registry& registry) {}
+/* void SocietyGenerator::m_generate_slavery_members(const Society& society, entt::registry& registry) {} */
+
+void SocietyGenerator::m_create_person_entity(entt::registry& registry,
+                                              const Society& society,
+                                              const uint32_t person_id)
+{
+  spdlog::info("PERSONID {}", person_id);
+  const auto& person = society.get_member(person_id);
+  const auto person_entity = registry.create();
+
+  registry.emplace<SocietyAgent>(person_entity, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
+
+  registry.emplace<Biology>(person_entity, person->sex, 100);
+
+  const auto x = random::get_integer(10, 20);
+  const auto y = random::get_integer(10, 20);
+  registry.emplace<Position>(person_entity, x, y, 0.);
+
+  auto frame = 0;
+
+  if (person->sex == Sex::Female)
+  {
+    frame = 1;
+  }
+
+  registry.emplace<Visibility>(person_entity, "spritesheet-characters", frame);
+}
 
 }  // namespace dl
