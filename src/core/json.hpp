@@ -16,13 +16,15 @@ class JSON
 
   void load(const std::string& filepath);
   void save(const std::string& filepath);
-  inline void set_filepath(const std::string& filepath) { m_filepath = filepath; };
-  inline void set_pretty_print(const bool status) { m_pretty_print = status; };
-  inline std::string get_filepath() const { return m_filepath; };
-  inline bool get_pretty_print() const { return m_pretty_print; };
+  void set_filepath(const std::string& filepath) { m_filepath = filepath; };
+  void set_pretty_print(const bool status) { m_pretty_print = status; };
+  std::string get_filepath() const { return m_filepath; };
+  bool get_pretty_print() const { return m_pretty_print; };
+  bool get_has_loaded() const { return m_has_loaded; }
 
  private:
   std::string m_filepath;
   bool m_pretty_print = true;
+  bool m_has_loaded = false;
 };
 }  // namespace dl

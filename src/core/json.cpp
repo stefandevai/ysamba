@@ -19,6 +19,7 @@ void JSON::load(const std::string& filepath)
   auto json_string = FileUtils::read_file(filepath.c_str());
   object = nlohmann::json::parse(json_string);
   m_filepath = filepath;
+  m_has_loaded = true;
 }
 
 void JSON::save(const std::string& filepath)
