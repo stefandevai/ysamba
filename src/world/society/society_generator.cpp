@@ -41,6 +41,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     father_parameters.texture_frame = 0;
     father_parameters.speed = 100;
     father_parameters.name = name_generator.generate();
+    spdlog::info("Father's name: {}", father_parameters.name);
     const auto father_components = m_get_member_components(society, father_parameters);
     members.push_back(father_components);
 
@@ -50,6 +51,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     mother_parameters.texture_frame = 1;
     mother_parameters.speed = 100;
     mother_parameters.name = name_generator.generate();
+    spdlog::info("Mothers's name: {}", mother_parameters.name);
     const auto mother_components = m_get_member_components(society, mother_parameters);
     members.push_back(mother_components);
 
@@ -64,6 +66,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       son_parameters.speed = 80;
       son_parameters.name = name_generator.generate();
       const auto son_components = m_get_member_components(society, son_parameters);
+      spdlog::info("Sons's name: {}", son_parameters.name);
       members.push_back(son_components);
     }
 
@@ -77,6 +80,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       daughter_parameters.texture_frame = 5;
       daughter_parameters.speed = 80;
       daughter_parameters.name = name_generator.generate();
+      spdlog::info("Daughters's name: {}", daughter_parameters.name);
       const auto daughter_components = m_get_member_components(society, daughter_parameters);
       members.push_back(daughter_components);
     }
