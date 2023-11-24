@@ -16,7 +16,7 @@
 
 namespace dl
 {
-SocietySystem::SocietySystem(World& world) : m_world(world) {}
+SocietySystem::SocietySystem() {}
 
 void SocietySystem::update(entt::registry& registry, const double delta)
 {

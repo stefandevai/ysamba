@@ -6,7 +6,7 @@
 #include "../../ecs/components/position.hpp"
 #include "../../ecs/components/society_agent.hpp"
 #include "../../ecs/components/visibility.hpp"
-#include "../society_blueprint.hpp"
+#include "./society_blueprint.hpp"
 
 namespace dl
 {

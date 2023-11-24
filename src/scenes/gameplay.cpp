@@ -10,7 +10,7 @@
 #include "../ecs/components/selectable.hpp"
 #include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
-#include "../world/generators/society_generator.hpp"
+#include "../world/society/society_generator.hpp"
 
 namespace dl
 {

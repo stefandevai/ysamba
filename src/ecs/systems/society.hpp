@@ -9,11 +9,8 @@ class World;
 class SocietySystem
 {
  public:
-  SocietySystem(World& world);
+  SocietySystem();
 
   void update(entt::registry& registry, const double delta);
-
- private:
-  World& m_world;
 };
 }  // namespace dl

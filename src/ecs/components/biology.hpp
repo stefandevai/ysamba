@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../world/sex.hpp"
+#include "../../world/society/sex.hpp"
 
 namespace dl
 {
