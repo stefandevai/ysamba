@@ -50,8 +50,8 @@ void HomeMenu::update(const double delta, SetSceneFunction set_scene)
   }
   else if (m_input_manager->poll_action("generate_name"))
   {
-    auto name_generator = NameGenerator();
-    name_generator.load("mix");
+    auto name_generator = NameGenerator(4, 10);
+    name_generator.load("nahuatl");
     const auto name = name_generator.generate();
     spdlog::critical("NAME: {}", name);
   }

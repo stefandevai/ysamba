@@ -1,5 +1,7 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
+
 #include <random>
 
 namespace dl::random
@@ -24,5 +26,14 @@ static inline T get_weighted_value(const std::vector<T>& values, const std::vect
 {
   std::discrete_distribution<> distribution(weights.begin(), weights.end());
   return values[distribution(rng)];
+}
+
+template <typename T>
+static inline T get_normal_number(const T from, const T to)
+{
+  std::normal_distribution<double> d(0.5, 0.2);
+  const auto n = d(rng);
+
+  return static_cast<T>(n * (to - from) + from);
 }
 }  // namespace dl::random

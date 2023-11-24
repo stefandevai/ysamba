@@ -7,9 +7,12 @@
 #include "../../core/random.hpp"
 #include "../../graphics/camera.hpp"
 #include "../world.hpp"
+#include "./name_generator.hpp"
 
 namespace dl
 {
+auto name_generator = NameGenerator();
+
 SocietyBlueprint SocietyGenerator::generate_blueprint()
 {
   SocietyBlueprint society{};
@@ -26,6 +29,7 @@ SocietyBlueprint SocietyGenerator::generate_blueprint()
 
 std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_members(SocietyBlueprint& society)
 {
+  name_generator.load("guarani");
   std::vector<MemberComponents> members;
   const auto first_generation_members = 1;
 
@@ -36,7 +40,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     father_parameters.member_id = father_id;
     father_parameters.texture_frame = 0;
     father_parameters.speed = 100;
-    father_parameters.name = "Tupa";
+    father_parameters.name = name_generator.generate();
     const auto father_components = m_get_member_components(society, father_parameters);
     members.push_back(father_components);
 
@@ -45,7 +49,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     mother_parameters.member_id = mother_id;
     mother_parameters.texture_frame = 1;
     mother_parameters.speed = 100;
-    mother_parameters.name = "Boudicca";
+    mother_parameters.name = name_generator.generate();
     const auto mother_components = m_get_member_components(society, mother_parameters);
     members.push_back(mother_components);
 
@@ -58,7 +62,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       son_parameters.member_id = son_id;
       son_parameters.texture_frame = 4;
       son_parameters.speed = 80;
-      son_parameters.name = "Tupac";
+      son_parameters.name = name_generator.generate();
       const auto son_components = m_get_member_components(society, son_parameters);
       members.push_back(son_components);
     }
@@ -72,7 +76,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       daughter_parameters.member_id = daughter_id;
       daughter_parameters.texture_frame = 5;
       daughter_parameters.speed = 80;
-      daughter_parameters.name = "Yara";
+      daughter_parameters.name = name_generator.generate();
       const auto daughter_components = m_get_member_components(society, daughter_parameters);
       members.push_back(daughter_components);
     }
