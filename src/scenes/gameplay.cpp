@@ -6,11 +6,15 @@
 #include <climits>
 #include <fstream>
 
-#include "../ecs/components/position.hpp"
-#include "../ecs/components/selectable.hpp"
 #include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
 #include "../world/society/society_generator.hpp"
+
+// TEMP
+#include "../ecs/components/position.hpp"
+#include "../ecs/components/selectable.hpp"
+#include "../ecs/components/visibility.hpp"
+// TEMP
 
 namespace dl
 {
@@ -24,9 +28,16 @@ void Gameplay::load()
 
   m_ecs.load();
 
-  auto society_blueprint = m_world.get_society("otomi");
-  const auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  /* auto society_blueprint = m_world.get_society("otomi"); */
+  /* const auto components = SocietyGenerator::generate_members(society_blueprint); */
+  /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
+
+  auto yu = m_registry.create();
+  m_registry.emplace<Position>(yu, 9, 9, 1);
+  m_registry.emplace<Visibility>(yu, "spritesheet-tileset", 6);
+  auto pe = m_registry.create();
+  m_registry.emplace<Position>(pe, 9, 9, 2);
+  m_registry.emplace<Visibility>(pe, "spritesheet-characters", 0);
 
   m_has_loaded = true;
 }

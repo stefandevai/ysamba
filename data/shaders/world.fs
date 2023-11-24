@@ -53,6 +53,11 @@ void main()
       final_color = texture(textures[10], f_in.uv);
       break;
   }
-  
-  color = vec4(final_color.rgb, final_color.a * f_in.color.r);
+
+  if (final_color.a < 0.1)
+  {
+    discard;
+  }
+
+  color = vec4(final_color.rgb, final_color.a * f_in.color.a);
 }
