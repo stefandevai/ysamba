@@ -155,6 +155,12 @@ bool World::adjacent(const int tile_id, const int x, const int y, const int z) c
   return false;
 }
 
+bool World::is_walkable(const int x, const int y, const int z) const
+{
+  const auto& tile = get(x, y, z);
+  return tile.flags.contains(tile_flag::walkable);
+}
+
 TilemapSize World::get_tilemap_size(const int z) { return m_tilemaps[z - m_depth_min].get_size(); }
 
 const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }

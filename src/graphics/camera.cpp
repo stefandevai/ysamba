@@ -6,11 +6,11 @@ namespace dl
 {
 Camera::Camera() {}
 
-const glm::vec2 Camera::get_position_in_tiles() const
+const glm::ivec2 Camera::get_position_in_tiles() const
 {
   assert(m_tile_size.x != 0.f && m_tile_size.y != 0.f && "Tile size was not set");
 
-  return glm::vec2{m_position.x / m_tile_size.x, m_position.y / m_tile_size.y};
+  return glm::ivec2{m_position.x / m_tile_size.x, m_position.y / m_tile_size.y};
 }
 
 void Camera::move(const float x, const float y, const float z)

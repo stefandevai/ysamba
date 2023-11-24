@@ -18,7 +18,7 @@ class Camera
 
   void move(const float x, const float y, const float z = 0.f);
   const glm::vec3& get_position() const { return m_position; }
-  const glm::vec2 get_position_in_tiles() const;
+  const glm::ivec2 get_position_in_tiles() const;
   glm::mat4 get_view_matrix() const { return glm::lookAt(m_position, m_front, m_up); }
   glm::mat4 get_default_view_matrix() const { return glm::lookAt({0.f, 0.f, 500.f}, {0.f, 0.f, -1.f}, m_up); }
   glm::mat4 get_projection_matrix() const

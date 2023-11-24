@@ -53,10 +53,13 @@ class World
   SocietyBlueprint get_society(const std::string& society_id) const { return m_societies.at(society_id); };
 
   // Get a nearby tile containing a flag
-  TileTarget search_by_flag(const std::string& flag, const int x = 0, const int y = 0, const int z = 0) const;
+  TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;
 
   // Check if a specific tile is adjacent to a position
-  bool adjacent(const int tile_id, const int x = 0, const int y = 0, const int z = 0) const;
+  bool adjacent(const int tile_id, const int x, const int y, const int z) const;
+
+  // Check if a specific tile is has WALKABLE flag
+  bool is_walkable(const int x, const int y, const int z) const;
 
   // Get information about a tile with id
   const TileData& get_tile_data(const uint32_t id) const;

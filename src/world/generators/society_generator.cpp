@@ -100,9 +100,27 @@ void SocietyGenerator::place_members(const std::vector<MemberComponents>& compon
 
 Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
 {
-  const auto x = static_cast<double>(random::get_integer(3, 10));
-  const auto y = static_cast<double>(random::get_integer(3, 10));
-  const auto position = Position{x, y, 0.};
+  const auto& camera_position = camera.get_position_in_tiles();
+  const auto& camera_size = camera.get_size_in_tiles();
+
+  auto position = Position{0., 0., 0.};
+  const uint32_t max_tries = 10;
+
+  for (uint32_t tries = 0; tries < max_tries; ++tries)
+  {
+    const auto x = static_cast<double>(random::get_integer(camera_position.x, camera_position.x + camera_size.x));
+    const auto y = static_cast<double>(random::get_integer(camera_position.y, camera_position.y + camera_size.y));
+
+    if (world.is_walkable(x, y, 0.))
+    {
+      position.x = x;
+      position.y = y;
+
+      return position;
+    }
+  }
+
+  spdlog::warn("Could not find position to place society member");
 
   return position;
 }

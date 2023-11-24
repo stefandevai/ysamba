@@ -19,18 +19,18 @@ RenderSystem::RenderSystem(World& world) : m_world(world), m_world_texture_id(m_
 
 void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Camera& camera)
 {
-  const auto& camera_size_in_tiles = camera.get_size_in_tiles();
+  const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();
-  const auto& camera_position_in_tiles = camera.get_position_in_tiles();
+  const auto& camera_position = camera.get_position_in_tiles();
 
   renderer.init("world");
 
-  for (int i = -m_frustum_tile_padding; i < camera_size_in_tiles.x + m_frustum_tile_padding; ++i)
+  for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
   {
-    for (int j = -m_frustum_tile_padding; j < camera_size_in_tiles.y + m_frustum_tile_padding; ++j)
+    for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j)
     {
-      const auto index_x = i + camera_position_in_tiles.x;
-      const auto index_y = j + camera_position_in_tiles.y;
+      const auto index_x = i + camera_position.x;
+      const auto index_y = j + camera_position.y;
       const auto& tile = m_world.get(index_x, index_y, 0.0);
       const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, tile.id);
 
@@ -42,8 +42,8 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
 
       renderer.batch("world",
                      sprite,
-                     i * tile_size.x + camera_position_in_tiles.x * tile_size.x,
-                     j * tile_size.y + camera_position_in_tiles.y * tile_size.y,
+                     i * tile_size.x + camera_position.x * tile_size.x,
+                     j * tile_size.y + camera_position.y * tile_size.y,
                      0.0);
     }
   }

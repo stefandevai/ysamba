@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace dl
 {
 enum class SocialClass
@@ -33,7 +35,7 @@ struct SocietyAgent
 
   uint32_t id;
   std::string society_id;
-  std::string name;
+  std::string name{};
   SocialClass social_class;
   Metier metiers;
   State state = State::Harvesting;
