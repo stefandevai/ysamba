@@ -19,15 +19,24 @@ Text::Text(const std::wstring text,
 
 void Text::initialize(AssetManager& asset_manager)
 {
-  auto font = asset_manager.get<Font>(m_font_name);
-  const auto scale = m_font_size / static_cast<float>(font->get_size());
+  m_font = asset_manager.get<Font>(m_font_name);
+  m_has_initialized = true;
+  update();
+}
+
+void Text::update()
+{
+  characters.clear();
+  assert(m_font != nullptr);
+  assert(m_has_initialized);
+  const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
 
   for (wchar_t c : m_text)
   {
-    const auto& ch = font->get_char_data(c);
+    const auto& ch = m_font->get_char_data(c);
     const float x = char_pos_x + ch.bl * scale;
-    const float y = (font->get_max_character_top() - ch.bt) * scale;
+    const float y = (m_font->get_max_character_top() - ch.bt) * scale;
     const float w = ch.bw * scale;
     const float h = ch.bh * scale;
 
@@ -38,10 +47,10 @@ void Text::initialize(AssetManager& asset_manager)
     {
       character.code = c;
       character.sprite = std::make_shared<Sprite>(m_font_name);
-      character.sprite->texture = font->get_atlas();
+      character.sprite->texture = m_font->get_atlas();
       character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
 
-      if (m_font_size != font->get_size())
+      if (m_font_size != m_font->get_size())
       {
         character.sprite->transform = std::make_shared<Transform>();
         character.sprite->transform->scale.x = scale;
@@ -66,7 +75,6 @@ void Text::initialize(AssetManager& asset_manager)
   }
 
   m_width = char_pos_x;
-  m_height = font->get_max_character_top() * scale;
-  m_has_initialized = true;
+  m_height = m_font->get_max_character_top() * scale;
 }
 }  // namespace dl

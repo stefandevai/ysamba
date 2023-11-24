@@ -14,6 +14,7 @@
 #include "../ecs/components/position.hpp"
 #include "../ecs/components/selectable.hpp"
 #include "../ecs/components/visibility.hpp"
+#include "../graphics/text.hpp"
 // TEMP
 
 namespace dl
@@ -32,8 +33,16 @@ void Gameplay::load()
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
+  m_fps_text = m_registry.create();
+  m_registry.emplace<Text>(m_fps_text, L"FPS: ");
+  m_registry.emplace<Position>(m_fps_text, 30, 30, 20);
+  auto& text_component = m_registry.get<Text>(m_fps_text);
+  text_component.set_is_static(false);
+
   m_has_loaded = true;
 }
+
+double delay = 0.0;
 
 void Gameplay::update(const double delta, SetSceneFunction set_scene)
 {
@@ -45,6 +54,17 @@ void Gameplay::update(const double delta, SetSceneFunction set_scene)
   if (m_current_state == Gameplay::State::PLAYING)
   {
     m_ecs.update(delta);
+  }
+
+  if (delay <= 0.0)
+  {
+    auto& text = m_registry.get<Text>(m_fps_text);
+    text.set_text(L"FPS: " + std::to_wstring(1.0 / delta));
+    delay = 0.8;
+  }
+  else
+  {
+    delay -= delta;
   }
 
   m_update_input(set_scene);

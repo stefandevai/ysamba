@@ -7,10 +7,12 @@
 
 #include "../../graphics/camera.hpp"
 #include "../../graphics/renderer.hpp"
+#include "../../graphics/text.hpp"
 #include "../../world/world.hpp"
 #include "../components/position.hpp"
 #include "../components/rectangle.hpp"
 #include "../components/selectable.hpp"
+#include "../components/text.hpp"
 #include "../components/visibility.hpp"
 
 namespace dl
@@ -81,13 +83,28 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
 
   auto quad_view = registry.view<const Position, const Rectangle>();
 
-  quad_view.each([&renderer](const auto& position, const auto& rectangle) {
-    const auto position_x = std::round(position.x) * 32;
-    const auto position_y = std::round(position.y) * 32;
+  for (auto entity : quad_view)
+  {
+    const auto& position = registry.get<Position>(entity);
+    const auto& rectangle = registry.get<Rectangle>(entity);
+    const auto position_x = std::round(position.x) * tile_size.x;
+    const auto position_y = std::round(position.y) * tile_size.y;
 
     renderer.batch("quad", rectangle.quad, position_x, position_y, 2.);
-  });
+  }
 
   renderer.finalize("quad");
+
+  renderer.init("text");
+
+  auto text_view = registry.view<const Text, const Position>();
+  for (auto entity : text_view)
+  {
+    const auto& position = registry.get<Position>(entity);
+    auto& text = registry.get<Text>(entity);
+
+    renderer.batch("text", text, position.x, position.x, 3);
+  }
+  renderer.finalize("text");
 }
 }  // namespace dl

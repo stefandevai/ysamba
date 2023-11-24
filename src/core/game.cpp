@@ -43,32 +43,24 @@ void Game::load()
 
 void Game::run()
 {
-  try
-  {
-    dl::Clock clock{};
+  Clock clock{};
 
-    while (!m_input_manager->should_quit())
+  while (!m_input_manager->should_quit())
+  {
+    clock.tick();
+
+    m_input_manager->update();
+    m_scene_manager.update(clock.delta);
+
+    m_display.clear();
+    m_scene_manager.render(m_renderer);
+    m_renderer.render(m_camera);
+    m_display.render();
+
+    if (m_input_manager->window_size_changed())
     {
-      clock.tick();
-
-      m_scene_manager.update(clock.delta);
-      m_input_manager->update();
-
-      if (m_input_manager->window_size_changed())
-      {
-        m_handle_window_size_change();
-      }
-
-      m_display.clear();
-      m_scene_manager.render(m_renderer);
-      m_renderer.render(m_camera);
-      m_display.render();
+      m_handle_window_size_change();
     }
-  }
-  catch (const std::exception& exc)
-  {
-    spdlog::critical("{}", exc.what());
-    throw;
   }
 }
 

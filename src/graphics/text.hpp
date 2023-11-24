@@ -5,6 +5,7 @@
 
 namespace dl
 {
+class Font;
 class Sprite;
 class AssetManager;
 
@@ -25,12 +26,13 @@ class Text
 
   Text() {}
   Text(const std::wstring text,
-       const std::string font_name,
-       const unsigned int font_size,
+       const std::string font_name = "font-1980",
+       const unsigned int font_size = 32,
        const std::string& color = "#ffffffff",
        const bool is_static = true);
 
   void initialize(AssetManager& asset_manager);
+  void update();
 
   inline std::wstring get_text() const { return m_text; };
   inline std::string get_color() const { return m_color; };
@@ -53,5 +55,6 @@ class Text
   bool m_has_initialized = false;
   int m_width = 0;
   int m_height = 0;
+  std::shared_ptr<Font> m_font = nullptr;
 };
 }  // namespace dl

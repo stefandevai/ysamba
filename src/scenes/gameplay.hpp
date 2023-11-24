@@ -37,6 +37,7 @@ class Gameplay : public Scene
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
   ECS m_ecs{m_registry, m_world, m_camera};
   State m_current_state = State::PAUSED;
+  entt::entity m_fps_text;
 
   void m_update_input(SetSceneFunction& set_scene);
   void m_select_entity(const float x, const float y);

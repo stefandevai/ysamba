@@ -75,6 +75,10 @@ void Renderer::batch(const std::string& layer_id, Text& text, const double x, co
   {
     text.initialize(m_asset_manager);
   }
+  else if (!text.get_is_static())
+  {
+    text.update();
+  }
 
   for (auto& character : text.characters)
   {
