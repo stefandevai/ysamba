@@ -102,14 +102,17 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
 {
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& camera_size = camera.get_size_in_tiles();
+  const auto placement_margin = 5;
 
   auto position = Position{0., 0., 0.};
   const uint32_t max_tries = 10;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = static_cast<double>(random::get_integer(camera_position.x, camera_position.x + camera_size.x));
-    const auto y = static_cast<double>(random::get_integer(camera_position.y, camera_position.y + camera_size.y));
+    const auto x = static_cast<double>(random::get_integer(camera_position.x + placement_margin,
+                                                           camera_position.x + camera_size.x - placement_margin));
+    const auto y = static_cast<double>(random::get_integer(camera_position.y + placement_margin,
+                                                           camera_position.y + camera_size.y - placement_margin));
 
     if (world.is_walkable(x, y, 0.))
     {
