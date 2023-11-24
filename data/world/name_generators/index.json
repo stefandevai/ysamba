@@ -1,5 +1,9 @@
 {
-    "otomi": "otomi.txt",
-    "guarani": "guarani.txt",
-    "nahuatl": "nahuatl.txt"
+    "otomi": "otomi.json",
+    "guarani": "guarani.json",
+    "nahuatl": "nahuatl.json",
+    "mapuche": "mapuche.json",
+    "quechua": "quechua.json",
+    "wayuunaiki": "wayuunaiki.json",
+    "mix": "mix.json"
 }

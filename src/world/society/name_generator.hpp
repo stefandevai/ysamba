@@ -12,7 +12,7 @@ class NameGenerator
   NameGenerator() {}
 
   void load(const std::string& key);
-  std::string generate();
+  [[nodiscard]] std::string generate();
   void set_seed(const int seed) { m_seed = seed; }
 
  private:

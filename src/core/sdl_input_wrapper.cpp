@@ -55,7 +55,7 @@ void SDLInputWrapper::update()
       m_keyboard = SDL_GetKeyboardState(nullptr);
       int index = event.key.keysym.scancode;
 
-      spdlog::debug("Pressed key code: {}", index);
+      /* spdlog::debug("Pressed key code: {}", index); */
 
       m_key_down[index] = true;
       m_any_key_down = true;

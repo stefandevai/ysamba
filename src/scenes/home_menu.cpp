@@ -1,7 +1,10 @@
 #include "./home_menu.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include "../graphics/camera.hpp"
 #include "../graphics/renderer.hpp"
+#include "../world/society/name_generator.hpp"
 
 namespace dl
 {
@@ -44,6 +47,13 @@ void HomeMenu::update(const double delta, SetSceneFunction set_scene)
   else if (m_input_manager->poll_action("create_world"))
   {
     set_scene("world_creation", m_camera);
+  }
+  else if (m_input_manager->poll_action("generate_name"))
+  {
+    auto name_generator = NameGenerator();
+    name_generator.load("mix");
+    const auto name = name_generator.generate();
+    spdlog::critical("NAME: {}", name);
   }
 }
 
