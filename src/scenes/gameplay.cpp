@@ -28,16 +28,9 @@ void Gameplay::load()
 
   m_ecs.load();
 
-  /* auto society_blueprint = m_world.get_society("otomi"); */
-  /* const auto components = SocietyGenerator::generate_members(society_blueprint); */
-  /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
-
-  auto yu = m_registry.create();
-  m_registry.emplace<Position>(yu, 9, 9, 1);
-  m_registry.emplace<Visibility>(yu, "spritesheet-tileset", 6);
-  auto pe = m_registry.create();
-  m_registry.emplace<Position>(pe, 9, 9, 2);
-  m_registry.emplace<Visibility>(pe, "spritesheet-characters", 0);
+  auto society_blueprint = m_world.get_society("otomi");
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   m_has_loaded = true;
 }

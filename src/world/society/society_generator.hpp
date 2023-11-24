@@ -31,7 +31,7 @@ class SocietyGenerator
   [[nodiscard]] static std::vector<MemberComponents> generate_members(SocietyBlueprint& society);
 
   // Create actual members entities and add them to the world
-  static void place_members(const std::vector<MemberComponents>& components,
+  static void place_members(std::vector<MemberComponents>& components,
                             const World& world,
                             const Camera& camera,
                             entt::registry& registry);

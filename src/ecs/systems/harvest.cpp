@@ -4,6 +4,7 @@
 
 #include <entt/entity/registry.hpp>
 
+#include "../../graphics/constants.hpp"
 #include "../../graphics/frame_data_types.hpp"
 #include "../../world/tile_flag.hpp"
 #include "../../world/world.hpp"
@@ -103,7 +104,8 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       {
         const auto drop = registry.create();
         registry.emplace<Position>(drop, target.x, target.y, target.z);
-        registry.emplace<Visibility>(drop, m_world.get_texture_id(), id, frame_data_type::item);
+        registry.emplace<Visibility>(
+            drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items);
       }
 
       stop_harvesting(registry, entity, agent);

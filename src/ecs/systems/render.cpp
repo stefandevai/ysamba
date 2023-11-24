@@ -72,7 +72,7 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
     const auto position_x = std::round(position.x) * sprite_size.x;
     const auto position_y = std::round(position.y) * sprite_size.y;
 
-    renderer.batch("world", visibility.sprite, position_x, position_y, position.z);
+    renderer.batch("world", visibility.sprite, position_x, position_y, visibility.layer_z);
   }
 
   renderer.finalize("world");

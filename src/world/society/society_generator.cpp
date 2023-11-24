@@ -6,6 +6,7 @@
 
 #include "../../core/random.hpp"
 #include "../../graphics/camera.hpp"
+#include "../../graphics/constants.hpp"
 #include "../world.hpp"
 #include "./name_generator.hpp"
 
@@ -89,20 +90,21 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
   return members;
 }
 
-void SocietyGenerator::place_members(const std::vector<MemberComponents>& components,
+void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
                                      const World& world,
                                      const Camera& camera,
                                      entt::registry& registry)
 {
-  for (const auto& member : components)
+  for (auto& member : components)
   {
     auto entity = registry.create();
     registry.emplace<SocietyAgent>(entity, member.agent);
     registry.emplace<Biology>(entity, member.biology);
-    registry.emplace<Visibility>(entity, member.visibility);
 
     const auto position = m_get_member_position(world, camera);
     registry.emplace<Position>(entity, position);
+    member.visibility.layer_z = position.z + renderer::layer_z_offset_characters;
+    registry.emplace<Visibility>(entity, member.visibility);
   }
 }
 
@@ -142,7 +144,7 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   const auto& member = society.get_member(parameters.member_id);
   const auto agent = SocietyAgent{parameters.member_id, society.id, parameters.name, SocialClass::None, Metier::None};
   const auto biology = Biology{member->sex, parameters.speed};
-  const auto visibility = Visibility{"spritesheet-characters", parameters.texture_frame};
+  const auto visibility = Visibility{"spritesheet-characters", parameters.texture_frame, 0};
 
   return SocietyGenerator::MemberComponents{agent, biology, visibility};
 }
