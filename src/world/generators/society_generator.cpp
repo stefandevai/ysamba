@@ -5,22 +5,14 @@
 #include <entt/entity/registry.hpp>
 
 #include "../../core/random.hpp"
-#include "../../ecs/components/biology.hpp"
-#include "../../ecs/components/position.hpp"
-#include "../../ecs/components/selectable.hpp"
-#include "../../ecs/components/society_agent.hpp"
-#include "../../ecs/components/velocity.hpp"
-#include "../../ecs/components/visibility.hpp"
+#include "../../graphics/camera.hpp"
+#include "../world.hpp"
 
 namespace dl
 {
-SocietyGenerator::SocietyGenerator() {}
-
-Society SocietyGenerator::generate(const int seed)
+SocietyBlueprint SocietyGenerator::generate_blueprint()
 {
-  random::rng.seed(seed);
-
-  Society society{};
+  SocietyBlueprint society{};
 
   society.id = "otomi";
   society.name = "Otomi";
@@ -32,112 +24,98 @@ Society SocietyGenerator::generate(const int seed)
   return society;
 }
 
-void SocietyGenerator::generate_members(const int seed, Society& society, entt::registry& registry)
+std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_members(SocietyBlueprint& society)
 {
-  random::rng.seed(seed);
-
-  switch (society.mode_of_production)
-  {
-  case ModeOfProduction::PrimitiveCommunism:
-    m_generate_primitive_communism_members(society, registry);
-    break;
-  case ModeOfProduction::Slavery:
-    /* m_generate_slavery_members(society, registry); */
-    break;
-  default:
-    break;
-  }
-
-  /* if (society.mode_of_production == ModeOfProduction::PrimitiveCommunism) */
-  /* { */
-  /*   genera */
-  /* } */
-
-  /* const auto member1 = registry.create(); */
-  /* registry.emplace<SocietyAgent>(member1, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
-  /* registry.emplace<Biology>(member1, Sex::Male, 100); */
-  /* registry.emplace<Position>(member1, 9., 16., 0.); */
-  /* registry.emplace<Visibility>(member1, "spritesheet-characters", 0); */
-  /* registry.emplace<Selectable>(member1); */
-
-  /* const auto member2 = registry.create(); */
-  /* registry.emplace<SocietyAgent>(member2, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
-  /* registry.emplace<Biology>(member2, Sex::Male, 80); */
-  /* registry.emplace<Position>(member2, 9., 15., 0.); */
-  /* registry.emplace<Visibility>(member2, "spritesheet-characters", 2); */
-  /* registry.emplace<Selectable>(member2); */
-
-  /* const uint32_t number_of_members = 10; */
-
-  /* for (uint32_t i = 0; i < number_of_members; ++i) */
-  /* { */
-  /*   const auto member = registry.create(); */
-  /*   registry.emplace<SocietyAgent>(member, "adam", "otomi", "Adam", SocialClass::None, Metier::None); */
-  /*   registry.emplace<Biology>(member, Sex::Male, 100.); */
-  /*   registry.emplace<Position>(member, i + 7, 8., 0.); */
-  /*   registry.emplace<Visibility>(member, "spritesheet-characters", i % 6); */
-  /*   registry.emplace<Selectable>(member); */
-  /* } */
-}
-
-void SocietyGenerator::m_generate_primitive_communism_members(Society& society, entt::registry& registry)
-{
-  /* const auto first_generation_members = random::get_integer(1, 2); */
+  std::vector<MemberComponents> members;
   const auto first_generation_members = 1;
-  /* const auto cacique = registry.create(); */
 
   for (auto i = 0; i < first_generation_members; ++i)
   {
-    const auto first_member_id = society.add_first_member(Sex::Male);
-    const auto first_member_spouse_id = society.add_spouse(first_member_id);
+    const auto father_id = society.add_first_member(Sex::Male);
+    auto father_parameters = MemberParameters();
+    father_parameters.member_id = father_id;
+    father_parameters.texture_frame = 0;
+    father_parameters.speed = 100;
+    father_parameters.name = "Tupa";
+    const auto father_components = m_get_member_components(society, father_parameters);
+    members.push_back(father_components);
 
-    m_create_person_entity(registry, society, first_member_id);
-    m_create_person_entity(registry, society, first_member_spouse_id);
+    const auto mother_id = society.add_spouse(father_id);
+    auto mother_parameters = MemberParameters();
+    mother_parameters.member_id = mother_id;
+    mother_parameters.texture_frame = 1;
+    mother_parameters.speed = 100;
+    mother_parameters.name = "Boudicca";
+    const auto mother_components = m_get_member_components(society, mother_parameters);
+    members.push_back(mother_components);
 
-    const auto number_of_sons = 1;
+    const auto number_of_sons = 3;
 
     for (auto j = 0; j < number_of_sons; ++j)
     {
-      const auto son = society.add_son(first_member_id);
-      m_create_person_entity(registry, society, son);
+      const auto son_id = society.add_son(father_id);
+      auto son_parameters = MemberParameters();
+      son_parameters.member_id = son_id;
+      son_parameters.texture_frame = 4;
+      son_parameters.speed = 80;
+      son_parameters.name = "Tupac";
+      const auto son_components = m_get_member_components(society, son_parameters);
+      members.push_back(son_components);
     }
 
-    const auto number_of_daughters = 1;
+    const auto number_of_daughters = 2;
 
     for (auto j = 0; j < number_of_daughters; ++j)
     {
-      const auto daughter = society.add_daughter(first_member_id);
-      m_create_person_entity(registry, society, daughter);
+      const auto daughter_id = society.add_daughter(father_id);
+      auto daughter_parameters = MemberParameters();
+      daughter_parameters.member_id = daughter_id;
+      daughter_parameters.texture_frame = 5;
+      daughter_parameters.speed = 80;
+      daughter_parameters.name = "Yara";
+      const auto daughter_components = m_get_member_components(society, daughter_parameters);
+      members.push_back(daughter_components);
     }
+  }
+
+  return members;
+}
+
+void SocietyGenerator::place_members(const std::vector<MemberComponents>& components,
+                                     const World& world,
+                                     const Camera& camera,
+                                     entt::registry& registry)
+{
+  for (const auto& member : components)
+  {
+    auto entity = registry.create();
+    registry.emplace<SocietyAgent>(entity, member.agent);
+    registry.emplace<Biology>(entity, member.biology);
+    registry.emplace<Visibility>(entity, member.visibility);
+
+    const auto position = m_get_member_position(world, camera);
+    registry.emplace<Position>(entity, position);
   }
 }
 
-/* void SocietyGenerator::m_generate_slavery_members(const Society& society, entt::registry& registry) {} */
-
-void SocietyGenerator::m_create_person_entity(entt::registry& registry,
-                                              const Society& society,
-                                              const uint32_t person_id)
+Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
 {
-  spdlog::info("PERSONID {}", person_id);
-  const auto& person = society.get_member(person_id);
-  const auto person_entity = registry.create();
+  const auto x = static_cast<double>(random::get_integer(3, 10));
+  const auto y = static_cast<double>(random::get_integer(3, 10));
+  const auto position = Position{x, y, 0.};
 
-  registry.emplace<SocietyAgent>(person_entity, "adam", "otomi", "Adam", SocialClass::None, Metier::None);
+  return position;
+}
 
-  registry.emplace<Biology>(person_entity, person->sex, 100);
+SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(const SocietyBlueprint& society,
+                                                                             const MemberParameters& parameters)
+{
+  const auto& member = society.get_member(parameters.member_id);
+  const auto agent = SocietyAgent{parameters.member_id, society.id, parameters.name, SocialClass::None, Metier::None};
+  const auto biology = Biology{member->sex, parameters.speed};
+  const auto visibility = Visibility{"spritesheet-characters", parameters.texture_frame};
 
-  const auto x = random::get_integer(10, 20);
-  const auto y = random::get_integer(10, 20);
-  registry.emplace<Position>(person_entity, x, y, 0.);
-
-  auto frame = 0;
-
-  if (person->sex == Sex::Female)
-  {
-    frame = 1;
-  }
-
-  registry.emplace<Visibility>(person_entity, "spritesheet-characters", frame);
+  return SocietyGenerator::MemberComponents{agent, biology, visibility};
 }
 
 }  // namespace dl

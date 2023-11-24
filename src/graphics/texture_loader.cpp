@@ -1,5 +1,7 @@
 #include "./texture_loader.hpp"
 
+#include <spdlog/spdlog.h>
+
 namespace dl
 {
 // Load single texture

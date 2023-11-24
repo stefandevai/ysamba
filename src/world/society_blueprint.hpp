@@ -41,12 +41,12 @@ struct RelationshipNode
   RelationshipNodeContainer children;
 };
 
-class Society
+class SocietyBlueprint
 {
  public:
   static const uint32_t null_member;
 
-  Society() {}
+  SocietyBlueprint() {}
 
   std::string id;
   std::string name;

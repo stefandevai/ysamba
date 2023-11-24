@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../graphics/texture.hpp"
 #include "./clock.hpp"
 #include "./file_manager.hpp"
 
@@ -20,7 +21,14 @@ void Game::load()
     const auto title = m_json.object["title"];
 
     m_display.load(width, height, title);
-    m_camera.set_frustrum(0.0f, m_display.get_width(), m_display.get_height(), 0.0f);
+
+    const auto& world_texture = m_asset_manager.get<Texture>("spritesheet-tileset");
+
+    assert(world_texture != nullptr && "World texture is not loaded in order to get tile size");
+
+    m_camera.set_size(m_display.get_width(), m_display.get_height());
+    m_camera.set_tile_size(world_texture->get_frame_width(), world_texture->get_frame_height());
+
     m_renderer.add_layer("world", "world");
     m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, false, 1);
     m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true, 2);
@@ -67,7 +75,7 @@ void Game::run()
 void Game::m_handle_window_size_change()
 {
   m_display.update_viewport();
-  m_camera.set_frustrum(0.0f, m_display.get_width(), m_display.get_height(), 0.0f);
+  m_camera.set_size(m_display.get_width(), m_display.get_height());
   m_input_manager->set_window_size_changed(false);
 }
 }  // namespace dl

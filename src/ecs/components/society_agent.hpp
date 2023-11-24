@@ -31,7 +31,7 @@ struct SocietyAgent
     Harvesting,
   };
 
-  std::string id;
+  uint32_t id;
   std::string society_id;
   std::string name;
   SocialClass social_class;

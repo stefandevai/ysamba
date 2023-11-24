@@ -9,7 +9,7 @@
 #include "../core/json.hpp"
 #include "../core/lua_api.hpp"
 #include "./item_data.hpp"
-#include "./society.hpp"
+#include "./society_blueprint.hpp"
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"
 #include "./tilemap.hpp"
@@ -50,7 +50,7 @@ class World
   const std::string& get_texture_id() const { return m_texture_id; };
 
   // Get a specific society
-  Society get_society(const std::string& society_id) const { return m_societies.at(society_id); };
+  SocietyBlueprint get_society(const std::string& society_id) const { return m_societies.at(society_id); };
 
   // Get a nearby tile containing a flag
   TileTarget search_by_flag(const std::string& flag, const int x = 0, const int y = 0, const int z = 0) const;
@@ -77,7 +77,7 @@ class World
   int m_depth_min = 0;
   int m_depth_max = 1;
   int m_seed = 0;
-  std::map<std::string, Society> m_societies;
+  std::map<std::string, SocietyBlueprint> m_societies;
 
   // Load information about tiles
   void m_load_tile_data();

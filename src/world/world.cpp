@@ -36,8 +36,8 @@ void World::generate(const int width, const int height, const int seed)
   auto tilemap = tilemap_generator.generate(seed);
   m_tilemaps.push_back(tilemap);
 
-  auto society_generator = SocietyGenerator();
-  auto society = society_generator.generate(seed);
+  /* auto society_generator = SocietyGenerator(); */
+  auto society = SocietyGenerator::generate_blueprint();
   m_societies[society.id] = society;
 }
 

@@ -2,29 +2,57 @@
 
 #include <entt/entity/fwd.hpp>
 
-#include "../society.hpp"
+#include "../../ecs/components/biology.hpp"
+#include "../../ecs/components/position.hpp"
+#include "../../ecs/components/society_agent.hpp"
+#include "../../ecs/components/visibility.hpp"
+#include "../society_blueprint.hpp"
 
 namespace dl
 {
+class Camera;
+class World;
+
 class SocietyGenerator
 {
  public:
-  SocietyGenerator();
+  // Components for a member entity
+  struct MemberComponents
+  {
+    SocietyAgent agent;
+    Biology biology;
+    Visibility visibility;
+  };
 
   // Generate society
-  Society generate(const int seed);
+  static SocietyBlueprint generate_blueprint();
 
   // Generate society members
-  void generate_members(const int seed, Society& society, entt::registry& registry);
+  [[nodiscard]] static std::vector<MemberComponents> generate_members(SocietyBlueprint& society);
+
+  // Create actual members entities and add them to the world
+  static void place_members(const std::vector<MemberComponents>& components,
+                            const World& world,
+                            const Camera& camera,
+                            entt::registry& registry);
 
  private:
-  // Generate members for a primitive communist society
-  void m_generate_primitive_communism_members(Society& society, entt::registry& registry);
+  SocietyGenerator() = delete;
 
-  // Generate members for a slavery based society
-  /* void m_generate_slavery_members(const Society& society, entt::registry& registry); */
+  // Parameters for society member creation
+  struct MemberParameters
+  {
+    uint32_t member_id;
+    uint32_t texture_frame;
+    int speed;
+    std::string name;
+  };
 
-  // Create a person entity for the game
-  void m_create_person_entity(entt::registry& registry, const Society& society, const uint32_t person_id);
+  // Member components factory method
+  [[nodiscard]] static MemberComponents m_get_member_components(const SocietyBlueprint& society,
+                                                                const MemberParameters& parameters);
+
+  // Search a viable position in the world to place a member
+  [[nodiscard]] static Position m_get_member_position(const World& world, const Camera& camera);
 };
 }  // namespace dl

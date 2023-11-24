@@ -24,9 +24,9 @@ void Gameplay::load()
 
   m_ecs.load();
 
-  auto society = m_world.get_society("otomi");
-  auto generator = SocietyGenerator();
-  generator.generate_members(100, society, m_registry);
+  auto society_blueprint = m_world.get_society("otomi");
+  const auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   m_has_loaded = true;
 }

@@ -15,43 +15,35 @@
 
 namespace dl
 {
-RenderSystem::RenderSystem(World& world) : m_world(world) {}
+RenderSystem::RenderSystem(World& world) : m_world(world), m_world_texture_id(m_world.get_texture_id()) {}
 
 void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Camera& camera)
 {
-  // TODO: Cache values so we don't have to calculate them every frame
-  const auto& camera_position = camera.get_position();
-  const auto& camera_dimensions = camera.get_dimensions();
-  const auto& world_texture_id = m_world.get_texture_id();
-  const auto& world_texture = renderer.get_texture(world_texture_id);
-  const auto tile_width = world_texture->get_frame_width();
-  const auto tile_height = world_texture->get_frame_height();
-  const auto horizontal_tiles = std::ceil(camera_dimensions.x / tile_width);
-  const auto vertical_tiles = std::ceil(camera_dimensions.y / tile_height);
-  const int camera_tile_offset_x = (camera_position.x + 1) / tile_width;
-  const int camera_tile_offset_y = (camera_position.y + 1) / tile_height;
-  const int frustum_tile_padding = 1;
+  const auto& camera_size_in_tiles = camera.get_size_in_tiles();
+  const auto& tile_size = camera.get_tile_size();
+  const auto& camera_position_in_tiles = camera.get_position_in_tiles();
 
   renderer.init("world");
 
-  for (int i = -frustum_tile_padding; i < horizontal_tiles + frustum_tile_padding; ++i)
+  for (int i = -m_frustum_tile_padding; i < camera_size_in_tiles.x + m_frustum_tile_padding; ++i)
   {
-    for (int j = -frustum_tile_padding; j < vertical_tiles + frustum_tile_padding; ++j)
+    for (int j = -m_frustum_tile_padding; j < camera_size_in_tiles.y + m_frustum_tile_padding; ++j)
     {
-      const auto index_x = i + camera_tile_offset_x;
-      const auto index_y = j + camera_tile_offset_y;
+      const auto index_x = i + camera_position_in_tiles.x;
+      const auto index_y = j + camera_position_in_tiles.y;
       const auto& tile = m_world.get(index_x, index_y, 0.0);
-      const auto& sprite = std::make_shared<Sprite>(world_texture_id, tile.id);
+      const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, tile.id);
 
       if (sprite->texture == nullptr)
       {
+        const auto& world_texture = renderer.get_texture(m_world_texture_id);
         sprite->texture = world_texture;
       }
 
       renderer.batch("world",
                      sprite,
-                     i * tile_width + camera_tile_offset_x * tile_width,
-                     j * tile_height + camera_tile_offset_y * tile_height,
+                     i * tile_size.x + camera_position_in_tiles.x * tile_size.x,
+                     j * tile_size.y + camera_position_in_tiles.y * tile_size.y,
                      0.0);
     }
   }

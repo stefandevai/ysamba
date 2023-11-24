@@ -16,5 +16,7 @@ class RenderSystem
 
  private:
   World& m_world;
+  const std::string& m_world_texture_id;
+  const int m_frustum_tile_padding = 1;
 };
 }  // namespace dl
