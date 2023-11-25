@@ -41,8 +41,7 @@ class SpatialHash
       const auto rounded_x = std::round(position.x);
       const auto rounded_y = std::round(position.y);
 
-      if (visibility.layer_z >= candidate_z && x >= rounded_x && x <= rounded_x + 1 && y >= rounded_y &&
-          y <= rounded_y + 1)
+      if (visibility.layer_z >= candidate_z && x == rounded_x && y == rounded_y)
       {
         candidate = entity;
         candidate_z = visibility.layer_z;
