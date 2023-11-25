@@ -27,8 +27,6 @@ void Gameplay::load()
 
   load_world("./world.dl");
 
-  /* m_ecs.load(); */
-
   auto society_blueprint = m_world.get_society("otomi");
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
@@ -91,7 +89,6 @@ void Gameplay::render(Renderer& renderer)
   }
 
   m_render_system.update(m_registry, renderer, m_camera);
-  /* m_ecs.render(renderer); */
 }
 
 void Gameplay::save_world(const std::string& file_path)

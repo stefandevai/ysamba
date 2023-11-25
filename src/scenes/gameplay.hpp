@@ -5,7 +5,6 @@
 
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
-/* #include "ecs/ecs.hpp" */
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/harvest.hpp"
 #include "ecs/systems/inspector.hpp"
