@@ -17,7 +17,7 @@ namespace dl
 {
 Display::Display() {}
 
-void Display::load(const unsigned int width, const unsigned int height, const std::string& title)
+void Display::load(const int width, const int height, const std::string& title)
 {
   m_width = width;
   m_height = height;
@@ -78,23 +78,33 @@ Display::~Display()
   SDL_Quit();
 }
 
-unsigned int Display::get_width() const { return m_width; }
+const Vector2i Display::get_size() const { return {m_width, m_height}; }
 
-unsigned int Display::get_height() const { return m_height; }
-
-int Display::get_window_width() const
+const Vector2i Display::get_window_size() const
 {
   int width, height;
   SDL_GetWindowSize(m_window, &width, &height);
-  return width;
+
+  return {width, height};
 }
 
-int Display::get_window_height() const
-{
-  int width, height;
-  SDL_GetWindowSize(m_window, &width, &height);
-  return height;
-}
+/* unsigned int Display::get_width() const { return m_width; } */
+
+/* unsigned int Display::get_height() const { return m_height; } */
+
+/* int Display::get_window_width() const */
+/* { */
+/*   int width, height; */
+/*   SDL_GetWindowSize(m_window, &width, &height); */
+/*   return width; */
+/* } */
+
+/* int Display::get_window_height() const */
+/* { */
+/*   int width, height; */
+/*   SDL_GetWindowSize(m_window, &width, &height); */
+/*   return height; */
+/* } */
 
 void Display::render() { SDL_GL_SwapWindow(m_window); }
 

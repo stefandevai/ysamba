@@ -40,9 +40,9 @@ class Camera
   const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
   const Vector2i& get_tile_size() const { return m_tile_size; }
   void set_position(const Vector3& position);
-  void set_size(const float width, const float height);
+  void set_size(const Vector2& size);
   void set_frustrum(const float left, const float right, const float bottom, const float top);
-  void set_tile_size(const float width, const float height);
+  void set_tile_size(const Vector2i& size);
   void save_position() { m_saved_position = m_position; }
 
  private:
@@ -56,7 +56,7 @@ class Camera
   glm::vec3 m_front{0.0f, 0.0f, -1.0f};
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   Vector3 m_saved_position{0., 0., 0.};
-  Vector2 m_size;
+  Vector2 m_size{};
   Vector2i m_tile_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
   // CameraState m_state = CameraState::IDLE;

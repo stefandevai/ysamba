@@ -26,8 +26,9 @@ void Game::load()
 
     assert(world_texture != nullptr && "World texture is not loaded in order to get tile size");
 
-    m_camera.set_size(m_display.get_width(), m_display.get_height());
-    m_camera.set_tile_size(world_texture->get_frame_width(), world_texture->get_frame_height());
+    const auto& display_size = m_display.get_size();
+    m_camera.set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
+    m_camera.set_tile_size({world_texture->get_frame_width(), world_texture->get_frame_height()});
 
     m_renderer.add_layer("world", "world");
     m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, true, 1);
@@ -66,8 +67,10 @@ void Game::run()
 
 void Game::m_handle_window_size_change()
 {
+  const auto& display_size = m_display.get_size();
+
   m_display.update_viewport();
-  m_camera.set_size(m_display.get_width(), m_display.get_height());
+  m_camera.set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
   m_input_manager->set_window_size_changed(false);
 }
 }  // namespace dl

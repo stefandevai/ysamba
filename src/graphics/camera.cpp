@@ -30,7 +30,11 @@ void Camera::set_position(const Vector3& position)
   m_front.z = position.z - 501;
 }
 
-void Camera::set_size(const float width, const float height) { set_frustrum(0.f, width, height, 0.f); }
+void Camera::set_size(const Vector2& size)
+{
+  m_size = size;
+  set_frustrum(0.f, size.x, size.y, 0.f);
+}
 
 void Camera::set_frustrum(const float left, const float right, const float bottom, const float top)
 {
@@ -49,15 +53,14 @@ void Camera::set_frustrum(const float left, const float right, const float botto
   }
 }
 
-void Camera::set_tile_size(const float width, const float height)
+void Camera::set_tile_size(const Vector2i& size)
 {
-  assert(width > 0 && "Tile width must be greather than 0");
-  assert(height > 0 && "Tile height must be greather than 0");
+  assert(size.x > 0 && "Tile width must be greather than 0");
+  assert(size.y > 0 && "Tile height must be greather than 0");
 
-  m_tile_size.x = width;
-  m_tile_size.y = height;
-  m_size_in_tiles.x = std::ceil(m_size.x / width);
-  m_size_in_tiles.y = std::ceil(m_size.y / height);
+  m_tile_size = size;
+  m_size_in_tiles.x = std::ceil(m_size.x / size.x);
+  m_size_in_tiles.y = std::ceil(m_size.y / size.y);
 }
 
 }  // namespace dl

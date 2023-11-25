@@ -8,6 +8,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include "core/maths/vector.hpp"
+
 namespace dl
 {
 class Display
@@ -15,24 +17,26 @@ class Display
  public:
   Display();
   ~Display();
-  void load(const unsigned int width, const unsigned int height, const std::string& title);
+  void load(const int width, const int height, const std::string& title);
   void render();
   void clear();
   void set_title(const std::string& title);
   void set_size(const int width, const int height);
   void set_clear_color(const float a, const float b, const float c);
-  unsigned int get_width() const;
-  unsigned int get_height() const;
-  int get_window_width() const;
-  int get_window_height() const;
+  const Vector2i get_size() const;
+  const Vector2i get_window_size() const;
+  /* unsigned int get_width() const; */
+  /* unsigned int get_height() const; */
+  /* int get_window_width() const; */
+  /* int get_window_height() const; */
   void reset_viewport();
   void update_viewport();
 
  private:
   SDL_Window* m_window;
   SDL_GLContext m_gl_context;
-  unsigned int m_width;
-  unsigned int m_height;
+  int m_width;
+  int m_height;
   std::string m_title;
   glm::vec3 m_clear_color{0.0f, 0.0f, 0.0f};
 };
