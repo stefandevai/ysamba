@@ -49,6 +49,10 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     size_t counter_x = 0;
     size_t counter_y = 0;
 
+    // TEMP
+    const auto& agent = registry.get<SocietyAgent>(entity);
+    // TEMP
+
     if (advance_x > 1 || advance_y > 1)
     {
       // TODO: Check if any collisions happen between the object and the target tile
@@ -56,29 +60,34 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       // Use Bresenham algorithm in tcodlib.
     }
 
-    // TEMP
-    const auto& agent = registry.get<SocietyAgent>(entity);
-    // TEMP
-
     // If can't advance advance_x or advance_y, check if it's possible to advance
     // to the tiles before that one.
-    while (counter_x <= advance_x || counter_y <= advance_y)
+    while (counter_x < advance_x || counter_y < advance_y)
     {
-      const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x;
+      const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x * velocity.x;
       const auto x_round = std::round(x);
       spdlog::info("FIRST {} ({}, {})", agent.name, position.x, position.y);
       spdlog::info("PARAMS ({}, {})", x, position.y);
       spdlog::info("PARAMS ROUND ({}, {})", x_round, std::round(position.y));
+      spdlog::info("ADVANCE ({}, {})", advance_x, advance_y);
+      spdlog::info("COUNTER ({}, {})", counter_x, counter_y);
+      spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor);
       const auto collides_horizontal = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
-      const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y;
+      const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y * velocity.y;
       const auto y_round = std::round(y);
       spdlog::info("SECOND {} ({}, {})", agent.name, position.x, position.y);
-      spdlog::info("PARAMS ({}, {})", x, position.y);
+      spdlog::info("PARAMS ({}, {})", position.x, y);
       spdlog::info("PARAMS ROUND ({}, {})", std::round(position.x), y_round);
+      spdlog::info("ADVANCE ({}, {})", advance_x, advance_y);
+      spdlog::info("COUNTER ({}, {})", counter_x, counter_y);
+      spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor);
       const auto collides_vertical = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
       spdlog::info("THIRD {} ({}, {})", agent.name, position.x, position.y);
       spdlog::info("PARAMS ({}, {})", x, y);
       spdlog::info("PARAMS ROUND ({}, {})", x_round, y_round);
+      spdlog::info("ADVANCE ({}, {})", advance_x, advance_y);
+      spdlog::info("COUNTER ({}, {})", counter_x, counter_y);
+      spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor);
       const auto collides_diagonal = m_collides(registry, entity, x_round, y_round, z_candidate);
       printf("\n");
 
@@ -87,22 +96,24 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
       // Stop early if the object advances this frame and collides in any axis.
       // This avoids the object moving in one axis only only
-      if (advance_x > 0 && advance_y > 0 && (collides_horizontal || collides_vertical || collides_diagonal))
+      if (advance_x > 0 && advance_y > 0 && ((collides_horizontal || collides_vertical) && collides_diagonal))
       {
         break;
       }
       // Stop early if the object advances partially this frame and collides in any axis.
       // This avoids the object moving in one axis only
-      else if (advance_x <= 0 && advance_y <= 0 && (collides_horizontal || collides_vertical || collides_diagonal))
+      else if (advance_x <= 0 && advance_y <= 0 && ((collides_horizontal || collides_vertical) && collides_diagonal))
       {
         break;
       }
 
-      if (counter_x <= advance_x)
+      if (counter_x < advance_x)
       {
+        // Don't go past the negative boundaries of the map
         if (x_round < 0)
         {
           target_x = 0;
+          // Set a big counter to break the loop
           counter_x = advance_x + 1;
         }
         else if (collides_horizontal || collides_diagonal)
@@ -112,15 +123,18 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         else
         {
           target_x = x;
+          // Set a big counter to break the loop
           counter_x = advance_x + 1;
         }
       }
 
-      if (counter_y <= advance_y)
+      if (counter_y < advance_y)
       {
+        // Don't go past the negative boundaries of the map
         if (y_round < 0)
         {
           target_y = 0;
+          // Set a big counter to break the loop
           counter_y = advance_y + 1;
         }
         else if (collides_vertical || collides_diagonal)
@@ -130,11 +144,26 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         else
         {
           target_y = y;
+          // Set a big counter to break the loop
           counter_y = advance_y + 1;
         }
       }
+
+      // Move diagonally if possible
+      spdlog::info("DIAGONAL1 {} {}, {}, {}", advance_x, advance_y, collides_diagonal);
+      if (advance_x > 0 && advance_y > 0 && !collides_diagonal)
+      {
+        spdlog::info("DIAGONAL2 {} {}, {}, {}", advance_x, advance_y, collides_diagonal);
+        target_x = x;
+        target_y = y;
+
+        // Set a big counter to break the loop
+        counter_x = advance_x + 1;
+        counter_y = advance_y + 1;
+      }
     }
 
+    // Update the position if it's different from the last position
     if (target_x != position.x || target_y != position.y)
     {
       registry.patch<Position>(entity, [target_x, target_y](auto& position) {
