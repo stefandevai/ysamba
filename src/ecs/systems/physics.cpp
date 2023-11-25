@@ -10,10 +10,6 @@
 #include "ecs/components/velocity.hpp"
 #include "world/world.hpp"
 
-// TEMP
-#include "ecs/components/society_agent.hpp"
-// TEMP
-
 namespace dl
 {
 PhysicsSystem::PhysicsSystem(World& world) : m_world(world) {}
@@ -47,20 +43,11 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     auto target_x = position.x;
     auto target_y = position.y;
 
-    // TEMP
-    /* const auto& agent = registry.get<SocietyAgent>(entity); */
-    // TEMP
-
-    bool distant_collide = false;
-    auto x_collide = position.x;
-    auto y_collide = position.y;
-
-    if (advance_x > 1 || advance_y > 1)
+    if (advance_x > 0 || advance_y > 0)
     {
-      // TODO: Check if any collisions happen between the object and the target tile
-      // so the object can't skip past another obstacle.
-      // Use Bresenham algorithm in tcodlib.
-      spdlog::info("BRESENHAM! {} {}", advance_x, advance_y);
+      bool distant_collide = false;
+      auto last_position_x = position.x;
+      auto last_position_y = position.y;
 
       TCOD_bresenham_data_t bresenham_data;
       int x_round = std::round(position.x);
@@ -76,10 +63,10 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
         if (distant_collide)
         {
-          x_collide = x_round;
-          y_collide = y_round;
           break;
         }
+        last_position_x = x_round;
+        last_position_y = y_round;
       }
 
       if (!distant_collide)
@@ -89,121 +76,20 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       }
       else
       {
-        spdlog::warn("COLLIDE: {} {}", x_collide, y_collide);
-        x_candidate = x_collide;
-        y_candidate = y_collide;
-        advance_x = std::abs(x_collide - position.x);
-        advance_y = std::abs(y_collide - position.y);
+        advance_x = std::abs(last_position_x - position.x);
+        advance_y = std::abs(last_position_y - position.y);
+
+        if (advance_x > 0 || advance_y > 0)
+        {
+          target_x = position.x + advance_x * velocity.x;
+          target_y = position.y + advance_y * velocity.y;
+        }
       }
     }
-
-    spdlog::warn("ADVANCE: {} {}", advance_x, advance_y);
-
-    size_t counter_x = 0;
-    size_t counter_y = 0;
-
-    // If can't advance advance_x or advance_y, check if it's possible to advance
-    // to the tiles before that one. Only go through this routine if Bresenham's
-    // algorithm didn't already find a position to visit.
-    while ((counter_x < advance_x || counter_y < advance_y) && target_x == position.x && target_y == position.y)
+    else
     {
-      /* const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x * velocity.x; */
-      const auto x = x_candidate - counter_x * velocity.x;
-      const auto x_round = std::round(x);
-      /* spdlog::info("FIRST {} ({}, {})", agent.name, position.x, position.y); */
-      /* spdlog::info("PARAMS ({}, {})", x, position.y); */
-      /* spdlog::info("PARAMS ROUND ({}, {})", x_round, std::round(position.y)); */
-      /* spdlog::info("ADVANCE ({}, {})", advance_x, advance_y); */
-      /* spdlog::info("COUNTER ({}, {})", counter_x, counter_y); */
-      /* spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor); */
-      const auto collides_horizontal = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
-      /* const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y * velocity.y; */
-      const auto y = y_candidate - counter_y * velocity.y;
-      const auto y_round = std::round(y);
-      /* spdlog::info("SECOND {} ({}, {})", agent.name, position.x, position.y); */
-      /* spdlog::info("PARAMS ({}, {})", position.x, y); */
-      /* spdlog::info("PARAMS ROUND ({}, {})", std::round(position.x), y_round); */
-      /* spdlog::info("ADVANCE ({}, {})", advance_x, advance_y); */
-      /* spdlog::info("COUNTER ({}, {})", counter_x, counter_y); */
-      /* spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor); */
-      const auto collides_vertical = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
-      /* spdlog::info("THIRD {} ({}, {})", agent.name, position.x, position.y); */
-      /* spdlog::info("PARAMS ({}, {})", x, y); */
-      /* spdlog::info("PARAMS ROUND ({}, {})", x_round, y_round); */
-      /* spdlog::info("ADVANCE ({}, {})", advance_x, advance_y); */
-      /* spdlog::info("COUNTER ({}, {})", counter_x, counter_y); */
-      /* spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor); */
-      const auto collides_diagonal = m_collides(registry, entity, x_round, y_round, z_candidate);
-      /* printf("\n"); */
-
-      // TODO: Resolve collision. If the tile has a collidable object, walking is not possible,
-      // otherwise walking is possible
-
-      // Stop early if the object advances this frame and collides in any axis.
-      // This avoids the object moving in one axis only only
-      if (advance_x > 0 && advance_y > 0 && ((collides_horizontal || collides_vertical) && collides_diagonal))
-      {
-        break;
-      }
-      // Stop early if the object advances partially this frame and collides in any axis.
-      // This avoids the object moving in one axis only
-      else if (advance_x <= 0 && advance_y <= 0 && ((collides_horizontal || collides_vertical) && collides_diagonal))
-      {
-        break;
-      }
-
-      if (counter_x < advance_x)
-      {
-        // Don't go past the negative boundaries of the map
-        if (x_round < 0)
-        {
-          target_x = 0;
-          // Set a big counter to break the loop
-          counter_x = advance_x + 1;
-        }
-        else if (collides_horizontal || collides_diagonal)
-        {
-          ++counter_x;
-        }
-        else
-        {
-          target_x = x;
-          // Set a big counter to break the loop
-          counter_x = advance_x + 1;
-        }
-      }
-
-      if (counter_y < advance_y)
-      {
-        // Don't go past the negative boundaries of the map
-        if (y_round < 0)
-        {
-          target_y = 0;
-          // Set a big counter to break the loop
-          counter_y = advance_y + 1;
-        }
-        else if (collides_vertical || collides_diagonal)
-        {
-          ++counter_y;
-        }
-        else
-        {
-          target_y = y;
-          // Set a big counter to break the loop
-          counter_y = advance_y + 1;
-        }
-      }
-
-      // Move diagonally if possible
-      if (advance_x > 0 && advance_y > 0 && !collides_diagonal)
-      {
-        target_x = x;
-        target_y = y;
-
-        // Set a big counter to break the loop
-        counter_x = advance_x + 1;
-        counter_y = advance_y + 1;
-      }
+      target_x = x_candidate;
+      target_y = y_candidate;
     }
 
     // Update the position if it's different from the last position
