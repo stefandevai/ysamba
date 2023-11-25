@@ -47,6 +47,9 @@ void Gameplay::load()
   /* m_world.set(5, 15, 15, 0); */
   /* m_world.set(5, 15, 13, 0); */
 
+  /* m_world.set(2, 15, 14, 0); */
+  /* m_world.set(5, 14, 14, 0); */
+
   const auto entity = m_registry.create();
   m_registry.emplace<SocietyAgent>(entity, 0, "otomi", "AAA", SocialClass::None, Metier::None);
   m_registry.emplace<Biology>(entity, Sex::Male, 100);
@@ -54,19 +57,19 @@ void Gameplay::load()
   m_registry.emplace<Visibility>(entity, "spritesheet-characters", 0, 2);
   m_registry.emplace<Selectable>(entity);
 
-  const auto entity2 = m_registry.create();
-  m_registry.emplace<SocietyAgent>(entity2, 0, "otomi", "BBB", SocialClass::None, Metier::None);
-  m_registry.emplace<Biology>(entity2, Sex::Male, 100);
-  m_registry.emplace<Position>(entity2, 17, 13);
-  m_registry.emplace<Visibility>(entity2, "spritesheet-characters", 0, 2);
-  m_registry.emplace<Selectable>(entity2);
+  /* const auto entity2 = m_registry.create(); */
+  /* m_registry.emplace<SocietyAgent>(entity2, 0, "otomi", "BBB", SocialClass::None, Metier::None); */
+  /* m_registry.emplace<Biology>(entity2, Sex::Male, 100); */
+  /* m_registry.emplace<Position>(entity2, 17, 13); */
+  /* m_registry.emplace<Visibility>(entity2, "spritesheet-characters", 0, 2); */
+  /* m_registry.emplace<Selectable>(entity2); */
 
-  const auto entity3 = m_registry.create();
-  m_registry.emplace<SocietyAgent>(entity3, 0, "otomi", "KKK", SocialClass::None, Metier::None);
-  m_registry.emplace<Biology>(entity3, Sex::Male, 100);
-  m_registry.emplace<Position>(entity3, 15, 13);
-  m_registry.emplace<Visibility>(entity3, "spritesheet-characters", 0, 2);
-  m_registry.emplace<Selectable>(entity3);
+  /* const auto entity3 = m_registry.create(); */
+  /* m_registry.emplace<SocietyAgent>(entity3, 0, "otomi", "KKK", SocialClass::None, Metier::None); */
+  /* m_registry.emplace<Biology>(entity3, Sex::Male, 100); */
+  /* m_registry.emplace<Position>(entity3, 15, 13); */
+  /* m_registry.emplace<Visibility>(entity3, "spritesheet-characters", 0, 2); */
+  /* m_registry.emplace<Selectable>(entity3); */
 
   m_has_loaded = true;
 }

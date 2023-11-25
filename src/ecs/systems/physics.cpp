@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include <entt/entity/registry.hpp>
+#include <libtcod.hpp>
 
 #include "ecs/components/biology.hpp"
 #include "ecs/components/position.hpp"
@@ -36,9 +37,9 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     biology.turn_threshold = 200.0;
 
     const auto speed_divide_factor = 100.0;
-    const double x_candidate = position.x + velocity.x * (biology.speed / speed_divide_factor);
-    const double y_candidate = position.y + velocity.y * (biology.speed / speed_divide_factor);
     const double z_candidate = position.z;
+    double x_candidate = position.x + velocity.x * (biology.speed / speed_divide_factor);
+    double y_candidate = position.y + velocity.y * (biology.speed / speed_divide_factor);
 
     size_t advance_x = std::abs(x_candidate - position.x);
     size_t advance_y = std::abs(y_candidate - position.y);
@@ -46,50 +47,94 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     auto target_x = position.x;
     auto target_y = position.y;
 
-    size_t counter_x = 0;
-    size_t counter_y = 0;
+    // TEMP
+    /* const auto& agent = registry.get<SocietyAgent>(entity); */
+    // TEMP
 
-    // TEMP
-    const auto& agent = registry.get<SocietyAgent>(entity);
-    // TEMP
+    bool distant_collide = false;
+    auto x_collide = position.x;
+    auto y_collide = position.y;
 
     if (advance_x > 1 || advance_y > 1)
     {
       // TODO: Check if any collisions happen between the object and the target tile
       // so the object can't skip past another obstacle.
       // Use Bresenham algorithm in tcodlib.
+      spdlog::info("BRESENHAM! {} {}", advance_x, advance_y);
+
+      TCOD_bresenham_data_t bresenham_data;
+      int x_round = std::round(position.x);
+      int y_round = std::round(position.y);
+
+      TCOD_line_init_mt(
+          x_round, y_round, x_round + advance_x * velocity.x, y_round + advance_y * velocity.y, &bresenham_data);
+
+      // While loop instead of do while to avoid checking the current position
+      while (!TCOD_line_step_mt(&x_round, &y_round, &bresenham_data))
+      {
+        distant_collide = m_collides(registry, entity, x_round, y_round, z_candidate);
+
+        if (distant_collide)
+        {
+          x_collide = x_round;
+          y_collide = y_round;
+          break;
+        }
+      }
+
+      if (!distant_collide)
+      {
+        target_x = x_candidate;
+        target_y = y_candidate;
+      }
+      else
+      {
+        spdlog::warn("COLLIDE: {} {}", x_collide, y_collide);
+        x_candidate = x_collide;
+        y_candidate = y_collide;
+        advance_x = std::abs(x_collide - position.x);
+        advance_y = std::abs(y_collide - position.y);
+      }
     }
 
+    spdlog::warn("ADVANCE: {} {}", advance_x, advance_y);
+
+    size_t counter_x = 0;
+    size_t counter_y = 0;
+
     // If can't advance advance_x or advance_y, check if it's possible to advance
-    // to the tiles before that one.
-    while (counter_x < advance_x || counter_y < advance_y)
+    // to the tiles before that one. Only go through this routine if Bresenham's
+    // algorithm didn't already find a position to visit.
+    while ((counter_x < advance_x || counter_y < advance_y) && target_x == position.x && target_y == position.y)
     {
-      const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x * velocity.x;
+      /* const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x * velocity.x; */
+      const auto x = x_candidate - counter_x * velocity.x;
       const auto x_round = std::round(x);
-      spdlog::info("FIRST {} ({}, {})", agent.name, position.x, position.y);
-      spdlog::info("PARAMS ({}, {})", x, position.y);
-      spdlog::info("PARAMS ROUND ({}, {})", x_round, std::round(position.y));
-      spdlog::info("ADVANCE ({}, {})", advance_x, advance_y);
-      spdlog::info("COUNTER ({}, {})", counter_x, counter_y);
-      spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor);
+      /* spdlog::info("FIRST {} ({}, {})", agent.name, position.x, position.y); */
+      /* spdlog::info("PARAMS ({}, {})", x, position.y); */
+      /* spdlog::info("PARAMS ROUND ({}, {})", x_round, std::round(position.y)); */
+      /* spdlog::info("ADVANCE ({}, {})", advance_x, advance_y); */
+      /* spdlog::info("COUNTER ({}, {})", counter_x, counter_y); */
+      /* spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor); */
       const auto collides_horizontal = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
-      const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y * velocity.y;
+      /* const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y * velocity.y; */
+      const auto y = y_candidate - counter_y * velocity.y;
       const auto y_round = std::round(y);
-      spdlog::info("SECOND {} ({}, {})", agent.name, position.x, position.y);
-      spdlog::info("PARAMS ({}, {})", position.x, y);
-      spdlog::info("PARAMS ROUND ({}, {})", std::round(position.x), y_round);
-      spdlog::info("ADVANCE ({}, {})", advance_x, advance_y);
-      spdlog::info("COUNTER ({}, {})", counter_x, counter_y);
-      spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor);
+      /* spdlog::info("SECOND {} ({}, {})", agent.name, position.x, position.y); */
+      /* spdlog::info("PARAMS ({}, {})", position.x, y); */
+      /* spdlog::info("PARAMS ROUND ({}, {})", std::round(position.x), y_round); */
+      /* spdlog::info("ADVANCE ({}, {})", advance_x, advance_y); */
+      /* spdlog::info("COUNTER ({}, {})", counter_x, counter_y); */
+      /* spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor); */
       const auto collides_vertical = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
-      spdlog::info("THIRD {} ({}, {})", agent.name, position.x, position.y);
-      spdlog::info("PARAMS ({}, {})", x, y);
-      spdlog::info("PARAMS ROUND ({}, {})", x_round, y_round);
-      spdlog::info("ADVANCE ({}, {})", advance_x, advance_y);
-      spdlog::info("COUNTER ({}, {})", counter_x, counter_y);
-      spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor);
+      /* spdlog::info("THIRD {} ({}, {})", agent.name, position.x, position.y); */
+      /* spdlog::info("PARAMS ({}, {})", x, y); */
+      /* spdlog::info("PARAMS ROUND ({}, {})", x_round, y_round); */
+      /* spdlog::info("ADVANCE ({}, {})", advance_x, advance_y); */
+      /* spdlog::info("COUNTER ({}, {})", counter_x, counter_y); */
+      /* spdlog::info("DATA {} {}, {}, {}", velocity.x, velocity.y, biology.speed, speed_divide_factor); */
       const auto collides_diagonal = m_collides(registry, entity, x_round, y_round, z_candidate);
-      printf("\n");
+      /* printf("\n"); */
 
       // TODO: Resolve collision. If the tile has a collidable object, walking is not possible,
       // otherwise walking is possible
@@ -150,10 +195,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       }
 
       // Move diagonally if possible
-      spdlog::info("DIAGONAL1 {} {}, {}, {}", advance_x, advance_y, collides_diagonal);
       if (advance_x > 0 && advance_y > 0 && !collides_diagonal)
       {
-        spdlog::info("DIAGONAL2 {} {}, {}, {}", advance_x, advance_y, collides_diagonal);
         target_x = x;
         target_y = y;
 
