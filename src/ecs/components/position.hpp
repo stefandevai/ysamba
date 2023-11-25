@@ -2,13 +2,12 @@
 
 #include <cstdint>
 
+#include "core/maths/vector.hpp"
+
 namespace dl
 {
-struct Position
+struct Position : public Vector3
 {
-  double x;
-  double y;
-  double z;
   uint32_t spatial_hash_index = 99999;
 };
 }  // namespace dl

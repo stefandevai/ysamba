@@ -116,7 +116,7 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
   const auto& camera_size = camera.get_size_in_tiles();
   const auto placement_margin = 5;
 
-  auto position = Position{0., 0., 0.};
+  auto position = Position{{0., 0., 0.}};
   const uint32_t max_tries = 10;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
