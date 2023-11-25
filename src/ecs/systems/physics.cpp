@@ -4,10 +4,10 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../../world/world.hpp"
-#include "../components/biology.hpp"
-#include "../components/position.hpp"
-#include "../components/velocity.hpp"
+#include "ecs/components/biology.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/velocity.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

@@ -4,8 +4,8 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../../world/world.hpp"
-#include "../components/position.hpp"
+#include "ecs/components/position.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

@@ -4,9 +4,9 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../graphics/camera.hpp"
-#include "../graphics/renderer.hpp"
 #include "./components/velocity.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/renderer.hpp"
 
 namespace dl
 {

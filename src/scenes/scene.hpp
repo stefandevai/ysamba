@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string>
 
-#include "../core/lua_api.hpp"
+#include "core/lua_api.hpp"
 
 namespace dl
 {

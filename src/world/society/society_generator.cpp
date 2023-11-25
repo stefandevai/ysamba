@@ -4,11 +4,11 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../../core/random.hpp"
-#include "../../graphics/camera.hpp"
-#include "../../graphics/constants.hpp"
-#include "../world.hpp"
 #include "./name_generator.hpp"
+#include "core/random.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/constants.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

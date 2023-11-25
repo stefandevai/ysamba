@@ -3,9 +3,9 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-#include "../core/input_manager.hpp"
-#include "../world/world.hpp"
 #include "./scene.hpp"
+#include "core/input_manager.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

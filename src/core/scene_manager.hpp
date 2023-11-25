@@ -3,8 +3,8 @@
 #include <map>
 #include <memory>
 
-#include "../scenes/scene.hpp"
 #include "./json.hpp"
+#include "scenes/scene.hpp"
 
 namespace dl
 {

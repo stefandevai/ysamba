@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../point.hpp"
+#include "world/point.hpp"
 
 namespace dl
 {

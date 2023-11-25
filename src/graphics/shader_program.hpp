@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../core/asset.hpp"
+#include "core/asset.hpp"
 
 namespace dl
 {

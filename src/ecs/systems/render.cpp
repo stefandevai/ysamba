@@ -5,15 +5,15 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../../graphics/camera.hpp"
-#include "../../graphics/renderer.hpp"
-#include "../../graphics/text.hpp"
-#include "../../world/world.hpp"
-#include "../components/position.hpp"
-#include "../components/rectangle.hpp"
-#include "../components/selectable.hpp"
-#include "../components/text.hpp"
-#include "../components/visibility.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/rectangle.hpp"
+#include "ecs/components/selectable.hpp"
+#include "ecs/components/text.hpp"
+#include "ecs/components/visibility.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/renderer.hpp"
+#include "graphics/text.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

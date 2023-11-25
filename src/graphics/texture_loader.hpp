@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../core/asset.hpp"
 #include "./texture.hpp"
+#include "core/asset.hpp"
 
 namespace dl
 {

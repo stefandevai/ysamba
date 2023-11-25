@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "../graphics/camera.hpp"
-#include "../graphics/renderer.hpp"
-#include "../world/society/name_generator.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/renderer.hpp"
+#include "world/society/name_generator.hpp"
 
 namespace dl
 {

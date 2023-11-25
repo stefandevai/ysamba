@@ -6,15 +6,15 @@
 #include <climits>
 #include <fstream>
 
-#include "../graphics/camera.hpp"
-#include "../graphics/renderer.hpp"
-#include "../world/society/society_generator.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/renderer.hpp"
+#include "world/society/society_generator.hpp"
 
 // TEMP
-#include "../ecs/components/position.hpp"
-#include "../ecs/components/selectable.hpp"
-#include "../ecs/components/visibility.hpp"
-#include "../graphics/text.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/selectable.hpp"
+#include "ecs/components/visibility.hpp"
+#include "graphics/text.hpp"
 // TEMP
 
 namespace dl

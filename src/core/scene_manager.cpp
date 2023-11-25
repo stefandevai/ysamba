@@ -4,10 +4,10 @@
 
 #include <memory>
 
-#include "../graphics/camera.hpp"
-#include "../scenes/gameplay.hpp"
-#include "../scenes/home_menu.hpp"
-#include "../scenes/world_creation.hpp"
+#include "graphics/camera.hpp"
+#include "scenes/gameplay.hpp"
+#include "scenes/home_menu.hpp"
+#include "scenes/world_creation.hpp"
 
 namespace dl
 {

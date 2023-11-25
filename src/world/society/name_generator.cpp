@@ -5,7 +5,7 @@
 #include <map>
 #include <unordered_map>
 
-#include "../../core/random.hpp"
+#include "core/random.hpp"
 
 namespace dl
 {

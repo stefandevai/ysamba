@@ -8,13 +8,13 @@
 #include <libtcod.hpp>
 #include <utility>
 
-#include "../../core/random.hpp"
 #include "./bay_data.hpp"
 #include "./lib/bezier.hpp"
 #include "./lib/fast_noise_lite.hpp"
 #include "./lib/gal/fortune_algorithm.hpp"
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./tile_type.hpp"
+#include "core/random.hpp"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846

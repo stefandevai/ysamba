@@ -2,7 +2,6 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../core/asset_manager.hpp"
 #include "./batch2d.hpp"
 #include "./batch_quad.hpp"
 #include "./camera.hpp"
@@ -11,6 +10,7 @@
 #include "./sprite.hpp"
 #include "./text.hpp"
 #include "./texture.hpp"
+#include "core/asset_manager.hpp"
 
 namespace dl
 {

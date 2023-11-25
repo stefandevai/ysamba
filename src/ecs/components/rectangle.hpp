@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../graphics/color.hpp"
-#include "../../graphics/quad.hpp"
+#include "graphics/color.hpp"
+#include "graphics/quad.hpp"
 
 namespace dl
 {

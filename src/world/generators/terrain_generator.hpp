@@ -3,12 +3,12 @@
 #include <queue>
 #include <vector>
 
-#include "../../core/lua_api.hpp"
-#include "../point.hpp"
-#include "../tilemap.hpp"
 #include "./island_data.hpp"
 #include "./lib/spline.hpp"
 #include "./river_segment.hpp"
+#include "core/lua_api.hpp"
+#include "world/point.hpp"
+#include "world/tilemap.hpp"
 
 namespace dl
 {

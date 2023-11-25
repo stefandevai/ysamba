@@ -3,10 +3,10 @@
 #include <entt/entity/registry.hpp>
 #include <memory>
 
-#include "../core/input_manager.hpp"
-#include "../ecs/ecs.hpp"
-#include "../world/world.hpp"
 #include "./scene.hpp"
+#include "core/input_manager.hpp"
+#include "ecs/ecs.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

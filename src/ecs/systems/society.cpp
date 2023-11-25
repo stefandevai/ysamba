@@ -4,15 +4,15 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../../core/random.hpp"
-#include "../../world/world.hpp"
-#include "../components/action_harvest.hpp"
-#include "../components/biology.hpp"
-#include "../components/position.hpp"
-#include "../components/rectangle.hpp"
-#include "../components/society_agent.hpp"
-#include "../components/velocity.hpp"
-#include "../components/visibility.hpp"
+#include "core/random.hpp"
+#include "ecs/components/action_harvest.hpp"
+#include "ecs/components/biology.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/rectangle.hpp"
+#include "ecs/components/society_agent.hpp"
+#include "ecs/components/velocity.hpp"
+#include "ecs/components/visibility.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

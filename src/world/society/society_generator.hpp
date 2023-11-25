@@ -2,11 +2,11 @@
 
 #include <entt/entity/fwd.hpp>
 
-#include "../../ecs/components/biology.hpp"
-#include "../../ecs/components/position.hpp"
-#include "../../ecs/components/society_agent.hpp"
-#include "../../ecs/components/visibility.hpp"
 #include "./society_blueprint.hpp"
+#include "ecs/components/biology.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/society_agent.hpp"
+#include "ecs/components/visibility.hpp"
 
 namespace dl
 {

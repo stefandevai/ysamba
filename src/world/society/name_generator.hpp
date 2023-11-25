@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include "../../core/json.hpp"
+#include "core/json.hpp"
 
 namespace dl
 {

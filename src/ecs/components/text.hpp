@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../graphics/text.hpp"
+#include "graphics/text.hpp"
 
 namespace dl
 {

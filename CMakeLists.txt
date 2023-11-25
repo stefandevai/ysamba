@@ -60,8 +60,9 @@ find_package(spdlog CONFIG REQUIRED)
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
-        ${LUA_INCLUDE_DIR}
-        "./lib/gal/include"
+    ${LUA_INCLUDE_DIR}
+    "./lib/gal/include"
+    "./src"
 )
 
 target_link_libraries(

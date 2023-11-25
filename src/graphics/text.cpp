@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "../core/asset_manager.hpp"
 #include "./font.hpp"
 #include "./sprite.hpp"
+#include "core/asset_manager.hpp"
 
 namespace dl
 {

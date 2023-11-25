@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "../graphics/texture.hpp"
 #include "./clock.hpp"
 #include "./file_manager.hpp"
+#include "graphics/texture.hpp"
 
 namespace dl
 {

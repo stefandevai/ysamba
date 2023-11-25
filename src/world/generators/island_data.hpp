@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <utility>
 
-#include "../point.hpp"
 #include "./lib/gal/diagram.hpp"
+#include "world/point.hpp"
 
 namespace dl
 {

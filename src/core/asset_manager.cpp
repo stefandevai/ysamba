@@ -4,9 +4,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../graphics/font_loader.hpp"
-#include "../graphics/shader_loader.hpp"
-#include "../graphics/texture_loader.hpp"
+#include "graphics/font_loader.hpp"
+#include "graphics/shader_loader.hpp"
+#include "graphics/texture_loader.hpp"
 
 namespace dl
 {

@@ -5,8 +5,8 @@
 #include <map>
 #include <string>
 
-#include "../core/asset.hpp"
-#include "../core/json.hpp"
+#include "core/asset.hpp"
+#include "core/json.hpp"
 
 namespace dl
 {

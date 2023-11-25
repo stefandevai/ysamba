@@ -4,8 +4,8 @@
 
 #include <vector>
 
-#include "../../core/random.hpp"
 #include "./tile_type.hpp"
+#include "core/random.hpp"
 
 namespace dl
 {

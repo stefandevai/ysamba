@@ -4,15 +4,15 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "../../graphics/constants.hpp"
-#include "../../graphics/frame_data_types.hpp"
-#include "../../world/tile_flag.hpp"
-#include "../../world/world.hpp"
-#include "../components/action_harvest.hpp"
-#include "../components/position.hpp"
-#include "../components/society_agent.hpp"
-#include "../components/velocity.hpp"
-#include "../components/visibility.hpp"
+#include "ecs/components/action_harvest.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/society_agent.hpp"
+#include "ecs/components/velocity.hpp"
+#include "ecs/components/visibility.hpp"
+#include "graphics/constants.hpp"
+#include "graphics/frame_data_types.hpp"
+#include "world/tile_flag.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

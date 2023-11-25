@@ -6,12 +6,12 @@
 #include <climits>
 #include <fstream>
 
-#include "../core/random.hpp"
-#include "../graphics/camera.hpp"
-#include "../graphics/color.hpp"
-#include "../graphics/renderer.hpp"
-#include "../graphics/sprite.hpp"
-#include "../graphics/texture.hpp"
+#include "core/random.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/color.hpp"
+#include "graphics/renderer.hpp"
+#include "graphics/sprite.hpp"
+#include "graphics/texture.hpp"
 
 namespace dl
 {

@@ -4,7 +4,7 @@
 
 #include <entt/entity/entity.hpp>
 
-#include "../ecs/components/position.hpp"
+#include "ecs/components/position.hpp"
 
 namespace dl
 {

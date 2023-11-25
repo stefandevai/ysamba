@@ -6,12 +6,12 @@
 #include <queue>
 #include <set>
 /* #include "./generators/terrain_generator.hpp" */
-#include "../graphics/renderer.hpp"
-#include "../graphics/sprite.hpp"
 #include "./generators/dummy_generator.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
 #include "./tile_target.hpp"
+#include "graphics/renderer.hpp"
+#include "graphics/sprite.hpp"
 
 namespace dl
 {

@@ -2,8 +2,8 @@
 
 #include <SDL.h>
 
-#include "../core/input_manager.hpp"
-#include "../graphics/camera.hpp"
+#include "core/input_manager.hpp"
+#include "graphics/camera.hpp"
 
 namespace dl
 {

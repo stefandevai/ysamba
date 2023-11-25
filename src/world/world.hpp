@@ -6,13 +6,13 @@
 #include <map>
 #include <vector>
 
-#include "../core/json.hpp"
-#include "../core/lua_api.hpp"
 #include "./item_data.hpp"
 #include "./society/society_blueprint.hpp"
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"
 #include "./tilemap.hpp"
+#include "core/json.hpp"
+#include "core/lua_api.hpp"
 
 namespace dl
 {

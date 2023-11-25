@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../core/input_manager.hpp"
-#include "../graphics/text.hpp"
 #include "./scene.hpp"
+#include "core/input_manager.hpp"
+#include "graphics/text.hpp"
 
 namespace dl
 {

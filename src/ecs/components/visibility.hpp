@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../graphics/sprite.hpp"
+#include "graphics/sprite.hpp"
 
 namespace dl
 {
