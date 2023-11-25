@@ -16,17 +16,19 @@ struct Vector2i
   Vector2i(const double x, const double y) : x(static_cast<int>(x)), y(static_cast<int>(y)) {}
 };
 
-struct Vector2f
-{
-  float x;
-  float y;
-};
-
 struct Vector3
 {
   double x;
   double y;
   double z;
+
+  Vector3& operator+=(const Vector3& rhs)
+  {
+    this->x += rhs.x;
+    this->y += rhs.y;
+    this->z += rhs.z;
+    return *this;
+  }
 };
 
 struct Vector3i
@@ -41,10 +43,4 @@ struct Vector3i
   }
 };
 
-struct Vector3f
-{
-  float x;
-  float y;
-  float z;
-};
 }  // namespace dl

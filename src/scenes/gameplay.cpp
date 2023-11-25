@@ -140,19 +140,19 @@ void Gameplay::m_update_input(SetSceneFunction& set_scene)
   }
   else if (m_input_manager->poll_action("camera_move_west"))
   {
-    m_camera.move(-8.f, 0.f);
+    m_camera.move({-8., 0., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_east"))
   {
-    m_camera.move(8.f, 0.f);
+    m_camera.move({8., 0., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_south"))
   {
-    m_camera.move(0.f, 8.f);
+    m_camera.move({0., 8., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_north"))
   {
-    m_camera.move(0.f, -8.f);
+    m_camera.move({0., -8., 0.});
   }
   else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
   {

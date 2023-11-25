@@ -13,26 +13,21 @@ const Vector2i Camera::get_position_in_tiles() const
   return Vector2i{m_position.x / m_tile_size.x, m_position.y / m_tile_size.y};
 }
 
-void Camera::move(const float x, const float y, const float z)
+void Camera::move(const Vector3& quantity)
 {
-  m_position.x += x;
-  m_position.y += y;
-  m_position.z += z;
-
-  m_front.x += x;
-  m_front.y += y;
-  m_front.z += z;
+  m_position += quantity;
+  m_front.x += quantity.x;
+  m_front.y += quantity.y;
+  m_front.z += quantity.z;
 }
 
-void Camera::set_position(const float x, const float y, const float z)
+void Camera::set_position(const Vector3& position)
 {
-  m_position.x = x;
-  m_position.y = y;
-  m_position.z = z;
+  m_position = position;
 
-  m_front.x = x;
-  m_front.y = y;
-  m_front.z = z - 501;
+  m_front.x = position.x;
+  m_front.y = position.y;
+  m_front.z = position.z - 501;
 }
 
 void Camera::set_size(const float width, const float height) { set_frustrum(0.f, width, height, 0.f); }

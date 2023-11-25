@@ -18,7 +18,7 @@ class Camera
  public:
   Camera();
 
-  void move(const float x, const float y, const float z = 0.f);
+  void move(const Vector3& quantity);
   const Vector3& get_position() const { return m_position; }
   const Vector2i get_position_in_tiles() const;
   glm::mat4 get_view_matrix() const
@@ -36,10 +36,10 @@ class Camera
             glm::lookAt(glm::vec3(m_position.x, m_position.y, m_position.z), m_front, m_up));
   }
   const Vector3& get_saved_position() const { return m_saved_position; }
-  const Vector2f& get_size() const { return m_size; }
+  const Vector2& get_size() const { return m_size; }
   const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
   const Vector2i& get_tile_size() const { return m_tile_size; }
-  void set_position(const float x, const float y, const float z);
+  void set_position(const Vector3& position);
   void set_size(const float width, const float height);
   void set_frustrum(const float left, const float right, const float bottom, const float top);
   void set_tile_size(const float width, const float height);
@@ -56,7 +56,7 @@ class Camera
   glm::vec3 m_front{0.0f, 0.0f, -1.0f};
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   Vector3 m_saved_position{0., 0., 0.};
-  Vector2f m_size;
+  Vector2 m_size;
   Vector2i m_tile_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
   // CameraState m_state = CameraState::IDLE;
