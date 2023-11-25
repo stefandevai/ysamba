@@ -30,7 +30,7 @@ void Game::load()
     m_camera.set_tile_size(world_texture->get_frame_width(), world_texture->get_frame_height());
 
     m_renderer.add_layer("world", "world");
-    m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, false, 1);
+    m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, true, 1);
     m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true, 2);
     m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
   }

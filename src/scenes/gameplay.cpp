@@ -34,7 +34,7 @@ void Gameplay::load()
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   m_fps_text = m_registry.create();
-  m_registry.emplace<Text>(m_fps_text, L"FPS: ");
+  m_registry.emplace<Text>(m_fps_text, "FPS: ");
   m_registry.emplace<Position>(m_fps_text, 30, 30, 20);
   auto& text_component = m_registry.get<Text>(m_fps_text);
   text_component.set_is_static(false);
@@ -72,7 +72,7 @@ void Gameplay::update(const double delta, SetSceneFunction set_scene)
   if (delay <= 0.0)
   {
     auto& text = m_registry.get<Text>(m_fps_text);
-    text.set_text(L"FPS: " + std::to_wstring(1.0 / delta));
+    text.set_text("FPS: " + std::to_string(1.0 / delta));
     delay = 0.8;
   }
   else

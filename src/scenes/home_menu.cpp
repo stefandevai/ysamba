@@ -14,8 +14,8 @@ void HomeMenu::load()
 {
   Scene::load();
 
-  const auto game_title = m_lua.get_variable<std::wstring>("game_title");
-  const auto instructions = m_lua.get_variable<std::wstring>("instructions");
+  const auto game_title = m_lua.get_variable<std::string>("game_title");
+  const auto instructions = m_lua.get_variable<std::string>("instructions");
 
   m_game_title.set_text(game_title);
   m_game_title.set_font_name("font-1980");

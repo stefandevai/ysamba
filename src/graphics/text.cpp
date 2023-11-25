@@ -8,7 +8,7 @@
 
 namespace dl
 {
-Text::Text(const std::wstring text,
+Text::Text(const std::string text,
            const std::string font_name,
            const unsigned int font_size,
            const std::string& color,

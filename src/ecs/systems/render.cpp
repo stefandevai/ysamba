@@ -1,5 +1,6 @@
 #include "./render.hpp"
 
+#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include <tgmath.h>
 
@@ -79,6 +80,8 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
 
   renderer.finalize("world");
 
+  glDisable(GL_DEPTH_TEST);
+
   renderer.init("quad");
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -101,7 +104,7 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    renderer.batch("text", text, position.x, position.x, 3);
+    renderer.batch("text", text, position.x, position.y, 3);
   }
   renderer.finalize("text");
 }

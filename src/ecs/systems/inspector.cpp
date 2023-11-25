@@ -6,8 +6,10 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
+#include "ecs/components/society_agent.hpp"
 #include "ecs/components/velocity.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/text.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -26,16 +28,17 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     return;
   }
 
-  const auto tile_x = (mouse_position.first + camera_position.x) / 32.f;
-  const auto tile_y = (mouse_position.second + camera_position.y) / 32.f;
+  const auto& tile_size = camera.get_tile_size();
+  const auto tile_x = (mouse_position.first + camera_position.x) / tile_size.x;
+  const auto tile_y = (mouse_position.second + camera_position.y) / tile_size.y;
 
   const auto entity = m_world.spatial_hash.search_by_component<Selectable>(tile_x, tile_y, registry);
 
   if (registry.valid(entity))
   {
-    m_update_inspector_content(entity, registry);
+    m_update_inspector_content(entity, registry, camera);
   }
-  else if (registry.valid(m_inspector_entity))
+  else if (m_is_valid(registry))
   {
     m_destroy_inspector(registry);
   }
@@ -45,23 +48,46 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   m_last_camera_position.second = camera_position.y;
 }
 
-void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt::registry& registry)
+void InspectorSystem::m_update_inspector_content(const entt::entity entity,
+                                                 entt::registry& registry,
+                                                 const Camera& camera)
 {
-  if (!registry.valid(m_inspector_entity))
+  if (!m_is_valid(registry))
   {
-    m_inspector_entity = registry.create();
+    m_inspector_quad = registry.create();
+    m_inspector_text = registry.create();
   }
 
-  if (registry.all_of<Rectangle, Position>(m_inspector_entity))
+  const auto& camera_size = camera.get_size();
+
+  if (!registry.all_of<Rectangle, Position>(m_inspector_quad))
   {
+    registry.emplace<Rectangle>(m_inspector_quad, 300, 100, "#1b2420aa");
+    registry.emplace<Position>(m_inspector_quad, camera_size.x - 30.0 - 300.0, 30.0, 10.0);
   }
-  else
+  if (!registry.all_of<Text, Position>(m_inspector_text))
   {
-    registry.emplace<Rectangle>(m_inspector_entity, 100, 100, "#ffffffff");
-    registry.emplace<Position>(m_inspector_entity, 30.0, 30.0, 10.0);
+    registry.emplace<Text>(m_inspector_text, "");
+    registry.emplace<Position>(m_inspector_text, camera_size.x - 15.0 - 300.0, 45.0, 10.0);
+  }
+
+  if (registry.all_of<SocietyAgent>(entity))
+  {
+    const auto& agent = registry.get<SocietyAgent>(entity);
+    auto& text = registry.get<Text>(m_inspector_text);
+    text.set_text(agent.name);
   }
 }
 
-void InspectorSystem::m_destroy_inspector(entt::registry& registry) { registry.destroy(m_inspector_entity); }
+void InspectorSystem::m_destroy_inspector(entt::registry& registry)
+{
+  registry.destroy(m_inspector_quad);
+  registry.destroy(m_inspector_text);
+}
+
+bool InspectorSystem::m_is_valid(const entt::registry& registry) const
+{
+  return registry.valid(m_inspector_quad) && registry.valid(m_inspector_text);
+}
 
 }  // namespace dl
