@@ -38,7 +38,7 @@ struct SocietyAgent
   std::string name{};
   SocialClass social_class;
   Metier metiers;
-  State state = State::Walking;
+  State state = State::Harvesting;
   double time_to_next_action = 0.0;
 };
 }  // namespace dl

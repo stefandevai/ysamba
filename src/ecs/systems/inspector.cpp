@@ -74,10 +74,12 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity,
   if (registry.all_of<SocietyAgent>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
-    const auto& position = registry.get<Position>(entity);
 
     auto& text = registry.get<Text>(m_inspector_text);
-    text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")");
+    text.set_text(agent.name);
+
+    /* const auto& position = registry.get<Position>(entity); */
+    /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
 }
 

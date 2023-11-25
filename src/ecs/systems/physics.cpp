@@ -33,21 +33,19 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     biology.turn_threshold = 200.0;
 
     const auto speed_divide_factor = 100.0;
+    const auto position_variation = (biology.speed / speed_divide_factor);
+
     const double z_candidate = position.z;
-    double x_candidate = position.x + velocity.x * (biology.speed / speed_divide_factor);
-    double y_candidate = position.y + velocity.y * (biology.speed / speed_divide_factor);
+    double x_candidate = position.x + velocity.x * position_variation;
+    double y_candidate = position.y + velocity.y * position_variation;
 
-    size_t advance_x = std::abs(x_candidate - position.x);
-    size_t advance_y = std::abs(y_candidate - position.y);
-
-    /* spdlog::warn("ADVANCE: ({}, {})", advance_x, advance_y); */
-    /* spdlog::warn("POSITION: ({}, {})", position.x, position.y); */
-    /* spdlog::warn("CANDIDATE: ({}, {})", x_candidate, y_candidate); */
-    /* printf("\n"); */
+    size_t advance_x = std::abs(std::round(x_candidate) - std::round(position.x));
+    size_t advance_y = std::abs(std::round(y_candidate) - std::round(position.y));
 
     auto target_x = position.x;
     auto target_y = position.y;
 
+    // Test collision for the tiles we want advance
     if (advance_x > 0 || advance_y > 0)
     {
       bool distant_collide = false;
@@ -74,11 +72,14 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         last_position_y = y_round;
       }
 
+      // Confirm position if there was no collision
       if (!distant_collide)
       {
         target_x = x_candidate;
         target_y = y_candidate;
       }
+      // Otherwise, advance to the last walkable position
+      // if it's not the current position.
       else
       {
         advance_x = std::abs(last_position_x - position.x);
@@ -91,25 +92,11 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         }
       }
     }
+    // If there was a fractional advance without tile change, just update our position
     else
     {
-      const auto x_tile = std::round(position.x);
-      const auto y_tile = std::round(position.y);
-      const auto target_tile_x = std::round(x_candidate);
-      const auto target_tile_y = std::round(y_candidate);
-
-      const auto collides_in_target = m_collides(registry, entity, target_tile_x, target_tile_y, z_candidate);
-
-      if (!collides_in_target)
-      {
-        target_x = x_candidate;
-        target_y = y_candidate;
-      }
-      else
-      {
-        target_x = x_tile;
-        target_y = y_tile;
-      }
+      target_x = x_candidate;
+      target_y = y_candidate;
     }
 
     // Update the position if it's different from the last position
