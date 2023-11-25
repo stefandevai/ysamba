@@ -40,7 +40,6 @@ class Gameplay : public Scene
   entt::registry m_registry;
   World m_world;
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-  /* ECS m_ecs{m_registry, m_world, m_camera}; */
   State m_current_state = State::PAUSED;
   entt::entity m_fps_text;
   double m_turn_delay = 0.0;

@@ -29,23 +29,23 @@ void SocietySystem::update(entt::registry& registry, const double delta)
         registry.emplace<ActionHarvest>(entity);
       }
     }
-    else if (agent.state == SocietyAgent::State::Idle)
-    {
-      if (agent.time_to_next_action <= 0)
-      {
-        agent.time_to_next_action = 1.0;
-        const auto n = random::get_real();
+    /* else if (agent.state == SocietyAgent::State::Idle) */
+    /* { */
+    /*   if (agent.time_to_next_action <= 0) */
+    /*   { */
+    /*     agent.time_to_next_action = 1.0; */
+    /*     const auto n = random::get_real(); */
 
-        if (n < .7f)
-        {
-          agent.state = SocietyAgent::State::Walking;
-        }
-      }
-      else
-      {
-        agent.time_to_next_action -= delta;
-      }
-    }
+    /*     if (n < .7f) */
+    /*     { */
+    /*       agent.state = SocietyAgent::State::Walking; */
+    /*     } */
+    /*   } */
+    /*   else */
+    /*   { */
+    /*     agent.time_to_next_action -= delta; */
+    /*   } */
+    /* } */
     else if (agent.state == SocietyAgent::State::Walking || agent.state == SocietyAgent::State::Idle)
     {
       if (agent.time_to_next_action <= 0)

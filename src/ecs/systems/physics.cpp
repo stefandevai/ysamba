@@ -9,6 +9,10 @@
 #include "ecs/components/velocity.hpp"
 #include "world/world.hpp"
 
+// TEMP
+#include "ecs/components/society_agent.hpp"
+// TEMP
+
 namespace dl
 {
 PhysicsSystem::PhysicsSystem(World& world) : m_world(world) {}
@@ -52,29 +56,44 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       // Use Bresenham algorithm in tcodlib.
     }
 
+    // TEMP
+    const auto& agent = registry.get<SocietyAgent>(entity);
+    // TEMP
+
     // If can't advance advance_x or advance_y, check if it's possible to advance
     // to the tiles before that one.
     while (counter_x <= advance_x || counter_y <= advance_y)
     {
       const auto x = position.x + velocity.x * (biology.speed / speed_divide_factor) - counter_x;
       const auto x_round = std::round(x);
-      const auto collides_x = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
+      spdlog::info("FIRST {} ({}, {})", agent.name, position.x, position.y);
+      spdlog::info("PARAMS ({}, {})", x, position.y);
+      spdlog::info("PARAMS ROUND ({}, {})", x_round, std::round(position.y));
+      const auto collides_horizontal = m_collides(registry, entity, x_round, std::round(position.y), z_candidate);
       const auto y = position.y + velocity.y * (biology.speed / speed_divide_factor) - counter_y;
       const auto y_round = std::round(y);
-      const auto collides_y = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
+      spdlog::info("SECOND {} ({}, {})", agent.name, position.x, position.y);
+      spdlog::info("PARAMS ({}, {})", x, position.y);
+      spdlog::info("PARAMS ROUND ({}, {})", std::round(position.x), y_round);
+      const auto collides_vertical = m_collides(registry, entity, std::round(position.x), y_round, z_candidate);
+      spdlog::info("THIRD {} ({}, {})", agent.name, position.x, position.y);
+      spdlog::info("PARAMS ({}, {})", x, y);
+      spdlog::info("PARAMS ROUND ({}, {})", x_round, y_round);
+      const auto collides_diagonal = m_collides(registry, entity, x_round, y_round, z_candidate);
+      printf("\n");
 
       // TODO: Resolve collision. If the tile has a collidable object, walking is not possible,
       // otherwise walking is possible
 
       // Stop early if the object advances this frame and collides in any axis.
       // This avoids the object moving in one axis only only
-      if (advance_x > 0 && advance_y > 0 && (collides_x || collides_y))
+      if (advance_x > 0 && advance_y > 0 && (collides_horizontal || collides_vertical || collides_diagonal))
       {
         break;
       }
       // Stop early if the object advances partially this frame and collides in any axis.
-      // This avoids the object moving in one axis only only
-      else if (advance_x <= 0 && advance_y <= 0 && (collides_x || collides_y))
+      // This avoids the object moving in one axis only
+      else if (advance_x <= 0 && advance_y <= 0 && (collides_horizontal || collides_vertical || collides_diagonal))
       {
         break;
       }
@@ -86,7 +105,7 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
           target_x = 0;
           counter_x = advance_x + 1;
         }
-        else if (collides_x)
+        else if (collides_horizontal || collides_diagonal)
         {
           ++counter_x;
         }
@@ -104,7 +123,7 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
           target_y = 0;
           counter_y = advance_y + 1;
         }
-        else if (collides_y)
+        else if (collides_vertical || collides_diagonal)
         {
           ++counter_y;
         }
@@ -131,10 +150,12 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
 bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, const int x, const int y, const int z)
 {
+  spdlog::info("Collides? ({}, {})", x, y);
   auto& target_tile = m_world.get(x, y, z);
 
   if (!target_tile.flags.contains("WALKABLE"))
   {
+    spdlog::critical("Yes! ({}, {})", x, y);
     return true;
   }
 
@@ -153,11 +174,13 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
 
       if (std::round(position.x) == x && std::round(position.y) == y)
       {
+        spdlog::critical("Yes! ({}, {}), person position: ({}, {})", x, y, position.x, position.y);
         return true;
       }
     }
   }
 
+  spdlog::debug("No! ({}, {})", x, y);
   return false;
 }
 }  // namespace dl
