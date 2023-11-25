@@ -40,6 +40,11 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     size_t advance_x = std::abs(x_candidate - position.x);
     size_t advance_y = std::abs(y_candidate - position.y);
 
+    /* spdlog::warn("ADVANCE: ({}, {})", advance_x, advance_y); */
+    /* spdlog::warn("POSITION: ({}, {})", position.x, position.y); */
+    /* spdlog::warn("CANDIDATE: ({}, {})", x_candidate, y_candidate); */
+    /* printf("\n"); */
+
     auto target_x = position.x;
     auto target_y = position.y;
 
@@ -88,8 +93,23 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     }
     else
     {
-      target_x = x_candidate;
-      target_y = y_candidate;
+      const auto x_tile = std::round(position.x);
+      const auto y_tile = std::round(position.y);
+      const auto target_tile_x = std::round(x_candidate);
+      const auto target_tile_y = std::round(y_candidate);
+
+      const auto collides_in_target = m_collides(registry, entity, target_tile_x, target_tile_y, z_candidate);
+
+      if (!collides_in_target)
+      {
+        target_x = x_candidate;
+        target_y = y_candidate;
+      }
+      else
+      {
+        target_x = x_tile;
+        target_y = y_tile;
+      }
     }
 
     // Update the position if it's different from the last position
@@ -108,12 +128,10 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
 bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, const int x, const int y, const int z)
 {
-  spdlog::info("Collides? ({}, {})", x, y);
   auto& target_tile = m_world.get(x, y, z);
 
   if (!target_tile.flags.contains("WALKABLE"))
   {
-    spdlog::critical("Yes! ({}, {})", x, y);
     return true;
   }
 
@@ -132,13 +150,11 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
 
       if (std::round(position.x) == x && std::round(position.y) == y)
       {
-        spdlog::critical("Yes! ({}, {}), person position: ({}, {})", x, y, position.x, position.y);
         return true;
       }
     }
   }
 
-  spdlog::debug("No! ({}, {})", x, y);
   return false;
 }
 }  // namespace dl
