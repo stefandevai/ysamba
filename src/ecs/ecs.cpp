@@ -4,7 +4,6 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "./components/velocity.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/renderer.hpp"
 
@@ -32,6 +31,7 @@ void ECS::update(const double delta)
   m_physics_system.update(m_registry, delta);
   m_society_system.update(m_registry, delta);
   m_harvest_system.update(m_registry, delta);
+  m_inspector_system.update(m_registry, m_camera);
 }
 
 void ECS::render(Renderer& renderer) { m_render_system.update(m_registry, renderer, m_camera); }

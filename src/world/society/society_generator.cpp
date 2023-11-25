@@ -6,6 +6,7 @@
 
 #include "./name_generator.hpp"
 #include "core/random.hpp"
+#include "ecs/components/selectable.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/constants.hpp"
 #include "world/world.hpp"
@@ -105,6 +106,7 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
     registry.emplace<Position>(entity, position);
     member.visibility.layer_z = position.z + renderer::layer_z_offset_characters;
     registry.emplace<Visibility>(entity, member.visibility);
+    registry.emplace<Selectable>(entity);
   }
 }
 

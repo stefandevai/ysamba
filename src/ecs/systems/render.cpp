@@ -87,10 +87,8 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
   {
     const auto& position = registry.get<Position>(entity);
     const auto& rectangle = registry.get<Rectangle>(entity);
-    const auto position_x = std::round(position.x) * tile_size.x;
-    const auto position_y = std::round(position.y) * tile_size.y;
 
-    renderer.batch("quad", rectangle.quad, position_x, position_y, 2.);
+    renderer.batch("quad", rectangle.quad, position.x, position.y, 10);
   }
 
   renderer.finalize("quad");

@@ -4,6 +4,7 @@
 
 #include "./systems/game.hpp"
 #include "./systems/harvest.hpp"
+#include "./systems/inspector.hpp"
 #include "./systems/physics.hpp"
 #include "./systems/render.hpp"
 #include "./systems/society.hpp"
@@ -31,6 +32,7 @@ class ECS
   RenderSystem m_render_system{m_world};
   SocietySystem m_society_system{};
   HarvestSystem m_harvest_system{m_world};
+  InspectorSystem m_inspector_system{m_world};
   double m_turn_delay = 0.0;
 };
 }  // namespace dl

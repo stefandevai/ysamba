@@ -27,7 +27,7 @@ void Gameplay::load()
 
   load_world("./world.dl");
 
-  m_ecs.load();
+  /* m_ecs.load(); */
 
   auto society_blueprint = m_world.get_society("otomi");
   auto components = SocietyGenerator::generate_members(society_blueprint);
@@ -53,8 +53,21 @@ void Gameplay::update(const double delta, SetSceneFunction set_scene)
 
   if (m_current_state == Gameplay::State::PLAYING)
   {
-    m_ecs.update(delta);
+    if (m_turn_delay > 0.0)
+    {
+      m_turn_delay -= delta;
+    }
+    else
+    {
+      m_turn_delay = 0.5;
+      m_game_system.update();
+      m_physics_system.update(m_registry, delta);
+      m_society_system.update(m_registry, delta);
+      m_harvest_system.update(m_registry, delta);
+    }
   }
+
+  m_inspector_system.update(m_registry, m_camera);
 
   if (delay <= 0.0)
   {
@@ -77,7 +90,8 @@ void Gameplay::render(Renderer& renderer)
     return;
   }
 
-  m_ecs.render(renderer);
+  m_render_system.update(m_registry, renderer, m_camera);
+  /* m_ecs.render(renderer); */
 }
 
 void Gameplay::save_world(const std::string& file_path)

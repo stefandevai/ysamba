@@ -1,8 +1,11 @@
 #pragma once
 
-#include <entt/entity/fwd.hpp>
+#include <entt/entity/registry.hpp>
 #include <unordered_map>
 #include <vector>
+
+#include "ecs/components/position.hpp"
+#include "ecs/components/visibility.hpp"
 
 namespace dl
 {
@@ -17,6 +20,37 @@ class SpatialHash
   void remove(const entt::entity object, const uint32_t key);
   uint32_t update(const entt::entity object, const int x, const int y, const uint32_t key);
   std::vector<entt::entity> get(const int x, const int y);
+
+  template <typename... T>
+  [[nodiscard]] entt::entity search_by_component(const uint32_t x, const uint32_t y, const entt::registry& registry)
+  {
+    const auto& entities = get(x, y);
+
+    entt::entity candidate = entt::null;
+    size_t candidate_z = 0;
+
+    for (const auto entity : entities)
+    {
+      if (!registry.all_of<Position, Visibility, T...>(entity))
+      {
+        continue;
+      }
+
+      const auto& position = registry.get<Position>(entity);
+      const auto& visibility = registry.get<Visibility>(entity);
+      const auto rounded_x = std::round(position.x);
+      const auto rounded_y = std::round(position.y);
+
+      if (visibility.layer_z >= candidate_z && x >= rounded_x && x <= rounded_x + 1 && y >= rounded_y &&
+          y <= rounded_y + 1)
+      {
+        candidate = entity;
+        candidate_z = visibility.layer_z;
+      }
+    }
+
+    return candidate;
+  }
 
  private:
   using HashMap = std::unordered_multimap<uint32_t, entt::entity>;
