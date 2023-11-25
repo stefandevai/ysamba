@@ -31,6 +31,9 @@ class World
   // Generate world
   void generate(const int width, const int height, const int seed);
 
+  // Load map from a json file
+  void load(const std::string& filepath);
+
   // Set tile by coordinates
   void set(const int tile_id, const int x, const int y, const int z);
 
@@ -50,7 +53,11 @@ class World
   const std::string& get_texture_id() const { return m_texture_id; };
 
   // Get a specific society
-  SocietyBlueprint get_society(const std::string& society_id) const { return m_societies.at(society_id); };
+  SocietyBlueprint get_society(const std::string& society_id) const
+  {
+    assert(m_societies.contains(society_id));
+    return m_societies.at(society_id);
+  };
 
   // Get a nearby tile containing a flag
   TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;

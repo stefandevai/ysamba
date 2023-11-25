@@ -41,6 +41,27 @@ void World::generate(const int width, const int height, const int seed)
   m_societies[society.id] = society;
 }
 
+void World::load(const std::string& filepath)
+{
+  auto society = SocietyGenerator::generate_blueprint();
+  m_societies[society.id] = society;
+
+  m_json.load(filepath);
+  const auto& layers = m_json.object.get<std::vector<nlohmann::json>>();
+
+  m_tilemaps.clear();
+  m_tilemaps.resize(layers.size());
+
+  for (size_t i = 0; i < layers.size(); ++i)
+  {
+    const auto width = layers[i]["width"].get<uint32_t>();
+    const auto height = layers[i]["width"].get<uint32_t>();
+    const auto data = layers[i]["data"].get<std::vector<int>>();
+
+    m_tilemaps[i] = Tilemap(data, width, height);
+  }
+}
+
 void World::set(const int tile_id, const int x, const int y, const int z)
 {
   m_tilemaps[z - m_depth_min].set(tile_id, x, y);
