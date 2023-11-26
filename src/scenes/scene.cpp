@@ -17,7 +17,7 @@ Scene::~Scene() {}
 void Scene::load()
 {
   /* auto input_manager = InputManager::get_instance(); */
-  /* m_lua.load(m_scene_dir / "main.lua"); */
+  m_lua.load(m_scene_dir / "main.lua");
   /* input_manager->push_context(m_scene_key); */
 }
 

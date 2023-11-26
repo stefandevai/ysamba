@@ -32,9 +32,7 @@ void SceneManager::set_scene(const std::string& key, Camera& camera)
     return;
   }
 
-  spdlog::warn("HEREEEEEEEEEEE1 {}", key);
   InputManager::get_instance()->push_context(key);
-  spdlog::warn("HEREEEEEEEEEEE2");
 
   const auto scene_type = it->second;
 
