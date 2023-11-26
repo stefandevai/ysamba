@@ -10,17 +10,17 @@
 namespace dl
 {
 class Renderer;
-class Camera;
 class Sprite;
 struct Quad;
+struct GameContext;
 
 class WorldCreation : public Scene
 {
  public:
-  WorldCreation(const std::string& scene_key, Camera& camera);
+  WorldCreation(GameContext& game_context);
 
   void load() override;
-  void update(const double delta, SetSceneFunction set_scene) override;
+  void update(GameContext& game_context) override;
   void render(Renderer& renderer) override;
   /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override; */
 

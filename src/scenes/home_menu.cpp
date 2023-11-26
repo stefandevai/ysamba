@@ -2,13 +2,16 @@
 
 #include <spdlog/spdlog.h>
 
-#include "graphics/camera.hpp"
+#include "core/game_context.hpp"
+#include "core/scene_manager.hpp"
 #include "graphics/renderer.hpp"
+#include "scenes/gameplay.hpp"
+#include "scenes/world_creation.hpp"
 #include "world/society/name_generator.hpp"
 
 namespace dl
 {
-HomeMenu::HomeMenu(const std::string& scene_key, Camera& camera) : Scene(scene_key, camera) {}
+HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context) {}
 
 void HomeMenu::load()
 {
@@ -27,10 +30,8 @@ void HomeMenu::load()
   m_has_loaded = true;
 }
 
-void HomeMenu::update(const double delta, SetSceneFunction set_scene)
+void HomeMenu::update(GameContext& game_context)
 {
-  (void)delta;
-
   if (!has_loaded())
   {
     return;
@@ -42,11 +43,11 @@ void HomeMenu::update(const double delta, SetSceneFunction set_scene)
   }
   else if (m_input_manager->poll_action("play"))
   {
-    set_scene("gameplay", m_camera);
+    game_context.scene_manager->push_scene<Gameplay>(game_context);
   }
   else if (m_input_manager->poll_action("create_world"))
   {
-    set_scene("world_creation", m_camera);
+    game_context.scene_manager->push_scene<WorldCreation>(game_context);
   }
 }
 

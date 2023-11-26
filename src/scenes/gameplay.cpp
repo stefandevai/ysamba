@@ -6,6 +6,8 @@
 #include <climits>
 #include <fstream>
 
+#include "core/game_context.hpp"
+#include "core/scene_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/renderer.hpp"
 #include "world/society/society_generator.hpp"
@@ -23,7 +25,7 @@
 
 namespace dl
 {
-Gameplay::Gameplay(const std::string& scene_key, Camera& camera) : Scene(scene_key, camera) {}
+Gameplay::Gameplay(GameContext& game_context) : Scene("gameplay", game_context) {}
 
 void Gameplay::load()
 {
@@ -40,19 +42,21 @@ void Gameplay::load()
 
   auto society_blueprint = m_world.get_society("otomi");
   auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  SocietyGenerator::place_members(components, m_world, *m_game_context.camera, m_registry);
 
   m_has_loaded = true;
 }
 
 double delay = 0.0;
 
-void Gameplay::update(const double delta, SetSceneFunction set_scene)
+void Gameplay::update(GameContext& m_game_context)
 {
   if (!has_loaded())
   {
     return;
   }
+
+  const auto delta = m_game_context.clock->delta;
 
   if (m_current_state == Gameplay::State::PLAYING)
   {
@@ -70,7 +74,7 @@ void Gameplay::update(const double delta, SetSceneFunction set_scene)
     }
   }
 
-  m_inspector_system.update(m_registry, m_camera);
+  m_inspector_system.update(m_registry, *m_game_context.camera);
 
   if (delay <= 0.0)
   {
@@ -83,7 +87,7 @@ void Gameplay::update(const double delta, SetSceneFunction set_scene)
     delay -= delta;
   }
 
-  m_update_input(set_scene);
+  m_update_input(m_game_context);
 }
 
 void Gameplay::render(Renderer& renderer)
@@ -93,7 +97,7 @@ void Gameplay::render(Renderer& renderer)
     return;
   }
 
-  m_render_system.update(m_registry, renderer, m_camera);
+  m_render_system.update(m_registry, renderer, *m_game_context.camera);
 }
 
 void Gameplay::save_world(const std::string& file_path)
@@ -111,11 +115,11 @@ void Gameplay::load_world(const std::string& file_path)
   m_has_loaded = true;
 }
 
-void Gameplay::m_update_input(SetSceneFunction& set_scene)
+void Gameplay::m_update_input(GameContext& m_game_context)
 {
   if (m_input_manager->poll_action("quit"))
   {
-    set_scene("home_menu", m_camera);
+    m_game_context.scene_manager->pop_scene();
   }
   else if (m_input_manager->poll_action("toggle_pause"))
   {
@@ -142,24 +146,24 @@ void Gameplay::m_update_input(SetSceneFunction& set_scene)
   }
   else if (m_input_manager->poll_action("camera_move_west"))
   {
-    m_camera.move({-8., 0., 0.});
+    m_game_context.camera->move({-8., 0., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_east"))
   {
-    m_camera.move({8., 0., 0.});
+    m_game_context.camera->move({8., 0., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_south"))
   {
-    m_camera.move({0., 8., 0.});
+    m_game_context.camera->move({0., 8., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_north"))
   {
-    m_camera.move({0., -8., 0.});
+    m_game_context.camera->move({0., -8., 0.});
   }
   else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
   {
     const auto& mouse_position = m_input_manager->get_mouse_position();
-    const auto& camera_position = m_camera.get_position();
+    const auto& camera_position = m_game_context.camera->get_position();
     m_select_entity((mouse_position.first + camera_position.x) / 32.f,
                     (mouse_position.second + camera_position.y) / 32.f);
   }

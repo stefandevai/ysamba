@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "./json.hpp"
+#include "core/input_manager.hpp"
 #include "scenes/scene.hpp"
 
 namespace dl
@@ -16,26 +17,29 @@ enum SceneType
 };
 
 class Renderer;
-class Camera;
+struct GameContext;
 
 class SceneManager
 {
  public:
-  SceneManager(Camera& camera);
+  SceneManager() {}
 
-  static void set_scene(const std::string& key, Camera& camera);
-  void update(const double delta);
+  template <typename Type, typename... Args>
+  void push_scene(Args&&... args)
+  {
+    auto scene = std::make_unique<Type>(std::forward<Args>(args)...);
+    InputManager::get_instance()->push_context(scene->get_key());
+    m_scenes.push_back(std::move(scene));
+  }
+
+  void pop_scene();
+  void update(GameContext& game_context);
   void render(Renderer& renderer);
-  /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename); */
-
-  inline std::shared_ptr<Scene> get_current_scene() const { return m_current_scene; };
 
  private:
-  Camera& m_camera;
   JSON m_json{"./data/game.json"};
   std::string m_inital_scene_key;
-  static std::shared_ptr<Scene> m_current_scene;
-  static std::map<std::string, SceneType> m_scenes_data;
+  std::vector<std::unique_ptr<Scene>> m_scenes;
 
   void m_load();
 };

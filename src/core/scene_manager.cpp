@@ -4,88 +4,55 @@
 
 #include <memory>
 
+#include "./game_context.hpp"
 #include "core/input_manager.hpp"
-#include "graphics/camera.hpp"
-#include "scenes/gameplay.hpp"
-#include "scenes/home_menu.hpp"
-#include "scenes/world_creation.hpp"
 
 namespace dl
 {
-std::shared_ptr<Scene> SceneManager::m_current_scene = nullptr;
-
-std::map<std::string, SceneType> SceneManager::m_scenes_data = std::map<std::string, SceneType>{
-    {"home_menu", SceneType::HOME_MENU},
-    {"world_creation", SceneType::WORLD_CREATION},
-    {"gameplay", SceneType::GAMEPLAY},
-};
-
-SceneManager::SceneManager(Camera& camera) : m_camera(camera) { m_load(); }
-
-void SceneManager::set_scene(const std::string& key, Camera& camera)
+void SceneManager::pop_scene()
 {
-  const auto it = m_scenes_data.find(key);
-
-  if (it == m_scenes_data.end())
+  if (m_scenes.empty())
   {
-    spdlog::critical("Could not find scene: ", key);
+    spdlog::warn("Scene stack is empty");
     return;
   }
 
-  InputManager::get_instance()->push_context(key);
-
-  const auto scene_type = it->second;
-
-  switch (scene_type)
-  {
-  case SceneType::HOME_MENU:
-    m_current_scene = std::make_shared<HomeMenu>(key, camera);
-    break;
-  case SceneType::WORLD_CREATION:
-    m_current_scene = std::make_shared<WorldCreation>(key, camera);
-    break;
-  case SceneType::GAMEPLAY:
-    m_current_scene = std::make_shared<Gameplay>(key, camera);
-    break;
-  default:
-    spdlog::critical("Could not find scene: ", key);
-    break;
-  }
+  InputManager::get_instance()->pop_context();
+  m_scenes.pop_back();
 }
 
-void SceneManager::update(const double delta)
+void SceneManager::update(GameContext& game_context)
 {
-  if (m_current_scene == nullptr)
+  if (m_scenes.empty())
   {
     return;
   }
 
-  if (!m_current_scene->has_loaded())
+  auto& current_scene = m_scenes.back();
+
+  if (!current_scene->has_loaded())
   {
-    m_current_scene->load();
+    current_scene->load();
   }
 
-  m_current_scene->update(delta, SceneManager::set_scene);
+  current_scene->update(game_context);
 }
 
 void SceneManager::render(Renderer& renderer)
 {
-  if (m_current_scene == nullptr || !m_current_scene->has_loaded())
+  if (m_scenes.empty())
   {
     return;
   }
 
-  m_current_scene->render(renderer);
+  auto& current_scene = m_scenes.back();
+
+  if (!current_scene->has_loaded())
+  {
+    return;
+  }
+
+  current_scene->render(renderer);
 }
 
-/* void SceneManager::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
-/* { */
-/*   m_current_scene->screenshot(context, console, filename); */
-/* } */
-
-void SceneManager::m_load()
-{
-  m_inital_scene_key = m_json.object["initial_scene"];
-  set_scene(m_inital_scene_key, m_camera);
-}
 }  // namespace dl

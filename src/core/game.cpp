@@ -2,9 +2,11 @@
 
 #include <spdlog/spdlog.h>
 
-#include "./clock.hpp"
 #include "./file_manager.hpp"
 #include "graphics/texture.hpp"
+#include "scenes/gameplay.hpp"
+#include "scenes/home_menu.hpp"
+#include "scenes/world_creation.hpp"
 
 namespace dl
 {
@@ -34,6 +36,27 @@ void Game::load()
     m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, true, 1);
     m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true, 2);
     m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
+
+    const auto& inital_scene_key = m_json.object["initial_scene"];
+
+    if (inital_scene_key == "home_menu")
+    {
+      m_scene_manager.push_scene<HomeMenu>(m_context);
+    }
+    else if (inital_scene_key == "world_creation")
+    {
+      m_scene_manager.push_scene<HomeMenu>(m_context);
+      m_scene_manager.push_scene<WorldCreation>(m_context);
+    }
+    else if (inital_scene_key == "gameplay")
+    {
+      m_scene_manager.push_scene<HomeMenu>(m_context);
+      m_scene_manager.push_scene<Gameplay>(m_context);
+    }
+    else
+    {
+      spdlog::critical("Could not find scene: ", inital_scene_key);
+    }
   }
   catch (const std::exception& exc)
   {
@@ -44,14 +67,12 @@ void Game::load()
 
 void Game::run()
 {
-  Clock clock{};
-
   while (!m_input_manager->should_quit())
   {
-    clock.tick();
+    m_clock.tick();
 
     m_input_manager->update();
-    m_scene_manager.update(clock.delta);
+    m_scene_manager.update(m_context);
 
     m_display.clear();
     m_scene_manager.render(m_renderer);

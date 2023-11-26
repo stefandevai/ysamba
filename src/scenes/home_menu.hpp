@@ -7,15 +7,15 @@
 namespace dl
 {
 class Renderer;
-class Camera;
+struct GameContext;
 
 class HomeMenu : public Scene
 {
  public:
-  HomeMenu(const std::string& scene_key, Camera& camera);
+  HomeMenu(GameContext& game_context);
 
   void load() override;
-  void update(const double delta, SetSceneFunction set_scene) override;
+  void update(GameContext& game_context) override;
   void render(Renderer& renderer) override;
 
  private:

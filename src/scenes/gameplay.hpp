@@ -16,15 +16,15 @@
 namespace dl
 {
 class Renderer;
-class Camera;
+struct GameContext;
 
 class Gameplay : public Scene
 {
  public:
-  Gameplay(const std::string& scene_key, Camera& camera);
+  Gameplay(GameContext& game_context);
 
   void load() override;
-  void update(const double delta, SetSceneFunction set_scene) override;
+  void update(GameContext& context) override;
   void render(Renderer& renderer) override;
 
   void save_world(const std::string& file_path);
@@ -51,7 +51,7 @@ class Gameplay : public Scene
   HarvestSystem m_harvest_system{m_world};
   InspectorSystem m_inspector_system{m_world};
 
-  void m_update_input(SetSceneFunction& set_scene);
+  void m_update_input(GameContext& game_context);
   void m_select_entity(const float x, const float y);
 };
 }  // namespace dl

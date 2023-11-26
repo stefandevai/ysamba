@@ -6,8 +6,9 @@
 #include <climits>
 #include <fstream>
 
+#include "core/game_context.hpp"
 #include "core/random.hpp"
-#include "graphics/camera.hpp"
+#include "core/scene_manager.hpp"
 #include "graphics/color.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/sprite.hpp"
@@ -15,7 +16,7 @@
 
 namespace dl
 {
-WorldCreation::WorldCreation(const std::string& scene_key, Camera& camera) : Scene(scene_key, camera) {}
+WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context) {}
 
 void WorldCreation::load()
 {
@@ -37,10 +38,8 @@ void WorldCreation::load()
   m_has_loaded = true;
 }
 
-void WorldCreation::update(const double delta, SetSceneFunction set_scene)
+void WorldCreation::update(GameContext& game_context)
 {
-  (void)delta;
-
   if (!has_loaded())
   {
     return;
@@ -48,7 +47,7 @@ void WorldCreation::update(const double delta, SetSceneFunction set_scene)
 
   if (m_input_manager->poll_action("quit"))
   {
-    set_scene("home_menu", m_camera);
+    game_context.scene_manager->pop_scene();
   }
   else if (m_input_manager->poll_action("generate_world"))
   {
