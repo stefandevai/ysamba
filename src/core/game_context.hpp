@@ -9,14 +9,12 @@ class SceneManager;
 class Display;
 class InputManager;
 class Camera;
-class Renderer;
 struct Clock;
 
 struct GameContext
 {
   Display* display;
   AssetManager* asset_manager;
-  Renderer* renderer;
   Camera* camera;
   SceneManager* scene_manager;
   Clock* clock;

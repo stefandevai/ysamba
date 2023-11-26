@@ -88,24 +88,6 @@ const Vector2i Display::get_window_size() const
   return {width, height};
 }
 
-/* unsigned int Display::get_width() const { return m_width; } */
-
-/* unsigned int Display::get_height() const { return m_height; } */
-
-/* int Display::get_window_width() const */
-/* { */
-/*   int width, height; */
-/*   SDL_GetWindowSize(m_window, &width, &height); */
-/*   return width; */
-/* } */
-
-/* int Display::get_window_height() const */
-/* { */
-/*   int width, height; */
-/*   SDL_GetWindowSize(m_window, &width, &height); */
-/*   return height; */
-/* } */
-
 void Display::render() { SDL_GL_SwapWindow(m_window); }
 
 void Display::set_title(const std::string& title) { SDL_SetWindowTitle(m_window, title.c_str()); }

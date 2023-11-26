@@ -16,7 +16,10 @@
 
 namespace dl
 {
-WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context) {}
+WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
+{
+  m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true, 2);
+}
 
 void WorldCreation::load()
 {
@@ -74,17 +77,12 @@ void WorldCreation::update(GameContext& game_context)
   }
 }
 
-void WorldCreation::render(Renderer& renderer)
+void WorldCreation::render()
 {
   if (!has_loaded())
   {
     return;
   }
-
-  /* if (!renderer.has_layer("color")) */
-  /* { */
-  /*   renderer.add_layer("color", "quad", Renderer::LayerType::QUAD); */
-  /* } */
 
   if (m_should_update_world_representation)
   {
@@ -92,15 +90,9 @@ void WorldCreation::render(Renderer& renderer)
     m_should_update_world_representation = false;
   }
 
-  /* renderer.init("color"); */
-  /* for (const auto& [position, quad] : m_world_representation) */
-  /* { */
-  /*   renderer.batch("color", quad, position.x, position.y, 0); */
-  /* } */
-  /* renderer.finalize("color"); */
-  renderer.init("gui");
-  renderer.batch("gui", m_world_sprite, 0, 0, 0);
-  renderer.finalize("gui");
+  m_renderer.init("gui");
+  m_renderer.batch("gui", m_world_sprite, 0, 0, 0);
+  m_renderer.finalize("gui");
 }
 
 /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */
@@ -190,69 +182,35 @@ void WorldCreation::m_create_world_representation()
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = water_color.rgba_color.g;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = water_color.rgba_color.b;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = water_color.rgba_color.a;
-        /* quad->color = Color("#3772ebff"); */
         break;
       case 2:
         pixel_data[j * tilemap_size.w * 4 + i * 4] = terrain_color.rgba_color.r;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = terrain_color.rgba_color.g;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = terrain_color.rgba_color.b;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = terrain_color.rgba_color.a;
-        /* quad->color = Color("#37c737ff"); */
         break;
       case 3:
         pixel_data[j * tilemap_size.w * 4 + i * 4] = sand_color.rgba_color.r;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = sand_color.rgba_color.g;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = sand_color.rgba_color.b;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = sand_color.rgba_color.a;
-        /* quad->color = Color("#edcb89ff"); */
         break;
       case 4:
         pixel_data[j * tilemap_size.w * 4 + i * 4] = wall_color.rgba_color.r;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = wall_color.rgba_color.g;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = wall_color.rgba_color.b;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = wall_color.rgba_color.a;
-        /* quad->color = Color("#636b5cff"); */
         break;
       default:
         pixel_data[j * tilemap_size.w * 4 + i * 4] = default_color.rgba_color.r;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = default_color.rgba_color.g;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = default_color.rgba_color.b;
         pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = default_color.rgba_color.a;
-        /* quad->color = Color("#000000ff"); */
         break;
       }
-      /* quad->w = tile_width; */
-      /* quad->h = tile_height; */
-
-      /* const auto position = glm::vec2(i * tile_width, j * tile_height); */
-
-      /* m_world_representation.push_back(std::make_pair(position, quad)); */
     }
   }
 
-  /* std::vector<unsigned char> pixel_data{ */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /*   255, 0, 255, 255, */
-  /* }; */
-
-  /* const auto texture = std::make_shared<Texture>(pixel_data, 4, 4); */
   const auto texture = std::make_shared<Texture>(pixel_data, tilemap_size.w, tilemap_size.h);
   m_world_sprite->texture = texture;
 }

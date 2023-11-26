@@ -38,7 +38,7 @@ void SceneManager::update(GameContext& game_context)
   current_scene->update(game_context);
 }
 
-void SceneManager::render(Renderer& renderer)
+void SceneManager::render()
 {
   if (m_scenes.empty())
   {
@@ -51,8 +51,9 @@ void SceneManager::render(Renderer& renderer)
   {
     return;
   }
-
-  current_scene->render(renderer);
+  current_scene->check_window_size();
+  current_scene->render();
+  current_scene->render_call();
 }
 
 }  // namespace dl

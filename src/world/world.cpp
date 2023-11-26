@@ -10,12 +10,13 @@
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
 #include "./tile_target.hpp"
-#include "graphics/renderer.hpp"
+#include "core/game_context.hpp"
 #include "graphics/sprite.hpp"
+#include "graphics/texture.hpp"
 
 namespace dl
 {
-World::World()
+World::World(GameContext& game_context) : m_game_context(game_context)
 {
   m_chunk_size = m_json.object["chunk_size"];
   m_texture_id = m_json.object["texture_id"];
@@ -36,7 +37,6 @@ void World::generate(const int width, const int height, const int seed)
   auto tilemap = tilemap_generator.generate(seed);
   m_tilemaps.push_back(tilemap);
 
-  /* auto society_generator = SocietyGenerator(); */
   auto society = SocietyGenerator::generate_blueprint();
   m_societies[society.id] = society;
 }
@@ -188,6 +188,12 @@ const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_da
 
 void World::m_load_tile_data()
 {
+  const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
+  assert(texture != nullptr && "World texture is not loaded in order to get tile size");
+
+  m_tile_size.x = texture->get_frame_width();
+  m_tile_size.y = texture->get_frame_height();
+
   const auto tiles = m_json.object["tiles"].get<std::vector<nlohmann::json>>();
 
   for (const auto& tile : tiles)

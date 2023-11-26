@@ -6,7 +6,6 @@
 
 namespace dl
 {
-class Renderer;
 struct GameContext;
 
 class HomeMenu : public Scene
@@ -16,7 +15,7 @@ class HomeMenu : public Scene
 
   void load() override;
   void update(GameContext& game_context) override;
-  void render(Renderer& renderer) override;
+  void render() override;
 
  private:
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();

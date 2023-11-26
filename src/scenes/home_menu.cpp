@@ -4,7 +4,6 @@
 
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
-#include "graphics/renderer.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
 #include "world/society/name_generator.hpp"
@@ -16,6 +15,8 @@ HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context)
 void HomeMenu::load()
 {
   Scene::load();
+
+  m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
 
   const auto game_title = m_lua.get_variable<std::string>("game_title");
   const auto instructions = m_lua.get_variable<std::string>("instructions");
@@ -51,16 +52,16 @@ void HomeMenu::update(GameContext& game_context)
   }
 }
 
-void HomeMenu::render(Renderer& renderer)
+void HomeMenu::render()
 {
   if (!has_loaded())
   {
     return;
   }
 
-  renderer.init("text");
-  renderer.batch("text", m_game_title, 60, 60, 0);
-  renderer.batch("text", m_instructions, 60, 108, 0);
-  renderer.finalize("text");
+  m_renderer.init("text");
+  m_renderer.batch("text", m_game_title, 60, 60, 0);
+  m_renderer.batch("text", m_instructions, 60, 108, 0);
+  m_renderer.finalize("text");
 }
 }  // namespace dl

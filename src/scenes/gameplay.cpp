@@ -9,7 +9,6 @@
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/renderer.hpp"
 #include "world/society/society_generator.hpp"
 
 // TEMP
@@ -31,8 +30,14 @@ void Gameplay::load()
 {
   Scene::load();
 
+  m_renderer.add_layer("world", "world");
+  m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, true, 1);
+  m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
+
   load_world("./world.dl");
   m_world.load("./data/world/test_map.json");
+
+  m_camera.set_tile_size(m_world.get_tile_size());
 
   m_fps_text = m_registry.create();
   m_registry.emplace<Text>(m_fps_text, "FPS: ");
@@ -42,7 +47,7 @@ void Gameplay::load()
 
   auto society_blueprint = m_world.get_society("otomi");
   auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, m_world, *m_game_context.camera, m_registry);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   m_has_loaded = true;
 }
@@ -74,7 +79,7 @@ void Gameplay::update(GameContext& m_game_context)
     }
   }
 
-  m_inspector_system.update(m_registry, *m_game_context.camera);
+  m_inspector_system.update(m_registry, m_camera);
 
   if (delay <= 0.0)
   {
@@ -90,14 +95,14 @@ void Gameplay::update(GameContext& m_game_context)
   m_update_input(m_game_context);
 }
 
-void Gameplay::render(Renderer& renderer)
+void Gameplay::render()
 {
   if (!has_loaded())
   {
     return;
   }
 
-  m_render_system.update(m_registry, renderer, *m_game_context.camera);
+  m_render_system.update(m_registry, m_renderer, m_camera);
 }
 
 void Gameplay::save_world(const std::string& file_path)
@@ -146,24 +151,24 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   }
   else if (m_input_manager->poll_action("camera_move_west"))
   {
-    m_game_context.camera->move({-8., 0., 0.});
+    m_camera.move({-8., 0., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_east"))
   {
-    m_game_context.camera->move({8., 0., 0.});
+    m_camera.move({8., 0., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_south"))
   {
-    m_game_context.camera->move({0., 8., 0.});
+    m_camera.move({0., 8., 0.});
   }
   else if (m_input_manager->poll_action("camera_move_north"))
   {
-    m_game_context.camera->move({0., -8., 0.});
+    m_camera.move({0., -8., 0.});
   }
   else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
   {
     const auto& mouse_position = m_input_manager->get_mouse_position();
-    const auto& camera_position = m_game_context.camera->get_position();
+    const auto& camera_position = m_camera.get_position();
     m_select_entity((mouse_position.first + camera_position.x) / 32.f,
                     (mouse_position.second + camera_position.y) / 32.f);
   }

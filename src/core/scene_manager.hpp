@@ -34,7 +34,7 @@ class SceneManager
 
   void pop_scene();
   void update(GameContext& game_context);
-  void render(Renderer& renderer);
+  void render();
 
  private:
   JSON m_json{"./data/game.json"};

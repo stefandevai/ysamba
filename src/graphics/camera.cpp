@@ -2,9 +2,17 @@
 
 #include <cmath>
 
+#include "core/display.hpp"
+
 namespace dl
 {
 Camera::Camera() {}
+
+Camera::Camera(const Display& display)
+{
+  const auto& display_size = display.get_size();
+  set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
+}
 
 const Vector2i Camera::get_position_in_tiles() const
 {

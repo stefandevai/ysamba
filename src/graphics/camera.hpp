@@ -7,6 +7,8 @@
 
 namespace dl
 {
+class Display;
+
 enum class CameraState
 {
   IDLE,
@@ -17,6 +19,7 @@ class Camera
 {
  public:
   Camera();
+  Camera(const Display& display);
 
   void move(const Vector3& quantity);
   const Vector3& get_position() const { return m_position; }
@@ -59,6 +62,5 @@ class Camera
   Vector2 m_size{};
   Vector2i m_tile_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
-  // CameraState m_state = CameraState::IDLE;
 };
 }  // namespace dl

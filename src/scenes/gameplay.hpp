@@ -15,7 +15,6 @@
 
 namespace dl
 {
-class Renderer;
 struct GameContext;
 
 class Gameplay : public Scene
@@ -25,7 +24,7 @@ class Gameplay : public Scene
 
   void load() override;
   void update(GameContext& context) override;
-  void render(Renderer& renderer) override;
+  void render() override;
 
   void save_world(const std::string& file_path);
   void load_world(const std::string& file_path);
@@ -38,7 +37,7 @@ class Gameplay : public Scene
   };
 
   entt::registry m_registry;
-  World m_world;
+  World m_world{m_game_context};
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
   State m_current_state = State::PAUSED;
   entt::entity m_fps_text;

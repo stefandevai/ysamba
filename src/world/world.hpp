@@ -13,10 +13,11 @@
 #include "./tilemap.hpp"
 #include "core/json.hpp"
 #include "core/lua_api.hpp"
+#include "core/maths/vector.hpp"
 
 namespace dl
 {
-class Renderer;
+struct GameContext;
 struct TileTarget;
 
 class World
@@ -26,7 +27,7 @@ class World
   SpatialHash spatial_hash;
 
   // Constructor
-  World();
+  World(GameContext& game_context);
 
   // Generate world
   void generate(const int width, const int height, const int seed);
@@ -42,6 +43,9 @@ class World
 
   // Get size of a specific tilemap
   TilemapSize get_tilemap_size(const int z);
+
+  // Get size of the tiles in the current tileset
+  Vector2i get_tile_size() { return m_tile_size; }
 
   // Get the seed used in this world generation
   int get_seed() const { return m_seed; };
@@ -78,6 +82,7 @@ class World
   }
 
  private:
+  GameContext& m_game_context;
   JSON m_json{"./data/world.json"};
   std::vector<Tilemap> m_tilemaps;
   std::unordered_map<uint32_t, TileData> m_tile_data;
@@ -87,6 +92,7 @@ class World
   int m_depth_min = 0;
   int m_depth_max = 1;
   int m_seed = 0;
+  Vector2i m_tile_size{0, 0};
   std::map<std::string, SocietyBlueprint> m_societies;
 
   // Load information about tiles

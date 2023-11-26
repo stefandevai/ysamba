@@ -9,7 +9,6 @@
 
 namespace dl
 {
-class Renderer;
 class Sprite;
 struct Quad;
 struct GameContext;
@@ -21,7 +20,7 @@ class WorldCreation : public Scene
 
   void load() override;
   void update(GameContext& game_context) override;
-  void render(Renderer& renderer) override;
+  void render() override;
   /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override; */
 
   void save_world(const std::string& file_path);
@@ -29,7 +28,7 @@ class WorldCreation : public Scene
 
  private:
   using WorldRepresentation = std::vector<std::pair<glm::vec2, std::shared_ptr<Quad>>>;
-  World m_world;
+  World m_world{m_game_context};
   std::shared_ptr<Sprite> m_world_sprite;
   WorldRepresentation m_world_representation;
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
