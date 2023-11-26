@@ -12,6 +12,8 @@ namespace dl
 class SpatialHash
 {
  public:
+  using TestFunction = std::function<bool(const entt::entity)>;
+
   SpatialHash();
   SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension);
 
@@ -20,6 +22,7 @@ class SpatialHash
   void remove(const entt::entity object, const uint32_t key);
   uint32_t update(const entt::entity object, const int x, const int y, const uint32_t key);
   std::vector<entt::entity> get(const int x, const int y);
+  std::vector<entt::entity> get_if(const Vector2i& position, TestFunction test_function);
 
   /* [[nodiscard]] std::vector<entt::entity> get_if(const uint32_t x, const uint32_t y, const entt::registry& registry)
    */

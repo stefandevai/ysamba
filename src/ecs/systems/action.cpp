@@ -66,16 +66,6 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
     const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-    /* const auto& entities = m_world.get_if({tile_x, tile_y}, */
-    /*     [registry](const entt::entity entity) { */
-    /*       if (registry.all_of<Selectable>(entity)) */
-    /*       { */
-    /*         const auto& selectable = registry.get<Selectable>(entity); */
-    /*         return selectable.selected; */
-    /*       } */
-
-    /*       return false; */
-    /*     }); */
     const auto entity = m_world.spatial_hash.get_by_component<Selectable>(tile_x, tile_y, registry);
 
     if (registry.valid(entity))

@@ -78,6 +78,26 @@ std::vector<entt::entity> SpatialHash::get(const int x, const int y)
   return objects;
 }
 
+std::vector<entt::entity> SpatialHash::get_if(const Vector2i& position, TestFunction test_function)
+{
+  std::vector<entt::entity> objects;
+  const auto search_keys = m_get_search_keys(position.x, position.y);
+
+  for (const auto& key : search_keys)
+  {
+    auto range = m_hash.equal_range(key);
+    for (auto i = range.first; i != range.second; ++i)
+    {
+      if (test_function(i->second))
+      {
+        objects.push_back(i->second);
+      }
+    }
+  }
+
+  return objects;
+}
+
 uint32_t SpatialHash::m_get_key(const int x, const int y)
 {
   const auto grid_x = x / m_cell_dimension;
