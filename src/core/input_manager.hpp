@@ -1,12 +1,26 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
+#include "./json.hpp"
 #include "./lua_api.hpp"
 #include "./sdl_input_wrapper.hpp"
 
+namespace dl::input_context
+{
+constexpr std::string_view home_menu = "home_menu";
+constexpr std::string_view world_creation = "world_creation";
+constexpr std::string_view gameplay = "gameplay";
+}  // namespace dl::input_context
+
 namespace dl
 {
+struct InputContext
+{
+  std::unordered_map<std::string, std::vector<std::string>> actions;
+};
+
 class InputManager
 {
  public:
@@ -25,10 +39,12 @@ class InputManager
   static std::shared_ptr<InputManager> get_instance();
   void update();
   void set_context(const std::string& context_key);
+  void push_context(const std::string& context_key);
+  void pop_context();
   bool poll_action(const std::string& action);
-  bool is_key_down(int key);
+  bool is_key_down(const std::string& key);
   bool is_any_key_down();
-  bool is_key_up(int key);
+  bool is_key_up(const std::string& key);
   bool is_clicking(const MouseButton button);
   std::pair<int, int> get_mouse_position();
   bool window_size_changed() const;
@@ -42,5 +58,10 @@ class InputManager
   static std::shared_ptr<SDLInputWrapper> m_sdl_input_wrapper;
   static std::string m_context_key;
   LuaAPI m_lua{"key_bindings.lua"};
+  JSON m_json{"./data/input.json"};
+  static std::unordered_map<std::string, std::shared_ptr<InputContext>> m_available_contexts;
+  static std::vector<std::shared_ptr<InputContext>> m_context_stack;
+
+  void m_parse_input();
 };
 }  // namespace dl

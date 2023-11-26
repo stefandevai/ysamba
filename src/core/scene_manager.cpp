@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include "core/input_manager.hpp"
 #include "graphics/camera.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/home_menu.hpp"
@@ -30,6 +31,10 @@ void SceneManager::set_scene(const std::string& key, Camera& camera)
     spdlog::critical("Could not find scene: ", key);
     return;
   }
+
+  spdlog::warn("HEREEEEEEEEEEE1 {}", key);
+  InputManager::get_instance()->push_context(key);
+  spdlog::warn("HEREEEEEEEEEEE2");
 
   const auto scene_type = it->second;
 

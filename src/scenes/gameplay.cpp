@@ -29,7 +29,7 @@ void Gameplay::load()
 {
   Scene::load();
 
-  /* load_world("./world.dl"); */
+  load_world("./world.dl");
   m_world.load("./data/world/test_map.json");
 
   m_fps_text = m_registry.create();

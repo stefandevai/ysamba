@@ -1,0 +1,26 @@
+{
+    "home_menu": {
+        "quit": ["k_escape"],
+        "play": ["k_p"],
+        "create_world": ["k_g"]
+    },
+    "world_creation": {
+        "quit": ["k_escape"],
+        "generate_world": ["k_g"],
+        "reload_world": ["k_r"],
+        "save_world": ["k_s"],
+        "load_world": ["k_l"],
+        "display_seed": ["k_e"]
+    },
+    "gameplay": {
+        "quit": ["k_escape"],
+        "toggle_pause": ["k_space"],
+        "camera_move_west": ["k_left"],
+        "camera_move_east": ["k_right"],
+        "camera_move_south": ["k_down"],
+        "camera_move_north": ["k_up"],
+        "save_world": ["k_s"],
+        "load_world": ["k_l"],
+        "display_seed": ["k_e"]
+    }
+}

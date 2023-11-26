@@ -11,8 +11,10 @@ std::shared_ptr<InputManager> InputManager::m_instance = nullptr;
 std::shared_ptr<SDLInputWrapper> InputManager::m_sdl_input_wrapper = SDLInputWrapper::get_instance();
 std::shared_ptr<sol::table> InputManager::m_context = nullptr;
 std::string InputManager::m_context_key = "";
+std::unordered_map<std::string, std::shared_ptr<InputContext>> InputManager::m_available_contexts = {};
+std::vector<std::shared_ptr<InputContext>> InputManager::m_context_stack = {};
 
-InputManager::InputManager() {}
+InputManager::InputManager() { m_parse_input(); }
 
 std::shared_ptr<InputManager> InputManager::get_instance()
 {
@@ -40,25 +42,49 @@ void InputManager::set_context(const std::string& context_key)
   m_context_key = context_key;
 }
 
-bool InputManager::poll_action(const std::string& action)
+void InputManager::push_context(const std::string& context_key)
 {
-  if (m_context == nullptr)
+  if (!m_available_contexts.contains(context_key))
   {
-    spdlog::critical("Current context not loaded: {}", m_context_key);
+    spdlog::critical("Input context not found: {}", m_context_key);
+    return;
+  }
+
+  const auto& context = m_available_contexts.at(context_key);
+  m_context_stack.push_back(context);
+}
+
+void InputManager::pop_context()
+{
+  if (m_context_stack.empty())
+  {
+    spdlog::warn("No context available for poping, quitting game");
+    quit();
+    return;
+  }
+
+  m_context_stack.pop_back();
+}
+
+bool InputManager::poll_action(const std::string& action_key)
+{
+  if (m_context_stack.empty())
+  {
+    spdlog::critical("No contexts avaiblable");
     return false;
   }
 
-  const auto action_keys = m_context->get_or<std::vector<int>>(action, {});
+  const auto current_context = m_context_stack.back();
 
-  if (action_keys.size() == 0)
+  if (!current_context->actions.contains(action_key))
   {
-    spdlog::critical("Could not find action in this context: {}", action);
+    spdlog::critical("Could not find action in this context: {}", action_key);
     return false;
   }
 
-  for (const auto key : action_keys)
+  for (const auto& action : current_context->actions.at(action_key))
   {
-    if (is_key_down(key))
+    if (is_key_down(action))
     {
       return true;
     }
@@ -67,19 +93,11 @@ bool InputManager::poll_action(const std::string& action)
   return false;
 }
 
-bool InputManager::is_key_down(int key)
-{
-  if (key < 0)
-  {
-    return is_any_key_down();
-  }
-
-  return m_sdl_input_wrapper->is_key_down(key);
-}
+bool InputManager::is_key_down(const std::string& key) { return m_sdl_input_wrapper->is_key_down(key); }
 
 bool InputManager::is_any_key_down() { return m_sdl_input_wrapper->is_any_key_down(); }
 
-bool InputManager::is_key_up(int key) { return m_sdl_input_wrapper->is_key_up(key); }
+bool InputManager::is_key_up(const std::string& key) { return m_sdl_input_wrapper->is_key_up(key); }
 
 bool InputManager::is_clicking(const MouseButton button)
 {
@@ -106,4 +124,21 @@ void InputManager::quit() { m_sdl_input_wrapper->quit(); }
 bool InputManager::window_size_changed() const { return m_sdl_input_wrapper->window_size_changed(); }
 
 void InputManager::set_window_size_changed(const bool value) { m_sdl_input_wrapper->set_window_size_changed(value); }
+
+void InputManager::m_parse_input()
+{
+  for (const auto& item : m_json.object.items())
+  {
+    const auto& key = item.key();
+    const auto input_context = std::make_shared<InputContext>();
+
+    for (const auto& value : item.value().items())
+    {
+      const auto& value_key = value.key();
+      input_context->actions[value_key] = value.value();
+    }
+
+    m_available_contexts[key] = input_context;
+  }
+}
 }  // namespace dl

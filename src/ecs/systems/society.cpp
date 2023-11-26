@@ -34,12 +34,12 @@ void SocietySystem::update(entt::registry& registry, const double delta)
       if (agent.time_to_next_action <= 0)
       {
         agent.time_to_next_action = 1.0;
-        const auto n = random::get_real();
+        /* const auto n = random::get_real(); */
 
-        if (n < .7f)
-        {
-          agent.state = SocietyAgent::State::Walking;
-        }
+        /* if (n < .7f) */
+        /* { */
+        /*   agent.state = SocietyAgent::State::Walking; */
+        /* } */
       }
       else
       {
