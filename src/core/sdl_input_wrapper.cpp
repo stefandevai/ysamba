@@ -56,8 +56,8 @@ void SDLInputWrapper::update()
 
     case SDL_MOUSEMOTION:
     {
-      m_mouse_position.first = event.motion.x;
-      m_mouse_position.second = event.motion.y;
+      m_mouse_position.x = event.motion.x;
+      m_mouse_position.y = event.motion.y;
       break;
     }
 

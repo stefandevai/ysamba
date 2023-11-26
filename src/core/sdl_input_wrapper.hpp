@@ -3,6 +3,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include "./maths/vector.hpp"
+
 namespace dl
 {
 class SDLInputWrapper
@@ -19,7 +21,7 @@ class SDLInputWrapper
   bool is_key_down(const std::string& key);
   bool is_key_up(const std::string& key);
   inline std::pair<bool, bool> get_mouse_state() { return m_mouse_state; };
-  inline std::pair<int, int> get_mouse_position() { return m_mouse_position; };
+  const Vector2i& get_mouse_position() { return m_mouse_position; };
   bool window_size_changed() const { return m_window_size_changed; }
   void set_window_size_changed(bool value) { m_window_size_changed = value; }
   bool should_quit();
@@ -32,7 +34,7 @@ class SDLInputWrapper
   std::unordered_map<int, bool> m_key_up;
   bool m_should_quit = false;
   std::pair<bool, bool> m_mouse_state{false, false};
-  std::pair<int, int> m_mouse_position{0, 0};
+  Vector2i m_mouse_position{0, 0};
   bool m_window_size_changed = false;
 };
 }  // namespace dl

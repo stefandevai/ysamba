@@ -6,6 +6,8 @@ struct Vector2
 {
   double x;
   double y;
+
+  bool operator==(const Vector2& rhs) { return x == rhs.x && y == rhs.y; }
 };
 
 struct Vector2i
@@ -15,6 +17,8 @@ struct Vector2i
 
   Vector2i(const int x, const int y) : x(x), y(y) {}
   Vector2i(const double x, const double y) : x(static_cast<int>(x)), y(static_cast<int>(y)) {}
+
+  bool operator==(const Vector2i& rhs) { return x == rhs.x && y == rhs.y; }
 };
 
 struct Vector3
@@ -30,6 +34,8 @@ struct Vector3
     this->z += rhs.z;
     return *this;
   }
+
+  bool operator==(const Vector3& rhs) { return x == rhs.x && y == rhs.y && z == rhs.z; }
 };
 
 struct Vector3i

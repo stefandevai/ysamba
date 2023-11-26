@@ -5,6 +5,7 @@
 
 #include "./json.hpp"
 #include "./lua_api.hpp"
+#include "./maths/vector.hpp"
 #include "./sdl_input_wrapper.hpp"
 
 namespace dl::input_context
@@ -45,7 +46,7 @@ class InputManager
   bool is_any_key_down();
   bool is_key_up(const std::string& key);
   bool is_clicking(const MouseButton button);
-  std::pair<int, int> get_mouse_position();
+  const Vector2i& get_mouse_position();
   bool window_size_changed() const;
   void set_window_size_changed(const bool value);
   bool should_quit();

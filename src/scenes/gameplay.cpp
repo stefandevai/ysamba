@@ -80,6 +80,7 @@ void Gameplay::update()
   }
 
   m_inspector_system.update(m_registry, m_camera);
+  m_action_system.update(m_registry, m_camera);
 
   if (delay <= 0.0)
   {
@@ -167,10 +168,10 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   }
   else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager->get_mouse_position();
-    const auto& camera_position = m_camera.get_position();
-    m_select_entity((mouse_position.first + camera_position.x) / 32.f,
-                    (mouse_position.second + camera_position.y) / 32.f);
+    /* const auto& mouse_position = m_input_manager->get_mouse_position(); */
+    /* const auto& camera_position = m_camera.get_position(); */
+    /* m_select_entity((mouse_position.first + camera_position.x) / 32.f, */
+    /*                 (mouse_position.second + camera_position.y) / 32.f); */
   }
 }
 

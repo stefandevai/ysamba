@@ -99,7 +99,7 @@ bool InputManager::is_clicking(const MouseButton button)
   return false;
 }
 
-std::pair<int, int> InputManager::get_mouse_position() { return m_sdl_input_wrapper.get_mouse_position(); }
+const Vector2i& InputManager::get_mouse_position() { return m_sdl_input_wrapper.get_mouse_position(); }
 
 bool InputManager::should_quit() { return m_sdl_input_wrapper.should_quit(); }
 

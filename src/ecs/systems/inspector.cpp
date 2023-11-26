@@ -22,15 +22,14 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   const auto& camera_position = camera.get_position();
 
   // The mouse didn't change the position, nothing changed, don't update
-  if (mouse_position == m_last_mouse_position && camera_position.x == m_last_camera_position.first &&
-      camera_position.y == m_last_camera_position.second)
+  if (mouse_position == m_last_mouse_position && camera_position == m_last_camera_position)
   {
     return;
   }
 
   const auto& tile_size = camera.get_tile_size();
-  const auto tile_x = (mouse_position.first + camera_position.x) / tile_size.x;
-  const auto tile_y = (mouse_position.second + camera_position.y) / tile_size.y;
+  const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
+  const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
   const auto entity = m_world.spatial_hash.search_by_component<Selectable>(tile_x, tile_y, registry);
 
@@ -44,8 +43,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   }
 
   m_last_mouse_position = mouse_position;
-  m_last_camera_position.first = camera_position.x;
-  m_last_camera_position.second = camera_position.y;
+  m_last_camera_position = camera_position;
 }
 
 void InspectorSystem::m_update_inspector_content(const entt::entity entity,
