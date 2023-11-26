@@ -13,13 +13,17 @@ namespace dl::input_context
 constexpr std::string_view home_menu = "home_menu";
 constexpr std::string_view world_creation = "world_creation";
 constexpr std::string_view gameplay = "gameplay";
+constexpr std::string_view action_menu = "action_menu";
 }  // namespace dl::input_context
 
 namespace dl
 {
 struct InputContext
 {
+  std::string key;
   std::unordered_map<std::string, std::vector<std::string>> actions;
+
+  InputContext(const std::string& key) : key(key) {}
 };
 
 class InputManager
@@ -47,6 +51,7 @@ class InputManager
   bool is_key_up(const std::string& key);
   bool is_clicking(const MouseButton button);
   const Vector2i& get_mouse_position();
+  const std::shared_ptr<InputContext> get_current_context();
   bool window_size_changed() const;
   void set_window_size_changed(const bool value);
   bool should_quit();

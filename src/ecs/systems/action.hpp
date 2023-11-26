@@ -13,20 +13,29 @@ class ActionSystem
 {
  public:
   ActionSystem(World& world);
-
   void update(entt::registry& registry, const Camera& camera);
 
  private:
-  World& m_world;
-  bool m_action_menu_open = false;
-  /* entt::entity m_inspector_quad = entt::null; */
-  /* entt::entity m_inspector_text = entt::null; */
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
-  /* std::pair<int, int> m_last_mouse_position{0, 0}; */
-  /* std::pair<float, float> m_last_camera_position{0.f, 0.f}; */
+  enum class ActionMenuState
+  {
+    Closed,
+    Open,
+    SelectingTarget,
+  };
 
-  /* void m_update_inspector_content(const entt::entity entity, entt::registry& registry, const Camera& camera); */
-  /* void m_destroy_inspector(entt::registry& registry); */
-  /* inline bool m_is_valid(const entt::registry& registry) const; */
+  World& m_world;
+  entt::entity m_menu_quad = entt::null;
+  entt::entity m_menu_text = entt::null;
+  entt::entity m_select_target_text = entt::null;
+  std::vector<entt::entity> m_selected_entities{};
+  ActionMenuState m_state = ActionMenuState::Closed;
+  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+
+  void m_update_action_menu(entt::registry& registry, const Camera& camera);
+  void m_update_selecting_target(entt::registry& registry, const Camera& camera);
+  void m_update_closed_menu(entt::registry& registry, const Camera& camera);
+  void m_show_select_target_text(entt::registry& registry, const Camera& camera);
+  void m_open_action_menu(entt::registry& registry, const Camera& camera);
+  void m_close_action_menu(entt::registry& registry);
 };
 }  // namespace dl

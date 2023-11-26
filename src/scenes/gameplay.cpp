@@ -61,6 +61,13 @@ void Gameplay::update()
     return;
   }
 
+  const auto& current_context = m_input_manager->get_current_context();
+
+  if (current_context != nullptr && current_context->key == "gameplay")
+  {
+    m_update_input(m_game_context);
+  }
+
   const auto delta = m_game_context.clock->delta;
 
   if (m_current_state == Gameplay::State::PLAYING)
@@ -92,8 +99,6 @@ void Gameplay::update()
   {
     delay -= delta;
   }
-
-  m_update_input(m_game_context);
 }
 
 void Gameplay::render()
@@ -165,36 +170,6 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   else if (m_input_manager->poll_action("camera_move_north"))
   {
     m_camera.move({0., -8., 0.});
-  }
-  else if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
-  {
-    /* const auto& mouse_position = m_input_manager->get_mouse_position(); */
-    /* const auto& camera_position = m_camera.get_position(); */
-    /* m_select_entity((mouse_position.first + camera_position.x) / 32.f, */
-    /*                 (mouse_position.second + camera_position.y) / 32.f); */
-  }
-}
-
-void Gameplay::m_select_entity(const float x, const float y)
-{
-  const auto tile_x = std::floor(x);
-  const auto tile_y = std::floor(y);
-  const auto& entities = m_world.spatial_hash.get(tile_x, tile_y);
-
-  for (const auto entity : entities)
-  {
-    if (m_registry.all_of<Selectable, Position>(entity))
-    {
-      auto& position = m_registry.get<Position>(entity);
-      auto& selectable = m_registry.get<Selectable>(entity);
-
-      if (x >= std::round(position.x) && x <= std::round(position.x) + 1.f && y >= std::round(position.y) &&
-          y <= std::round(position.y) + 1.f)
-      {
-        selectable.selected = true;
-        return;
-      }
-    }
   }
 }
 }  // namespace dl

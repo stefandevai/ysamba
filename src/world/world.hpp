@@ -39,41 +39,44 @@ class World
   void set(const int tile_id, const int x, const int y, const int z);
 
   // Get tile data by coordinates
-  const TileData& get(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
 
   // Get size of a specific tilemap
-  TilemapSize get_tilemap_size(const int z);
+  [[nodiscard]] TilemapSize get_tilemap_size(const int z);
 
   // Get size of the tiles in the current tileset
-  Vector2i get_tile_size() { return m_tile_size; }
+  [[nodiscard]] Vector2i get_tile_size() { return m_tile_size; }
 
   // Get the seed used in this world generation
-  int get_seed() const { return m_seed; };
+  [[nodiscard]] int get_seed() const { return m_seed; };
 
   // Get the size of a loaded chunk
-  size_t get_chunk_size() const { return m_chunk_size; };
+  [[nodiscard]] size_t get_chunk_size() const { return m_chunk_size; };
 
   // Get the texture id for the tiles used in this world
-  const std::string& get_texture_id() const { return m_texture_id; };
+  [[nodiscard]] const std::string& get_texture_id() const { return m_texture_id; };
 
   // Get a specific society
-  SocietyBlueprint get_society(const std::string& society_id) const
+  [[nodiscard]] SocietyBlueprint get_society(const std::string& society_id) const
   {
     assert(m_societies.contains(society_id));
     return m_societies.at(society_id);
   };
 
+  // Get a path between two points
+  [[nodiscard]] std::stack<std::pair<int, int>> get_path_between(const Vector3i& from, const Vector3i& to);
+
   // Get a nearby tile containing a flag
-  TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;
+  [[nodiscard]] TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;
 
   // Check if a specific tile is adjacent to a position
-  bool adjacent(const int tile_id, const int x, const int y, const int z) const;
+  [[nodiscard]] bool adjacent(const int tile_id, const int x, const int y, const int z) const;
 
   // Check if a specific tile is has WALKABLE flag
-  bool is_walkable(const int x, const int y, const int z) const;
+  [[nodiscard]] bool is_walkable(const int x, const int y, const int z) const;
 
   // Get information about a tile with id
-  const TileData& get_tile_data(const uint32_t id) const;
+  [[nodiscard]] const TileData& get_tile_data(const uint32_t id) const;
 
   template <class Archive>
   void serialize(Archive& archive)

@@ -44,6 +44,8 @@ struct Vector3i
   int y;
   int z;
 
+  Vector3i(const int x, const int y, const int z) : x(x), y(y), z(z) {}
+
   Vector3i(const double x, const double y, const double z)
       : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z))
   {

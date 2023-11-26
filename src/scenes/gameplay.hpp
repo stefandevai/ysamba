@@ -53,6 +53,5 @@ class Gameplay : public Scene
   ActionSystem m_action_system{m_world};
 
   void m_update_input(GameContext& game_context);
-  void m_select_entity(const float x, const float y);
 };
 }  // namespace dl

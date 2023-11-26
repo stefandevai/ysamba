@@ -101,6 +101,17 @@ bool InputManager::is_clicking(const MouseButton button)
 
 const Vector2i& InputManager::get_mouse_position() { return m_sdl_input_wrapper.get_mouse_position(); }
 
+const std::shared_ptr<InputContext> InputManager::get_current_context()
+{
+  if (m_context_stack.empty())
+  {
+    spdlog::critical("No contexts avaiblable");
+    return nullptr;
+  }
+
+  return m_context_stack.back();
+}
+
 bool InputManager::should_quit() { return m_sdl_input_wrapper.should_quit(); }
 
 void InputManager::quit() { m_sdl_input_wrapper.quit(); }
@@ -114,7 +125,7 @@ void InputManager::m_parse_input()
   for (const auto& item : m_json.object.items())
   {
     const auto& key = item.key();
-    const auto input_context = std::make_shared<InputContext>();
+    const auto input_context = std::make_shared<InputContext>(key);
 
     for (const auto& value : item.value().items())
     {

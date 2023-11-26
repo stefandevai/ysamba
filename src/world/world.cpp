@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <libtcod.hpp>
 #include <nlohmann/json.hpp>
 #include <queue>
 #include <set>
@@ -72,6 +73,30 @@ const TileData& World::get(const int x, const int y, const int z) const
   const int tile_index = m_tilemaps[z - m_depth_min].at(x, y);
 
   return m_tile_data.at(tile_index);
+}
+
+std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, const Vector3i& to)
+{
+  std::stack<std::pair<int, int>> path{};
+
+  // TODO: Use A* algorithm instead
+  TCOD_bresenham_data_t bresenham_data;
+  int x = to.x;
+  int y = to.y;
+
+  TCOD_line_init_mt(x, y, from.x, from.y, &bresenham_data);
+
+  do
+  {
+    if (x == from.x && y == from.y)
+    {
+      break;
+    }
+
+    path.push({x, y});
+  } while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
+
+  return path;
 }
 
 TileTarget World::search_by_flag(const std::string& flag, const int x, const int y, const int z) const

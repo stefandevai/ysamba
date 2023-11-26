@@ -22,5 +22,9 @@
         "save_world": ["k_s"],
         "load_world": ["k_l"],
         "display_seed": ["k_e"]
+    },
+    "action_menu": {
+        "close_menu": ["k_escape"],
+        "harvest": ["k_h"]
     }
 }

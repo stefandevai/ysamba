@@ -31,7 +31,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
   const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-  const auto entity = m_world.spatial_hash.search_by_component<Selectable>(tile_x, tile_y, registry);
+  const auto entity = m_world.spatial_hash.get_by_component<Selectable>(tile_x, tile_y, registry);
 
   if (registry.valid(entity))
   {
