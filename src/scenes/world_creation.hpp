@@ -19,7 +19,7 @@ class WorldCreation : public Scene
   WorldCreation(GameContext& game_context);
 
   void load() override;
-  void update(GameContext& game_context) override;
+  void update() override;
   void render() override;
   /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override; */
 

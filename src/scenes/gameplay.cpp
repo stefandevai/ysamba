@@ -54,7 +54,7 @@ void Gameplay::load()
 
 double delay = 0.0;
 
-void Gameplay::update(GameContext& m_game_context)
+void Gameplay::update()
 {
   if (!has_loaded())
   {

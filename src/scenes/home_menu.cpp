@@ -31,7 +31,7 @@ void HomeMenu::load()
   m_has_loaded = true;
 }
 
-void HomeMenu::update(GameContext& game_context)
+void HomeMenu::update()
 {
   if (!has_loaded())
   {
@@ -44,11 +44,11 @@ void HomeMenu::update(GameContext& game_context)
   }
   else if (m_input_manager->poll_action("play"))
   {
-    game_context.scene_manager->push_scene<Gameplay>(game_context);
+    m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   }
   else if (m_input_manager->poll_action("create_world"))
   {
-    game_context.scene_manager->push_scene<WorldCreation>(game_context);
+    m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
   }
 }
 

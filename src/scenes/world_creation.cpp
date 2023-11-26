@@ -41,7 +41,7 @@ void WorldCreation::load()
   m_has_loaded = true;
 }
 
-void WorldCreation::update(GameContext& game_context)
+void WorldCreation::update()
 {
   if (!has_loaded())
   {
@@ -50,7 +50,7 @@ void WorldCreation::update(GameContext& game_context)
 
   if (m_input_manager->poll_action("quit"))
   {
-    game_context.scene_manager->pop_scene();
+    m_game_context.scene_manager->pop_scene();
   }
   else if (m_input_manager->poll_action("generate_world"))
   {

@@ -59,7 +59,7 @@ void Game::run()
     m_clock.tick();
 
     m_input_manager->update();
-    m_scene_manager.update(m_context);
+    m_scene_manager.update();
 
     m_display.clear();
     m_scene_manager.render();

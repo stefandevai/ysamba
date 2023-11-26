@@ -23,7 +23,7 @@ class Gameplay : public Scene
   Gameplay(GameContext& game_context);
 
   void load() override;
-  void update(GameContext& context) override;
+  void update() override;
   void render() override;
 
   void save_world(const std::string& file_path);

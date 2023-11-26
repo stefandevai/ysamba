@@ -21,7 +21,7 @@ void SceneManager::pop_scene()
   m_scenes.pop_back();
 }
 
-void SceneManager::update(GameContext& game_context)
+void SceneManager::update()
 {
   if (m_scenes.empty())
   {
@@ -35,7 +35,7 @@ void SceneManager::update(GameContext& game_context)
     current_scene->load();
   }
 
-  current_scene->update(game_context);
+  current_scene->update();
 }
 
 void SceneManager::render()

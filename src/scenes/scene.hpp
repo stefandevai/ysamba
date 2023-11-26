@@ -20,7 +20,7 @@ class Scene
   virtual ~Scene();
 
   virtual void load();
-  virtual void update(GameContext& game_context) = 0;
+  virtual void update() = 0;
   virtual void render() = 0;
   void render_call() { m_renderer.render(m_camera); }
   void check_window_size();

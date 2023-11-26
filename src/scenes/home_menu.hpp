@@ -14,7 +14,7 @@ class HomeMenu : public Scene
   HomeMenu(GameContext& game_context);
 
   void load() override;
-  void update(GameContext& game_context) override;
+  void update() override;
   void render() override;
 
  private:

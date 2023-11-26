@@ -33,7 +33,7 @@ class SceneManager
   }
 
   void pop_scene();
-  void update(GameContext& game_context);
+  void update();
   void render();
 
  private:
