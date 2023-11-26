@@ -7,7 +7,6 @@ namespace dl
 {
 class SceneManager;
 class Display;
-class InputManager;
 class Camera;
 struct Clock;
 
@@ -18,6 +17,5 @@ struct GameContext
   Camera* camera;
   SceneManager* scene_manager;
   Clock* clock;
-  std::shared_ptr<InputManager> input_manager;
 };
 }  // namespace dl

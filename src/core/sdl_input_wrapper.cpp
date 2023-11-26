@@ -5,19 +5,7 @@
 
 namespace dl
 {
-std::shared_ptr<SDLInputWrapper> SDLInputWrapper::m_instance = nullptr;
-
 SDLInputWrapper::SDLInputWrapper() {}
-
-std::shared_ptr<SDLInputWrapper> SDLInputWrapper::get_instance()
-{
-  if (m_instance == nullptr)
-  {
-    m_instance = std::make_shared<SDLInputWrapper>();
-  }
-
-  return m_instance;
-}
 
 void SDLInputWrapper::update()
 {
@@ -121,7 +109,6 @@ bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }
 
 bool SDLInputWrapper::is_key_down(const std::string& key)
 {
-  const auto sdl_value = m_key_map.at(key);
   const auto it = m_key_down.find(m_key_map.at(key));
 
   if (it == m_key_down.end())

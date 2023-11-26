@@ -8,9 +8,7 @@
 namespace dl
 {
 std::shared_ptr<InputManager> InputManager::m_instance = nullptr;
-std::shared_ptr<SDLInputWrapper> InputManager::m_sdl_input_wrapper = SDLInputWrapper::get_instance();
-std::shared_ptr<sol::table> InputManager::m_context = nullptr;
-std::string InputManager::m_context_key = "";
+SDLInputWrapper InputManager::m_sdl_input_wrapper = SDLInputWrapper();
 std::unordered_map<std::string, std::shared_ptr<InputContext>> InputManager::m_available_contexts = {};
 std::vector<std::shared_ptr<InputContext>> InputManager::m_context_stack = {};
 
@@ -26,27 +24,13 @@ std::shared_ptr<InputManager> InputManager::get_instance()
   return m_instance;
 }
 
-void InputManager::update() { m_sdl_input_wrapper->update(); }
-
-void InputManager::set_context(const std::string& context_key)
-{
-  const auto context = m_lua.get_variable<sol::table>(context_key);
-
-  if (context == sol::lua_nil)
-  {
-    spdlog::critical("Could not load context: {}", context_key);
-    return;
-  }
-
-  m_context = std::make_shared<sol::table>(context);
-  m_context_key = context_key;
-}
+void InputManager::update() { m_sdl_input_wrapper.update(); }
 
 void InputManager::push_context(const std::string& context_key)
 {
   if (!m_available_contexts.contains(context_key))
   {
-    spdlog::critical("Input context not found: {}", m_context_key);
+    spdlog::critical("Input context not found: {}", context_key);
     return;
   }
 
@@ -93,15 +77,15 @@ bool InputManager::poll_action(const std::string& action_key)
   return false;
 }
 
-bool InputManager::is_key_down(const std::string& key) { return m_sdl_input_wrapper->is_key_down(key); }
+bool InputManager::is_key_down(const std::string& key) { return m_sdl_input_wrapper.is_key_down(key); }
 
-bool InputManager::is_any_key_down() { return m_sdl_input_wrapper->is_any_key_down(); }
+bool InputManager::is_any_key_down() { return m_sdl_input_wrapper.is_any_key_down(); }
 
-bool InputManager::is_key_up(const std::string& key) { return m_sdl_input_wrapper->is_key_up(key); }
+bool InputManager::is_key_up(const std::string& key) { return m_sdl_input_wrapper.is_key_up(key); }
 
 bool InputManager::is_clicking(const MouseButton button)
 {
-  const auto& mouse_state = m_sdl_input_wrapper->get_mouse_state();
+  const auto& mouse_state = m_sdl_input_wrapper.get_mouse_state();
 
   if (button == MouseButton::Left)
   {
@@ -115,15 +99,15 @@ bool InputManager::is_clicking(const MouseButton button)
   return false;
 }
 
-std::pair<int, int> InputManager::get_mouse_position() { return m_sdl_input_wrapper->get_mouse_position(); }
+std::pair<int, int> InputManager::get_mouse_position() { return m_sdl_input_wrapper.get_mouse_position(); }
 
-bool InputManager::should_quit() { return m_sdl_input_wrapper->should_quit(); }
+bool InputManager::should_quit() { return m_sdl_input_wrapper.should_quit(); }
 
-void InputManager::quit() { m_sdl_input_wrapper->quit(); }
+void InputManager::quit() { m_sdl_input_wrapper.quit(); }
 
-bool InputManager::window_size_changed() const { return m_sdl_input_wrapper->window_size_changed(); }
+bool InputManager::window_size_changed() const { return m_sdl_input_wrapper.window_size_changed(); }
 
-void InputManager::set_window_size_changed(const bool value) { m_sdl_input_wrapper->set_window_size_changed(value); }
+void InputManager::set_window_size_changed(const bool value) { m_sdl_input_wrapper.set_window_size_changed(value); }
 
 void InputManager::m_parse_input()
 {

@@ -38,7 +38,6 @@ class InputManager
 
   static std::shared_ptr<InputManager> get_instance();
   void update();
-  void set_context(const std::string& context_key);
   void push_context(const std::string& context_key);
   void pop_context();
   bool poll_action(const std::string& action);
@@ -53,12 +52,9 @@ class InputManager
   void quit();
 
  private:
-  static std::shared_ptr<InputManager> m_instance;
-  static std::shared_ptr<sol::table> m_context;
-  static std::shared_ptr<SDLInputWrapper> m_sdl_input_wrapper;
-  static std::string m_context_key;
-  LuaAPI m_lua{"key_bindings.lua"};
   JSON m_json{"./data/input.json"};
+  static std::shared_ptr<InputManager> m_instance;
+  static SDLInputWrapper m_sdl_input_wrapper;
   static std::unordered_map<std::string, std::shared_ptr<InputContext>> m_available_contexts;
   static std::vector<std::shared_ptr<InputContext>> m_context_stack;
 

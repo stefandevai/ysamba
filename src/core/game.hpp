@@ -26,11 +26,11 @@ class Game
   JSON m_json{"./data/game.json"};
   Display m_display;
   AssetManager m_asset_manager{"./data/assets.json"};
-  Camera m_camera;
   SceneManager m_scene_manager{};
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  Camera m_camera;
   Clock m_clock{};
+  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
 
-  GameContext m_context{&m_display, &m_asset_manager, &m_camera, &m_scene_manager, &m_clock, m_input_manager};
+  GameContext m_context{&m_display, &m_asset_manager, &m_camera, &m_scene_manager, &m_clock};
 };
 }  // namespace dl

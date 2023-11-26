@@ -14,7 +14,6 @@ class SDLInputWrapper
   SDLInputWrapper(SDLInputWrapper const&){};
   void operator=(SDLInputWrapper const&){};
 
-  static std::shared_ptr<SDLInputWrapper> get_instance();
   void update();
   bool is_any_key_down();
   bool is_key_down(const std::string& key);
@@ -27,7 +26,6 @@ class SDLInputWrapper
   void quit();
 
  private:
-  static std::shared_ptr<SDLInputWrapper> m_instance;
   static const std::unordered_map<std::string, int> m_key_map;
   bool m_any_key_down = false;
   std::unordered_map<int, bool> m_key_down;
