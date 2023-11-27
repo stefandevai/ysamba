@@ -18,5 +18,9 @@
     {
         "id": 4,
         "name": "mushrooms"
+    },
+    {
+        "id": 5,
+        "name": "rocks"
     }
 ]

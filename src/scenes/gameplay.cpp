@@ -83,6 +83,7 @@ void Gameplay::update()
       m_physics_system.update(m_registry, delta);
       m_society_system.update(m_registry, delta);
       m_harvest_system.update(m_registry, delta);
+      m_break_system.update(m_registry, delta);
     }
   }
 

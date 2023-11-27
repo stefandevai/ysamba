@@ -58,5 +58,15 @@
         "frame": 40,
         "id": 4,
         "type": "item"
+    },
+    {
+        "frame": 136,
+        "id": 8,
+        "type": "tile"
+    },
+    {
+        "frame": 42,
+        "id": 5,
+        "type": "item"
     }
 ]

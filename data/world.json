@@ -46,6 +46,13 @@
       "flags": ["HARVESTABLE", "WALKABLE"],
       "drop_ids": [4],
       "after_removed": 2
+    },
+    {
+      "id": 8,
+      "name": "rock",
+      "flags": ["BREAKABLE", "WALKABLE"],
+      "drop_ids": [5],
+      "after_removed": 2
     }
   ]
 }
