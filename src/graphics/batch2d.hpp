@@ -19,9 +19,11 @@ class ShaderProgram;
 class Batch2D : public Layer
 {
  public:
+  Batch2D();
   Batch2D(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
   ~Batch2D();
 
+  void load();
   void render();
   void emplace(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
   void init_emplacing();

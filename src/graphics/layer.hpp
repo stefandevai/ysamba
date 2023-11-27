@@ -11,7 +11,7 @@ class ShaderProgram;
 class Layer
 {
  public:
-  std::shared_ptr<ShaderProgram> shader;
+  std::shared_ptr<ShaderProgram> shader = nullptr;
   int priority = 0;
 
   Layer(std::shared_ptr<ShaderProgram> shader, const int priority = 0) : shader(shader), priority(priority) {}
@@ -33,11 +33,4 @@ class Layer
   Layer() {}
 };
 
-/* struct LayerPriorityCompare */
-/* { */
-/*   bool operator()(const Layer& lhs, const Layer& rhs) const */
-/*   { */
-/*     return lhs.priority < rhs.priority; */
-/*   } */
-/* }; */
 }  // namespace dl

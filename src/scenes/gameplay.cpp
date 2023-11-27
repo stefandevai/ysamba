@@ -19,6 +19,8 @@
 #include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/text.hpp"
+#include "ui/components/container.hpp"
+#include "ui/components/label.hpp"
 #include "world/society/sex.hpp"
 // TEMP
 
@@ -33,6 +35,8 @@ void Gameplay::load()
   m_renderer.add_layer("world", "world");
   m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, true, 1);
   m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
+  m_renderer.add_layer("ui-quad", "quad", Renderer::LayerType::Quad, true, 10);
+  m_renderer.add_layer("ui-text", "text", Renderer::LayerType::Sprite, true, 10);
 
   load_world("./world.dl");
   m_world.load("./data/world/test_map.json");
@@ -48,6 +52,20 @@ void Gameplay::load()
   auto society_blueprint = m_world.get_society("otomi");
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+
+  // TEMP
+  auto label = std::make_shared<ui::Label>();
+  label->text.value = "TESTING UI";
+  label->text.typeface = "font-1980";
+  label->position.x = 80;
+  label->position.y = 80;
+  m_ui_manager.add_component(label);
+
+  auto container = std::make_shared<ui::Container>(100, 100, "#ffffffff");
+  container->position.x = 100;
+  container->position.y = 100;
+  m_ui_manager.add_component(container);
+  // TEMP
 
   m_has_loaded = true;
 }
@@ -67,6 +85,8 @@ void Gameplay::update()
   {
     m_update_input(m_game_context);
   }
+
+  m_ui_manager.update();
 
   const auto delta = m_game_context.clock->delta;
 
@@ -109,7 +129,8 @@ void Gameplay::render()
     return;
   }
 
-  m_render_system.update(m_registry, m_renderer, m_camera);
+  m_render_system.render(m_registry, m_renderer, m_camera);
+  m_ui_manager.render(m_renderer);
 }
 
 void Gameplay::save_world(const std::string& file_path)

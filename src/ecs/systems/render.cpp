@@ -21,7 +21,7 @@ namespace dl
 {
 RenderSystem::RenderSystem(World& world) : m_world(world), m_world_texture_id(m_world.get_texture_id()) {}
 
-void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Camera& camera)
+void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Camera& camera)
 {
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();

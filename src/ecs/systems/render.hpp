@@ -12,7 +12,7 @@ class RenderSystem
 {
  public:
   RenderSystem(World& world);
-  void update(entt::registry& registry, Renderer& renderer, const Camera& camera);
+  void render(entt::registry& registry, Renderer& renderer, const Camera& camera);
 
  private:
   World& m_world;

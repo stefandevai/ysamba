@@ -11,7 +11,18 @@
 
 namespace dl
 {
-Batch2D::Batch2D(std::shared_ptr<ShaderProgram> shader, const int priority) : Layer(shader, priority)
+Batch2D::Batch2D() {}
+
+Batch2D::Batch2D(std::shared_ptr<ShaderProgram> shader, const int priority) : Layer(shader, priority) { load(); }
+
+Batch2D::~Batch2D()
+{
+  glDeleteBuffers(1, &m_ebo);
+  glDeleteBuffers(1, &m_vbo);
+  glDeleteVertexArrays(1, &m_vao);
+}
+
+void Batch2D::load()
 {
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);
@@ -52,13 +63,6 @@ Batch2D::Batch2D(std::shared_ptr<ShaderProgram> shader, const int priority) : La
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   glBindVertexArray(0);
-}
-
-Batch2D::~Batch2D()
-{
-  glDeleteBuffers(1, &m_ebo);
-  glDeleteBuffers(1, &m_vbo);
-  glDeleteVertexArrays(1, &m_vao);
 }
 
 void Batch2D::render()

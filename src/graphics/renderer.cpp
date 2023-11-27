@@ -1,6 +1,6 @@
 #include "./renderer.hpp"
 
-#include <entt/entity/registry.hpp>
+#include <glad/glad.h>
 
 #include "./batch2d.hpp"
 #include "./batch_quad.hpp"
@@ -108,8 +108,6 @@ void Renderer::finalize(const std::string& layer_id) { m_layers.at(layer_id)->fi
 
 void Renderer::render(const Camera& camera)
 {
-  glm::mat4 model_matrix = glm::mat4(1.0f);
-
   for (const auto& layer : m_ordered_layers)
   {
     if (!layer->get_should_render())
@@ -123,14 +121,18 @@ void Renderer::render(const Camera& camera)
 
     if (layer->get_ignore_camera())
     {
-      shader->set_mat_4("mvp", camera.get_projection_matrix() * camera.get_default_view_matrix() * model_matrix);
+      shader->set_mat_4("mvp", camera.get_projection_matrix() * m_default_view_matrix * m_default_model_matrix);
     }
     else
     {
-      shader->set_mat_4("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * model_matrix);
+      shader->set_mat_4("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * m_default_model_matrix);
     }
 
     layer->render();
   }
 }
+
+void Renderer::enable_depth_test() { glEnable(GL_DEPTH_TEST); }
+
+void Renderer::disable_depth_test() { glDisable(GL_DEPTH_TEST); }
 }  // namespace dl

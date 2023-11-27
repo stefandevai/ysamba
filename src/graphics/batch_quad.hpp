@@ -18,9 +18,11 @@ class ShaderProgram;
 class BatchQuad : public Layer
 {
  public:
+  BatchQuad();
   BatchQuad(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
   ~BatchQuad();
 
+  void load();
   void render();
   void emplace(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z);
   void init_emplacing();

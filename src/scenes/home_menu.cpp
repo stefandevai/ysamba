@@ -22,11 +22,11 @@ void HomeMenu::load()
   const auto instructions = m_lua.get_variable<std::string>("instructions");
 
   m_game_title.set_text(game_title);
-  m_game_title.set_font_name("font-1980");
+  m_game_title.set_typeface("font-1980");
   m_game_title.set_font_size(32);
 
   m_instructions.set_text(instructions);
-  m_instructions.set_font_name("font-1980");
+  m_instructions.set_typeface("font-1980");
   m_instructions.set_font_size(32);
   m_has_loaded = true;
 }

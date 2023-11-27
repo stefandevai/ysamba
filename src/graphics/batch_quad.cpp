@@ -11,7 +11,18 @@
 
 namespace dl
 {
-BatchQuad::BatchQuad(std::shared_ptr<ShaderProgram> shader, const int priority) : Layer(shader, priority)
+BatchQuad::BatchQuad() {}
+
+BatchQuad::BatchQuad(std::shared_ptr<ShaderProgram> shader, const int priority) : Layer(shader, priority) { load(); }
+
+BatchQuad::~BatchQuad()
+{
+  glDeleteBuffers(1, &m_ebo);
+  glDeleteBuffers(1, &m_vbo);
+  glDeleteVertexArrays(1, &m_vao);
+}
+
+void BatchQuad::load()
 {
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);
@@ -45,13 +56,6 @@ BatchQuad::BatchQuad(std::shared_ptr<ShaderProgram> shader, const int priority) 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   glBindVertexArray(0);
-}
-
-BatchQuad::~BatchQuad()
-{
-  glDeleteBuffers(1, &m_ebo);
-  glDeleteBuffers(1, &m_vbo);
-  glDeleteVertexArrays(1, &m_vao);
 }
 
 void BatchQuad::render()

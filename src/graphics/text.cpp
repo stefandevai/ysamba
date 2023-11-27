@@ -9,17 +9,17 @@
 namespace dl
 {
 Text::Text(const std::string text,
-           const std::string font_name,
+           const std::string typeface,
            const unsigned int font_size,
            const std::string& color,
            const bool is_static)
-    : m_text(text), m_font_name(font_name), m_color(color), m_font_size(font_size), m_is_static(is_static)
+    : value(text), typeface(typeface), color(color), m_font_size(font_size), m_is_static(is_static)
 {
 }
 
 void Text::initialize(AssetManager& asset_manager)
 {
-  m_font = asset_manager.get<Font>(m_font_name);
+  m_font = asset_manager.get<Font>(typeface);
   m_has_initialized = true;
   update();
 }
@@ -32,7 +32,7 @@ void Text::update()
   const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
 
-  for (wchar_t c : m_text)
+  for (wchar_t c : value)
   {
     const auto& ch = m_font->get_char_data(c);
     const float x = char_pos_x + ch.bl * scale;
@@ -46,7 +46,7 @@ void Text::update()
     if (w > 0.f && h > 0.f)
     {
       character.code = c;
-      character.sprite = std::make_shared<Sprite>(m_font_name);
+      character.sprite = std::make_shared<Sprite>(typeface);
       character.sprite->texture = m_font->get_atlas();
       character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
 
