@@ -39,6 +39,13 @@
       "id": 6,
       "name": "dirt",
       "flags": ["WALKABLE"]
+    },
+    {
+      "id": 7,
+      "name": "mushrooms",
+      "flags": ["HARVESTABLE", "WALKABLE"],
+      "drop_ids": [4],
+      "after_removed": 2
     }
   ]
 }

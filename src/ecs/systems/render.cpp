@@ -12,6 +12,7 @@
 #include "ecs/components/text.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/frame_data_types.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/text.hpp"
 #include "world/world.hpp"
@@ -35,12 +36,14 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
       const auto& tile = m_world.get(index_x, index_y, 0.0);
-      const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, tile.id);
+      const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
 
       if (sprite->texture == nullptr)
       {
         const auto& world_texture = renderer.get_texture(m_world_texture_id);
+        const auto& frame = world_texture->id_to_frame(tile.id, frame_data_type::tile);
         sprite->texture = world_texture;
+        sprite->set_frame(frame);
       }
 
       renderer.batch("world",

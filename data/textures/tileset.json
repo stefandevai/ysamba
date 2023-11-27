@@ -35,7 +35,7 @@
         "type": "item"
     },
     {
-        "frame": 7,
+        "frame": 102,
         "id": 2,
         "type": "item"
     },
@@ -45,8 +45,18 @@
         "type": "item"
     },
     {
-        "frame": 32,
+        "frame": 71,
         "id": 3,
         "type": "tile"
+    },
+    {
+        "frame": 104,
+        "id": 7,
+        "type": "tile"
+    },
+    {
+        "frame": 40,
+        "id": 4,
+        "type": "item"
     }
 ]
