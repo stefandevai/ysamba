@@ -19,6 +19,7 @@
 #include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/text.hpp"
+#include "ui/components/button.hpp"
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
 #include "world/society/sex.hpp"
@@ -61,7 +62,7 @@ void Gameplay::load()
   label->position.y = 80;
   m_ui_manager.add_component(label);
 
-  auto container = std::make_shared<ui::Container>(100, 100, "#ffffffff");
+  auto container = std::make_shared<ui::Container>(100, 100, "#1b2420aa");
   container->position.x = 100;
   container->position.y = 100;
   m_ui_manager.add_component(container);

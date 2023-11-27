@@ -10,7 +10,6 @@ class Container : public UIComponent
 {
  public:
   std::shared_ptr<Quad> quad;
-  ContainerStyle style;
 
   Container(const int width, const int height, const std::string& color);
 };
