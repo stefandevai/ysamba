@@ -5,6 +5,7 @@
 #include "./batch2d.hpp"
 #include "./batch_quad.hpp"
 #include "./camera.hpp"
+#include "./renderer2.hpp"
 #include "./shader_loader.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
@@ -25,15 +26,16 @@ void Renderer::add_layer(const std::string& layer_id,
   const auto shader = m_asset_manager.get<ShaderProgram>(shader_id);
   std::shared_ptr<Layer> layer;
 
-  switch (layer_type)
-  {
-  case LayerType::Sprite:
-    layer.reset(new Batch2D(shader, priority));
-    break;
-  case LayerType::Quad:
-    layer.reset(new BatchQuad(shader, priority));
-    break;
-  }
+  layer.reset(new Batch(shader, priority));
+
+  /* switch (layer_type) */
+  /* { */
+  /* case LayerType::Sprite: */
+  /*   break; */
+  /* case LayerType::Quad: */
+  /*   layer.reset(new BatchQuad(shader, priority)); */
+  /*   break; */
+  /* } */
 
   layer->set_ignore_camera(ignore_camera);
   m_layers.emplace(layer_id, layer);
@@ -49,12 +51,12 @@ std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
   return m_asset_manager.get<Texture>(resource_id);
 }
 
-void Renderer::init(const std::string& layer_id) { m_layers.at(layer_id)->init_emplacing(); }
+void Renderer::init(const std::string& layer_id) { /* m_layers.at(layer_id)->init_emplacing(); */ }
 
 void Renderer::batch(
     const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
 {
-  const auto& layer = std::dynamic_pointer_cast<Batch2D>(m_layers.at(layer_id));
+  const auto& layer = std::dynamic_pointer_cast<Batch>(m_layers.at(layer_id));
   assert(layer != nullptr);
 
   // Load texture if it has not been loaded
@@ -68,7 +70,7 @@ void Renderer::batch(
 
 void Renderer::batch(const std::string& layer_id, Text& text, const double x, const double y, const double z)
 {
-  const auto& layer = std::dynamic_pointer_cast<Batch2D>(m_layers.at(layer_id));
+  const auto& layer = std::dynamic_pointer_cast<Batch>(m_layers.at(layer_id));
   assert(layer != nullptr);
 
   if (!text.get_has_initialized())
@@ -98,13 +100,13 @@ void Renderer::batch(const std::string& layer_id, Text& text, const double x, co
 void Renderer::batch(
     const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z)
 {
-  const auto& layer = std::dynamic_pointer_cast<BatchQuad>(m_layers.at(layer_id));
+  const auto& layer = std::dynamic_pointer_cast<Batch>(m_layers.at(layer_id));
   assert(layer != nullptr);
 
-  layer->emplace(quad, x, y, z);
+  layer->quad(quad, x, y, z);
 }
 
-void Renderer::finalize(const std::string& layer_id) { m_layers.at(layer_id)->finalize_emplacing(); }
+void Renderer::finalize(const std::string& layer_id) { /* m_layers.at(layer_id)->finalize_emplacing(); */ }
 
 void Renderer::render(const Camera& camera)
 {

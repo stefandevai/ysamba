@@ -20,6 +20,6 @@ void main()
   gl_Position = mvp * vec4(position, 1.0);
   v_out.uv = vec2(uv.x, uv.y);
   v_out.tid = tid;
-  v_out.color = color;
+  v_out.color = color.wzyx;
   v_out.pos = position.xy;
 }

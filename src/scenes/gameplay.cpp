@@ -34,9 +34,9 @@ void Gameplay::load()
   Scene::load();
 
   m_renderer.add_layer("world", "world");
-  m_renderer.add_layer("quad", "quad", Renderer::LayerType::Quad, true, 1);
+  m_renderer.add_layer("quad", "world", Renderer::LayerType::Quad, true, 1);
   m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
-  m_renderer.add_layer("ui-quad", "quad", Renderer::LayerType::Quad, true, 10);
+  m_renderer.add_layer("ui-quad", "world", Renderer::LayerType::Quad, true, 10);
   m_renderer.add_layer("ui-text", "text", Renderer::LayerType::Sprite, true, 10);
 
   load_world("./world.dl");

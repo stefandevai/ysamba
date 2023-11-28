@@ -15,43 +15,47 @@ uniform sampler2D textures[11];
 void main()
 {
   vec4 final_color = f_in.color;
-  int tid = int(f_in.tid + 0.5);
 
-  switch (tid)
+  if (f_in.tid > -0.5)
   {
-    case 0:
-      final_color = texture(textures[0], f_in.uv);
-      break;
-    case 1:
-      final_color = texture(textures[1], f_in.uv);
-      break;
-    case 2:
-      final_color = texture(textures[2], f_in.uv);
-      break;
-    case 3:
-      final_color = texture(textures[3], f_in.uv);
-      break;
-    case 4:
-      final_color = texture(textures[4], f_in.uv);
-      break;
-    case 5:
-      final_color = texture(textures[5], f_in.uv);
-      break;
-    case 6:
-      final_color = texture(textures[6], f_in.uv);
-      break;
-    case 7:
-      final_color = texture(textures[7], f_in.uv);
-      break;
-    case 8:
-      final_color = texture(textures[8], f_in.uv);
-      break;
-    case 9:
-      final_color = texture(textures[9], f_in.uv);
-      break;
-    case 10:
-      final_color = texture(textures[10], f_in.uv);
-      break;
+    int tid = int(f_in.tid + 0.5);
+
+    switch (tid)
+    {
+      case 0:
+        final_color = texture(textures[0], f_in.uv);
+        break;
+      case 1:
+        final_color = texture(textures[1], f_in.uv);
+        break;
+      case 2:
+        final_color = texture(textures[2], f_in.uv);
+        break;
+      case 3:
+        final_color = texture(textures[3], f_in.uv);
+        break;
+      case 4:
+        final_color = texture(textures[4], f_in.uv);
+        break;
+      case 5:
+        final_color = texture(textures[5], f_in.uv);
+        break;
+      case 6:
+        final_color = texture(textures[6], f_in.uv);
+        break;
+      case 7:
+        final_color = texture(textures[7], f_in.uv);
+        break;
+      case 8:
+        final_color = texture(textures[8], f_in.uv);
+        break;
+      case 9:
+        final_color = texture(textures[9], f_in.uv);
+        break;
+      case 10:
+        final_color = texture(textures[10], f_in.uv);
+        break;
+    }
   }
 
   if (final_color.a < 0.1)
@@ -59,5 +63,5 @@ void main()
     discard;
   }
 
-  color = vec4(final_color.rgb, final_color.a * f_in.color.a);
+  color = final_color;
 }
