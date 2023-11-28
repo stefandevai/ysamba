@@ -40,7 +40,8 @@ class Renderer
   void set_projection_matrix(const glm::mat4& projection_matrix) { m_projection_matrix = projection_matrix; }
 
   std::shared_ptr<Texture> get_texture(const std::string& resource_id);
-  inline bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
+  std::shared_ptr<Batch> get_layer(const std::string& layer_id) const { return m_layers.at(layer_id); }
+  bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
 
  private:
   using LayerMap = std::map<std::string, std::shared_ptr<Batch>>;

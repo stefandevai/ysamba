@@ -52,6 +52,8 @@ void Gameplay::load()
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   // TEMP
+  const auto& batch = m_renderer.get_layer("ui");
+  m_ui_manager.load(batch);
   auto label = std::make_shared<ui::Label>();
   label->text.value = "TESTING UI";
   label->text.typeface = "font-1980";

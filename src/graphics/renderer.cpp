@@ -52,28 +52,7 @@ void Renderer::batch(const std::string& layer_id, Text& text, const double x, co
   const auto& layer = m_layers.at(layer_id);
   assert(layer != nullptr);
 
-  if (!text.get_has_initialized())
-  {
-    text.initialize(m_asset_manager);
-  }
-  else if (!text.get_is_static())
-  {
-    text.update();
-  }
-
-  for (auto& character : text.characters)
-  {
-    if (character.sprite == nullptr)
-    {
-      continue;
-    }
-    if (character.sprite->texture == nullptr)
-    {
-      character.sprite->texture = m_asset_manager.get<Texture>(character.sprite->resource_id);
-    }
-
-    layer->emplace(character.sprite, character.x + x, character.y + y, z);
-  }
+  layer->text(text, x, y, z);
 }
 
 void Renderer::batch(

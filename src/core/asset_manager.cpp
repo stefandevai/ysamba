@@ -10,6 +10,8 @@
 
 namespace dl
 {
+AssetMap AssetManager::m_assets = {};
+
 AssetManager::AssetManager(const std::filesystem::path& filepath) : m_filepath(filepath)
 {
   // Get base dir from the config filepath

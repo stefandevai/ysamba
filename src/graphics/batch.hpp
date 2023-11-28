@@ -15,6 +15,7 @@ class ShaderProgram;
 class Texture;
 class Sprite;
 struct Quad;
+class Text;
 
 class Batch
 {
@@ -33,6 +34,7 @@ class Batch
   const glm::mat4& peek_matrix();
   void emplace(const std::shared_ptr<Sprite>& renderable, const double x, const double y, const double z);
   void quad(const std::shared_ptr<Quad>& renderable, const double x, const double y, const double z);
+  void text(Text& text, const double x, const double y, const double z);
   bool get_should_render() { return m_index_count > 0; }
 
  private:

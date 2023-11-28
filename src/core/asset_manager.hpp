@@ -26,7 +26,7 @@ class AssetManager
 
   // Gets a loaded asset by its name
   template <typename T>
-  std::shared_ptr<T> get(const std::string& id)
+  static std::shared_ptr<T> get(const std::string& id)
   {
     std::shared_ptr<T> asset_value = nullptr;
 
@@ -60,7 +60,7 @@ class AssetManager
   const std::filesystem::path m_filepath;
   std::filesystem::path m_base_dir;
   JSON m_json;
-  AssetMap m_assets;
+  static AssetMap m_assets;
 
   const std::unordered_map<std::string, AssetType> m_asset_types = {
       {ASSET_TYPE_TEXTURE, AssetType::TEXTURE},

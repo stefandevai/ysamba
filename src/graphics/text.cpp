@@ -17,9 +17,9 @@ Text::Text(const std::string text,
 {
 }
 
-void Text::initialize(AssetManager& asset_manager)
+void Text::initialize()
 {
-  m_font = asset_manager.get<Font>(typeface);
+  m_font = AssetManager::get<Font>(typeface);
   m_has_initialized = true;
   update();
 }

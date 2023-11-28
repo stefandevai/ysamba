@@ -8,6 +8,7 @@
 #include "./quad.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
+#include "./text.hpp"
 #include "./texture.hpp"
 
 namespace dl
@@ -255,6 +256,30 @@ void Batch::quad(const std::shared_ptr<Quad>& quad, const double x, const double
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   m_index_count += 6;
+}
+
+void Batch::text(Text& text, const double x, const double y, const double z)
+{
+  if (!text.get_has_initialized())
+  {
+    text.initialize();
+  }
+
+  if (!text.get_is_static())
+  {
+    text.update();
+  }
+
+  for (auto& character : text.characters)
+  {
+    // Character is a space
+    if (character.sprite == nullptr)
+    {
+      continue;
+    }
+
+    emplace(character.sprite, character.x + x, character.y + y, z);
+  }
 }
 
 }  // namespace dl

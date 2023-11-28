@@ -7,7 +7,6 @@ namespace dl
 {
 class Font;
 class Sprite;
-class AssetManager;
 
 struct Character
 {
@@ -33,7 +32,7 @@ class Text
        const std::string& color = "#ffffffff",
        const bool is_static = true);
 
-  void initialize(AssetManager& asset_manager);
+  void initialize();
   void update();
 
   std::string get_text() const { return value; };
