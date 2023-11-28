@@ -96,6 +96,22 @@ void Batch::render()
   m_vertices_index = 0;
 }
 
+void Batch::push_matrix(const glm::mat4& matrix)
+{
+  m_matrix_stack.push_back(m_matrix);
+  m_matrix = matrix * m_matrix;
+}
+
+const glm::mat4 Batch::pop_matrix()
+{
+  auto old_matrix = m_matrix;
+  m_matrix = m_matrix_stack.back();
+  m_matrix_stack.pop_back();
+  return old_matrix;
+}
+
+const glm::mat4& Batch::peek_matrix() { return m_matrix; }
+
 void Batch::emplace(const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
 {
   assert(m_index_count <= m_indices_size);
@@ -131,7 +147,7 @@ void Batch::emplace(const std::shared_ptr<Sprite>& sprite, const double x, const
   }
 
   // Get transformations and apply them to the sprite vertices
-  auto general_transform = glm::mat4(1.0f);
+  auto general_transform = m_matrix;
   if (sprite->transform)
   {
     // Translate and add pivot for other transformations
@@ -214,7 +230,7 @@ void Batch::quad(const std::shared_ptr<Quad>& quad, const double x, const double
   assert(m_index_count <= m_indices_size);
 
   const auto color = quad->color.int_color;
-  auto general_transform = glm::mat4(1.0f);
+  auto general_transform = m_matrix;
   general_transform = glm::translate(general_transform, glm::vec3(x, y, z));
 
   // Top left vertex

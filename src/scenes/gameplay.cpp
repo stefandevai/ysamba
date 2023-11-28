@@ -34,10 +34,10 @@ void Gameplay::load()
   Scene::load();
 
   m_renderer.add_layer("world", "world");
-  m_renderer.add_layer("quad", "world", true, 1);
-  m_renderer.add_layer("text", "text", true, 2);
-  m_renderer.add_layer("ui-quad", "world", true, 10);
-  m_renderer.add_layer("ui-text", "text", true, 10);
+  m_renderer.add_layer("quad", "world", 1);
+  m_renderer.add_layer("text", "text", 2);
+  m_renderer.add_layer("ui-quad", "world", 10);
+  m_renderer.add_layer("ui-text", "text", 10);
 
   load_world("./world.dl");
   m_world.load("./data/world/test_map.json");
@@ -130,7 +130,9 @@ void Gameplay::render()
     return;
   }
 
+  m_renderer.push_matrix("world", m_camera.get_view_matrix());
   m_render_system.render(m_registry, m_renderer, m_camera);
+  m_renderer.pop_matrix("world");
   m_ui_manager.render(m_renderer);
 }
 

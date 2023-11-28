@@ -32,12 +32,12 @@ class Renderer
   void batch(
       const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z);
   void render(const Camera& camera);
-  void add_layer(const std::string& layer_id,
-                 const std::string shader_id,
-                 const bool ignore_camera = false,
-                 const int priority = 0);
+  void add_layer(const std::string& layer_id, const std::string shader_id, const int priority = 0);
   void enable_depth_test();
   void disable_depth_test();
+  void push_matrix(const std::string& layer_id, const glm::mat4& matrix);
+  const glm::mat4 pop_matrix(const std::string& layer_id);
+  const glm::mat4& peek_matrix(const std::string& layer_id);
 
   std::shared_ptr<Texture> get_texture(const std::string& resource_id);
   inline bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
