@@ -14,6 +14,8 @@ class Label : public UIComponent
 
   Label() : UIComponent(ComponentType::Text) {}
 
+  void render(Batch& batch);
+
  private:
 };
 

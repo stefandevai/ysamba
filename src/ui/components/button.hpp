@@ -10,6 +10,8 @@ class Button : public UIComponent
   std::function<void()> on_click{};
 
   Button();
+
+  void render(Batch& batch);
 };
 
 }  // namespace dl::ui

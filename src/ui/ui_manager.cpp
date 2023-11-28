@@ -36,18 +36,7 @@ void UIManager::render(Renderer& renderer)
 
   for (auto& c : m_components)
   {
-    auto& component = c.second;
-
-    if (component->type == ComponentType::Text)
-    {
-      auto label = dynamic_pointer_cast<Label>(component);
-      m_batch->text(label->text, label->position.x, label->position.y, 0);
-    }
-    else if (component->type == ComponentType::Quad)
-    {
-      auto container = dynamic_pointer_cast<Container>(component);
-      m_batch->quad(container->quad, container->position.x, container->position.y, 0);
-    }
+    c.second->render(*m_batch);
   }
 }
 

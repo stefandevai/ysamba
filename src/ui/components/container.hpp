@@ -12,6 +12,8 @@ class Container : public UIComponent
   std::shared_ptr<Quad> quad;
 
   Container(const int width, const int height, const std::string& color);
+
+  void render(Batch& batch);
 };
 
 }  // namespace dl::ui

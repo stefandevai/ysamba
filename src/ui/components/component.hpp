@@ -5,6 +5,11 @@
 #include "./types.hpp"
 #include "core/maths/vector.hpp"
 
+namespace dl
+{
+class Batch;
+}
+
 namespace dl::ui
 {
 class UIComponent
@@ -16,6 +21,8 @@ class UIComponent
 
   UIComponent(ComponentType type) : type(type) {}
   virtual ~UIComponent() {}
+
+  virtual void render(Batch& batch) = 0;
 };
 
 }  // namespace dl::ui
