@@ -13,7 +13,7 @@ class Container : public UIComponent
 
   Container(const int width, const int height, const std::string& color);
 
-  void render(Batch& batch);
+  void render(const std::shared_ptr<Batch> batch);
 };
 
 }  // namespace dl::ui

@@ -15,6 +15,7 @@ Text::Text(const std::string text,
            const bool is_static)
     : value(text), typeface(typeface), color(color), m_font_size(font_size), m_is_static(is_static)
 {
+  initialize();
 }
 
 void Text::initialize()
@@ -74,7 +75,19 @@ void Text::update()
     char_pos_x += (ch.ax >> 6) * scale;
   }
 
-  m_width = char_pos_x;
-  m_height = m_font->get_max_character_top() * scale;
+  m_size.x = char_pos_x;
+  m_size.y = m_font->get_max_character_top() * scale;
+}
+
+void Text::set_typeface(const std::string& typeface)
+{
+  this->typeface = typeface;
+  initialize();
+}
+
+void Text::set_text(const std::string& text)
+{
+  value = text;
+  update();
 }
 }  // namespace dl

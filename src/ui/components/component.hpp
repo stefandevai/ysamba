@@ -22,7 +22,8 @@ class UIComponent
   UIComponent(ComponentType type) : type(type) {}
   virtual ~UIComponent() {}
 
-  virtual void render(Batch& batch) = 0;
+  virtual void update(const std::shared_ptr<Batch> batch);
+  virtual void render(const std::shared_ptr<Batch> batch);
 };
 
 }  // namespace dl::ui

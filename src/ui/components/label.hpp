@@ -12,9 +12,9 @@ class Label : public UIComponent
   Text text;
   TextStyle style;
 
-  Label() : UIComponent(ComponentType::Text) {}
+  Label(const std::string& text, const std::string& typeface = "font-1980");
 
-  void render(Batch& batch);
+  void render(const std::shared_ptr<Batch> batch);
 
  private:
 };

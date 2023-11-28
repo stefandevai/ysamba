@@ -6,7 +6,6 @@
 
 namespace dl
 {
-class Renderer;
 class Batch;
 }  // namespace dl
 
@@ -16,13 +15,13 @@ class UIManager
 {
  public:
   UIManager();
-  void load(const std::shared_ptr<Batch>& batch);
+  void load(std::shared_ptr<Batch> batch);
 
   uint32_t add_component(const std::shared_ptr<UIComponent>& component);
   void remove_component(const uint32_t id);
 
   void update();
-  void render(Renderer& renderer);
+  void render();
 
  private:
   std::map<uint32_t, std::shared_ptr<UIComponent>> m_components;

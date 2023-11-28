@@ -54,17 +54,23 @@ void Gameplay::load()
   // TEMP
   const auto& batch = m_renderer.get_layer("ui");
   m_ui_manager.load(batch);
-  auto label = std::make_shared<ui::Label>();
-  label->text.value = "TESTING UI";
-  label->text.typeface = "font-1980";
-  label->position.x = 80;
-  label->position.y = 80;
-  m_ui_manager.add_component(label);
+  /* auto label = std::make_shared<ui::Label>(); */
+  /* label->text.value = "TESTING UI"; */
+  /* label->text.typeface = "font-1980"; */
+  /* label->position.x = 80; */
+  /* label->position.y = 80; */
+  /* m_ui_manager.add_component(label); */
 
-  auto container = std::make_shared<ui::Container>(100, 100, "#1b2420aa");
-  container->position.x = 100;
-  container->position.y = 100;
+  auto container = std::make_shared<ui::Container>(160, 110, "#1b2420aa");
+  container->position.x = 500;
+  container->position.y = 500;
+
+  auto button = std::make_shared<ui::Button>("CLICK", Vector3i{30, 30, 0}, Vector2i{100, 50});
+  button->on_click = []() { spdlog::warn("CLICKED HERE!"); };
+
+  container->children.push_back(button);
   m_ui_manager.add_component(container);
+  /* m_ui_manager.add_component(button); */
   // TEMP
 
   m_has_loaded = true;
@@ -85,8 +91,6 @@ void Gameplay::update()
   {
     m_update_input(m_game_context);
   }
-
-  m_ui_manager.update();
 
   const auto delta = m_game_context.clock->delta;
 
@@ -120,6 +124,8 @@ void Gameplay::update()
   {
     delay -= delta;
   }
+
+  m_ui_manager.update();
 }
 
 void Gameplay::render()
@@ -130,11 +136,10 @@ void Gameplay::render()
   }
 
   m_renderer.push_matrix("world", m_camera.get_view_matrix());
-
   m_render_system.render(m_registry, m_renderer, m_camera);
-  m_ui_manager.render(m_renderer);
-
   m_renderer.pop_matrix("world");
+
+  m_ui_manager.render();
 }
 
 void Gameplay::save_world(const std::string& file_path)

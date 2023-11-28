@@ -11,7 +11,7 @@ namespace dl::ui
 {
 UIManager::UIManager() {}
 
-void UIManager::load(const std::shared_ptr<Batch>& batch) { m_batch = batch; }
+void UIManager::load(std::shared_ptr<Batch> batch) { m_batch = batch; }
 
 uint32_t UIManager::add_component(const std::shared_ptr<UIComponent>& component)
 {
@@ -22,9 +22,7 @@ uint32_t UIManager::add_component(const std::shared_ptr<UIComponent>& component)
 
 void UIManager::remove_component(const uint32_t id) { m_components.erase(id); }
 
-void UIManager::update() {}
-
-void UIManager::render(Renderer& renderer)
+void UIManager::update()
 {
   if (m_batch == nullptr)
   {
@@ -32,11 +30,23 @@ void UIManager::render(Renderer& renderer)
     return;
   }
 
-  renderer.disable_depth_test();
-
-  for (auto& c : m_components)
+  for (auto c : m_components)
   {
-    c.second->render(*m_batch);
+    c.second->update(m_batch);
+  }
+}
+
+void UIManager::render()
+{
+  if (m_batch == nullptr)
+  {
+    spdlog::warn("No batch loaded in UI Manager");
+    return;
+  }
+
+  for (auto c : m_components)
+  {
+    c.second->render(m_batch);
   }
 }
 
