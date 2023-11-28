@@ -54,6 +54,8 @@ void Camera::set_frustrum(const float left, const float right, const float botto
   m_size.x = std::abs(right - left);
   m_size.y = std::abs(top - bottom);
 
+  m_projection = glm::ortho(m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far);
+
   if (m_tile_size.x > 0 && m_tile_size.y > 0)
   {
     m_size_in_tiles.x = std::ceil(m_size.x / m_tile_size.x);

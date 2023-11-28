@@ -18,7 +18,7 @@ namespace dl
 {
 WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
 {
-  m_renderer.add_layer("gui", "gui", 2);
+  m_renderer.add_layer("gui", "world", 2);
 }
 
 void WorldCreation::load()

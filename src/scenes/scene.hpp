@@ -22,7 +22,7 @@ class Scene
   virtual void load();
   virtual void update() = 0;
   virtual void render() = 0;
-  void render_call() { m_renderer.render(m_camera); }
+  void render_call() { m_renderer.render(); }
   void check_window_size();
   bool has_loaded() const { return m_has_loaded; }
   const std::string& get_key() const { return m_scene_key; }

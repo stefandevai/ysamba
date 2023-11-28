@@ -2,7 +2,6 @@
 
 #include <glad/glad.h>
 
-#include "./camera.hpp"
 #include "./shader_loader.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
@@ -83,7 +82,7 @@ void Renderer::batch(
   m_layers.at(layer_id)->quad(quad, x, y, z);
 }
 
-void Renderer::render(const Camera& camera)
+void Renderer::render()
 {
   for (const auto& layer : m_ordered_layers)
   {
@@ -96,7 +95,7 @@ void Renderer::render(const Camera& camera)
     assert(shader != nullptr);
 
     shader->use();
-    shader->set_mat_4("mvp", camera.get_projection_matrix() * m_default_view_matrix);
+    shader->set_mat_4("mvp", m_projection_matrix * m_default_view_matrix);
     layer->render();
   }
 }

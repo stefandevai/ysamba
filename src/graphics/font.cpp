@@ -80,6 +80,12 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
       xoffset += m_face->glyph->bitmap.width;
     }
   }
+
+  // Use the red value in the GBA channels to facilitate the work in the shader
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
+
   m_texture_atlas->unbind();
 
   FT_Done_Face(m_face);

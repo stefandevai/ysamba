@@ -15,6 +15,10 @@
 
 namespace dl
 {
+SDL_Window* Display::m_window = nullptr;
+int Display::m_width = 0;
+int Display::m_height = 0;
+
 Display::Display() {}
 
 void Display::load(const int width, const int height, const std::string& title)
@@ -80,13 +84,7 @@ Display::~Display()
 
 const Vector2i Display::get_size() const { return {m_width, m_height}; }
 
-const Vector2i Display::get_window_size() const
-{
-  int width, height;
-  SDL_GetWindowSize(m_window, &width, &height);
-
-  return {width, height};
-}
+const Vector2i Display::get_window_size() { return {m_width, m_height}; }
 
 void Display::render() { SDL_GL_SwapWindow(m_window); }
 
