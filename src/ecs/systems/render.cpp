@@ -88,7 +88,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     const auto& rectangle = registry.get<Rectangle>(entity);
 
-    renderer.batch("quad", rectangle.quad, position.x, position.y, 10);
+    renderer.batch("ui", rectangle.quad, position.x, position.y, 10);
   }
 
   auto text_view = registry.view<const Text, const Position>();
@@ -97,7 +97,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    renderer.batch("text", text, position.x, position.y, 3);
+    renderer.batch("ui", text, position.x, position.y, 3);
   }
 }
 }  // namespace dl

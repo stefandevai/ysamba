@@ -2,27 +2,9 @@
     "assets":
     [
         {
-            "id": "world",
+            "id": "default",
             "type": "shader",
-            "path": "shaders/world"
-        },
-
-        {
-            "id": "gui",
-            "type": "shader",
-            "path": "shaders/gui"
-        },
-
-        {
-            "id": "quad",
-            "type": "shader",
-            "path": "shaders/quad"
-        },
-
-        {
-            "id": "text",
-            "type": "shader",
-            "path": "shaders/text"
+            "path": "shaders/default"
         },
 
         {

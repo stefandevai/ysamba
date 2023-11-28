@@ -37,18 +37,12 @@ void UIManager::render(Renderer& renderer)
     if (component->type == ComponentType::Text)
     {
       auto label = dynamic_pointer_cast<Label>(component);
-      renderer.batch("ui-text", label->text, label->position.x, label->position.y, 0);
+      renderer.batch("ui", label->text, label->position.x, label->position.y, 0);
     }
-  }
-
-  for (auto& c : m_components)
-  {
-    auto& component = c.second;
-
-    if (component->type == ComponentType::Quad)
+    else if (component->type == ComponentType::Quad)
     {
       auto container = dynamic_pointer_cast<Container>(component);
-      renderer.batch("ui-quad", container->quad, container->position.x, container->position.y, 0);
+      renderer.batch("ui", container->quad, container->position.x, container->position.y, 0);
     }
   }
 }

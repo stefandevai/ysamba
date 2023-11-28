@@ -33,11 +33,8 @@ void Gameplay::load()
 {
   Scene::load();
 
-  m_renderer.add_layer("world", "world");
-  m_renderer.add_layer("quad", "world", 1);
-  m_renderer.add_layer("text", "world", 2);
-  m_renderer.add_layer("ui-quad", "world", 10);
-  m_renderer.add_layer("ui-text", "world", 10);
+  m_renderer.add_layer("world", "default");
+  m_renderer.add_layer("ui", "default", 10);
 
   load_world("./world.dl");
   m_world.load("./data/world/test_map.json");
