@@ -1,4 +1,4 @@
-#include "./renderer2.hpp"
+#include "./batch.hpp"
 
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
@@ -12,9 +12,9 @@
 
 namespace dl
 {
-Batch::Batch() {}
+Batch::Batch(const int priority) : priority(priority) {}
 
-Batch::Batch(std::shared_ptr<ShaderProgram> shader, const int priority) : Layer(shader, priority) { load(); }
+Batch::Batch(std::shared_ptr<ShaderProgram> shader, const int priority) : shader(shader), priority(priority) { load(); }
 
 Batch::~Batch()
 {
@@ -25,7 +25,7 @@ Batch::~Batch()
 
 void Batch::load()
 {
-  m_vertices.reserve(INDICES_SIZE);
+  m_vertices.reserve(m_indices_size);
 
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);
@@ -34,23 +34,24 @@ void Batch::load()
   glBindVertexArray(m_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-  glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE, NULL, GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(POSITION_INDEX, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)0);
-  glEnableVertexAttribArray(POSITION_INDEX);
-
-  glVertexAttribPointer(TEXCOORDS_INDEX, 2, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)offsetof(VertexData, texcoords));
-  glEnableVertexAttribArray(TEXCOORDS_INDEX);
+  glBufferData(GL_ARRAY_BUFFER, m_buffer_size, NULL, GL_DYNAMIC_DRAW);
+  glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)0);
+  glEnableVertexAttribArray(PositionIndex);
 
   glVertexAttribPointer(
-      TEXTURE_ID_INDEX, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)offsetof(VertexData, texture_id));
-  glEnableVertexAttribArray(TEXTURE_ID_INDEX);
+      TextureCoordsIndex, 2, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)offsetof(VertexData, texcoords));
+  glEnableVertexAttribArray(TextureCoordsIndex);
 
-  glVertexAttribPointer(COLOR_INDEX, 4, GL_UNSIGNED_BYTE, GL_TRUE, VERTEX_SIZE, (GLvoid*)offsetof(VertexData, color));
-  glEnableVertexAttribArray(COLOR_INDEX);
+  glVertexAttribPointer(
+      TextureIdIndex, 1, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)offsetof(VertexData, texture_id));
+  glEnableVertexAttribArray(TextureIdIndex);
+
+  glVertexAttribPointer(ColorIndex, 4, GL_UNSIGNED_BYTE, GL_TRUE, m_vertex_size, (GLvoid*)offsetof(VertexData, color));
+  glEnableVertexAttribArray(ColorIndex);
 
   GLint offset = 0;
-  GLuint indices[INDICES_SIZE];
-  for (GLuint i = 0; i < INDICES_SIZE; i += 6)
+  GLuint indices[m_indices_size];
+  for (GLuint i = 0; i < m_indices_size; i += 6)
   {
     indices[i] = offset;
     indices[i + 1] = offset + 1;
@@ -95,17 +96,9 @@ void Batch::render()
   m_vertices_index = 0;
 }
 
-void Batch::emplace(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z)
+void Batch::emplace(const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
 {
-  assert(m_index_count <= INDICES_SIZE);
-
-  const auto sprite = std::dynamic_pointer_cast<Sprite>(renderable);
-
-  if (sprite == nullptr)
-  {
-    spdlog::critical("Could not cast Renderable to Sprite");
-    return;
-  }
+  assert(m_index_count <= m_indices_size);
 
   const glm::vec2 size = sprite->get_size();
   const std::array<glm::vec2, 4> texcoords = sprite->get_texcoords();
@@ -216,17 +209,9 @@ void Batch::emplace(const std::shared_ptr<Renderable>& renderable, const double 
   m_index_count += 6;
 }
 
-void Batch::quad(const std::shared_ptr<Renderable>& renderable, const double x, const double y, const double z)
+void Batch::quad(const std::shared_ptr<Quad>& quad, const double x, const double y, const double z)
 {
-  assert(m_index_count <= INDICES_SIZE);
-
-  const auto quad = std::dynamic_pointer_cast<Quad>(renderable);
-
-  if (quad == nullptr)
-  {
-    spdlog::critical("Could not cast Renderable to Quad");
-    return;
-  }
+  assert(m_index_count <= m_indices_size);
 
   const auto color = quad->color.int_color;
   auto general_transform = glm::mat4(1.0f);

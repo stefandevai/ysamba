@@ -16,7 +16,7 @@ void HomeMenu::load()
 {
   Scene::load();
 
-  m_renderer.add_layer("text", "text", Renderer::LayerType::Sprite, true, 2);
+  m_renderer.add_layer("text", "text", true, 2);
 
   const auto game_title = m_lua.get_variable<std::string>("game_title");
   const auto instructions = m_lua.get_variable<std::string>("instructions");
@@ -59,9 +59,7 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.init("text");
   m_renderer.batch("text", m_game_title, 60, 60, 0);
   m_renderer.batch("text", m_instructions, 60, 108, 0);
-  m_renderer.finalize("text");
 }
 }  // namespace dl

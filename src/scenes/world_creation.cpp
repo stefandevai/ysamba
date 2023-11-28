@@ -18,7 +18,7 @@ namespace dl
 {
 WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
 {
-  m_renderer.add_layer("gui", "gui", Renderer::LayerType::Sprite, true, 2);
+  m_renderer.add_layer("gui", "gui", true, 2);
 }
 
 void WorldCreation::load()
@@ -90,9 +90,7 @@ void WorldCreation::render()
     m_should_update_world_representation = false;
   }
 
-  m_renderer.init("gui");
   m_renderer.batch("gui", m_world_sprite, 0, 0, 0);
-  m_renderer.finalize("gui");
 }
 
 /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "./layer.hpp"
+#include "./batch.hpp"
 #include "./quad.hpp"
 
 namespace dl
@@ -21,15 +21,8 @@ class Texture;
 class Renderer
 {
  public:
-  enum class LayerType
-  {
-    Sprite,
-    Quad,
-  };
-
   Renderer(AssetManager& asset_manager);
 
-  void init(const std::string& layer_id);
   void batch(const std::string& layer_id,
              const std::shared_ptr<Sprite>& sprite,
              const double x,
@@ -38,11 +31,9 @@ class Renderer
   void batch(const std::string& layer_id, Text& text, const double x, const double y, const double z);
   void batch(
       const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z);
-  void finalize(const std::string& layer_id);
   void render(const Camera& camera);
   void add_layer(const std::string& layer_id,
                  const std::string shader_id,
-                 const LayerType layer_type = LayerType::Sprite,
                  const bool ignore_camera = false,
                  const int priority = 0);
   void enable_depth_test();
@@ -52,10 +43,10 @@ class Renderer
   inline bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
 
  private:
-  using LayerMap = std::map<std::string, std::shared_ptr<Layer>>;
+  using LayerMap = std::map<std::string, std::shared_ptr<Batch>>;
 
   AssetManager& m_asset_manager;
-  std::vector<std::shared_ptr<Layer>> m_ordered_layers;
+  std::vector<std::shared_ptr<Batch>> m_ordered_layers;
   LayerMap m_layers;
   glm::mat4 m_default_model_matrix = glm::mat4(1.0f);
   glm::mat4 m_default_view_matrix =

@@ -13,7 +13,7 @@
 #include "ecs/systems/physics.hpp"
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/society.hpp"
-#include "graphics/renderer2.hpp"
+#include "graphics/batch.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 

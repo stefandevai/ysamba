@@ -29,7 +29,6 @@ void UIManager::update() {}
 void UIManager::render(Renderer& renderer)
 {
   renderer.disable_depth_test();
-  renderer.init("ui-text");
 
   for (auto& c : m_components)
   {
@@ -42,10 +41,6 @@ void UIManager::render(Renderer& renderer)
     }
   }
 
-  renderer.finalize("ui-text");
-
-  renderer.init("ui-quad");
-
   for (auto& c : m_components)
   {
     auto& component = c.second;
@@ -56,8 +51,6 @@ void UIManager::render(Renderer& renderer)
       renderer.batch("ui-quad", container->quad, container->position.x, container->position.y, 0);
     }
   }
-
-  renderer.finalize("ui-quad");
 }
 
 }  // namespace dl::ui

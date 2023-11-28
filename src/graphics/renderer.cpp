@@ -2,10 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "./batch2d.hpp"
-#include "./batch_quad.hpp"
 #include "./camera.hpp"
-#include "./renderer2.hpp"
 #include "./shader_loader.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
@@ -19,23 +16,13 @@ Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager)
 
 void Renderer::add_layer(const std::string& layer_id,
                          const std::string shader_id,
-                         const LayerType layer_type,
                          const bool ignore_camera,
                          const int priority)
 {
   const auto shader = m_asset_manager.get<ShaderProgram>(shader_id);
-  std::shared_ptr<Layer> layer;
+  std::shared_ptr<Batch> layer;
 
   layer.reset(new Batch(shader, priority));
-
-  /* switch (layer_type) */
-  /* { */
-  /* case LayerType::Sprite: */
-  /*   break; */
-  /* case LayerType::Quad: */
-  /*   layer.reset(new BatchQuad(shader, priority)); */
-  /*   break; */
-  /* } */
 
   layer->set_ignore_camera(ignore_camera);
   m_layers.emplace(layer_id, layer);
@@ -50,8 +37,6 @@ std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
 {
   return m_asset_manager.get<Texture>(resource_id);
 }
-
-void Renderer::init(const std::string& layer_id) { /* m_layers.at(layer_id)->init_emplacing(); */ }
 
 void Renderer::batch(
     const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
@@ -106,8 +91,6 @@ void Renderer::batch(
   layer->quad(quad, x, y, z);
 }
 
-void Renderer::finalize(const std::string& layer_id) { /* m_layers.at(layer_id)->finalize_emplacing(); */ }
-
 void Renderer::render(const Camera& camera)
 {
   for (const auto& layer : m_ordered_layers)
@@ -123,11 +106,11 @@ void Renderer::render(const Camera& camera)
 
     if (layer->get_ignore_camera())
     {
-      shader->set_mat_4("mvp", camera.get_projection_matrix() * m_default_view_matrix * m_default_model_matrix);
+      shader->set_mat_4("mvp", camera.get_projection_matrix() * m_default_view_matrix);
     }
     else
     {
-      shader->set_mat_4("mvp", camera.get_projection_matrix() * camera.get_view_matrix() * m_default_model_matrix);
+      shader->set_mat_4("mvp", camera.get_projection_matrix() * camera.get_view_matrix());
     }
 
     layer->render();

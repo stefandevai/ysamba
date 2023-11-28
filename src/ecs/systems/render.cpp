@@ -27,8 +27,6 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
   const auto& tile_size = camera.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
 
-  renderer.init("world");
-
   for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
   {
     for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j)
@@ -81,11 +79,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     renderer.batch("world", visibility.sprite, position_x, position_y, visibility.layer_z);
   }
 
-  renderer.finalize("world");
-
   glDisable(GL_DEPTH_TEST);
-
-  renderer.init("quad");
 
   auto quad_view = registry.view<const Position, const Rectangle>();
 
@@ -97,10 +91,6 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     renderer.batch("quad", rectangle.quad, position.x, position.y, 10);
   }
 
-  renderer.finalize("quad");
-
-  renderer.init("text");
-
   auto text_view = registry.view<const Text, const Position>();
   for (auto entity : text_view)
   {
@@ -109,6 +99,5 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 
     renderer.batch("text", text, position.x, position.y, 3);
   }
-  renderer.finalize("text");
 }
 }  // namespace dl
