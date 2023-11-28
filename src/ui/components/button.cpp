@@ -4,7 +4,6 @@
 
 #include "./container.hpp"
 #include "./label.hpp"
-#include "core/input_manager.hpp"
 #include "graphics/batch.hpp"
 
 namespace dl::ui
@@ -26,21 +25,24 @@ Button::Button(const std::string& text, const Vector3i& position, const Vector2i
   children.push_back(container);
 }
 
-void Button::update(const std::shared_ptr<Batch> batch)
+void Button::update(std::vector<glm::mat4>& matrix_stack)
 {
-  const auto& input_manager = InputManager::get_instance();
+  const auto& matrix = matrix_stack.back();
+  const auto translate = glm::translate(matrix, glm::vec3(position.x, position.y, position.z));
 
   if (position.x != 0 && position.y != 0)
   {
-    auto translate = glm::translate(glm::mat4(1), glm::vec3(position.x, position.y, position.z));
-    batch->push_matrix(translate);
+    matrix_stack.push_back(translate);
   }
 
-  if (input_manager->is_clicking(InputManager::MouseButton::Left))
+  const auto top_left = translate * glm::vec4(0.f, 0.f, 1.f, 1.f);
+
+  absolute_position.x = top_left.x;
+  absolute_position.y = top_left.y;
+
+  if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = input_manager->get_mouse_position();
-    const auto& matrix = batch->peek_matrix();
-    const auto top_left = matrix * glm::vec4(0.f, 0.f, 1.f, 1.f);
+    const auto& mouse_position = m_input_manager->get_mouse_position();
 
     if (mouse_position.x > top_left.x && mouse_position.x < top_left.x + m_size.x && mouse_position.y > top_left.y &&
         mouse_position.y < top_left.y + m_size.y)
@@ -51,12 +53,13 @@ void Button::update(const std::shared_ptr<Batch> batch)
 
   for (auto& child : children)
   {
-    child->update(batch);
+    child->update(matrix_stack);
   }
 
   if (position.x != 0 && position.y != 0)
   {
-    batch->pop_matrix();
+    matrix_stack.pop_back();
   }
 }
+
 }  // namespace dl::ui

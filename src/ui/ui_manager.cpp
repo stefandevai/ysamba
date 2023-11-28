@@ -9,14 +9,18 @@
 
 namespace dl::ui
 {
-UIManager::UIManager() {}
+UIManager::UIManager() { m_matrix_stack.push_back(glm::mat4(1)); }
 
-void UIManager::load(std::shared_ptr<Batch> batch) { m_batch = batch; }
+UIManager::~UIManager()
+{
+  m_matrix_stack.clear();
+  m_components.clear();
+}
 
 uint32_t UIManager::add_component(const std::shared_ptr<UIComponent>& component)
 {
-  auto id = m_identifier();
-  m_components[id] = component;
+  const auto id = m_identifier();
+  m_components.insert({id, component});
   return id;
 }
 
@@ -24,29 +28,23 @@ void UIManager::remove_component(const uint32_t id) { m_components.erase(id); }
 
 void UIManager::update()
 {
-  if (m_batch == nullptr)
+  for (auto& c : m_components)
   {
-    spdlog::warn("No batch loaded in UI Manager");
-    return;
-  }
-
-  for (auto c : m_components)
-  {
-    c.second->update(m_batch);
+    c.second->update(m_matrix_stack);
   }
 }
 
-void UIManager::render()
+void UIManager::render(std::shared_ptr<Batch> batch)
 {
-  if (m_batch == nullptr)
+  if (batch == nullptr)
   {
     spdlog::warn("No batch loaded in UI Manager");
     return;
   }
 
-  for (auto c : m_components)
+  for (auto& c : m_components)
   {
-    c.second->render(m_batch);
+    c.second->render(batch);
   }
 }
 

@@ -52,8 +52,8 @@ void Gameplay::load()
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   // TEMP
-  const auto& batch = m_renderer.get_layer("ui");
-  m_ui_manager.load(batch);
+  /* auto batch = m_renderer.get_layer("ui"); */
+  /* m_ui_manager.load(batch); */
   /* auto label = std::make_shared<ui::Label>(); */
   /* label->text.value = "TESTING UI"; */
   /* label->text.typeface = "font-1980"; */
@@ -91,6 +91,7 @@ void Gameplay::update()
   {
     m_update_input(m_game_context);
   }
+  m_ui_manager.update();
 
   const auto delta = m_game_context.clock->delta;
 
@@ -124,8 +125,6 @@ void Gameplay::update()
   {
     delay -= delta;
   }
-
-  m_ui_manager.update();
 }
 
 void Gameplay::render()
@@ -139,7 +138,7 @@ void Gameplay::render()
   m_render_system.render(m_registry, m_renderer, m_camera);
   m_renderer.pop_matrix("world");
 
-  m_ui_manager.render();
+  m_ui_manager.render(m_renderer.get_layer("ui"));
 }
 
 void Gameplay::save_world(const std::string& file_path)

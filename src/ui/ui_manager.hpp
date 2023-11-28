@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <map>
 
 #include "./components/component.hpp"
@@ -15,21 +16,17 @@ class UIManager
 {
  public:
   UIManager();
-  void load(std::shared_ptr<Batch> batch);
+  ~UIManager();
 
   uint32_t add_component(const std::shared_ptr<UIComponent>& component);
   void remove_component(const uint32_t id);
 
   void update();
-  void render();
+  void render(std::shared_ptr<Batch> batch);
 
  private:
   std::map<uint32_t, std::shared_ptr<UIComponent>> m_components;
-  std::shared_ptr<Batch> m_batch = nullptr;
-  /* ShaderLoader m_gui_shader{"./data/shaders/gui"}; */
-  /* ShaderLoader m_text_shader{"./data/shaders/text"}; */
-  /* Batch2D m_sprite_batch{}; */
-  /* BatchQuad m_quad_batch{}; */
+  std::vector<glm::mat4> m_matrix_stack;
 
   static uint32_t m_identifier() noexcept
   {
