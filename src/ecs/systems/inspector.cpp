@@ -2,14 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ecs/components/biology.hpp"
-#include "ecs/components/position.hpp"
-#include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/velocity.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/text.hpp"
 #include "ui/components/inspector.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
