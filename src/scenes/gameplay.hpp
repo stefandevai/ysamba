@@ -54,8 +54,8 @@ class Gameplay : public Scene
   SocietySystem m_society_system{};
   HarvestSystem m_harvest_system{m_world};
   BreakSystem m_break_system{m_world};
-  InspectorSystem m_inspector_system{m_world};
-  ActionSystem m_action_system{m_world};
+  InspectorSystem m_inspector_system{m_world, m_ui_manager};
+  ActionSystem m_action_system{m_world, m_ui_manager};
 
   void m_update_input(GameContext& game_context);
 };

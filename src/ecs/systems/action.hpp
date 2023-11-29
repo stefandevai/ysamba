@@ -4,6 +4,11 @@
 
 #include "core/input_manager.hpp"
 
+namespace dl::ui
+{
+class UIManager;
+}
+
 namespace dl
 {
 class World;
@@ -12,7 +17,7 @@ class Camera;
 class ActionSystem
 {
  public:
-  ActionSystem(World& world);
+  ActionSystem(World& world, ui::UIManager& ui_manager);
   void update(entt::registry& registry, const Camera& camera);
 
  private:
@@ -24,6 +29,7 @@ class ActionSystem
   };
 
   World& m_world;
+  ui::UIManager& m_ui_manager;
   entt::entity m_menu_quad = entt::null;
   entt::entity m_menu_text = entt::null;
   entt::entity m_select_target_text = entt::null;

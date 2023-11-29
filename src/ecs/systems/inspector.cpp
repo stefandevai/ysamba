@@ -10,11 +10,16 @@
 #include "ecs/components/velocity.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
+#include "ui/components/inspector.hpp"
+#include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-InspectorSystem::InspectorSystem(World& world) : m_world(world) {}
+InspectorSystem::InspectorSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
+{
+  m_inspector = std::make_shared<ui::Inspector>();
+}
 
 void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 {
@@ -35,61 +40,42 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
   if (registry.valid(entity))
   {
-    m_update_inspector_content(entity, registry, camera);
+    m_update_inspector_content(entity, registry);
   }
-  else if (m_is_valid(registry))
+  else if (m_is_valid())
   {
-    m_destroy_inspector(registry);
+    m_destroy_inspector();
   }
 
   m_last_mouse_position = mouse_position;
   m_last_camera_position = camera_position;
 }
 
-void InspectorSystem::m_update_inspector_content(const entt::entity entity,
-                                                 entt::registry& registry,
-                                                 const Camera& camera)
+void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt::registry& registry)
 {
-  if (!m_is_valid(registry))
+  if (!m_is_valid())
   {
-    m_inspector_quad = registry.create();
-    m_inspector_text = registry.create();
-  }
-
-  const auto& camera_size = camera.get_size();
-
-  if (!registry.all_of<Rectangle, Position>(m_inspector_quad))
-  {
-    registry.emplace<Rectangle>(m_inspector_quad, 300, 100, "#1b2420aa");
-    registry.emplace<Position>(m_inspector_quad, camera_size.x - 30.0 - 300.0, 30.0, 10.0);
-  }
-  if (!registry.all_of<Text, Position>(m_inspector_text))
-  {
-    registry.emplace<Text>(m_inspector_text, "");
-    registry.emplace<Position>(m_inspector_text, camera_size.x - 15.0 - 300.0, 45.0, 10.0);
+    m_inspector_id = m_ui_manager.add_component(m_inspector);
   }
 
   if (registry.all_of<SocietyAgent>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
-
-    auto& text = registry.get<Text>(m_inspector_text);
-    text.set_text(agent.name);
-
+    m_inspector->set_content(agent.name);
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
 }
 
-void InspectorSystem::m_destroy_inspector(entt::registry& registry)
+void InspectorSystem::m_destroy_inspector()
 {
-  registry.destroy(m_inspector_quad);
-  registry.destroy(m_inspector_text);
+  if (m_inspector_id >= 0)
+  {
+    m_ui_manager.remove_component(m_inspector_id);
+    m_inspector_id = -1;
+  }
 }
 
-bool InspectorSystem::m_is_valid(const entt::registry& registry) const
-{
-  return registry.valid(m_inspector_quad) && registry.valid(m_inspector_text);
-}
+bool InspectorSystem::m_is_valid() const { return m_inspector_id >= 0 && m_inspector != nullptr; }
 
 }  // namespace dl

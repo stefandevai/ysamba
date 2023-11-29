@@ -4,6 +4,11 @@
 #include "graphics/quad.hpp"
 #include "ui/style/container.hpp"
 
+namespace dl
+{
+struct Vector2i;
+}
+
 namespace dl::ui
 {
 class Container : public UIComponent
@@ -11,7 +16,7 @@ class Container : public UIComponent
  public:
   std::shared_ptr<Quad> quad;
 
-  Container(const int width, const int height, const std::string& color);
+  Container(const Vector2i& size, const std::string& color);
 
   void render(const std::shared_ptr<Batch> batch);
 };

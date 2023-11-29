@@ -4,7 +4,7 @@
 
 namespace dl::ui
 {
-class ContainerStyle : public Style
+struct ContainerStyle : public Style
 {
   double border_radius;
 };

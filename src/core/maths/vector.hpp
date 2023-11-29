@@ -15,6 +15,7 @@ struct Vector2i
   int x;
   int y;
 
+  Vector2i() {}
   Vector2i(const int x, const int y) : x(x), y(y) {}
   Vector2i(const double x, const double y) : x(static_cast<int>(x)), y(static_cast<int>(y)) {}
 

@@ -52,25 +52,15 @@ void Gameplay::load()
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   // TEMP
-  /* auto batch = m_renderer.get_layer("ui"); */
-  /* m_ui_manager.load(batch); */
-  /* auto label = std::make_shared<ui::Label>(); */
-  /* label->text.value = "TESTING UI"; */
-  /* label->text.typeface = "font-1980"; */
-  /* label->position.x = 80; */
-  /* label->position.y = 80; */
-  /* m_ui_manager.add_component(label); */
+  /* auto container = std::make_shared<ui::Container>(Vector2i{160, 110}, "#1b2420aa"); */
+  /* container->position.x = 500; */
+  /* container->position.y = 500; */
 
-  auto container = std::make_shared<ui::Container>(160, 110, "#1b2420aa");
-  container->position.x = 500;
-  container->position.y = 500;
+  /* auto button = std::make_shared<ui::Button>("CLICK", Vector3i{30, 30, 0}, Vector2i{100, 50}); */
+  /* button->on_click = []() { spdlog::warn("CLICKED HERE!"); }; */
 
-  auto button = std::make_shared<ui::Button>("CLICK", Vector3i{30, 30, 0}, Vector2i{100, 50});
-  button->on_click = []() { spdlog::warn("CLICKED HERE!"); };
-
-  container->children.push_back(button);
-  m_ui_manager.add_component(container);
-  /* m_ui_manager.add_component(button); */
+  /* container->children.push_back(button); */
+  /* m_ui_manager.add_component(container); */
   // TEMP
 
   m_has_loaded = true;

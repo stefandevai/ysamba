@@ -11,13 +11,14 @@
 #include "ecs/components/velocity.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
+#include "ui/ui_manager.hpp"
 #include "world/tile_flag.hpp"
 #include "world/tile_target.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-ActionSystem::ActionSystem(World& world) : m_world(world) {}
+ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager) {}
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)
 {

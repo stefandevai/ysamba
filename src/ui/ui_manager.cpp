@@ -30,7 +30,7 @@ void UIManager::update()
 {
   for (auto& c : m_components)
   {
-    c.second->update(m_matrix_stack);
+    c.second->update_component(m_matrix_stack);
   }
 }
 
