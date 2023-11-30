@@ -11,6 +11,7 @@
 #include "ecs/systems/harvest.hpp"
 #include "ecs/systems/inspector.hpp"
 #include "ecs/systems/physics.hpp"
+#include "ecs/systems/pickup.hpp"
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/society.hpp"
 #include "graphics/batch.hpp"
@@ -56,6 +57,7 @@ class Gameplay : public Scene
   BreakSystem m_break_system{m_world};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager};
+  PickupSystem m_pickup_system{m_world};
 
   void m_update_input(GameContext& game_context);
 };

@@ -1,0 +1,12 @@
+[
+    {
+        "id": 0,
+        "name": "human body",
+        "slots": [
+            {
+                "id": 0,
+                "name": "left hand"
+            }
+        ]
+    }
+]

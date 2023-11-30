@@ -102,3 +102,14 @@ TODO:
 - Honey
 - Weird rock with spiral shapes (fossil)
 - Learn recipies with other societies
+
+# Inventory
+- CarriedItems and WearedItems components to attach to people
+- They contain a vector of entt::entities
+- Carried and Weared components added to the items
+- The pickup system will use item data (where can it be weared or carried?), and slot data (what kind of body parts the creature has to carry or wear?),
+  and person data (does the person have all the arms?) to evaluate if an item can be carried or weared
+
+## Society inventory
+- Define a storage area and all items in this area appear in the society inventory
+- Also get all Selectable, CarriedItems and WearedItems components to be able to display all items

@@ -20,6 +20,7 @@ void GameSystem::update() {}
 
 void GameSystem::m_add_to_spatial_hash(entt::registry& registry, entt::entity entity)
 {
+  spdlog::debug("ADDED! {}", (uint32_t)entity);
   auto& position = registry.get<Position>(entity);
   const auto index = m_world.spatial_hash.add(entity, std::round(position.x), std::round(position.y));
   position.spatial_hash_index = index;

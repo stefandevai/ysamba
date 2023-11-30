@@ -78,6 +78,25 @@ std::vector<entt::entity> SpatialHash::get(const int x, const int y)
   return objects;
 }
 
+bool SpatialHash::has(entt::entity entity, const int x, const int y)
+{
+  const auto search_keys = m_get_search_keys(x, y);
+
+  for (const auto& key : search_keys)
+  {
+    auto range = m_hash.equal_range(key);
+    for (auto i = range.first; i != range.second; ++i)
+    {
+      if (i->second == entity)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 std::vector<entt::entity> SpatialHash::get_if(const Vector2i& position, TestFunction test_function)
 {
   std::vector<entt::entity> objects;

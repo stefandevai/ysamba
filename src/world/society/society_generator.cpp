@@ -106,6 +106,7 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
     registry.emplace<Position>(entity, position);
     member.visibility.layer_z = position.z + renderer::layer_z_offset_characters;
     registry.emplace<Visibility>(entity, member.visibility);
+    registry.emplace<WearedItems>(entity, member.weared_items);
     registry.emplace<Selectable>(entity);
   }
 }
@@ -147,8 +148,9 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   const auto agent = SocietyAgent{parameters.member_id, society.id, parameters.name, SocialClass::None, Metier::None};
   const auto biology = Biology{member->sex, parameters.speed};
   const auto visibility = Visibility{"spritesheet-characters", parameters.texture_frame, 0};
+  const auto weared_items = WearedItems{};
 
-  return SocietyGenerator::MemberComponents{agent, biology, visibility};
+  return SocietyGenerator::MemberComponents{agent, biology, visibility, weared_items};
 }
 
 }  // namespace dl
