@@ -23,6 +23,7 @@ class SDLInputWrapper
   inline std::pair<bool, bool> get_mouse_state() { return m_mouse_state; };
   const Vector2i& get_mouse_position() { return m_mouse_position; };
   bool window_size_changed() const { return m_window_size_changed; }
+  const Vector2i& get_scroll() const { return m_scroll; }
   void set_window_size_changed(bool value) { m_window_size_changed = value; }
   bool should_quit();
   void quit();
@@ -35,6 +36,7 @@ class SDLInputWrapper
   bool m_should_quit = false;
   std::pair<bool, bool> m_mouse_state{false, false};
   Vector2i m_mouse_position{0, 0};
+  Vector2i m_scroll{0, 0};
   bool m_window_size_changed = false;
 };
 }  // namespace dl

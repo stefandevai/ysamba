@@ -25,6 +25,9 @@ void SDLInputWrapper::update()
 
   m_any_key_down = false;
 
+  m_scroll.x = 0;
+  m_scroll.y = 0;
+
   // Update key status
   SDL_Event event;
 
@@ -84,6 +87,13 @@ void SDLInputWrapper::update()
       {
         m_mouse_state.second = false;
       }
+      break;
+    }
+
+    case SDL_MOUSEWHEEL:
+    {
+      m_scroll.x = event.wheel.x;
+      m_scroll.y = event.wheel.y;
       break;
     }
 
