@@ -5,6 +5,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "ecs/components/action_harvest.hpp"
+#include "ecs/components/pickable.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/velocity.hpp"
@@ -107,6 +108,7 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
         registry.emplace<Position>(drop, target.x, target.y, target.z);
         registry.emplace<Visibility>(
             drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items);
+        registry.emplace<Pickable>(drop);
       }
 
       stop_harvesting(registry, entity, agent);

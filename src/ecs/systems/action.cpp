@@ -5,6 +5,7 @@
 #include "ecs/components/action_harvest.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/biology.hpp"
+#include "ecs/components/pickable.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
@@ -120,24 +121,20 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
       m_close_action_menu(registry);
     }
 
-    const auto& entities = m_world.spatial_hash.get(tile_x, tile_y);
+    const auto item = m_world.spatial_hash.get_by_component<Pickable>(tile_x, tile_y, registry);
 
-    for (const auto item : entities)
+    // TODO: Move whole pickup action to an idividual menu, multiple people can't take a
+    // single item in this stage of development
+    for (const auto entity : m_selected_entities)
     {
-      // TODO: Move whole pickup action to an idividual menu, multiple people can't take a
-      // single item in this stage of development
-      for (const auto entity : m_selected_entities)
-      {
-        spdlog::warn("HEREEEEEEEEEEEEEEEEEEEE");
-        const auto& position = registry.get<Position>(entity);
-        const Vector3i tile_position = {
-            static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
-        auto& action_pickup =
-            registry.emplace_or_replace<ActionPickup>(entity, ItemTarget(item, tile_x, tile_y, position.z));
-        action_pickup.target.path = m_world.get_path_between(tile_position, {tile_x, tile_y, position.z});
-        m_close_action_menu(registry);
-        return;
-      }
+      const auto& position = registry.get<Position>(entity);
+      const Vector3i tile_position = {
+          static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
+      auto& action_pickup =
+          registry.emplace_or_replace<ActionPickup>(entity, ItemTarget(item, tile_x, tile_y, position.z));
+      action_pickup.target.path = m_world.get_path_between(tile_position, {tile_x, tile_y, position.z});
+      m_close_action_menu(registry);
+      return;
     }
   }
 }

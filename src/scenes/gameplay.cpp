@@ -22,6 +22,7 @@
 #include "ui/components/button.hpp"
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
+#include "ui/components/list.hpp"
 #include "world/society/sex.hpp"
 // TEMP
 
@@ -61,6 +62,9 @@ void Gameplay::load()
 
   /* container->children.push_back(button); */
   /* m_ui_manager.add_component(container); */
+
+  const auto list = std::make_shared<ui::List>();
+  m_ui_manager.add_component(list);
   // TEMP
 
   m_has_loaded = true;

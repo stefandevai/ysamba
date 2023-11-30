@@ -78,39 +78,11 @@ void PickupSystem::update(entt::registry& registry, const double delta)
       return;
     }
 
-    spdlog::debug("PICKED! {}", (uint32_t)target.entity);
     registry.remove<Position>(target.entity);
     registry.remove<Visibility>(target.entity);
 
     auto weared_items = registry.get<WearedItems>(entity);
     weared_items.items.push_back(target.entity);
-
-    /* const auto& tile = m_world.get(target.x, target.y, target.z); */
-
-    /* if (tile.id != target.id) */
-    /* { */
-    /*   stop_pickup(registry, entity, agent); */
-    /*   return; */
-    /* } */
-
-    /* const auto& tile_data = m_world.get_tile_data(target.id); */
-
-    // Tile doesn't have any drop
-    /* if (tile_data.drop_ids.empty()) */
-    /* { */
-    /*   stop_pickup(registry, entity, agent); */
-    /*   return; */
-    /* } */
-
-    /* m_world.set(tile_data.after_removed, target.x, target.y, target.z); */
-
-    /* for (const auto id : tile_data.drop_ids) */
-    /* { */
-    /*   const auto drop = registry.create(); */
-    /*   registry.emplace<Position>(drop, target.x, target.y, target.z); */
-    /*   registry.emplace<Visibility>( */
-    /*       drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items); */
-    /* } */
 
     stop_pickup(registry, entity, agent);
   }
