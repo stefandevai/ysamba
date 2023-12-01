@@ -1,8 +1,8 @@
-#include "./pickup.hpp"
+#include "./walk.hpp"
 
 #include <spdlog/spdlog.h>
 
-#include "ecs/components/action_pickup.hpp"
+#include "ecs/components/action_walk.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/velocity.hpp"
@@ -11,30 +11,30 @@
 
 namespace dl
 {
-auto stop_pickup = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
-  registry.remove<ActionPickup>(entity);
+auto stop_walk = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
+  registry.remove<ActionWalk>(entity);
   agent.state = SocietyAgent::State::Idle;
 };
 
-PickupSystem::PickupSystem(World& world) : m_world(world) {}
+WalkSystem::WalkSystem(World& world) : m_world(world) {}
 
-void PickupSystem::update(entt::registry& registry, const double delta)
+void WalkSystem::update(entt::registry& registry, const double delta)
 {
-  auto view = registry.view<SocietyAgent, ActionPickup, const Position>();
+  auto view = registry.view<SocietyAgent, ActionWalk, const Position>();
   for (const auto entity : view)
   {
-    auto& action_pickup = registry.get<ActionPickup>(entity);
+    auto& action_walk = registry.get<ActionWalk>(entity);
     auto& agent = registry.get<SocietyAgent>(entity);
 
-    if (!registry.valid(action_pickup.target.entity))
+    if (!action_walk.target)
     {
-      stop_pickup(registry, entity, agent);
+      stop_walk(registry, entity, agent);
       continue;
     }
 
     const auto& position = registry.get<Position>(entity);
 
-    auto& target = action_pickup.target;
+    auto& target = action_walk.target;
 
     // If the target tile is not adjacent, move towards the target
     if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
@@ -42,7 +42,7 @@ void PickupSystem::update(entt::registry& registry, const double delta)
       // If the target path is empty, that means that the target disappeared.
       if (target.path.size() <= 1)
       {
-        stop_pickup(registry, entity, agent);
+        stop_walk(registry, entity, agent);
         continue;
       }
       auto current_target_position = target.path.top();
@@ -71,20 +71,7 @@ void PickupSystem::update(entt::registry& registry, const double delta)
       continue;
     }
 
-    // Check if target tile is still there
-    if (!m_world.spatial_hash.has(target.entity, target.x, target.y))
-    {
-      stop_pickup(registry, entity, agent);
-      continue;
-    }
-
-    registry.remove<Position>(target.entity);
-    registry.remove<Visibility>(target.entity);
-
-    auto weared_items = registry.get<WearedItems>(entity);
-    weared_items.items.push_back(target.entity);
-
-    stop_pickup(registry, entity, agent);
+    stop_walk(registry, entity, agent);
   }
 }
 

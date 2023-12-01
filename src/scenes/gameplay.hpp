@@ -14,6 +14,7 @@
 #include "ecs/systems/pickup.hpp"
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/society.hpp"
+#include "ecs/systems/walk.hpp"
 #include "graphics/batch.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
@@ -58,6 +59,7 @@ class Gameplay : public Scene
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager};
   PickupSystem m_pickup_system{m_world};
+  WalkSystem m_walk_system{m_world};
 
   void m_update_input(GameContext& game_context);
 };

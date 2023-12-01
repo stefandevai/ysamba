@@ -5,13 +5,12 @@
 #include "ecs/components/action_break.hpp"
 #include "ecs/components/action_harvest.hpp"
 #include "ecs/components/action_pickup.hpp"
-#include "ecs/components/biology.hpp"
+#include "ecs/components/action_walk.hpp"
 #include "ecs/components/pickable.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/velocity.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "ui/components/action_menu.hpp"
@@ -45,7 +44,7 @@ void ActionSystem::update(entt::registry& registry, const Camera& camera)
 {
   if (m_state == ActionMenuState::Open)
   {
-    m_update_action_menu(registry);
+    m_update_action_menu();
   }
   else if (m_state == ActionMenuState::Closed)
   {
@@ -57,7 +56,7 @@ void ActionSystem::update(entt::registry& registry, const Camera& camera)
   }
 }
 
-void ActionSystem::m_update_action_menu(entt::registry& registry)
+void ActionSystem::m_update_action_menu()
 {
   if (m_action_menu_id < 0)
   {
@@ -66,7 +65,7 @@ void ActionSystem::m_update_action_menu(entt::registry& registry)
 
   if (m_input_manager->poll_action("close_menu"))
   {
-    m_dispose(registry);
+    m_dispose();
   }
   else if (m_input_manager->poll_action("harvest"))
   {
@@ -84,25 +83,58 @@ void ActionSystem::m_update_action_menu(entt::registry& registry)
 
 void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
 {
-  if (m_input_manager->has_clicked(InputManager::MouseButton::Left))
+  if (m_input_manager->poll_action("open_action_menu"))
+  {
+    if (m_selected_entities.empty())
+    {
+      return;
+    }
+
+    m_state = ActionMenuState::Open;
+    m_input_manager->push_context("action_menu");
+  }
+  else if (m_input_manager->has_clicked(InputManager::MouseButton::Left))
   {
     const auto& mouse_position = m_input_manager->get_mouse_position();
     const auto& camera_position = camera.get_position();
     const auto& tile_size = camera.get_tile_size();
 
-    const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
-    const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
+    const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
+    const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-    const auto entity = m_world.spatial_hash.get_by_component<Selectable>(tile_x, tile_y, registry);
+    const auto selected_entity = m_world.spatial_hash.get_by_component<Selectable>(tile_x, tile_y, registry);
 
-    if (registry.valid(entity))
+    // If a selectable entity was clicked, toggle its selected state
+    if (registry.valid(selected_entity))
     {
-      auto& selectable = registry.get<Selectable>(entity);
-      selectable.selected = true;
-      m_selected_entities.push_back(entity);
+      auto& selectable = registry.get<Selectable>(selected_entity);
+      selectable.selected = !selectable.selected;
 
-      m_state = ActionMenuState::Open;
-      m_input_manager->push_context("action_menu");
+      if (selectable.selected)
+      {
+        registry.emplace<Rectangle>(selected_entity, 32, 32, "#5588cc88");
+        m_selected_entities.push_back(selected_entity);
+      }
+      else
+      {
+        registry.remove<Rectangle>(selected_entity);
+        m_selected_entities.erase(std::find(m_selected_entities.begin(), m_selected_entities.end(), selected_entity));
+      }
+    }
+    // If we are not selecting an entity, walk to the target
+    else if (!m_selected_entities.empty())
+    {
+      const auto& tile = m_world.get(tile_x, tile_y, 0);
+
+      for (const auto entity : m_selected_entities)
+      {
+        const auto& position = registry.get<Position>(entity);
+        const Vector3i tile_position =
+            Vector3i{static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
+        auto& action_walk =
+            registry.emplace_or_replace<ActionWalk>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
+        action_walk.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+      }
     }
   }
 }
@@ -120,7 +152,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
 
   if (m_input_manager->poll_action("close_menu"))
   {
-    m_dispose(registry);
+    m_dispose();
   }
   else if (m_input_manager->has_clicked(InputManager::MouseButton::Left))
   {
@@ -150,7 +182,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     }
     default:
     {
-      m_dispose(registry);
+      m_dispose();
       break;
     }
     }
@@ -187,18 +219,18 @@ void ActionSystem::m_close_select_target()
   }
 }
 
-void ActionSystem::m_dispose(entt::registry& registry)
+void ActionSystem::m_dispose()
 {
   m_close_action_menu();
   m_close_select_target();
 
-  for (const auto entity : m_selected_entities)
-  {
-    auto& selectable = registry.get<Selectable>(entity);
-    selectable.selected = false;
-  }
+  /* for (const auto entity : m_selected_entities) */
+  /* { */
+  /*   auto& selectable = registry.get<Selectable>(entity); */
+  /*   selectable.selected = false; */
+  /* } */
 
-  m_selected_entities.clear();
+  /* m_selected_entities.clear(); */
   m_state = ActionMenuState::Closed;
   m_input_manager->pop_context();
 }
@@ -218,7 +250,7 @@ void ActionSystem::m_select_harvest_target(const int tile_x, const int tile_y, e
           registry.emplace_or_replace<ActionHarvest>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
       action_harvest.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
     }
-    m_dispose(registry);
+    m_dispose();
   }
 }
 
@@ -243,7 +275,7 @@ void ActionSystem::m_select_pickup_target(const int tile_x, const int tile_y, en
     action_pickup.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
   }
 
-  m_dispose(registry);
+  m_dispose();
 }
 
 void ActionSystem::m_select_break_target(const int tile_x, const int tile_y, entt::registry& registry)
@@ -262,7 +294,7 @@ void ActionSystem::m_select_break_target(const int tile_x, const int tile_y, ent
       action_break.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
     }
 
-    m_dispose(registry);
+    m_dispose();
   }
 }
 

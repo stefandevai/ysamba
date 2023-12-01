@@ -49,7 +49,7 @@ void BreakSystem::update(entt::registry& registry, const double delta)
       if (target.path.size() <= 1)
       {
         stop_breaking(registry, entity, agent);
-        return;
+        continue;
       }
       auto current_target_position = target.path.top();
 
@@ -74,7 +74,7 @@ void BreakSystem::update(entt::registry& registry, const double delta)
       {
         registry.emplace<Velocity>(entity, x_dir, y_dir, 0.);
       }
-      return;
+      continue;
     }
 
     action_break.time_left -= delta;
@@ -87,7 +87,7 @@ void BreakSystem::update(entt::registry& registry, const double delta)
       if (tile.id != target.id)
       {
         stop_breaking(registry, entity, agent);
-        return;
+        continue;
       }
 
       const auto& tile_data = m_world.get_tile_data(target.id);
@@ -96,7 +96,7 @@ void BreakSystem::update(entt::registry& registry, const double delta)
       if (tile_data.drop_ids.empty())
       {
         stop_breaking(registry, entity, agent);
-        return;
+        continue;
       }
 
       m_world.set(tile_data.after_removed, target.x, target.y, target.z);

@@ -73,6 +73,14 @@ void Renderer::render()
     {
       continue;
     }
+    if (!layer->has_depth_test)
+    {
+      glDisable(GL_DEPTH_TEST);
+    }
+    else
+    {
+      glEnable(GL_DEPTH_TEST);
+    }
     if (!layer->has_scissor)
     {
       glDisable(GL_SCISSOR_TEST);

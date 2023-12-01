@@ -21,7 +21,8 @@
         "camera_move_north": ["k_up"],
         "save_world": ["k_s"],
         "load_world": ["k_l"],
-        "display_seed": ["k_e"]
+        "display_seed": ["k_e"],
+        "open_action_menu": ["k_a"]
     },
     "action_menu": {
         "close_menu": ["k_escape"],

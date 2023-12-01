@@ -79,8 +79,6 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     renderer.batch("world", visibility.sprite, position_x, position_y, visibility.layer_z);
   }
 
-  glDisable(GL_DEPTH_TEST);
-
   auto quad_view = registry.view<const Position, const Rectangle>();
 
   for (auto entity : quad_view)
@@ -88,7 +86,8 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     const auto& rectangle = registry.get<Rectangle>(entity);
 
-    renderer.batch("ui", rectangle.quad, position.x, position.y, 10);
+    renderer.batch(
+        "world", rectangle.quad, std::round(position.x) * tile_size.x, std::round(position.y) * tile_size.y, 1);
   }
 
   auto text_view = registry.view<const Text, const Position>();
@@ -97,7 +96,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    renderer.batch("ui", text, position.x, position.y, 3);
+    renderer.batch("world", text, position.x, position.y, 3);
   }
 }
 }  // namespace dl

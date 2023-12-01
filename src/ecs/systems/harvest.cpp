@@ -27,16 +27,21 @@ HarvestSystem::HarvestSystem(World& world) : m_world(world) {}
 void HarvestSystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<SocietyAgent, ActionHarvest, const Position>();
-  view.each([this, &registry, delta](auto entity, auto& agent, auto& action_harvest, const auto& position) {
+  for (const auto entity : view)
+  {
+    auto& action_harvest = registry.get<ActionHarvest>(entity);
+    auto& agent = registry.get<SocietyAgent>(entity);
+    const auto& position = registry.get<Position>(entity);
+
     if (!action_harvest.target)
     {
-      action_harvest.target = m_world.search_by_flag(tile_flag::harvestable, position.x, position.y, position.z);
+      /* action_harvest.target = m_world.search_by_flag(tile_flag::harvestable, position.x, position.y, position.z); */
 
-      if (!action_harvest.target)
-      {
-        stop_harvesting(registry, entity, agent);
-        return;
-      }
+      /* if (!action_harvest.target) */
+      /* { */
+      stop_harvesting(registry, entity, agent);
+      continue;
+      /* } */
     }
 
     auto& target = action_harvest.target;
@@ -48,7 +53,7 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       if (target.path.size() <= 1)
       {
         stop_harvesting(registry, entity, agent);
-        return;
+        continue;
       }
       auto current_target_position = target.path.top();
 
@@ -73,7 +78,7 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       {
         registry.emplace<Velocity>(entity, x_dir, y_dir, 0.);
       }
-      return;
+      continue;
     }
 
     // Harvest
@@ -87,7 +92,7 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       if (tile.id != target.id)
       {
         stop_harvesting(registry, entity, agent);
-        return;
+        continue;
       }
 
       const auto& tile_data = m_world.get_tile_data(target.id);
@@ -96,7 +101,7 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       if (tile_data.drop_ids.empty())
       {
         stop_harvesting(registry, entity, agent);
-        return;
+        continue;
       }
 
       m_world.set(tile_data.after_removed, target.x, target.y, target.z);
@@ -112,7 +117,7 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
 
       stop_harvesting(registry, entity, agent);
     }
-  });
+  }
 }
 
 }  // namespace dl
