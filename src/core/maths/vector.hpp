@@ -4,18 +4,18 @@ namespace dl
 {
 struct Vector2
 {
-  double x;
-  double y;
+  double x = 0.0;
+  double y = 0.0;
 
   bool operator==(const Vector2& rhs) { return x == rhs.x && y == rhs.y; }
 };
 
 struct Vector2i
 {
-  int x;
-  int y;
+  int x = 0;
+  int y = 0;
 
-  Vector2i() {}
+  Vector2i() : x(0), y(0) {}
   Vector2i(const int x, const int y) : x(x), y(y) {}
   Vector2i(const double x, const double y) : x(static_cast<int>(x)), y(static_cast<int>(y)) {}
 
@@ -24,9 +24,9 @@ struct Vector2i
 
 struct Vector3
 {
-  double x;
-  double y;
-  double z;
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
 
   Vector3& operator+=(const Vector3& rhs)
   {
@@ -41,9 +41,9 @@ struct Vector3
 
 struct Vector3i
 {
-  int x;
-  int y;
-  int z;
+  int x = 0;
+  int y = 0;
+  int z = 0;
 
   Vector3i() : x(0), y(0), z(0) {}
 
@@ -57,10 +57,10 @@ struct Vector3i
 
 struct Vector4i
 {
-  int x;
-  int y;
-  int z;
-  int w;
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  int w = 0;
 
   Vector4i() : x(0), y(0), z(0), w(0) {}
 

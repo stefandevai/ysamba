@@ -19,7 +19,6 @@ UIManager::~UIManager()
 
 uint32_t UIManager::add_component(const std::shared_ptr<UIComponent>& component)
 {
-  spdlog::warn("HREEEE1");
   const auto id = m_identifier();
   m_components.insert({id, component});
   return id;
