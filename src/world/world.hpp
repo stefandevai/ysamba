@@ -20,6 +20,12 @@ namespace dl
 struct GameContext;
 struct TileTarget;
 
+struct WorldTile
+{
+  const TileData& terrain;
+  const TileData& over_terrain;
+};
+
 class World
 {
  public:
@@ -36,10 +42,17 @@ class World
   void load(const std::string& filepath);
 
   // Set tile by coordinates
-  void set(const int tile_id, const int x, const int y, const int z);
+  void set_terrain(const int tile_id, const int x, const int y, const int z);
+  void set_over_terrain(const int tile_id, const int x, const int y, const int z);
+
+  // Replace tile by coordinates
+  void replace(const int from, const int to, const int x, const int y, const int z);
 
   // Get tile data by coordinates
   [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
+
+  // Get all tiles in a tile map coordinate
+  [[nodiscard]] const WorldTile get_all(const int x, const int y, const int z) const;
 
   // Get size of a specific tilemap
   [[nodiscard]] TilemapSize get_tilemap_size(const int z);
@@ -81,13 +94,14 @@ class World
   template <class Archive>
   void serialize(Archive& archive)
   {
-    archive(m_depth_min, m_depth_max, m_tilemaps, m_seed, m_societies);
+    archive(m_depth_min, m_depth_max, m_terrains, m_over_terrains, m_seed, m_societies);
   }
 
  private:
   GameContext& m_game_context;
   JSON m_json{"./data/world.json"};
-  std::vector<Tilemap> m_tilemaps;
+  std::vector<Tilemap> m_terrains;
+  std::vector<Tilemap> m_over_terrains;
   std::unordered_map<uint32_t, TileData> m_tile_data;
   std::unordered_map<uint32_t, ItemData> m_item_data;
   size_t m_chunk_size = 0;

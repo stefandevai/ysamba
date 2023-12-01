@@ -18,7 +18,7 @@ auto stop_pickup = [](entt::registry& registry, const entt::entity entity, Socie
 
 PickupSystem::PickupSystem(World& world) : m_world(world) {}
 
-void PickupSystem::update(entt::registry& registry, const double delta)
+void PickupSystem::update(entt::registry& registry)
 {
   auto view = registry.view<SocietyAgent, ActionPickup, const Position>();
   for (const auto entity : view)

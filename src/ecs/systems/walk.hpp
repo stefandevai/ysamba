@@ -9,11 +9,8 @@ class World;
 class WalkSystem
 {
  public:
-  WalkSystem(World& world);
+  WalkSystem();
 
-  void update(entt::registry& registry, const double delta);
-
- private:
-  World& m_world;
+  void update(entt::registry& registry);
 };
 }  // namespace dl

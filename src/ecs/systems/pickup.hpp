@@ -11,7 +11,7 @@ class PickupSystem
  public:
   PickupSystem(World& world);
 
-  void update(entt::registry& registry, const double delta);
+  void update(entt::registry& registry);
 
  private:
   World& m_world;

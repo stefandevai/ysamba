@@ -25,7 +25,7 @@ class Batch
   std::shared_ptr<ShaderProgram> shader = nullptr;
   int priority = 0;
   bool has_scissor = false;
-  bool has_depth_test = true;
+  bool has_depth = true;
   Vector4i scissor{0, 0, -1, -1};
 
   Batch(const int priority = 0);

@@ -1,6 +1,5 @@
 #include "./render.hpp"
 
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include <tgmath.h>
 
@@ -33,22 +32,45 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     {
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
-      const auto& tile = m_world.get(index_x, index_y, 0.0);
-      const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+      const auto& world_tile = m_world.get_all(index_x, index_y, 0.0);
 
-      if (sprite->texture == nullptr)
+      if (world_tile.terrain.id > 0)
       {
-        const auto& world_texture = renderer.get_texture(m_world_texture_id);
-        const auto& frame = world_texture->id_to_frame(tile.id, frame_data_type::tile);
-        sprite->texture = world_texture;
-        sprite->set_frame(frame);
+        const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+
+        if (sprite->texture == nullptr)
+        {
+          const auto& world_texture = renderer.get_texture(m_world_texture_id);
+          const auto& frame = world_texture->id_to_frame(world_tile.terrain.id, frame_data_type::tile);
+          sprite->texture = world_texture;
+          sprite->set_frame(frame);
+        }
+
+        renderer.batch("world",
+                       sprite,
+                       i * tile_size.x + camera_position.x * tile_size.x,
+                       j * tile_size.y + camera_position.y * tile_size.y,
+                       0.0);
       }
 
-      renderer.batch("world",
-                     sprite,
-                     i * tile_size.x + camera_position.x * tile_size.x,
-                     j * tile_size.y + camera_position.y * tile_size.y,
-                     0.0);
+      if (world_tile.over_terrain.id > 0)
+      {
+        const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+
+        if (sprite->texture == nullptr)
+        {
+          const auto& world_texture = renderer.get_texture(m_world_texture_id);
+          const auto& frame = world_texture->id_to_frame(world_tile.over_terrain.id, frame_data_type::tile);
+          sprite->texture = world_texture;
+          sprite->set_frame(frame);
+        }
+
+        renderer.batch("world",
+                       sprite,
+                       i * tile_size.x + camera_position.x * tile_size.x,
+                       j * tile_size.y + camera_position.y * tile_size.y,
+                       1.0);
+      }
     }
   }
 

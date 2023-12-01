@@ -16,9 +16,9 @@ auto stop_walk = [](entt::registry& registry, const entt::entity entity, Society
   agent.state = SocietyAgent::State::Idle;
 };
 
-WalkSystem::WalkSystem(World& world) : m_world(world) {}
+WalkSystem::WalkSystem() {}
 
-void WalkSystem::update(entt::registry& registry, const double delta)
+void WalkSystem::update(entt::registry& registry)
 {
   auto view = registry.view<SocietyAgent, ActionWalk, const Position>();
   for (const auto entity : view)

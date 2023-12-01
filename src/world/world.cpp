@@ -31,12 +31,12 @@ World::World(GameContext& game_context) : m_game_context(game_context)
 void World::generate(const int width, const int height, const int seed)
 {
   m_seed = seed;
-  m_tilemaps.clear();
+  m_terrains.clear();
 
   /* auto tilemap_generator = TerrainGenerator(width, height); */
   auto tilemap_generator = DummyGenerator(width, height);
   auto tilemap = tilemap_generator.generate(seed);
-  m_tilemaps.push_back(tilemap);
+  m_terrains.push_back(tilemap);
 
   auto society = SocietyGenerator::generate_blueprint();
   m_societies[society.id] = society;
@@ -50,29 +50,77 @@ void World::load(const std::string& filepath)
   m_json.load(filepath);
   const auto& layers = m_json.object.get<std::vector<nlohmann::json>>();
 
-  m_tilemaps.clear();
-  m_tilemaps.resize(layers.size());
+  m_terrains.clear();
+  m_terrains.resize(layers.size());
+
+  m_over_terrains.clear();
+  m_over_terrains.resize(layers.size());
 
   for (size_t i = 0; i < layers.size(); ++i)
   {
     const auto width = layers[i]["width"].get<uint32_t>();
     const auto height = layers[i]["width"].get<uint32_t>();
-    const auto data = layers[i]["data"].get<std::vector<int>>();
+    const auto terrain_data = layers[i]["terrain"].get<std::vector<int>>();
+    const auto over_terrain_data = layers[i]["over_terrain"].get<std::vector<int>>();
 
-    m_tilemaps[i] = Tilemap(data, width, height);
+    m_terrains[i] = Tilemap(terrain_data, width, height);
+    m_over_terrains[i] = Tilemap(over_terrain_data, width, height);
   }
 }
 
-void World::set(const int tile_id, const int x, const int y, const int z)
+void World::set_terrain(const int tile_id, const int x, const int y, const int z)
 {
-  m_tilemaps[z - m_depth_min].set(tile_id, x, y);
+  m_terrains[z - m_depth_min].set(tile_id, x, y);
+}
+
+void World::set_over_terrain(const int tile_id, const int x, const int y, const int z)
+{
+  m_over_terrains[z - m_depth_min].set(tile_id, x, y);
+}
+
+void World::replace(const int from, const int to, const int x, const int y, const int z)
+{
+  const int over_tile_index = m_over_terrains[z - m_depth_min].at(x, y);
+  const int terrain_index = m_terrains[z - m_depth_min].at(x, y);
+
+  if (over_tile_index == from && terrain_index != to)
+  {
+    m_over_terrains[z - m_depth_min].set(to, x, y);
+    return;
+  }
+  // If the terrain already has the target tile, just assign the null tile to the over tile
+  else if (over_tile_index == from && terrain_index == to)
+  {
+    m_over_terrains[z - m_depth_min].set(0, x, y);
+    return;
+  }
+
+  if (terrain_index == from)
+  {
+    m_terrains[z - m_depth_min].set(to, x, y);
+  }
 }
 
 const TileData& World::get(const int x, const int y, const int z) const
 {
-  const int tile_index = m_tilemaps[z - m_depth_min].at(x, y);
+  const int over_tile_index = m_over_terrains[z - m_depth_min].at(x, y);
 
-  return m_tile_data.at(tile_index);
+  if (over_tile_index != 0)
+  {
+    return m_tile_data.at(over_tile_index);
+  }
+
+  const int terrain_index = m_terrains[z - m_depth_min].at(x, y);
+
+  return m_tile_data.at(terrain_index);
+}
+
+const WorldTile World::get_all(const int x, const int y, const int z) const
+{
+  const auto terrain_id = m_terrains[z - m_depth_min].at(x, y);
+  const auto over_terrain_id = m_over_terrains[z - m_depth_min].at(x, y);
+
+  return WorldTile{m_tile_data.at(terrain_id), m_tile_data.at(over_terrain_id)};
 }
 
 std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, const Vector3i& to)
@@ -207,7 +255,7 @@ bool World::is_walkable(const int x, const int y, const int z) const
   return tile.flags.contains(tile_flag::walkable);
 }
 
-TilemapSize World::get_tilemap_size(const int z) { return m_tilemaps[z - m_depth_min].get_size(); }
+TilemapSize World::get_tilemap_size(const int z) { return m_terrains[z - m_depth_min].get_size(); }
 
 const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }
 

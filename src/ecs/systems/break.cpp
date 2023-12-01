@@ -99,7 +99,7 @@ void BreakSystem::update(entt::registry& registry, const double delta)
         continue;
       }
 
-      m_world.set(tile_data.after_removed, target.x, target.y, target.z);
+      m_world.replace(target.id, tile_data.after_removed, target.x, target.y, target.z);
 
       for (const auto id : tile_data.drop_ids)
       {

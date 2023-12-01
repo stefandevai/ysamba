@@ -38,10 +38,10 @@ void Gameplay::load()
   m_renderer.add_layer("ui", "default", 10);
   m_renderer.add_layer("ui-2", "default", 11);
 
-  m_renderer.get_layer("ui")->has_depth_test = false;
-  m_renderer.get_layer("ui-2")->has_depth_test = false;
+  m_renderer.get_layer("ui")->has_depth = false;
+  m_renderer.get_layer("ui-2")->has_depth = false;
 
-  load_world("./world.dl");
+  /* load_world("./world.dl"); */
   m_world.load("./data/world/test_map.json");
 
   m_camera.set_tile_size(m_world.get_tile_size());
@@ -137,11 +137,11 @@ void Gameplay::update()
       m_turn_delay = 0.5;
       m_game_system.update();
       m_physics_system.update(m_registry, delta);
-      m_walk_system.update(m_registry, delta);
+      m_walk_system.update(m_registry);
       m_society_system.update(m_registry, delta);
       m_harvest_system.update(m_registry, delta);
       m_break_system.update(m_registry, delta);
-      m_pickup_system.update(m_registry, delta);
+      m_pickup_system.update(m_registry);
     }
   }
 

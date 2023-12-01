@@ -73,7 +73,7 @@ void Renderer::render()
     {
       continue;
     }
-    if (!layer->has_depth_test)
+    if (!layer->has_depth)
     {
       glDisable(GL_DEPTH_TEST);
     }
