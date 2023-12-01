@@ -10,60 +10,7 @@
 
 namespace dl::ui
 {
-Scrollable::Scrollable() : UIComponent()
-{
-  const auto padding = Vector2i{0, 0};
-  const auto width = 200;
-  const auto line_spacing = 20;
-  const auto max_height = 300;
-
-  std::vector<std::string> keys = {
-      "Item 1aaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "Item 2",
-      "Item 3",
-      "Item 4",
-      "Item 5",
-      "Item 1",
-      "Item 2",
-      "Item 3",
-      "Item 4",
-      "Item 5",
-  };
-
-  if (keys.size() < 1)
-  {
-    return;
-  }
-
-  position.x = 100;
-  position.y = 100;
-
-  /* auto container = std::make_shared<Container>(Vector2i{0, 0}, "#1b2420aa"); */
-
-  auto first_label = std::make_shared<Label>(keys[0]);
-  first_label->position.x = padding.x;
-  first_label->position.y = padding.y + line_spacing / 2;
-  /* container->children.push_back(first_label); */
-  children.push_back(first_label);
-
-  const auto line_height = first_label->text.get_size().y;
-
-  for (size_t i = 1; i < keys.size(); ++i)
-  {
-    auto label = std::make_shared<Label>(keys[i]);
-    label->position.x = padding.x;
-    label->position.y = i * line_height + padding.y + i * line_spacing + line_spacing / 2;
-    /* container->children.push_back(label); */
-    children.push_back(label);
-  }
-
-  const auto height =
-      std::min(static_cast<int>(keys.size() * (line_height + line_spacing)) + 2 * padding.y, max_height);
-
-  size = {width + 2 * padding.x, height};
-  /* container->set_size({width + 2 * padding.x, height}); */
-  /* children.push_back(container); */
-}
+Scrollable::Scrollable() : UIComponent() {}
 
 void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 {
@@ -78,6 +25,20 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
         mouse_position.y < top_left.y + size.y)
     {
       m_scroll_y += m_input_manager->get_scroll().y * 4;
+
+      if (m_scroll_y > 0)
+      {
+        m_scroll_y = 0;
+      }
+      else if (size.y < children[0]->size.y)
+      {
+        const auto delta_size_y = children[0]->size.y - size.y;
+
+        if (std::abs(m_scroll_y) > delta_size_y)
+        {
+          m_scroll_y = -delta_size_y;
+        }
+      }
     }
   }
 

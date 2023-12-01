@@ -23,6 +23,7 @@
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
 #include "ui/components/list.hpp"
+#include "ui/components/scrollable.hpp"
 #include "world/society/sex.hpp"
 // TEMP
 
@@ -54,9 +55,9 @@ void Gameplay::load()
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   // TEMP
-  /* auto container = std::make_shared<ui::Container>(Vector2i{160, 110}, "#1b2420aa"); */
-  /* container->position.x = 500; */
-  /* container->position.y = 500; */
+  auto container = std::make_shared<ui::Container>(Vector2i{200, 300}, "#1b2420aa");
+  container->position.x = 200;
+  container->position.y = 200;
 
   /* auto button = std::make_shared<ui::Button>("CLICK", Vector3i{30, 30, 0}, Vector2i{100, 50}); */
   /* button->on_click = []() { spdlog::warn("CLICKED HERE!"); }; */
@@ -65,7 +66,16 @@ void Gameplay::load()
   /* m_ui_manager.add_component(container); */
 
   const auto list = std::make_shared<ui::List>();
-  m_ui_manager.add_component(list);
+  const auto scrollable = std::make_shared<ui::Scrollable>();
+  /* scrollable->position.x = 100; */
+  /* scrollable->position.y = 100; */
+  scrollable->size.x = 200;
+  scrollable->size.y = 300;
+
+  scrollable->children.push_back(list);
+  container->children.push_back(scrollable);
+
+  m_ui_manager.add_component(container);
   // TEMP
 
   m_has_loaded = true;
