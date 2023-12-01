@@ -20,7 +20,8 @@ class SDLInputWrapper
   bool is_any_key_down();
   bool is_key_down(const std::string& key);
   bool is_key_up(const std::string& key);
-  inline std::pair<bool, bool> get_mouse_state() { return m_mouse_state; };
+  inline std::pair<bool, bool> get_mouse_state_down() { return m_mouse_state_down; };
+  inline std::pair<bool, bool> get_mouse_state_up() { return m_mouse_state_up; };
   const Vector2i& get_mouse_position() { return m_mouse_position; };
   bool window_size_changed() const { return m_window_size_changed; }
   const Vector2i& get_scroll() const { return m_scroll; }
@@ -34,7 +35,8 @@ class SDLInputWrapper
   std::unordered_map<int, bool> m_key_down;
   std::unordered_map<int, bool> m_key_up;
   bool m_should_quit = false;
-  std::pair<bool, bool> m_mouse_state{false, false};
+  std::pair<bool, bool> m_mouse_state_down{false, false};
+  std::pair<bool, bool> m_mouse_state_up{false, false};
   Vector2i m_mouse_position{0, 0};
   Vector2i m_scroll{0, 0};
   bool m_window_size_changed = false;

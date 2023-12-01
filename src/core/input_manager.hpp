@@ -50,6 +50,7 @@ class InputManager
   bool is_any_key_down();
   bool is_key_up(const std::string& key);
   bool is_clicking(const MouseButton button);
+  bool has_clicked(const MouseButton button);
   bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
   bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
   const Vector2i& get_scroll() const { return m_sdl_input_wrapper.get_scroll(); }

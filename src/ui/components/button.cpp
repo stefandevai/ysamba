@@ -30,7 +30,7 @@ void Button::update(std::vector<glm::mat4>& matrix_stack)
     return;
   }
 
-  if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
+  if (m_input_manager->has_clicked(InputManager::MouseButton::Left))
   {
     const auto& matrix = matrix_stack.back();
     const auto top_left = matrix * glm::vec4(0.f, 0.f, 1.f, 1.f);

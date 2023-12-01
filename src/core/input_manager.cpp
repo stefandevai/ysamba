@@ -85,7 +85,23 @@ bool InputManager::is_key_up(const std::string& key) { return m_sdl_input_wrappe
 
 bool InputManager::is_clicking(const MouseButton button)
 {
-  const auto& mouse_state = m_sdl_input_wrapper.get_mouse_state();
+  const auto& mouse_state = m_sdl_input_wrapper.get_mouse_state_down();
+
+  if (button == MouseButton::Left)
+  {
+    return mouse_state.first;
+  }
+  else if (button == MouseButton::Right)
+  {
+    return mouse_state.second;
+  }
+
+  return false;
+}
+
+bool InputManager::has_clicked(const MouseButton button)
+{
+  const auto& mouse_state = m_sdl_input_wrapper.get_mouse_state_up();
 
   if (button == MouseButton::Left)
   {

@@ -25,6 +25,8 @@
     },
     "action_menu": {
         "close_menu": ["k_escape"],
-        "harvest": ["k_h"]
+        "harvest": ["k_h"],
+        "pickup": ["k_p"],
+        "break": ["k_b"]
     }
 }

@@ -28,6 +28,9 @@ void SDLInputWrapper::update()
   m_scroll.x = 0;
   m_scroll.y = 0;
 
+  m_mouse_state_up.first = false;
+  m_mouse_state_up.first = false;
+
   // Update key status
   SDL_Event event;
 
@@ -68,11 +71,11 @@ void SDLInputWrapper::update()
     {
       if (event.button.button == SDL_BUTTON_LEFT)
       {
-        m_mouse_state.first = true;
+        m_mouse_state_down.first = true;
       }
       else if (event.button.button == SDL_BUTTON_RIGHT)
       {
-        m_mouse_state.second = true;
+        m_mouse_state_down.second = true;
       }
       break;
     }
@@ -81,11 +84,13 @@ void SDLInputWrapper::update()
     {
       if (event.button.button == SDL_BUTTON_LEFT)
       {
-        m_mouse_state.first = false;
+        m_mouse_state_up.first = true;
+        m_mouse_state_down.first = false;
       }
       else if (event.button.button == SDL_BUTTON_RIGHT)
       {
-        m_mouse_state.second = false;
+        m_mouse_state_up.second = true;
+        m_mouse_state_down.second = false;
       }
       break;
     }

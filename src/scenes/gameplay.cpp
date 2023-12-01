@@ -19,10 +19,10 @@
 #include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/text.hpp"
+#include "ui/components/action_menu.hpp"
 #include "ui/components/button.hpp"
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/scrollable_list.hpp"
 #include "world/society/sex.hpp"
 // TEMP
 
@@ -54,35 +54,35 @@ void Gameplay::load()
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   // TEMP
-  auto container = std::make_shared<ui::Container>(Vector2i{200, 300}, "#1b2420aa");
-  container->position.x = 200;
-  container->position.y = 200;
+  /* auto container = std::make_shared<ui::Container>(Vector2i{200, 300}, "#1b2420aa"); */
+  /* container->position.x = 200; */
+  /* container->position.y = 200; */
 
   /* container->children.push_back(button); */
   /* m_ui_manager.add_component(container); */
 
-  const std::vector<std::string> items = {
-      "Item 1",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-      "Item 2",
-  };
+  /* const std::vector<std::string> items = { */
+  /*     "Item 1", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /*     "Item 2", */
+  /* }; */
 
-  const auto on_select = [](const int i) { spdlog::debug("SELECTDFFJDK {}", i); };
+  /* const auto on_select = [](const int i) { spdlog::debug("SELECTDFFJDK {}", i); }; */
 
-  const auto list = std::make_shared<ui::ScrollableList>(items, Vector2i{200, 300}, on_select);
-  list->position.x = 100;
-  list->position.y = 100;
-  m_ui_manager.add_component(list);
+  /* const auto action_menu = std::make_shared<ui::ActionMenu>(items, on_select); */
+  /* action_menu->position.x = 100; */
+  /* action_menu->position.y = 100; */
+  /* m_ui_manager.add_component(action_menu); */
 
   /* auto button = std::make_shared<ui::Button>("CLICK HERE", Vector2i{ 100, 50 }); */
   /* button->on_click = []() { spdlog::warn("CLICKED HERE!"); }; */

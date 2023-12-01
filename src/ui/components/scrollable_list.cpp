@@ -20,11 +20,6 @@ ScrollableList::ScrollableList(const std::vector<std::string>& items,
 
   ui::ListStyle style{{15, 15}, 5};
 
-  /* const auto on_select = [](const int i) { */
-  /*   spdlog::debug("SELECTED FROM LIST"); */
-
-  /* }; */
-
   const auto list = std::make_shared<ui::ButtonList>(items, Vector2i{size.x, 45}, on_select, style);
 
   const auto scrollable = std::make_shared<ui::Scrollable>();
