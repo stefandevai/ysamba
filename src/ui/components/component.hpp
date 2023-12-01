@@ -9,7 +9,8 @@
 namespace dl
 {
 class Batch;
-}
+class Renderer;
+}  // namespace dl
 
 namespace dl::ui
 {
@@ -50,7 +51,7 @@ class UIComponent
 
   virtual void update(std::vector<glm::mat4>& matrix_stack) { (void)matrix_stack; }
   virtual void update_component(std::vector<glm::mat4>& matrix_stack);
-  virtual void render(const std::shared_ptr<Batch> batch);
+  virtual void render(Renderer& renderer, const std::string& layer);
 
  protected:
   static const std::shared_ptr<InputManager> m_input_manager;

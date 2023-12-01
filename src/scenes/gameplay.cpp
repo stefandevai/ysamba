@@ -36,6 +36,7 @@ void Gameplay::load()
 
   m_renderer.add_layer("world", "default");
   m_renderer.add_layer("ui", "default", 10);
+  m_renderer.add_layer("ui-2", "default", 11);
 
   load_world("./world.dl");
   m_world.load("./data/world/test_map.json");
@@ -134,7 +135,7 @@ void Gameplay::render()
   m_render_system.render(m_registry, m_renderer, m_camera);
   m_renderer.pop_matrix("world");
 
-  m_ui_manager.render(m_renderer.get_layer("ui"));
+  m_ui_manager.render(m_renderer);
 }
 
 void Gameplay::save_world(const std::string& file_path)

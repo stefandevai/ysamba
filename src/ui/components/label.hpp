@@ -14,7 +14,7 @@ class Label : public UIComponent
 
   Label(const std::string& text, const std::string& typeface = "font-1980");
 
-  void render(const std::shared_ptr<Batch> batch);
+  void render(Renderer& renderer, const std::string& layer);
 
  private:
 };

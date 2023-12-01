@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/maths/vector.hpp"
-#include "graphics/batch.hpp"
+#include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
@@ -16,13 +16,13 @@ Container::Container(const Vector2i& size, const std::string& color)
   this->size = size;
 }
 
-void Container::render(const std::shared_ptr<Batch> batch)
+void Container::render(Renderer& renderer, const std::string& layer)
 {
-  batch->quad(quad, absolute_position.x, absolute_position.y, absolute_position.z);
+  renderer.get_layer(layer)->quad(quad, absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {
-    child->render(batch);
+    child->render(renderer, layer);
   }
 }
 

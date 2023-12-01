@@ -4,10 +4,10 @@
 
 namespace dl::ui
 {
-class List : public UIComponent
+class Scrollable : public UIComponent
 {
  public:
-  List();
+  Scrollable();
 
   void update(std::vector<glm::mat4>& matrix_stack);
   void render(Renderer& renderer, const std::string& layer);

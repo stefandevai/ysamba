@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/display.hpp"
-#include "graphics/batch.hpp"
+#include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
@@ -57,11 +57,11 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
   }
 }
 
-void UIComponent::render(const std::shared_ptr<Batch> batch)
+void UIComponent::render(Renderer& renderer, const std::string& layer)
 {
   for (auto& child : children)
   {
-    child->render(batch);
+    child->render(renderer, layer);
   }
 }
 

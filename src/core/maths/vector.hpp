@@ -55,4 +55,21 @@ struct Vector3i
   }
 };
 
+struct Vector4i
+{
+  int x;
+  int y;
+  int z;
+  int w;
+
+  Vector4i() : x(0), y(0), z(0), w(0) {}
+
+  Vector4i(const int x, const int y, const int z, const int w) : x(x), y(y), z(z), w(w) {}
+
+  Vector4i(const double x, const double y, const double z, const int w)
+      : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z)), w(static_cast<int>(w))
+  {
+  }
+};
+
 }  // namespace dl

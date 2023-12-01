@@ -9,6 +9,10 @@
 #include "./texture.hpp"
 #include "core/asset_manager.hpp"
 
+// TEMP
+#include "core/display.hpp"
+// TEMP
+
 namespace dl
 {
 Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager) {}
@@ -68,6 +72,15 @@ void Renderer::render()
     if (!layer->get_should_render())
     {
       continue;
+    }
+    if (!layer->has_scissor)
+    {
+      glDisable(GL_SCISSOR_TEST);
+    }
+    else
+    {
+      glEnable(GL_SCISSOR_TEST);
+      glScissor(layer->scissor.x, layer->scissor.y, layer->scissor.z, layer->scissor.w);
     }
 
     const auto& shader = layer->shader;

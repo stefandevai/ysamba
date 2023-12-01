@@ -34,17 +34,11 @@ void UIManager::update()
   }
 }
 
-void UIManager::render(std::shared_ptr<Batch> batch)
+void UIManager::render(Renderer& renderer)
 {
-  if (batch == nullptr)
-  {
-    spdlog::warn("No batch loaded in UI Manager");
-    return;
-  }
-
   for (auto& c : m_components)
   {
-    c.second->render(batch);
+    c.second->render(renderer, "ui");
   }
 }
 

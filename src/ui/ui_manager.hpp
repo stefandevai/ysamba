@@ -8,6 +8,7 @@
 namespace dl
 {
 class Batch;
+class Renderer;
 }  // namespace dl
 
 namespace dl::ui
@@ -22,7 +23,7 @@ class UIManager
   void remove_component(const uint32_t id);
 
   void update();
-  void render(std::shared_ptr<Batch> batch);
+  void render(Renderer& renderer);
 
  private:
   std::map<uint32_t, std::shared_ptr<UIComponent>> m_components;

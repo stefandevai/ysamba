@@ -19,7 +19,7 @@ class Container : public UIComponent
   Container();
   Container(const Vector2i& size, const std::string& color);
 
-  void render(const std::shared_ptr<Batch> batch);
+  void render(Renderer& renderer, const std::string& layer);
 
   void set_size(const Vector2i& size);
   void set_color(const std::string& color);

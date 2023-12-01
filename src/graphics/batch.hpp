@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "core/maths/vector.hpp"
+
 namespace dl
 {
 typedef unsigned int GLuint;
@@ -22,6 +24,8 @@ class Batch
  public:
   std::shared_ptr<ShaderProgram> shader = nullptr;
   int priority = 0;
+  bool has_scissor = false;
+  Vector4i scissor{0, 0, -1, -1};
 
   Batch(const int priority = 0);
   Batch(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
@@ -36,6 +40,7 @@ class Batch
   void quad(const std::shared_ptr<Quad>& renderable, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   bool get_should_render() { return m_index_count > 0; }
+  void add_scissor(const Vector4i& scissor);
 
  private:
   struct VertexData

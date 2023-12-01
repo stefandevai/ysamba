@@ -1,12 +1,12 @@
 #include "./label.hpp"
 
-#include "graphics/batch.hpp"
+#include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
 Label::Label(const std::string& text, const std::string& typeface) : UIComponent(), text(Text(text, typeface)) {}
-void Label::render(const std::shared_ptr<Batch> batch)
+void Label::render(Renderer& renderer, const std::string& layer)
 {
-  batch->text(text, absolute_position.x, absolute_position.y, absolute_position.z);
+  renderer.get_layer(layer)->text(text, absolute_position.x, absolute_position.y, absolute_position.z);
 }
 }  // namespace dl::ui

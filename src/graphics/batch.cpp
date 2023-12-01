@@ -282,4 +282,10 @@ void Batch::text(Text& text, const double x, const double y, const double z)
   }
 }
 
+void Batch::add_scissor(const Vector4i& scissor)
+{
+  this->scissor = scissor;
+  has_scissor = true;
+}
+
 }  // namespace dl

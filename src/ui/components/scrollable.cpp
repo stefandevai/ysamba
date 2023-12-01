@@ -1,4 +1,4 @@
-#include "./list.hpp"
+#include "./scrollable.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -10,7 +10,7 @@
 
 namespace dl::ui
 {
-List::List() : UIComponent()
+Scrollable::Scrollable() : UIComponent()
 {
   const auto padding = Vector2i{0, 0};
   const auto width = 200;
@@ -65,7 +65,7 @@ List::List() : UIComponent()
   /* children.push_back(container); */
 }
 
-void List::update(std::vector<glm::mat4>& matrix_stack)
+void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 {
   const auto& matrix = matrix_stack.back();
 
@@ -86,7 +86,7 @@ void List::update(std::vector<glm::mat4>& matrix_stack)
   matrix_stack.push_back(translate);
 }
 
-void List::render(Renderer& renderer, const std::string& layer)
+void Scrollable::render(Renderer& renderer, const std::string& layer)
 {
   (void)layer;
 
