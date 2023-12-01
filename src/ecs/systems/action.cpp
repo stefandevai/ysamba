@@ -71,17 +71,14 @@ void ActionSystem::m_update_action_menu(entt::registry& registry)
   else if (m_input_manager->poll_action("harvest"))
   {
     m_state = ActionMenuState::SelectHarvestTarget;
-    /* m_close_action_menu(); */
   }
   else if (m_input_manager->poll_action("pickup"))
   {
     m_state = ActionMenuState::SelectPickupTarget;
-    /* m_close_action_menu(); */
   }
   else if (m_input_manager->poll_action("break"))
   {
     m_state = ActionMenuState::SelectBreakTarget;
-    /* m_close_action_menu(); */
   }
 }
 

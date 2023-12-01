@@ -5,6 +5,8 @@
 
 namespace dl::ui
 {
+class Button;
+
 class ButtonList : public UIComponent
 {
  public:
@@ -15,6 +17,9 @@ class ButtonList : public UIComponent
 
   ListStyle style;
   std::function<void(const int)> on_select;
+
+ private:
+  std::vector<std::shared_ptr<Button>> m_buttons;
 };
 
 }  // namespace dl::ui

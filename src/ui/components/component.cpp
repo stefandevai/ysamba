@@ -1,5 +1,7 @@
 #include "./component.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -52,7 +54,13 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
 
   for (auto& child : children)
   {
-    child->update_component(matrix_stack);
+    if (child.expired())
+    {
+      continue;
+    }
+
+    auto child_ptr = child.lock();
+    child_ptr->update_component(matrix_stack);
   }
 
   if (m_is_positioned())
@@ -65,7 +73,13 @@ void UIComponent::render(Renderer& renderer, const std::string& layer)
 {
   for (auto& child : children)
   {
-    child->render(renderer, layer);
+    if (child.expired())
+    {
+      continue;
+    }
+
+    auto child_ptr = child.lock();
+    child_ptr->render(renderer, layer);
   }
 }
 

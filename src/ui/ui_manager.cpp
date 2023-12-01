@@ -19,6 +19,7 @@ UIManager::~UIManager()
 
 uint32_t UIManager::add_component(const std::shared_ptr<UIComponent>& component)
 {
+  spdlog::warn("HREEEE1");
   const auto id = m_identifier();
   m_components.insert({id, component});
   return id;
@@ -30,7 +31,13 @@ void UIManager::update()
 {
   for (auto& c : m_components)
   {
-    c.second->update_component(m_matrix_stack);
+    if (c.second.expired())
+    {
+      continue;
+    }
+
+    auto c_ptr = c.second.lock();
+    c_ptr->update_component(m_matrix_stack);
   }
 }
 
@@ -38,7 +45,13 @@ void UIManager::render(Renderer& renderer)
 {
   for (auto& c : m_components)
   {
-    c.second->render(renderer, "ui");
+    if (c.second.expired())
+    {
+      continue;
+    }
+
+    auto c_ptr = c.second.lock();
+    c_ptr->render(renderer, "ui");
   }
 }
 

@@ -104,7 +104,6 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       for (const auto id : tile_data.drop_ids)
       {
         const auto drop = registry.create();
-        spdlog::debug("CREATED! {}", (uint32_t)drop);
         registry.emplace<Position>(drop, target.x, target.y, target.z);
         registry.emplace<Visibility>(
             drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items);

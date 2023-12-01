@@ -26,7 +26,7 @@ class UIManager
   void render(Renderer& renderer);
 
  private:
-  std::map<uint32_t, std::shared_ptr<UIComponent>> m_components;
+  std::map<uint32_t, std::weak_ptr<UIComponent>> m_components;
   std::vector<glm::mat4> m_matrix_stack;
 
   static uint32_t m_identifier() noexcept

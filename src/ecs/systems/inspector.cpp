@@ -50,13 +50,13 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
 {
   if (!m_is_valid())
   {
-    m_inspector_id = m_ui_manager.add_component(m_inspector);
+    /* m_inspector_id = m_ui_manager.add_component(m_inspector); */
   }
 
   if (registry.all_of<SocietyAgent>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
-    m_inspector->set_content(agent.name);
+    /* m_inspector->set_content(agent.name); */
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }

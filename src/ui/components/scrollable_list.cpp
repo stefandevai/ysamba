@@ -18,18 +18,18 @@ ScrollableList::ScrollableList(const std::vector<std::string>& items,
 {
   this->size = size;
 
-  ui::ListStyle style{{15, 15}, 5};
+  ListStyle style{{15, 15}, 5};
 
-  const auto list = std::make_shared<ui::ButtonList>(items, Vector2i{size.x, 45}, on_select, style);
+  m_list = std::make_shared<ButtonList>(items, Vector2i{size.x, 45}, on_select, style);
 
-  const auto scrollable = std::make_shared<ui::Scrollable>();
-  scrollable->size = size;
-  scrollable->children.push_back(list);
+  m_scrollable = std::make_shared<Scrollable>();
+  m_scrollable->size = size;
+  m_scrollable->children.push_back(m_list);
 
-  const auto container = std::make_shared<ui::Container>(size, "#1b2420aa");
-  container->children.push_back(scrollable);
+  m_container = std::make_shared<Container>(size, "#1b2420aa");
+  m_container->children.push_back(m_scrollable);
 
-  children.push_back(container);
+  children.push_back(m_container);
 }
 
 }  // namespace dl::ui

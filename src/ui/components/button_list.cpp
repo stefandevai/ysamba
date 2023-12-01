@@ -6,7 +6,6 @@
 #include "./container.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
@@ -23,6 +22,7 @@ ButtonList::ButtonList(const std::vector<std::string>& items,
 
   const auto items_size = items.size();
   children.reserve(items_size);
+  m_buttons.reserve(items_size);
 
   for (size_t i = 0; i < items_size; ++i)
   {
@@ -40,6 +40,7 @@ ButtonList::ButtonList(const std::vector<std::string>& items,
     button->position.y = i * (button_size.y + style.line_spacing) + style.margin.y;
 
     children.push_back(button);
+    m_buttons.push_back(button);
   }
 
   const auto height =

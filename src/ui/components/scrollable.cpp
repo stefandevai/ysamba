@@ -14,6 +14,9 @@ Scrollable::Scrollable() : UIComponent() {}
 
 void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 {
+  assert(children.size() > 0);
+  assert(!children[0].expired());
+
   const auto& matrix = matrix_stack.back();
 
   if (m_input_manager->is_scrolling_y())
@@ -27,9 +30,10 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
       m_scroll_y += m_input_manager->get_scroll().y * 4;
 
       // Set lower and upper bounds for scrolling
-      if (m_scroll_y < 0 && size.y < children[0]->size.y)
+      auto child_ptr = children[0].lock();
+      if (m_scroll_y < 0 && size.y < child_ptr->size.y)
       {
-        const auto delta_size_y = children[0]->size.y - size.y;
+        const auto delta_size_y = child_ptr->size.y - size.y;
 
         if (std::abs(m_scroll_y) > delta_size_y)
         {
@@ -64,7 +68,13 @@ void Scrollable::render(Renderer& renderer, const std::string& layer)
 
   for (auto& child : children)
   {
-    child->render(renderer, "ui-2");
+    if (child.expired())
+    {
+      continue;
+    }
+
+    auto child_ptr = child.lock();
+    child_ptr->render(renderer, "ui-2");
   }
 }
 

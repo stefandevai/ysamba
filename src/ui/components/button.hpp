@@ -4,6 +4,9 @@
 
 namespace dl::ui
 {
+class Label;
+class Container;
+
 class Button : public UIComponent
 {
  public:
@@ -15,6 +18,10 @@ class Button : public UIComponent
          YAlignement y_alignment = YAlignement::Center);
 
   void update(std::vector<glm::mat4>& matrix_stack);
+
+ private:
+  std::shared_ptr<Label> m_label = nullptr;
+  std::shared_ptr<Container> m_container = nullptr;
 };
 
 }  // namespace dl::ui

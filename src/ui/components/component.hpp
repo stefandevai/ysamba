@@ -45,7 +45,7 @@ class UIComponent
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
 
-  std::vector<std::shared_ptr<UIComponent>> children;
+  std::vector<std::weak_ptr<UIComponent>> children;
 
   UIComponent() {}
   virtual ~UIComponent() {}
