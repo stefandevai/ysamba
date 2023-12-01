@@ -10,33 +10,18 @@
 
 namespace dl::ui
 {
-List::List() : UIComponent()
+List::List(const std::vector<std::string>& items, const ListStyle& style) : UIComponent(), style(style)
 {
-  const auto padding = Vector2i{0, 0};
-  const auto line_spacing = 20;
-  /* const auto max_height = 300; */
-
-  std::vector<std::string> keys = {
-      "Item 1aaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "Item 2",
-      "Item 3",
-      "Item 4",
-      "Item 5",
-      "Item 1",
-      "Item 2",
-      "Item 3",
-      "Item 4",
-      "Item 5",
-  };
-
-  if (keys.size() < 1)
+  if (items.size() < 1)
   {
     return;
   }
 
-  auto first_label = std::make_shared<Label>(keys[0]);
-  first_label->position.x = padding.x;
-  first_label->position.y = padding.y + line_spacing / 2;
+  children.reserve(items.size());
+
+  auto first_label = std::make_shared<Label>(items[0]);
+  first_label->position.x = style.margin.x;
+  first_label->position.y = style.margin.y + style.line_spacing / 2;
   children.push_back(first_label);
 
   const auto& first_label_size = first_label->text.get_size();
@@ -44,20 +29,20 @@ List::List() : UIComponent()
 
   auto width = first_label_size.x;
 
-  for (size_t i = 1; i < keys.size(); ++i)
+  for (size_t i = 1; i < items.size(); ++i)
   {
-    auto label = std::make_shared<Label>(keys[i]);
-    label->position.x = padding.x;
-    label->position.y = i * (line_height + line_spacing) + padding.y + line_spacing / 2;
+    auto label = std::make_shared<Label>(items[i]);
+    label->position.x = style.margin.x;
+    label->position.y = i * (line_height + style.line_spacing) + style.margin.y + style.line_spacing / 2;
     children.push_back(label);
 
     const auto& line_size = label->text.get_size();
     width = std::max(width, line_size.x);
   }
 
-  const auto height = static_cast<int>(keys.size() * (line_height + line_spacing)) + 2 * padding.y;
+  const auto height = static_cast<int>(items.size() * (line_height + style.line_spacing)) + 2 * style.margin.y;
 
-  size = {width + 2 * padding.x, height};
+  size = {width + 2 * style.margin.x, height};
 }
 
 }  // namespace dl::ui

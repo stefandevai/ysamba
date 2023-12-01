@@ -26,11 +26,8 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
     {
       m_scroll_y += m_input_manager->get_scroll().y * 4;
 
-      if (m_scroll_y > 0)
-      {
-        m_scroll_y = 0;
-      }
-      else if (size.y < children[0]->size.y)
+      // Set lower and upper bounds for scrolling
+      if (m_scroll_y < 0 && size.y < children[0]->size.y)
       {
         const auto delta_size_y = children[0]->size.y - size.y;
 
@@ -38,6 +35,10 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
         {
           m_scroll_y = -delta_size_y;
         }
+      }
+      else
+      {
+        m_scroll_y = 0;
       }
     }
   }

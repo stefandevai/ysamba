@@ -24,6 +24,7 @@
 #include "ui/components/label.hpp"
 #include "ui/components/list.hpp"
 #include "ui/components/scrollable.hpp"
+#include "ui/style/list.hpp"
 #include "world/society/sex.hpp"
 // TEMP
 
@@ -65,7 +66,25 @@ void Gameplay::load()
   /* container->children.push_back(button); */
   /* m_ui_manager.add_component(container); */
 
-  const auto list = std::make_shared<ui::List>();
+  const std::vector<std::string> items = {
+      "Item 1",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+      "Item 2",
+  };
+
+  ui::ListStyle list_style{{15, 0}, 25};
+  const auto list = std::make_shared<ui::List>(items, list_style);
+
   const auto scrollable = std::make_shared<ui::Scrollable>();
   /* scrollable->position.x = 100; */
   /* scrollable->position.y = 100; */
