@@ -40,6 +40,7 @@ class UIComponent
   Vector3i position;
   Vector3i absolute_position;
   Vector2i size;
+  Vector2i parent_size;
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;

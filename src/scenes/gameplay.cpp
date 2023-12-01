@@ -58,9 +58,6 @@ void Gameplay::load()
   container->position.x = 200;
   container->position.y = 200;
 
-  /* auto button = std::make_shared<ui::Button>("CLICK", Vector3i{30, 30, 0}, Vector2i{100, 50}); */
-  /* button->on_click = []() { spdlog::warn("CLICKED HERE!"); }; */
-
   /* container->children.push_back(button); */
   /* m_ui_manager.add_component(container); */
 
@@ -80,10 +77,16 @@ void Gameplay::load()
       "Item 2",
   };
 
-  const auto list = std::make_shared<ui::ScrollableList>(items, Vector2i{200, 300});
-  list->position.x = 0;
-  list->position.y = 0;
+  const auto on_select = [](const int i) { spdlog::debug("SELECTDFFJDK {}", i); };
+
+  const auto list = std::make_shared<ui::ScrollableList>(items, Vector2i{200, 300}, on_select);
+  list->position.x = 100;
+  list->position.y = 100;
   m_ui_manager.add_component(list);
+
+  /* auto button = std::make_shared<ui::Button>("CLICK HERE", Vector2i{ 100, 50 }); */
+  /* button->on_click = []() { spdlog::warn("CLICKED HERE!"); }; */
+  /* m_ui_manager.add_component(button); */
   /* ui::ListStyle list_style{{15, 0}, 25}; */
   /* const auto list = std::make_shared<ui::List>(items, list_style); */
 

@@ -8,17 +8,16 @@
 
 namespace dl::ui
 {
-Button::Button(const std::string& text, const Vector3i& position, const Vector2i& size) : UIComponent()
+Button::Button(const std::string& text, const Vector2i& size, XAlignement x_alignment, YAlignement y_alignment)
+    : UIComponent()
 {
-  this->position = position;
   this->size = size;
 
   auto container = std::make_shared<Container>(size, "#33aa88aa");
   auto label = std::make_shared<Label>(text);
-  const auto& label_size = label->text.get_size();
-
-  label->position.x = size.x / 2 - label_size.x / 2;
-  label->position.y = size.y / 2 - label_size.y / 2;
+  label->parent_size = size;
+  label->x_alignment = x_alignment;
+  label->y_alignment = y_alignment;
 
   container->children.push_back(label);
   children.push_back(container);
@@ -26,6 +25,11 @@ Button::Button(const std::string& text, const Vector3i& position, const Vector2i
 
 void Button::update(std::vector<glm::mat4>& matrix_stack)
 {
+  if (!on_click)
+  {
+    return;
+  }
+
   if (m_input_manager->is_clicking(InputManager::MouseButton::Left))
   {
     const auto& matrix = matrix_stack.back();
