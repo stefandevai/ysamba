@@ -52,6 +52,12 @@ void Scrollable::render(Renderer& renderer, const std::string& layer)
 {
   (void)layer;
 
+  // TODO: Don't use hardcoded layers, impement draw calls objects
+  // https://realtimecollisiondetection.net/blog/?p=86
+  // https://www.reddit.com/r/opengl/comments/8xzigy/architecture_for_an_opengl_renderer/
+  // https://nlguillemot.wordpress.com/2016/11/18/opengl-renderer-design/
+  // https://gamedev.stackexchange.com/questions/182241/opengl-rendering-pipeline
+  // https://github.com/htmlboss/OpenGL-Renderer/tree/master
   const auto& window_size = Display::get_window_size();
   renderer.get_layer("ui-2")->add_scissor(
       {absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});

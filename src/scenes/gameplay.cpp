@@ -22,9 +22,7 @@
 #include "ui/components/button.hpp"
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/list.hpp"
-#include "ui/components/scrollable.hpp"
-#include "ui/style/list.hpp"
+#include "ui/components/scrollable_list.hpp"
 #include "world/society/sex.hpp"
 // TEMP
 
@@ -82,19 +80,23 @@ void Gameplay::load()
       "Item 2",
   };
 
-  ui::ListStyle list_style{{15, 0}, 25};
-  const auto list = std::make_shared<ui::List>(items, list_style);
+  const auto list = std::make_shared<ui::ScrollableList>(items, Vector2i{200, 300});
+  list->position.x = 0;
+  list->position.y = 0;
+  m_ui_manager.add_component(list);
+  /* ui::ListStyle list_style{{15, 0}, 25}; */
+  /* const auto list = std::make_shared<ui::List>(items, list_style); */
 
-  const auto scrollable = std::make_shared<ui::Scrollable>();
-  /* scrollable->position.x = 100; */
-  /* scrollable->position.y = 100; */
-  scrollable->size.x = 200;
-  scrollable->size.y = 300;
+  /* const auto scrollable = std::make_shared<ui::Scrollable>(); */
+  /* /1* scrollable->position.x = 100; *1/ */
+  /* /1* scrollable->position.y = 100; *1/ */
+  /* scrollable->size.x = 200; */
+  /* scrollable->size.y = 300; */
 
-  scrollable->children.push_back(list);
-  container->children.push_back(scrollable);
+  /* scrollable->children.push_back(list); */
+  /* container->children.push_back(scrollable); */
 
-  m_ui_manager.add_component(container);
+  /* m_ui_manager.add_component(container); */
   // TEMP
 
   m_has_loaded = true;
