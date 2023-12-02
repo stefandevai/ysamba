@@ -16,6 +16,7 @@ typedef int GLsizei;
 class ShaderProgram;
 class Texture;
 class Sprite;
+class MultiSprite;
 struct Quad;
 class Text;
 
@@ -37,8 +38,9 @@ class Batch
   void push_matrix(const glm::mat4& matrix);
   const glm::mat4 pop_matrix();
   const glm::mat4& peek_matrix();
-  void emplace(const std::shared_ptr<Sprite>& renderable, const double x, const double y, const double z);
-  void quad(const std::shared_ptr<Quad>& renderable, const double x, const double y, const double z);
+  void emplace(const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z);
+  void emplace(const std::shared_ptr<MultiSprite>& sprite, const double x, const double y, const double z);
+  void quad(const std::shared_ptr<Quad>& quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   bool get_should_render() { return m_index_count > 0; }
   void add_scissor(const Vector4i& scissor);

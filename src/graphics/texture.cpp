@@ -154,7 +154,7 @@ void Texture::m_load_empty()
   }
 }
 
-uint32_t Texture::id_to_frame(const uint32_t id, const std::string& type)
+const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type)
 {
   return m_frame_data.at(std::make_pair(id, type));
 }
@@ -167,11 +167,30 @@ void Texture::load_data(const std::string& filepath)
 
   for (const auto& item : items)
   {
-    const auto game_id = item["id"].get<uint32_t>();
     const auto type = item["type"].get<std::string>();
-    const auto frame = item["frame"].get<uint32_t>();
+    const auto game_id = item["id"].get<uint32_t>();
 
-    m_frame_data[std::make_pair(game_id, type)] = frame;
+    FrameData frame_data{};
+
+    frame_data.tile_type = item["tile_type"].get<std::string>();
+
+    if (frame_data.tile_type == "multiple")
+    {
+      frame_data.width = item["width"].get<uint32_t>();
+      frame_data.height = item["height"].get<uint32_t>();
+      frame_data.frames = item["frames"].get<std::vector<uint32_t>>();
+      frame_data.pattern = item["pattern"].get<std::vector<uint32_t>>();
+      frame_data.pattern_width = item["pattern_width"].get<uint32_t>();
+      frame_data.pattern_height = item["pattern_height"].get<uint32_t>();
+      frame_data.anchor_x = item["anchor_x"].get<uint32_t>();
+      frame_data.anchor_y = item["anchor_y"].get<uint32_t>();
+    }
+    else
+    {
+      frame_data.frame = item["frame"].get<uint32_t>();
+    }
+
+    m_frame_data[std::make_pair(game_id, type)] = frame_data;
   }
 }
 

@@ -88,6 +88,11 @@ class World
   // Check if a specific tile is has WALKABLE flag
   [[nodiscard]] bool is_walkable(const int x, const int y, const int z) const;
 
+  // Check if the world has a specific pattern for a given position
+  [[nodiscard]] bool has_pattern(const std::vector<uint32_t>& pattern,
+                                 const Vector2i& size,
+                                 const Vector3i& position) const;
+
   // Get information about a tile with id
   [[nodiscard]] const TileData& get_tile_data(const uint32_t id) const;
 

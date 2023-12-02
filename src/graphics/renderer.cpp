@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "./multi_sprite.hpp"
 #include "./shader_loader.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
@@ -49,6 +50,23 @@ void Renderer::batch(
   }
 
   layer->emplace(sprite, x, y, z);
+}
+
+void Renderer::batch(const std::string& layer_id,
+                     const std::shared_ptr<MultiSprite>& multi_sprite,
+                     const double x,
+                     const double y,
+                     const double z)
+{
+  const auto& layer = m_layers.at(layer_id);
+
+  // Load texture if it has not been loaded
+  if (multi_sprite->texture == nullptr)
+  {
+    multi_sprite->texture = m_asset_manager.get<Texture>(multi_sprite->resource_id);
+  }
+
+  layer->emplace(multi_sprite, x, y, z);
 }
 
 void Renderer::batch(const std::string& layer_id, Text& text, const double x, const double y, const double z)

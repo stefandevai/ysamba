@@ -255,6 +255,40 @@ bool World::is_walkable(const int x, const int y, const int z) const
   return tile.flags.contains(tile_flag::walkable);
 }
 
+bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
+{
+  bool found_pattern = true;
+
+  for (int j = 0; j < size.y; ++j)
+  {
+    for (int i = 0; i < size.x; ++i)
+    {
+      const auto pattern_value = pattern[j * size.x + i];
+
+      if (pattern_value == 0)
+      {
+        continue;
+      }
+
+      const uint32_t over_terrain_index = m_over_terrains[position.z - m_depth_min].at(position.x + i, position.y + j);
+
+      if (over_terrain_index == pattern_value)
+      {
+        continue;
+      }
+
+      const uint32_t terrain_index = m_terrains[position.z - m_depth_min].at(position.x + i, position.y + j);
+
+      if (terrain_index != pattern_value)
+      {
+        return false;
+      }
+    }
+  }
+
+  return found_pattern;
+}
+
 TilemapSize World::get_tilemap_size(const int z) { return m_terrains[z - m_depth_min].get_size(); }
 
 const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }

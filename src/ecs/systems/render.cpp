@@ -12,6 +12,7 @@
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"
+#include "graphics/multi_sprite.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/text.hpp"
 #include "world/world.hpp"
@@ -41,9 +42,9 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
         if (sprite->texture == nullptr)
         {
           const auto& world_texture = renderer.get_texture(m_world_texture_id);
-          const auto& frame = world_texture->id_to_frame(world_tile.terrain.id, frame_data_type::tile);
+          const auto& frame_data = world_texture->id_to_frame(world_tile.terrain.id, frame_data_type::tile);
           sprite->texture = world_texture;
-          sprite->set_frame(frame);
+          sprite->set_frame(frame_data.frame);
         }
 
         renderer.batch("world",
@@ -55,21 +56,54 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 
       if (world_tile.over_terrain.id > 0)
       {
-        const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+        const auto& world_texture = renderer.get_texture(m_world_texture_id);
+        const auto& frame_data = world_texture->id_to_frame(world_tile.over_terrain.id, frame_data_type::tile);
 
-        if (sprite->texture == nullptr)
+        if (frame_data.tile_type == "multiple")
         {
-          const auto& world_texture = renderer.get_texture(m_world_texture_id);
-          const auto& frame = world_texture->id_to_frame(world_tile.over_terrain.id, frame_data_type::tile);
-          sprite->texture = world_texture;
-          sprite->set_frame(frame);
-        }
+          assert(frame_data.pattern.size() > 0);
+          assert(frame_data.frames.size() > 0);
+          assert(frame_data.width > 0);
+          assert(frame_data.height > 0);
+          assert(frame_data.pattern_width > 0);
+          assert(frame_data.pattern_height > 0);
 
-        renderer.batch("world",
-                       sprite,
-                       i * tile_size.x + camera_position.x * tile_size.x,
-                       j * tile_size.y + camera_position.y * tile_size.y,
-                       1.0);
+          if (!m_world.has_pattern(
+                  frame_data.pattern, Vector2i{(int)frame_data.width, (int)frame_data.height}, Vector3i{i, j, 0}))
+          {
+            continue;
+          }
+
+          const auto& multi_sprite =
+              std::make_shared<MultiSprite>(m_world_texture_id, frame_data.frames, frame_data.width, frame_data.height);
+
+          if (multi_sprite->texture == nullptr)
+          {
+            multi_sprite->texture = world_texture;
+          }
+
+          renderer.batch("world",
+                         multi_sprite,
+                         i * (tile_size.x - frame_data.anchor_x) + camera_position.x * tile_size.x,
+                         j * (tile_size.y - frame_data.anchor_y) + camera_position.y * tile_size.y,
+                         1.0);
+        }
+        else
+        {
+          const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+
+          if (sprite->texture == nullptr)
+          {
+            sprite->texture = world_texture;
+            sprite->set_frame(frame_data.frame);
+          }
+
+          renderer.batch("world",
+                         sprite,
+                         i * tile_size.x + camera_position.x * tile_size.x,
+                         j * tile_size.y + camera_position.y * tile_size.y,
+                         1.0);
+        }
       }
     }
   }
@@ -89,8 +123,8 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
       // This allows flexibility by separating the texture frames from game ids.
       if (visibility.frame_id > 0 && !visibility.frame_type.empty())
       {
-        const auto frame = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
-        visibility.sprite->set_frame(frame);
+        const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
+        visibility.sprite->set_frame(frame_data.frame);
       }
     }
 

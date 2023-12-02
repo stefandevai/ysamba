@@ -53,6 +53,13 @@
       "flags": ["BREAKABLE", "WALKABLE"],
       "drop_ids": [5],
       "after_removed": 2
+    },
+    {
+      "id": 9,
+      "name": "rock",
+      "flags": ["BREAKABLE"],
+      "drop_ids": [5],
+      "after_removed": 2
     }
   ]
 }

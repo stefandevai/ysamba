@@ -14,6 +14,7 @@ namespace dl
 class ShaderProgram;
 class AssetManager;
 class Sprite;
+class MultiSprite;
 class Text;
 class Texture;
 
@@ -24,6 +25,11 @@ class Renderer
 
   void batch(const std::string& layer_id,
              const std::shared_ptr<Sprite>& sprite,
+             const double x,
+             const double y,
+             const double z);
+  void batch(const std::string& layer_id,
+             const std::shared_ptr<MultiSprite>& multi_sprite,
              const double x,
              const double y,
              const double z);

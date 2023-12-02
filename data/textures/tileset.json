@@ -1,72 +1,99 @@
 [
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 0,
-        "id": 0,
-        "type": "tile"
+        "id": 0
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 1,
-        "id": 1,
-        "type": "tile"
+        "id": 1
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 2,
-        "id": 2,
-        "type": "tile"
+        "id": 2
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 3,
-        "id": 6,
-        "type": "tile"
+        "id": 6
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 4,
-        "id": 4,
-        "type": "tile"
+        "id": 4
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 5,
-        "id": 5,
-        "type": "tile"
+        "id": 5
     },
     {
+        "type": "item",
+        "tile_type": "single",
         "frame": 6,
-        "id": 1,
-        "type": "item"
+        "id": 1
     },
     {
+        "type": "item",
+        "tile_type": "single",
         "frame": 102,
-        "id": 2,
-        "type": "item"
+        "id": 2
     },
     {
+        "type": "item",
+        "tile_type": "single",
         "frame": 8,
-        "id": 3,
-        "type": "item"
+        "id": 3
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 71,
-        "id": 3,
-        "type": "tile"
+        "id": 3
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 104,
-        "id": 7,
-        "type": "tile"
+        "id": 7
     },
     {
+        "type": "item",
+        "tile_type": "single",
         "frame": 40,
-        "id": 4,
-        "type": "item"
+        "id": 4
     },
     {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 44,
-        "id": 8,
-        "type": "tile"
+        "id": 8
     },
     {
+        "type": "item",
+        "tile_type": "single",
         "frame": 42,
-        "id": 5,
-        "type": "item"
+        "id": 5
+    },
+    {
+        "type": "tile",
+        "tile_type": "multiple",
+        "frames": [45, 46, 77, 78, 109, 110, 141, 142],
+        "width": 2,
+        "height": 4,
+        "pattern": [9, 9, 9, 9],
+        "pattern_width": 2,
+        "pattern_height": 2,
+        "anchor_x": 0,
+        "anchor_y": 2,
+        "id": 9
     }
 ]

@@ -5,6 +5,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>  // IWYU pragma: export
 
+#include "./multi_sprite.hpp"
 #include "./quad.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
@@ -224,6 +225,89 @@ void Batch::emplace(const std::shared_ptr<Sprite>& sprite, const double x, const
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   m_index_count += 6;
+}
+
+void Batch::emplace(const std::shared_ptr<MultiSprite>& sprite, const double x, const double y, const double z)
+{
+  assert(m_index_count <= m_indices_size);
+
+  unsigned int color = 4294967295;  // Default white color
+
+  const std::shared_ptr<Texture>& texture = sprite->texture;
+
+  assert(sprite->texture != nullptr);
+
+  if (sprite->color)
+  {
+    color = sprite->color->int_color;
+  }
+
+  // Build vector of textures to bind when rendering
+  // texture_index is the index in m_textures that will
+  // be translated to a index in the shader.
+  float texture_index = 0.f;
+  const auto it = std::find(m_textures.begin(), m_textures.end(), texture);
+  if (it == m_textures.end())
+  {
+    texture_index = m_textures.size();
+    m_textures.emplace_back(texture);
+  }
+  else
+  {
+    texture_index = it - m_textures.begin();
+  }
+
+  const auto& frames = sprite->get_frames();
+  const auto& size = sprite->get_size();
+  const int frame_width = texture->get_frame_width();
+  const int frame_height = texture->get_frame_height();
+
+  for (size_t i = 0; i < size.x; ++i)
+  {
+    for (size_t j = 0; j < size.y; ++j)
+    {
+      const std::array<glm::vec2, 4> texcoords = sprite->get_texcoords(frames[j * size.x + i]);
+
+      // Get transformations and apply them to the sprite vertices
+      auto general_transform = m_matrix;
+      general_transform = glm::translate(general_transform, glm::vec3(x + i * frame_width, y + j * frame_height, z));
+
+      // Top left vertex
+      glm::vec4 transformation_result = general_transform * glm::vec4(0.f, 0.f, 1.f, 1.f);
+      m_vertices[m_vertices_index++] =
+          VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                     texcoords[0],
+                     texture_index,
+                     color};
+
+      // Top right vertex
+      transformation_result = general_transform * glm::vec4(frame_width, 0.f, 1.f, 1.f);
+      m_vertices[m_vertices_index++] =
+          VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                     texcoords[1],
+                     texture_index,
+                     color};
+
+      // Bottom right vertex
+      transformation_result = general_transform * glm::vec4(frame_width, frame_height, 1.f, 1.f);
+      m_vertices[m_vertices_index++] =
+          VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                     texcoords[2],
+                     texture_index,
+                     color};
+
+      // Bottom left vertex
+      transformation_result = general_transform * glm::vec4(0.f, frame_height, 1.f, 1.f);
+      m_vertices[m_vertices_index++] =
+          VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                     texcoords[3],
+                     texture_index,
+                     color};
+
+      // Each quad has 6 vertices, we have therefore to increment by 6 each time
+      m_index_count += 6;
+    }
+  }
 }
 
 void Batch::quad(const std::shared_ptr<Quad>& quad, const double x, const double y, const double z)

@@ -17,6 +17,20 @@ enum class TextureType
   NORMAL,
 };
 
+struct FrameData
+{
+  uint32_t frame = 0;
+  uint32_t width = 0;
+  uint32_t height = 0;
+  uint32_t pattern_width = 0;
+  uint32_t pattern_height = 0;
+  uint32_t anchor_x = 0;
+  uint32_t anchor_y = 0;
+  std::string tile_type = "";
+  std::vector<uint32_t> frames{};
+  std::vector<uint32_t> pattern{};
+};
+
 class Texture : public Asset
 {
  public:
@@ -51,7 +65,7 @@ class Texture : public Asset
   void load_data(const std::string& filepath);
 
   // Convert a game id to a texture frame known from a metadata file
-  uint32_t id_to_frame(const uint32_t id, const std::string& type);
+  const FrameData& id_to_frame(const uint32_t id, const std::string& type);
 
  private:
   struct PairHash
@@ -62,10 +76,10 @@ class Texture : public Asset
     };
   };
 
-  using FrameData = std::unordered_map<std::pair<uint32_t, std::string>, uint32_t, PairHash>;
+  using FrameDataMap = std::unordered_map<std::pair<uint32_t, std::string>, FrameData, PairHash>;
 
   JSON m_json{};
-  FrameData m_frame_data;
+  FrameDataMap m_frame_data;
   const TextureType m_type = TextureType::DIFFUSE;
   const int m_horizontal_frames;
   const int m_vertical_frames;
