@@ -62,7 +62,6 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
         if (frame_data.tile_type == "multiple")
         {
           assert(frame_data.pattern.size() > 0);
-          /* assert(frame_data.frames.size() > 0); */
           assert(frame_data.width > 0);
           assert(frame_data.height > 0);
           assert(frame_data.pattern_width > 0);
@@ -70,7 +69,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 
           if (!m_world.has_pattern(frame_data.pattern,
                                    Vector2i{(int)frame_data.pattern_width, (int)frame_data.pattern_height},
-                                   Vector3i{i, j, 0}))
+                                   Vector3i{i + camera_position.x, j + camera_position.y, 0}))
           {
             continue;
           }
@@ -86,7 +85,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
           renderer.batch("world",
                          multi_sprite,
                          (i - frame_data.anchor_x) * tile_size.x + camera_position.x * tile_size.x,
-                         (j - frame_data.anchor_y) * tile_size.y + camera_position.x * tile_size.y,
+                         (j - frame_data.anchor_y) * tile_size.y + camera_position.y * tile_size.y,
                          1.0);
         }
         else
