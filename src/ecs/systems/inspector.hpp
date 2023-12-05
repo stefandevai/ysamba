@@ -14,6 +14,7 @@ class Inspector;
 namespace dl
 {
 class World;
+struct TileData;
 class Camera;
 
 class InspectorSystem
@@ -31,8 +32,10 @@ class InspectorSystem
   std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
   Vector2i m_last_mouse_position{0, 0};
   Vector3 m_last_camera_position{0., 0., 0.};
+  entt::entity m_target_quad = entt::null;
 
   void m_update_inspector_content(const entt::entity entity, entt::registry& registry);
+  void m_update_inspector_content(const TileData& tile_data);
   void m_destroy_inspector();
   inline bool m_is_valid() const;
 };

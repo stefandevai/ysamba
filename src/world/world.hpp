@@ -96,6 +96,9 @@ class World
   // Get information about a tile with id
   [[nodiscard]] const TileData& get_tile_data(const uint32_t id) const;
 
+  // Get information about an item with id
+  [[nodiscard]] const ItemData& get_item_data(const uint32_t id) const;
+
   template <class Archive>
   void serialize(Archive& archive)
   {

@@ -2,11 +2,16 @@
 
 #include <spdlog/spdlog.h>
 
+#include "ecs/components/pickable.hpp"
+#include "ecs/components/position.hpp"
+#include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "ui/components/inspector.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/tile_data.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -31,13 +36,37 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
   const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-  const auto entity = m_world.spatial_hash.get_by_component<Selectable>(tile_x, tile_y, registry);
+  if (!registry.valid(m_target_quad))
+  {
+    m_target_quad = registry.create();
+    registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, "#e3c16488");
+    registry.emplace<Position>(m_target_quad, 0, 0, 4);
+  }
+
+  auto& quad_position = registry.get<Position>(m_target_quad);
+  quad_position.x = std::floor(tile_x);
+  quad_position.y = std::floor(tile_y);
+
+  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y, registry);
+  bool updated_inspector_content = false;
 
   if (registry.valid(entity))
   {
     m_update_inspector_content(entity, registry);
+    updated_inspector_content = true;
   }
-  else if (m_is_valid())
+  else
+  {
+    const auto& tile_data = m_world.get(tile_x, tile_y, 0);
+
+    if (tile_data.id > 0)
+    {
+      m_update_inspector_content(tile_data);
+      updated_inspector_content = true;
+    }
+  }
+
+  if (!updated_inspector_content && m_is_valid())
   {
     m_destroy_inspector();
   }
@@ -60,6 +89,27 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
+  else if (registry.all_of<Pickable, Visibility>(entity))
+  {
+    const auto& item = registry.get<Pickable>(entity);
+    if (item.id <= 0)
+    {
+      return;
+    }
+
+    const auto& item_data = m_world.get_item_data(item.id);
+    m_inspector->set_content(item_data.name);
+  }
+}
+
+void InspectorSystem::m_update_inspector_content(const TileData& tile_data)
+{
+  if (!m_is_valid())
+  {
+    m_inspector_id = m_ui_manager.add_component(m_inspector);
+  }
+
+  m_inspector->set_content(tile_data.name);
 }
 
 void InspectorSystem::m_destroy_inspector()

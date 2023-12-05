@@ -143,8 +143,11 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     const auto& rectangle = registry.get<Rectangle>(entity);
 
-    renderer.batch(
-        "world", rectangle.quad, std::round(position.x) * tile_size.x, std::round(position.y) * tile_size.y, 1);
+    renderer.batch("world",
+                   rectangle.quad,
+                   std::round(position.x) * tile_size.x,
+                   std::round(position.y) * tile_size.y,
+                   position.z);
   }
 
   auto text_view = registry.view<const Text, const Position>();

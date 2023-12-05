@@ -107,7 +107,7 @@ void BreakSystem::update(entt::registry& registry, const double delta)
         registry.emplace<Position>(drop, target.x, target.y, target.z);
         registry.emplace<Visibility>(
             drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items);
-        registry.emplace<Pickable>(drop);
+        registry.emplace<Pickable>(drop, id);
       }
 
       stop_breaking(registry, entity, agent);

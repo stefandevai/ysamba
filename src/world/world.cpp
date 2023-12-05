@@ -293,6 +293,8 @@ TilemapSize World::get_tilemap_size(const int z) { return m_terrains[z - m_depth
 
 const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }
 
+const ItemData& World::get_item_data(const uint32_t id) const { return m_item_data.at(id); }
+
 void World::m_load_tile_data()
 {
   const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
