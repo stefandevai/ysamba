@@ -259,8 +259,8 @@ void Batch::emplace(const std::shared_ptr<MultiSprite>& sprite, const double x, 
 
   /* const auto& frames = sprite->get_frames(); */
   const auto& size = sprite->get_size();
-  const int frame_width = texture->get_frame_width() * (size.x + 1);
-  const int frame_height = texture->get_frame_height() * (size.y + 1);
+  const int frame_width = texture->get_frame_width() * (size.x);
+  const int frame_height = texture->get_frame_height() * (size.y);
 
   const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
 

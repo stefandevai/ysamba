@@ -28,6 +28,7 @@ class ActionSystem
     SelectHarvestTarget = 0,
     SelectPickupTarget,
     SelectBreakTarget,
+    SelectDigTarget,
     Closed,
     Open,
   };
@@ -56,5 +57,6 @@ class ActionSystem
   void m_select_harvest_target(const int tile_x, const int tile_y, entt::registry& registry);
   void m_select_pickup_target(const int tile_x, const int tile_y, entt::registry& registry);
   void m_select_break_target(const int tile_x, const int tile_y, entt::registry& registry);
+  void m_select_dig_target(const int tile_x, const int tile_y, entt::registry& registry);
 };
 }  // namespace dl

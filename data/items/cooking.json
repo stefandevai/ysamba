@@ -22,5 +22,9 @@
     {
         "id": 5,
         "name": "crushed rocks"
+    },
+    {
+        "id": 6,
+        "name": "dirt"
     }
 ]

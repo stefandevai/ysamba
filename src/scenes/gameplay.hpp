@@ -7,6 +7,7 @@
 #include "core/input_manager.hpp"
 #include "ecs/systems/action.hpp"
 #include "ecs/systems/break.hpp"
+#include "ecs/systems/dig.hpp"
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/harvest.hpp"
 #include "ecs/systems/inspector.hpp"
@@ -56,6 +57,7 @@ class Gameplay : public Scene
   SocietySystem m_society_system{};
   HarvestSystem m_harvest_system{m_world};
   BreakSystem m_break_system{m_world};
+  DigSystem m_dig_system{m_world};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager};
   PickupSystem m_pickup_system{m_world};

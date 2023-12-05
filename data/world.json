@@ -16,12 +16,16 @@
     {
       "id": 2,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE", "DIGGABLE"],
+      "drop_ids": [6],
+      "after_removed": 12
     },
     {
       "id": 3,
       "name": "sand",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE", "DIGGABLE"],
+      "drop_ids": [6],
+      "after_removed": 12
     },
     {
       "id": 4,
@@ -65,6 +69,16 @@
       "id": 10,
       "name": "nopal",
       "flags": []
+    },
+    {
+      "id": 11,
+      "name": "nopal with tunas",
+      "flags": []
+    },
+    {
+      "id": 12,
+      "name": "hole in dirt",
+      "flags": ["WALKABLE"]
     }
   ]
 }

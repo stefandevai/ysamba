@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "ecs/components/action_break.hpp"
+#include "ecs/components/action_dig.hpp"
 #include "ecs/components/action_harvest.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
@@ -27,6 +28,7 @@ const std::vector<std::string> ActionSystem::menu_items = {
     "[H]arvest",
     "[P]ickup",
     "[B]reak",
+    "[D]ig",
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
@@ -78,6 +80,10 @@ void ActionSystem::m_update_action_menu()
   else if (m_input_manager->poll_action("break"))
   {
     m_state = ActionMenuState::SelectBreakTarget;
+  }
+  else if (m_input_manager->poll_action("dig"))
+  {
+    m_state = ActionMenuState::SelectDigTarget;
   }
 }
 
@@ -178,6 +184,11 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     case ActionMenuState::SelectBreakTarget:
     {
       m_select_break_target(tile_x, tile_y, registry);
+      break;
+    }
+    case ActionMenuState::SelectDigTarget:
+    {
+      m_select_dig_target(tile_x, tile_y, registry);
       break;
     }
     default:
@@ -292,6 +303,26 @@ void ActionSystem::m_select_break_target(const int tile_x, const int tile_y, ent
       auto& action_break =
           registry.emplace_or_replace<ActionBreak>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
       action_break.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+    }
+
+    m_dispose();
+  }
+}
+
+void ActionSystem::m_select_dig_target(const int tile_x, const int tile_y, entt::registry& registry)
+{
+  const auto& tile = m_world.get(tile_x, tile_y, 0);
+
+  if (tile.flags.contains(tile_flag::diggable))
+  {
+    for (const auto entity : m_selected_entities)
+    {
+      const auto& position = registry.get<Position>(entity);
+      const Vector3i tile_position = {
+          static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
+      auto& action_dig =
+          registry.emplace_or_replace<ActionDig>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
+      action_dig.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
     }
 
     m_dispose();

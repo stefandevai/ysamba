@@ -108,5 +108,30 @@
         "anchor_x": 0,
         "anchor_y": 1,
         "id": 10
+    },
+    {
+        "type": "tile",
+        "tile_type": "multiple",
+        "frame": 54,
+        "width": 1,
+        "height": 2,
+        "pattern": [11],
+        "pattern_width": 1,
+        "pattern_height": 1,
+        "anchor_x": 0,
+        "anchor_y": 1,
+        "id": 11
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 160,
+        "id": 12
+    },
+    {
+        "type": "item",
+        "tile_type": "single",
+        "frame": 192,
+        "id": 6
     }
 ]

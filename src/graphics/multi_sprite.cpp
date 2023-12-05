@@ -21,8 +21,8 @@ std::array<glm::vec2, 4> MultiSprite::get_texture_coordinates() const
 
   const float top_left_x = frame_width * frame_x;
   const float top_left_y = frame_height * frame_y;
-  const float bottom_right_x = frame_width * (frame_x + m_width) + frame_width;
-  const float bottom_right_y = frame_height * (frame_y + m_height) + frame_height;
+  const float bottom_right_x = frame_width * (frame_x + m_width);
+  const float bottom_right_y = frame_height * (frame_y + m_height);
 
   return std::array<glm::vec2, 4>{
       glm::vec2{top_left_x, top_left_y},
