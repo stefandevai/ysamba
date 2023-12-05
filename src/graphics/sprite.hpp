@@ -23,7 +23,7 @@ class Sprite : public Renderable
   inline int get_frame() const { return m_frame; };
   glm::vec2 get_size() const;
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> get_texcoords() const;
+  std::array<glm::vec2, 4> get_texture_coordinates() const;
 
   inline void set_frame(const int frame) { m_frame = frame; };
   void set_custom_uv(const float left, const float top, const float width, const float height);

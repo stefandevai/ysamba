@@ -62,7 +62,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
         if (frame_data.tile_type == "multiple")
         {
           assert(frame_data.pattern.size() > 0);
-          assert(frame_data.frames.size() > 0);
+          /* assert(frame_data.frames.size() > 0); */
           assert(frame_data.width > 0);
           assert(frame_data.height > 0);
           assert(frame_data.pattern_width > 0);
@@ -76,7 +76,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
           }
 
           const auto& multi_sprite =
-              std::make_shared<MultiSprite>(m_world_texture_id, frame_data.frames, frame_data.width, frame_data.height);
+              std::make_shared<MultiSprite>(m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height);
 
           if (multi_sprite->texture == nullptr)
           {
@@ -85,8 +85,8 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 
           renderer.batch("world",
                          multi_sprite,
-                         (i - frame_data.anchor_x + camera_position.x) * tile_size.x,
-                         (j - frame_data.anchor_y + camera_position.y) * tile_size.y,
+                         (i - frame_data.anchor_x) * tile_size.x + camera_position.x * tile_size.x,
+                         (j - frame_data.anchor_y) * tile_size.y + camera_position.x * tile_size.y,
                          1.0);
         }
         else

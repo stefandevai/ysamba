@@ -86,7 +86,7 @@
     {
         "type": "tile",
         "tile_type": "multiple",
-        "frames": [45, 46, 77, 78, 109, 110, 141, 142],
+        "frame": 45,
         "width": 2,
         "height": 4,
         "pattern": [9, 9, 9, 9],
@@ -95,5 +95,18 @@
         "anchor_x": 0,
         "anchor_y": 2,
         "id": 9
+    },
+    {
+        "type": "tile",
+        "tile_type": "multiple",
+        "frame": 53,
+        "width": 1,
+        "height": 2,
+        "pattern": [10],
+        "pattern_width": 1,
+        "pattern_height": 1,
+        "anchor_x": 0,
+        "anchor_y": 1,
+        "id": 10
     }
 ]

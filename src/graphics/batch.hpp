@@ -49,7 +49,7 @@ class Batch
   struct VertexData
   {
     glm::vec3 position;
-    glm::vec2 texcoords;
+    glm::vec2 texture_coordinates;
     GLfloat texture_id;
     unsigned int color;
   };

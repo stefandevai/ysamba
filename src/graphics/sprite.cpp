@@ -18,7 +18,7 @@ glm::vec2 Sprite::get_size() const
 }
 
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-std::array<glm::vec2, 4> Sprite::get_texcoords() const
+std::array<glm::vec2, 4> Sprite::get_texture_coordinates() const
 {
   if (texture == nullptr)
   {

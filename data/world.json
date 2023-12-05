@@ -60,6 +60,11 @@
       "flags": ["BREAKABLE"],
       "drop_ids": [5],
       "after_removed": 2
+    },
+    {
+      "id": 10,
+      "name": "nopal",
+      "flags": []
     }
   ]
 }

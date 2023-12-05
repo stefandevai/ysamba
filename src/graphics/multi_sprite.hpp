@@ -18,21 +18,18 @@ class MultiSprite : public Renderable
   std::shared_ptr<Transform> transform = nullptr;
 
   MultiSprite() {}
-  MultiSprite(const std::string& resource_id,
-              const std::vector<uint32_t>& frames,
-              const uint32_t width,
-              const uint32_t height)
-      : resource_id(resource_id), m_frames(frames), m_width(width), m_height(height)
+  MultiSprite(const std::string& resource_id, const uint32_t frame, const uint32_t width, const uint32_t height)
+      : resource_id(resource_id), m_frame(frame), m_width(width), m_height(height)
   {
   }
 
-  const std::vector<uint32_t>& get_frames() const { return m_frames; };
+  uint32_t get_frame() const { return m_frame; };
   glm::vec2 get_size() const;
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> get_texcoords(const uint32_t frame) const;
+  std::array<glm::vec2, 4> get_texture_coordinates() const;
 
  private:
-  std::vector<uint32_t> m_frames{};
+  uint32_t m_frame = 0;
   int m_width = 0;
   int m_height = 0;
 };

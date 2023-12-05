@@ -27,7 +27,7 @@ struct FrameData
   uint32_t anchor_x = 0;
   uint32_t anchor_y = 0;
   std::string tile_type = "";
-  std::vector<uint32_t> frames{};
+  /* std::vector<uint32_t> frames{}; */
   std::vector<uint32_t> pattern{};
 };
 
