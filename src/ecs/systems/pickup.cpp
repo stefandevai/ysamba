@@ -14,6 +14,7 @@ namespace dl
 auto stop_pickup = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
   registry.remove<ActionPickup>(entity);
   agent.state = SocietyAgent::State::Idle;
+  agent.jobs.top().status = JobStatus::Finished;
 };
 
 PickupSystem::PickupSystem(World& world) : m_world(world) {}
@@ -81,7 +82,7 @@ void PickupSystem::update(entt::registry& registry)
     registry.remove<Position>(target.entity);
     registry.remove<Visibility>(target.entity);
 
-    auto weared_items = registry.get<WearedItems>(entity);
+    auto& weared_items = registry.get<WearedItems>(entity);
     weared_items.items.push_back(target.entity);
 
     stop_pickup(registry, entity, agent);

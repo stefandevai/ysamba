@@ -5,7 +5,6 @@
 #include <entt/entity/registry.hpp>
 
 #include "core/random.hpp"
-#include "ecs/components/action_harvest.hpp"
 #include "ecs/components/biology.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
@@ -24,10 +23,10 @@ void SocietySystem::update(entt::registry& registry, const double delta)
   view.each([&registry, delta](auto entity, auto& agent) {
     if (agent.state == SocietyAgent::State::Harvesting)
     {
-      if (!registry.all_of<ActionHarvest>(entity))
-      {
-        registry.emplace<ActionHarvest>(entity);
-      }
+      /* if (!registry.all_of<ActionHarvest>(entity)) */
+      /* { */
+      /*   registry.emplace<ActionHarvest>(entity); */
+      /* } */
     }
     else if (agent.state == SocietyAgent::State::Idle)
     {

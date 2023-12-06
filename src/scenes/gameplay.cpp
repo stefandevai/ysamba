@@ -12,6 +12,7 @@
 #include "world/society/society_generator.hpp"
 
 // TEMP
+#include "core/json.hpp"
 #include "ecs/components/biology.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
@@ -139,9 +140,6 @@ void Gameplay::update()
       m_physics_system.update(m_registry, delta);
       m_walk_system.update(m_registry);
       m_society_system.update(m_registry, delta);
-      m_harvest_system.update(m_registry, delta);
-      m_break_system.update(m_registry, delta);
-      m_dig_system.update(m_registry, delta);
       m_pickup_system.update(m_registry);
       m_job_system.update(m_registry, delta);
     }
@@ -217,6 +215,23 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   else if (m_input_manager->poll_action("load_world"))
   {
     load_world("./world.dl");
+  }
+  else if (m_input_manager->poll_action("add_item"))
+  {
+    JSON json{"./data/debug/item.json"};
+    const auto id = json.object["id"].get<uint32_t>();
+
+    const auto& mouse_position = m_input_manager->get_mouse_position();
+    const auto& camera_position = m_camera.get_position();
+    const auto& tile_size = m_camera.get_tile_size();
+
+    const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
+    const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
+
+    const auto item = m_registry.create();
+    m_registry.emplace<Position>(item, tile_x, tile_y, 1);
+    m_registry.emplace<Visibility>(item, m_world.get_texture_id(), id, "item", 1);
+    m_registry.emplace<Pickable>(item, id);
   }
   else if (m_input_manager->poll_action("display_seed"))
   {

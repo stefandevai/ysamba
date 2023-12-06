@@ -8,6 +8,7 @@
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/weared_items.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "ui/components/action_menu.hpp"
@@ -235,8 +236,21 @@ void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const Job
 
   if (tile.actions.contains(job_type))
   {
+    const auto& qualities_required = tile.actions.at(job_type).qualities_required;
+
     for (const auto entity : m_selected_entities)
     {
+      // Check if the agent has the necessary qualities to perform the action
+      if (!qualities_required.empty())
+      {
+        if (!m_has_qualities_required(qualities_required, entity, registry))
+        {
+          spdlog::debug("HOOOO1");
+          continue;
+        }
+      }
+      spdlog::debug("HOOOO2");
+
       auto& agent = registry.get<SocietyAgent>(entity);
       agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
       agent.jobs.push(Job{job_type, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, tile.id}});
@@ -265,6 +279,44 @@ void ActionSystem::m_select_item_target(const Vector2i& tile_position, const Job
   }
 
   m_dispose();
+}
+
+bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,
+                                            const entt::entity entity,
+                                            entt::registry& registry)
+{
+  for (const auto& quality : qualities_required)
+  {
+    spdlog::debug("QUAL {}", quality);
+    bool has_quality = false;
+
+    const auto& weared_items = registry.get<WearedItems>(entity);
+
+    spdlog::debug("SIZE {}", weared_items.items.size());
+
+    for (const auto item_entity : weared_items.items)
+    {
+      const auto& item = registry.get<Pickable>(item_entity);
+      const auto& item_data = m_world.get_item_data(item.id);
+
+      spdlog::debug("ITEM {} {}", item.id, item_data.qualities.contains(quality));
+
+      if (item_data.qualities.contains(quality))
+      {
+        spdlog::debug("HERE1");
+        has_quality = true;
+        continue;
+      }
+    }
+
+    if (!has_quality)
+    {
+      spdlog::debug("HERE2");
+      return false;
+    }
+  }
+  spdlog::debug("HERE3");
+  return true;
 }
 
 }  // namespace dl

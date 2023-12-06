@@ -58,5 +58,8 @@ class ActionSystem
   void m_dispose();
   void m_select_tile_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry);
   void m_select_item_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry);
+  bool m_has_qualities_required(const std::vector<std::string>& qualities_required,
+                                const entt::entity entity,
+                                entt::registry& registry);
 };
 }  // namespace dl

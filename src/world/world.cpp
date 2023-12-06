@@ -360,6 +360,13 @@ void World::m_load_item_data()
 
     item_data.id = item["id"].get<uint32_t>();
     item_data.name = item["name"].get<std::string>();
+    if (item.contains("qualities"))
+    {
+      for (const auto& quality : item["qualities"])
+      {
+        item_data.qualities[quality["name"].get<std::string>()] = quality["level"].get<int>();
+      }
+    }
     m_item_data[item_data.id] = item_data;
   }
 }

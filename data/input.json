@@ -22,7 +22,8 @@
         "save_world": ["k_s"],
         "load_world": ["k_l"],
         "display_seed": ["k_e"],
-        "open_action_menu": ["k_a"]
+        "open_action_menu": ["k_a"],
+        "add_item": ["k_z"]
     },
     "action_menu": {
         "close_menu": ["k_escape"],

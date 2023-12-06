@@ -2,9 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ecs/components/action_break.hpp"
-#include "ecs/components/action_dig.hpp"
-#include "ecs/components/action_harvest.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/position.hpp"
