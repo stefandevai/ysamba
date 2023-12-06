@@ -154,7 +154,13 @@
         {
           "type": 5,
           "name": "prepare firecamp",
-          "turns_into": 13
+          "turns_into": 13,
+          "consumes": [
+            {
+              "id": 9,
+              "quantity": 1
+            }
+          ]
         }
       ]
     },
@@ -166,14 +172,15 @@
         {
           "type": 6,
           "name": "start fire",
-          "turns_into": 14
+          "turns_into": 14,
+          "qualities_required": ["fire_starter"]
         }
       ]
     },
     {
       "id": 14,
       "name": "firecamp",
-      "flags": []
+      "flags": ["WALKABLE", "FIRE", "HURTS"]
     }
   ]
 }

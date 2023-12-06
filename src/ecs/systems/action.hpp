@@ -63,5 +63,6 @@ class ActionSystem
   bool m_has_qualities_required(const std::vector<std::string>& qualities_required,
                                 const entt::entity entity,
                                 entt::registry& registry);
+  bool m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry);
 };
 }  // namespace dl

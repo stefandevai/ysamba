@@ -257,6 +257,16 @@ void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const Job
   if (tile.actions.contains(job_type))
   {
     const auto& qualities_required = tile.actions.at(job_type).qualities_required;
+    const auto& consumed_items = tile.actions.at(job_type).consumes;
+
+    if (!consumed_items.empty())
+    {
+      if (!m_has_consumables(consumed_items, registry))
+      {
+        // TODO: Notify player that items are needed
+        return;
+      }
+    }
 
     for (const auto entity : m_selected_entities)
     {
@@ -265,6 +275,7 @@ void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const Job
       {
         if (!m_has_qualities_required(qualities_required, entity, registry))
         {
+          // TODO: Notify player that items with required qualities are needed
           continue;
         }
       }
@@ -326,6 +337,12 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
       return false;
     }
   }
+  return true;
+}
+
+bool ActionSystem::m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry)
+{
+  // TODO: Check society inventory for consumable items
   return true;
 }
 
