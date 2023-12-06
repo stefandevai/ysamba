@@ -11,7 +11,6 @@
 #include "ecs/components/visibility.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/frame_data_types.hpp"
-#include "world/tile_flag.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -59,29 +58,29 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
         continue;
       }
 
-      const auto& tile_data = m_world.get_tile_data(target.id);
-      const auto& action = tile_data.actions.at("harvest");
+      /* const auto& tile_data = m_world.get_tile_data(target.id); */
+      /* const auto& action = tile_data.actions.at("harvest"); */
 
-      m_world.replace(target.id, action.turns_into, target.x, target.y, target.z);
+      /* m_world.replace(target.id, action.turns_into, target.x, target.y, target.z); */
 
-      // Tile doesn't have any drop
-      if (action.gives.empty())
-      {
-        stop_harvesting(registry, entity, agent);
-        continue;
-      }
+      /* // Tile doesn't have any drop */
+      /* if (action.gives.empty()) */
+      /* { */
+      /*   stop_harvesting(registry, entity, agent); */
+      /*   continue; */
+      /* } */
 
-      for (const auto& item : action.gives)
-      {
-        const auto drop = registry.create();
-        registry.emplace<Position>(drop, target.x, target.y, target.z);
-        registry.emplace<Visibility>(drop,
-                                     m_world.get_texture_id(),
-                                     item.first,
-                                     frame_data_type::item,
-                                     target.z + renderer::layer_z_offset_items);
-        registry.emplace<Pickable>(drop, item.first);
-      }
+      /* for (const auto& item : action.gives) */
+      /* { */
+      /*   const auto drop = registry.create(); */
+      /*   registry.emplace<Position>(drop, target.x, target.y, target.z); */
+      /*   registry.emplace<Visibility>(drop, */
+      /*                                m_world.get_texture_id(), */
+      /*                                item.first, */
+      /*                                frame_data_type::item, */
+      /*                                target.z + renderer::layer_z_offset_items); */
+      /*   registry.emplace<Pickable>(drop, item.first); */
+      /* } */
 
       stop_harvesting(registry, entity, agent);
     }

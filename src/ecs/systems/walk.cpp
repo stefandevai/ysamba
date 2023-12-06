@@ -14,7 +14,8 @@ namespace dl
 auto stop_walk = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
   registry.remove<ActionWalk>(entity);
   agent.state = SocietyAgent::State::Idle;
-  agent.jobs.pop();
+  const auto& current_job = agent.jobs.top();
+  current_job.status = JobStatus::Finished;
 };
 
 WalkSystem::WalkSystem() {}

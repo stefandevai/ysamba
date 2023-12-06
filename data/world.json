@@ -19,6 +19,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
+          "type": 3,
           "name": "dig",
           "qualities_required": ["dig"],
           "gives": [
@@ -38,6 +39,7 @@
       "drop_ids": [6],
       "actions": [
         {
+          "type": 3,
           "name": "dig",
           "qualities_required": ["dig"],
           "gives": [
@@ -61,6 +63,7 @@
       "flags": [],
       "actions": [
         {
+          "type": 1,
           "name": "harvest",
           "gives": [
             {
@@ -83,6 +86,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
+          "type": 1,
           "name": "harvest",
           "gives": [
             {
@@ -100,6 +104,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
+          "type": 2,
           "name": "break",
           "qualities_required": ["hammer"],
           "gives": [
@@ -118,6 +123,7 @@
       "flags": [],
       "actions": [
         {
+          "type": 2,
           "name": "break",
           "qualities_required": ["hammer"],
           "gives": [

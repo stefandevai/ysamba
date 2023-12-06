@@ -42,8 +42,8 @@ class World
   void load(const std::string& filepath);
 
   // Set tile by coordinates
-  void set_terrain(const int tile_id, const int x, const int y, const int z);
-  void set_over_terrain(const int tile_id, const int x, const int y, const int z);
+  void set_terrain(const uint32_t tile_id, const int x, const int y, const int z);
+  void set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z);
 
   // Replace tile by coordinates
   void replace(const int from, const int to, const int x, const int y, const int z);
@@ -83,7 +83,7 @@ class World
   [[nodiscard]] TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;
 
   // Check if a specific tile is adjacent to a position
-  [[nodiscard]] bool adjacent(const int tile_id, const int x, const int y, const int z) const;
+  [[nodiscard]] bool adjacent(const uint32_t tile_id, const int x, const int y, const int z) const;
 
   // Check if a specific tile is has WALKABLE flag
   [[nodiscard]] bool is_walkable(const int x, const int y, const int z) const;

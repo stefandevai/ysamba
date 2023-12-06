@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_set>
 
+#include "./society/job_type.hpp"
+
 namespace dl
 {
 struct Action
@@ -16,9 +18,9 @@ struct Action
 
 struct TileData
 {
-  int id;
+  uint32_t id;
   std::string name;
   std::unordered_set<std::string> flags;
-  std::unordered_map<std::string, Action> actions{};
+  std::unordered_map<JobType, Action> actions{};
 };
 }  // namespace dl

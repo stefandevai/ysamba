@@ -14,7 +14,6 @@
 #include "ui/components/label.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/item_target.hpp"
-#include "world/tile_flag.hpp"
 #include "world/tile_target.hpp"
 #include "world/world.hpp"
 
@@ -129,7 +128,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       for (const auto entity : m_selected_entities)
       {
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{JobType::Walk, 0, Vector3i{tile_x, tile_y, 0}});
+        agent.jobs.push(Job{JobType::Walk, 0, Target{Vector3i{tile_x, tile_y, 0}}});
       }
     }
   }
@@ -164,7 +163,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     {
     case ActionMenuState::SelectHarvestTarget:
     {
-      m_select_tile_target("harvest", tile_position, JobType::Harvest, registry);
+      m_select_tile_target(tile_position, JobType::Harvest, registry);
       break;
     }
     case ActionMenuState::SelectPickupTarget:
@@ -174,12 +173,12 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     }
     case ActionMenuState::SelectBreakTarget:
     {
-      m_select_tile_target("break", tile_position, JobType::Break, registry);
+      m_select_tile_target(tile_position, JobType::Break, registry);
       break;
     }
     case ActionMenuState::SelectDigTarget:
     {
-      m_select_tile_target("dig", tile_position, JobType::Dig, registry);
+      m_select_tile_target(tile_position, JobType::Dig, registry);
       break;
     }
     default:
@@ -230,20 +229,17 @@ void ActionSystem::m_dispose()
   m_input_manager->pop_context();
 }
 
-void ActionSystem::m_select_tile_target(const std::string& action,
-                                        const Vector2i& tile_position,
-                                        const JobType job_type,
-                                        entt::registry& registry)
+void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry)
 {
   const auto& tile = m_world.get(tile_position.x, tile_position.y, 0);
 
-  if (tile.actions.contains(action))
+  if (tile.actions.contains(job_type))
   {
     for (const auto entity : m_selected_entities)
     {
       auto& agent = registry.get<SocietyAgent>(entity);
-      agent.jobs.push(Job{JobType::Walk, 2, Vector3i{tile_position.x, tile_position.y, 0}});
-      agent.jobs.push(Job{job_type, 2, Vector3i{tile_position.x, tile_position.y, 0}});
+      agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
+      agent.jobs.push(Job{job_type, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, tile.id}});
     }
     m_dispose();
   }
@@ -263,8 +259,9 @@ void ActionSystem::m_select_item_target(const Vector2i& tile_position, const Job
   for (const auto entity : m_selected_entities)
   {
     auto& agent = registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{JobType::Walk, 2, Vector3i{tile_position.x, tile_position.y, 0}});
-    agent.jobs.push(Job{job_type, 2, Vector3i{tile_position.x, tile_position.y, 0}});
+    agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
+    agent.jobs.push(
+        Job{job_type, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, static_cast<uint32_t>(item)}});
   }
 
   m_dispose();

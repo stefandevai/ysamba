@@ -2,19 +2,12 @@
 
 #include <cstdint>
 
+#include "./job_type.hpp"
 #include "core/maths/vector.hpp"
+#include "world/target.hpp"
 
 namespace dl
 {
-enum class JobType
-{
-  Walk,
-  Harvest,
-  Break,
-  Dig,
-  Pickup,
-};
-
 enum class JobStatus
 {
   Waiting,
@@ -27,12 +20,13 @@ class Job
  public:
   JobType type;
   int priority = 0;
-  Vector3i target;
+  Target target;
+  mutable double time_left = 0.05;
   mutable JobStatus status = JobStatus::Waiting;
   int insertion_index = 0;
   static int current_index;
 
-  Job(const JobType type, const int priority, const Vector3i& target) : type(type), priority(priority), target(target)
+  Job(const JobType type, const int priority, const Target& target) : type(type), priority(priority), target(target)
   {
     insertion_index = ++current_index;
   }

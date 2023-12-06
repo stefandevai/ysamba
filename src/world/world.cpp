@@ -8,6 +8,7 @@
 #include <set>
 /* #include "./generators/terrain_generator.hpp" */
 #include "./generators/dummy_generator.hpp"
+#include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
 #include "./tile_target.hpp"
@@ -68,12 +69,12 @@ void World::load(const std::string& filepath)
   }
 }
 
-void World::set_terrain(const int tile_id, const int x, const int y, const int z)
+void World::set_terrain(const uint32_t tile_id, const int x, const int y, const int z)
 {
   m_terrains[z - m_depth_min].set(tile_id, x, y);
 }
 
-void World::set_over_terrain(const int tile_id, const int x, const int y, const int z)
+void World::set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z)
 {
   m_over_terrains[z - m_depth_min].set(tile_id, x, y);
 }
@@ -224,7 +225,7 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
   return tile_target;
 }
 
-bool World::adjacent(const int tile_id, const int x, const int y, const int z) const
+bool World::adjacent(const uint32_t tile_id, const int x, const int y, const int z) const
 {
   const auto displacements = {-1, 0, 1};
 
@@ -309,7 +310,7 @@ void World::m_load_tile_data()
   {
     auto tile_data = TileData();
 
-    tile_data.id = tile["id"].get<int>();
+    tile_data.id = tile["id"].get<uint32_t>();
     tile_data.name = tile["name"].get<std::string>();
 
     if (tile.contains("flags"))
@@ -322,14 +323,14 @@ void World::m_load_tile_data()
 
       for (const auto& action : actions)
       {
+        const auto& type = action["type"].get<JobType>();
         const auto& action_name = action["name"].get<std::string>();
-        tile_data.actions[action_name].name = action_name;
-        tile_data.actions[action_name].turns_into = action["turns_into"].get<uint32_t>();
+        tile_data.actions[type].name = action_name;
+        tile_data.actions[type].turns_into = action["turns_into"].get<uint32_t>();
 
         if (action.contains("qualities_required"))
         {
-          tile_data.actions[action_name].qualities_required =
-              action["qualities_required"].get<std::vector<std::string>>();
+          tile_data.actions[type].qualities_required = action["qualities_required"].get<std::vector<std::string>>();
         }
 
         const auto& gives = action["gives"].get<std::vector<nlohmann::json>>();
@@ -338,7 +339,7 @@ void World::m_load_tile_data()
         {
           const auto item_id = item["item_id"].get<uint32_t>();
           const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
-          tile_data.actions[action_name].gives[item_id] = quantity;
+          tile_data.actions[type].gives[item_id] = quantity;
         }
       }
     }
