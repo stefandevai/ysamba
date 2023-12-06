@@ -1,11 +1,11 @@
 #pragma once
 
-#include "world/item_target.hpp"
+#include "world/society/job.hpp"
 
 namespace dl
 {
 struct ActionPickup
 {
-  ItemTarget target;
+  const Job* job = nullptr;
 };
 }  // namespace dl

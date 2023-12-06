@@ -4,56 +4,56 @@
 
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/society_agent.hpp"
 #include "ecs/components/velocity.hpp"
-#include "ecs/components/weared_items.hpp"
+#include "ecs/components/walk_path.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-auto stop_walk = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
+const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const Job* job) {
   registry.remove<ActionWalk>(entity);
-  agent.state = SocietyAgent::State::Idle;
-  const auto& current_job = agent.jobs.top();
-  current_job.status = JobStatus::Finished;
+  registry.remove<WalkPath>(entity);
+  job->status = JobStatus::Finished;
 };
 
-WalkSystem::WalkSystem() {}
+WalkSystem::WalkSystem(World& world) : m_world(world) {}
 
 void WalkSystem::update(entt::registry& registry)
 {
-  auto view = registry.view<SocietyAgent, ActionWalk, const Position>();
+  auto view = registry.view<ActionWalk, const Position>();
   for (const auto entity : view)
   {
     auto& action_walk = registry.get<ActionWalk>(entity);
-    auto& agent = registry.get<SocietyAgent>(entity);
-
-    if (!action_walk.target)
-    {
-      stop_walk(registry, entity, agent);
-      continue;
-    }
-
+    const auto& job = action_walk.job;
+    const auto& target = job->target;
     const auto& position = registry.get<Position>(entity);
 
-    auto& target = action_walk.target;
+    if (!registry.all_of<WalkPath>(entity))
+    {
+      auto& walk_path = registry.emplace<WalkPath>(entity);
+      walk_path.steps = m_world.get_path_between(Vector3i{position.x, position.y, position.z}, target.position);
+    }
 
-    // If the target tile is not adjacent, move towards the target
-    if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
+    auto& walk_path = registry.get<WalkPath>(entity);
+
+    // If the target is not adjacent, move towards the target
+    if (std::abs(target.position.x - std::round(position.x)) > target.distance_offset ||
+        std::abs(target.position.y - std::round(position.y)) > target.distance_offset)
     {
       // If the target path is empty, that means that the target disappeared.
-      if (target.path.size() < 1)
+      if (walk_path.steps.empty())
       {
-        stop_walk(registry, entity, agent);
+        stop_walk(registry, entity, job);
         continue;
       }
-      auto current_target_position = target.path.top();
+
+      auto& current_target_position = walk_path.steps.top();
 
       if (std::round(position.x) == current_target_position.first &&
           std::round(position.y) == current_target_position.second)
       {
-        target.path.pop();
-        current_target_position = target.path.top();
+        walk_path.steps.pop();
+        current_target_position = walk_path.steps.top();
       }
 
       const auto x_dir = current_target_position.first - std::round(position.x);
@@ -73,7 +73,7 @@ void WalkSystem::update(entt::registry& registry)
       continue;
     }
 
-    stop_walk(registry, entity, agent);
+    stop_walk(registry, entity, job);
   }
 }
 

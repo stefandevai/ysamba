@@ -1,11 +1,11 @@
 #pragma once
 
-#include "world/tile_target.hpp"
+#include "world/society/job.hpp"
 
 namespace dl
 {
 struct ActionWalk
 {
-  TileTarget target;
+  const Job* job = nullptr;
 };
 }  // namespace dl

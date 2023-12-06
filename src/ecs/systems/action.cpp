@@ -14,8 +14,6 @@
 #include "ui/components/action_menu.hpp"
 #include "ui/components/label.hpp"
 #include "ui/ui_manager.hpp"
-#include "world/item_target.hpp"
-#include "world/tile_target.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -139,7 +137,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       for (const auto entity : m_selected_entities)
       {
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{JobType::Walk, 0, Target{Vector3i{tile_x, tile_y, 0}}});
+        agent.jobs.push(Job{JobType::Walk, 0, Target{Vector3i{tile_x, tile_y, 0}, 0, 0}});
       }
     }
   }

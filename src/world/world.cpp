@@ -11,7 +11,6 @@
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
-#include "./tile_target.hpp"
 #include "core/game_context.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/texture.hpp"
