@@ -316,13 +316,31 @@ void World::m_load_tile_data()
     {
       tile_data.flags = tile["flags"].get<std::unordered_set<std::string>>();
     }
-    if (tile.contains("drop_ids"))
+    if (tile.contains("actions"))
     {
-      tile_data.drop_ids = tile["drop_ids"].get<std::vector<uint32_t>>();
-    }
-    if (tile.contains("after_removed"))
-    {
-      tile_data.after_removed = tile["after_removed"].get<uint32_t>();
+      const auto actions = tile["actions"].get<std::vector<nlohmann::json>>();
+
+      for (const auto& action : actions)
+      {
+        const auto& action_name = action["name"].get<std::string>();
+        tile_data.actions[action_name].name = action_name;
+        tile_data.actions[action_name].turns_into = action["turns_into"].get<uint32_t>();
+
+        if (action.contains("qualities_required"))
+        {
+          tile_data.actions[action_name].qualities_required =
+              action["qualities_required"].get<std::vector<std::string>>();
+        }
+
+        const auto& gives = action["gives"].get<std::vector<nlohmann::json>>();
+
+        for (const auto& item : gives)
+        {
+          const auto item_id = item["item_id"].get<uint32_t>();
+          const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
+          tile_data.actions[action_name].gives[item_id] = quantity;
+        }
+      }
     }
 
     m_tile_data[tile_data.id] = tile_data;

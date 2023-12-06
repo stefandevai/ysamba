@@ -51,6 +51,10 @@ void JobSystem::update(entt::registry& registry)
         break;
       }
     }
+    else if (current_job.status == JobStatus::Finished)
+    {
+      agent.jobs.pop();
+    }
   }
 }
 

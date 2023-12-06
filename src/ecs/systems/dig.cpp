@@ -54,25 +54,29 @@ void DigSystem::update(entt::registry& registry, const double delta)
       }
 
       const auto& tile_data = m_world.get_tile_data(target.id);
+      const auto& action = tile_data.actions.at("dig");
+
+      m_world.replace(target.id, action.turns_into, target.x, target.y, target.z);
 
       // Tile doesn't have any drop
-      if (tile_data.drop_ids.empty())
+      if (action.gives.empty())
       {
         stop_digging(registry, entity, agent);
         continue;
       }
 
-      m_world.replace(target.id, tile_data.after_removed, target.x, target.y, target.z);
-
       const auto& position = registry.get<Position>(entity);
 
-      for (const auto id : tile_data.drop_ids)
+      for (const auto& item : action.gives)
       {
         const auto drop = registry.create();
         registry.emplace<Position>(drop, position.x, position.y, position.z);
-        registry.emplace<Visibility>(
-            drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items);
-        registry.emplace<Pickable>(drop, id);
+        registry.emplace<Visibility>(drop,
+                                     m_world.get_texture_id(),
+                                     item.first,
+                                     frame_data_type::item,
+                                     target.z + renderer::layer_z_offset_items);
+        registry.emplace<Pickable>(drop, item.first);
       }
 
       stop_digging(registry, entity, agent);

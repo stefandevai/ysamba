@@ -19,7 +19,8 @@ namespace dl
 auto stop_harvesting = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
   registry.remove<ActionHarvest>(entity);
   agent.state = SocietyAgent::State::Idle;
-  agent.jobs.pop();
+  const auto& current_job = agent.jobs.top();
+  current_job.status = JobStatus::Finished;
 };
 
 HarvestSystem::HarvestSystem(World& world) : m_world(world) {}
@@ -59,23 +60,27 @@ void HarvestSystem::update(entt::registry& registry, const double delta)
       }
 
       const auto& tile_data = m_world.get_tile_data(target.id);
+      const auto& action = tile_data.actions.at("harvest");
+
+      m_world.replace(target.id, action.turns_into, target.x, target.y, target.z);
 
       // Tile doesn't have any drop
-      if (tile_data.drop_ids.empty())
+      if (action.gives.empty())
       {
         stop_harvesting(registry, entity, agent);
         continue;
       }
 
-      m_world.replace(target.id, tile_data.after_removed, target.x, target.y, target.z);
-
-      for (const auto id : tile_data.drop_ids)
+      for (const auto& item : action.gives)
       {
         const auto drop = registry.create();
         registry.emplace<Position>(drop, target.x, target.y, target.z);
-        registry.emplace<Visibility>(
-            drop, m_world.get_texture_id(), id, frame_data_type::item, target.z + renderer::layer_z_offset_items);
-        registry.emplace<Pickable>(drop, id);
+        registry.emplace<Visibility>(drop,
+                                     m_world.get_texture_id(),
+                                     item.first,
+                                     frame_data_type::item,
+                                     target.z + renderer::layer_z_offset_items);
+        registry.emplace<Pickable>(drop, item.first);
       }
 
       stop_harvesting(registry, entity, agent);

@@ -56,7 +56,7 @@ class ActionSystem
   void m_close_action_menu();
   void m_close_select_target();
   void m_dispose();
-  void m_select_tile_target(const std::string& flag,
+  void m_select_tile_target(const std::string& action,
                             const Vector2i& tile_position,
                             const JobType job_type,
                             entt::registry& registry);

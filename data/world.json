@@ -16,16 +16,39 @@
     {
       "id": 2,
       "name": "grass",
-      "flags": ["WALKABLE", "DIGGABLE"],
-      "drop_ids": [6],
-      "after_removed": 12
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 3,
       "name": "sand",
-      "flags": ["WALKABLE", "DIGGABLE"],
+      "flags": ["WALKABLE"],
       "drop_ids": [6],
-      "after_removed": 12
+      "actions": [
+        {
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 4,
@@ -35,9 +58,19 @@
     {
       "id": 5,
       "name": "yuca_plant",
-      "flags": ["HARVESTABLE"],
-      "drop_ids": [1],
-      "after_removed": 2
+      "flags": [],
+      "actions": [
+        {
+          "name": "harvest",
+          "gives": [
+            {
+              "item_id": 1,
+              "quantity": [3, 10]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
     },
     {
       "id": 6,
@@ -47,23 +80,55 @@
     {
       "id": 7,
       "name": "mushrooms",
-      "flags": ["HARVESTABLE", "WALKABLE"],
-      "drop_ids": [4],
-      "after_removed": 2
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "name": "harvest",
+          "gives": [
+            {
+              "item_id": 4,
+              "quantity": [1, 6]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
     },
     {
       "id": 8,
       "name": "rock",
-      "flags": ["BREAKABLE", "WALKABLE"],
-      "drop_ids": [5],
-      "after_removed": 2
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "name": "break",
+          "qualities_required": ["hammer"],
+          "gives": [
+            {
+              "item_id": 5,
+              "quantity": [1, 10]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
     },
     {
       "id": 9,
       "name": "rock",
-      "flags": ["BREAKABLE"],
-      "drop_ids": [5],
-      "after_removed": 2
+      "flags": [],
+      "actions": [
+        {
+          "name": "break",
+          "qualities_required": ["hammer"],
+          "gives": [
+            {
+              "item_id": 5,
+              "quantity": [1, 10]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
     },
     {
       "id": 10,

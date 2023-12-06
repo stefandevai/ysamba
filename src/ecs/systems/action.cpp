@@ -164,26 +164,22 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     {
     case ActionMenuState::SelectHarvestTarget:
     {
-      /* m_select_harvest_target(tile_x, tile_y, registry); */
-      m_select_tile_target(tile_flag::harvestable, tile_position, JobType::Harvest, registry);
+      m_select_tile_target("harvest", tile_position, JobType::Harvest, registry);
       break;
     }
     case ActionMenuState::SelectPickupTarget:
     {
-      /* m_select_pickup_target(tile_position.x, tile_position.y, registry); */
       m_select_item_target(tile_position, JobType::Pickup, registry);
       break;
     }
     case ActionMenuState::SelectBreakTarget:
     {
-      /* m_select_break_target(tile_x, tile_y, registry); */
-      m_select_tile_target(tile_flag::breakable, tile_position, JobType::Break, registry);
+      m_select_tile_target("break", tile_position, JobType::Break, registry);
       break;
     }
     case ActionMenuState::SelectDigTarget:
     {
-      /* m_select_dig_target(tile_x, tile_y, registry); */
-      m_select_tile_target(tile_flag::diggable, tile_position, JobType::Dig, registry);
+      m_select_tile_target("dig", tile_position, JobType::Dig, registry);
       break;
     }
     default:
@@ -234,14 +230,14 @@ void ActionSystem::m_dispose()
   m_input_manager->pop_context();
 }
 
-void ActionSystem::m_select_tile_target(const std::string& flag,
+void ActionSystem::m_select_tile_target(const std::string& action,
                                         const Vector2i& tile_position,
                                         const JobType job_type,
                                         entt::registry& registry)
 {
   const auto& tile = m_world.get(tile_position.x, tile_position.y, 0);
 
-  if (tile.flags.contains(flag))
+  if (tile.actions.contains(action))
   {
     for (const auto entity : m_selected_entities)
     {
