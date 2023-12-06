@@ -6,6 +6,15 @@
 
 namespace dl
 {
+enum class JobType
+{
+  Walk,
+  Harvest,
+  Break,
+  Dig,
+  Pickup,
+};
+
 enum class JobStatus
 {
   Waiting,
@@ -16,14 +25,14 @@ enum class JobStatus
 class Job
 {
  public:
-  uint32_t id;
+  JobType type;
   int priority = 0;
   Vector3i target;
   mutable JobStatus status = JobStatus::Waiting;
   int insertion_index = 0;
   static int current_index;
 
-  Job(const uint32_t id, const int priority, const Vector3i& target) : id(id), priority(priority), target(target)
+  Job(const JobType type, const int priority, const Vector3i& target) : type(type), priority(priority), target(target)
   {
     insertion_index = ++current_index;
   }

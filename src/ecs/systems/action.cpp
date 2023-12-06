@@ -129,7 +129,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       for (const auto entity : m_selected_entities)
       {
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{3, 0, Vector3i{tile_x, tile_y, 0}});
+        agent.jobs.push(Job{JobType::Walk, 0, Vector3i{tile_x, tile_y, 0}});
       }
     }
   }
@@ -156,29 +156,34 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     const auto& camera_position = camera.get_position();
     const auto& tile_size = camera.get_tile_size();
 
-    const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
-    const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
+    Vector2i tile_position{};
+    tile_position.x = (mouse_position.x + camera_position.x) / tile_size.x;
+    tile_position.y = (mouse_position.y + camera_position.y) / tile_size.y;
 
     switch (m_state)
     {
     case ActionMenuState::SelectHarvestTarget:
     {
-      m_select_harvest_target(tile_x, tile_y, registry);
+      /* m_select_harvest_target(tile_x, tile_y, registry); */
+      m_select_tile_target(tile_flag::harvestable, tile_position, JobType::Harvest, registry);
       break;
     }
     case ActionMenuState::SelectPickupTarget:
     {
-      m_select_pickup_target(tile_x, tile_y, registry);
+      /* m_select_pickup_target(tile_position.x, tile_position.y, registry); */
+      m_select_item_target(tile_position, JobType::Pickup, registry);
       break;
     }
     case ActionMenuState::SelectBreakTarget:
     {
-      m_select_break_target(tile_x, tile_y, registry);
+      /* m_select_break_target(tile_x, tile_y, registry); */
+      m_select_tile_target(tile_flag::breakable, tile_position, JobType::Break, registry);
       break;
     }
     case ActionMenuState::SelectDigTarget:
     {
-      m_select_dig_target(tile_x, tile_y, registry);
+      /* m_select_dig_target(tile_x, tile_y, registry); */
+      m_select_tile_target(tile_flag::diggable, tile_position, JobType::Dig, registry);
       break;
     }
     default:
@@ -229,25 +234,28 @@ void ActionSystem::m_dispose()
   m_input_manager->pop_context();
 }
 
-void ActionSystem::m_select_harvest_target(const int tile_x, const int tile_y, entt::registry& registry)
+void ActionSystem::m_select_tile_target(const std::string& flag,
+                                        const Vector2i& tile_position,
+                                        const JobType job_type,
+                                        entt::registry& registry)
 {
-  const auto& tile = m_world.get(tile_x, tile_y, 0);
+  const auto& tile = m_world.get(tile_position.x, tile_position.y, 0);
 
-  if (tile.flags.contains(tile_flag::harvestable))
+  if (tile.flags.contains(flag))
   {
     for (const auto entity : m_selected_entities)
     {
       auto& agent = registry.get<SocietyAgent>(entity);
-      agent.jobs.push(Job{3, 2, Vector3i{tile_x, tile_y, 0}});
-      agent.jobs.push(Job{0, 2, Vector3i{tile_x, tile_y, 0}});
+      agent.jobs.push(Job{JobType::Walk, 2, Vector3i{tile_position.x, tile_position.y, 0}});
+      agent.jobs.push(Job{job_type, 2, Vector3i{tile_position.x, tile_position.y, 0}});
     }
     m_dispose();
   }
 }
 
-void ActionSystem::m_select_pickup_target(const int tile_x, const int tile_y, entt::registry& registry)
+void ActionSystem::m_select_item_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry)
 {
-  const auto item = m_world.spatial_hash.get_by_component<Pickable>(tile_x, tile_y, registry);
+  const auto item = m_world.spatial_hash.get_by_component<Pickable>(tile_position.x, tile_position.y, registry);
 
   if (!registry.valid(item))
   {
@@ -258,49 +266,12 @@ void ActionSystem::m_select_pickup_target(const int tile_x, const int tile_y, en
   // single item in this stage of development
   for (const auto entity : m_selected_entities)
   {
-    const auto& position = registry.get<Position>(entity);
-    const Vector3i tile_position = {
-        static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
-    auto& action_pickup =
-        registry.emplace_or_replace<ActionPickup>(entity, ItemTarget(item, tile_x, tile_y, position.z));
-    action_pickup.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+    auto& agent = registry.get<SocietyAgent>(entity);
+    agent.jobs.push(Job{JobType::Walk, 2, Vector3i{tile_position.x, tile_position.y, 0}});
+    agent.jobs.push(Job{job_type, 2, Vector3i{tile_position.x, tile_position.y, 0}});
   }
 
   m_dispose();
-}
-
-void ActionSystem::m_select_break_target(const int tile_x, const int tile_y, entt::registry& registry)
-{
-  const auto& tile = m_world.get(tile_x, tile_y, 0);
-
-  if (tile.flags.contains(tile_flag::breakable))
-  {
-    for (const auto entity : m_selected_entities)
-    {
-      auto& agent = registry.get<SocietyAgent>(entity);
-      agent.jobs.push(Job{3, 2, Vector3i{tile_x, tile_y, 0}});
-      agent.jobs.push(Job{1, 2, Vector3i{tile_x, tile_y, 0}});
-    }
-
-    m_dispose();
-  }
-}
-
-void ActionSystem::m_select_dig_target(const int tile_x, const int tile_y, entt::registry& registry)
-{
-  const auto& tile = m_world.get(tile_x, tile_y, 0);
-
-  if (tile.flags.contains(tile_flag::diggable))
-  {
-    for (const auto entity : m_selected_entities)
-    {
-      auto& agent = registry.get<SocietyAgent>(entity);
-      agent.jobs.push(Job{3, 2, Vector3i{tile_x, tile_y, 0}});
-      agent.jobs.push(Job{2, 2, Vector3i{tile_x, tile_y, 0}});
-    }
-
-    m_dispose();
-  }
 }
 
 }  // namespace dl

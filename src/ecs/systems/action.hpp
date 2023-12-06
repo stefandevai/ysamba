@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "core/input_manager.hpp"
+#include "world/society/job.hpp"
 
 namespace dl::ui
 {
@@ -15,6 +16,7 @@ namespace dl
 {
 class World;
 class Camera;
+struct Vector2i;
 
 class ActionSystem
 {
@@ -54,9 +56,10 @@ class ActionSystem
   void m_close_action_menu();
   void m_close_select_target();
   void m_dispose();
-  void m_select_harvest_target(const int tile_x, const int tile_y, entt::registry& registry);
-  void m_select_pickup_target(const int tile_x, const int tile_y, entt::registry& registry);
-  void m_select_break_target(const int tile_x, const int tile_y, entt::registry& registry);
-  void m_select_dig_target(const int tile_x, const int tile_y, entt::registry& registry);
+  void m_select_tile_target(const std::string& flag,
+                            const Vector2i& tile_position,
+                            const JobType job_type,
+                            entt::registry& registry);
+  void m_select_item_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry);
 };
 }  // namespace dl
