@@ -25,6 +25,8 @@ const std::vector<std::string> ActionSystem::menu_items = {
     "[P]ickup",
     "[B]reak",
     "[D]ig",
+    "P[R]epare Firecamp",
+    "Start [F]ire",
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
@@ -80,6 +82,14 @@ void ActionSystem::m_update_action_menu()
   else if (m_input_manager->poll_action("dig"))
   {
     m_state = ActionMenuState::SelectDigTarget;
+  }
+  else if (m_input_manager->poll_action("prepare_firecamp"))
+  {
+    m_state = ActionMenuState::PrepareFirecampTarget;
+  }
+  else if (m_input_manager->poll_action("start_fire"))
+  {
+    m_state = ActionMenuState::StartFireTarget;
   }
 }
 
@@ -182,6 +192,16 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
       m_select_tile_target(tile_position, JobType::Dig, registry);
       break;
     }
+    case ActionMenuState::PrepareFirecampTarget:
+    {
+      m_select_tile_target(tile_position, JobType::PrepareFirecamp, registry);
+      break;
+    }
+    case ActionMenuState::StartFireTarget:
+    {
+      m_select_tile_target(tile_position, JobType::StartFire, registry);
+      break;
+    }
     default:
     {
       m_dispose();
@@ -245,11 +265,9 @@ void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const Job
       {
         if (!m_has_qualities_required(qualities_required, entity, registry))
         {
-          spdlog::debug("HOOOO1");
           continue;
         }
       }
-      spdlog::debug("HOOOO2");
 
       auto& agent = registry.get<SocietyAgent>(entity);
       agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
@@ -287,23 +305,17 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
 {
   for (const auto& quality : qualities_required)
   {
-    spdlog::debug("QUAL {}", quality);
     bool has_quality = false;
 
     const auto& weared_items = registry.get<WearedItems>(entity);
-
-    spdlog::debug("SIZE {}", weared_items.items.size());
 
     for (const auto item_entity : weared_items.items)
     {
       const auto& item = registry.get<Pickable>(item_entity);
       const auto& item_data = m_world.get_item_data(item.id);
 
-      spdlog::debug("ITEM {} {}", item.id, item_data.qualities.contains(quality));
-
       if (item_data.qualities.contains(quality))
       {
-        spdlog::debug("HERE1");
         has_quality = true;
         continue;
       }
@@ -311,11 +323,9 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
 
     if (!has_quality)
     {
-      spdlog::debug("HERE2");
       return false;
     }
   }
-  spdlog::debug("HERE3");
   return true;
 }
 

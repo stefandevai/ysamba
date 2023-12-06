@@ -20,7 +20,7 @@ class JobSystem
  private:
   World& m_world;
 
-  void m_update_tile_job(const Job& job, const double delta, entt::registry& registry);
+  void m_update_tile_job(const Job& job, const double delta, const entt::entity agent, entt::registry& registry);
 
   template <typename T>
   void m_create_tile_action(const entt::entity entity, entt::registry& registry, const Job& current_job)

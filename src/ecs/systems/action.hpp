@@ -31,6 +31,8 @@ class ActionSystem
     SelectPickupTarget,
     SelectBreakTarget,
     SelectDigTarget,
+    PrepareFirecampTarget,
+    StartFireTarget,
     Closed,
     Open,
   };

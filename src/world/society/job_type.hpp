@@ -9,5 +9,7 @@ enum class JobType
   Break,
   Dig,
   Pickup,
+  PrepareFirecamp,
+  StartFire,
 };
 }

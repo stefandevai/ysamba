@@ -149,7 +149,31 @@
     {
       "id": 12,
       "name": "hole in dirt",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 5,
+          "name": "prepare firecamp",
+          "turns_into": 13
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "prepared firecamp",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 6,
+          "name": "start fire",
+          "turns_into": 14
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "firecamp",
+      "flags": []
     }
   ]
 }

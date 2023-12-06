@@ -129,6 +129,18 @@
         "id": 12
     },
     {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 161,
+        "id": 13
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 162,
+        "id": 14
+    },
+    {
         "type": "item",
         "tile_type": "single",
         "frame": 192,
@@ -139,5 +151,23 @@
         "tile_type": "single",
         "frame": 21,
         "id": 7
+    },
+    {
+        "type": "item",
+        "tile_type": "single",
+        "frame": 22,
+        "id": 8
+    },
+    {
+        "type": "item",
+        "tile_type": "single",
+        "frame": 23,
+        "id": 9
+    },
+    {
+        "type": "item",
+        "tile_type": "single",
+        "frame": 24,
+        "id": 10
     }
 ]

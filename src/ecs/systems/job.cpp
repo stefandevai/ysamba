@@ -50,7 +50,9 @@ void JobSystem::update(entt::registry& registry, const double delta)
       case JobType::Harvest:
       case JobType::Break:
       case JobType::Dig:
-        m_update_tile_job(current_job, delta, registry);
+      case JobType::PrepareFirecamp:
+      case JobType::StartFire:
+        m_update_tile_job(current_job, delta, entity, registry);
       default:
         break;
       }
@@ -62,7 +64,10 @@ void JobSystem::update(entt::registry& registry, const double delta)
   }
 }
 
-void JobSystem::m_update_tile_job(const Job& job, const double delta, entt::registry& registry)
+void JobSystem::m_update_tile_job(const Job& job,
+                                  const double delta,
+                                  const entt::entity agent,
+                                  entt::registry& registry)
 {
   if (job.status != JobStatus::InProgress)
   {
@@ -93,10 +98,12 @@ void JobSystem::m_update_tile_job(const Job& job, const double delta, entt::regi
       return;
     }
 
+    const auto& position = registry.get<Position>(agent);
+
     for (const auto& item : action.gives)
     {
       const auto drop = registry.create();
-      registry.emplace<Position>(drop, job.target.position.x, job.target.position.y, job.target.position.z);
+      registry.emplace<Position>(drop, position.x, position.y, position.z);
       registry.emplace<Visibility>(drop,
                                    m_world.get_texture_id(),
                                    item.first,

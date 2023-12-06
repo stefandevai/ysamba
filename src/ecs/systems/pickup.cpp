@@ -33,44 +33,7 @@ void PickupSystem::update(entt::registry& registry)
       continue;
     }
 
-    const auto& position = registry.get<Position>(entity);
-
     auto& target = action_pickup.target;
-
-    // If the target tile is not adjacent, move towards the target
-    if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
-    {
-      // If the target path is empty, that means that the target disappeared.
-      if (target.path.size() <= 1)
-      {
-        stop_pickup(registry, entity, agent);
-        continue;
-      }
-      auto current_target_position = target.path.top();
-
-      if (std::round(position.x) == current_target_position.first &&
-          std::round(position.y) == current_target_position.second)
-      {
-        target.path.pop();
-        current_target_position = target.path.top();
-      }
-
-      const auto x_dir = current_target_position.first - std::round(position.x);
-      const auto y_dir = current_target_position.second - std::round(position.y);
-
-      if (registry.all_of<Velocity>(entity))
-      {
-        registry.patch<Velocity>(entity, [x_dir, y_dir](auto& velocity) {
-          velocity.x = x_dir;
-          velocity.y = y_dir;
-        });
-      }
-      else
-      {
-        registry.emplace<Velocity>(entity, x_dir, y_dir, 0.);
-      }
-      continue;
-    }
 
     // Check if target tile is still there
     if (!m_world.spatial_hash.has(target.entity, target.x, target.y))

@@ -333,13 +333,16 @@ void World::m_load_tile_data()
           tile_data.actions[type].qualities_required = action["qualities_required"].get<std::vector<std::string>>();
         }
 
-        const auto& gives = action["gives"].get<std::vector<nlohmann::json>>();
-
-        for (const auto& item : gives)
+        if (action.contains("gives"))
         {
-          const auto item_id = item["item_id"].get<uint32_t>();
-          const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
-          tile_data.actions[type].gives[item_id] = quantity;
+          const auto& gives = action["gives"].get<std::vector<nlohmann::json>>();
+
+          for (const auto& item : gives)
+          {
+            const auto item_id = item["item_id"].get<uint32_t>();
+            const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
+            tile_data.actions[type].gives[item_id] = quantity;
+          }
         }
       }
     }
