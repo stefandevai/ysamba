@@ -1,0 +1,47 @@
+[
+    {
+        "id": 0,
+        "name": ""
+    },
+    {
+        "id": 1,
+        "flags": ["PICKABLE", "WIELDABLE"],
+        "name": "yuca roots"
+    },
+    {
+        "id": 2,
+        "flags": ["PICKABLE"],
+        "name": "some yuca flour"
+    },
+    {
+        "id": 3,
+        "flags": ["PICKABLE"],
+        "name": "a lot of yuca flour"
+    },
+    {
+        "id": 4,
+        "flags": ["PICKABLE", "WIELDABLE"],
+        "name": "mushrooms"
+    },
+    {
+        "id": 5,
+        "flags": ["PICKABLE", "WIELDABLE"],
+        "name": "crushed rocks"
+    },
+    {
+        "id": 6,
+        "flags": ["PICKABLE"],
+        "name": "dirt"
+    },
+    {
+        "id": 7,
+        "name": "stone hammer",
+        "flags": ["PICKABLE", "WIELDABLE"],
+        "qualities": [
+            {
+                "name": "hammer",
+                "level": 2
+            }
+        ]
+    }
+]

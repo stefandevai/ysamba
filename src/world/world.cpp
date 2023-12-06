@@ -331,7 +331,7 @@ void World::m_load_tile_data()
 
 void World::m_load_item_data()
 {
-  m_json.load("./data/items/cooking.json");
+  m_json.load("./data/items/items.json");
 
   const auto items = m_json.object.get<std::vector<nlohmann::json>>();
 
