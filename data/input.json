@@ -23,6 +23,7 @@
         "load_world": ["k_l"],
         "display_seed": ["k_e"],
         "open_action_menu": ["k_a"],
+        "open_inventory": ["k_i"],
         "add_item": ["k_z"]
     },
     "action_menu": {
@@ -33,5 +34,8 @@
         "dig": ["k_d"],
         "prepare_firecamp": ["k_r"],
         "start_fire": ["k_f"]
+    },
+    "inventory": {
+        "close_inventory": ["k_escape"]
     }
 }

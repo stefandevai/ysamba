@@ -93,6 +93,13 @@ void ActionSystem::m_update_action_menu()
 
 void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
 {
+  const auto& current_context = m_input_manager->get_current_context();
+
+  if (current_context == nullptr || current_context->key != "gameplay")
+  {
+    return;
+  }
+
   if (m_input_manager->poll_action("open_action_menu"))
   {
     if (m_selected_entities.empty())

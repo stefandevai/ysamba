@@ -8,6 +8,7 @@
 #include "ecs/systems/action.hpp"
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/inspector.hpp"
+#include "ecs/systems/inventory.hpp"
 #include "ecs/systems/job.hpp"
 #include "ecs/systems/physics.hpp"
 #include "ecs/systems/pickup.hpp"
@@ -58,6 +59,7 @@ class Gameplay : public Scene
   PickupSystem m_pickup_system{m_world};
   WalkSystem m_walk_system{m_world};
   JobSystem m_job_system{m_world};
+  InventorySystem m_inventory_system{m_world, m_ui_manager};
 
   void m_update_input(GameContext& game_context);
 };
