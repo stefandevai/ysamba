@@ -14,6 +14,7 @@ namespace dl
 auto stop_walk = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
   registry.remove<ActionWalk>(entity);
   agent.state = SocietyAgent::State::Idle;
+  agent.jobs.pop();
 };
 
 WalkSystem::WalkSystem() {}
@@ -40,7 +41,7 @@ void WalkSystem::update(entt::registry& registry)
     if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
     {
       // If the target path is empty, that means that the target disappeared.
-      if (target.path.size() <= 1)
+      if (target.path.size() < 1)
       {
         stop_walk(registry, entity, agent);
         continue;

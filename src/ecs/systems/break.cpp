@@ -6,7 +6,6 @@
 
 #include "ecs/components/action_break.hpp"
 #include "ecs/components/pickable.hpp"
-#include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
@@ -20,6 +19,7 @@ namespace dl
 auto stop_breaking = [](entt::registry& registry, const entt::entity entity, SocietyAgent& agent) {
   registry.remove<ActionBreak>(entity);
   agent.state = SocietyAgent::State::Idle;
+  agent.jobs.pop();
 };
 
 BreakSystem::BreakSystem(World& world) : m_world(world) {}
@@ -38,50 +38,12 @@ void BreakSystem::update(entt::registry& registry, const double delta)
       continue;
     }
 
-    const auto& position = registry.get<Position>(entity);
-
-    auto& target = action_break.target;
-
-    // If the target tile is not adjacent, move towards the target
-    if (std::abs(target.x - std::round(position.x)) > 1 || std::abs(target.y - std::round(position.y)) > 1)
-    {
-      // If the target path is empty, that means that the target disappeared.
-      if (target.path.size() <= 1)
-      {
-        stop_breaking(registry, entity, agent);
-        continue;
-      }
-      auto current_target_position = target.path.top();
-
-      if (std::round(position.x) == current_target_position.first &&
-          std::round(position.y) == current_target_position.second)
-      {
-        target.path.pop();
-        current_target_position = target.path.top();
-      }
-
-      const auto x_dir = current_target_position.first - std::round(position.x);
-      const auto y_dir = current_target_position.second - std::round(position.y);
-
-      if (registry.all_of<Velocity>(entity))
-      {
-        registry.patch<Velocity>(entity, [x_dir, y_dir](auto& velocity) {
-          velocity.x = x_dir;
-          velocity.y = y_dir;
-        });
-      }
-      else
-      {
-        registry.emplace<Velocity>(entity, x_dir, y_dir, 0.);
-      }
-      continue;
-    }
-
     action_break.time_left -= delta;
 
     if (action_break.time_left < 0.0)
     {
       // Check if target tile is still there
+      auto& target = action_break.target;
       const auto& tile = m_world.get(target.x, target.y, target.z);
 
       if (tile.id != target.id)

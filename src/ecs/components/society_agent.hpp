@@ -1,6 +1,10 @@
 #pragma once
 
+#include <queue>
 #include <string>
+
+#include "core/maths/vector.hpp"
+#include "world/society/job.hpp"
 
 namespace dl
 {
@@ -40,5 +44,6 @@ struct SocietyAgent
   Metier metiers;
   State state = State::Idle;
   double time_to_next_action = 0.0;
+  std::priority_queue<Job> jobs{};
 };
 }  // namespace dl

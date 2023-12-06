@@ -143,6 +143,7 @@ void Gameplay::update()
       m_break_system.update(m_registry, delta);
       m_dig_system.update(m_registry, delta);
       m_pickup_system.update(m_registry);
+      m_job_system.update(m_registry);
     }
   }
 

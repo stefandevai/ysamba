@@ -2,11 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ecs/components/action_break.hpp"
-#include "ecs/components/action_dig.hpp"
-#include "ecs/components/action_harvest.hpp"
 #include "ecs/components/action_pickup.hpp"
-#include "ecs/components/action_walk.hpp"
 #include "ecs/components/pickable.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
@@ -130,16 +126,10 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     // If we are not selecting an entity, walk to the target
     else if (!m_selected_entities.empty())
     {
-      const auto& tile = m_world.get(tile_x, tile_y, 0);
-
       for (const auto entity : m_selected_entities)
       {
-        const auto& position = registry.get<Position>(entity);
-        const Vector3i tile_position =
-            Vector3i{static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
-        auto& action_walk =
-            registry.emplace_or_replace<ActionWalk>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
-        action_walk.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+        auto& agent = registry.get<SocietyAgent>(entity);
+        agent.jobs.push(Job{3, 0, Vector3i{tile_x, tile_y, 0}});
       }
     }
   }
@@ -235,13 +225,6 @@ void ActionSystem::m_dispose()
   m_close_action_menu();
   m_close_select_target();
 
-  /* for (const auto entity : m_selected_entities) */
-  /* { */
-  /*   auto& selectable = registry.get<Selectable>(entity); */
-  /*   selectable.selected = false; */
-  /* } */
-
-  /* m_selected_entities.clear(); */
   m_state = ActionMenuState::Closed;
   m_input_manager->pop_context();
 }
@@ -254,12 +237,9 @@ void ActionSystem::m_select_harvest_target(const int tile_x, const int tile_y, e
   {
     for (const auto entity : m_selected_entities)
     {
-      const auto& position = registry.get<Position>(entity);
-      const Vector3i tile_position = {
-          static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
-      auto& action_harvest =
-          registry.emplace_or_replace<ActionHarvest>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
-      action_harvest.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+      auto& agent = registry.get<SocietyAgent>(entity);
+      agent.jobs.push(Job{3, 2, Vector3i{tile_x, tile_y, 0}});
+      agent.jobs.push(Job{0, 2, Vector3i{tile_x, tile_y, 0}});
     }
     m_dispose();
   }
@@ -297,12 +277,9 @@ void ActionSystem::m_select_break_target(const int tile_x, const int tile_y, ent
   {
     for (const auto entity : m_selected_entities)
     {
-      const auto& position = registry.get<Position>(entity);
-      const Vector3i tile_position = {
-          static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
-      auto& action_break =
-          registry.emplace_or_replace<ActionBreak>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
-      action_break.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+      auto& agent = registry.get<SocietyAgent>(entity);
+      agent.jobs.push(Job{3, 2, Vector3i{tile_x, tile_y, 0}});
+      agent.jobs.push(Job{1, 2, Vector3i{tile_x, tile_y, 0}});
     }
 
     m_dispose();
@@ -317,12 +294,9 @@ void ActionSystem::m_select_dig_target(const int tile_x, const int tile_y, entt:
   {
     for (const auto entity : m_selected_entities)
     {
-      const auto& position = registry.get<Position>(entity);
-      const Vector3i tile_position = {
-          static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.x)};
-      auto& action_dig =
-          registry.emplace_or_replace<ActionDig>(entity, TileTarget(tile.id, tile_x, tile_y, position.z));
-      action_dig.target.path = m_world.get_path_between(tile_position, Vector3i{tile_x, tile_y, (int)position.z});
+      auto& agent = registry.get<SocietyAgent>(entity);
+      agent.jobs.push(Job{3, 2, Vector3i{tile_x, tile_y, 0}});
+      agent.jobs.push(Job{2, 2, Vector3i{tile_x, tile_y, 0}});
     }
 
     m_dispose();

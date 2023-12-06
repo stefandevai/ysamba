@@ -11,6 +11,7 @@
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/harvest.hpp"
 #include "ecs/systems/inspector.hpp"
+#include "ecs/systems/job.hpp"
 #include "ecs/systems/physics.hpp"
 #include "ecs/systems/pickup.hpp"
 #include "ecs/systems/render.hpp"
@@ -62,6 +63,7 @@ class Gameplay : public Scene
   ActionSystem m_action_system{m_world, m_ui_manager};
   PickupSystem m_pickup_system{m_world};
   WalkSystem m_walk_system{};
+  JobSystem m_job_system{m_world};
 
   void m_update_input(GameContext& game_context);
 };
