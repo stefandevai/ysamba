@@ -62,7 +62,7 @@ bool InputManager::poll_action(const std::string& action_key)
 
   if (!current_context->actions.contains(action_key))
   {
-    spdlog::critical("Could not find action in this context: {}", action_key);
+    spdlog::warn("Could not find input action in this context: {}", action_key);
     return false;
   }
 
