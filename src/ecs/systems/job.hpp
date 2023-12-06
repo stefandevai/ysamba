@@ -2,7 +2,6 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "ecs/components/pickable.hpp"
 #include "world/society/job.hpp"
 #include "world/world.hpp"
 

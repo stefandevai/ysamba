@@ -2,10 +2,9 @@
 
 namespace dl
 {
-struct Pickable
+struct Item
 {
-  int id = 0;
-  uint32_t weight = 0;
+  uint32_t id = 0;
 };
 
 }  // namespace dl

@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "ecs/components/action_pickup.hpp"
-#include "ecs/components/pickable.hpp"
+#include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
@@ -288,7 +288,7 @@ void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const Job
 
 void ActionSystem::m_select_item_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry)
 {
-  const auto item = m_world.spatial_hash.get_by_component<Pickable>(tile_position.x, tile_position.y, registry);
+  const auto item = m_world.spatial_hash.get_by_component<Item>(tile_position.x, tile_position.y, registry);
 
   if (!registry.valid(item))
   {
@@ -320,7 +320,7 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
 
     for (const auto item_entity : weared_items.items)
     {
-      const auto& item = registry.get<Pickable>(item_entity);
+      const auto& item = registry.get<Item>(item_entity);
       const auto& item_data = m_world.get_item_data(item.id);
 
       if (item_data.qualities.contains(quality))

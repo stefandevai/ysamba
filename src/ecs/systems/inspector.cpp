@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ecs/components/pickable.hpp"
+#include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
@@ -89,9 +89,9 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
-  else if (registry.all_of<Pickable, Visibility>(entity))
+  else if (registry.all_of<Item, Visibility>(entity))
   {
-    const auto& item = registry.get<Pickable>(entity);
+    const auto& item = registry.get<Item>(entity);
     if (item.id <= 0)
     {
       return;

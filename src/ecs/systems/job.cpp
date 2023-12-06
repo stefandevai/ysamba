@@ -4,6 +4,7 @@
 
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
+#include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "graphics/constants.hpp"
@@ -109,7 +110,7 @@ void JobSystem::m_update_tile_job(const Job& job,
                                    item.first,
                                    frame_data_type::item,
                                    job.target.position.z + renderer::layer_z_offset_items);
-      registry.emplace<Pickable>(drop, item.first);
+      registry.emplace<Item>(drop, item.first);
     }
   }
 }

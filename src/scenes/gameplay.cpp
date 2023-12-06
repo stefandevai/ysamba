@@ -14,6 +14,7 @@
 // TEMP
 #include "core/json.hpp"
 #include "ecs/components/biology.hpp"
+#include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -231,7 +232,7 @@ void Gameplay::m_update_input(GameContext& m_game_context)
     const auto item = m_registry.create();
     m_registry.emplace<Position>(item, tile_x, tile_y, 1);
     m_registry.emplace<Visibility>(item, m_world.get_texture_id(), id, "item", 1);
-    m_registry.emplace<Pickable>(item, id);
+    m_registry.emplace<Item>(item, id);
   }
   else if (m_input_manager->poll_action("display_seed"))
   {
