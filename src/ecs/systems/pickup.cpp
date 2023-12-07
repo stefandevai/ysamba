@@ -3,8 +3,8 @@
 #include <spdlog/spdlog.h>
 
 #include "ecs/components/action_pickup.hpp"
+#include "ecs/components/carried_items.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/weared_items.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -42,8 +42,8 @@ void PickupSystem::update(entt::registry& registry)
     registry.remove<Position>(item);
     registry.remove<Visibility>(item);
 
-    auto& weared_items = registry.get<WearedItems>(entity);
-    weared_items.items.push_back(item);
+    auto& carried_items = registry.get<CarriedItems>(entity);
+    carried_items.items.push_back(item);
 
     stop_pickup(registry, entity, job);
   }

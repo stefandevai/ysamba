@@ -4,10 +4,10 @@
 
 #include "./society_blueprint.hpp"
 #include "ecs/components/biology.hpp"
+#include "ecs/components/carried_items.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/visibility.hpp"
-#include "ecs/components/weared_items.hpp"
 
 namespace dl
 {
@@ -23,7 +23,7 @@ class SocietyGenerator
     SocietyAgent agent;
     Biology biology;
     Visibility visibility;
-    WearedItems weared_items;
+    CarriedItems carried_items;
   };
 
   // Generate society

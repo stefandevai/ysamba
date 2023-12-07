@@ -2,7 +2,7 @@
 
 namespace dl
 {
-struct WearedItems
+struct CarriedItems
 {
   std::vector<entt::entity> items{};
 };

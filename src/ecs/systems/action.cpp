@@ -3,12 +3,12 @@
 #include <spdlog/spdlog.h>
 
 #include "ecs/components/action_pickup.hpp"
+#include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/weared_items.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "ui/components/action_menu.hpp"
@@ -323,9 +323,9 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
   {
     bool has_quality = false;
 
-    const auto& weared_items = registry.get<WearedItems>(entity);
+    const auto& carried_items = registry.get<CarriedItems>(entity);
 
-    for (const auto item_entity : weared_items.items)
+    for (const auto item_entity : carried_items.items)
     {
       const auto& item = registry.get<Item>(item_entity);
       const auto& item_data = m_world.get_item_data(item.id);

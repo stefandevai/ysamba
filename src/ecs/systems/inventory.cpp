@@ -2,10 +2,10 @@
 
 #include <spdlog/spdlog.h>
 
+#include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
-#include "ecs/components/weared_items.hpp"
 #include "ui/components/inventory.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
@@ -123,12 +123,12 @@ void InventorySystem::m_update_items(entt::registry& registry)
   {
     for (const auto entity : selected_entities)
     {
-      if (!registry.all_of<WearedItems>(entity))
+      if (!registry.all_of<CarriedItems>(entity))
       {
         continue;
       }
 
-      const auto& items = registry.get<WearedItems>(entity);
+      const auto& items = registry.get<CarriedItems>(entity);
 
       m_items.insert(m_items.begin(), items.items.begin(), items.items.end());
     }
