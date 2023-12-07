@@ -24,6 +24,7 @@
         "display_seed": ["k_e"],
         "open_action_menu": ["k_a"],
         "open_inventory": ["k_i"],
+        "inspect": ["k_x"],
         "add_item": ["k_z"]
     },
     "action_menu": {
@@ -37,5 +38,8 @@
     },
     "inventory": {
         "close_inventory": ["k_escape"]
+    },
+    "inspector": {
+        "quit": ["k_escape"]
     }
 }

@@ -128,7 +128,7 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
-  if (m_current_state == Gameplay::State::PLAYING)
+  if (m_current_state == State::PLAYING)
   {
     if (m_turn_delay > 0.0)
     {
@@ -146,9 +146,9 @@ void Gameplay::update()
     }
   }
 
-  m_inspector_system.update(m_registry, m_camera);
   m_action_system.update(m_registry, m_camera);
   m_inventory_system.update(m_registry, m_camera);
+  m_inspector_system.update(m_registry, m_camera);
 
   m_ui_manager.update();
 
@@ -201,13 +201,13 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   }
   else if (m_input_manager->poll_action("toggle_pause"))
   {
-    if (m_current_state == Gameplay::State::PLAYING)
+    if (m_current_state == State::PLAYING)
     {
-      m_current_state = Gameplay::State::PAUSED;
+      m_current_state = State::PAUSED;
     }
     else
     {
-      m_current_state = Gameplay::State::PLAYING;
+      m_current_state = State::PLAYING;
     }
   }
   else if (m_input_manager->poll_action("save_world"))

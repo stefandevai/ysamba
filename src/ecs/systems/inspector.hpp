@@ -25,6 +25,13 @@ class InspectorSystem
   void update(entt::registry& registry, const Camera& camera);
 
  private:
+  enum class State
+  {
+    Active,
+    Inactive,
+  };
+
+  State m_state = State::Inactive;
   World& m_world;
   ui::UIManager& m_ui_manager;
   std::shared_ptr<ui::Inspector> m_inspector = nullptr;
@@ -34,6 +41,7 @@ class InspectorSystem
   Vector3 m_last_camera_position{0., 0., 0.};
   entt::entity m_target_quad = entt::null;
 
+  void m_update_input(entt::registry& registry);
   void m_update_inspector_content(const entt::entity entity, entt::registry& registry);
   void m_update_inspector_content(const TileData& tile_data);
   void m_destroy_inspector();

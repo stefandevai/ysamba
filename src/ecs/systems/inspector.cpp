@@ -23,6 +23,13 @@ InspectorSystem::InspectorSystem(World& world, ui::UIManager& ui_manager) : m_wo
 
 void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 {
+  m_update_input(registry);
+
+  if (m_state != State::Active)
+  {
+    return;
+  }
+
   const auto mouse_position = m_input_manager->get_mouse_position();
   const auto& camera_position = camera.get_position();
 
@@ -122,5 +129,38 @@ void InspectorSystem::m_destroy_inspector()
 }
 
 bool InspectorSystem::m_is_valid() const { return m_inspector_id >= 0 && m_inspector != nullptr; }
+
+void InspectorSystem::m_update_input(entt::registry& registry)
+{
+  if (m_state == State::Inactive)
+  {
+    const auto& current_context = m_input_manager->get_current_context();
+
+    if (current_context == nullptr || current_context->key != "gameplay")
+    {
+      return;
+    }
+
+    if (m_input_manager->poll_action("inspect"))
+    {
+      m_state = State::Active;
+      m_input_manager->push_context("inspector");
+    }
+  }
+  else if (m_state == State::Active)
+  {
+    if (m_input_manager->poll_action("quit"))
+    {
+      m_destroy_inspector();
+
+      if (registry.valid(m_target_quad))
+      {
+        registry.destroy(m_target_quad);
+      }
+      m_state = State::Inactive;
+      m_input_manager->pop_context();
+    }
+  }
+}
 
 }  // namespace dl
