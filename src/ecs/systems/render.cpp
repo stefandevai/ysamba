@@ -37,7 +37,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 
       if (world_tile.terrain.id > 0)
       {
-        const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+        const auto& sprite = std::make_unique<Sprite>(m_world_texture_id, 0);
 
         if (sprite->texture == nullptr)
         {
@@ -75,7 +75,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
           }
 
           const auto& multi_sprite =
-              std::make_shared<MultiSprite>(m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height);
+              std::make_unique<MultiSprite>(m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height);
 
           if (multi_sprite->texture == nullptr)
           {
@@ -90,7 +90,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
         }
         else
         {
-          const auto& sprite = std::make_shared<Sprite>(m_world_texture_id, 0);
+          const auto& sprite = std::make_unique<Sprite>(m_world_texture_id, 0);
 
           if (sprite->texture == nullptr)
           {

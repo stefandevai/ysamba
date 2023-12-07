@@ -8,7 +8,7 @@ namespace dl
 {
 struct Visibility
 {
-  std::shared_ptr<Sprite> sprite = nullptr;
+  std::unique_ptr<Sprite> sprite = nullptr;
 
   std::string resource_id{};
 
@@ -21,12 +21,12 @@ struct Visibility
   // A z index to be applied only for rendering
   uint32_t layer_z{};
 
-  Visibility() {}
+  Visibility() = default;
 
   Visibility(const std::string& resource_id, const uint32_t frame = 0, const uint32_t layer_z = 0)
       : resource_id(resource_id), layer_z(layer_z)
   {
-    sprite = std::make_shared<Sprite>(resource_id, frame);
+    sprite = std::make_unique<Sprite>(resource_id, frame);
   };
 
   Visibility(const std::string& resource_id,
@@ -35,7 +35,7 @@ struct Visibility
              const uint32_t layer_z = 0)
       : resource_id(resource_id), frame_id(frame_id), frame_type(frame_type), layer_z(layer_z)
   {
-    sprite = std::make_shared<Sprite>(resource_id, 0);
+    sprite = std::make_unique<Sprite>(resource_id, 0);
   };
 };
 }  // namespace dl

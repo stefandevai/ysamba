@@ -4,11 +4,11 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
+#include "graphics/sprite.hpp"
 
 namespace dl
 {
 class Font;
-class Sprite;
 
 struct Character
 {
@@ -17,7 +17,7 @@ struct Character
   int y;
   int w;
   int h;
-  std::shared_ptr<Sprite> sprite;
+  std::unique_ptr<Sprite> sprite = nullptr;
 };
 
 class Text
@@ -26,12 +26,16 @@ class Text
   std::string value, typeface, color;
   std::vector<Character> characters{};
 
-  Text() {}
   Text(const std::string_view text,
        const std::string_view typeface = "font-1980",
        const unsigned int font_size = 32,
        const std::string_view color = "#ffffffff",
        const bool is_static = true);
+  Text() = default;
+  Text(Text&&) = default;
+  Text(const Text&) = delete;
+  Text& operator=(const Text&) = delete;
+  Text& operator=(Text&&) = default;
 
   void initialize();
   void update();

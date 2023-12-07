@@ -25,7 +25,7 @@ void WorldCreation::load()
 {
   Scene::load();
 
-  m_world_sprite = std::make_shared<Sprite>();
+  m_world_sprite = std::make_unique<Sprite>();
 
   const auto seed = m_lua.get_optional_variable<int>("seed");
 

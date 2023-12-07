@@ -7,7 +7,7 @@ namespace dl
 {
 struct Rectangle
 {
-  Rectangle(int w, int h, const std::string& color) { quad = std::make_shared<Quad>(w, h, Color{color}); }
-  std::shared_ptr<Quad> quad = nullptr;
+  Rectangle(int w, int h, const std::string& color) { quad = std::make_unique<Quad>(w, h, Color{color}); }
+  std::unique_ptr<Quad> quad = nullptr;
 };
 }  // namespace dl

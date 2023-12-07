@@ -8,10 +8,10 @@
 
 namespace dl::ui
 {
-Container::Container() : UIComponent(), quad(std::make_shared<Quad>(0, 0, Color{"#ffffffff"})) {}
+Container::Container() : UIComponent(), quad(std::make_unique<Quad>(0, 0, Color{"#ffffffff"})) {}
 
 Container::Container(const Vector2i& size, const std::string& color)
-    : UIComponent(), quad(std::make_shared<Quad>(size.x, size.y, Color{color}))
+    : UIComponent(), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
 {
   this->size = size;
 }

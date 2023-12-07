@@ -47,7 +47,7 @@ void Text::update()
     if (w > 0.f && h > 0.f)
     {
       character.code = c;
-      character.sprite = std::make_shared<Sprite>(typeface);
+      character.sprite = std::make_unique<Sprite>(typeface);
       character.sprite->texture = m_font->get_atlas();
       character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
 
@@ -70,7 +70,7 @@ void Text::update()
       character.x = x;
       character.y = y;
     }
-    characters.push_back(character);
+    characters.push_back(std::move(character));
 
     char_pos_x += (ch.ax >> 6) * scale;
   }

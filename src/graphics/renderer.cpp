@@ -39,7 +39,7 @@ std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
 }
 
 void Renderer::batch(
-    const std::string& layer_id, const std::shared_ptr<Sprite>& sprite, const double x, const double y, const double z)
+    const std::string& layer_id, const std::unique_ptr<Sprite>& sprite, const double x, const double y, const double z)
 {
   const auto& layer = m_layers.at(layer_id);
 
@@ -53,7 +53,7 @@ void Renderer::batch(
 }
 
 void Renderer::batch(const std::string& layer_id,
-                     const std::shared_ptr<MultiSprite>& multi_sprite,
+                     const std::unique_ptr<MultiSprite>& multi_sprite,
                      const double x,
                      const double y,
                      const double z)
@@ -78,7 +78,7 @@ void Renderer::batch(const std::string& layer_id, Text& text, const double x, co
 }
 
 void Renderer::batch(
-    const std::string& layer_id, const std::shared_ptr<Quad>& quad, const double x, const double y, const double z)
+    const std::string& layer_id, const std::unique_ptr<Quad>& quad, const double x, const double y, const double z)
 {
   m_layers.at(layer_id)->quad(quad, x, y, z);
 }

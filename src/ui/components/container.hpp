@@ -14,7 +14,7 @@ namespace dl::ui
 class Container : public UIComponent
 {
  public:
-  std::shared_ptr<Quad> quad;
+  std::unique_ptr<Quad> quad = nullptr;
 
   Container();
   Container(const Vector2i& size, const std::string& color);
