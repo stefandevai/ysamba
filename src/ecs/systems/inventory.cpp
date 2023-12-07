@@ -18,7 +18,7 @@ InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager) : m_wo
   m_inventory = std::make_shared<ui::Inventory>(on_select);
 }
 
-void InventorySystem::update(entt::registry& registry, const Camera& camera)
+void InventorySystem::update(entt::registry& registry)
 {
   if (m_state == InventoryState::Open)
   {

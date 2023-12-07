@@ -20,7 +20,7 @@ class InventorySystem
 {
  public:
   InventorySystem(World& world, ui::UIManager& ui_manager);
-  void update(entt::registry& registry, const Camera& camera);
+  void update(entt::registry& registry);
 
  private:
   enum class InventoryState
