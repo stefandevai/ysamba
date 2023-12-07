@@ -8,10 +8,10 @@
 #include <glm/glm.hpp>
 #include <string>
 
-#include "core/maths/vector.hpp"
-
 namespace dl
 {
+struct Vector2i;
+
 class Display
 {
  public:

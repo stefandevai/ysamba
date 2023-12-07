@@ -13,6 +13,8 @@
 #endif
 #endif
 
+#include "core/maths/vector.hpp"
+
 namespace dl
 {
 SDL_Window* Display::m_window = nullptr;
