@@ -3,154 +3,9 @@
 
 #include "./input_manager.hpp"
 
-namespace dl
+namespace
 {
-SDLInputWrapper::SDLInputWrapper() {}
-
-void SDLInputWrapper::update()
-{
-  // Block until events exist
-  /* SDL_WaitEvent(nullptr); */
-
-  // Reset keys
-  for (auto& it : m_key_down)
-  {
-    it.second = false;
-  }
-
-  for (auto& it : m_key_up)
-  {
-    it.second = false;
-  }
-
-  m_any_key_down = false;
-
-  m_scroll.x = 0;
-  m_scroll.y = 0;
-
-  m_mouse_state_up.first = false;
-  m_mouse_state_up.first = false;
-
-  // Update key status
-  SDL_Event event;
-
-  while (SDL_PollEvent(&event))
-  {
-    switch (event.type)
-    {
-    case SDL_QUIT:
-    {
-      m_should_quit = true;
-      break;
-    }
-
-    case SDL_KEYDOWN:
-    {
-      const int index = event.key.keysym.sym;
-
-      m_key_down[index] = true;
-      m_any_key_down = true;
-      break;
-    }
-
-    case SDL_KEYUP:
-    {
-      const int index = event.key.keysym.sym;
-      m_key_up[index] = true;
-      break;
-    }
-
-    case SDL_MOUSEMOTION:
-    {
-      m_mouse_position.x = event.motion.x;
-      m_mouse_position.y = event.motion.y;
-      break;
-    }
-
-    case SDL_MOUSEBUTTONDOWN:
-    {
-      if (event.button.button == SDL_BUTTON_LEFT)
-      {
-        m_mouse_state_down.first = true;
-      }
-      else if (event.button.button == SDL_BUTTON_RIGHT)
-      {
-        m_mouse_state_down.second = true;
-      }
-      break;
-    }
-
-    case SDL_MOUSEBUTTONUP:
-    {
-      if (event.button.button == SDL_BUTTON_LEFT)
-      {
-        m_mouse_state_up.first = true;
-        m_mouse_state_down.first = false;
-      }
-      else if (event.button.button == SDL_BUTTON_RIGHT)
-      {
-        m_mouse_state_up.second = true;
-        m_mouse_state_down.second = false;
-      }
-      break;
-    }
-
-    case SDL_MOUSEWHEEL:
-    {
-      m_scroll.x = event.wheel.x;
-      m_scroll.y = event.wheel.y;
-      break;
-    }
-
-    case SDL_WINDOWEVENT:
-    {
-      switch (event.window.event)
-      {
-      case SDL_WINDOWEVENT_RESIZED:
-      case SDL_WINDOWEVENT_SIZE_CHANGED:
-        m_window_size_changed = true;
-        break;
-      }
-      break;
-    }
-
-    default:
-      break;
-    }
-  }
-}
-
-bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }
-
-bool SDLInputWrapper::is_key_down(const std::string& key)
-{
-  const auto it = m_key_down.find(m_key_map.at(key));
-
-  if (it == m_key_down.end())
-  {
-    return false;
-  }
-
-  return it->second;
-}
-
-bool SDLInputWrapper::is_key_up(const std::string& key)
-{
-  const auto it = m_key_up.find(m_key_map.at(key));
-
-  if (it == m_key_up.end())
-  {
-    return false;
-  }
-
-  return it->second;
-}
-
-bool SDLInputWrapper::should_quit() { return m_should_quit; }
-
-void SDLInputWrapper::quit() { m_should_quit = true; }
-
-const std::unordered_map<std::string, int> SDLInputWrapper::m_key_map = {
+const std::unordered_map<std::string, int> key_map = {
     {"k_backspace", SDLK_BACKSPACE},
     {"k_tab", SDLK_TAB},
     {"k_return", SDLK_RETURN},
@@ -387,4 +242,153 @@ const std::unordered_map<std::string, int> SDLInputWrapper::m_key_map = {
     {"k_eject", SDLK_EJECT},
     {"k_sleep", SDLK_SLEEP},
 };
+}
+
+namespace dl
+{
+SDLInputWrapper::SDLInputWrapper() {}
+
+void SDLInputWrapper::update()
+{
+  // Block until events exist
+  /* SDL_WaitEvent(nullptr); */
+
+  // Reset keys
+  for (auto& it : m_key_down)
+  {
+    it.second = false;
+  }
+
+  for (auto& it : m_key_up)
+  {
+    it.second = false;
+  }
+
+  m_any_key_down = false;
+
+  m_scroll.x = 0;
+  m_scroll.y = 0;
+
+  m_mouse_state_up.first = false;
+  m_mouse_state_up.first = false;
+
+  // Update key status
+  SDL_Event event;
+
+  while (SDL_PollEvent(&event))
+  {
+    switch (event.type)
+    {
+    case SDL_QUIT:
+    {
+      m_should_quit = true;
+      break;
+    }
+
+    case SDL_KEYDOWN:
+    {
+      const int index = event.key.keysym.sym;
+
+      m_key_down[index] = true;
+      m_any_key_down = true;
+      break;
+    }
+
+    case SDL_KEYUP:
+    {
+      const int index = event.key.keysym.sym;
+      m_key_up[index] = true;
+      break;
+    }
+
+    case SDL_MOUSEMOTION:
+    {
+      m_mouse_position.x = event.motion.x;
+      m_mouse_position.y = event.motion.y;
+      break;
+    }
+
+    case SDL_MOUSEBUTTONDOWN:
+    {
+      if (event.button.button == SDL_BUTTON_LEFT)
+      {
+        m_mouse_state_down.first = true;
+      }
+      else if (event.button.button == SDL_BUTTON_RIGHT)
+      {
+        m_mouse_state_down.second = true;
+      }
+      break;
+    }
+
+    case SDL_MOUSEBUTTONUP:
+    {
+      if (event.button.button == SDL_BUTTON_LEFT)
+      {
+        m_mouse_state_up.first = true;
+        m_mouse_state_down.first = false;
+      }
+      else if (event.button.button == SDL_BUTTON_RIGHT)
+      {
+        m_mouse_state_up.second = true;
+        m_mouse_state_down.second = false;
+      }
+      break;
+    }
+
+    case SDL_MOUSEWHEEL:
+    {
+      m_scroll.x = event.wheel.x;
+      m_scroll.y = event.wheel.y;
+      break;
+    }
+
+    case SDL_WINDOWEVENT:
+    {
+      switch (event.window.event)
+      {
+      case SDL_WINDOWEVENT_RESIZED:
+      case SDL_WINDOWEVENT_SIZE_CHANGED:
+        m_window_size_changed = true;
+        break;
+      }
+      break;
+    }
+
+    default:
+      break;
+    }
+  }
+}
+
+bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }
+
+bool SDLInputWrapper::is_key_down(const std::string& key)
+{
+  const auto it = m_key_down.find(key_map.at(key));
+
+  if (it == m_key_down.end())
+  {
+    return false;
+  }
+
+  return it->second;
+}
+
+bool SDLInputWrapper::is_key_up(const std::string& key)
+{
+  const auto it = m_key_up.find(key_map.at(key));
+
+  if (it == m_key_up.end())
+  {
+    return false;
+  }
+
+  return it->second;
+}
+
+bool SDLInputWrapper::should_quit() { return m_should_quit; }
+
+void SDLInputWrapper::quit() { m_should_quit = true; }
+
 }  // namespace dl

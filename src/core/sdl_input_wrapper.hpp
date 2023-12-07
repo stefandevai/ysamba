@@ -30,7 +30,6 @@ class SDLInputWrapper
   void quit();
 
  private:
-  static const std::unordered_map<std::string, int> m_key_map;
   bool m_any_key_down = false;
   std::unordered_map<int, bool> m_key_down;
   std::unordered_map<int, bool> m_key_up;
