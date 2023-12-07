@@ -14,7 +14,11 @@ Scrollable::Scrollable() : UIComponent() {}
 
 void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 {
-  assert(children.size() > 0);
+  if (children.empty())
+  {
+    return;
+  }
+
   assert(!children[0].expired());
 
   const auto& matrix = matrix_stack.back();
