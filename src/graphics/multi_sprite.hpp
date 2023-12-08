@@ -14,8 +14,8 @@ class MultiSprite : public Renderable
  public:
   std::string resource_id;
   std::shared_ptr<Texture> texture = nullptr;
-  std::shared_ptr<Color> color = nullptr;
-  std::shared_ptr<Transform> transform = nullptr;
+  std::unique_ptr<Color> color = nullptr;
+  std::unique_ptr<Transform> transform = nullptr;
 
   MultiSprite() {}
   MultiSprite(const std::string& resource_id, const uint32_t frame, const uint32_t width, const uint32_t height)
