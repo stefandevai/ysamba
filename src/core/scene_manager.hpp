@@ -9,21 +9,12 @@
 
 namespace dl
 {
-enum SceneType
-{
-  HOME_MENU,
-  WORLD_CREATION,
-  GAMEPLAY,
-};
-
 class Renderer;
 struct GameContext;
 
 class SceneManager
 {
  public:
-  SceneManager() {}
-
   template <typename Type, typename... Args>
   void push_scene(Args&&... args)
   {

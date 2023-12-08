@@ -8,14 +8,6 @@
 #include "./maths/vector.hpp"
 #include "./sdl_input_wrapper.hpp"
 
-namespace dl::input_context
-{
-constexpr std::string_view home_menu = "home_menu";
-constexpr std::string_view world_creation = "world_creation";
-constexpr std::string_view gameplay = "gameplay";
-constexpr std::string_view action_menu = "action_menu";
-}  // namespace dl::input_context
-
 namespace dl
 {
 struct InputContext
