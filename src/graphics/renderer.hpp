@@ -44,7 +44,7 @@ class Renderer
   using LayerMap = std::map<std::string, std::shared_ptr<Batch>>;
 
   AssetManager& m_asset_manager;
-  std::vector<std::shared_ptr<Batch>> m_ordered_layers;
+  std::vector<Batch*> m_ordered_layers;
   LayerMap m_layers;
   glm::mat4 m_default_model_matrix = glm::mat4(1.0f);
   glm::mat4 m_default_view_matrix =

@@ -26,7 +26,7 @@ void Renderer::add_layer(const std::string& layer_id, const std::string shader_i
   layer.reset(new Batch(shader, priority));
 
   m_layers.emplace(layer_id, layer);
-  m_ordered_layers.push_back(layer);
+  m_ordered_layers.push_back(layer.get());
 
   std::sort(m_ordered_layers.begin(), m_ordered_layers.end(), [](const auto& lhs, const auto& rhs) {
     return lhs->priority < rhs->priority;
