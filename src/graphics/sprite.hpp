@@ -14,8 +14,8 @@ class Sprite : public Renderable
  public:
   std::string resource_id;
   std::shared_ptr<Texture> texture = nullptr;
-  std::shared_ptr<Color> color = nullptr;
-  std::shared_ptr<Transform> transform = nullptr;
+  std::unique_ptr<Color> color = nullptr;
+  std::unique_ptr<Transform> transform = nullptr;
 
   Sprite() {}
   Sprite(const std::string& resource_id, const int frame = 0) : resource_id(resource_id), m_frame(frame) {}

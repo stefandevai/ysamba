@@ -53,7 +53,7 @@ void Text::update()
 
       if (m_font_size != m_font->get_size())
       {
-        character.sprite->transform = std::make_shared<Transform>();
+        character.sprite->transform = std::make_unique<Transform>();
         character.sprite->transform->scale.x = scale;
         character.sprite->transform->scale.y = scale;
       }
