@@ -37,7 +37,7 @@ void WorldCreation::load()
   {
     m_generate_map();
   }
-  m_should_update_world_representation = true;
+  m_create_world_representation();
   m_has_loaded = true;
 }
 
@@ -55,12 +55,12 @@ void WorldCreation::update()
   else if (m_input_manager.poll_action("generate_world"))
   {
     m_generate_map();
-    m_should_update_world_representation = true;
+    m_create_world_representation();
   }
   else if (m_input_manager.poll_action("reload_world"))
   {
     m_generate_map(m_seed);
-    m_should_update_world_representation = true;
+    m_create_world_representation();
   }
   else if (m_input_manager.poll_action("save_world"))
   {
@@ -69,7 +69,7 @@ void WorldCreation::update()
   else if (m_input_manager.poll_action("load_world"))
   {
     load_world("./world.dl");
-    m_should_update_world_representation = true;
+    m_create_world_representation();
   }
   else if (m_input_manager.poll_action("display_seed"))
   {
@@ -82,12 +82,6 @@ void WorldCreation::render()
   if (!has_loaded())
   {
     return;
-  }
-
-  if (m_should_update_world_representation)
-  {
-    m_create_world_representation();
-    m_should_update_world_representation = false;
   }
 
   m_renderer.batch("gui", m_world_sprite.get(), 0, 0, 0);
@@ -171,7 +165,7 @@ void WorldCreation::m_create_world_representation()
   {
     for (auto j = 0; j < tilemap_size.h; ++j)
     {
-      const auto tile = m_world.get(i, j, 0);
+      const auto& tile = m_world.get(i, j, 0);
 
       switch (tile.id)
       {

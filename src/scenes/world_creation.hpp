@@ -33,7 +33,6 @@ class WorldCreation : public Scene
   WorldRepresentation m_world_representation;
   InputManager& m_input_manager = InputManager::get_instance();
   int m_seed = 110;
-  bool m_should_update_world_representation = false;
 
   void m_generate_map(const int seed = 0);
   void m_create_world_representation();
