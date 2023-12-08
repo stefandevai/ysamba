@@ -21,12 +21,10 @@ Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager)
 void Renderer::add_layer(const std::string& layer_id, const std::string shader_id, const int priority)
 {
   const auto shader = m_asset_manager.get<ShaderProgram>(shader_id);
-  std::shared_ptr<Batch> layer;
+  auto layer = std::make_unique<Batch>(shader, priority);
 
-  layer.reset(new Batch(shader, priority));
-
-  m_layers.emplace(layer_id, layer);
   m_ordered_layers.push_back(layer.get());
+  m_layers.emplace(layer_id, std::move(layer));
 
   std::sort(m_ordered_layers.begin(), m_ordered_layers.end(), [](const auto& lhs, const auto& rhs) {
     return lhs->priority < rhs->priority;

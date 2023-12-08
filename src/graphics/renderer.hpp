@@ -41,7 +41,7 @@ class Renderer
   bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
 
  private:
-  using LayerMap = std::map<std::string, std::shared_ptr<Batch>>;
+  using LayerMap = std::map<std::string, std::unique_ptr<Batch>>;
 
   AssetManager& m_asset_manager;
   std::vector<Batch*> m_ordered_layers;
