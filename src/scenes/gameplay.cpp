@@ -8,26 +8,14 @@
 #include <fstream>
 
 #include "core/game_context.hpp"
-#include "core/scene_manager.hpp"
-#include "graphics/camera.hpp"
-#include "world/society/society_generator.hpp"
-
-// TEMP
 #include "core/json.hpp"
-#include "ecs/components/biology.hpp"
+#include "core/scene_manager.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/selectable.hpp"
-#include "ecs/components/society_agent.hpp"
-#include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/text.hpp"
-#include "ui/components/action_menu.hpp"
-#include "ui/components/button.hpp"
-#include "ui/components/container.hpp"
-#include "ui/components/label.hpp"
-#include "world/society/sex.hpp"
-// TEMP
+#include "world/society/society_generator.hpp"
 
 namespace dl
 {
@@ -60,55 +48,6 @@ void Gameplay::load()
   auto society_blueprint = m_world.get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
-
-  // TEMP
-  /* auto container = std::make_shared<ui::Container>(Vector2i{200, 300}, "#1b2420aa"); */
-  /* container->position.x = 200; */
-  /* container->position.y = 200; */
-
-  /* container->children.push_back(button); */
-  /* m_ui_manager.add_component(container); */
-
-  /* const std::vector<std::string> items = { */
-  /*     "Item 1", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /*     "Item 2", */
-  /* }; */
-
-  /* const auto on_select = [](const int i) { spdlog::debug("SELECTDFFJDK {}", i); }; */
-
-  /* const auto action_menu = std::make_shared<ui::ActionMenu>(items, on_select); */
-  /* action_menu->position.x = 100; */
-  /* action_menu->position.y = 100; */
-  /* m_ui_manager.add_component(action_menu); */
-
-  /* auto button = std::make_shared<ui::Button>("CLICK HERE", Vector2i{ 100, 50 }); */
-  /* button->on_click = []() { spdlog::warn("CLICKED HERE!"); }; */
-  /* m_ui_manager.add_component(button); */
-  /* ui::ListStyle list_style{{15, 0}, 25}; */
-  /* const auto list = std::make_shared<ui::List>(items, list_style); */
-
-  /* const auto scrollable = std::make_shared<ui::Scrollable>(); */
-  /* /1* scrollable->position.x = 100; *1/ */
-  /* /1* scrollable->position.y = 100; *1/ */
-  /* scrollable->size.x = 200; */
-  /* scrollable->size.y = 300; */
-
-  /* scrollable->children.push_back(list); */
-  /* container->children.push_back(scrollable); */
-
-  /* m_ui_manager.add_component(container); */
-  // TEMP
 
   m_has_loaded = true;
 }
