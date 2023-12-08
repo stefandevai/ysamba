@@ -63,7 +63,7 @@ class InputManager
 
  private:
   JSON m_json{"./data/input.json"};
-  static std::shared_ptr<InputManager> m_instance;
+  static std::unique_ptr<InputManager> m_instance;
   static SDLInputWrapper m_sdl_input_wrapper;
   static std::unordered_map<std::string, std::shared_ptr<InputContext>> m_available_contexts;
   static std::vector<std::shared_ptr<InputContext>> m_context_stack;

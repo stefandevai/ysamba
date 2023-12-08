@@ -7,7 +7,7 @@
 
 namespace dl
 {
-std::shared_ptr<InputManager> InputManager::m_instance = nullptr;
+std::unique_ptr<InputManager> InputManager::m_instance = nullptr;
 SDLInputWrapper InputManager::m_sdl_input_wrapper = SDLInputWrapper();
 std::unordered_map<std::string, std::shared_ptr<InputContext>> InputManager::m_available_contexts = {};
 std::vector<std::shared_ptr<InputContext>> InputManager::m_context_stack = {};
@@ -18,7 +18,7 @@ InputManager& InputManager::get_instance()
 {
   if (m_instance == nullptr)
   {
-    m_instance = std::make_shared<InputManager>();
+    m_instance = std::make_unique<InputManager>();
   }
 
   return *m_instance;
