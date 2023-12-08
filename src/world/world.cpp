@@ -32,11 +32,15 @@ void World::generate(const int width, const int height, const int seed)
 {
   m_seed = seed;
   m_terrains.clear();
+  m_over_terrains.clear();
 
   /* auto tilemap_generator = TerrainGenerator(width, height); */
   auto tilemap_generator = DummyGenerator(width, height);
   auto tilemap = tilemap_generator.generate(seed);
   m_terrains.push_back(tilemap);
+
+  // TODO: Generate over terrains as well
+  m_over_terrains.resize(m_terrains.size());
 
   auto society = SocietyGenerator::generate_blueprint();
   m_societies[society.id] = society;
