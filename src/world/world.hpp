@@ -81,7 +81,7 @@ class World
   [[nodiscard]] const std::string& get_texture_id() const { return m_texture_id; };
 
   // Get a specific society
-  [[nodiscard]] SocietyBlueprint get_society(const std::string& society_id) const
+  [[nodiscard]] SocietyBlueprint get_society(const uint32_t society_id) const
   {
     assert(m_societies.contains(society_id));
     return m_societies.at(society_id);
@@ -129,7 +129,7 @@ class World
   int m_depth_max = 1;
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};
-  std::map<std::string, SocietyBlueprint> m_societies;
+  std::map<uint32_t, SocietyBlueprint> m_societies;
 
   // Load information about tiles
   void m_load_tile_data();

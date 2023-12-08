@@ -48,12 +48,12 @@ class SocietyBlueprint
 
   SocietyBlueprint() {}
 
-  std::string id;
-  std::string name;
-  unsigned int age;
-  Predominance predominance;
-  SocietyType type;
-  ModeOfProduction mode_of_production;
+  uint32_t id{};
+  std::string name{};
+  unsigned int age{};
+  Predominance predominance{};
+  SocietyType type{};
+  ModeOfProduction mode_of_production{};
 
   [[nodiscard]] uint32_t add_first_member(const Sex sex);
   [[nodiscard]] uint32_t add_child(const uint32_t parent_id, const Sex sex);

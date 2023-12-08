@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 
 #include "./name_generator.hpp"
@@ -17,9 +18,11 @@ auto name_generator = NameGenerator();
 
 SocietyBlueprint SocietyGenerator::generate_blueprint()
 {
+  using namespace entt::literals;
+
   SocietyBlueprint society{};
 
-  society.id = "otomi";
+  society.id = "otomi"_hs;
   society.name = "Otomi";
   society.age = random::get_integer(148, 1848);
   society.predominance = static_cast<Predominance>(random::get_integer(0, 2));

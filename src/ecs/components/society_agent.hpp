@@ -38,7 +38,7 @@ struct SocietyAgent
   };
 
   uint32_t id;
-  std::string society_id;
+  uint32_t society_id;
   std::string name{};
   SocialClass social_class;
   Metier metiers;

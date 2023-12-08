@@ -57,7 +57,7 @@ void Gameplay::load()
   auto& text_component = m_registry.get<Text>(m_fps_text);
   text_component.set_is_static(false);
 
-  auto society_blueprint = m_world.get_society("otomi");
+  auto society_blueprint = m_world.get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
