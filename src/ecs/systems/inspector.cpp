@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
@@ -132,24 +134,26 @@ bool InspectorSystem::m_is_valid() const { return m_inspector_id >= 0 && m_inspe
 
 void InspectorSystem::m_update_input(entt::registry& registry)
 {
+  using namespace entt::literals;
+
   if (m_state == State::Inactive)
   {
     const auto& current_context = m_input_manager.get_current_context();
 
-    if (current_context == nullptr || current_context->key != "gameplay")
+    if (current_context == nullptr || current_context->key != "gameplay"_hs)
     {
       return;
     }
 
-    if (m_input_manager.poll_action("inspect"))
+    if (m_input_manager.poll_action("inspect"_hs))
     {
       m_state = State::Active;
-      m_input_manager.push_context("inspector");
+      m_input_manager.push_context("inspector"_hs);
     }
   }
   else if (m_state == State::Active)
   {
-    if (m_input_manager.poll_action("quit"))
+    if (m_input_manager.poll_action("quit"_hs))
     {
       m_destroy_inspector();
 

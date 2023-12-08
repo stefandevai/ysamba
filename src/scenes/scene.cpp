@@ -2,13 +2,17 @@
 
 #include <SDL.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "core/display.hpp"
 #include "core/input_manager.hpp"
 
 namespace dl
 {
 Scene::Scene(const std::string& scene_key, GameContext& game_context)
-    : m_scene_key(scene_key), m_scene_dir("scenes/" + scene_key + "/"), m_game_context(game_context)
+    : m_scene_key(entt::hashed_string{scene_key.c_str()}),
+      m_scene_dir("scenes/" + scene_key + "/"),
+      m_game_context(game_context)
 {
   const auto& display_size = Display::get_window_size();
   m_renderer.set_projection_matrix(m_camera.get_projection_matrix());

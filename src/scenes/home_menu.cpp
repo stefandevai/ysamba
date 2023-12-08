@@ -37,20 +37,22 @@ void HomeMenu::load()
 
 void HomeMenu::update()
 {
+  using namespace entt::literals;
+
   if (!has_loaded())
   {
     return;
   }
 
-  if (m_input_manager.poll_action("quit"))
+  if (m_input_manager.poll_action("quit"_hs))
   {
     m_input_manager.quit();
   }
-  else if (m_input_manager.poll_action("play"))
+  else if (m_input_manager.poll_action("play"_hs))
   {
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   }
-  else if (m_input_manager.poll_action("create_world"))
+  else if (m_input_manager.poll_action("create_world"_hs))
   {
     m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
   }

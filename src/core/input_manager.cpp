@@ -3,13 +3,14 @@
 #include <SDL.h>
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
 #include <vector>
 
 namespace dl
 {
 std::unique_ptr<InputManager> InputManager::m_instance = nullptr;
 SDLInputWrapper InputManager::m_sdl_input_wrapper = SDLInputWrapper();
-std::unordered_map<std::string, std::shared_ptr<InputContext>> InputManager::m_available_contexts = {};
+std::unordered_map<uint32_t, std::shared_ptr<InputContext>> InputManager::m_available_contexts = {};
 std::vector<std::shared_ptr<InputContext>> InputManager::m_context_stack = {};
 
 InputManager::InputManager() { m_parse_input(); }
@@ -26,7 +27,7 @@ InputManager& InputManager::get_instance()
 
 void InputManager::update() { m_sdl_input_wrapper.update(); }
 
-void InputManager::push_context(const std::string& context_key)
+void InputManager::push_context(const uint32_t context_key)
 {
   if (!m_available_contexts.contains(context_key))
   {
@@ -50,7 +51,7 @@ void InputManager::pop_context()
   m_context_stack.pop_back();
 }
 
-bool InputManager::poll_action(const std::string& action_key)
+bool InputManager::poll_action(const uint32_t action_key)
 {
   if (m_context_stack.empty())
   {
@@ -77,11 +78,11 @@ bool InputManager::poll_action(const std::string& action_key)
   return false;
 }
 
-bool InputManager::is_key_down(const std::string& key) { return m_sdl_input_wrapper.is_key_down(key); }
+bool InputManager::is_key_down(const uint32_t key) { return m_sdl_input_wrapper.is_key_down(key); }
 
 bool InputManager::is_any_key_down() { return m_sdl_input_wrapper.is_any_key_down(); }
 
-bool InputManager::is_key_up(const std::string& key) { return m_sdl_input_wrapper.is_key_up(key); }
+bool InputManager::is_key_up(const uint32_t key) { return m_sdl_input_wrapper.is_key_up(key); }
 
 bool InputManager::is_clicking(const MouseButton button)
 {
@@ -140,13 +141,22 @@ void InputManager::m_parse_input()
 {
   for (const auto& item : m_json.object.items())
   {
-    const auto& key = item.key();
+    const auto& key = entt::hashed_string{item.key().c_str()};
     const auto input_context = std::make_shared<InputContext>(key);
 
     for (const auto& value : item.value().items())
     {
-      const auto& value_key = value.key();
-      input_context->actions[value_key] = value.value();
+      const auto& value_key = entt::hashed_string{value.key().c_str()};
+      const std::vector<std::string>& values_strings = value.value();
+      std::vector<uint32_t> values(values_strings.size(), 0);
+
+      for (size_t i = 0; i < values_strings.size(); ++i)
+      {
+        values[i] = entt::hashed_string{values_strings[i].c_str()};
+      }
+
+      input_context->actions[value_key] = std::move(values);
+      /* input_context->actions[value_key] = std::apply(entt::hashed_string{}, .get<std::vector<std::string>>()); */
     }
 
     m_available_contexts[key] = input_context;

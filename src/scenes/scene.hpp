@@ -25,10 +25,10 @@ class Scene
   void render_call() { m_renderer.render(); }
   void check_window_size();
   bool has_loaded() const { return m_has_loaded; }
-  const std::string& get_key() const { return m_scene_key; }
+  uint32_t get_key() const { return m_scene_key; }
 
  protected:
-  const std::string m_scene_key;
+  const uint32_t m_scene_key;
   const std::filesystem::path m_scene_dir;
   GameContext& m_game_context;
   LuaAPI m_lua;

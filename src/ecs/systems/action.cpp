@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
@@ -56,36 +58,38 @@ void ActionSystem::update(entt::registry& registry, const Camera& camera)
 
 void ActionSystem::m_update_action_menu()
 {
+  using namespace entt::literals;
+
   if (m_action_menu_id < 0)
   {
     m_open_action_menu();
   }
 
-  if (m_input_manager.poll_action("close_menu"))
+  if (m_input_manager.poll_action("close_menu"_hs))
   {
     m_dispose();
   }
-  else if (m_input_manager.poll_action("harvest"))
+  else if (m_input_manager.poll_action("harvest"_hs))
   {
     m_state = ActionMenuState::SelectHarvestTarget;
   }
-  else if (m_input_manager.poll_action("pickup"))
+  else if (m_input_manager.poll_action("pickup"_hs))
   {
     m_state = ActionMenuState::SelectPickupTarget;
   }
-  else if (m_input_manager.poll_action("break"))
+  else if (m_input_manager.poll_action("break"_hs))
   {
     m_state = ActionMenuState::SelectBreakTarget;
   }
-  else if (m_input_manager.poll_action("dig"))
+  else if (m_input_manager.poll_action("dig"_hs))
   {
     m_state = ActionMenuState::SelectDigTarget;
   }
-  else if (m_input_manager.poll_action("prepare_firecamp"))
+  else if (m_input_manager.poll_action("prepare_firecamp"_hs))
   {
     m_state = ActionMenuState::PrepareFirecampTarget;
   }
-  else if (m_input_manager.poll_action("start_fire"))
+  else if (m_input_manager.poll_action("start_fire"_hs))
   {
     m_state = ActionMenuState::StartFireTarget;
   }
@@ -93,14 +97,16 @@ void ActionSystem::m_update_action_menu()
 
 void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
 {
+  using namespace entt::literals;
+
   const auto& current_context = m_input_manager.get_current_context();
 
-  if (current_context == nullptr || current_context->key != "gameplay")
+  if (current_context == nullptr || current_context->key != "gameplay"_hs)
   {
     return;
   }
 
-  if (m_input_manager.poll_action("open_action_menu"))
+  if (m_input_manager.poll_action("open_action_menu"_hs))
   {
     if (m_selected_entities.empty())
     {
@@ -108,7 +114,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     }
 
     m_state = ActionMenuState::Open;
-    m_input_manager.push_context("action_menu");
+    m_input_manager.push_context("action_menu"_hs);
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
@@ -152,6 +158,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
 void ActionSystem::m_update_selecting_target(entt::registry& registry, const Camera& camera)
 {
+  using namespace entt::literals;
+
   if (m_action_menu_id > -1)
   {
     m_close_action_menu();
@@ -161,7 +169,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     m_show_select_target_text();
   }
 
-  if (m_input_manager.poll_action("close_menu"))
+  if (m_input_manager.poll_action("close_menu"_hs))
   {
     m_dispose();
   }

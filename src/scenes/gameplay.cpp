@@ -56,6 +56,8 @@ double delay = 0.0;
 
 void Gameplay::update()
 {
+  using namespace entt::literals;
+
   if (!has_loaded())
   {
     return;
@@ -63,7 +65,7 @@ void Gameplay::update()
 
   const auto& current_context = m_input_manager.get_current_context();
 
-  if (current_context != nullptr && current_context->key == "gameplay")
+  if (current_context != nullptr && current_context->key == "gameplay"_hs)
   {
     m_update_input(m_game_context);
   }
@@ -139,11 +141,13 @@ void Gameplay::load_world(const std::string& file_path)
 
 void Gameplay::m_update_input(GameContext& m_game_context)
 {
-  if (m_input_manager.poll_action("quit"))
+  using namespace entt::literals;
+
+  if (m_input_manager.poll_action("quit"_hs))
   {
     m_game_context.scene_manager->pop_scene();
   }
-  else if (m_input_manager.poll_action("toggle_pause"))
+  else if (m_input_manager.poll_action("toggle_pause"_hs))
   {
     if (m_current_state == State::PLAYING)
     {
@@ -154,15 +158,15 @@ void Gameplay::m_update_input(GameContext& m_game_context)
       m_current_state = State::PLAYING;
     }
   }
-  else if (m_input_manager.poll_action("save_world"))
+  else if (m_input_manager.poll_action("save_world"_hs))
   {
     save_world("./world.dl");
   }
-  else if (m_input_manager.poll_action("load_world"))
+  else if (m_input_manager.poll_action("load_world"_hs))
   {
     load_world("./world.dl");
   }
-  else if (m_input_manager.poll_action("add_item"))
+  else if (m_input_manager.poll_action("add_item"_hs))
   {
     JSON json{"./data/debug/item.json"};
     const auto id = json.object["id"].get<uint32_t>();
@@ -179,23 +183,23 @@ void Gameplay::m_update_input(GameContext& m_game_context)
     m_registry.emplace<Visibility>(item, m_world.get_texture_id(), id, "item", 1);
     m_registry.emplace<Item>(item, id);
   }
-  else if (m_input_manager.poll_action("display_seed"))
+  else if (m_input_manager.poll_action("display_seed"_hs))
   {
     spdlog::info("SEED: {}", m_world.get_seed());
   }
-  else if (m_input_manager.poll_action("camera_move_west"))
+  else if (m_input_manager.poll_action("camera_move_west"_hs))
   {
     m_camera.move({-8., 0., 0.});
   }
-  else if (m_input_manager.poll_action("camera_move_east"))
+  else if (m_input_manager.poll_action("camera_move_east"_hs))
   {
     m_camera.move({8., 0., 0.});
   }
-  else if (m_input_manager.poll_action("camera_move_south"))
+  else if (m_input_manager.poll_action("camera_move_south"_hs))
   {
     m_camera.move({0., 8., 0.});
   }
-  else if (m_input_manager.poll_action("camera_move_north"))
+  else if (m_input_manager.poll_action("camera_move_north"_hs))
   {
     m_camera.move({0., -8., 0.});
   }

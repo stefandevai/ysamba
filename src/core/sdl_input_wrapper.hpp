@@ -18,8 +18,8 @@ class SDLInputWrapper
 
   void update();
   bool is_any_key_down();
-  bool is_key_down(const std::string& key);
-  bool is_key_up(const std::string& key);
+  bool is_key_down(const uint32_t key);
+  bool is_key_up(const uint32_t key);
   inline std::pair<bool, bool> get_mouse_state_down() { return m_mouse_state_down; };
   inline std::pair<bool, bool> get_mouse_state_up() { return m_mouse_state_up; };
   const Vector2i& get_mouse_position() { return m_mouse_position; };

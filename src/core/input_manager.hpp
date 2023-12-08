@@ -20,10 +20,10 @@ namespace dl
 {
 struct InputContext
 {
-  std::string key;
-  std::unordered_map<std::string, std::vector<std::string>> actions;
+  uint32_t key;
+  std::unordered_map<uint32_t, std::vector<uint32_t>> actions;
 
-  InputContext(const std::string& key) : key(key) {}
+  InputContext(const uint32_t key) : key(key) {}
 };
 
 class InputManager
@@ -43,12 +43,12 @@ class InputManager
 
   static InputManager& get_instance();
   void update();
-  void push_context(const std::string& context_key);
+  void push_context(const uint32_t context_key);
   void pop_context();
-  bool poll_action(const std::string& action);
-  bool is_key_down(const std::string& key);
+  bool poll_action(const uint32_t action);
+  bool is_key_down(const uint32_t key);
   bool is_any_key_down();
-  bool is_key_up(const std::string& key);
+  bool is_key_up(const uint32_t key);
   bool is_clicking(const MouseButton button);
   bool has_clicked(const MouseButton button);
   bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
@@ -65,7 +65,7 @@ class InputManager
   JSON m_json{"./data/input.json"};
   static std::unique_ptr<InputManager> m_instance;
   static SDLInputWrapper m_sdl_input_wrapper;
-  static std::unordered_map<std::string, std::shared_ptr<InputContext>> m_available_contexts;
+  static std::unordered_map<uint32_t, std::shared_ptr<InputContext>> m_available_contexts;
   static std::vector<std::shared_ptr<InputContext>> m_context_stack;
 
   void m_parse_input();

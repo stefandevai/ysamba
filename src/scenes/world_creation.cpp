@@ -20,6 +20,7 @@ namespace dl
 WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
 {
   using namespace entt::literals;
+
   m_renderer.add_layer("gui"_hs, "default", 2);
 }
 
@@ -45,35 +46,37 @@ void WorldCreation::load()
 
 void WorldCreation::update()
 {
+  using namespace entt::literals;
+
   if (!has_loaded())
   {
     return;
   }
 
-  if (m_input_manager.poll_action("quit"))
+  if (m_input_manager.poll_action("quit"_hs))
   {
     m_game_context.scene_manager->pop_scene();
   }
-  else if (m_input_manager.poll_action("generate_world"))
+  else if (m_input_manager.poll_action("generate_world"_hs))
   {
     m_generate_map();
     m_create_world_representation();
   }
-  else if (m_input_manager.poll_action("reload_world"))
+  else if (m_input_manager.poll_action("reload_world"_hs))
   {
     m_generate_map(m_seed);
     m_create_world_representation();
   }
-  else if (m_input_manager.poll_action("save_world"))
+  else if (m_input_manager.poll_action("save_world"_hs))
   {
     save_world("./world.dl");
   }
-  else if (m_input_manager.poll_action("load_world"))
+  else if (m_input_manager.poll_action("load_world"_hs))
   {
     load_world("./world.dl");
     m_create_world_representation();
   }
-  else if (m_input_manager.poll_action("display_seed"))
+  else if (m_input_manager.poll_action("display_seed"_hs))
   {
     spdlog::info("SEED: {}", m_world.get_seed());
   }

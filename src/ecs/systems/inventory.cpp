@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
@@ -32,12 +34,14 @@ void InventorySystem::update(entt::registry& registry)
 
 void InventorySystem::m_update_inventory(entt::registry& registry)
 {
+  using namespace entt::literals;
+
   if (m_inventory_id < 0)
   {
     m_open_inventory(registry);
   }
 
-  if (m_input_manager.poll_action("close_inventory"))
+  if (m_input_manager.poll_action("close_inventory"_hs))
   {
     m_dispose();
   }
@@ -45,19 +49,21 @@ void InventorySystem::m_update_inventory(entt::registry& registry)
 
 void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 {
+  using namespace entt::literals;
+
   const auto& current_context = m_input_manager.get_current_context();
 
-  if (current_context == nullptr || current_context->key != "gameplay")
+  if (current_context == nullptr || current_context->key != "gameplay"_hs)
   {
     return;
   }
 
-  if (m_input_manager.poll_action("open_inventory"))
+  if (m_input_manager.poll_action("open_inventory"_hs))
   {
     m_update_items(registry);
 
     m_state = InventoryState::Open;
-    m_input_manager.push_context("inventory");
+    m_input_manager.push_context("inventory"_hs);
   }
 }
 
