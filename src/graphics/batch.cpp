@@ -114,7 +114,7 @@ const glm::mat4 Batch::pop_matrix()
 
 const glm::mat4& Batch::peek_matrix() { return m_matrix; }
 
-void Batch::emplace(const std::unique_ptr<Sprite>& sprite, const double x, const double y, const double z)
+void Batch::emplace(const Sprite* sprite, const double x, const double y, const double z)
 {
   assert(m_index_count <= m_indices_size);
 
@@ -227,7 +227,7 @@ void Batch::emplace(const std::unique_ptr<Sprite>& sprite, const double x, const
   m_index_count += 6;
 }
 
-void Batch::emplace(const std::unique_ptr<MultiSprite>& sprite, const double x, const double y, const double z)
+void Batch::emplace(const MultiSprite* sprite, const double x, const double y, const double z)
 {
   assert(m_index_count <= m_indices_size);
 
@@ -304,7 +304,7 @@ void Batch::emplace(const std::unique_ptr<MultiSprite>& sprite, const double x, 
   m_index_count += 6;
 }
 
-void Batch::quad(const std::unique_ptr<Quad>& quad, const double x, const double y, const double z)
+void Batch::quad(const Quad* quad, const double x, const double y, const double z)
 {
   assert(m_index_count <= m_indices_size);
 
@@ -356,7 +356,7 @@ void Batch::text(Text& text, const double x, const double y, const double z)
       continue;
     }
 
-    emplace(character.sprite, character.x + x, character.y + y, z);
+    emplace(character.sprite.get(), character.x + x, character.y + y, z);
   }
 }
 

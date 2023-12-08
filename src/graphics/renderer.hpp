@@ -23,19 +23,10 @@ class Renderer
  public:
   Renderer(AssetManager& asset_manager);
 
-  void batch(const std::string& layer_id,
-             const std::unique_ptr<Sprite>& sprite,
-             const double x,
-             const double y,
-             const double z);
-  void batch(const std::string& layer_id,
-             const std::unique_ptr<MultiSprite>& multi_sprite,
-             const double x,
-             const double y,
-             const double z);
+  void batch(const std::string& layer_id, Sprite* sprite, const double x, const double y, const double z);
+  void batch(const std::string& layer_id, MultiSprite* multi_sprite, const double x, const double y, const double z);
   void batch(const std::string& layer_id, Text& text, const double x, const double y, const double z);
-  void batch(
-      const std::string& layer_id, const std::unique_ptr<Quad>& quad, const double x, const double y, const double z);
+  void batch(const std::string& layer_id, const Quad* quad, const double x, const double y, const double z);
   void render();
   void add_layer(const std::string& layer_id, const std::string shader_id, const int priority = 0);
   void enable_depth_test();

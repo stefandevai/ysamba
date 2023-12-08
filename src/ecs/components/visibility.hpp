@@ -10,7 +10,11 @@ struct Visibility
 {
   std::unique_ptr<Sprite> sprite = nullptr;
 
+  // Texture id
   std::string resource_id{};
+
+  // Literal texture frame
+  uint32_t frame{};
 
   // The id that relates to frame data for a texture
   uint32_t frame_id{};
@@ -24,7 +28,7 @@ struct Visibility
   Visibility() = default;
 
   Visibility(const std::string& resource_id, const uint32_t frame = 0, const uint32_t layer_z = 0)
-      : resource_id(resource_id), layer_z(layer_z)
+      : resource_id(resource_id), frame(frame), layer_z(layer_z)
   {
     sprite = std::make_unique<Sprite>(resource_id, frame);
   };

@@ -90,7 +90,7 @@ void WorldCreation::render()
     m_should_update_world_representation = false;
   }
 
-  m_renderer.batch("gui", m_world_sprite, 0, 0, 0);
+  m_renderer.batch("gui", m_world_sprite.get(), 0, 0, 0);
 }
 
 /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */

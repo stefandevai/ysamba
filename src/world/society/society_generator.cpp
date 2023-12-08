@@ -43,7 +43,6 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     father_parameters.texture_frame = 0;
     father_parameters.speed = 100;
     father_parameters.name = name_generator.generate();
-    spdlog::info("Father's name: {}", father_parameters.name);
     members.push_back(m_get_member_components(society, father_parameters));
 
     const auto mother_id = society.add_spouse(father_id);
@@ -101,8 +100,9 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
     const auto position = m_get_member_position(world, camera);
     registry.emplace<Position>(entity, position);
     member.visibility.layer_z = position.z + renderer::layer_z_offset_characters;
+    spdlog::debug("HEREEE {}", member.visibility.frame);
     registry.emplace<Visibility>(
-        entity, member.visibility.resource_id, member.visibility.frame_id, member.visibility.layer_z);
+        entity, member.visibility.resource_id, member.visibility.frame, member.visibility.layer_z);
     registry.emplace<CarriedItems>(entity, member.carried_items);
     registry.emplace<Selectable>(entity);
   }
@@ -144,7 +144,6 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   const auto& member = society.get_member(parameters.member_id);
   const auto agent = SocietyAgent{parameters.member_id, society.id, parameters.name, SocialClass::None, Metier::None};
   const auto biology = Biology{member->sex, parameters.speed};
-  /* const auto visibility = Visibility{"spritesheet-characters", parameters.texture_frame, 0}; */
   const auto carried_items = CarriedItems{};
 
   return SocietyGenerator::MemberComponents{

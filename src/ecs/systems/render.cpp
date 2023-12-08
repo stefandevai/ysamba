@@ -48,7 +48,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
         }
 
         renderer.batch("world",
-                       sprite,
+                       sprite.get(),
                        i * tile_size.x + camera_position.x * tile_size.x,
                        j * tile_size.y + camera_position.y * tile_size.y,
                        0.0);
@@ -83,7 +83,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
           }
 
           renderer.batch("world",
-                         multi_sprite,
+                         multi_sprite.get(),
                          (i - frame_data.anchor_x) * tile_size.x + camera_position.x * tile_size.x,
                          (j - frame_data.anchor_y) * tile_size.y + camera_position.y * tile_size.y,
                          1.0);
@@ -99,7 +99,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
           }
 
           renderer.batch("world",
-                         sprite,
+                         sprite.get(),
                          i * tile_size.x + camera_position.x * tile_size.x,
                          j * tile_size.y + camera_position.y * tile_size.y,
                          1.0);
@@ -132,7 +132,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto position_x = std::round(position.x) * sprite_size.x;
     const auto position_y = std::round(position.y) * sprite_size.y;
 
-    renderer.batch("world", visibility.sprite, position_x, position_y, visibility.layer_z);
+    renderer.batch("world", visibility.sprite.get(), position_x, position_y, visibility.layer_z);
   }
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -143,7 +143,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& rectangle = registry.get<Rectangle>(entity);
 
     renderer.batch("world",
-                   rectangle.quad,
+                   rectangle.quad.get(),
                    std::round(position.x) * tile_size.x,
                    std::round(position.y) * tile_size.y,
                    position.z);

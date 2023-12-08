@@ -18,7 +18,7 @@ Container::Container(const Vector2i& size, const std::string& color)
 
 void Container::render(Renderer& renderer, const std::string& layer)
 {
-  renderer.get_layer(layer)->quad(quad, absolute_position.x, absolute_position.y, absolute_position.z);
+  renderer.get_layer(layer)->quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {
