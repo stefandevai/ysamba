@@ -28,7 +28,7 @@ ScrollableList::ScrollableList(const std::vector<std::string>& items,
 
   set_items(items);
 
-  m_container = std::make_shared<Container>(size, "#1b2420aa");
+  m_container = std::make_shared<Container>(size, 0x1b2420aa);
   m_container->children.push_back(m_scrollable);
 
   children.push_back(m_container);
@@ -42,7 +42,7 @@ ScrollableList::ScrollableList(const Vector2i& size, const std::function<void(co
   m_scrollable = std::make_shared<Scrollable>();
   m_scrollable->size = size;
 
-  m_container = std::make_shared<Container>(size, "#1b2420aa");
+  m_container = std::make_shared<Container>(size, 0x1b2420aa);
   m_container->children.push_back(m_scrollable);
 
   children.push_back(m_container);

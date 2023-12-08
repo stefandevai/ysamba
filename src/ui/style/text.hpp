@@ -1,11 +1,9 @@
 #pragma once
 
-#include "./style.hpp"
-
 namespace dl::ui
 {
-class TextStyle : public Style
+struct TextStyle
 {
-  std::string typeface;
+  std::string typeface{};
 };
 }  // namespace dl::ui

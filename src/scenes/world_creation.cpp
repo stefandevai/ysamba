@@ -155,11 +155,11 @@ void WorldCreation::m_create_world_representation()
 
   std::vector<unsigned char> pixel_data((tilemap_size.w * tilemap_size.h) * 4);
 
-  const auto water_color = Color("#3772ebff");
-  const auto terrain_color = Color("#37c737ff");
-  const auto sand_color = Color("#edcb89ff");
-  const auto wall_color = Color("#636b5cff");
-  const auto default_color = Color("#000000ff");
+  const auto water_color = Color(0x3772ebff);
+  const auto terrain_color = Color(0x37c737ff);
+  const auto sand_color = Color(0xedcb89ff);
+  const auto wall_color = Color(0x636b5cff);
+  const auto default_color = Color(0x000000ff);
 
   for (auto i = 0; i < tilemap_size.w; ++i)
   {

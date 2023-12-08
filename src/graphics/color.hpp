@@ -1,24 +1,22 @@
 #pragma once
 
-#include <string>
+#include <cstdint>
 
 namespace dl
 {
 struct Color
 {
  private:
-  struct rgba_color_info
+  struct RGBA
   {
-    int r, g, b, a;
+    uint8_t r, g, b, a;
   };
 
  public:
-  Color() {}
-  Color(const std::string& color);
-  Color(const unsigned r, const unsigned g, const unsigned b, const unsigned a = 255);
+  Color(const uint32_t color);
+  Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 255);
 
-  std::string hex_color = "#ffffff";
-  unsigned int_color = 4294967295;
-  rgba_color_info rgba_color{255, 255, 255, 255};
+  uint32_t int_color = 0xFFFFFFFF;
+  RGBA rgba_color{255, 255, 255, 255};
 };
 }  // namespace dl

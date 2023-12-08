@@ -13,7 +13,7 @@ Inspector::Inspector() : UIComponent()
   position = {30, 30, 0};
   size = {300, 100};
 
-  m_container = std::make_shared<Container>(size, "#1b2420aa");
+  m_container = std::make_shared<Container>(size, 0x1b2420aa);
 
   m_label = std::make_shared<Label>("");
   m_label->position = {15, 15, 0};

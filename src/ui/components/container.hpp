@@ -17,12 +17,12 @@ class Container : public UIComponent
   std::unique_ptr<Quad> quad = nullptr;
 
   Container();
-  Container(const Vector2i& size, const std::string& color);
+  Container(const Vector2i& size, const uint32_t color);
 
   void render(Renderer& renderer, const std::string& layer);
 
   void set_size(const Vector2i& size);
-  void set_color(const std::string& color);
+  void set_color(const uint32_t color);
 };
 
 }  // namespace dl::ui

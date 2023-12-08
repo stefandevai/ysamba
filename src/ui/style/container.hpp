@@ -1,10 +1,8 @@
 #pragma once
 
-#include "./style.hpp"
-
 namespace dl::ui
 {
-struct ContainerStyle : public Style
+struct ContainerStyle
 {
   double border_radius;
 };

@@ -129,7 +129,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       if (selectable.selected)
       {
-        registry.emplace<Rectangle>(selected_entity, 32, 32, "#5588cc88");
+        registry.emplace<Rectangle>(selected_entity, 32, 32, 0x5588cc88);
         m_selected_entities.push_back(selected_entity);
       }
       else

@@ -46,7 +46,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   if (!registry.valid(m_target_quad))
   {
     m_target_quad = registry.create();
-    registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, "#e3c16488");
+    registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, 0xe3c16488);
     registry.emplace<Position>(m_target_quad, 0, 0, 4);
   }
 

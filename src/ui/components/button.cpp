@@ -13,7 +13,7 @@ Button::Button(const std::string& text, const Vector2i& size, XAlignement x_alig
 {
   this->size = size;
 
-  m_container = std::make_shared<Container>(size, "#33aa88aa");
+  m_container = std::make_shared<Container>(size, 0x33aa88aa);
   m_label = std::make_shared<Label>(text);
   m_label->parent_size = size;
   m_label->x_alignment = x_alignment;
