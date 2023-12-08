@@ -69,7 +69,7 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
   }
 }
 
-void UIComponent::render(Renderer& renderer, const std::string& layer)
+void UIComponent::render(Renderer& renderer, const uint32_t layer)
 {
   for (auto& child : children)
   {

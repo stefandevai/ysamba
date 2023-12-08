@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
 #include "scenes/gameplay.hpp"
@@ -14,9 +16,11 @@ HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context)
 
 void HomeMenu::load()
 {
+  using namespace entt::literals;
+
   Scene::load();
 
-  m_renderer.add_layer("text", "default", 2);
+  m_renderer.add_layer("text"_hs, "default", 2);
 
   const auto game_title = m_lua.get_variable<std::string>("game_title");
   const auto instructions = m_lua.get_variable<std::string>("instructions");
@@ -54,12 +58,14 @@ void HomeMenu::update()
 
 void HomeMenu::render()
 {
+  using namespace entt::literals;
+
   if (!has_loaded())
   {
     return;
   }
 
-  m_renderer.batch("text", m_game_title, 60, 60, 0);
-  m_renderer.batch("text", m_instructions, 60, 108, 0);
+  m_renderer.batch("text"_hs, m_game_title, 60, 60, 0);
+  m_renderer.batch("text"_hs, m_instructions, 60, 108, 0);
 }
 }  // namespace dl

@@ -23,25 +23,25 @@ class Renderer
  public:
   Renderer(AssetManager& asset_manager);
 
-  void batch(const std::string& layer_id, Sprite* sprite, const double x, const double y, const double z);
-  void batch(const std::string& layer_id, MultiSprite* multi_sprite, const double x, const double y, const double z);
-  void batch(const std::string& layer_id, Text& text, const double x, const double y, const double z);
-  void batch(const std::string& layer_id, const Quad* quad, const double x, const double y, const double z);
+  void batch(const uint32_t layer_id, Sprite* sprite, const double x, const double y, const double z);
+  void batch(const uint32_t layer_id, MultiSprite* multi_sprite, const double x, const double y, const double z);
+  void batch(const uint32_t layer_id, Text& text, const double x, const double y, const double z);
+  void batch(const uint32_t layer_id, const Quad* quad, const double x, const double y, const double z);
   void render();
-  void add_layer(const std::string& layer_id, const std::string shader_id, const int priority = 0);
+  void add_layer(const uint32_t layer_id, const std::string shader_id, const int priority = 0);
   void enable_depth_test();
   void disable_depth_test();
-  void push_matrix(const std::string& layer_id, const glm::mat4& matrix);
-  const glm::mat4 pop_matrix(const std::string& layer_id);
-  const glm::mat4& peek_matrix(const std::string& layer_id);
+  void push_matrix(const uint32_t layer_id, const glm::mat4& matrix);
+  const glm::mat4 pop_matrix(const uint32_t layer_id);
+  const glm::mat4& peek_matrix(const uint32_t layer_id);
   void set_projection_matrix(const glm::mat4& projection_matrix) { m_projection_matrix = projection_matrix; }
 
   std::shared_ptr<Texture> get_texture(const std::string& resource_id);
-  Batch* get_layer(const std::string& layer_id) const { return m_layers.at(layer_id).get(); }
-  bool has_layer(const std::string& layer_id) const { return m_layers.contains(layer_id); }
+  Batch* get_layer(const uint32_t layer_id) const { return m_layers.at(layer_id).get(); }
+  bool has_layer(const uint32_t layer_id) const { return m_layers.contains(layer_id); }
 
  private:
-  using LayerMap = std::map<std::string, std::unique_ptr<Batch>>;
+  using LayerMap = std::map<uint32_t, std::unique_ptr<Batch>>;
 
   AssetManager& m_asset_manager;
   std::vector<Batch*> m_ordered_layers;

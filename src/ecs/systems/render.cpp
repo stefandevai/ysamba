@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 #include <tgmath.h>
 
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 
 #include "ecs/components/position.hpp"
@@ -23,6 +24,8 @@ RenderSystem::RenderSystem(World& world) : m_world(world), m_world_texture_id(m_
 
 void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Camera& camera)
 {
+  using namespace entt::literals;
+
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
@@ -47,7 +50,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
           sprite->set_frame(frame_data.frame);
         }
 
-        renderer.batch("world",
+        renderer.batch("world"_hs,
                        sprite.get(),
                        i * tile_size.x + camera_position.x * tile_size.x,
                        j * tile_size.y + camera_position.y * tile_size.y,
@@ -82,7 +85,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
             multi_sprite->texture = world_texture;
           }
 
-          renderer.batch("world",
+          renderer.batch("world"_hs,
                          multi_sprite.get(),
                          (i - frame_data.anchor_x) * tile_size.x + camera_position.x * tile_size.x,
                          (j - frame_data.anchor_y) * tile_size.y + camera_position.y * tile_size.y,
@@ -98,7 +101,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
             sprite->set_frame(frame_data.frame);
           }
 
-          renderer.batch("world",
+          renderer.batch("world"_hs,
                          sprite.get(),
                          i * tile_size.x + camera_position.x * tile_size.x,
                          j * tile_size.y + camera_position.y * tile_size.y,
@@ -132,7 +135,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto position_x = std::round(position.x) * sprite_size.x;
     const auto position_y = std::round(position.y) * sprite_size.y;
 
-    renderer.batch("world", visibility.sprite.get(), position_x, position_y, visibility.layer_z);
+    renderer.batch("world"_hs, visibility.sprite.get(), position_x, position_y, visibility.layer_z);
   }
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -142,7 +145,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     const auto& rectangle = registry.get<Rectangle>(entity);
 
-    renderer.batch("world",
+    renderer.batch("world"_hs,
                    rectangle.quad.get(),
                    std::round(position.x) * tile_size.x,
                    std::round(position.y) * tile_size.y,
@@ -155,7 +158,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    renderer.batch("world", text, position.x, position.y, 3);
+    renderer.batch("world"_hs, text, position.x, position.y, 3);
   }
 }
 }  // namespace dl

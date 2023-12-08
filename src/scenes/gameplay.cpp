@@ -4,6 +4,7 @@
 
 #include <cereal/archives/binary.hpp>
 #include <climits>
+#include <entt/core/hashed_string.hpp>
 #include <fstream>
 
 #include "core/game_context.hpp"
@@ -34,14 +35,16 @@ Gameplay::Gameplay(GameContext& game_context) : Scene("gameplay", game_context) 
 
 void Gameplay::load()
 {
+  using namespace entt::literals;
+
   Scene::load();
 
-  m_renderer.add_layer("world", "default");
-  m_renderer.add_layer("ui", "default", 10);
-  m_renderer.add_layer("ui-2", "default", 11);
+  m_renderer.add_layer("world"_hs, "default");
+  m_renderer.add_layer("ui"_hs, "default", 10);
+  m_renderer.add_layer("ui-2"_hs, "default", 11);
 
-  m_renderer.get_layer("ui")->has_depth = false;
-  m_renderer.get_layer("ui-2")->has_depth = false;
+  m_renderer.get_layer("ui"_hs)->has_depth = false;
+  m_renderer.get_layer("ui-2"_hs)->has_depth = false;
 
   /* load_world("./world.dl"); */
   m_world.load("./data/world/test_map.json");
@@ -166,14 +169,16 @@ void Gameplay::update()
 
 void Gameplay::render()
 {
+  using namespace entt::literals;
+
   if (!has_loaded())
   {
     return;
   }
 
-  m_renderer.push_matrix("world", m_camera.get_view_matrix());
+  m_renderer.push_matrix("world"_hs, m_camera.get_view_matrix());
   m_render_system.render(m_registry, m_renderer, m_camera);
-  m_renderer.pop_matrix("world");
+  m_renderer.pop_matrix("world"_hs);
 
   m_ui_manager.render(m_renderer);
 }

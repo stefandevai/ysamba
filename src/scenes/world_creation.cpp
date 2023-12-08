@@ -4,6 +4,7 @@
 
 #include <cereal/archives/binary.hpp>
 #include <climits>
+#include <entt/core/hashed_string.hpp>
 #include <fstream>
 
 #include "core/game_context.hpp"
@@ -18,7 +19,8 @@ namespace dl
 {
 WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
 {
-  m_renderer.add_layer("gui", "default", 2);
+  using namespace entt::literals;
+  m_renderer.add_layer("gui"_hs, "default", 2);
 }
 
 void WorldCreation::load()
@@ -79,12 +81,14 @@ void WorldCreation::update()
 
 void WorldCreation::render()
 {
+  using namespace entt::literals;
+
   if (!has_loaded())
   {
     return;
   }
 
-  m_renderer.batch("gui", m_world_sprite.get(), 0, 0, 0);
+  m_renderer.batch("gui"_hs, m_world_sprite.get(), 0, 0, 0);
 }
 
 /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */

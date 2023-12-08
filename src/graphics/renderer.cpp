@@ -18,7 +18,7 @@ namespace dl
 {
 Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager) {}
 
-void Renderer::add_layer(const std::string& layer_id, const std::string shader_id, const int priority)
+void Renderer::add_layer(const uint32_t layer_id, const std::string shader_id, const int priority)
 {
   const auto shader = m_asset_manager.get<ShaderProgram>(shader_id);
   auto layer = std::make_unique<Batch>(shader, priority);
@@ -36,7 +36,7 @@ std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
   return m_asset_manager.get<Texture>(resource_id);
 }
 
-void Renderer::batch(const std::string& layer_id, Sprite* sprite, const double x, const double y, const double z)
+void Renderer::batch(const uint32_t layer_id, Sprite* sprite, const double x, const double y, const double z)
 {
   const auto& layer = m_layers.at(layer_id);
 
@@ -49,8 +49,7 @@ void Renderer::batch(const std::string& layer_id, Sprite* sprite, const double x
   layer->emplace(sprite, x, y, z);
 }
 
-void Renderer::batch(
-    const std::string& layer_id, MultiSprite* multi_sprite, const double x, const double y, const double z)
+void Renderer::batch(const uint32_t layer_id, MultiSprite* multi_sprite, const double x, const double y, const double z)
 {
   const auto& layer = m_layers.at(layer_id);
 
@@ -63,7 +62,7 @@ void Renderer::batch(
   layer->emplace(multi_sprite, x, y, z);
 }
 
-void Renderer::batch(const std::string& layer_id, Text& text, const double x, const double y, const double z)
+void Renderer::batch(const uint32_t layer_id, Text& text, const double x, const double y, const double z)
 {
   const auto& layer = m_layers.at(layer_id);
   assert(layer != nullptr);
@@ -71,7 +70,7 @@ void Renderer::batch(const std::string& layer_id, Text& text, const double x, co
   layer->text(text, x, y, z);
 }
 
-void Renderer::batch(const std::string& layer_id, const Quad* quad, const double x, const double y, const double z)
+void Renderer::batch(const uint32_t layer_id, const Quad* quad, const double x, const double y, const double z)
 {
   m_layers.at(layer_id)->quad(quad, x, y, z);
 }
@@ -115,12 +114,12 @@ void Renderer::enable_depth_test() { glEnable(GL_DEPTH_TEST); }
 
 void Renderer::disable_depth_test() { glDisable(GL_DEPTH_TEST); }
 
-void Renderer::push_matrix(const std::string& layer_id, const glm::mat4& matrix)
+void Renderer::push_matrix(const uint32_t layer_id, const glm::mat4& matrix)
 {
   m_layers.at(layer_id)->push_matrix(matrix);
 }
 
-const glm::mat4 Renderer::pop_matrix(const std::string& layer_id) { return m_layers.at(layer_id)->pop_matrix(); }
+const glm::mat4 Renderer::pop_matrix(const uint32_t layer_id) { return m_layers.at(layer_id)->pop_matrix(); }
 
-const glm::mat4& Renderer::peek_matrix(const std::string& layer_id) { return m_layers.at(layer_id)->peek_matrix(); }
+const glm::mat4& Renderer::peek_matrix(const uint32_t layer_id) { return m_layers.at(layer_id)->peek_matrix(); }
 }  // namespace dl

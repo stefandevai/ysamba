@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "./container.hpp"
 #include "./label.hpp"
 #include "core/display.hpp"
@@ -56,8 +58,10 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
   matrix_stack.push_back(translate);
 }
 
-void Scrollable::render(Renderer& renderer, const std::string& layer)
+void Scrollable::render(Renderer& renderer, const uint32_t layer)
 {
+  using namespace entt::literals;
+
   (void)layer;
 
   // TODO: Don't use hardcoded layers, impement draw calls objects
@@ -67,7 +71,7 @@ void Scrollable::render(Renderer& renderer, const std::string& layer)
   // https://gamedev.stackexchange.com/questions/182241/opengl-rendering-pipeline
   // https://github.com/htmlboss/OpenGL-Renderer/tree/master
   const auto& window_size = Display::get_window_size();
-  renderer.get_layer("ui-2")->add_scissor(
+  renderer.get_layer("ui-2"_hs)->add_scissor(
       {absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
 
   for (auto& child : children)
@@ -78,7 +82,7 @@ void Scrollable::render(Renderer& renderer, const std::string& layer)
     }
 
     auto child_ptr = child.lock();
-    child_ptr->render(renderer, "ui-2");
+    child_ptr->render(renderer, "ui-2"_hs);
   }
 }
 

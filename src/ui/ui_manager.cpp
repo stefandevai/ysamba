@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "./components/container.hpp"
 #include "./components/label.hpp"
 #include "graphics/batch.hpp"
@@ -42,6 +44,8 @@ void UIManager::update()
 
 void UIManager::render(Renderer& renderer)
 {
+  using namespace entt::literals;
+
   for (auto& c : m_components)
   {
     if (c.second.expired())
@@ -50,7 +54,7 @@ void UIManager::render(Renderer& renderer)
     }
 
     auto c_ptr = c.second.lock();
-    c_ptr->render(renderer, "ui");
+    c_ptr->render(renderer, "ui"_hs);
   }
 }
 
