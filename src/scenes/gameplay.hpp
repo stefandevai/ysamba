@@ -45,7 +45,7 @@ class Gameplay : public Scene
   entt::registry m_registry;
   World m_world{m_game_context};
   ui::UIManager m_ui_manager{};
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
   State m_current_state = State::PAUSED;
   entt::entity m_fps_text;
   double m_turn_delay = 0.0;

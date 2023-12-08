@@ -37,7 +37,7 @@ void InventorySystem::m_update_inventory(entt::registry& registry)
     m_open_inventory(registry);
   }
 
-  if (m_input_manager->poll_action("close_inventory"))
+  if (m_input_manager.poll_action("close_inventory"))
   {
     m_dispose();
   }
@@ -45,19 +45,19 @@ void InventorySystem::m_update_inventory(entt::registry& registry)
 
 void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 {
-  const auto& current_context = m_input_manager->get_current_context();
+  const auto& current_context = m_input_manager.get_current_context();
 
   if (current_context == nullptr || current_context->key != "gameplay")
   {
     return;
   }
 
-  if (m_input_manager->poll_action("open_inventory"))
+  if (m_input_manager.poll_action("open_inventory"))
   {
     m_update_items(registry);
 
     m_state = InventoryState::Open;
-    m_input_manager->push_context("inventory");
+    m_input_manager.push_context("inventory");
   }
 }
 
@@ -98,7 +98,7 @@ void InventorySystem::m_dispose()
 {
   m_close_inventory();
   m_state = InventoryState::Closed;
-  m_input_manager->pop_context();
+  m_input_manager.pop_context();
 }
 
 void InventorySystem::m_update_items(entt::registry& registry)

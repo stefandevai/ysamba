@@ -38,7 +38,7 @@ class InventorySystem
   int m_inventory_id = -1;
 
   InventoryState m_state = InventoryState::Closed;
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
 
   void m_update_inventory(entt::registry& registry);
   void m_update_closed_inventory(entt::registry& registry);

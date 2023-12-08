@@ -38,15 +38,15 @@ void HomeMenu::update()
     return;
   }
 
-  if (m_input_manager->poll_action("quit"))
+  if (m_input_manager.poll_action("quit"))
   {
-    m_input_manager->quit();
+    m_input_manager.quit();
   }
-  else if (m_input_manager->poll_action("play"))
+  else if (m_input_manager.poll_action("play"))
   {
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   }
-  else if (m_input_manager->poll_action("create_world"))
+  else if (m_input_manager.poll_action("create_world"))
   {
     m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
   }

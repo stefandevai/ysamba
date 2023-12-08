@@ -30,7 +30,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     return;
   }
 
-  const auto mouse_position = m_input_manager->get_mouse_position();
+  const auto mouse_position = m_input_manager.get_mouse_position();
   const auto& camera_position = camera.get_position();
 
   // The mouse didn't change the position, nothing changed, don't update
@@ -134,22 +134,22 @@ void InspectorSystem::m_update_input(entt::registry& registry)
 {
   if (m_state == State::Inactive)
   {
-    const auto& current_context = m_input_manager->get_current_context();
+    const auto& current_context = m_input_manager.get_current_context();
 
     if (current_context == nullptr || current_context->key != "gameplay")
     {
       return;
     }
 
-    if (m_input_manager->poll_action("inspect"))
+    if (m_input_manager.poll_action("inspect"))
     {
       m_state = State::Active;
-      m_input_manager->push_context("inspector");
+      m_input_manager.push_context("inspector");
     }
   }
   else if (m_state == State::Active)
   {
-    if (m_input_manager->poll_action("quit"))
+    if (m_input_manager.poll_action("quit"))
     {
       m_destroy_inspector();
 
@@ -158,7 +158,7 @@ void InspectorSystem::m_update_input(entt::registry& registry)
         registry.destroy(m_target_quad);
       }
       m_state = State::Inactive;
-      m_input_manager->pop_context();
+      m_input_manager.pop_context();
     }
   }
 }

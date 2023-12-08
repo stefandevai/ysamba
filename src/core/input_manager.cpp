@@ -14,14 +14,14 @@ std::vector<std::shared_ptr<InputContext>> InputManager::m_context_stack = {};
 
 InputManager::InputManager() { m_parse_input(); }
 
-std::shared_ptr<InputManager> InputManager::get_instance()
+InputManager& InputManager::get_instance()
 {
   if (m_instance == nullptr)
   {
     m_instance = std::make_shared<InputManager>();
   }
 
-  return m_instance;
+  return *m_instance;
 }
 
 void InputManager::update() { m_sdl_input_wrapper.update(); }

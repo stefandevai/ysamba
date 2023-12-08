@@ -28,7 +28,7 @@ class SceneManager
   void push_scene(Args&&... args)
   {
     auto scene = std::make_unique<Type>(std::forward<Args>(args)...);
-    InputManager::get_instance()->push_context(scene->get_key());
+    InputManager::get_instance().push_context(scene->get_key());
     m_scenes.push_back(std::move(scene));
   }
 

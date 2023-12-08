@@ -41,7 +41,7 @@ class InputManager
   InputManager(InputManager const&){};
   void operator=(InputManager const&){};
 
-  static std::shared_ptr<InputManager> get_instance();
+  static InputManager& get_instance();
   void update();
   void push_context(const std::string& context_key);
   void pop_context();

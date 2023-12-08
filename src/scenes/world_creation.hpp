@@ -31,7 +31,7 @@ class WorldCreation : public Scene
   World m_world{m_game_context};
   std::unique_ptr<Sprite> m_world_sprite = nullptr;
   WorldRepresentation m_world_representation;
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
   int m_seed = 110;
   bool m_should_update_world_representation = false;
 

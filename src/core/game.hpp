@@ -29,7 +29,7 @@ class Game
   SceneManager m_scene_manager{};
   Camera m_camera;
   Clock m_clock{};
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
 
   GameContext m_context{&m_display, &m_asset_manager, &m_camera, &m_scene_manager, &m_clock};
 };

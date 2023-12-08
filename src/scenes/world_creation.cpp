@@ -48,30 +48,30 @@ void WorldCreation::update()
     return;
   }
 
-  if (m_input_manager->poll_action("quit"))
+  if (m_input_manager.poll_action("quit"))
   {
     m_game_context.scene_manager->pop_scene();
   }
-  else if (m_input_manager->poll_action("generate_world"))
+  else if (m_input_manager.poll_action("generate_world"))
   {
     m_generate_map();
     m_should_update_world_representation = true;
   }
-  else if (m_input_manager->poll_action("reload_world"))
+  else if (m_input_manager.poll_action("reload_world"))
   {
     m_generate_map(m_seed);
     m_should_update_world_representation = true;
   }
-  else if (m_input_manager->poll_action("save_world"))
+  else if (m_input_manager.poll_action("save_world"))
   {
     save_world("./world.dl");
   }
-  else if (m_input_manager->poll_action("load_world"))
+  else if (m_input_manager.poll_action("load_world"))
   {
     load_world("./world.dl");
     m_should_update_world_representation = true;
   }
-  else if (m_input_manager->poll_action("display_seed"))
+  else if (m_input_manager.poll_action("display_seed"))
   {
     spdlog::info("SEED: {}", m_world.get_seed());
   }

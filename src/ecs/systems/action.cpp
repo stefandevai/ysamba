@@ -61,31 +61,31 @@ void ActionSystem::m_update_action_menu()
     m_open_action_menu();
   }
 
-  if (m_input_manager->poll_action("close_menu"))
+  if (m_input_manager.poll_action("close_menu"))
   {
     m_dispose();
   }
-  else if (m_input_manager->poll_action("harvest"))
+  else if (m_input_manager.poll_action("harvest"))
   {
     m_state = ActionMenuState::SelectHarvestTarget;
   }
-  else if (m_input_manager->poll_action("pickup"))
+  else if (m_input_manager.poll_action("pickup"))
   {
     m_state = ActionMenuState::SelectPickupTarget;
   }
-  else if (m_input_manager->poll_action("break"))
+  else if (m_input_manager.poll_action("break"))
   {
     m_state = ActionMenuState::SelectBreakTarget;
   }
-  else if (m_input_manager->poll_action("dig"))
+  else if (m_input_manager.poll_action("dig"))
   {
     m_state = ActionMenuState::SelectDigTarget;
   }
-  else if (m_input_manager->poll_action("prepare_firecamp"))
+  else if (m_input_manager.poll_action("prepare_firecamp"))
   {
     m_state = ActionMenuState::PrepareFirecampTarget;
   }
-  else if (m_input_manager->poll_action("start_fire"))
+  else if (m_input_manager.poll_action("start_fire"))
   {
     m_state = ActionMenuState::StartFireTarget;
   }
@@ -93,14 +93,14 @@ void ActionSystem::m_update_action_menu()
 
 void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
 {
-  const auto& current_context = m_input_manager->get_current_context();
+  const auto& current_context = m_input_manager.get_current_context();
 
   if (current_context == nullptr || current_context->key != "gameplay")
   {
     return;
   }
 
-  if (m_input_manager->poll_action("open_action_menu"))
+  if (m_input_manager.poll_action("open_action_menu"))
   {
     if (m_selected_entities.empty())
     {
@@ -108,11 +108,11 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     }
 
     m_state = ActionMenuState::Open;
-    m_input_manager->push_context("action_menu");
+    m_input_manager.push_context("action_menu");
   }
-  else if (m_input_manager->has_clicked(InputManager::MouseButton::Left))
+  else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager->get_mouse_position();
+    const auto& mouse_position = m_input_manager.get_mouse_position();
     const auto& camera_position = camera.get_position();
     const auto& tile_size = camera.get_tile_size();
 
@@ -161,13 +161,13 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     m_show_select_target_text();
   }
 
-  if (m_input_manager->poll_action("close_menu"))
+  if (m_input_manager.poll_action("close_menu"))
   {
     m_dispose();
   }
-  else if (m_input_manager->has_clicked(InputManager::MouseButton::Left))
+  else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager->get_mouse_position();
+    const auto& mouse_position = m_input_manager.get_mouse_position();
     const auto& camera_position = camera.get_position();
     const auto& tile_size = camera.get_tile_size();
 
@@ -252,7 +252,7 @@ void ActionSystem::m_dispose()
   m_close_select_target();
 
   m_state = ActionMenuState::Closed;
-  m_input_manager->pop_context();
+  m_input_manager.pop_context();
 }
 
 void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry)

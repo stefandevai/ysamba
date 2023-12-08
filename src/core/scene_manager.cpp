@@ -17,7 +17,7 @@ void SceneManager::pop_scene()
     return;
   }
 
-  InputManager::get_instance()->pop_context();
+  InputManager::get_instance().pop_context();
   m_scenes.pop_back();
 }
 

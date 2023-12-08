@@ -10,7 +10,7 @@
 
 namespace dl::ui
 {
-const std::shared_ptr<InputManager> UIComponent::m_input_manager = InputManager::get_instance();
+InputManager& UIComponent::m_input_manager = InputManager::get_instance();
 
 void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
 {

@@ -18,7 +18,7 @@ class HomeMenu : public Scene
   void render() override;
 
  private:
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
   Text m_game_title;
   Text m_instructions;
 };

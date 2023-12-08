@@ -48,7 +48,7 @@ class ActionSystem
 
   std::vector<entt::entity> m_selected_entities{};
   ActionMenuState m_state = ActionMenuState::Closed;
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
 
   void m_update_action_menu();
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);

@@ -55,7 +55,7 @@ class UIComponent
   virtual void render(Renderer& renderer, const std::string& layer);
 
  protected:
-  static const std::shared_ptr<InputManager> m_input_manager;
+  static InputManager& m_input_manager;
 
   bool m_is_positioned();
 };

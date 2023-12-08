@@ -54,11 +54,11 @@ void Game::load()
 
 void Game::run()
 {
-  while (!m_input_manager->should_quit())
+  while (!m_input_manager.should_quit())
   {
     m_clock.tick();
 
-    m_input_manager->update();
+    m_input_manager.update();
     m_scene_manager.update();
 
     m_display.clear();

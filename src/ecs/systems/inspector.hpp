@@ -36,7 +36,7 @@ class InspectorSystem
   ui::UIManager& m_ui_manager;
   std::shared_ptr<ui::Inspector> m_inspector = nullptr;
   int m_inspector_id = -1;
-  std::shared_ptr<InputManager> m_input_manager = InputManager::get_instance();
+  InputManager& m_input_manager = InputManager::get_instance();
   Vector2i m_last_mouse_position{0, 0};
   Vector3 m_last_camera_position{0., 0., 0.};
   entt::entity m_target_quad = entt::null;
