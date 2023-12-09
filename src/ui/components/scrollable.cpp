@@ -12,7 +12,11 @@
 
 namespace dl::ui
 {
-Scrollable::Scrollable() : UIComponent() {}
+Scrollable::Scrollable() : UIComponent()
+{
+  m_batch.has_depth = false;
+  m_batch.has_scissor = true;
+}
 
 void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 {
@@ -58,11 +62,17 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
   matrix_stack.push_back(translate);
 }
 
-void Scrollable::render(Renderer& renderer, const uint32_t layer)
+void Scrollable::render(Renderer& renderer, Batch& batch)
 {
   using namespace entt::literals;
 
-  (void)layer;
+  (void)batch;
+
+  if (!m_added_batch)
+  {
+    renderer.add_batch(&m_batch);
+    m_added_batch = true;
+  }
 
   // TODO: Don't use hardcoded layers, impement draw calls objects
   // https://realtimecollisiondetection.net/blog/?p=86
@@ -71,8 +81,7 @@ void Scrollable::render(Renderer& renderer, const uint32_t layer)
   // https://gamedev.stackexchange.com/questions/182241/opengl-rendering-pipeline
   // https://github.com/htmlboss/OpenGL-Renderer/tree/master
   const auto& window_size = Display::get_window_size();
-  renderer.get_layer("ui-2"_hs)->add_scissor(
-      {absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
+  m_batch.add_scissor({absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
 
   for (auto& child : children)
   {
@@ -82,7 +91,7 @@ void Scrollable::render(Renderer& renderer, const uint32_t layer)
     }
 
     auto child_ptr = child.lock();
-    child_ptr->render(renderer, "ui-2"_hs);
+    child_ptr->render(renderer, m_batch);
   }
 }
 

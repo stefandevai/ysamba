@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "core/maths/vector.hpp"
@@ -24,6 +25,7 @@ class Batch
 {
  public:
   std::shared_ptr<ShaderProgram> shader = nullptr;
+  std::string shader_id{};
   int priority = 0;
   bool has_scissor = false;
   bool has_depth = true;
@@ -31,6 +33,7 @@ class Batch
 
   Batch(const int priority = 0);
   Batch(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
+  Batch(const std::string shader_id, const int priority = 0);
   ~Batch();
 
   void load();

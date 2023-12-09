@@ -27,6 +27,15 @@ void Renderer::add_layer(const uint32_t layer_id, const std::string shader_id, c
   });
 }
 
+void Renderer::add_batch(Batch* batch)
+{
+  m_ordered_layers.push_back(batch);
+
+  std::sort(m_ordered_layers.begin(), m_ordered_layers.end(), [](const auto& lhs, const auto& rhs) {
+    return lhs->priority < rhs->priority;
+  });
+}
+
 std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
 {
   return m_asset_manager.get<Texture>(resource_id);
@@ -79,22 +88,19 @@ void Renderer::render()
     {
       continue;
     }
-    if (!layer->has_depth)
+
+    if (layer->shader == nullptr)
     {
-      glDisable(GL_DEPTH_TEST);
+      layer->shader = m_asset_manager.get<ShaderProgram>(layer->shader_id);
     }
-    else
+
+    if (layer->has_depth)
     {
       glEnable(GL_DEPTH_TEST);
     }
-    if (!layer->has_scissor)
-    {
-      glDisable(GL_SCISSOR_TEST);
-    }
     else
     {
-      glEnable(GL_SCISSOR_TEST);
-      glScissor(layer->scissor.x, layer->scissor.y, layer->scissor.z, layer->scissor.w);
+      glDisable(GL_DEPTH_TEST);
     }
 
     const auto& shader = layer->shader;
@@ -102,8 +108,21 @@ void Renderer::render()
 
     shader->use();
     shader->set_mat_4("mvp", m_projection_matrix * m_default_view_matrix);
+
+    if (layer->has_scissor)
+    {
+      glEnable(GL_SCISSOR_TEST);
+      glScissor(layer->scissor.x, layer->scissor.y, layer->scissor.z, layer->scissor.w);
+    }
+    else
+    {
+      glDisable(GL_SCISSOR_TEST);
+    }
+
     layer->render();
   }
+
+  glDisable(GL_SCISSOR_TEST);
 }
 
 void Renderer::enable_depth_test() { glEnable(GL_DEPTH_TEST); }

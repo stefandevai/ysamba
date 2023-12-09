@@ -16,9 +16,9 @@ Container::Container(const Vector2i& size, const uint32_t color)
   this->size = size;
 }
 
-void Container::render(Renderer& renderer, const uint32_t layer)
+void Container::render(Renderer& renderer, Batch& batch)
 {
-  renderer.get_layer(layer)->quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
+  batch.quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {
@@ -28,7 +28,7 @@ void Container::render(Renderer& renderer, const uint32_t layer)
     }
 
     auto child_ptr = child.lock();
-    child_ptr->render(renderer, layer);
+    child_ptr->render(renderer, batch);
   }
 }
 

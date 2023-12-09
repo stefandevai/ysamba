@@ -4,6 +4,7 @@
 #include <map>
 
 #include "./components/component.hpp"
+#include "graphics/batch.hpp"
 
 namespace dl
 {
@@ -28,6 +29,8 @@ class UIManager
  private:
   std::map<uint32_t, std::weak_ptr<UIComponent>> m_components;
   std::vector<glm::mat4> m_matrix_stack;
+  Batch m_batch{"default", 10};
+  bool m_added_batch = false;
 
   static uint32_t m_identifier() noexcept
   {

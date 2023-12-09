@@ -52,7 +52,7 @@ class UIComponent
 
   virtual void update(std::vector<glm::mat4>& matrix_stack) { (void)matrix_stack; }
   virtual void update_component(std::vector<glm::mat4>& matrix_stack);
-  virtual void render(Renderer& renderer, const uint32_t layer);
+  virtual void render(Renderer& renderer, Batch& batch);
 
  protected:
   static InputManager& m_input_manager;

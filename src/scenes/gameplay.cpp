@@ -14,6 +14,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "ui/components/debug_info.hpp"
+#include "ui/components/scrollable_list.hpp"
 #include "world/society/society_generator.hpp"
 
 namespace dl
@@ -27,11 +28,6 @@ void Gameplay::load()
   Scene::load();
 
   m_renderer.add_layer("world"_hs, "default");
-  m_renderer.add_layer("ui"_hs, "default", 10);
-  m_renderer.add_layer("ui-2"_hs, "default", 11);
-
-  m_renderer.get_layer("ui"_hs)->has_depth = false;
-  m_renderer.get_layer("ui-2"_hs)->has_depth = false;
 
   load_game();
   /* m_world.load("./data/world/test_map.json"); */
@@ -39,12 +35,6 @@ void Gameplay::load()
   m_camera.set_tile_size(m_world.get_tile_size());
   m_debug_info = std::make_shared<ui::DebugInfo>();
   m_ui_manager.add_component(m_debug_info);
-
-  /* m_fps_text = m_registry.create(); */
-  /* m_registry.emplace<Text>(m_fps_text, "FPS: "); */
-  /* m_registry.emplace<Position>(m_fps_text, 30, 30, 20); */
-  /* auto& text_component = m_registry.get<Text>(m_fps_text); */
-  /* text_component.set_is_static(false); */
 
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */
@@ -100,8 +90,6 @@ void Gameplay::update()
   if (delay <= 0.0)
   {
     m_debug_info->set_content("FPS: " + std::to_string(1.0 / delta));
-    /* auto& text = m_registry.get<Text>(m_fps_text); */
-    /* text.set_text("FPS: " + std::to_string(1.0 / delta)); */
     delay = 0.8;
   }
   else

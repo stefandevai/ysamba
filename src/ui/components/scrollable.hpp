@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./component.hpp"
+#include "graphics/batch.hpp"
 
 namespace dl::ui
 {
@@ -10,9 +11,11 @@ class Scrollable : public UIComponent
   Scrollable();
 
   void update(std::vector<glm::mat4>& matrix_stack);
-  void render(Renderer& renderer, const uint32_t layer);
+  void render(Renderer& renderer, Batch& batch);
 
  private:
+  Batch m_batch{"default", 99999};
+  bool m_added_batch = false;
   int m_scroll_y = 0;
 };
 

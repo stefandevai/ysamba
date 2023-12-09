@@ -69,7 +69,7 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
   }
 }
 
-void UIComponent::render(Renderer& renderer, const uint32_t layer)
+void UIComponent::render(Renderer& renderer, Batch& batch)
 {
   for (auto& child : children)
   {
@@ -79,7 +79,7 @@ void UIComponent::render(Renderer& renderer, const uint32_t layer)
     }
 
     auto child_ptr = child.lock();
-    child_ptr->render(renderer, layer);
+    child_ptr->render(renderer, batch);
   }
 }
 

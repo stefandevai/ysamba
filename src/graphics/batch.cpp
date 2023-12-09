@@ -18,6 +18,8 @@ Batch::Batch(const int priority) : priority(priority) {}
 
 Batch::Batch(std::shared_ptr<ShaderProgram> shader, const int priority) : shader(shader), priority(priority) { load(); }
 
+Batch::Batch(const std::string shader_id, const int priority) : shader_id(shader_id), priority(priority) { load(); }
+
 Batch::~Batch()
 {
   glDeleteBuffers(1, &m_ebo);

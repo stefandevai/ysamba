@@ -8,8 +8,8 @@ Label::Label(const std::string& text, const std::string& typeface) : UIComponent
 {
   size = this->text.get_size();
 }
-void Label::render(Renderer& renderer, const uint32_t layer)
+void Label::render(Renderer& renderer, Batch& batch)
 {
-  renderer.get_layer(layer)->text(text, absolute_position.x, absolute_position.y, absolute_position.z);
+  batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z);
 }
 }  // namespace dl::ui

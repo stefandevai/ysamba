@@ -18,13 +18,8 @@ ScrollableList::ScrollableList(const std::vector<std::string>& items,
 {
   this->size = size;
 
-  /* ListStyle style{{15, 15}, 5}; */
-
-  /* m_list = std::make_shared<ButtonList>(items, Vector2i{size.x, 45}, on_select, style); */
-
   m_scrollable = std::make_shared<Scrollable>();
   m_scrollable->size = size;
-  /* m_scrollable->children.push_back(m_list); */
 
   set_items(items);
 

@@ -11,7 +11,11 @@
 
 namespace dl::ui
 {
-UIManager::UIManager() { m_matrix_stack.push_back(glm::mat4(1)); }
+UIManager::UIManager()
+{
+  m_batch.has_depth = false;
+  m_matrix_stack.push_back(glm::mat4(1));
+}
 
 UIManager::~UIManager()
 {
@@ -46,6 +50,12 @@ void UIManager::render(Renderer& renderer)
 {
   using namespace entt::literals;
 
+  if (!m_added_batch)
+  {
+    renderer.add_batch(&m_batch);
+    m_added_batch = true;
+  }
+
   for (auto& c : m_components)
   {
     if (c.second.expired())
@@ -54,7 +64,7 @@ void UIManager::render(Renderer& renderer)
     }
 
     auto c_ptr = c.second.lock();
-    c_ptr->render(renderer, "ui"_hs);
+    c_ptr->render(renderer, m_batch);
   }
 }
 
