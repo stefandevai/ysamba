@@ -140,7 +140,10 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
       else
       {
-        registry.remove<Rectangle>(selected_entity);
+        if (registry.all_of<Rectangle>(selected_entity))
+        {
+          registry.remove<Rectangle>(selected_entity);
+        }
         m_selected_entities.erase(std::find(m_selected_entities.begin(), m_selected_entities.end(), selected_entity));
       }
     }

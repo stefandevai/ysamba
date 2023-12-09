@@ -48,6 +48,7 @@ if (EMSCRIPTEN)
 endif()
 
 find_package(SDL2 CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
@@ -70,6 +71,7 @@ target_link_libraries(
     PRIVATE
         SDL2::SDL2
         SDL2::SDL2main
+        glad::glad
         libtcod::libtcod
         ${LUA_LIBRARIES}
         sol2

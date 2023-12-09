@@ -10,10 +10,6 @@
 #include "./texture.hpp"
 #include "core/asset_manager.hpp"
 
-// TEMP
-#include "core/display.hpp"
-// TEMP
-
 namespace dl
 {
 Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager) {}

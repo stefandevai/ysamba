@@ -26,6 +26,8 @@ class Job
   int insertion_index = 0;
   static int current_index;
 
+  Job() = default;
+
   Job(const JobType type, const int priority, const Target& target) : type(type), priority(priority), target(target)
   {
     insertion_index = ++current_index;
@@ -40,4 +42,10 @@ class Job
     return priority > rhs.priority;
   }
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Job& job)
+{
+  archive(job.type, job.priority, job.target, job.time_left, job.status, job.insertion_index);
+}
 }  // namespace dl

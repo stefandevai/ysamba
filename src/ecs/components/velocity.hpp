@@ -8,4 +8,10 @@ struct Velocity
   double y;
   double z;
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Velocity& velocity)
+{
+  archive(velocity.x, velocity.y, velocity.z);
+}
 }  // namespace dl

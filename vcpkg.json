@@ -13,14 +13,16 @@
         "zlib"
       ]
     },
+    "entt",
     "sdl2",
+    "glad",
     "lua",
     "sol2",
     "cereal",
-    "entt",
     "glm",
     "nlohmann-json",
     "freetype",
     "spdlog"
-  ]
+  ],
+  "builtin-baseline": "a42af01b72c28a8e1d7b48107b33e4f286a55ef6"
 }

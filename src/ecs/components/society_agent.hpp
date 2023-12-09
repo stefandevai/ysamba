@@ -46,4 +46,17 @@ struct SocietyAgent
   double time_to_next_action = 0.0;
   std::priority_queue<Job> jobs{};
 };
+
+template <typename Archive>
+void serialize(Archive& archive, SocietyAgent& agent)
+{
+  archive(agent.id,
+          agent.society_id,
+          agent.name,
+          agent.social_class,
+          agent.metiers,
+          agent.state,
+          agent.time_to_next_action,
+          agent.jobs);
+}
 }  // namespace dl

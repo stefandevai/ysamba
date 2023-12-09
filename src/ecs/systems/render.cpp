@@ -116,8 +116,12 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
   for (auto entity : items_view)
   {
     const auto& position = registry.get<Position>(entity);
-    const auto& visibility = registry.get<Visibility>(entity);
+    auto& visibility = registry.get<Visibility>(entity);
 
+    if (visibility.sprite == nullptr)
+    {
+      visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame);
+    }
     if (visibility.sprite->texture == nullptr)
     {
       visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id);

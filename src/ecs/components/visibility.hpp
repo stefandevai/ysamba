@@ -42,4 +42,10 @@ struct Visibility
     sprite = std::make_unique<Sprite>(resource_id, 0);
   };
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Visibility& visibility)
+{
+  archive(visibility.resource_id, visibility.frame, visibility.frame_id, visibility.frame_type, visibility.layer_z);
+}
 }  // namespace dl

@@ -24,7 +24,7 @@ void Game::load()
 
     m_display.load(width, height, title);
 
-    const auto& inital_scene_key = m_json.object["initial_scene"];
+    const auto& inital_scene_key = m_json.object["initial_scene"].get<std::string>();
 
     if (inital_scene_key == "home_menu")
     {
@@ -42,7 +42,7 @@ void Game::load()
     }
     else
     {
-      spdlog::critical("Could not find scene: ", inital_scene_key);
+      spdlog::critical("Could not find scene: {}", inital_scene_key);
     }
   }
   catch (const std::exception& exc)

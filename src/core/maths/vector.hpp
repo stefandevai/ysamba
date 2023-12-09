@@ -10,6 +10,12 @@ struct Vector2
   bool operator==(const Vector2& rhs) { return x == rhs.x && y == rhs.y; }
 };
 
+template <typename Archive>
+void serialize(Archive& archive, Vector2& v)
+{
+  archive(v.x, v.y);
+}
+
 struct Vector2i
 {
   int x = 0;
@@ -21,6 +27,12 @@ struct Vector2i
 
   bool operator==(const Vector2i& rhs) { return x == rhs.x && y == rhs.y; }
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Vector2i& v)
+{
+  archive(v.x, v.y);
+}
 
 struct Vector3
 {
@@ -39,6 +51,12 @@ struct Vector3
   bool operator==(const Vector3& rhs) { return x == rhs.x && y == rhs.y && z == rhs.z; }
 };
 
+template <typename Archive>
+void serialize(Archive& archive, Vector3& v)
+{
+  archive(v.x, v.y, v.z);
+}
+
 struct Vector3i
 {
   int x = 0;
@@ -54,6 +72,12 @@ struct Vector3i
   {
   }
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Vector3i& v)
+{
+  archive(v.x, v.y, v.z);
+}
 
 struct Vector4i
 {
@@ -71,5 +95,11 @@ struct Vector4i
   {
   }
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Vector4i& v)
+{
+  archive(v.x, v.y, v.z, v.w);
+}
 
 }  // namespace dl
