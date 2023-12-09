@@ -3,13 +3,12 @@
 #include <glm/vec2.hpp>
 
 #include "./color.hpp"
-#include "./renderable.hpp"
 #include "./texture.hpp"
 #include "./transform.hpp"
 
 namespace dl
 {
-class MultiSprite : public Renderable
+class MultiSprite
 {
  public:
   std::string resource_id;

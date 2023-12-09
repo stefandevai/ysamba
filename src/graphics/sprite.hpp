@@ -3,13 +3,12 @@
 #include <glm/vec2.hpp>
 
 #include "./color.hpp"
-#include "./renderable.hpp"
 #include "./texture.hpp"
 #include "./transform.hpp"
 
 namespace dl
 {
-class Sprite : public Renderable
+class Sprite
 {
  public:
   std::string resource_id;
