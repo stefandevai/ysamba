@@ -68,11 +68,11 @@ void WorldCreation::update()
   }
   else if (m_input_manager.poll_action("save_world"_hs))
   {
-    save_world("./world.dl");
+    save_world();
   }
   else if (m_input_manager.poll_action("load_world"_hs))
   {
-    load_world("./world.dl");
+    load_world();
     m_create_world_representation();
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
@@ -123,9 +123,9 @@ void WorldCreation::render()
 /*   SDL_FreeSurface(surface); */
 /* } */
 
-void WorldCreation::save_world(const std::string& file_path) { serialization::save_world(m_world); }
+void WorldCreation::save_world() { serialization::save_world(m_world); }
 
-void WorldCreation::load_world(const std::string& file_path)
+void WorldCreation::load_world()
 {
   serialization::load_world(m_world);
   m_has_loaded = true;

@@ -13,6 +13,7 @@
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
+#include "ui/components/debug_info.hpp"
 #include "world/society/society_generator.hpp"
 
 namespace dl
@@ -32,10 +33,12 @@ void Gameplay::load()
   m_renderer.get_layer("ui"_hs)->has_depth = false;
   m_renderer.get_layer("ui-2"_hs)->has_depth = false;
 
-  load_game("./world.dl");
+  load_game();
   /* m_world.load("./data/world/test_map.json"); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
+  m_debug_info = std::make_shared<ui::DebugInfo>();
+  m_ui_manager.add_component(m_debug_info);
 
   /* m_fps_text = m_registry.create(); */
   /* m_registry.emplace<Text>(m_fps_text, "FPS: "); */
@@ -96,6 +99,7 @@ void Gameplay::update()
 
   if (delay <= 0.0)
   {
+    m_debug_info->set_content("FPS: " + std::to_string(1.0 / delta));
     /* auto& text = m_registry.get<Text>(m_fps_text); */
     /* text.set_text("FPS: " + std::to_string(1.0 / delta)); */
     delay = 0.8;
@@ -122,9 +126,9 @@ void Gameplay::render()
   m_ui_manager.render(m_renderer);
 }
 
-void Gameplay::save_game(const std::string& file_path) { serialization::save_game(m_world, m_registry); }
+void Gameplay::save_game() { serialization::save_game(m_world, m_registry); }
 
-void Gameplay::load_game(const std::string& file_path)
+void Gameplay::load_game()
 {
   m_registry.clear();
   serialization::load_game(m_world, m_registry);
@@ -152,11 +156,11 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   }
   else if (m_input_manager.poll_action("save_game"_hs))
   {
-    save_game("./world.dl");
+    save_game();
   }
   else if (m_input_manager.poll_action("load_game"_hs))
   {
-    load_game("./world.dl");
+    load_game();
   }
   else if (m_input_manager.poll_action("add_item"_hs))
   {

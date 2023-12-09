@@ -19,6 +19,11 @@
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
+namespace dl::ui
+{
+class DebugInfo;
+}
+
 namespace dl
 {
 struct GameContext;
@@ -32,8 +37,8 @@ class Gameplay : public Scene
   void update() override;
   void render() override;
 
-  void save_game(const std::string& file_path);
-  void load_game(const std::string& file_path);
+  void save_game();
+  void load_game();
 
  private:
   enum State
@@ -47,7 +52,7 @@ class Gameplay : public Scene
   ui::UIManager m_ui_manager{};
   InputManager& m_input_manager = InputManager::get_instance();
   State m_current_state = State::PAUSED;
-  entt::entity m_fps_text;
+  std::shared_ptr<ui::DebugInfo> m_debug_info = nullptr;
   double m_turn_delay = 0.0;
 
   GameSystem m_game_system{m_registry, m_world};

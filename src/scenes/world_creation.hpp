@@ -23,8 +23,8 @@ class WorldCreation : public Scene
   void render() override;
   /* void screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) override; */
 
-  void save_world(const std::string& file_path);
-  void load_world(const std::string& file_path);
+  void save_world();
+  void load_world();
 
  private:
   using WorldRepresentation = std::vector<std::pair<glm::vec2, std::shared_ptr<Quad>>>;
