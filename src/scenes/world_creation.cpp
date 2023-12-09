@@ -2,17 +2,13 @@
 
 #include <spdlog/spdlog.h>
 
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/map.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
 #include <climits>
 #include <entt/core/hashed_string.hpp>
-#include <fstream>
 
 #include "core/game_context.hpp"
 #include "core/random.hpp"
 #include "core/scene_manager.hpp"
+#include "core/serialization.hpp"
 #include "graphics/color.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/sprite.hpp"
@@ -127,18 +123,11 @@ void WorldCreation::render()
 /*   SDL_FreeSurface(surface); */
 /* } */
 
-void WorldCreation::save_world(const std::string& file_path)
-{
-  std::ofstream output_stream(file_path);
-  cereal::BinaryOutputArchive archive(output_stream);
-  archive(m_world);
-}
+void WorldCreation::save_world(const std::string& file_path) { serialization::save_world(m_world); }
 
 void WorldCreation::load_world(const std::string& file_path)
 {
-  std::ifstream input_stream(file_path);
-  cereal::BinaryInputArchive archive(input_stream);
-  archive(m_world);
+  serialization::load_world(m_world);
   m_has_loaded = true;
 }
 

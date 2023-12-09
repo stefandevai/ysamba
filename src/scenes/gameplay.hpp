@@ -32,8 +32,8 @@ class Gameplay : public Scene
   void update() override;
   void render() override;
 
-  void save_world(const std::string& file_path);
-  void load_world(const std::string& file_path);
+  void save_game(const std::string& file_path);
+  void load_game(const std::string& file_path);
 
  private:
   enum State

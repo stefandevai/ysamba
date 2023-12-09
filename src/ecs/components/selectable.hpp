@@ -10,6 +10,7 @@ struct Selectable
 template <typename Archive>
 void serialize(Archive& archive, Selectable& selectable)
 {
+  selectable.selected = false;
   archive(selectable.selected);
 }
 }  // namespace dl

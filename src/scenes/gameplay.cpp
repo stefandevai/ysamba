@@ -2,33 +2,15 @@
 
 #include <spdlog/spdlog.h>
 
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/types/map.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/queue.hpp>
-#include <cereal/types/stack.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/vector.hpp>
-#include <climits>
 #include <entt/core/hashed_string.hpp>
-#include <entt/entity/snapshot.hpp>
-#include <fstream>
 
 #include "core/game_context.hpp"
 #include "core/json.hpp"
 #include "core/scene_manager.hpp"
-#include "ecs/components/action_pickup.hpp"
-#include "ecs/components/action_walk.hpp"
-#include "ecs/components/biology.hpp"
-#include "ecs/components/carried_items.hpp"
+#include "core/serialization.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/selectable.hpp"
-#include "ecs/components/society_agent.hpp"
-#include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
-#include "ecs/components/walk_path.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "world/society/society_generator.hpp"
@@ -50,16 +32,16 @@ void Gameplay::load()
   m_renderer.get_layer("ui"_hs)->has_depth = false;
   m_renderer.get_layer("ui-2"_hs)->has_depth = false;
 
-  load_world("./world.dl");
+  load_game("./world.dl");
   /* m_world.load("./data/world/test_map.json"); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
 
-  m_fps_text = m_registry.create();
-  m_registry.emplace<Text>(m_fps_text, "FPS: ");
-  m_registry.emplace<Position>(m_fps_text, 30, 30, 20);
-  auto& text_component = m_registry.get<Text>(m_fps_text);
-  text_component.set_is_static(false);
+  /* m_fps_text = m_registry.create(); */
+  /* m_registry.emplace<Text>(m_fps_text, "FPS: "); */
+  /* m_registry.emplace<Position>(m_fps_text, 30, 30, 20); */
+  /* auto& text_component = m_registry.get<Text>(m_fps_text); */
+  /* text_component.set_is_static(false); */
 
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */
@@ -114,8 +96,8 @@ void Gameplay::update()
 
   if (delay <= 0.0)
   {
-    auto& text = m_registry.get<Text>(m_fps_text);
-    text.set_text("FPS: " + std::to_string(1.0 / delta));
+    /* auto& text = m_registry.get<Text>(m_fps_text); */
+    /* text.set_text("FPS: " + std::to_string(1.0 / delta)); */
     delay = 0.8;
   }
   else
@@ -140,51 +122,12 @@ void Gameplay::render()
   m_ui_manager.render(m_renderer);
 }
 
-void Gameplay::save_world(const std::string& file_path)
+void Gameplay::save_game(const std::string& file_path) { serialization::save_game(m_world, m_registry); }
+
+void Gameplay::load_game(const std::string& file_path)
 {
-  std::ofstream output{file_path};
-  cereal::BinaryOutputArchive archive{output};
-
-  archive(m_world);
-
-  std::ofstream output2{"game.dl"};
-  cereal::BinaryOutputArchive archive2{output2};
-
-  /* std::stringstream storage; */
-  /* cereal::JSONOutputArchive output{storage}; */
-
-  entt::snapshot{m_registry}
-      .get<entt::entity>(archive2)
-      .get<Position>(archive2)
-      .get<Velocity>(archive2)
-      .get<Biology>(archive2)
-      .get<CarriedItems>(archive2)
-      .get<WalkPath>(archive2)
-      .get<Visibility>(archive2)
-      .get<SocietyAgent>(archive2)
-      .get<Item>(archive2);
-}
-
-void Gameplay::load_world(const std::string& file_path)
-{
-  std::ifstream input_stream{file_path};
-  cereal::BinaryInputArchive archive{input_stream};
-  archive(m_world);
-
-  std::ifstream input{"game.dl"};
-  cereal::BinaryInputArchive archive2{input};
-
-  entt::snapshot_loader{m_registry}
-      .get<entt::entity>(archive2)
-      .get<Position>(archive2)
-      .get<Velocity>(archive2)
-      .get<Biology>(archive2)
-      .get<CarriedItems>(archive2)
-      .get<WalkPath>(archive2)
-      .get<Visibility>(archive2)
-      .get<SocietyAgent>(archive2)
-      .get<Item>(archive2);
-
+  m_registry.clear();
+  serialization::load_game(m_world, m_registry);
   m_has_loaded = true;
 }
 
@@ -207,13 +150,13 @@ void Gameplay::m_update_input(GameContext& m_game_context)
       m_current_state = State::PLAYING;
     }
   }
-  else if (m_input_manager.poll_action("save_world"_hs))
+  else if (m_input_manager.poll_action("save_game"_hs))
   {
-    save_world("./world.dl");
+    save_game("./world.dl");
   }
-  else if (m_input_manager.poll_action("load_world"_hs))
+  else if (m_input_manager.poll_action("load_game"_hs))
   {
-    load_world("./world.dl");
+    load_game("./world.dl");
   }
   else if (m_input_manager.poll_action("add_item"_hs))
   {
