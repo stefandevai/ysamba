@@ -34,8 +34,7 @@ void Display::load(const int width, const int height, const std::string& title)
     throw std::runtime_error("It was not possible to initialize SDL2");
   }
 
-  /* SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1"); */
-
+  /* const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL); */
   const SDL_WindowFlags window_flags =
       (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL);
   m_window = SDL_CreateWindow(
@@ -64,17 +63,6 @@ void Display::load(const int width, const int height, const std::string& title)
   {
     spdlog::critical("Failed to initialize GLAD");
   }
-
-  // OpenGL Viewport settings
-  int maximized_width, maximized_height;
-  SDL_GetWindowSize(m_window, &maximized_width, &maximized_height);
-  glViewport(0, 0, maximized_width, maximized_height);
-  m_width = maximized_width;
-  m_height = maximized_height;
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_DEPTH_TEST);
 }
 
 Display::~Display()
@@ -106,19 +94,6 @@ void Display::set_size(const int width, const int height)
   }
 
   SDL_SetWindowSize(m_window, width, height);
-}
-
-void Display::set_clear_color(const float a, const float b, const float c)
-{
-  m_clear_color.x = a;
-  m_clear_color.y = b;
-  m_clear_color.z = c;
-}
-
-void Display::clear()
-{
-  glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Display::reset_viewport() { glViewport(0, 0, m_width, m_height); }

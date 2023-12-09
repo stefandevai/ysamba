@@ -16,8 +16,6 @@ namespace dl
 {
 Batch::Batch(const int priority) : priority(priority) {}
 
-Batch::Batch(std::shared_ptr<ShaderProgram> shader, const int priority) : shader(shader), priority(priority) { load(); }
-
 Batch::Batch(const std::string shader_id, const int priority) : shader_id(shader_id), priority(priority) { load(); }
 
 Batch::~Batch()
@@ -73,7 +71,7 @@ void Batch::load()
   glBindVertexArray(0);
 }
 
-void Batch::render()
+void Batch::render(ShaderProgram* shader)
 {
   // Return early if no sprites were added to the batch
   if (m_index_count == 0)

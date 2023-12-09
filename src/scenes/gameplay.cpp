@@ -27,7 +27,7 @@ void Gameplay::load()
 
   Scene::load();
 
-  m_renderer.add_layer("world"_hs, "default");
+  m_renderer.add_batch("world"_hs, "default");
 
   load_game();
   /* m_world.load("./data/world/test_map.json"); */

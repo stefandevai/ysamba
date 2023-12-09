@@ -20,7 +20,7 @@ WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation"
 {
   using namespace entt::literals;
 
-  m_renderer.add_layer("gui"_hs, "default", 2);
+  m_renderer.add_batch("gui"_hs, "default", 2);
 }
 
 void WorldCreation::load()

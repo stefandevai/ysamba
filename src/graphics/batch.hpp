@@ -24,20 +24,19 @@ class Text;
 class Batch
 {
  public:
-  std::shared_ptr<ShaderProgram> shader = nullptr;
   std::string shader_id{};
   int priority = 0;
   bool has_scissor = false;
   bool has_depth = true;
+  bool has_blend = true;
   Vector4i scissor{0, 0, -1, -1};
 
   Batch(const int priority = 0);
-  Batch(std::shared_ptr<ShaderProgram> shader, const int priority = 0);
   Batch(const std::string shader_id, const int priority = 0);
   ~Batch();
 
   void load();
-  void render();
+  void render(ShaderProgram* shader);
   void push_matrix(const glm::mat4& matrix);
   const glm::mat4 pop_matrix();
   const glm::mat4& peek_matrix();
@@ -45,7 +44,6 @@ class Batch
   void emplace(const MultiSprite* sprite, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
-  bool get_should_render() { return m_index_count > 0; }
   void add_scissor(const Vector4i& scissor);
 
  private:
@@ -80,6 +78,5 @@ class Batch
   unsigned int m_index_count = 0;
   unsigned int m_vertices_index = 0;
   std::vector<std::shared_ptr<Texture>> m_textures;
-  /* bool m_ignore_camera = false; */
 };
 }  // namespace dl

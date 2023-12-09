@@ -20,7 +20,7 @@ void HomeMenu::load()
 
   Scene::load();
 
-  m_renderer.add_layer("text"_hs, "default", 2);
+  m_renderer.add_batch("text"_hs, "default", 2);
 
   const auto game_title = m_lua.get_variable<std::string>("game_title");
   const auto instructions = m_lua.get_variable<std::string>("instructions");
