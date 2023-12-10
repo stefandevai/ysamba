@@ -24,6 +24,7 @@ class Text;
 class Batch
 {
  public:
+  std::shared_ptr<ShaderProgram> shader = nullptr;
   std::string shader_id{};
   int priority = 0;
   bool has_scissor = false;
@@ -32,11 +33,11 @@ class Batch
   Vector4i scissor{0, 0, -1, -1};
 
   Batch(const int priority = 0);
-  Batch(const std::string shader_id, const int priority = 0);
+  Batch(const std::string& shader_id, const int priority = 0);
   ~Batch();
 
   void load();
-  void render(ShaderProgram* shader);
+  void render();
   void push_matrix(const glm::mat4& matrix);
   const glm::mat4 pop_matrix();
   const glm::mat4& peek_matrix();

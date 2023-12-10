@@ -85,6 +85,12 @@ void Renderer::render()
 
   for (const auto& batch : m_ordered_batches)
   {
+    if (batch->shader == nullptr)
+    {
+      batch->shader = m_asset_manager.get<ShaderProgram>(batch->shader_id);
+    }
+    assert(batch->shader != nullptr);
+
     if (batch->has_blend)
     {
       glEnable(GL_BLEND);
@@ -112,13 +118,10 @@ void Renderer::render()
       glDisable(GL_SCISSOR_TEST);
     }
 
-    const auto& shader = m_asset_manager.get<ShaderProgram>(batch->shader_id);
-    assert(shader != nullptr);
+    batch->shader->use();
+    batch->shader->set_mat_4("mvp", m_projection_matrix * m_default_view_matrix);
 
-    shader->use();
-    shader->set_mat_4("mvp", m_projection_matrix * m_default_view_matrix);
-
-    batch->render(shader.get());
+    batch->render();
   }
 
   glDisable(GL_SCISSOR_TEST);
