@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "core/input_manager.hpp"
+#include "ui/types.hpp"
 
 namespace dl::ui
 {
@@ -32,7 +33,7 @@ class InventorySystem
   World& m_world;
   ui::UIManager& m_ui_manager;
   std::vector<entt::entity> m_items{};
-  std::vector<std::string> m_item_names{};
+  ui::ItemList m_item_names{};
 
   std::shared_ptr<ui::Inventory> m_inventory = nullptr;
   int m_inventory_id = -1;

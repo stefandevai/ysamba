@@ -273,7 +273,7 @@ void SDLInputWrapper::update()
   m_scroll.y = 0;
 
   m_mouse_state_up.first = false;
-  m_mouse_state_up.first = false;
+  m_mouse_state_up.second = false;
 
   // Update key status
   SDL_Event event;

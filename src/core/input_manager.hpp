@@ -10,6 +10,8 @@
 
 namespace dl
 {
+class Camera;
+
 struct InputContext
 {
   uint32_t key;
@@ -37,20 +39,22 @@ class InputManager
   void update();
   void push_context(const uint32_t context_key);
   void pop_context();
-  bool poll_action(const uint32_t action);
-  bool is_key_down(const uint32_t key);
-  bool is_any_key_down();
-  bool is_key_up(const uint32_t key);
-  bool is_clicking(const MouseButton button);
-  bool has_clicked(const MouseButton button);
-  bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
-  bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
-  const Vector2i& get_scroll() const { return m_sdl_input_wrapper.get_scroll(); }
-  const Vector2i& get_mouse_position();
-  const std::shared_ptr<InputContext> get_current_context();
-  bool window_size_changed() const;
+  [[nodiscard]] bool is_context(const uint32_t key);
+  [[nodiscard]] bool poll_action(const uint32_t action);
+  [[nodiscard]] bool is_key_down(const uint32_t key);
+  [[nodiscard]] bool is_any_key_down();
+  [[nodiscard]] bool is_key_up(const uint32_t key);
+  [[nodiscard]] bool is_clicking(const MouseButton button);
+  [[nodiscard]] bool has_clicked(const MouseButton button);
+  [[nodiscard]] bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
+  [[nodiscard]] bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
+  [[nodiscard]] const Vector2i& get_scroll() const { return m_sdl_input_wrapper.get_scroll(); }
+  [[nodiscard]] const Vector2i& get_mouse_position() const;
+  [[nodiscard]] const Vector2i get_mouse_tile_position(const Camera& camera) const;
+  [[nodiscard]] const std::shared_ptr<InputContext> get_current_context();
+  [[nodiscard]] bool window_size_changed() const;
   void set_window_size_changed(const bool value);
-  bool should_quit();
+  [[nodiscard]] bool should_quit();
   void quit();
 
  private:

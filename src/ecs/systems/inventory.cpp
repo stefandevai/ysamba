@@ -83,7 +83,7 @@ void InventorySystem::m_open_inventory(entt::registry& registry)
 
     const auto& item = registry.get<Item>(entity);
     const auto& item_data = m_world.get_item_data(item.id);
-    m_item_names.push_back(item_data.name);
+    m_item_names.push_back({static_cast<uint32_t>(entity), item_data.name});
   }
 
   m_inventory->set_items(m_item_names);

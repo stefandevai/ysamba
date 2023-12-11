@@ -6,6 +6,8 @@
 #include <entt/core/hashed_string.hpp>
 #include <vector>
 
+#include "graphics/camera.hpp"
+
 namespace dl
 {
 std::unique_ptr<InputManager> InputManager::m_instance = nullptr;
@@ -49,6 +51,18 @@ void InputManager::pop_context()
   }
 
   m_context_stack.pop_back();
+}
+
+bool InputManager::is_context(const uint32_t key)
+{
+  const auto& current_context = m_context_stack.back();
+
+  if (current_context == nullptr || current_context->key != key)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 bool InputManager::poll_action(const uint32_t action_key)
@@ -116,7 +130,17 @@ bool InputManager::has_clicked(const MouseButton button)
   return false;
 }
 
-const Vector2i& InputManager::get_mouse_position() { return m_sdl_input_wrapper.get_mouse_position(); }
+const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
+
+const Vector2i InputManager::get_mouse_tile_position(const Camera& camera) const
+{
+  const auto& mouse_position = get_mouse_position();
+  const auto& camera_position = camera.get_position();
+  const auto& tile_size = camera.get_tile_size();
+
+  return Vector2i{(mouse_position.x + camera_position.x) / tile_size.x,
+                  (mouse_position.y + camera_position.y) / tile_size.y};
+}
 
 const std::shared_ptr<InputContext> InputManager::get_current_context()
 {

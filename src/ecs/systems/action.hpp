@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "core/input_manager.hpp"
+#include "ui/types.hpp"
 #include "world/society/job.hpp"
 
 namespace dl::ui
@@ -28,11 +29,8 @@ class ActionSystem
   enum class ActionMenuState
   {
     SelectHarvestTarget = 0,
-    SelectPickupTarget,
     SelectBreakTarget,
     SelectDigTarget,
-    PrepareFirecampTarget,
-    StartFireTarget,
     Closed,
     Open,
   };
@@ -40,7 +38,8 @@ class ActionSystem
   World& m_world;
   ui::UIManager& m_ui_manager;
 
-  static const std::vector<std::string> menu_items;
+  static const ui::ItemList m_menu_items;
+  ui::ItemList m_actions{};
   std::shared_ptr<ui::ActionMenu> m_action_menu = nullptr;
   int m_action_menu_id = -1;
   std::shared_ptr<ui::Label> m_select_target_label = nullptr;
@@ -60,9 +59,17 @@ class ActionSystem
   void m_dispose();
   void m_select_tile_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry);
   void m_select_item_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry);
+  void m_create_job(const JobType job_type,
+                    const uint32_t id,
+                    const Vector2i& position,
+                    entt::registry& registry,
+                    entt::entity entity);
   bool m_has_qualities_required(const std::vector<std::string>& qualities_required,
                                 const entt::entity entity,
                                 entt::registry& registry);
   bool m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry);
+  std::function<void(const uint32_t)> m_on_select_generic_action = [this](const uint32_t i) {
+    m_state = static_cast<ActionMenuState>(i);
+  };
 };
 }  // namespace dl

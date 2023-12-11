@@ -15,6 +15,6 @@ Inventory::Inventory(const std::function<void(const int i)>& on_select) : UIComp
   children.push_back(m_scrollable_list);
 }
 
-void Inventory::set_items(const std::vector<std::string>& items) { m_scrollable_list->set_items(items); }
+void Inventory::set_items(const ItemList& items) { m_scrollable_list->set_items(items); }
 
 }  // namespace dl::ui

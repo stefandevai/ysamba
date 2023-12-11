@@ -30,11 +30,8 @@
     "action_menu": {
         "close_menu": ["k_escape"],
         "harvest": ["k_h"],
-        "pickup": ["k_p"],
         "break": ["k_b"],
-        "dig": ["k_d"],
-        "prepare_firecamp": ["k_r"],
-        "start_fire": ["k_f"]
+        "dig": ["k_d"]
     },
     "inventory": {
         "close_inventory": ["k_escape"]

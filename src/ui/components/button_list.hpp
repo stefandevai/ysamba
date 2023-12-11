@@ -2,6 +2,7 @@
 
 #include "./component.hpp"
 #include "ui/style/list.hpp"
+#include "ui/types.hpp"
 
 namespace dl::ui
 {
@@ -10,13 +11,15 @@ class Button;
 class ButtonList : public UIComponent
 {
  public:
-  ButtonList(const std::vector<std::string>& items,
+  ListStyle style;
+  std::function<void(const uint32_t)> on_select;
+
+  ButtonList(const ItemList& items,
              const Vector2i& button_size,
-             std::function<void(const int)> on_select,
+             const std::function<void(const uint32_t)>& on_select,
              const ListStyle& style = ListStyle());
 
-  ListStyle style;
-  std::function<void(const int)> on_select;
+  void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
  private:
   std::vector<std::shared_ptr<Button>> m_buttons;

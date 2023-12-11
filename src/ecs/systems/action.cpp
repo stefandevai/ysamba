@@ -20,20 +20,15 @@
 
 namespace dl
 {
-const std::vector<std::string> ActionSystem::menu_items = {
-    "[H]arvest",
-    "[P]ickup",
-    "[B]reak",
-    "[D]ig",
-    "P[R]epare Firecamp",
-    "Start [F]ire",
+const ui::ItemList ActionSystem::m_menu_items = {
+    {0, "[H]arvest"},
+    {1, "[B]reak"},
+    {2, "[D]ig"},
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  auto on_select = [this](const int i) { m_state = static_cast<ActionMenuState>(i); };
-
-  m_action_menu = std::make_shared<ui::ActionMenu>(menu_items, on_select);
+  m_action_menu = std::make_shared<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
 
   m_select_target_label = std::make_shared<ui::Label>("Select target");
   m_select_target_label->x_alignment = ui::XAlignement::Center;
@@ -73,10 +68,6 @@ void ActionSystem::m_update_action_menu()
   {
     m_state = ActionMenuState::SelectHarvestTarget;
   }
-  else if (m_input_manager.poll_action("pickup"_hs))
-  {
-    m_state = ActionMenuState::SelectPickupTarget;
-  }
   else if (m_input_manager.poll_action("break"_hs))
   {
     m_state = ActionMenuState::SelectBreakTarget;
@@ -85,23 +76,13 @@ void ActionSystem::m_update_action_menu()
   {
     m_state = ActionMenuState::SelectDigTarget;
   }
-  else if (m_input_manager.poll_action("prepare_firecamp"_hs))
-  {
-    m_state = ActionMenuState::PrepareFirecampTarget;
-  }
-  else if (m_input_manager.poll_action("start_fire"_hs))
-  {
-    m_state = ActionMenuState::StartFireTarget;
-  }
 }
 
 void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
 
-  const auto& current_context = m_input_manager.get_current_context();
-
-  if (current_context == nullptr || current_context->key != "gameplay"_hs)
+  if (!m_input_manager.is_context("gameplay"_hs))
   {
     return;
   }
@@ -113,19 +94,16 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       return;
     }
 
-    m_state = ActionMenuState::Open;
+    m_action_menu->set_actions(m_menu_items);
     m_input_manager.push_context("action_menu"_hs);
+    m_state = ActionMenuState::Open;
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager.get_mouse_position();
-    const auto& camera_position = camera.get_position();
-    const auto& tile_size = camera.get_tile_size();
+    const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
 
-    const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
-    const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
-
-    const auto selected_entity = m_world.spatial_hash.get_by_component<Selectable>(tile_x, tile_y, registry);
+    const auto selected_entity =
+        m_world.spatial_hash.get_by_component<Selectable>(mouse_position.x, mouse_position.y, registry);
 
     // If a selectable entity was clicked, toggle its selected state
     if (registry.valid(selected_entity))
@@ -153,8 +131,65 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       for (const auto entity : m_selected_entities)
       {
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{JobType::Walk, 0, Target{Vector3i{tile_x, tile_y, 0}, 0, 0}});
+        agent.jobs.push(Job{JobType::Walk, 0, Target{Vector3i{mouse_position.x, mouse_position.y, 0}, 0, 0}});
       }
+    }
+  }
+  else if (m_input_manager.has_clicked(InputManager::MouseButton::Right))
+  {
+    if (m_selected_entities.empty())
+    {
+      return;
+    }
+
+    const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
+    const auto selected_entity =
+        m_world.spatial_hash.get_by_component<Item>(mouse_position.x, mouse_position.y, registry);
+
+    if (registry.valid(selected_entity))
+    {
+      const auto& item = registry.get<Item>(selected_entity);
+      const auto& item_data = m_world.get_item_data(item.id);
+      m_actions.clear();
+
+      if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1)
+      {
+        m_actions.push_back({static_cast<uint32_t>(JobType::Pickup), "pickup"});
+      }
+
+      m_action_menu->set_actions(m_actions);
+      m_action_menu->set_on_select([this, &registry, mouse_position, selected_entity](const uint32_t i) {
+        for (const auto entity : m_selected_entities)
+        {
+          m_create_job(
+              static_cast<JobType>(i), static_cast<uint32_t>(selected_entity), mouse_position, registry, entity);
+        }
+        m_dispose();
+      });
+      m_input_manager.push_context("action_menu"_hs);
+      m_state = ActionMenuState::Open;
+    }
+    else
+    {
+      // Get tile actions
+      const auto& tile_data = m_world.get(mouse_position.x, mouse_position.y, 0);
+      m_actions.clear();
+
+      for (const auto& action : tile_data.actions)
+      {
+        m_actions.push_back({static_cast<uint32_t>(action.first), action.second.name});
+      }
+
+      m_action_menu->set_actions(m_actions);
+      m_action_menu->set_on_select([this, &registry, mouse_position, &tile_data](const uint32_t i) {
+        for (const auto entity : m_selected_entities)
+        {
+          m_create_job(static_cast<JobType>(i), tile_data.id, mouse_position, registry, entity);
+        }
+        m_dispose();
+      });
+      m_input_manager.push_context("action_menu"_hs);
+      m_state = ActionMenuState::Open;
     }
   }
 }
@@ -193,11 +228,6 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
       m_select_tile_target(tile_position, JobType::Harvest, registry);
       break;
     }
-    case ActionMenuState::SelectPickupTarget:
-    {
-      m_select_item_target(tile_position, JobType::Pickup, registry);
-      break;
-    }
     case ActionMenuState::SelectBreakTarget:
     {
       m_select_tile_target(tile_position, JobType::Break, registry);
@@ -206,16 +236,6 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     case ActionMenuState::SelectDigTarget:
     {
       m_select_tile_target(tile_position, JobType::Dig, registry);
-      break;
-    }
-    case ActionMenuState::PrepareFirecampTarget:
-    {
-      m_select_tile_target(tile_position, JobType::PrepareFirecamp, registry);
-      break;
-    }
-    case ActionMenuState::StartFireTarget:
-    {
-      m_select_tile_target(tile_position, JobType::StartFire, registry);
       break;
     }
     default:
@@ -296,9 +316,7 @@ void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const Job
         }
       }
 
-      auto& agent = registry.get<SocietyAgent>(entity);
-      agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
-      agent.jobs.push(Job{job_type, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, tile.id}});
+      m_create_job(job_type, tile.id, tile_position, registry, entity);
     }
     m_dispose();
   }
@@ -313,17 +331,20 @@ void ActionSystem::m_select_item_target(const Vector2i& tile_position, const Job
     return;
   }
 
-  // TODO: Move whole pickup action to an idividual menu, multiple people can't take a
-  // single item in this stage of development
   for (const auto entity : m_selected_entities)
   {
-    auto& agent = registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
-    agent.jobs.push(
-        Job{job_type, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, static_cast<uint32_t>(item)}});
+    m_create_job(job_type, static_cast<uint32_t>(item), tile_position, registry, entity);
   }
 
   m_dispose();
+}
+
+void ActionSystem::m_create_job(
+    const JobType job_type, const uint32_t id, const Vector2i& position, entt::registry& registry, entt::entity entity)
+{
+  auto& agent = registry.get<SocietyAgent>(entity);
+  agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{position.x, position.y, 0}}});
+  agent.jobs.push(Job{job_type, 2, Target{Vector3i{position.x, position.y, 0}, id}});
 }
 
 bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,

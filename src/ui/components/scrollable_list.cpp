@@ -11,9 +11,9 @@
 
 namespace dl::ui
 {
-ScrollableList::ScrollableList(const std::vector<std::string>& items,
+ScrollableList::ScrollableList(const ItemList& items,
                                const Vector2i& size,
-                               const std::function<void(const int i)>& on_select)
+                               const std::function<void(const uint32_t)>& on_select)
     : UIComponent(), m_on_select(on_select)
 {
   this->size = size;
@@ -29,7 +29,7 @@ ScrollableList::ScrollableList(const std::vector<std::string>& items,
   children.push_back(m_container);
 }
 
-ScrollableList::ScrollableList(const Vector2i& size, const std::function<void(const int i)>& on_select)
+ScrollableList::ScrollableList(const Vector2i& size, const std::function<void(const uint32_t)>& on_select)
     : UIComponent(), m_on_select(on_select)
 {
   this->size = size;
@@ -43,12 +43,17 @@ ScrollableList::ScrollableList(const Vector2i& size, const std::function<void(co
   children.push_back(m_container);
 }
 
-void ScrollableList::set_items(const std::vector<std::string>& items)
+void ScrollableList::set_items(const ItemList& items)
 {
   ListStyle style{{15, 15}, 5};
   m_list = std::make_shared<ButtonList>(items, Vector2i{size.x, 45}, m_on_select, style);
   m_scrollable->children.clear();
   m_scrollable->children.push_back(m_list);
+}
+
+void ScrollableList::set_on_select(const std::function<void(const uint32_t)>& on_select)
+{
+  m_list->set_on_select(on_select);
 }
 
 }  // namespace dl::ui

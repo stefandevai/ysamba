@@ -9,9 +9,9 @@
 
 namespace dl::ui
 {
-ButtonList::ButtonList(const std::vector<std::string>& items,
+ButtonList::ButtonList(const ItemList& items,
                        const Vector2i& button_size,
-                       std::function<void(const int)> on_select,
+                       const std::function<void(const uint32_t)>& on_select,
                        const ListStyle& style)
     : UIComponent(), style(style), on_select(on_select)
 {
@@ -26,14 +26,16 @@ ButtonList::ButtonList(const std::vector<std::string>& items,
 
   for (size_t i = 0; i < items_size; ++i)
   {
-    auto button = std::make_shared<Button>(items[i],
+    const auto& item = items[i];
+
+    auto button = std::make_shared<Button>(item.second,
                                            Vector2i{button_size.x - 2 * style.margin.x, button_size.y},
                                            XAlignement::Center,
                                            YAlignement::Center);
 
     if (on_select)
     {
-      button->on_click = [this, i]() { this->on_select(i); };
+      button->on_click = [this, &item]() { this->on_select(item.first); };
     }
 
     button->position.x = style.margin.x;
@@ -48,5 +50,7 @@ ButtonList::ButtonList(const std::vector<std::string>& items,
 
   size = {button_size.x, height};
 }
+
+void ButtonList::set_on_select(const std::function<void(const uint32_t)>& on_select) { this->on_select = on_select; }
 
 }  // namespace dl::ui

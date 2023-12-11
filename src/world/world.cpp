@@ -379,6 +379,10 @@ void World::m_load_item_data()
         item_data.qualities[quality["name"].get<std::string>()] = quality["level"].get<int>();
       }
     }
+    if (item.contains("flags"))
+    {
+      item_data.flags = item["flags"].get<std::unordered_set<std::string>>();
+    }
     m_item_data[item_data.id] = item_data;
   }
 }
