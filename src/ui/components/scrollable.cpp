@@ -2,8 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include <entt/core/hashed_string.hpp>
-
 #include "./container.hpp"
 #include "./label.hpp"
 #include "core/display.hpp"
@@ -62,12 +60,8 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
   matrix_stack.push_back(translate);
 }
 
-void Scrollable::render(Renderer& renderer, Batch& batch)
+void Scrollable::render(Renderer& renderer, [[maybe_unused]] Batch& batch)
 {
-  using namespace entt::literals;
-
-  (void)batch;
-
   if (!m_added_batch)
   {
     renderer.add_batch(&m_batch);

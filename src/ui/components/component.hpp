@@ -50,7 +50,7 @@ class UIComponent
   UIComponent() {}
   virtual ~UIComponent() {}
 
-  virtual void update(std::vector<glm::mat4>& matrix_stack) { (void)matrix_stack; }
+  virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
   virtual void update_component(std::vector<glm::mat4>& matrix_stack);
   virtual void render(Renderer& renderer, Batch& batch);
 
