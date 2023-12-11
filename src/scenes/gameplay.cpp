@@ -29,8 +29,8 @@ void Gameplay::load()
 
   m_renderer.add_batch("world"_hs, "default");
 
-  load_game();
   /* m_world.load("./data/world/test_map.json"); */
+  load_game();
 
   m_camera.set_tile_size(m_world.get_tile_size());
   m_debug_info = std::make_shared<ui::DebugInfo>();

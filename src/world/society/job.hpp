@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <entt/entity/registry.hpp>
 
 #include "./job_type.hpp"
 #include "core/maths/vector.hpp"
@@ -22,6 +23,7 @@ class Job
   int priority = 0;
   Target target;
   mutable double time_left = 0.05;
+  mutable entt::entity progress_entity = entt::null;
   mutable JobStatus status = JobStatus::Waiting;
   int insertion_index = 0;
   static int current_index;

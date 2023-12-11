@@ -12,6 +12,7 @@ struct Action
 {
   std::string name{};
   uint32_t turns_into{};
+  bool gives_in_place = true;
   std::vector<std::string> qualities_required{};
   std::map<uint32_t, uint32_t> consumes{};
   std::map<uint32_t, std::pair<uint32_t, uint32_t>> gives{};

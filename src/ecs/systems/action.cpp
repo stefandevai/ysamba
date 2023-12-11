@@ -148,6 +148,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
     if (registry.valid(selected_entity))
     {
+      // Get item actions
       const auto& item = registry.get<Item>(selected_entity);
       const auto& item_data = m_world.get_item_data(item.id);
       m_actions.clear();

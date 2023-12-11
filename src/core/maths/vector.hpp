@@ -34,6 +34,28 @@ void serialize(Archive& archive, Vector2i& v)
   archive(v.x, v.y);
 }
 
+struct Vector3i
+{
+  int x = 0;
+  int y = 0;
+  int z = 0;
+
+  Vector3i() : x(0), y(0), z(0) {}
+
+  Vector3i(const int x, const int y, const int z) : x(x), y(y), z(z) {}
+
+  Vector3i(const double x, const double y, const double z)
+      : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z))
+  {
+  }
+};
+
+template <typename Archive>
+void serialize(Archive& archive, Vector3i& v)
+{
+  archive(v.x, v.y, v.z);
+}
+
 struct Vector3
 {
   double x = 0.0;
@@ -53,28 +75,6 @@ struct Vector3
 
 template <typename Archive>
 void serialize(Archive& archive, Vector3& v)
-{
-  archive(v.x, v.y, v.z);
-}
-
-struct Vector3i
-{
-  int x = 0;
-  int y = 0;
-  int z = 0;
-
-  Vector3i() : x(0), y(0), z(0) {}
-
-  Vector3i(const int x, const int y, const int z) : x(x), y(y), z(z) {}
-
-  Vector3i(const double x, const double y, const double z)
-      : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z))
-  {
-  }
-};
-
-template <typename Archive>
-void serialize(Archive& archive, Vector3i& v)
 {
   archive(v.x, v.y, v.z);
 }

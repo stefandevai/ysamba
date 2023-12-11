@@ -17,6 +17,7 @@
 #include "ecs/components/biology.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -59,6 +60,7 @@ void save_game(World& world, entt::registry& registry)
       .get<SocietyAgent>(archive)
       .get<Selectable>(archive)
       .get<Item>(archive);
+  /* .get<JobProgress>(archive); */
 }
 
 void load_game(World& world, entt::registry& registry)
@@ -79,5 +81,6 @@ void load_game(World& world, entt::registry& registry)
       .get<SocietyAgent>(archive)
       .get<Selectable>(archive)
       .get<Item>(archive);
+  /* .get<JobProgress>(archive); */
 }
 }  // namespace dl::serialization

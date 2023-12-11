@@ -352,6 +352,8 @@ void World::m_load_tile_data()
             const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
             tile_data.actions[type].gives[item_id] = quantity;
           }
+
+          tile_data.actions[type].gives_in_place = action["gives_in_place"].get<bool>();
         }
       }
     }

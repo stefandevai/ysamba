@@ -5,6 +5,7 @@
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "graphics/constants.hpp"
@@ -41,6 +42,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
         registry.emplace<ActionPickup>(entity, &current_job);
         break;
       default:
+        m_create_or_assign_job_progress(current_job, registry);
         break;
       }
     }
@@ -75,11 +77,20 @@ void JobSystem::m_update_tile_job(const Job& job,
     return;
   }
 
-  job.time_left -= delta;
-
-  if (job.time_left < 0.0)
+  if (!registry.valid(job.progress_entity))
   {
     job.status = JobStatus::Finished;
+    return;
+  }
+
+  auto& job_progress = registry.get<JobProgress>(job.progress_entity);
+
+  job_progress.time_left -= delta;
+
+  if (job_progress.time_left < 0.0)
+  {
+    job.status = JobStatus::Finished;
+    registry.destroy(job.progress_entity);
 
     const auto& tile = m_world.get(job.target.position.x, job.target.position.y, job.target.position.z);
 
@@ -91,8 +102,9 @@ void JobSystem::m_update_tile_job(const Job& job,
 
     const auto& tile_data = m_world.get_tile_data(tile.id);
     const auto& action = tile_data.actions.at(job.type);
+    const auto& target_position = job.target.position;
 
-    m_world.replace(tile.id, action.turns_into, job.target.position.x, job.target.position.y, job.target.position.z);
+    m_world.replace(tile.id, action.turns_into, target_position.x, target_position.y, target_position.z);
 
     if (action.gives.empty())
     {
@@ -104,7 +116,16 @@ void JobSystem::m_update_tile_job(const Job& job,
     for (const auto& item : action.gives)
     {
       const auto drop = registry.create();
-      registry.emplace<Position>(drop, position.x, position.y, position.z);
+
+      if (action.gives_in_place)
+      {
+        registry.emplace<Position>(drop, target_position.x, target_position.y, target_position.z);
+      }
+      else
+      {
+        registry.emplace<Position>(drop, position.x, position.y, position.z);
+      }
+
       registry.emplace<Visibility>(drop,
                                    m_world.get_texture_id(),
                                    item.first,
@@ -112,6 +133,29 @@ void JobSystem::m_update_tile_job(const Job& job,
                                    job.target.position.z + renderer::layer_z_offset_items);
       registry.emplace<Item>(drop, item.first);
     }
+  }
+}
+
+void JobSystem::m_create_or_assign_job_progress(const Job& job, entt::registry& registry)
+{
+  const auto& target_position = job.target.position;
+  const auto existing_entity =
+      m_world.spatial_hash.get_by_component<JobProgress>(target_position.x, target_position.y, registry);
+
+  if (registry.valid(existing_entity))
+  {
+    const auto& job_progress = registry.get<JobProgress>(existing_entity);
+    if (job_progress.type == job.type)
+    {
+      job.progress_entity = existing_entity;
+    }
+  }
+  else
+  {
+    const auto entity = registry.create();
+    registry.emplace<JobProgress>(entity, job.type, 0.1);
+    registry.emplace<Position>(entity, target_position.x, target_position.y, target_position.z);
+    job.progress_entity = entity;
   }
 }
 
