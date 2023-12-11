@@ -110,6 +110,98 @@ TODO:
 - The pickup system will use item data (where can it be weared or carried?), and slot data (what kind of body parts the creature has to carry or wear?),
   and person data (does the person have all the arms?) to evaluate if an item can be carried or weared
 
+- hammer_entity
+  - item_component
+    - id: hammer_id
+  - stored_component
+    - container_entity: bag_entity
+
+- bag_entity
+  - item_component
+    - id: bag_id
+  - storage_component
+    - items: [hammer_entity, ...]
+    - weight_capacity: 10kg
+    - current_weight: 1kg
+
+- hat_entity
+  - item_component
+    - id: hat_id
+  - wearable_component
+    - slots: [head_slot_id]
+  - weared_component
+    - slot_id: head_slot_id
+
+- sword_entity
+  - item_component
+    - id: sword_id
+  - wielded_component
+    - slot_id: right_hand_id
+
+- person_entity
+  - biology_component
+    - body_parts: [left_hand_id, torso_id, leg_id, ...]
+    - wield_slots: [left_hand_id, right_hand_id, ...],
+  - wielded_items:
+    - items: [sword_entity]
+  - weared_items
+    - items: [hat_entity, bag_entity, ...]
+  - carried_items
+    - items: [hammer_entity, ...]
+
+slots:
+[
+  {
+    "id": 2,
+    "name": "left hand"
+    "can_wield": true,
+  },
+  {
+    "id": 3,
+    "name": "torso"
+    "can_wield": false,
+  },
+  ...
+]
+
+items:
+[
+  {
+    "id": 0,
+    "name": "hat"
+    "flags": ["PICKABLE", "WIELDABLE"],
+    "wearable_slots": [2, ...],
+  },
+  {
+    "id": 1,
+    "name": "sword"
+    "flags": ["PICKABLE", "WIELDABLE", "TWO_HANDED"],
+  },
+  ...
+]
+
+### Wear system
+1. Get item entity and agent entity
+2. Get Item component and Biology component
+3. Check item_data.wearable_parts if it's wearable and if biology has corresponding body parts that match the wearable parts
+4. Wear item and compute encumbrance for body part
+
+### Pickup system
+1. Get item entity and agent entity
+2. Check agent entity WearedItems component and get those with Storage component
+  - if current_weight lt weight_capacity ? push_item : get child container items
+  - Push item to CarriedItems component or StorageComponent or both?
+  - Decision: push to StorageComponent only for simplicity, CarriedItems look like a cache and can be implemented later
+3. Add item weight to total weight in biology component
+
+### Wield system
+1. Get item entity and agent entity
+2. Check if item has WIELDABLE flag
+3. Check if agent has free wield slots
+4. Add wielded entt::tag to item entity
+
 ## Society inventory
 - Define a storage area and all items in this area appear in the society inventory
 - Also get all Selectable, CarriedItems and WearedItems components to be able to display all items
+
+
