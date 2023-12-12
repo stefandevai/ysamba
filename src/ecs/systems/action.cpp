@@ -253,7 +253,7 @@ void ActionSystem::m_open_action_menu()
 
   if (!m_action_menu->visible)
   {
-    m_action_menu->visible = true;
+    m_action_menu->show();
   }
 }
 
@@ -263,7 +263,7 @@ void ActionSystem::m_show_select_target_text()
 
   if (!m_select_target_label->visible)
   {
-    m_select_target_label->visible = true;
+    m_select_target_label->show();
   }
 }
 
@@ -271,7 +271,7 @@ void ActionSystem::m_close_action_menu()
 {
   if (m_action_menu->visible)
   {
-    m_action_menu->visible = false;
+    m_action_menu->hide();
   }
 }
 
@@ -279,7 +279,7 @@ void ActionSystem::m_close_select_target()
 {
   if (m_select_target_label->visible)
   {
-    m_select_target_label->visible = false;
+    m_select_target_label->hide();
   }
 }
 

@@ -71,6 +71,8 @@ class UIComponent
   virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
   virtual void update_component(std::vector<glm::mat4>& matrix_stack);
   virtual void render(Renderer& renderer, Batch& batch);
+  virtual void show();
+  virtual void hide();
 
  protected:
   static InputManager& m_input_manager;

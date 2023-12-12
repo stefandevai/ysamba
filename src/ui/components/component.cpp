@@ -86,6 +86,10 @@ void UIComponent::render(Renderer& renderer, Batch& batch)
   }
 }
 
+void UIComponent::show() { visible = true; }
+
+void UIComponent::hide() { visible = false; }
+
 bool UIComponent::m_is_positioned()
 {
   return position.x != 0 || position.y != 0 || x_alignment != XAlignement::Left || y_alignment != YAlignement::Top;

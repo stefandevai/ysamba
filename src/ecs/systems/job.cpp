@@ -36,7 +36,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
       switch (current_job.type)
       {
       case JobType::Walk:
-        registry.emplace<ActionWalk>(entity, &current_job);
+        registry.emplace_or_replace<ActionWalk>(entity, &current_job);
         break;
       case JobType::Pickup:
         registry.emplace<ActionPickup>(entity, &current_job);

@@ -89,7 +89,7 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
 {
   if (!m_inspector->visible)
   {
-    m_inspector->visible = true;
+    m_inspector->show();
   }
 
   if (registry.all_of<SocietyAgent>(entity))
@@ -116,13 +116,13 @@ void InspectorSystem::m_update_inspector_content(const TileData& tile_data)
 {
   if (!m_inspector->visible)
   {
-    m_inspector->visible = true;
+    m_inspector->show();
   }
 
   m_inspector->set_content(tile_data.name);
 }
 
-void InspectorSystem::m_destroy_inspector() { m_inspector->visible = false; }
+void InspectorSystem::m_destroy_inspector() { m_inspector->hide(); }
 
 void InspectorSystem::m_update_input(entt::registry& registry)
 {

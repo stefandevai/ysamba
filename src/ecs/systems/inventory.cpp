@@ -86,12 +86,11 @@ void InventorySystem::m_open_inventory(entt::registry& registry)
     }
 
     m_inventory->set_items(m_item_names);
-
-    m_inventory->visible = true;
+    m_inventory->show();
   }
 }
 
-void InventorySystem::m_close_inventory() { m_inventory->visible = false; }
+void InventorySystem::m_close_inventory() { m_inventory->hide(); }
 
 void InventorySystem::m_dispose()
 {
