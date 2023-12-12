@@ -40,10 +40,8 @@ class ActionSystem
 
   static const ui::ItemList m_menu_items;
   ui::ItemList m_actions{};
-  std::shared_ptr<ui::ActionMenu> m_action_menu = nullptr;
-  int m_action_menu_id = -1;
-  std::shared_ptr<ui::Label> m_select_target_label = nullptr;
-  int m_select_target_label_id = -1;
+  ui::ActionMenu* m_action_menu = nullptr;
+  ui::Label* m_select_target_label = nullptr;
 
   std::vector<entt::entity> m_selected_entities{};
   ActionMenuState m_state = ActionMenuState::Closed;

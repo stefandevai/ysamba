@@ -33,8 +33,7 @@ void Gameplay::load()
   load_game();
 
   m_camera.set_tile_size(m_world.get_tile_size());
-  m_debug_info = std::make_shared<ui::DebugInfo>();
-  m_ui_manager.add_component(m_debug_info);
+  m_debug_info = m_ui_manager.emplace<ui::DebugInfo>();
 
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */

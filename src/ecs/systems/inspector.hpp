@@ -34,7 +34,7 @@ class InspectorSystem
   State m_state = State::Inactive;
   World& m_world;
   ui::UIManager& m_ui_manager;
-  ui::Inspector& m_inspector;
+  ui::Inspector* m_inspector = nullptr;
   InputManager& m_input_manager = InputManager::get_instance();
   Vector2i m_last_mouse_position{0, 0};
   Vector3 m_last_camera_position{0., 0., 0.};
@@ -44,6 +44,5 @@ class InspectorSystem
   void m_update_inspector_content(const entt::entity entity, entt::registry& registry);
   void m_update_inspector_content(const TileData& tile_data);
   void m_destroy_inspector();
-  inline bool m_is_valid() const;
 };
 }  // namespace dl

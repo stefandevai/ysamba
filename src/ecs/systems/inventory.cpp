@@ -17,7 +17,7 @@ namespace dl
 InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
   auto on_select = [this](const int i) { m_state = static_cast<InventoryState>(i); };
-  m_inventory = std::make_shared<ui::Inventory>(on_select);
+  m_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
 }
 
 void InventorySystem::update(entt::registry& registry)
@@ -36,10 +36,7 @@ void InventorySystem::m_update_inventory(entt::registry& registry)
 {
   using namespace entt::literals;
 
-  if (m_inventory_id < 0)
-  {
-    m_open_inventory(registry);
-  }
+  m_open_inventory(registry);
 
   if (m_input_manager.poll_action("close_inventory"_hs))
   {
@@ -69,36 +66,32 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 
 void InventorySystem::m_open_inventory(entt::registry& registry)
 {
-  assert(m_inventory != nullptr && m_inventory_id < 0);
+  assert(m_inventory != nullptr);
 
-  m_item_names.clear();
-  m_item_names.reserve(m_items.size());
-
-  for (const auto entity : m_items)
+  if (!m_inventory->visible)
   {
-    if (!registry.all_of<Item>(entity))
+    m_item_names.clear();
+    m_item_names.reserve(m_items.size());
+
+    for (const auto entity : m_items)
     {
-      continue;
+      if (!registry.all_of<Item>(entity))
+      {
+        continue;
+      }
+
+      const auto& item = registry.get<Item>(entity);
+      const auto& item_data = m_world.get_item_data(item.id);
+      m_item_names.push_back({static_cast<uint32_t>(entity), item_data.name});
     }
 
-    const auto& item = registry.get<Item>(entity);
-    const auto& item_data = m_world.get_item_data(item.id);
-    m_item_names.push_back({static_cast<uint32_t>(entity), item_data.name});
-  }
+    m_inventory->set_items(m_item_names);
 
-  m_inventory->set_items(m_item_names);
-
-  m_inventory_id = m_ui_manager.add_component(m_inventory);
-}
-
-void InventorySystem::m_close_inventory()
-{
-  if (m_inventory_id >= 0)
-  {
-    m_ui_manager.remove_component(m_inventory_id);
-    m_inventory_id = -1;
+    m_inventory->visible = true;
   }
 }
+
+void InventorySystem::m_close_inventory() { m_inventory->visible = false; }
 
 void InventorySystem::m_dispose()
 {

@@ -21,22 +21,21 @@
 namespace dl
 {
 const ui::ItemList ActionSystem::m_menu_items = {
-    {0, "[H]arvest"},
-    {1, "[B]reak"},
-    {2, "[D]ig"},
-    {0, "[H]arvest"},
-    {1, "[B]reak"},
-    {2, "[D]ig"},
-    {0, "[H]arvest"},
-    {1, "[B]reak"},
-    {2, "[D]ig"},
+    {0, "[H]arvest"}, {1, "[B]reak"}, {2, "[D]ig"},
+    /* {0, "[H]arvest"}, */
+    /* {1, "[B]reak"}, */
+    /* {2, "[D]ig"}, */
+    /* {0, "[H]arvest"}, */
+    /* {1, "[B]reak"}, */
+    /* {2, "[D]ig"}, */
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  m_action_menu = std::make_shared<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
+  m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
 
-  m_select_target_label = std::make_shared<ui::Label>("Select target");
+  m_select_target_label = m_ui_manager.emplace<ui::Label>("Select target");
+  m_select_target_label->visible = false;
   m_select_target_label->x_alignment = ui::XAlignement::Center;
   m_select_target_label->position.y = 30;
 }
@@ -61,10 +60,7 @@ void ActionSystem::m_update_action_menu()
 {
   using namespace entt::literals;
 
-  if (m_action_menu_id < 0)
-  {
-    m_open_action_menu();
-  }
+  m_open_action_menu();
 
   if (m_input_manager.poll_action("close_menu"_hs))
   {
@@ -205,14 +201,9 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
 {
   using namespace entt::literals;
 
-  if (m_action_menu_id > -1)
-  {
-    m_close_action_menu();
-  }
-  if (m_select_target_label_id < 0)
-  {
-    m_show_select_target_text();
-  }
+  m_close_action_menu();
+
+  m_show_select_target_text();
 
   if (m_input_manager.poll_action("close_menu"_hs))
   {
@@ -256,31 +247,37 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
 
 void ActionSystem::m_open_action_menu()
 {
-  assert(m_action_menu != nullptr && m_action_menu_id < 0);
-  m_action_menu_id = m_ui_manager.add_component(m_action_menu);
+  assert(m_action_menu != nullptr);
+
+  if (!m_action_menu->visible)
+  {
+    m_action_menu->visible = true;
+  }
 }
 
 void ActionSystem::m_show_select_target_text()
 {
-  assert(m_select_target_label != nullptr && m_select_target_label_id < 0);
-  m_select_target_label_id = m_ui_manager.add_component(m_select_target_label);
+  assert(m_select_target_label != nullptr);
+
+  if (!m_select_target_label->visible)
+  {
+    m_select_target_label->visible = true;
+  }
 }
 
 void ActionSystem::m_close_action_menu()
 {
-  if (m_action_menu_id >= 0)
+  if (m_action_menu->visible)
   {
-    m_ui_manager.remove_component(m_action_menu_id);
-    m_action_menu_id = -1;
+    m_action_menu->visible = false;
   }
 }
 
 void ActionSystem::m_close_select_target()
 {
-  if (m_select_target_label_id >= 0)
+  if (m_select_target_label->visible)
   {
-    m_ui_manager.remove_component(m_select_target_label_id);
-    m_select_target_label_id = -1;
+    m_select_target_label->visible = false;
   }
 }
 

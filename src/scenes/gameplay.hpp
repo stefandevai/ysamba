@@ -52,7 +52,7 @@ class Gameplay : public Scene
   ui::UIManager m_ui_manager{};
   InputManager& m_input_manager = InputManager::get_instance();
   State m_current_state = State::PAUSED;
-  std::shared_ptr<ui::DebugInfo> m_debug_info = nullptr;
+  ui::DebugInfo* m_debug_info = nullptr;
   double m_turn_delay = 0.0;
 
   GameSystem m_game_system{m_registry, m_world};

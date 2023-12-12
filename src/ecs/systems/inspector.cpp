@@ -18,10 +18,10 @@
 
 namespace dl
 {
-InspectorSystem::InspectorSystem(World& world, ui::UIManager& ui_manager)
-    : m_world(world), m_ui_manager(ui_manager), m_inspector(m_ui_manager.emplace<ui::Inspector>())
+InspectorSystem::InspectorSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 
 {
+  m_inspector = m_ui_manager.emplace<ui::Inspector>();
 }
 
 void InspectorSystem::update(entt::registry& registry, const Camera& camera)
@@ -76,7 +76,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     }
   }
 
-  if (!updated_inspector_content && m_inspector.visible)
+  if (!updated_inspector_content && m_inspector->visible)
   {
     m_destroy_inspector();
   }
@@ -87,15 +87,15 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
 void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt::registry& registry)
 {
-  if (!m_inspector.visible)
+  if (!m_inspector->visible)
   {
-    m_inspector.visible = true;
+    m_inspector->visible = true;
   }
 
   if (registry.all_of<SocietyAgent>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
-    m_inspector.set_content(agent.name);
+    m_inspector->set_content(agent.name);
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
@@ -108,21 +108,21 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
     }
 
     const auto& item_data = m_world.get_item_data(item.id);
-    m_inspector.set_content(item_data.name);
+    m_inspector->set_content(item_data.name);
   }
 }
 
 void InspectorSystem::m_update_inspector_content(const TileData& tile_data)
 {
-  if (!m_inspector.visible)
+  if (!m_inspector->visible)
   {
-    m_inspector.visible = true;
+    m_inspector->visible = true;
   }
 
-  m_inspector.set_content(tile_data.name);
+  m_inspector->set_content(tile_data.name);
 }
 
-void InspectorSystem::m_destroy_inspector() { m_inspector.visible = false; }
+void InspectorSystem::m_destroy_inspector() { m_inspector->visible = false; }
 
 void InspectorSystem::m_update_input(entt::registry& registry)
 {

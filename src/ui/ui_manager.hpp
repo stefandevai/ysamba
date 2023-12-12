@@ -20,15 +20,15 @@ class UIManager
   UIManager();
   ~UIManager();
 
-  uint32_t add_component(const std::shared_ptr<UIComponent>& component);
-  void remove_component(const uint32_t id);
+  /* uint32_t add_component(const std::shared_ptr<UIComponent>& component); */
+  /* void remove_component(const uint32_t id); */
 
   template <typename T, typename... Args>
-  T& emplace(Args&&... args)
+  T* emplace(Args&&... args)
   {
     auto component = std::make_unique<T>(std::forward<Args>(args)...);
     m_components2.push_back(std::move(component));
-    return dynamic_cast<T&>(*m_components2.back());
+    return dynamic_cast<T*>(&(*m_components2.back()));
   }
 
   void erase(const UIComponent& component);

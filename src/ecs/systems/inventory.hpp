@@ -34,10 +34,7 @@ class InventorySystem
   ui::UIManager& m_ui_manager;
   std::vector<entt::entity> m_items{};
   ui::ItemList m_item_names{};
-
-  std::shared_ptr<ui::Inventory> m_inventory = nullptr;
-  int m_inventory_id = -1;
-
+  ui::Inventory* m_inventory = nullptr;
   InventoryState m_state = InventoryState::Closed;
   InputManager& m_input_manager = InputManager::get_instance();
 
