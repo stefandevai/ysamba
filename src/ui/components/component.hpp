@@ -52,6 +52,13 @@ class UIComponent
   UIComponent(const Vector2i& size = {0, 0}) : size(size) {}
   virtual ~UIComponent() {}
 
+  virtual void init() {}
+  virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
+  virtual void update_component(std::vector<glm::mat4>& matrix_stack);
+  virtual void render(Renderer& renderer, Batch& batch);
+  virtual void show();
+  virtual void hide();
+
   template <typename T, typename... Args>
   T* emplace(Args&&... args)
   {
@@ -68,15 +75,10 @@ class UIComponent
     }));
   }
 
-  virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
-  virtual void update_component(std::vector<glm::mat4>& matrix_stack);
-  virtual void render(Renderer& renderer, Batch& batch);
-  virtual void show();
-  virtual void hide();
-
  protected:
   static InputManager& m_input_manager;
   glm::mat4 m_transform_matrix{};
+  bool m_has_initialized = false;
 
   bool m_is_positioned();
 };

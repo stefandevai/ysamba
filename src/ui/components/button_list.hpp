@@ -11,17 +11,19 @@ class Button;
 class ButtonList : public UIComponent
 {
  public:
-  ListStyle style;
+  int line_spacing = 5;
+  Vector2i margin = {15, 15};
+  Vector2i button_size = {35, 35};
   std::function<void(const uint32_t)> on_select;
 
-  ButtonList(const ItemList& items,
-             const Vector2i& button_size,
-             const std::function<void(const uint32_t)>& on_select,
-             const ListStyle& style = ListStyle());
+  ButtonList(const ItemList& items, const std::function<void(const uint32_t)>& on_select);
 
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
+  void init();
+
  private:
+  ItemList m_items;
   std::vector<Button*> m_buttons;
 };
 

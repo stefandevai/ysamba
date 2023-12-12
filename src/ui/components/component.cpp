@@ -14,6 +14,12 @@ InputManager& UIComponent::m_input_manager = InputManager::get_instance();
 
 void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
 {
+  if (!m_has_initialized)
+  {
+    init();
+    m_has_initialized = true;
+  }
+
   if (!visible)
   {
     return;
