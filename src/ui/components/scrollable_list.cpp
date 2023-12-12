@@ -14,10 +14,8 @@ namespace dl::ui
 ScrollableList::ScrollableList(const ItemList& items,
                                const Vector2i& size,
                                const std::function<void(const uint32_t)>& on_select)
-    : UIComponent(), m_on_select(on_select)
+    : UIComponent(size), m_on_select(on_select)
 {
-  this->size = size;
-
   m_scrollable = std::make_shared<Scrollable>();
   m_scrollable->size = size;
 

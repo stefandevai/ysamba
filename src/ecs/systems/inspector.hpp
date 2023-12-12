@@ -34,8 +34,7 @@ class InspectorSystem
   State m_state = State::Inactive;
   World& m_world;
   ui::UIManager& m_ui_manager;
-  std::shared_ptr<ui::Inspector> m_inspector = nullptr;
-  int m_inspector_id = -1;
+  ui::Inspector& m_inspector;
   InputManager& m_input_manager = InputManager::get_instance();
   Vector2i m_last_mouse_position{0, 0};
   Vector3 m_last_camera_position{0., 0., 0.};

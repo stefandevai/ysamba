@@ -9,10 +9,8 @@
 namespace dl::ui
 {
 Button::Button(const std::string& text, const Vector2i& size, XAlignement x_alignment, YAlignement y_alignment)
-    : UIComponent()
+    : UIComponent(size)
 {
-  this->size = size;
-
   m_container = std::make_shared<Container>(size, 0x33aa88aa);
   m_label = std::make_shared<Label>(text);
   m_label->parent_size = size;

@@ -25,20 +25,17 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 
   assert(!children[0].expired());
 
-  const auto& matrix = matrix_stack.back();
-
   if (m_input_manager.is_scrolling_y())
   {
-    const auto top_left = matrix * glm::vec4(0.f, 0.f, 1.f, 1.f);
     const auto& mouse_position = m_input_manager.get_mouse_position();
 
-    if (mouse_position.x > top_left.x && mouse_position.x < top_left.x + size.x && mouse_position.y > top_left.y &&
-        mouse_position.y < top_left.y + size.y)
+    if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x &&
+        mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
     {
+      const auto& child_ptr = children[0].lock();
       m_scroll_y += m_input_manager.get_scroll().y * 4;
 
       // Set lower and upper bounds for scrolling
-      auto child_ptr = children[0].lock();
       if (m_scroll_y < 0 && size.y < child_ptr->size.y)
       {
         const auto delta_size_y = child_ptr->size.y - size.y;
@@ -52,16 +49,22 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
       {
         m_scroll_y = 0;
       }
+
+      const auto& matrix = matrix_stack.back();
+      matrix_stack.pop_back();
+      m_transform_matrix = glm::translate(matrix, glm::vec3(0, m_scroll_y, 0));
+      matrix_stack.push_back(m_transform_matrix);
+      dirty = true;
     }
   }
-
-  matrix_stack.pop_back();
-  const auto translate = glm::translate(matrix, glm::vec3(0, m_scroll_y, 0));
-  matrix_stack.push_back(translate);
 }
 
 void Scrollable::render(Renderer& renderer, [[maybe_unused]] Batch& batch)
 {
+  if (!visible)
+  {
+    return;
+  }
   if (!m_added_batch)
   {
     renderer.add_batch(&m_batch);

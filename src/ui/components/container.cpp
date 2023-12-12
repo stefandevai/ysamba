@@ -11,9 +11,8 @@ namespace dl::ui
 Container::Container() : UIComponent(), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff})) {}
 
 Container::Container(const Vector2i& size, const uint32_t color)
-    : UIComponent(), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
+    : UIComponent(size), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
 {
-  this->size = size;
 }
 
 void Container::render(Renderer& renderer, Batch& batch)

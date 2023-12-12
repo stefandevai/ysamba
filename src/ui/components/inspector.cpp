@@ -7,10 +7,10 @@
 
 namespace dl::ui
 {
-Inspector::Inspector() : UIComponent()
+Inspector::Inspector() : UIComponent({300, 100})
 {
+  visible = false;
   position = {30, 30, 0};
-  size = {300, 100};
 
   m_container = std::make_shared<Container>(size, 0x1b2420aa);
 
@@ -24,6 +24,10 @@ Inspector::Inspector() : UIComponent()
   x_alignment = XAlignement::Right;
 }
 
-void Inspector::set_content(const std::string& text) { m_label->text.set_text(text); }
+void Inspector::set_content(const std::string& text)
+{
+  dirty = true;
+  m_label->text.set_text(text);
+}
 
 }  // namespace dl::ui

@@ -44,10 +44,12 @@ class UIComponent
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
+  bool visible = true;
+  bool dirty = true;
 
   std::vector<std::weak_ptr<UIComponent>> children;
 
-  UIComponent() {}
+  UIComponent(const Vector2i& size = {0, 0}) : size(size) {}
   virtual ~UIComponent() {}
 
   virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
@@ -56,6 +58,7 @@ class UIComponent
 
  protected:
   static InputManager& m_input_manager;
+  glm::mat4 m_transform_matrix{};
 
   bool m_is_positioned();
 };

@@ -7,10 +7,9 @@
 
 namespace dl::ui
 {
-DebugInfo::DebugInfo() : UIComponent()
+DebugInfo::DebugInfo() : UIComponent({200, 100})
 {
   position = {30, 30, 0};
-  size = {200, 100};
 
   m_container = std::make_shared<Container>(size, 0x1b2420aa);
 

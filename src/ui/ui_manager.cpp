@@ -2,8 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include <entt/core/hashed_string.hpp>
-
 #include "./components/container.hpp"
 #include "./components/label.hpp"
 #include "graphics/batch.hpp"
@@ -30,42 +28,74 @@ uint32_t UIManager::add_component(const std::shared_ptr<UIComponent>& component)
   return id;
 }
 
+void UIManager::erase(const UIComponent& component) {}
+
 void UIManager::remove_component(const uint32_t id) { m_components.erase(id); }
 
 void UIManager::update()
 {
-  for (auto& c : m_components)
+  for (auto& component : m_components2)
   {
-    if (c.second.expired())
+    if (!component->visible)
     {
       continue;
     }
 
-    auto c_ptr = c.second.lock();
-    c_ptr->update_component(m_matrix_stack);
+    component->update_component(m_matrix_stack);
   }
+
+  /* for (auto& c : m_components) */
+  /* { */
+  /*   if (c.second.expired()) */
+  /*   { */
+  /*     continue; */
+  /*   } */
+
+  /*   const auto& c_ptr = c.second.lock(); */
+
+  /*   if (!c_ptr->visible) */
+  /*   { */
+  /*     continue; */
+  /*   } */
+
+  /*   c_ptr->update_component(m_matrix_stack); */
+  /* } */
 }
 
 void UIManager::render(Renderer& renderer)
 {
-  using namespace entt::literals;
-
   if (!m_added_batch)
   {
     renderer.add_batch(&m_batch);
     m_added_batch = true;
   }
 
-  for (auto& c : m_components)
+  for (auto& component : m_components2)
   {
-    if (c.second.expired())
+    if (!component->visible)
     {
       continue;
     }
 
-    auto c_ptr = c.second.lock();
-    c_ptr->render(renderer, m_batch);
+    component->render(renderer, m_batch);
   }
+
+  /* for (auto& c : m_components) */
+  /* { */
+  /*   if (c.second.expired()) */
+  /*   { */
+  /*     continue; */
+  /*   } */
+
+  /*   const auto& c_ptr = c.second.lock(); */
+
+  /*   if (!c_ptr->visible) */
+  /*   { */
+  /*     continue; */
+  /*   } */
+
+  /*   c_ptr->render(renderer, m_batch); */
+  /* } */
 }
 
 }  // namespace dl::ui

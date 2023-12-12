@@ -15,7 +15,11 @@ ActionMenu::ActionMenu(const ItemList& items, const std::function<void(const uin
   children.push_back(m_scrollable_list);
 }
 
-void ActionMenu::set_actions(const ItemList& actions) { m_scrollable_list->set_items(actions); }
+void ActionMenu::set_actions(const ItemList& actions)
+{
+  dirty = true;
+  m_scrollable_list->set_items(actions);
+}
 
 void ActionMenu::set_on_select(const std::function<void(const uint32_t)>& on_select)
 {
