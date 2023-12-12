@@ -20,8 +20,8 @@ class Button : public UIComponent
   void update(std::vector<glm::mat4>& matrix_stack);
 
  private:
-  std::shared_ptr<Label> m_label = nullptr;
-  std::shared_ptr<Container> m_container = nullptr;
+  Label* m_label = nullptr;
+  Container* m_container = nullptr;
 };
 
 }  // namespace dl::ui

@@ -28,10 +28,11 @@ ButtonList::ButtonList(const ItemList& items,
   {
     const auto& item = items[i];
 
-    auto button = std::make_shared<Button>(item.second,
-                                           Vector2i{button_size.x - 2 * style.margin.x, button_size.y},
-                                           XAlignement::Center,
-                                           YAlignement::Center);
+    auto button = emplace<Button>(item.second,
+                                  Vector2i{button_size.x - 2 * style.margin.x, button_size.y},
+                                  XAlignement::Center,
+                                  YAlignement::Center);
+    m_buttons.push_back(button);
 
     if (on_select)
     {
@@ -40,9 +41,6 @@ ButtonList::ButtonList(const ItemList& items,
 
     button->position.x = style.margin.x;
     button->position.y = i * (button_size.y + style.line_spacing) + style.margin.y;
-
-    children.push_back(button);
-    m_buttons.push_back(button);
   }
 
   const auto height =

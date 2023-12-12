@@ -12,13 +12,10 @@ Inspector::Inspector() : UIComponent({300, 100})
   visible = false;
   position = {30, 30, 0};
 
-  m_container = std::make_shared<Container>(size, 0x1b2420aa);
+  m_container = emplace<Container>(size, 0x1b2420aa);
 
-  m_label = std::make_shared<Label>("");
+  m_label = m_container->emplace<Label>("");
   m_label->position = {15, 15, 0};
-
-  m_container->children.push_back(m_label);
-  children.push_back(m_container);
 
   placement = Placement::Absolute;
   x_alignment = XAlignement::Right;

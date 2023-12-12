@@ -15,7 +15,7 @@ class Inventory : public UIComponent
   void set_items(const ItemList& items);
 
  private:
-  std::shared_ptr<ScrollableList> m_scrollable_list = nullptr;
+  ScrollableList* m_scrollable_list = nullptr;
 };
 
 }  // namespace dl::ui

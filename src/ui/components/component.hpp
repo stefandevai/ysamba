@@ -47,10 +47,26 @@ class UIComponent
   bool visible = true;
   bool dirty = true;
 
-  std::vector<std::weak_ptr<UIComponent>> children;
+  std::vector<std::unique_ptr<UIComponent>> children;
 
   UIComponent(const Vector2i& size = {0, 0}) : size(size) {}
   virtual ~UIComponent() {}
+
+  template <typename T, typename... Args>
+  T* emplace(Args&&... args)
+  {
+    auto component = std::make_unique<T>(std::forward<Args>(args)...);
+    children.push_back(std::move(component));
+    return dynamic_cast<T*>(&(*children.back()));
+  }
+
+  template <typename T, typename... Args>
+  void erase(const T* component)
+  {
+    children.erase(std::find_if(children.begin(), children.end(), [component](std::unique_ptr<UIComponent>& c) {
+      return c.get() == component;
+    }));
+  }
 
   virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
   virtual void update_component(std::vector<glm::mat4>& matrix_stack);

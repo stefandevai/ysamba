@@ -139,6 +139,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Right))
   {
+    assert(m_action_menu != nullptr);
+
     if (m_selected_entities.empty())
     {
       return;

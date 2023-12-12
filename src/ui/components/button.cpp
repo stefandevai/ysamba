@@ -11,14 +11,11 @@ namespace dl::ui
 Button::Button(const std::string& text, const Vector2i& size, XAlignement x_alignment, YAlignement y_alignment)
     : UIComponent(size)
 {
-  m_container = std::make_shared<Container>(size, 0x33aa88aa);
-  m_label = std::make_shared<Label>(text);
+  m_container = emplace<Container>(size, 0x33aa88aa);
+  m_label = m_container->emplace<Label>(text);
   m_label->parent_size = size;
   m_label->x_alignment = x_alignment;
   m_label->y_alignment = y_alignment;
-
-  m_container->children.push_back(m_label);
-  children.push_back(m_container);
 }
 
 void Button::update(std::vector<glm::mat4>& matrix_stack)

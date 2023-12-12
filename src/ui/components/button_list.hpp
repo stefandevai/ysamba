@@ -22,7 +22,7 @@ class ButtonList : public UIComponent
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
  private:
-  std::vector<std::shared_ptr<Button>> m_buttons;
+  std::vector<Button*> m_buttons;
 };
 
 }  // namespace dl::ui

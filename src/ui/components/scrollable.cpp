@@ -23,8 +23,6 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
     return;
   }
 
-  assert(!children[0].expired());
-
   if (m_input_manager.is_scrolling_y())
   {
     const auto& mouse_position = m_input_manager.get_mouse_position();
@@ -32,13 +30,13 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
     if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x &&
         mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
     {
-      const auto& child_ptr = children[0].lock();
+      const auto& child = children[0];
       m_scroll_y += m_input_manager.get_scroll().y * 4;
 
       // Set lower and upper bounds for scrolling
-      if (m_scroll_y < 0 && size.y < child_ptr->size.y)
+      if (m_scroll_y < 0 && size.y < child->size.y)
       {
-        const auto delta_size_y = child_ptr->size.y - size.y;
+        const auto delta_size_y = child->size.y - size.y;
 
         if (std::abs(m_scroll_y) > delta_size_y)
         {
@@ -82,13 +80,7 @@ void Scrollable::render(Renderer& renderer, [[maybe_unused]] Batch& batch)
 
   for (auto& child : children)
   {
-    if (child.expired())
-    {
-      continue;
-    }
-
-    auto child_ptr = child.lock();
-    child_ptr->render(renderer, m_batch);
+    child->render(renderer, m_batch);
   }
 }
 

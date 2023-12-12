@@ -19,10 +19,9 @@ List::List(const std::vector<std::string>& items, const ListStyle& style) : UICo
 
   children.reserve(items.size());
 
-  auto first_label = std::make_shared<Label>(items[0]);
+  auto first_label = emplace<Label>(items[0]);
   first_label->position.x = style.margin.x;
   first_label->position.y = style.margin.y + style.line_spacing / 2;
-  children.push_back(first_label);
 
   const auto& first_label_size = first_label->text.get_size();
   const auto line_height = first_label_size.y;
@@ -31,10 +30,9 @@ List::List(const std::vector<std::string>& items, const ListStyle& style) : UICo
 
   for (size_t i = 1; i < items.size(); ++i)
   {
-    auto label = std::make_shared<Label>(items[i]);
+    auto label = emplace<Label>(items[i]);
     label->position.x = style.margin.x;
     label->position.y = i * (line_height + style.line_spacing) + style.margin.y + style.line_spacing / 2;
-    children.push_back(label);
 
     const auto& line_size = label->text.get_size();
     width = std::max(width, line_size.x);

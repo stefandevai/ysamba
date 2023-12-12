@@ -61,14 +61,8 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
 
   for (const auto& child : children)
   {
-    if (child.expired())
-    {
-      continue;
-    }
-
-    const auto& child_ptr = child.lock();
-    child_ptr->dirty = dirty;
-    child_ptr->update_component(matrix_stack);
+    child->dirty = dirty;
+    child->update_component(matrix_stack);
   }
 
   if (m_is_positioned())
@@ -88,14 +82,7 @@ void UIComponent::render(Renderer& renderer, Batch& batch)
 
   for (const auto& child : children)
   {
-    if (child.expired())
-    {
-      continue;
-    }
-
-    /* spdlog::debug("ABS {} {}", absolute_position.x, absolute_position.y); */
-    const auto& child_ptr = child.lock();
-    child_ptr->render(renderer, batch);
+    child->render(renderer, batch);
   }
 }
 

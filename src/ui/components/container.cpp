@@ -21,13 +21,7 @@ void Container::render(Renderer& renderer, Batch& batch)
 
   for (auto& child : children)
   {
-    if (child.expired())
-    {
-      continue;
-    }
-
-    auto child_ptr = child.lock();
-    child_ptr->render(renderer, batch);
+    child->render(renderer, batch);
   }
 }
 

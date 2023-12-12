@@ -12,13 +12,10 @@ DebugInfo::DebugInfo() : UIComponent({200, 100})
   visible = true;
   position = {30, 30, 0};
 
-  m_container = std::make_shared<Container>(size, 0x1b2420aa);
+  m_container = emplace<Container>(size, 0x1b2420aa);
 
-  m_label = std::make_shared<Label>("FPS: ");
+  m_label = m_container->emplace<Label>("FPS: ");
   m_label->position = {15, 15, 0};
-
-  m_container->children.push_back(m_label);
-  children.push_back(m_container);
 
   placement = Placement::Absolute;
 }

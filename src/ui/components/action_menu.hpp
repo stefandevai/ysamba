@@ -15,7 +15,7 @@ class ActionMenu : public UIComponent
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
  private:
-  std::shared_ptr<ScrollableList> m_scrollable_list = nullptr;
+  ScrollableList* m_scrollable_list = nullptr;
 };
 
 }  // namespace dl::ui
