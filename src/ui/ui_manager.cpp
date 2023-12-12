@@ -15,17 +15,11 @@ UIManager::UIManager()
   m_matrix_stack.push_back(glm::mat4(1));
 }
 
-UIManager::~UIManager()
-{
-  m_matrix_stack.clear();
-  /* m_components.clear(); */
-}
-
-void UIManager::erase(const UIComponent& component) {}
+UIManager::~UIManager() { m_matrix_stack.clear(); }
 
 void UIManager::update()
 {
-  for (auto& component : m_components2)
+  for (auto& component : m_components)
   {
     if (!component->visible)
     {
@@ -44,7 +38,7 @@ void UIManager::render(Renderer& renderer)
     m_added_batch = true;
   }
 
-  for (auto& component : m_components2)
+  for (auto& component : m_components)
   {
     if (!component->visible)
     {
