@@ -2,6 +2,14 @@
 
 namespace dl::ui
 {
+template <typename... Ts>
+struct AnimationOverload : Ts...
+{
+  using Ts::operator()...;
+};
+template <class... Ts>
+AnimationOverload(Ts...) -> AnimationOverload<Ts...>;
+
 enum class Easing
 {
   InSine,
@@ -38,14 +46,16 @@ enum class Easing
 
 struct FadeInAnimation
 {
-  double duration = 0.5;
   Easing easing = Easing::InOutCubic;
+  double duration = 1.0;
+  double time_left = 1.0;
 };
 
 struct FadeOutAnimation
 {
-  double duration = 0.5;
   Easing easing = Easing::InOutCubic;
+  double duration = 1.0;
+  double time_left = 1.0;
 };
 
 using Animation = std::variant<FadeInAnimation, FadeOutAnimation>;

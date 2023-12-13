@@ -58,10 +58,11 @@ void Scrollable::update(const double delta)
 
 void Scrollable::render(Renderer& renderer, [[maybe_unused]] Batch& batch)
 {
-  if (state != UIComponent::State::Visible)
+  if (state == UIComponent::State::Hidden)
   {
     return;
   }
+
   if (!m_added_batch)
   {
     renderer.add_batch(&m_batch);

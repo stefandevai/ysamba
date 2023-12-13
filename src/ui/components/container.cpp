@@ -17,6 +17,11 @@ Container::Container(const Vector2i& size, const uint32_t color)
 
 void Container::render(Renderer& renderer, Batch& batch)
 {
+  if (state == State::Hidden)
+  {
+    return;
+  }
+
   if (quad->color.opacity_factor != opacity)
   {
     quad->color.opacity_factor = opacity;

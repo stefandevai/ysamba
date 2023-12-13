@@ -12,6 +12,8 @@ namespace dl::ui
 {
 InputManager& UIComponent::m_input_manager = InputManager::get_instance();
 
+UIComponent::UIComponent(const Vector2i& size) : size(size) {}
+
 void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
 {
   if (!m_has_initialized)
@@ -63,6 +65,29 @@ void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
 
 void UIComponent::m_update(const double delta, std::vector<glm::mat4>& matrix_stack)
 {
+  if (state == State::Animating)
+  {
+    std::visit(AnimationOverload{[this, delta](FadeInAnimation& animation) {
+                                   animation.time_left -= delta;
+                                   opacity = 1.0 - animation.time_left;
+                                   if (animation.time_left <= 0)
+                                   {
+                                     state = State::Visible;
+                                     opacity = 1.0;
+                                   }
+                                 },
+                                 [this, delta](FadeOutAnimation& animation) {
+                                   animation.time_left -= delta;
+                                   opacity = animation.time_left;
+                                   if (animation.time_left <= 0)
+                                   {
+                                     state = State::Hidden;
+                                     opacity = 1.0;
+                                   }
+                                 }},
+               animation);
+  }
+
   m_update_geometry(matrix_stack);
 
   if (m_is_positioned())
@@ -90,7 +115,7 @@ void UIComponent::m_update(const double delta, std::vector<glm::mat4>& matrix_st
 
 void UIComponent::render(Renderer& renderer, Batch& batch)
 {
-  if (state != State::Visible)
+  if (state == State::Hidden)
   {
     return;
   }
@@ -101,9 +126,17 @@ void UIComponent::render(Renderer& renderer, Batch& batch)
   }
 }
 
-void UIComponent::show() { state = State::Visible; }
+void UIComponent::show()
+{
+  animation.emplace<FadeInAnimation>();
+  state = State::Animating;
+}
 
-void UIComponent::hide() { state = State::Hidden; }
+void UIComponent::hide()
+{
+  animation.emplace<FadeOutAnimation>();
+  state = State::Animating;
+}
 
 bool UIComponent::m_is_positioned()
 {

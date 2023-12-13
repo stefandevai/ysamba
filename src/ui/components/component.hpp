@@ -57,12 +57,13 @@ class UIComponent
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
   double opacity = 1.0;
-  std::optional<Animation> animation{};
+  Animation animation;
 
   UIComponent* parent = nullptr;
   std::vector<std::unique_ptr<UIComponent>> children;
 
-  UIComponent(const Vector2i& size = {0, 0}) : size(size) {}
+  /* UIComponent(const Vector2i& size = {0, 0}) : size(size) {} */
+  UIComponent(const Vector2i& size = {0, 0});
   virtual ~UIComponent() {}
 
   virtual void init() {}
