@@ -13,8 +13,8 @@ class MultiSprite
  public:
   std::string resource_id;
   std::shared_ptr<Texture> texture = nullptr;
-  std::unique_ptr<Color> color = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
+  Color color{0xFFFFFFFF};
 
   MultiSprite() {}
   MultiSprite(const std::string& resource_id, const uint32_t frame, const uint32_t width, const uint32_t height)

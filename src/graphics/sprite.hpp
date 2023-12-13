@@ -13,8 +13,8 @@ class Sprite
  public:
   std::string resource_id;
   std::shared_ptr<Texture> texture = nullptr;
-  std::unique_ptr<Color> color = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
+  Color color{0xFFFFFFFF};
 
   Sprite() {}
   Sprite(const std::string& resource_id, const int frame = 0) : resource_id(resource_id), m_frame(frame) {}

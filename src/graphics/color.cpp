@@ -11,6 +11,21 @@ Color::Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
 }
 
+void Color::set(const uint32_t color)
+{
+  int_color = color;
+  rgba_color = int_to_rgba(color);
+}
+
+void Color::set(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
+{
+  int_color = rgba_to_int(r, g, b, a);
+  rgba_color.r = r;
+  rgba_color.g = g;
+  rgba_color.b = b;
+  rgba_color.a = a;
+}
+
 uint32_t Color::rgba_to_int(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
 {
   return (r << 24 | g << 16 | b << 8 | a);

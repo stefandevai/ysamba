@@ -21,6 +21,9 @@ struct Color
   Color(const uint32_t color);
   Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 255);
 
+  void set(const uint32_t color);
+  void set(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 255);
+
   static uint32_t rgba_to_int(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 255);
   static RGBA int_to_rgba(const uint32_t color);
 };

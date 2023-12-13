@@ -9,6 +9,7 @@
 namespace dl
 {
 class Font;
+class Sprite;
 
 struct Character
 {
@@ -26,6 +27,7 @@ class Text
   std::string value = "";
   std::string typeface = "font-1980";
   std::vector<Character> characters{};
+  Color color{0xFFFFFFFF};
 
   Text(const std::string_view text,
        const std::string_view typeface = "font-1980",

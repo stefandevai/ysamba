@@ -120,7 +120,7 @@ void Batch::emplace(const Sprite* sprite, const double x, const double y, const 
 
   const glm::vec2 size = sprite->get_size();
   const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
-  unsigned int color = 4294967295;  // Default white color
+  unsigned int color = sprite->color.int_color;
 
   const std::shared_ptr<Texture>& texture = sprite->texture;
 
@@ -128,9 +128,13 @@ void Batch::emplace(const Sprite* sprite, const double x, const double y, const 
   assert(size.x != 0);
   assert(size.y != 0);
 
-  if (sprite->color)
+  if (sprite->color.opacity_factor < 1.0)
   {
-    color = sprite->color->int_color;
+    const auto& sprite_color = sprite->color.rgba_color;
+    color = Color::rgba_to_int(sprite_color.r,
+                               sprite_color.g,
+                               sprite_color.b,
+                               static_cast<uint8_t>(sprite_color.a * sprite->color.opacity_factor));
   }
 
   // Build vector of textures to bind when rendering
@@ -231,15 +235,19 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
 {
   assert(m_index_count <= m_indices_size);
 
-  unsigned int color = 4294967295;  // Default white color
+  unsigned int color = sprite->color.int_color;
 
   const std::shared_ptr<Texture>& texture = sprite->texture;
 
   assert(sprite->texture != nullptr);
 
-  if (sprite->color)
+  if (sprite->color.opacity_factor < 1.0)
   {
-    color = sprite->color->int_color;
+    const auto& sprite_color = sprite->color.rgba_color;
+    color = Color::rgba_to_int(sprite_color.r,
+                               sprite_color.g,
+                               sprite_color.b,
+                               static_cast<uint8_t>(sprite_color.a * sprite->color.opacity_factor));
   }
 
   // Build vector of textures to bind when rendering
@@ -362,6 +370,14 @@ void Batch::text(Text& text, const double x, const double y, const double z)
     if (character.sprite == nullptr)
     {
       continue;
+    }
+    if (character.sprite->color.int_color != text.color.int_color)
+    {
+      character.sprite->color.set(text.color.int_color);
+    }
+    if (character.sprite->color.opacity_factor != text.color.opacity_factor)
+    {
+      character.sprite->color.opacity_factor = text.color.opacity_factor;
     }
 
     emplace(character.sprite.get(), character.x + x, character.y + y, z);
