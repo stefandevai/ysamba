@@ -28,6 +28,12 @@ const ui::ItemList ActionSystem::m_menu_items = {
     /* {0, "[H]arvest"}, */
     /* {1, "[B]reak"}, */
     /* {2, "[D]ig"}, */
+    /* {0, "[H]arvest"}, */
+    /* {1, "[B]reak"}, */
+    /* {2, "[D]ig"}, */
+    /* {0, "[H]arvest"}, */
+    /* {1, "[B]reak"}, */
+    /* {2, "[D]ig"}, */
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)

@@ -17,13 +17,9 @@ class Button : public UIComponent
   YAlignement label_y_alignment = YAlignement::Center;
 
   Button();
-  /* Button(const std::string& text, */
-  /*        const Vector2i& size = {100, 50}, */
-  /*        XAlignement x_alignment = XAlignement::Center, */
-  /*        YAlignement y_alignment = YAlignement::Center); */
 
   void init();
-  void update(std::vector<glm::mat4>& matrix_stack);
+  void update(const double delta);
 
  private:
   Label* m_label = nullptr;

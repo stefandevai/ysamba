@@ -36,7 +36,7 @@ class UIManager
                                     [component](std::unique_ptr<UIComponent>& c) { return c.get() == component; }));
   }
 
-  void update();
+  void update(const double delta);
   void render(Renderer& renderer);
 
  private:

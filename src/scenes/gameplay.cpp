@@ -83,7 +83,7 @@ void Gameplay::update()
   m_inspector_system.update(m_registry, m_camera);
   m_inventory_system.update(m_registry);
 
-  m_ui_manager.update();
+  m_ui_manager.update(delta);
 
   if (delay <= 0.0)
   {

@@ -16,8 +16,10 @@ Scrollable::Scrollable() : UIComponent()
   m_batch.has_scissor = true;
 }
 
-void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
+void Scrollable::update(const double delta)
 {
+  (void)delta;
+
   if (children.empty())
   {
     return;
@@ -48,10 +50,7 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
         m_scroll_y = 0;
       }
 
-      const auto& matrix = matrix_stack.back();
-      matrix_stack.pop_back();
-      m_transform_matrix = glm::translate(matrix, glm::vec3(0, m_scroll_y, 0));
-      matrix_stack.push_back(m_transform_matrix);
+      child->position.y = m_scroll_y;
       dirty = true;
     }
   }

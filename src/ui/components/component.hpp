@@ -39,6 +39,8 @@ enum class Placement
 class UIComponent
 {
  public:
+  friend class UIManager;
+
   enum class State
   {
     Hidden,
@@ -64,8 +66,8 @@ class UIComponent
   virtual ~UIComponent() {}
 
   virtual void init() {}
-  virtual void update([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
-  virtual void update_component(std::vector<glm::mat4>& matrix_stack);
+  virtual void update_geometry([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
+  virtual void update([[maybe_unused]] const double delta) {}
   virtual void render(Renderer& renderer, Batch& batch);
   virtual void show();
   virtual void hide();
@@ -93,6 +95,8 @@ class UIComponent
   bool m_has_initialized = false;
 
   bool m_is_positioned();
+  void m_update(const double delta, std::vector<glm::mat4>& matrix_stack);
+  void m_update_geometry(std::vector<glm::mat4>& matrix_stack);
 };
 
 }  // namespace dl::ui

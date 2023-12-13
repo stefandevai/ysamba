@@ -17,7 +17,7 @@ UIManager::UIManager()
 
 UIManager::~UIManager() { m_matrix_stack.clear(); }
 
-void UIManager::update()
+void UIManager::update(const double delta)
 {
   for (auto& component : m_components)
   {
@@ -26,7 +26,7 @@ void UIManager::update()
       continue;
     }
 
-    component->update_component(m_matrix_stack);
+    component->m_update(delta, m_matrix_stack);
   }
 }
 

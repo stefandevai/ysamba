@@ -10,7 +10,7 @@ class Scrollable : public UIComponent
  public:
   Scrollable();
 
-  void update(std::vector<glm::mat4>& matrix_stack);
+  void update(const double delta);
   void render(Renderer& renderer, Batch& batch);
 
  private:

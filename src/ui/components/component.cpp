@@ -12,7 +12,7 @@ namespace dl::ui
 {
 InputManager& UIComponent::m_input_manager = InputManager::get_instance();
 
-void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
+void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
 {
   if (!m_has_initialized)
   {
@@ -59,18 +59,25 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
     absolute_position.x = top_left.x;
     absolute_position.y = top_left.y;
   }
+}
+
+void UIComponent::m_update(const double delta, std::vector<glm::mat4>& matrix_stack)
+{
+  m_update_geometry(matrix_stack);
+
   if (m_is_positioned())
   {
     matrix_stack.push_back(m_transform_matrix);
   }
 
-  update(matrix_stack);
+  update_geometry(matrix_stack);
+  update(delta);
 
   for (const auto& child : children)
   {
     child->dirty = dirty;
     child->opacity = opacity;
-    child->update_component(matrix_stack);
+    child->m_update(delta, matrix_stack);
   }
 
   if (m_is_positioned())
