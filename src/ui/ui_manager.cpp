@@ -21,7 +21,7 @@ void UIManager::update()
 {
   for (auto& component : m_components)
   {
-    if (!component->visible)
+    if (component->state == UIComponent::State::Hidden)
     {
       continue;
     }
@@ -40,7 +40,7 @@ void UIManager::render(Renderer& renderer)
 
   for (auto& component : m_components)
   {
-    if (!component->visible)
+    if (component->state == UIComponent::State::Hidden)
     {
       continue;
     }

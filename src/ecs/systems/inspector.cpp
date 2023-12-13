@@ -76,7 +76,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     }
   }
 
-  if (!updated_inspector_content && m_inspector->visible)
+  if (!updated_inspector_content && m_inspector->state == ui::UIComponent::State::Visible)
   {
     m_destroy_inspector();
   }
@@ -87,7 +87,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
 void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt::registry& registry)
 {
-  if (!m_inspector->visible)
+  if (m_inspector->state == ui::UIComponent::State::Hidden)
   {
     m_inspector->show();
   }
@@ -114,7 +114,7 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
 
 void InspectorSystem::m_update_inspector_content(const TileData& tile_data)
 {
-  if (!m_inspector->visible)
+  if (m_inspector->state == ui::UIComponent::State::Hidden)
   {
     m_inspector->show();
   }

@@ -10,8 +10,8 @@ class Button;
 class ButtonList : public UIComponent
 {
  public:
-  int line_spacing = 5;
-  Vector2i margin = {15, 15};
+  int line_spacing = 0;
+  Vector2i margin = {28, 16};
   Vector2i button_size = {25, 25};
   std::function<void(const uint32_t)> on_select;
 

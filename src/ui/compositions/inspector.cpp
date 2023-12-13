@@ -9,7 +9,7 @@ namespace dl::ui
 {
 Inspector::Inspector() : UIComponent({300, 100})
 {
-  visible = false;
+  state = UIComponent::State::Hidden;
   position = {30, 30, 0};
 
   m_container = emplace<Container>(size, 0x1b2420aa);

@@ -1,10 +1,12 @@
 #pragma once
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <optional>
 #include <vector>
 
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
+#include "ui/animation.hpp"
 
 namespace dl
 {
@@ -37,14 +39,22 @@ enum class Placement
 class UIComponent
 {
  public:
+  enum class State
+  {
+    Hidden,
+    Visible,
+    Animating,
+  };
+
+  bool dirty = true;
+  State state = State::Visible;
   Vector3i position;
   Vector3i absolute_position;
   Vector2i size;
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
-  bool visible = true;
-  bool dirty = true;
+  std::optional<Animation> animation{};
 
   UIComponent* parent = nullptr;
   std::vector<std::unique_ptr<UIComponent>> children;

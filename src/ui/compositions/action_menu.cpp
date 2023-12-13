@@ -9,7 +9,7 @@ namespace dl::ui
 {
 ActionMenu::ActionMenu(const ItemList& items, const std::function<void(const uint32_t)>& on_select) : UIComponent()
 {
-  visible = false;
+  state = UIComponent::State::Hidden;
   m_scrollable_list = emplace<ScrollableList>();
   m_scrollable_list->size = Vector2i{200, 300};
   m_scrollable_list->x_alignment = XAlignement::Center;

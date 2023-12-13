@@ -22,7 +22,7 @@ void ScrollableList::init()
   m_container->set_size(size);
   m_container->set_color(color);
   m_scrollable->size = size;
-  m_list->button_size = Vector2i{size.x, 45};
+  m_list->button_size = Vector2i{size.x, 32};
   m_has_initialized = true;
 }
 

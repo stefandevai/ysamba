@@ -68,7 +68,7 @@ void InventorySystem::m_open_inventory(entt::registry& registry)
 {
   assert(m_inventory != nullptr);
 
-  if (!m_inventory->visible)
+  if (m_inventory->state == ui::UIComponent::State::Hidden)
   {
     m_item_names.clear();
     m_item_names.reserve(m_items.size());

@@ -35,7 +35,7 @@ ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(wo
   m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
 
   m_select_target_label = m_ui_manager.emplace<ui::Label>("Select target");
-  m_select_target_label->visible = false;
+  m_select_target_label->state = ui::UIComponent::State::Hidden;
   m_select_target_label->x_alignment = ui::XAlignement::Center;
   m_select_target_label->position.y = 30;
 }
@@ -251,7 +251,7 @@ void ActionSystem::m_open_action_menu()
 {
   assert(m_action_menu != nullptr);
 
-  if (!m_action_menu->visible)
+  if (m_action_menu->state == ui::UIComponent::State::Hidden)
   {
     m_action_menu->show();
   }
@@ -261,7 +261,7 @@ void ActionSystem::m_show_select_target_text()
 {
   assert(m_select_target_label != nullptr);
 
-  if (!m_select_target_label->visible)
+  if (m_select_target_label->state == ui::UIComponent::State::Hidden)
   {
     m_select_target_label->show();
   }
@@ -269,7 +269,7 @@ void ActionSystem::m_show_select_target_text()
 
 void ActionSystem::m_close_action_menu()
 {
-  if (m_action_menu->visible)
+  if (m_action_menu->state == ui::UIComponent::State::Visible)
   {
     m_action_menu->hide();
   }
@@ -277,7 +277,7 @@ void ActionSystem::m_close_action_menu()
 
 void ActionSystem::m_close_select_target()
 {
-  if (m_select_target_label->visible)
+  if (m_select_target_label->state == ui::UIComponent::State::Visible)
   {
     m_select_target_label->hide();
   }

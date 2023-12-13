@@ -9,7 +9,7 @@ namespace dl::ui
 {
 Inventory::Inventory(const std::function<void(const int i)>& on_select) : UIComponent()
 {
-  visible = false;
+  state = UIComponent::State::Hidden;
   m_scrollable_list = emplace<ScrollableList>();
   m_scrollable_list->size = Vector2i{500, 400};
   m_scrollable_list->x_alignment = XAlignement::Center;

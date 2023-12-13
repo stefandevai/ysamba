@@ -59,7 +59,7 @@ void Scrollable::update(std::vector<glm::mat4>& matrix_stack)
 
 void Scrollable::render(Renderer& renderer, [[maybe_unused]] Batch& batch)
 {
-  if (!visible)
+  if (state != UIComponent::State::Visible)
   {
     return;
   }

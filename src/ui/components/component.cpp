@@ -21,7 +21,7 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
     dirty = true;
   }
 
-  if (!visible)
+  if (state != State::Visible)
   {
     return;
   }
@@ -82,7 +82,7 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
 
 void UIComponent::render(Renderer& renderer, Batch& batch)
 {
-  if (!visible)
+  if (state != State::Visible)
   {
     return;
   }
@@ -93,9 +93,9 @@ void UIComponent::render(Renderer& renderer, Batch& batch)
   }
 }
 
-void UIComponent::show() { visible = true; }
+void UIComponent::show() { state = State::Visible; }
 
-void UIComponent::hide() { visible = false; }
+void UIComponent::hide() { state = State::Hidden; }
 
 bool UIComponent::m_is_positioned()
 {
