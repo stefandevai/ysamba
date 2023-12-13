@@ -8,14 +8,12 @@
 
 namespace dl::ui
 {
-Button::Button(const std::string& text, const Vector2i& size, XAlignement x_alignment, YAlignement y_alignment)
-    : UIComponent(size)
+void Button::init()
 {
-  m_container = emplace<Container>(size, 0x33aa88aa);
+  m_container = emplace<Container>(size, background_color);
   m_label = m_container->emplace<Label>(text);
-  m_label->parent_size = size;
-  m_label->x_alignment = x_alignment;
-  m_label->y_alignment = y_alignment;
+  m_label->x_alignment = label_x_alignment;
+  m_label->y_alignment = label_y_alignment;
 }
 
 void Button::update(std::vector<glm::mat4>& matrix_stack)

@@ -2,7 +2,6 @@
 
 #include "./component.hpp"
 #include "graphics/quad.hpp"
-#include "ui/style/container.hpp"
 
 namespace dl
 {

@@ -18,6 +18,7 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
   {
     init();
     m_has_initialized = true;
+    dirty = true;
   }
 
   if (!visible)
@@ -34,22 +35,22 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
 
     if (x_alignment == XAlignement::Right)
     {
-      const int anchor_w = parent_size.x == 0 ? window_size.x : parent_size.x;
+      const int anchor_w = (parent == nullptr || parent->size.x == 0) ? window_size.x : parent->size.x;
       transformed_position.x = anchor_w - size.x - position.x;
     }
     else if (x_alignment == XAlignement::Center)
     {
-      const int anchor_w = parent_size.x == 0 ? window_size.x : parent_size.x;
+      const int anchor_w = (parent == nullptr || parent->size.x == 0) ? window_size.x : parent->size.x;
       transformed_position.x = anchor_w / 2 - size.x / 2 + position.x;
     }
     if (y_alignment == YAlignement::Bottom)
     {
-      const int anchor_h = parent_size.y == 0 ? window_size.y : parent_size.y;
+      const int anchor_h = (parent == nullptr || parent->size.y == 0) ? window_size.y : parent->size.y;
       transformed_position.y = anchor_h - size.y - position.y;
     }
     else if (y_alignment == YAlignement::Center)
     {
-      const int anchor_h = parent_size.y == 0 ? window_size.y : parent_size.y;
+      const int anchor_h = (parent == nullptr || parent->size.y == 0) ? window_size.y : parent->size.y;
       transformed_position.y = anchor_h / 2 - size.y / 2 + position.y;
     }
     m_transform_matrix =

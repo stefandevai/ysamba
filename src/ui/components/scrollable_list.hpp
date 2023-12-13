@@ -12,9 +12,11 @@ class Container;
 class ScrollableList : public UIComponent
 {
  public:
-  ScrollableList(const ItemList& items, const Vector2i& size, const std::function<void(const uint32_t)>& on_select);
-  ScrollableList(const Vector2i& size, const std::function<void(const uint32_t)>& on_select);
+  uint32_t color = 0x1b2420aa;
 
+  ScrollableList() = default;
+
+  void init();
   void set_items(const ItemList& items);
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
@@ -22,7 +24,8 @@ class ScrollableList : public UIComponent
   ButtonList* m_list = nullptr;
   Scrollable* m_scrollable = nullptr;
   Container* m_container = nullptr;
-  const std::function<void(const uint32_t i)> m_on_select;
+  std::function<void(const uint32_t i)> m_on_select;
+  ItemList m_items;
 };
 
 }  // namespace dl::ui

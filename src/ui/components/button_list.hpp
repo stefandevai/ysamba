@@ -1,7 +1,6 @@
 #pragma once
 
 #include "./component.hpp"
-#include "ui/style/list.hpp"
 #include "ui/types.hpp"
 
 namespace dl::ui
@@ -13,11 +12,12 @@ class ButtonList : public UIComponent
  public:
   int line_spacing = 5;
   Vector2i margin = {15, 15};
-  Vector2i button_size = {35, 35};
+  Vector2i button_size = {25, 25};
   std::function<void(const uint32_t)> on_select;
 
-  ButtonList(const ItemList& items, const std::function<void(const uint32_t)>& on_select);
+  ButtonList() = default;
 
+  void set_items(const ItemList& items);
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
   void init();

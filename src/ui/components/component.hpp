@@ -40,13 +40,13 @@ class UIComponent
   Vector3i position;
   Vector3i absolute_position;
   Vector2i size;
-  Vector2i parent_size;
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
   bool visible = true;
   bool dirty = true;
 
+  UIComponent* parent = nullptr;
   std::vector<std::unique_ptr<UIComponent>> children;
 
   UIComponent(const Vector2i& size = {0, 0}) : size(size) {}
@@ -63,6 +63,7 @@ class UIComponent
   T* emplace(Args&&... args)
   {
     auto component = std::make_unique<T>(std::forward<Args>(args)...);
+    component->parent = this;
     children.push_back(std::move(component));
     return dynamic_cast<T*>(&(*children.back()));
   }
