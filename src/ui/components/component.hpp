@@ -54,6 +54,7 @@ class UIComponent
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
+  double opacity = 1.0;
   std::optional<Animation> animation{};
 
   UIComponent* parent = nullptr;

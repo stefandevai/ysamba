@@ -308,7 +308,15 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
 {
   assert(m_index_count <= m_indices_size);
 
-  const auto color = quad->color.int_color;
+  uint32_t color = quad->color.int_color;
+
+  if (quad->color.opacity_factor < 1.0)
+  {
+    const auto& quad_color = quad->color.rgba_color;
+    color = Color::rgba_to_int(
+        quad_color.r, quad_color.g, quad_color.b, static_cast<uint8_t>(quad_color.a * quad->color.opacity_factor));
+  }
+
   auto general_transform = m_matrix;
   general_transform = glm::translate(general_transform, glm::vec3(x, y, z + y));
 

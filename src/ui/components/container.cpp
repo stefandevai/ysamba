@@ -17,6 +17,11 @@ Container::Container(const Vector2i& size, const uint32_t color)
 
 void Container::render(Renderer& renderer, Batch& batch)
 {
+  if (quad->color.opacity_factor != opacity)
+  {
+    quad->color.opacity_factor = opacity;
+  }
+
   batch.quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)

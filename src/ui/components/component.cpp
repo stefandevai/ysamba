@@ -69,6 +69,7 @@ void UIComponent::update_component(std::vector<glm::mat4>& matrix_stack)
   for (const auto& child : children)
   {
     child->dirty = dirty;
+    child->opacity = opacity;
     child->update_component(matrix_stack);
   }
 
