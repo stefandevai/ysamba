@@ -30,8 +30,8 @@ void ActionMenu::set_on_select(const std::function<void(const uint32_t)>& on_sel
   m_scrollable_list->set_on_select(on_select);
 }
 
-void ActionMenu::show() { animate<AnimationFadeIn>(this, 1.0, Easing::InOutCubic); }
+void ActionMenu::show() { animate<AnimationFadeIn>(0.5, Easing::OutQuart); }
 
-void ActionMenu::hide() { animate<AnimationFadeOut>(this, 1.0, Easing::InOutCubic); }
+void ActionMenu::hide() { animate<AnimationFadeOut>(0.5, Easing::OutQuart); }
 
 }  // namespace dl::ui

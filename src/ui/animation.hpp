@@ -8,6 +8,7 @@ class UIComponent;
 
 enum class Easing
 {
+  Linear,
   InSine,
   OutSine,
   InOutSine,
@@ -40,32 +41,33 @@ enum class Easing
   InOutBounce,
 };
 
+struct AnimationTarget
+{
+  UIComponent* value = nullptr;
+};
+
 struct Animation
 {
-  UIComponent* component = nullptr;
   double duration = 1.0;
-  double time_left = 1.0;
-  Easing easing = Easing::InOutCubic;
+  double time_spent = 0.0;
+  Easing easing = Easing::Linear;
 
-  Animation(UIComponent* component, const double duration, const Easing easing)
-      : component(component), duration(duration), time_left(duration), easing(easing)
-  {
-  }
+  Animation(const double duration, const Easing easing) : duration(duration), easing(easing) {}
 };
 
 struct AnimationFadeIn : public Animation
 {
-  AnimationFadeIn(UIComponent* component, const double duration, const Easing easing)
-      : Animation(component, duration, easing)
-  {
-  }
+  AnimationFadeIn(const double duration, const Easing easing) : Animation(duration, easing) {}
 };
 
 struct AnimationFadeOut : public Animation
 {
-  AnimationFadeOut(UIComponent* component, const double duration, const Easing easing)
-      : Animation(component, duration, easing)
-  {
-  }
+  AnimationFadeOut(const double duration, const Easing easing) : Animation(duration, easing) {}
 };
+
+namespace animation
+{
+double get_ease_value(const double t, Easing easing);
+}
+
 }  // namespace dl::ui

@@ -7,6 +7,7 @@
 
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
+#include "ui/animation.hpp"
 
 namespace dl
 {
@@ -105,6 +106,7 @@ class UIComponent
     if (!animator->valid(animations))
     {
       animations = animator->create();
+      animator->emplace<AnimationTarget>(animations, this);
     }
 
     animator->emplace<T>(animations, std::forward<Args>(args)...);
