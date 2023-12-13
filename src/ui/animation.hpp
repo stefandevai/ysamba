@@ -1,14 +1,10 @@
 #pragma once
 
+#include <entt/entity/registry.hpp>
+
 namespace dl::ui
 {
-template <typename... Ts>
-struct AnimationOverload : Ts...
-{
-  using Ts::operator()...;
-};
-template <class... Ts>
-AnimationOverload(Ts...) -> AnimationOverload<Ts...>;
+class UIComponent;
 
 enum class Easing
 {
@@ -44,19 +40,32 @@ enum class Easing
   InOutBounce,
 };
 
-struct FadeInAnimation
+struct Animation
 {
-  Easing easing = Easing::InOutCubic;
+  UIComponent* component = nullptr;
   double duration = 1.0;
   double time_left = 1.0;
-};
-
-struct FadeOutAnimation
-{
   Easing easing = Easing::InOutCubic;
-  double duration = 1.0;
-  double time_left = 1.0;
+
+  Animation(UIComponent* component, const double duration, const Easing easing)
+      : component(component), duration(duration), time_left(duration), easing(easing)
+  {
+  }
 };
 
-using Animation = std::variant<FadeInAnimation, FadeOutAnimation>;
+struct AnimationFadeIn : public Animation
+{
+  AnimationFadeIn(UIComponent* component, const double duration, const Easing easing)
+      : Animation(component, duration, easing)
+  {
+  }
+};
+
+struct AnimationFadeOut : public Animation
+{
+  AnimationFadeOut(UIComponent* component, const double duration, const Easing easing)
+      : Animation(component, duration, easing)
+  {
+  }
+};
 }  // namespace dl::ui

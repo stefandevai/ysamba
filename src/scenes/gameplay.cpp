@@ -56,7 +56,12 @@ void Gameplay::update()
 
   if (current_context != nullptr && current_context->key == "gameplay"_hs)
   {
-    m_update_input(m_game_context);
+    const auto will_quit = m_update_input(m_game_context);
+
+    if (will_quit)
+    {
+      return;
+    }
   }
 
   const auto delta = m_game_context.clock->delta;
@@ -121,13 +126,16 @@ void Gameplay::load_game()
   m_has_loaded = true;
 }
 
-void Gameplay::m_update_input(GameContext& m_game_context)
+bool Gameplay::m_update_input(GameContext& m_game_context)
 {
   using namespace entt::literals;
+
+  bool will_quit = false;
 
   if (m_input_manager.poll_action("quit"_hs))
   {
     m_game_context.scene_manager->pop_scene();
+    will_quit = true;
   }
   else if (m_input_manager.poll_action("toggle_pause"_hs))
   {
@@ -185,5 +193,7 @@ void Gameplay::m_update_input(GameContext& m_game_context)
   {
     m_camera.move({0., -8., 0.});
   }
+
+  return will_quit;
 }
 }  // namespace dl

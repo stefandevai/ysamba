@@ -19,6 +19,8 @@ UIManager::~UIManager() { m_matrix_stack.clear(); }
 
 void UIManager::update(const double delta)
 {
+  m_animation_manager.update(delta);
+
   for (auto& component : m_components)
   {
     if (component->state == UIComponent::State::Hidden)

@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <map>
 
+#include "./animation_manager.hpp"
 #include "./components/component.hpp"
 #include "graphics/batch.hpp"
 
@@ -24,6 +25,7 @@ class UIManager
   T* emplace(Args&&... args)
   {
     auto component = std::make_unique<T>(std::forward<Args>(args)...);
+    component->m_set_animator(&m_animation_manager.registry);
     m_components.push_back(std::move(component));
     return dynamic_cast<T*>(&(*m_components.back()));
   }
@@ -44,6 +46,7 @@ class UIManager
   std::vector<glm::mat4> m_matrix_stack;
   Batch m_batch{"default", 10};
   bool m_added_batch = false;
+  AnimationManager m_animation_manager{};
 };
 
 }  // namespace dl::ui

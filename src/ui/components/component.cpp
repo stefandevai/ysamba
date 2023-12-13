@@ -23,7 +23,7 @@ void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
     dirty = true;
   }
 
-  if (state != State::Visible)
+  if (state == State::Hidden)
   {
     return;
   }
@@ -65,29 +65,6 @@ void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
 
 void UIComponent::m_update(const double delta, std::vector<glm::mat4>& matrix_stack)
 {
-  if (state == State::Animating)
-  {
-    std::visit(AnimationOverload{[this, delta](FadeInAnimation& animation) {
-                                   animation.time_left -= delta;
-                                   opacity = 1.0 - animation.time_left;
-                                   if (animation.time_left <= 0)
-                                   {
-                                     state = State::Visible;
-                                     opacity = 1.0;
-                                   }
-                                 },
-                                 [this, delta](FadeOutAnimation& animation) {
-                                   animation.time_left -= delta;
-                                   opacity = animation.time_left;
-                                   if (animation.time_left <= 0)
-                                   {
-                                     state = State::Hidden;
-                                     opacity = 1.0;
-                                   }
-                                 }},
-               animation);
-  }
-
   m_update_geometry(matrix_stack);
 
   if (m_is_positioned())
@@ -126,16 +103,20 @@ void UIComponent::render(Renderer& renderer, Batch& batch)
   }
 }
 
-void UIComponent::show()
-{
-  animation.emplace<FadeInAnimation>();
-  state = State::Animating;
-}
+void UIComponent::show() { state = State::Visible; }
 
-void UIComponent::hide()
+void UIComponent::hide() { state = State::Hidden; }
+
+void UIComponent::m_set_animator(entt::registry* animator)
 {
-  animation.emplace<FadeOutAnimation>();
-  state = State::Animating;
+  assert(animator != nullptr && "Trying to set a null animator");
+
+  this->animator = animator;
+
+  for (auto& child : children)
+  {
+    child->m_set_animator(animator);
+  }
 }
 
 bool UIComponent::m_is_positioned()

@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "core/maths/vector.hpp"
+#include "ui/animation.hpp"
 #include "ui/components/scrollable_list.hpp"
 
 namespace dl::ui
@@ -28,5 +29,9 @@ void ActionMenu::set_on_select(const std::function<void(const uint32_t)>& on_sel
 {
   m_scrollable_list->set_on_select(on_select);
 }
+
+void ActionMenu::show() { animate<AnimationFadeIn>(this, 1.0, Easing::InOutCubic); }
+
+void ActionMenu::hide() { animate<AnimationFadeOut>(this, 1.0, Easing::InOutCubic); }
 
 }  // namespace dl::ui

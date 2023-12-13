@@ -66,6 +66,6 @@ class Gameplay : public Scene
   JobSystem m_job_system{m_world};
   InventorySystem m_inventory_system{m_world, m_ui_manager};
 
-  void m_update_input(GameContext& game_context);
+  bool m_update_input(GameContext& game_context);
 };
 }  // namespace dl
