@@ -9,7 +9,6 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
-#include "ecs/components/text.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"

@@ -13,8 +13,7 @@
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
-#include "ui/components/debug_info.hpp"
-#include "ui/components/scrollable_list.hpp"
+#include "ui/compositions/debug_info.hpp"
 #include "world/society/society_generator.hpp"
 
 namespace dl

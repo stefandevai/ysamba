@@ -14,7 +14,7 @@ class ScrollableList : public UIComponent
  public:
   uint32_t color = 0x1b2420aa;
 
-  ScrollableList() = default;
+  ScrollableList();
 
   void init();
   void set_items(const ItemList& items);

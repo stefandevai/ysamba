@@ -11,7 +11,7 @@
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
-#include "ui/components/inspector.hpp"
+#include "ui/compositions/inspector.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/tile_data.hpp"
 #include "world/world.hpp"

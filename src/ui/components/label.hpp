@@ -9,8 +9,10 @@ class Label : public UIComponent
 {
  public:
   Text text;
+  Label();
+  Label(const std::string_view value);
 
-  Label(const std::string& text, const std::string& typeface = "font-1980");
+  void set_text(const std::string_view value);
 
   void render(Renderer& renderer, Batch& batch);
 

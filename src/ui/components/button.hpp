@@ -16,7 +16,7 @@ class Button : public UIComponent
   XAlignement label_x_alignment = XAlignement::Center;
   YAlignement label_y_alignment = YAlignement::Center;
 
-  Button() = default;
+  Button();
   /* Button(const std::string& text, */
   /*        const Vector2i& size = {100, 50}, */
   /*        XAlignement x_alignment = XAlignement::Center, */

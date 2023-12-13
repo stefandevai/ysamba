@@ -2,8 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "./container.hpp"
-#include "./label.hpp"
+#include "ui/components/container.hpp"
+#include "ui/components/label.hpp"
 
 namespace dl::ui
 {

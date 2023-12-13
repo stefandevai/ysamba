@@ -11,9 +11,8 @@ namespace dl
 Text::Text(const std::string_view text,
            const std::string_view typeface,
            const unsigned int font_size,
-           const std::string_view color,
            const bool is_static)
-    : value(text), typeface(typeface), color(color), m_font_size(font_size), m_is_static(is_static)
+    : value(text), typeface(typeface), m_font_size(font_size), m_is_static(is_static)
 {
   initialize();
 }
@@ -27,6 +26,11 @@ void Text::initialize()
 
 void Text::update()
 {
+  if (!m_has_initialized)
+  {
+    initialize();
+  }
+
   characters.clear();
   assert(m_font != nullptr);
   assert(m_has_initialized);

@@ -13,8 +13,8 @@
 #include "ecs/components/society_agent.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
-#include "ui/components/action_menu.hpp"
 #include "ui/components/label.hpp"
+#include "ui/compositions/action_menu.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 

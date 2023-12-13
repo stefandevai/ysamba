@@ -1,16 +1,16 @@
 #pragma once
 
-#include "./component.hpp"
+#include "ui/components/component.hpp"
 
 namespace dl::ui
 {
 class Label;
 class Container;
 
-class Inspector : public UIComponent
+class DebugInfo : public UIComponent
 {
  public:
-  Inspector();
+  DebugInfo();
 
   void set_content(const std::string& text);
 

@@ -8,7 +8,7 @@
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
-#include "ui/components/inventory.hpp"
+#include "ui/compositions/inventory.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 

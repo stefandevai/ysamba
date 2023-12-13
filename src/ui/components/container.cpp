@@ -28,8 +28,8 @@ void Container::render(Renderer& renderer, Batch& batch)
 void Container::set_size(const Vector2i& size)
 {
   this->size = size;
-  this->quad->w = size.x;
-  this->quad->h = size.y;
+  quad->w = size.x;
+  quad->h = size.y;
 }
 
 void Container::set_color(const uint32_t color) { quad->color = Color{color}; }

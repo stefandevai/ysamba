@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./component.hpp"
+#include "ui/components/component.hpp"
 #include "ui/types.hpp"
 
 namespace dl::ui
