@@ -21,19 +21,21 @@
 namespace dl
 {
 const ui::ItemList ActionSystem::m_menu_items = {
-    {0, "[H]arvest"}, {1, "[B]reak"}, {2, "[D]ig"},
-    /* {0, "[H]arvest"}, */
-    /* {1, "[B]reak"}, */
-    /* {2, "[D]ig"}, */
-    /* {0, "[H]arvest"}, */
-    /* {1, "[B]reak"}, */
-    /* {2, "[D]ig"}, */
-    /* {0, "[H]arvest"}, */
-    /* {1, "[B]reak"}, */
-    /* {2, "[D]ig"}, */
-    /* {0, "[H]arvest"}, */
-    /* {1, "[B]reak"}, */
-    /* {2, "[D]ig"}, */
+    {0, "[H]arvest"},
+    {1, "[B]reak"},
+    {2, "[D]ig"},
+    {0, "[H]arvest"},
+    {1, "[B]reak"},
+    {2, "[D]ig"},
+    {0, "[H]arvest"},
+    {1, "[B]reak"},
+    {2, "[D]ig"},
+    {0, "[H]arvest"},
+    {1, "[B]reak"},
+    {2, "[D]ig"},
+    {0, "[H]arvest"},
+    {1, "[B]reak"},
+    {2, "[D]ig"},
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
@@ -67,6 +69,11 @@ void ActionSystem::m_update_action_menu()
   using namespace entt::literals;
 
   m_open_action_menu();
+
+  if (m_action_menu->state != ui::UIComponent::State::Visible)
+  {
+    return;
+  }
 
   if (m_input_manager.poll_action("close_menu"_hs))
   {

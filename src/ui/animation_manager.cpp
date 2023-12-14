@@ -16,6 +16,11 @@ void AnimationManager::update(const double delta)
 
     assert(target.value != nullptr);
 
+    if (animation.time_spent == 0.0)
+    {
+      target.value->propagate_state();
+    }
+
     if (animation.time_spent < animation.duration)
     {
       animation.time_spent += delta;
@@ -26,6 +31,7 @@ void AnimationManager::update(const double delta)
 
     target.value->opacity = 1.0;
     target.value->state = UIComponent::State::Visible;
+    target.value->propagate_state();
     registry.remove<AnimationFadeIn>(entity);
   }
 
@@ -38,6 +44,11 @@ void AnimationManager::update(const double delta)
 
     assert(target.value != nullptr);
 
+    if (animation.time_spent == 0.0)
+    {
+      target.value->propagate_state();
+    }
+
     if (animation.time_spent < animation.duration)
     {
       animation.time_spent += delta;
@@ -48,6 +59,7 @@ void AnimationManager::update(const double delta)
 
     target.value->opacity = 0.0;
     target.value->state = UIComponent::State::Hidden;
+    target.value->propagate_state();
     registry.remove<AnimationFadeOut>(entity);
   }
 }

@@ -74,6 +74,9 @@ class UIComponent
   virtual void show();
   virtual void hide();
 
+  // Propagates state to children
+  void propagate_state();
+
   template <typename T, typename... Args>
   T* emplace(Args&&... args)
   {

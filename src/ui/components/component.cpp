@@ -73,7 +73,11 @@ void UIComponent::m_update(const double delta, std::vector<glm::mat4>& matrix_st
   }
 
   update_geometry(matrix_stack);
-  update(delta);
+
+  if (state == State::Visible)
+  {
+    update(delta);
+  }
 
   for (const auto& child : children)
   {
@@ -116,6 +120,15 @@ void UIComponent::m_set_animator(entt::registry* animator)
   for (auto& child : children)
   {
     child->m_set_animator(animator);
+  }
+}
+
+void UIComponent::propagate_state()
+{
+  for (auto& child : children)
+  {
+    child->state = state;
+    child->propagate_state();
   }
 }
 
