@@ -27,7 +27,7 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
   unsigned int aw = 0, ah = 0;
   for (const auto& char_range : m_char_ranges)
   {
-    for (wchar_t c = char_range.first; c < char_range.second; c++)
+    for (char32_t c = char_range.first; c < char_range.second; c++)
     {
       if (FT_Load_Char(m_face, c, FT_LOAD_RENDER))
       {
@@ -50,7 +50,7 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
 
   for (const auto& char_range : m_char_ranges)
   {
-    for (wchar_t c = char_range.first; c < char_range.second; c++)
+    for (char32_t c = char_range.first; c < char_range.second; c++)
     {
       if (FT_Load_Char(m_face, c, FT_LOAD_RENDER))
       {
@@ -76,7 +76,7 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
                                m_face->glyph->bitmap_left,
                                m_face->glyph->bitmap_top,
                                (float)xoffset / m_atlas_width};
-      m_chars.insert(std::pair<wchar_t, CharacterData>(c, ch_data));
+      m_chars.insert(std::pair<char32_t, CharacterData>(c, ch_data));
       xoffset += m_face->glyph->bitmap.width;
     }
   }

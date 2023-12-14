@@ -27,7 +27,7 @@ class Font : public Asset
 {
  public:
   Font(const std::string& path, std::size_t size = 48);
-  inline CharacterData get_char_data(wchar_t c)
+  inline CharacterData get_char_data(char32_t c)
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars[c] : m_empty_char_data);
   };
@@ -40,7 +40,7 @@ class Font : public Asset
   std::size_t m_size;
   FT_Library m_ft;
   FT_Face m_face;
-  std::map<wchar_t, CharacterData> m_chars;
+  std::map<char32_t, CharacterData> m_chars;
   std::shared_ptr<Texture> m_texture_atlas;
   unsigned int m_atlas_width, m_atlas_height;
   int m_max_character_top = 0;
@@ -53,7 +53,7 @@ class Font : public Asset
   CharacterData m_empty_char_data = {0, 0, 0, 0, 0, 0, 0.f};
 
   // Unicode char ranges to load data from the font file
-  std::vector<std::pair<wchar_t, wchar_t>> m_char_ranges = {
+  std::vector<std::pair<char32_t, char32_t>> m_char_ranges = {
       std::make_pair(0x20, 0x7E),  // Basic Latin
       std::make_pair(0xA1, 0x1BF),  // Latin Supplement, Extended-A and part of Extended-B
       std::make_pair(0x1C4, 0x1CC),  // Serbian Cyrillic

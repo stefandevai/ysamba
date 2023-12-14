@@ -4,6 +4,7 @@
 
 #include "./font.hpp"
 #include "core/asset_manager.hpp"
+#include "core/utf8.hpp"
 
 namespace dl
 {
@@ -36,9 +37,9 @@ void Text::update()
   const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
 
-  for (wchar_t c : value)
+  for (UTF8Iterator it = value.begin(); it != value.end(); ++it)
   {
-    const auto& ch = m_font->get_char_data(c);
+    const auto& ch = m_font->get_char_data(*it);
     const float x = char_pos_x + ch.bl * scale;
     const float y = (m_font->get_max_character_top() - ch.bt) * scale;
     const float w = ch.bw * scale;
@@ -49,7 +50,7 @@ void Text::update()
     // If the character has a graphical representation
     if (w > 0.f && h > 0.f)
     {
-      character.code = c;
+      character.code = *it;
       character.sprite = std::make_unique<Sprite>(typeface);
       character.sprite->texture = m_font->get_atlas();
       character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
@@ -70,7 +71,7 @@ void Text::update()
     // Else, the character is an space
     else
     {
-      character.code = c;
+      character.code = *it;
       character.x = x;
       character.y = y;
     }
