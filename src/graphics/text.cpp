@@ -45,36 +45,33 @@ void Text::update()
     const float w = ch.bw * scale;
     const float h = ch.bh * scale;
 
+    // Skip if character is a space
+    if (w <= 0.f && h <= 0.f)
+    {
+      char_pos_x += (ch.ax >> 6) * scale;
+      continue;
+    }
+
     Character character;
 
-    // If the character has a graphical representation
-    if (w > 0.f && h > 0.f)
-    {
-      character.code = *it;
-      character.sprite = std::make_unique<Sprite>(typeface);
-      character.sprite->texture = m_font->get_atlas();
-      character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
-      character.sprite->color = color;
+    character.code = *it;
+    character.sprite = std::make_unique<Sprite>(typeface);
+    character.sprite->texture = m_font->get_atlas();
+    character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
+    character.sprite->color = color;
 
-      if (m_font_size != m_font->get_size())
-      {
-        character.sprite->transform = std::make_unique<Transform>();
-        character.sprite->transform->scale.x = scale;
-        character.sprite->transform->scale.y = scale;
-      }
-
-      character.x = x;
-      character.y = y;
-      character.w = w;
-      character.h = h;
-    }
-    // Else, the character is an space
-    else
+    if (m_font_size != m_font->get_size())
     {
-      character.code = *it;
-      character.x = x;
-      character.y = y;
+      character.sprite->transform = std::make_unique<Transform>();
+      character.sprite->transform->scale.x = scale;
+      character.sprite->transform->scale.y = scale;
     }
+
+    character.x = x;
+    character.y = y;
+    character.w = w;
+    character.h = h;
+
     characters.push_back(std::move(character));
 
     char_pos_x += (ch.ax >> 6) * scale;
