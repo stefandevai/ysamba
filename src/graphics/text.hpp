@@ -31,7 +31,7 @@ class Text
 
   Text(const std::string_view text,
        const std::string_view typeface = "font-1980",
-       const unsigned int font_size = 32,
+       const unsigned int font_size = 16,
        const bool is_static = true);
   Text() = default;
   Text(Text&&) = default;
@@ -55,7 +55,7 @@ class Text
   void set_is_static(const bool is_static) { m_is_static = is_static; }
 
  private:
-  size_t m_font_size = 32;
+  size_t m_font_size = 16;
   bool m_is_static = true;
   bool m_has_initialized = false;
   Vector2i m_size{0, 0};

@@ -38,8 +38,8 @@
         {
             "id": "font-1980",
             "type": "font",
-            "path": "fonts/m5x7.ttf",
-            "size": 32
+            "path": "fonts/unscii.ttf",
+            "size": 16
         }
     ]
 }
