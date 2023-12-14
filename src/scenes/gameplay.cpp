@@ -42,7 +42,7 @@ void Gameplay::load()
   nine_patch.left = 0;
   nine_patch.bottom = 32;
   nine_patch.right = 32;
-  nine_patch.border = 5;
+  nine_patch.border = 12;
 
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */
