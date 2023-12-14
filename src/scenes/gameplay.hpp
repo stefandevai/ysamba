@@ -16,6 +16,7 @@
 #include "ecs/systems/society.hpp"
 #include "ecs/systems/walk.hpp"
 #include "graphics/batch.hpp"
+#include "graphics/nine_patch.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
@@ -67,5 +68,7 @@ class Gameplay : public Scene
   InventorySystem m_inventory_system{m_world, m_ui_manager};
 
   bool m_update_input(GameContext& game_context);
+
+  NinePatch nine_patch{};
 };
 }  // namespace dl

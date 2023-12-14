@@ -20,6 +20,7 @@ class Sprite;
 class MultiSprite;
 struct Quad;
 class Text;
+struct NinePatch;
 
 class Batch
 {
@@ -41,10 +42,11 @@ class Batch
   void push_matrix(const glm::mat4& matrix);
   const glm::mat4 pop_matrix();
   const glm::mat4& peek_matrix();
-  void emplace(const Sprite* sprite, const double x, const double y, const double z);
+  void emplace(Sprite* sprite, const double x, const double y, const double z);
   void emplace(const MultiSprite* sprite, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
+  void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
   void add_scissor(const Vector4i& scissor);
 
  private:

@@ -13,7 +13,12 @@
             "path": "textures/tileset.png",
             "textureType": "diffuse"
         },
-
+        {
+            "id": "ui",
+            "type": "texture",
+            "path": "textures/ui.png",
+            "textureType": "diffuse"
+        },
         {
             "id": "spritesheet-tileset",
             "type": "texture-atlas",

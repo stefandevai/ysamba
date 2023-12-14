@@ -1,18 +1,18 @@
-#include "./container.hpp"
+#include "./window_decoration.hpp"
 
 #include "core/maths/vector.hpp"
 #include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
-Container::Container() : UIComponent(), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff})) {}
+WindowDecoration::WindowDecoration() : UIComponent(), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff})) {}
 
-Container::Container(const Vector2i& size, const uint32_t color)
+WindowDecoration::WindowDecoration(const Vector2i& size, const uint32_t color)
     : UIComponent(size), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
 {
 }
 
-void Container::render(Renderer& renderer, Batch& batch)
+void WindowDecoration::render(Renderer& renderer, Batch& batch)
 {
   if (state == State::Hidden)
   {
@@ -32,12 +32,12 @@ void Container::render(Renderer& renderer, Batch& batch)
   }
 }
 
-void Container::set_size(const Vector2i& size)
+void WindowDecoration::set_size(const Vector2i& size)
 {
   this->size = size;
   quad->w = size.x;
   quad->h = size.y;
 }
 
-void Container::set_color(const uint32_t color) { quad->color = Color{color}; }
+void WindowDecoration::set_color(const uint32_t color) { quad->color = Color{color}; }
 }  // namespace dl::ui

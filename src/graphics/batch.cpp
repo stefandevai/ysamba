@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>  // IWYU pragma: export
 
 #include "./multi_sprite.hpp"
+#include "./nine_patch.hpp"
 #include "./quad.hpp"
 #include "./shader_program.hpp"
 #include "./sprite.hpp"
@@ -114,12 +115,12 @@ const glm::mat4 Batch::pop_matrix()
 
 const glm::mat4& Batch::peek_matrix() { return m_matrix; }
 
-void Batch::emplace(const Sprite* sprite, const double x, const double y, const double z)
+void Batch::emplace(Sprite* sprite, const double x, const double y, const double z)
 {
   assert(m_index_count <= m_indices_size);
 
   const glm::vec2 size = sprite->get_size();
-  const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
+  const auto& texture_coordinates = sprite->get_texture_coordinates();
   unsigned int color = sprite->color.int_color;
 
   const std::shared_ptr<Texture>& texture = sprite->texture;
@@ -265,12 +266,10 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
     texture_index = it - m_textures.begin();
   }
 
-  /* const auto& frames = sprite->get_frames(); */
   const auto& size = sprite->get_size();
+  const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
   const int frame_width = texture->get_frame_width() * (size.x);
   const int frame_height = texture->get_frame_height() * (size.y);
-
-  const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
 
   // Get transformations and apply them to the sprite vertices
   auto general_transform = m_matrix;
@@ -382,6 +381,37 @@ void Batch::text(Text& text, const double x, const double y, const double z)
 
     emplace(character.sprite.get(), character.x + x, character.y + y, z);
   }
+}
+
+void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, const double z)
+{
+  if (nine_patch.dirty)
+  {
+    nine_patch.generate_patches();
+  }
+
+  // Top left patch
+  emplace(&nine_patch.border_patches[0], x, y, z);
+  // Top center patch
+  emplace(&nine_patch.border_patches[1], x + nine_patch.border, y, z);
+  // Top right patch
+  emplace(&nine_patch.border_patches[2], x + nine_patch.size.x - nine_patch.border, y, z);
+  // Center right patch
+  emplace(&nine_patch.border_patches[3], x + nine_patch.size.x - nine_patch.border, y + nine_patch.border, z);
+  // Bottom right patch
+  emplace(&nine_patch.border_patches[4],
+          x + nine_patch.size.x - nine_patch.border,
+          y + nine_patch.size.y - nine_patch.border,
+          z);
+  // Bottom center patch
+  emplace(&nine_patch.border_patches[5], x + nine_patch.border, y + nine_patch.size.y - nine_patch.border, z);
+  // Bottom left patch
+  emplace(&nine_patch.border_patches[6], x, y + nine_patch.size.y - nine_patch.border, z);
+  // Center left patch
+  emplace(&nine_patch.border_patches[7], x, y + nine_patch.border, z);
+
+  // Center patch
+  emplace(&nine_patch.center_patch, x + nine_patch.border, y + nine_patch.border, z);
 }
 
 void Batch::add_scissor(const Vector4i& scissor)

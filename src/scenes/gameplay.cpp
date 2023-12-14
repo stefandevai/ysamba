@@ -34,6 +34,16 @@ void Gameplay::load()
   m_camera.set_tile_size(m_world.get_tile_size());
   m_debug_info = m_ui_manager.emplace<ui::DebugInfo>();
 
+  nine_patch.resource_id = "ui";
+  nine_patch.texture = m_game_context.asset_manager->get<Texture>("ui");
+  nine_patch.size.x = 400.f;
+  nine_patch.size.y = 200.f;
+  nine_patch.top = 0;
+  nine_patch.left = 0;
+  nine_patch.bottom = 32;
+  nine_patch.right = 32;
+  nine_patch.border = 5;
+
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */
   /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
@@ -113,6 +123,9 @@ void Gameplay::render()
   m_renderer.push_matrix("world"_hs, m_camera.get_view_matrix());
   m_render_system.render(m_registry, m_renderer, m_camera);
   m_renderer.pop_matrix("world"_hs);
+
+  auto batch = m_renderer.get_batch("world"_hs);
+  batch->nine_patch(nine_patch, 200, 200, 60);
 
   m_ui_manager.render(m_renderer);
 }

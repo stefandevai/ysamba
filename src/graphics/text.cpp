@@ -57,7 +57,7 @@ void Text::update()
     character.code = *it;
     character.sprite = std::make_unique<Sprite>(typeface);
     character.sprite->texture = m_font->get_atlas();
-    character.sprite->set_custom_uv(ch.tx, ch.bh, ch.bw, ch.bh);
+    character.sprite->set_custom_uv(ch.bh, ch.tx, ch.bw, ch.bh);
     character.sprite->color = color;
 
     if (m_font_size != m_font->get_size())
