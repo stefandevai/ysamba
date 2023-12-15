@@ -28,15 +28,15 @@ void Gameplay::load()
 
   m_renderer.add_batch("world"_hs, "default");
 
-  /* m_world.load("./data/world/test_map.json"); */
-  load_game();
+  m_world.load("./data/world/test_map.json");
+  /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
   m_debug_info = m_ui_manager.emplace<ui::DebugInfo>();
 
-  /* auto society_blueprint = m_world.get_society("otomi"_hs); */
-  /* auto components = SocietyGenerator::generate_members(society_blueprint); */
-  /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
+  auto society_blueprint = m_world.get_society("otomi"_hs);
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   m_has_loaded = true;
 }
@@ -79,12 +79,13 @@ void Gameplay::update()
       m_physics_system.update(m_registry, delta);
       m_walk_system.update(m_registry);
       m_society_system.update(m_registry, delta);
-      m_pickup_system.update(m_registry);
       m_job_system.update(m_registry, delta);
     }
   }
 
   m_action_system.update(m_registry, m_camera);
+  m_pickup_system.update(m_registry);
+  m_wear_system.update(m_registry);
   m_inspector_system.update(m_registry, m_camera);
   m_inventory_system.update(m_registry);
 
@@ -168,10 +169,7 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
     const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
     const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-    const auto item = m_registry.create();
-    m_registry.emplace<Position>(item, tile_x, tile_y, 1);
-    m_registry.emplace<Visibility>(item, m_world.get_texture_id(), id, "item", 1);
-    m_registry.emplace<Item>(item, id);
+    m_world.create_item(m_registry, id, tile_x, tile_y, 1);
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "world/society/sex.hpp"
 
 namespace dl
@@ -18,6 +20,7 @@ struct Biology
   /* std::string genetics; */
   int base_speed{};
   int speed{};
+  std::vector<uint32_t> body_parts{};
   double turn_threshold = 100.0;
 };
 

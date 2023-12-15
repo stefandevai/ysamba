@@ -8,6 +8,7 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/visibility.hpp"
+#include "ecs/components/weared_items.hpp"
 
 namespace dl
 {
@@ -24,6 +25,7 @@ class SocietyGenerator
     Biology biology;
     Visibility visibility;
     CarriedItems carried_items;
+    WearedItems weared_items;
   };
 
   // Generate society

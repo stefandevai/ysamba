@@ -119,6 +119,8 @@ TODO:
 - bag_entity
   - item_component
     - id: bag_id
+  - wearable_component
+    - slots: [torso_slot_id]
   - storage_component
     - items: [hammer_entity, ...]
     - weight_capacity: 10kg

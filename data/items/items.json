@@ -70,5 +70,17 @@
                 "level": 1
             }
         ]
+    },
+    {
+        "id": 11,
+        "name": "bag",
+        "flags": ["PICKABLE", "WIELDABLE", "WEARABLE"],
+        "qualities": [
+            {
+                "name": "fire_starter",
+                "level": 1
+            }
+        ],
+        "weared_on": [4]
     }
 ]

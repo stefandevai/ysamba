@@ -2,16 +2,19 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/entity/registry.hpp>
 #include <libtcod.hpp>
 #include <nlohmann/json.hpp>
 #include <queue>
 #include <set>
 /* #include "./generators/terrain_generator.hpp" */
 #include "./generators/dummy_generator.hpp"
+#include "./item_factory.hpp"
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
 #include "core/game_context.hpp"
+#include "ecs/components/position.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/texture.hpp"
 
@@ -299,6 +302,16 @@ const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_da
 
 const ItemData& World::get_item_data(const uint32_t id) const { return m_item_data.at(id); }
 
+entt::entity World::create_item(
+    entt::registry& registry, const uint32_t id, const int x, const int y, const int z) const
+{
+  const auto item = item_factory::create(get_item_data(id), registry);
+
+  registry.emplace<Visibility>(item, get_texture_id(), id, "item", 1);
+  registry.emplace<Position>(item, x, y, z);
+  return item;
+}
+
 void World::m_load_tile_data()
 {
   const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
@@ -385,6 +398,11 @@ void World::m_load_item_data()
     {
       item_data.flags = item["flags"].get<std::unordered_set<std::string>>();
     }
+    if (item.contains("weared_on"))
+    {
+      item_data.weared_on = item["weared_on"].get<std::vector<uint32_t>>();
+    }
+
     m_item_data[item_data.id] = item_data;
   }
 }

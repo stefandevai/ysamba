@@ -169,6 +169,10 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       {
         m_actions.push_back({static_cast<uint32_t>(JobType::Pickup), "pickup"});
       }
+      if (item_data.flags.contains("WEARABLE") && m_selected_entities.size() == 1)
+      {
+        m_actions.push_back({static_cast<uint32_t>(JobType::Wear), "wear"});
+      }
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select([this, &registry, mouse_position, selected_entity](const uint32_t i) {

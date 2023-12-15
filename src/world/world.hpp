@@ -1,5 +1,6 @@
 #pragma once
 
+#include <entt/entity/entity.hpp>
 #include <map>
 #include <vector>
 
@@ -106,6 +107,9 @@ class World
 
   // Get information about an item with id
   [[nodiscard]] const ItemData& get_item_data(const uint32_t id) const;
+
+  // Create a item and add it to the world
+  entt::entity create_item(entt::registry& registry, const uint32_t id, const int x, const int y, const int z) const;
 
   template <class Archive>
   void serialize(Archive& archive)

@@ -15,6 +15,7 @@
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/society.hpp"
 #include "ecs/systems/walk.hpp"
+#include "ecs/systems/wear.hpp"
 #include "graphics/batch.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
@@ -65,6 +66,7 @@ class Gameplay : public Scene
   WalkSystem m_walk_system{m_world};
   JobSystem m_job_system{m_world};
   InventorySystem m_inventory_system{m_world, m_ui_manager};
+  WearSystem m_wear_system{m_world};
 
   bool m_update_input(GameContext& game_context);
 };
