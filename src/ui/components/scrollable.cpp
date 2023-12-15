@@ -31,6 +31,7 @@ void Scrollable::update()
     if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x &&
         mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
     {
+      assert(children.size() == 1 && "Updating scroll with a number of children different than 1");
       const auto& child = children[0];
       m_scroll_y += m_input_manager.get_scroll().y * 4;
 
@@ -69,6 +70,17 @@ void Scrollable::render([[maybe_unused]] Batch& batch)
   {
     child->render(m_batch);
   }
+}
+
+void Scrollable::reset_scroll()
+{
+  assert(children.size() == 1 && "Reseting scroll with a number of children different than 1");
+
+  const auto& child = children[0];
+
+  m_scroll_y = 0;
+  child->position.y = 0;
+  dirty = true;
 }
 
 }  // namespace dl::ui

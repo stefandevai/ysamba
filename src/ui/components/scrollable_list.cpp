@@ -33,4 +33,14 @@ void ScrollableList::set_on_select(const std::function<void(const uint32_t)>& on
   m_list->set_on_select(on_select);
 }
 
+void ScrollableList::reset_scroll()
+{
+  if (m_scrollable == nullptr)
+  {
+    return;
+  }
+
+  m_scrollable->reset_scroll();
+}
+
 }  // namespace dl::ui

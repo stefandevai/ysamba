@@ -19,6 +19,7 @@ class ScrollableList : public UIComponent
   void init();
   void set_items(const ItemList& items);
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
+  void reset_scroll();
 
  private:
   ButtonList* m_list = nullptr;

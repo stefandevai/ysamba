@@ -25,7 +25,6 @@ void ButtonList::m_create_buttons()
 
   children.clear();
   children.reserve(items_size);
-  spdlog::debug("CREATING BUTTONS {}", items_size);
 
   for (size_t i = 0; i < items_size; ++i)
   {
@@ -53,13 +52,6 @@ void ButtonList::m_create_buttons()
 
 void ButtonList::set_items(const ItemList& items)
 {
-  spdlog::debug("SETTING ITEMS");
-  for (auto& item : items)
-  {
-    spdlog::debug("{} {}", item.first, item.second);
-  }
-  spdlog::debug("");
-
   m_items = items;
   has_initialized = false;
 }

@@ -12,6 +12,7 @@ class Scrollable : public UIComponent
 
   void update();
   void render(Batch& batch);
+  void reset_scroll();
 
  private:
   Batch m_batch{"default", 99999};
