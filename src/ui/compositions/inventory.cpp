@@ -12,10 +12,11 @@ namespace dl::ui
 {
 const std::string test_text =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore "
-    "magna aliqua. \\[Ut\\] enim ad minim veniam, quis [b]nostrud[/b] [#53bfc5ff]exercitation[/#] ullamco laboris nisi "
+    "magna aliqua. \\[Ut] enim ad minim veniam, quis [b]nostrud[/b] [#53bfc5ff]exercitation[/#] ullamco laboris nisi "
     "ut aliquip ex ea commodo "
     "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. "
-    "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    "[#53bfc5]Excepteur sint occaecat[/#] cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id "
+    "est laborum.";
 
 Inventory::Inventory(UIContext& context, const std::function<void(const int i)>& on_select) : UIComponent(context)
 {

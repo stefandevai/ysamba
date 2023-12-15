@@ -8,6 +8,14 @@
 
 namespace dl
 {
+constexpr uint32_t unicode_space = 0x20;
+constexpr uint32_t unicode_new_line = 0x0A;
+constexpr uint32_t unicode_backslash = 0x5C;
+constexpr uint32_t unicode_bracket_left = 0x5B;
+constexpr uint32_t unicode_bracket_right = 0x5D;
+constexpr uint32_t unicode_slash = 0x2F;
+constexpr uint32_t unicode_hash = 0x23;
+
 Text::Text(const std::string_view text,
            const std::string_view typeface,
            const unsigned int font_size,
@@ -46,7 +54,7 @@ void Text::update()
     const float h = ch.bh * scale;
 
     // Skip if character is a space
-    if (*it == 0x20)
+    if (*it == unicode_space)
     {
       char_pos_x += (ch.ax >> 6) * scale;
       continue;
@@ -120,15 +128,21 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
     // Break to new line if width is bigger than wrap_width
     if (char_pos_x > wrap_width)
     {
-      auto last_element = characters.end() - 1;
-
-      while (last_element != last_word_index && last_element != characters.begin())
+      // Pop characters, get iterator back to the last word
+      while (true)
       {
-        characters.pop_back();
-        last_element = characters.end() - 1;
+        auto last_element = characters.end() - 1;
         --it;
+
+        if (last_element == last_word_index || last_element == characters.begin())
+        {
+          break;
+        }
+
+        characters.pop_back();
       }
 
+      // Set y position to the next line and reset x position
       char_pos_y += max_character_top * scale * line_height;
       char_pos_x = 0.f;
 
@@ -136,14 +150,14 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
     }
 
     // Skip if character is a space
-    if (*it == 0x20)
+    if (*it == unicode_space)
     {
       last_word_index = characters.end() - 1;
       char_pos_x += (ch.ax >> 6) * scale;
       continue;
     }
     // Character is a newline break "\n"
-    else if (*it == 0x0A)
+    else if (*it == unicode_new_line)
     {
       last_word_index = characters.end() - 1;
       char_pos_x = 0;
@@ -151,41 +165,15 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
       continue;
     }
     // Escape character "\"
-    else if (*it == 0x5C)
+    else if (*it == unicode_backslash)
     {
       ++it;
       ch = m_font->get_char_data(*it);
     }
     // Character is part of a command "["
-    else if (*it == 0x5B)
+    else if (*it == unicode_bracket_left)
     {
-      ++it;
-
-      const auto command = *it;
-
-      // Finish last command "/"
-      if (command == 0x2F)
-      {
-        ++it;
-        if (*it == 0x23)
-        {
-          character_color = color;
-        }
-      }
-
-      // Color command "#"
-      else if (command == 0x23)
-      {
-        const auto hex_color = std::string(it.string_iterator + 1, it.string_iterator + 9);
-        character_color = Color{std::move(hex_color)};
-      }
-
-      // Skip command characters
-      while (*it != 0x5D && it != value.end())
-      {
-        ++it;
-      }
-
+      m_process_command(it, character_color);
       continue;
     }
 
@@ -222,4 +210,44 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
   m_size.x = char_pos_x;
   m_size.y = char_pos_y;
 }
+
+void Text::m_process_command(UTF8Iterator& it, Color& character_color)
+{
+  ++it;
+
+  const auto command = *it;
+
+  switch (command)
+  {
+  // Character to finish last command
+  case unicode_slash:
+  {
+    ++it;
+
+    if (*it == unicode_hash)
+    {
+      character_color = color;
+    }
+    break;
+  }
+
+  // Color command
+  case unicode_hash:
+  {
+    const auto hex_color = std::string(it.string_iterator + 1, it.string_iterator + 7);
+    character_color = Color{std::move(hex_color)};
+    break;
+  }
+
+  default:
+    break;
+  }
+
+  // Skip command characters
+  while (*it != unicode_bracket_right && it != value.end())
+  {
+    ++it;
+  }
+}
+
 }  // namespace dl

@@ -10,6 +10,7 @@ namespace dl
 {
 class Font;
 class Sprite;
+class UTF8Iterator;
 
 struct Character
 {
@@ -62,5 +63,7 @@ class Text
   bool m_has_initialized = false;
   Vector2i m_size{0, 0};
   std::shared_ptr<Font> m_font = nullptr;
+
+  void m_process_command(UTF8Iterator& it, Color& character_color);
 };
 }  // namespace dl

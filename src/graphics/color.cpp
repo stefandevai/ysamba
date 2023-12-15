@@ -68,7 +68,7 @@ uint32_t Color::string_to_int(std::string_view color)
     std::stringstream ss;
     ss << std::hex << color;
     ss >> parsed_color;
-    parsed_color = (parsed_color << 2) & 0x000000FF;
+    parsed_color = (parsed_color << 8) | 0x000000FF;
   }
 
   return parsed_color;
