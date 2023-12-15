@@ -24,7 +24,7 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
   }
   FT_Set_Pixel_Sizes(m_face, 0, m_size);
 
-  unsigned int aw = 0, ah = 0;
+  unsigned int atlas_width = 0, atlas_height = 0;
   for (const auto& char_range : m_char_ranges)
   {
     for (char32_t c = char_range.first; c < char_range.second; c++)
@@ -34,17 +34,17 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
         spdlog::critical("Failed to load Glyph");
         continue;
       }
-      aw += m_face->glyph->bitmap.width;
-      ah = std::max(ah, m_face->glyph->bitmap.rows);
+      atlas_width += m_face->glyph->bitmap.width;
+      atlas_height = std::max(atlas_height, m_face->glyph->bitmap.rows);
     }
   }
 
-  m_atlas_width = aw;
-  m_atlas_height = ah;
+  m_atlas_width = atlas_width;
+  m_atlas_height = atlas_height;
 
-  m_texture_atlas = std::make_shared<Texture>(aw, ah, TextureType::DIFFUSE);
+  m_texture_atlas = std::make_shared<Texture>(atlas_width, atlas_height, TextureType::DIFFUSE);
 
-  int xoffset = 0;
+  int x_offset = 0;
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   m_texture_atlas->bind();
 
@@ -59,7 +59,7 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
       }
       glTexSubImage2D(GL_TEXTURE_2D,
                       0,
-                      xoffset,
+                      x_offset,
                       0,
                       m_face->glyph->bitmap.width,
                       m_face->glyph->bitmap.rows,
@@ -75,9 +75,9 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
                                m_face->glyph->bitmap.rows,
                                m_face->glyph->bitmap_left,
                                m_face->glyph->bitmap_top,
-                               (float)xoffset / m_atlas_width};
+                               (float)x_offset / m_atlas_width};
       m_chars.insert(std::pair<char32_t, CharacterData>(c, ch_data));
-      xoffset += m_face->glyph->bitmap.width;
+      x_offset += m_face->glyph->bitmap.width;
     }
   }
 
