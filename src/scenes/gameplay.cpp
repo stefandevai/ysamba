@@ -98,7 +98,7 @@ void Gameplay::update()
   m_inspector_system.update(m_registry, m_camera);
   m_inventory_system.update(m_registry);
 
-  m_ui_manager.update(delta);
+  m_ui_manager.update();
 
   if (delay <= 0.0)
   {
@@ -124,10 +124,10 @@ void Gameplay::render()
   m_render_system.render(m_registry, m_renderer, m_camera);
   m_renderer.pop_matrix("world"_hs);
 
-  auto batch = m_renderer.get_batch("world"_hs);
-  batch->nine_patch(nine_patch, 200, 200, 60);
+  /* auto batch = m_renderer.get_batch("world"_hs); */
+  /* batch->nine_patch(nine_patch, 200, 200, 60); */
 
-  m_ui_manager.render(m_renderer);
+  m_ui_manager.render();
 }
 
 void Gameplay::save_game() { serialization::save_game(m_world, m_registry); }

@@ -10,7 +10,7 @@ class Container;
 class DebugInfo : public UIComponent
 {
  public:
-  DebugInfo();
+  DebugInfo(UIContext& context);
 
   void set_content(const std::string& text);
 

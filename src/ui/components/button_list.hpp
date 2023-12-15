@@ -15,16 +15,17 @@ class ButtonList : public UIComponent
   Vector2i button_size = {25, 25};
   std::function<void(const uint32_t)> on_select;
 
-  ButtonList() = default;
+  ButtonList(UIContext& context);
+
+  void init();
 
   void set_items(const ItemList& items);
   void set_on_select(const std::function<void(const uint32_t)>& on_select);
 
-  void init();
-
  private:
   ItemList m_items;
-  std::vector<Button*> m_buttons;
+
+  void m_create_buttons();
 };
 
 }  // namespace dl::ui

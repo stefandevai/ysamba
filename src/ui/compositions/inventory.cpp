@@ -7,7 +7,7 @@
 
 namespace dl::ui
 {
-Inventory::Inventory(const std::function<void(const int i)>& on_select) : UIComponent()
+Inventory::Inventory(UIContext& context, const std::function<void(const int i)>& on_select) : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
   m_scrollable_list = emplace<ScrollableList>();

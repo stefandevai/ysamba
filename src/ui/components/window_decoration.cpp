@@ -5,14 +5,12 @@
 
 namespace dl::ui
 {
-WindowDecoration::WindowDecoration() : UIComponent(), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff})) {}
-
-WindowDecoration::WindowDecoration(const Vector2i& size, const uint32_t color)
-    : UIComponent(size), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
+WindowDecoration::WindowDecoration(UIContext& context)
+    : UIComponent(context), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff}))
 {
 }
 
-void WindowDecoration::render(Renderer& renderer, Batch& batch)
+void WindowDecoration::render(Batch& batch)
 {
   if (state == State::Hidden)
   {
@@ -28,7 +26,7 @@ void WindowDecoration::render(Renderer& renderer, Batch& batch)
 
   for (auto& child : children)
   {
-    child->render(renderer, batch);
+    child->render(batch);
   }
 }
 

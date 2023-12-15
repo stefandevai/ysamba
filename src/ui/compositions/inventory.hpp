@@ -10,7 +10,7 @@ class ScrollableList;
 class Inventory : public UIComponent
 {
  public:
-  Inventory(const std::function<void(const int i)>& on_select);
+  Inventory(UIContext& context, const std::function<void(const int i)>& on_select);
 
   void set_items(const ItemList& items);
 

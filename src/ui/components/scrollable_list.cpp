@@ -5,12 +5,13 @@
 #include "./button_list.hpp"
 #include "./container.hpp"
 #include "./scrollable.hpp"
+#include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
 
 namespace dl::ui
 {
-ScrollableList::ScrollableList()
+ScrollableList::ScrollableList(UIContext& context) : UIComponent(context)
 {
   m_container = emplace<Container>();
   m_scrollable = m_container->emplace<Scrollable>();
@@ -23,7 +24,6 @@ void ScrollableList::init()
   m_container->set_color(color);
   m_scrollable->size = size;
   m_list->button_size = Vector2i{size.x, 32};
-  m_has_initialized = true;
 }
 
 void ScrollableList::set_items(const ItemList& items) { m_list->set_items(items); }

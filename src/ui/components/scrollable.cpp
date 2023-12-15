@@ -10,16 +10,15 @@
 
 namespace dl::ui
 {
-Scrollable::Scrollable() : UIComponent()
+Scrollable::Scrollable(UIContext& context) : UIComponent(context)
 {
   m_batch.has_depth = false;
   m_batch.has_scissor = true;
+  m_context.renderer->add_batch(&m_batch);
 }
 
-void Scrollable::update(const double delta)
+void Scrollable::update()
 {
-  (void)delta;
-
   if (children.empty())
   {
     return;
@@ -56,31 +55,19 @@ void Scrollable::update(const double delta)
   }
 }
 
-void Scrollable::render(Renderer& renderer, [[maybe_unused]] Batch& batch)
+void Scrollable::render([[maybe_unused]] Batch& batch)
 {
   if (state == UIComponent::State::Hidden)
   {
     return;
   }
 
-  if (!m_added_batch)
-  {
-    renderer.add_batch(&m_batch);
-    m_added_batch = true;
-  }
-
-  // TODO: Don't use hardcoded layers, impement draw calls objects
-  // https://realtimecollisiondetection.net/blog/?p=86
-  // https://www.reddit.com/r/opengl/comments/8xzigy/architecture_for_an_opengl_renderer/
-  // https://nlguillemot.wordpress.com/2016/11/18/opengl-renderer-design/
-  // https://gamedev.stackexchange.com/questions/182241/opengl-rendering-pipeline
-  // https://github.com/htmlboss/OpenGL-Renderer/tree/master
   const auto& window_size = Display::get_window_size();
   m_batch.add_scissor({absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
 
   for (auto& child : children)
   {
-    child->render(renderer, m_batch);
+    child->render(m_batch);
   }
 }
 

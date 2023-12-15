@@ -15,10 +15,9 @@ class WindowDecoration : public UIComponent
  public:
   std::unique_ptr<Quad> quad = nullptr;
 
-  WindowDecoration();
-  WindowDecoration(const Vector2i& size, const uint32_t color);
+  WindowDecoration(UIContext& context);
 
-  void render(Renderer& renderer, Batch& batch);
+  void render(Batch& batch);
 
   void set_size(const Vector2i& size);
   void set_color(const uint32_t color);

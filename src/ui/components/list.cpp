@@ -10,7 +10,7 @@
 
 namespace dl::ui
 {
-List::List(const std::vector<std::string>& items) : UIComponent(), m_items(items) {}
+List::List(UIContext& context, const std::vector<std::string>& items) : UIComponent(context), m_items(items) {}
 
 void List::init()
 {

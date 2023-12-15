@@ -9,12 +9,12 @@ class Label : public UIComponent
 {
  public:
   Text text;
-  Label();
-  Label(const std::string_view value);
+  Label(UIContext& context);
+  Label(UIContext& context, const std::string_view value);
 
   void set_text(const std::string_view value);
 
-  void render(Renderer& renderer, Batch& batch);
+  void render(Batch& batch);
 
  private:
 };

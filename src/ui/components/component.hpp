@@ -8,11 +8,13 @@
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
+#include "ui/context.hpp"
 
 namespace dl
 {
 class Batch;
 class Renderer;
+class AssetManager;
 }  // namespace dl
 
 namespace dl::ui
@@ -49,6 +51,7 @@ class UIComponent
     Animating,
   };
 
+  bool has_initialized = false;
   bool dirty = true;
   State state = State::Visible;
   Vector3i position;
@@ -57,20 +60,19 @@ class UIComponent
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
-  entt::registry* animator = nullptr;
   entt::entity animations = entt::null;
   double opacity = 1.0;
 
   UIComponent* parent = nullptr;
   std::vector<std::unique_ptr<UIComponent>> children;
 
-  UIComponent(const Vector2i& size = {0, 0});
+  UIComponent(UIContext& context) : m_context(context) {}
   virtual ~UIComponent() {}
 
   virtual void init() {}
-  virtual void update_geometry([[maybe_unused]] std::vector<glm::mat4>& matrix_stack) {}
-  virtual void update([[maybe_unused]] const double delta) {}
-  virtual void render(Renderer& renderer, Batch& batch);
+  virtual void update_geometry() {}
+  virtual void update() {}
+  virtual void render(Batch& batch);
   virtual void show();
   virtual void hide();
 
@@ -80,16 +82,9 @@ class UIComponent
   template <typename T, typename... Args>
   T* emplace(Args&&... args)
   {
-    auto component = std::make_unique<T>(std::forward<Args>(args)...);
+    auto component = std::make_unique<T>(m_context, std::forward<Args>(args)...);
     component->parent = this;
-
-    if (animator != nullptr)
-    {
-      component->animator = animator;
-    }
-
     children.push_back(std::move(component));
-
     return dynamic_cast<T*>(&(*children.back()));
   }
 
@@ -104,15 +99,13 @@ class UIComponent
   template <typename T, typename... Args>
   void animate(Args&&... args)
   {
-    assert(animator != nullptr && "Animation registry was not initialized when animating component");
-
-    if (!animator->valid(animations))
+    if (!m_context.animator->valid(animations))
     {
-      animations = animator->create();
-      animator->emplace<AnimationTarget>(animations, this);
+      animations = m_context.animator->create();
+      m_context.animator->emplace<AnimationTarget>(animations, this);
     }
 
-    animator->emplace<T>(animations, std::forward<Args>(args)...);
+    m_context.animator->emplace<T>(animations, std::forward<Args>(args)...);
 
     if (state != State::Animating)
     {
@@ -121,13 +114,13 @@ class UIComponent
   }
 
  protected:
+  UIContext& m_context;
   static InputManager& m_input_manager;
   glm::mat4 m_transform_matrix{};
-  bool m_has_initialized = false;
 
-  void m_set_animator(entt::registry* animator);
-  void m_update(const double delta, std::vector<glm::mat4>& matrix_stack);
-  void m_update_geometry(std::vector<glm::mat4>& matrix_stack);
+  void m_init();
+  void m_update();
+  void m_update_geometry();
   bool m_is_positioned();
 };
 

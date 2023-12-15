@@ -5,14 +5,17 @@
 
 namespace dl::ui
 {
-Container::Container() : UIComponent(), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff})) {}
-
-Container::Container(const Vector2i& size, const uint32_t color)
-    : UIComponent(size), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
+Container::Container(UIContext& context) : UIComponent(context), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff}))
 {
 }
 
-void Container::render(Renderer& renderer, Batch& batch)
+Container::Container(UIContext& context, const Vector2i& size, const uint32_t color)
+    : UIComponent(context), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
+{
+  this->size = size;
+}
+
+void Container::render(Batch& batch)
 {
   if (state == State::Hidden)
   {
@@ -28,7 +31,7 @@ void Container::render(Renderer& renderer, Batch& batch)
 
   for (auto& child : children)
   {
-    child->render(renderer, batch);
+    child->render(batch);
   }
 }
 

@@ -4,11 +4,11 @@
 
 namespace dl::ui
 {
-Label::Label() : UIComponent(), text(Text()) {}
+Label::Label(UIContext& context) : UIComponent(context), text(Text()) {}
 
-Label::Label(const std::string_view value) : UIComponent(), text(Text(value)) {}
+Label::Label(UIContext& context, const std::string_view value) : UIComponent(context), text(Text(value)) {}
 
-void Label::render([[maybe_unused]] Renderer& renderer, Batch& batch)
+void Label::render(Batch& batch)
 {
   if (state == State::Hidden)
   {

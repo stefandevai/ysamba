@@ -34,7 +34,7 @@ void AssetManager::add(const std::string& id, const std::string& filepath, Args.
   }
 
   auto asset_loader = std::make_unique<T>(m_base_dir / filepath, args...);
-  std::weak_ptr<Asset> asset_ptr;
+  std::shared_ptr<Asset> asset_ptr = nullptr;
   /* assert (asset_loader != nullptr); */
   /* assert (asset_ptr != nullptr); */
   m_assets.emplace(id, std::make_pair(std::move(asset_ptr), std::move(asset_loader)));

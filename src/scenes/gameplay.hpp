@@ -50,7 +50,7 @@ class Gameplay : public Scene
 
   entt::registry m_registry;
   World m_world{m_game_context};
-  ui::UIManager m_ui_manager{};
+  ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer};
   InputManager& m_input_manager = InputManager::get_instance();
   State m_current_state = State::PAUSED;
   ui::DebugInfo* m_debug_info = nullptr;

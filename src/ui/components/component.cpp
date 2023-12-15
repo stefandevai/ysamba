@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "graphics/renderer.hpp"
 
@@ -12,17 +13,24 @@ namespace dl::ui
 {
 InputManager& UIComponent::m_input_manager = InputManager::get_instance();
 
-UIComponent::UIComponent(const Vector2i& size) : size(size) {}
-
-void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
+void UIComponent::m_init()
 {
-  if (!m_has_initialized)
+  init();
+
+  for (const auto& child : children)
   {
-    init();
-    m_has_initialized = true;
-    dirty = true;
+    if (!child->has_initialized)
+    {
+      child->m_init();
+    }
   }
 
+  has_initialized = true;
+  dirty = true;
+}
+
+void UIComponent::m_update_geometry()
+{
   if (state == State::Hidden)
   {
     return;
@@ -31,7 +39,7 @@ void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
   if (dirty)
   {
     const auto& window_size = Display::get_window_size();
-    const auto& matrix = matrix_stack.back();
+    const auto& matrix = m_context.matrix_stack->back();
 
     glm::vec3 transformed_position{position.x, position.y, position.z};
 
@@ -63,38 +71,43 @@ void UIComponent::m_update_geometry(std::vector<glm::mat4>& matrix_stack)
   }
 }
 
-void UIComponent::m_update(const double delta, std::vector<glm::mat4>& matrix_stack)
+void UIComponent::m_update()
 {
-  m_update_geometry(matrix_stack);
+  if (!has_initialized)
+  {
+    m_init();
+  }
+
+  m_update_geometry();
 
   if (m_is_positioned())
   {
-    matrix_stack.push_back(m_transform_matrix);
+    m_context.matrix_stack->push_back(m_transform_matrix);
   }
 
-  update_geometry(matrix_stack);
+  update_geometry();
 
   if (state == State::Visible)
   {
-    update(delta);
+    update();
   }
 
   for (const auto& child : children)
   {
     child->dirty = dirty;
     child->opacity = opacity;
-    child->m_update(delta, matrix_stack);
+    child->m_update();
   }
 
   if (m_is_positioned())
   {
-    matrix_stack.pop_back();
+    m_context.matrix_stack->pop_back();
   }
 
   dirty = false;
 }
 
-void UIComponent::render(Renderer& renderer, Batch& batch)
+void UIComponent::render(Batch& batch)
 {
   if (state == State::Hidden)
   {
@@ -103,25 +116,13 @@ void UIComponent::render(Renderer& renderer, Batch& batch)
 
   for (const auto& child : children)
   {
-    child->render(renderer, batch);
+    child->render(batch);
   }
 }
 
 void UIComponent::show() { state = State::Visible; }
 
 void UIComponent::hide() { state = State::Hidden; }
-
-void UIComponent::m_set_animator(entt::registry* animator)
-{
-  assert(animator != nullptr && "Trying to set a null animator");
-
-  this->animator = animator;
-
-  for (auto& child : children)
-  {
-    child->m_set_animator(animator);
-  }
-}
 
 void UIComponent::propagate_state()
 {

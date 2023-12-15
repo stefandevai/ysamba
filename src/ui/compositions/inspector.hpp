@@ -10,7 +10,7 @@ class Container;
 class Inspector : public UIComponent
 {
  public:
-  Inspector();
+  Inspector(UIContext& context);
 
   void set_content(const std::string& text);
 

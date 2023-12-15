@@ -7,8 +7,9 @@
 
 namespace dl::ui
 {
-DebugInfo::DebugInfo() : UIComponent({200, 100})
+DebugInfo::DebugInfo(UIContext& context) : UIComponent(context)
 {
+  size = {200, 100};
   position = {30, 30, 0};
 
   m_container = emplace<Container>(size, 0x1b2420aa);

@@ -4,22 +4,26 @@
 
 #include "./components/container.hpp"
 #include "./components/label.hpp"
+#include "core/asset_manager.hpp"
 #include "graphics/batch.hpp"
 #include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
-UIManager::UIManager()
+UIManager::UIManager(AssetManager* asset_manager, Renderer* renderer)
+    : m_asset_manager(asset_manager), m_renderer(renderer)
 {
   m_batch.has_depth = false;
   m_matrix_stack.push_back(glm::mat4(1));
+  m_renderer->add_batch(&m_batch);
 }
 
 UIManager::~UIManager() { m_matrix_stack.clear(); }
 
-void UIManager::update(const double delta)
+void UIManager::update()
 {
-  m_animation_manager.update(delta);
+  m_clock.tick();
+  m_animation_manager.update(m_clock.delta);
 
   for (auto& component : m_components)
   {
@@ -28,18 +32,12 @@ void UIManager::update(const double delta)
       continue;
     }
 
-    component->m_update(delta, m_matrix_stack);
+    component->m_update();
   }
 }
 
-void UIManager::render(Renderer& renderer)
+void UIManager::render()
 {
-  if (!m_added_batch)
-  {
-    renderer.add_batch(&m_batch);
-    m_added_batch = true;
-  }
-
   for (auto& component : m_components)
   {
     if (component->state == UIComponent::State::Hidden)
@@ -47,7 +45,7 @@ void UIManager::render(Renderer& renderer)
       continue;
     }
 
-    component->render(renderer, m_batch);
+    component->render(m_batch);
   }
 }
 

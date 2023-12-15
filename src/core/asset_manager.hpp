@@ -12,7 +12,7 @@
 
 namespace dl
 {
-using AssetPair = std::pair<std::weak_ptr<Asset>, std::unique_ptr<AssetLoader>>;
+using AssetPair = std::pair<std::shared_ptr<Asset>, std::unique_ptr<AssetLoader>>;
 using AssetMap = std::unordered_map<std::string, AssetPair>;
 
 class AssetManager
@@ -28,30 +28,25 @@ class AssetManager
   template <typename T>
   static std::shared_ptr<T> get(const std::string& id)
   {
-    std::shared_ptr<T> asset_value = nullptr;
-
-    try
+    if (!m_assets.contains(id))
     {
-      auto& asset_pair = m_assets.at(id);
-      auto& asset_ptr = asset_pair.first;
-
-      if (asset_ptr.expired())
-      {
-        asset_value = std::dynamic_pointer_cast<T>(asset_pair.second->construct());
-        asset_ptr = asset_value;
-      }
-      else
-      {
-        asset_value = std::dynamic_pointer_cast<T>(asset_ptr.lock());
-      }
-      assert(asset_value != nullptr && "Template type must be an Asset type");
-    }
-    catch (std::out_of_range& e)
-    {
-      // TODO: Add default asset to return
-      spdlog::warn("There's no asset with ID {}.\n{}", id, e.what());
+      spdlog::warn("There's no asset with ID {}.\n{}", id);
       return nullptr;
     }
+
+    auto& asset_pair = m_assets.at(id);
+    auto& asset_ptr = asset_pair.first;
+
+    if (asset_ptr != nullptr)
+    {
+      return std::dynamic_pointer_cast<T>(asset_ptr);
+    }
+
+    std::shared_ptr<T> asset_value = std::dynamic_pointer_cast<T>(asset_pair.second->construct());
+
+    assert(asset_value != nullptr && "Asset construction failed");
+
+    asset_ptr = asset_value;
 
     return asset_value;
   }

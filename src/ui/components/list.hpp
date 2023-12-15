@@ -11,7 +11,7 @@ class List : public UIComponent
   int line_spacing = 5;
   Vector2i margin = {15, 15};
 
-  List(const std::vector<std::string>& items);
+  List(UIContext& context, const std::vector<std::string>& items);
 
   void init();
 

@@ -7,8 +7,9 @@
 
 namespace dl::ui
 {
-Inspector::Inspector() : UIComponent({300, 100})
+Inspector::Inspector(UIContext& context) : UIComponent(context)
 {
+  size = {300, 100};
   state = UIComponent::State::Hidden;
   position = {30, 30, 0};
 

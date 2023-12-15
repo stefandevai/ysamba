@@ -16,10 +16,10 @@ class Button : public UIComponent
   XAlignement label_x_alignment = XAlignement::Center;
   YAlignement label_y_alignment = YAlignement::Center;
 
-  Button();
+  Button(UIContext& context);
 
   void init();
-  void update(const double delta);
+  void update();
 
  private:
   Label* m_label = nullptr;

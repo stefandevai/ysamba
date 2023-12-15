@@ -8,14 +8,13 @@ namespace dl::ui
 class Scrollable : public UIComponent
 {
  public:
-  Scrollable();
+  Scrollable(UIContext& context);
 
-  void update(const double delta);
-  void render(Renderer& renderer, Batch& batch);
+  void update();
+  void render(Batch& batch);
 
  private:
   Batch m_batch{"default", 99999};
-  bool m_added_batch = false;
   int m_scroll_y = 0;
 };
 

@@ -4,11 +4,12 @@
 
 #include "./container.hpp"
 #include "./label.hpp"
+#include "core/asset_manager.hpp"
 #include "graphics/batch.hpp"
 
 namespace dl::ui
 {
-Button::Button() : UIComponent()
+Button::Button(UIContext& context) : UIComponent(context)
 {
   m_container = emplace<Container>();
   m_label = m_container->emplace<Label>();
@@ -23,10 +24,8 @@ void Button::init()
   m_label->y_alignment = label_y_alignment;
 }
 
-void Button::update(const double delta)
+void Button::update()
 {
-  (void)delta;
-
   if (!on_click)
   {
     return;
