@@ -13,16 +13,12 @@ namespace dl::ui
 {
 ScrollableList::ScrollableList(UIContext& context) : UIComponent(context)
 {
-  m_container = emplace<WindowFrame>();
-  m_scrollable = m_container->emplace<Scrollable>();
+  m_scrollable = emplace<Scrollable>();
   m_list = m_scrollable->emplace<ButtonList>();
 }
 
 void ScrollableList::init()
 {
-  m_container->size = size;
-  /* m_container->set_size(size); */
-  /* m_container->set_color(color); */
   m_scrollable->size = size;
   m_list->button_size = Vector2i{size.x, 32};
 }

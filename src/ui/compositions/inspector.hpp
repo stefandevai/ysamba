@@ -13,6 +13,8 @@ class Inspector : public UIComponent
   Inspector(UIContext& context);
 
   void set_content(const std::string& text);
+  void show();
+  void hide();
 
  private:
   WindowFrame* m_window_frame = nullptr;

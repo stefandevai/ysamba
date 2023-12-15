@@ -6,6 +6,7 @@
 namespace dl::ui
 {
 class ScrollableList;
+class WindowFrame;
 
 class ActionMenu : public UIComponent
 {
@@ -18,6 +19,7 @@ class ActionMenu : public UIComponent
 
  private:
   ScrollableList* m_scrollable_list = nullptr;
+  WindowFrame* m_window_frame = nullptr;
 };
 
 }  // namespace dl::ui

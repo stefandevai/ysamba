@@ -5,6 +5,7 @@
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/scrollable_list.hpp"
+#include "ui/components/window_frame.hpp"
 
 namespace dl::ui
 {
@@ -12,10 +13,15 @@ ActionMenu::ActionMenu(UIContext& context, const ItemList& items, const std::fun
     : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
-  m_scrollable_list = emplace<ScrollableList>();
-  m_scrollable_list->size = Vector2i{200, 300};
-  m_scrollable_list->x_alignment = XAlignement::Center;
-  m_scrollable_list->y_alignment = YAlignement::Center;
+
+  m_window_frame = emplace<WindowFrame>();
+  m_window_frame->size = Vector2i{200, 300};
+  m_window_frame->x_alignment = XAlignement::Center;
+  m_window_frame->y_alignment = YAlignement::Center;
+
+  m_scrollable_list = m_window_frame->emplace<ScrollableList>();
+  m_scrollable_list->size = Vector2i{152, 252};
+  m_scrollable_list->position = Vector3i{24, 24, 0};
   m_scrollable_list->set_on_select(on_select);
 
   if (items.size() > 0)
