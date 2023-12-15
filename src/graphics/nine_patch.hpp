@@ -2,6 +2,7 @@
 
 #include <glm/vec2.hpp>
 
+#include "./color.hpp"
 #include "./sprite.hpp"
 #include "./texture.hpp"
 
@@ -33,6 +34,9 @@ struct NinePatch
 
   // Flag to trigger patche (re)generation
   bool dirty = true;
+
+  // Color overlay
+  Color color{0xFFFFFFFF};
 
   NinePatch() = default;
   NinePatch(const std::string& resource_id) : resource_id(resource_id) {}

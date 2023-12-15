@@ -389,6 +389,15 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
   {
     nine_patch.generate_patches();
   }
+  if (nine_patch.color.opacity_factor != nine_patch.center_patch.color.opacity_factor)
+  {
+    nine_patch.center_patch.color.opacity_factor = nine_patch.color.opacity_factor;
+
+    for (auto& patch : nine_patch.border_patches)
+    {
+      patch.color.opacity_factor = nine_patch.color.opacity_factor;
+    }
+  }
 
   // Top left patch
   emplace(&nine_patch.border_patches[0], x, y, z);

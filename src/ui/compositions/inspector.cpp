@@ -2,21 +2,22 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
+#include "ui/components/window_frame.hpp"
 
 namespace dl::ui
 {
 Inspector::Inspector(UIContext& context) : UIComponent(context)
 {
-  size = {300, 100};
   state = UIComponent::State::Hidden;
+  size = {250, 100};
   position = {30, 30, 0};
 
-  m_container = emplace<Container>(size, 0x1b2420aa);
+  m_window_frame = emplace<WindowFrame>();
+  m_window_frame->size = size;
 
-  m_label = m_container->emplace<Label>("");
-  m_label->position = {15, 15, 0};
+  m_label = m_window_frame->emplace<Label>("");
+  m_label->position = {20, 20, 0};
 
   placement = Placement::Absolute;
   x_alignment = XAlignement::Right;

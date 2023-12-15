@@ -7,7 +7,7 @@ namespace dl::ui
 {
 class ButtonList;
 class Scrollable;
-class Container;
+class WindowFrame;
 
 class ScrollableList : public UIComponent
 {
@@ -24,7 +24,7 @@ class ScrollableList : public UIComponent
  private:
   ButtonList* m_list = nullptr;
   Scrollable* m_scrollable = nullptr;
-  Container* m_container = nullptr;
+  WindowFrame* m_container = nullptr;
   std::function<void(const uint32_t i)> m_on_select;
   ItemList m_items;
 };

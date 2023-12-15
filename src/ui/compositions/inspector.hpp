@@ -5,7 +5,7 @@
 namespace dl::ui
 {
 class Label;
-class Container;
+class WindowFrame;
 
 class Inspector : public UIComponent
 {
@@ -15,8 +15,8 @@ class Inspector : public UIComponent
   void set_content(const std::string& text);
 
  private:
-  Container* m_container;
-  Label* m_label;
+  WindowFrame* m_window_frame = nullptr;
+  Label* m_label = nullptr;
 };
 
 }  // namespace dl::ui

@@ -3,8 +3,8 @@
 #include <spdlog/spdlog.h>
 
 #include "./button_list.hpp"
-#include "./container.hpp"
 #include "./scrollable.hpp"
+#include "./window_frame.hpp"
 #include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
@@ -13,15 +13,16 @@ namespace dl::ui
 {
 ScrollableList::ScrollableList(UIContext& context) : UIComponent(context)
 {
-  m_container = emplace<Container>();
+  m_container = emplace<WindowFrame>();
   m_scrollable = m_container->emplace<Scrollable>();
   m_list = m_scrollable->emplace<ButtonList>();
 }
 
 void ScrollableList::init()
 {
-  m_container->set_size(size);
-  m_container->set_color(color);
+  m_container->size = size;
+  /* m_container->set_size(size); */
+  /* m_container->set_color(color); */
   m_scrollable->size = size;
   m_list->button_size = Vector2i{size.x, 32};
 }
