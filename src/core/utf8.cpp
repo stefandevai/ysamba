@@ -4,7 +4,7 @@ namespace dl
 {
 UTF8Iterator& UTF8Iterator::operator=(const UTF8Iterator& rhs)
 {
-  m_string_iterator = rhs.m_string_iterator;
+  string_iterator = rhs.string_iterator;
   return *this;
 }
 
@@ -25,7 +25,7 @@ char32_t UTF8Iterator::operator*()
 UTF8Iterator& UTF8Iterator::operator++()
 {
   m_dirty = true;
-  m_string_iterator += m_get_code_point_size();
+  string_iterator += m_get_code_point_size();
   return *this;
 }
 
@@ -41,19 +41,19 @@ UTF8Iterator& UTF8Iterator::operator--()
 {
   m_dirty = true;
 
-  --m_string_iterator;
+  --string_iterator;
 
-  if (*m_string_iterator & m_first_bit_mask)
+  if (*string_iterator & m_first_bit_mask)
   {
-    --m_string_iterator;
+    --string_iterator;
 
-    if ((*m_string_iterator & m_second_bit_mask) == 0)
+    if ((*string_iterator & m_second_bit_mask) == 0)
     {
-      --m_string_iterator;
+      --string_iterator;
 
-      if ((*m_string_iterator & m_third_bit_mask) == 0)
+      if ((*string_iterator & m_third_bit_mask) == 0)
       {
-        --m_string_iterator;
+        --string_iterator;
       }
     }
   }
@@ -70,7 +70,7 @@ UTF8Iterator UTF8Iterator::operator--(int)
 
 uint8_t UTF8Iterator::m_get_code_point() const
 {
-  char8_t first_byte = *m_string_iterator;
+  char8_t first_byte = *string_iterator;
   char32_t code_point = first_byte;
 
   const auto size = m_get_code_point_size();
@@ -80,27 +80,27 @@ uint8_t UTF8Iterator::m_get_code_point() const
   case 2:
   {
     code_point = (first_byte & 0x1f) << 0x6;
-    const char8_t second_byte = *(m_string_iterator + 1);
+    const char8_t second_byte = *(string_iterator + 1);
     code_point += (second_byte & 0x3f);
     break;
   }
   case 3:
   {
     code_point = (first_byte & 0x0f) << 0xC;
-    const char8_t second_byte = *(m_string_iterator + 1);
+    const char8_t second_byte = *(string_iterator + 1);
     code_point += (second_byte & 0x3f) << 0x6;
-    const char8_t third_byte = *(m_string_iterator + 2);
+    const char8_t third_byte = *(string_iterator + 2);
     code_point += (third_byte & 0x3f);
     break;
   }
   case 4:
   {
     code_point = (first_byte & 0x07) << 0x12;
-    const char8_t second_byte = *(m_string_iterator + 1);
+    const char8_t second_byte = *(string_iterator + 1);
     code_point += (second_byte & 0x3F) << 0xC;
-    const char8_t third_byte = *(m_string_iterator + 2);
+    const char8_t third_byte = *(string_iterator + 2);
     code_point += (third_byte & 0x3F) << 0x6;
-    const char8_t fourth_byte = *(m_string_iterator + 3);
+    const char8_t fourth_byte = *(string_iterator + 3);
     code_point += (fourth_byte & 0x3F);
   }
   break;
@@ -114,7 +114,7 @@ uint8_t UTF8Iterator::m_get_code_point() const
 uint8_t UTF8Iterator::m_get_code_point_size() const
 {
   uint8_t size = 1;
-  char8_t first_byte = *m_string_iterator;
+  char8_t first_byte = *string_iterator;
 
   if (first_byte & m_first_bit_mask)
   {

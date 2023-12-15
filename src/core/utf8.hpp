@@ -15,11 +15,13 @@ class UTF8Iterator
   using pointer = const char32_t*;
   using reference = const char32_t&;
 
-  UTF8Iterator(std::string::const_iterator it) : m_string_iterator(it) {}
+  std::string::const_iterator string_iterator;
 
-  UTF8Iterator(std::string::iterator it) : m_string_iterator(it) {}
+  UTF8Iterator(std::string::const_iterator it) : string_iterator(it) {}
 
-  UTF8Iterator(const UTF8Iterator& other) : m_string_iterator(other.m_string_iterator) {}
+  UTF8Iterator(std::string::iterator it) : string_iterator(it) {}
+
+  UTF8Iterator(const UTF8Iterator& other) : string_iterator(other.string_iterator) {}
 
   UTF8Iterator& operator=(const UTF8Iterator& rhs);
 
@@ -33,20 +35,19 @@ class UTF8Iterator
 
   UTF8Iterator operator--(int);
 
-  bool operator==(const UTF8Iterator& rhs) const { return m_string_iterator == rhs.m_string_iterator; }
+  bool operator==(const UTF8Iterator& rhs) const { return string_iterator == rhs.string_iterator; }
 
-  bool operator!=(const UTF8Iterator& rhs) const { return m_string_iterator != rhs.m_string_iterator; }
+  bool operator!=(const UTF8Iterator& rhs) const { return string_iterator != rhs.string_iterator; }
 
-  bool operator==(std::string::iterator rhs) const { return m_string_iterator == rhs; }
+  bool operator==(std::string::iterator rhs) const { return string_iterator == rhs; }
 
-  bool operator==(std::string::const_iterator rhs) const { return m_string_iterator == rhs; }
+  bool operator==(std::string::const_iterator rhs) const { return string_iterator == rhs; }
 
-  bool operator!=(std::string::iterator rhs) const { return m_string_iterator != rhs; }
+  bool operator!=(std::string::iterator rhs) const { return string_iterator != rhs; }
 
-  bool operator!=(std::string::const_iterator rhs) const { return m_string_iterator != rhs; }
+  bool operator!=(std::string::const_iterator rhs) const { return string_iterator != rhs; }
 
  private:
-  std::string::const_iterator m_string_iterator;
   static constexpr uint8_t m_first_bit_mask = 0x80;
   static constexpr uint8_t m_second_bit_mask = 0x40;
   static constexpr uint8_t m_third_bit_mask = 0x20;

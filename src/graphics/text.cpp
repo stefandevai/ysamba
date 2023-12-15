@@ -156,7 +156,7 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
       ++it;
       ch = m_font->get_char_data(*it);
     }
-    // Character is part of a modifier "["
+    // Character is part of a command "["
     else if (*it == 0x5B)
     {
       ++it;
@@ -176,7 +176,8 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
       // Color command "#"
       else if (command == 0x23)
       {
-        character_color = Color{0xFF0000FF};
+        const auto hex_color = std::string(it.string_iterator + 1, it.string_iterator + 9);
+        character_color = Color{std::move(hex_color)};
       }
 
       // Skip command characters
