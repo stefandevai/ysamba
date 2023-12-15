@@ -147,6 +147,13 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
       char_pos_x += (ch.ax >> 6) * scale;
       continue;
     }
+    else if (*it == 0x0a)
+    {
+      last_word_index = characters.end() - 1;
+      char_pos_x = 0;
+      char_pos_y += max_character_top * scale * line_height;
+      continue;
+    }
 
     const float x = char_pos_x + ch.bl * scale;
     const float y = char_pos_y + (max_character_top - ch.bt) * scale;
