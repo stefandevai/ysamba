@@ -370,10 +370,10 @@ void Batch::text(Text& text, const double x, const double y, const double z)
     {
       continue;
     }
-    if (character.sprite->color.int_color != text.color.int_color)
-    {
-      character.sprite->color.set(text.color.int_color);
-    }
+    /* if (character.sprite->color.int_color != text.color.int_color) */
+    /* { */
+    /*   character.sprite->color.set(text.color.int_color); */
+    /* } */
     if (character.sprite->color.opacity_factor != text.color.opacity_factor)
     {
       character.sprite->color.opacity_factor = text.color.opacity_factor;

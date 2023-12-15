@@ -111,6 +111,7 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
   const auto max_character_top = m_font->get_max_character_top();
 
   auto last_word_index = characters.begin();
+  Color character_color = color;
 
   for (UTF8Iterator it = value.begin(); it != value.end(); ++it)
   {
@@ -131,13 +132,7 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
       char_pos_y += max_character_top * scale * line_height;
       char_pos_x = 0.f;
 
-      // Skip if character is a space without aggregating to the total width
-      if (*it == 0x20)
-      {
-        continue;
-      }
-
-      ch = m_font->get_char_data(*it);
+      continue;
     }
 
     // Skip if character is a space
@@ -147,11 +142,49 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
       char_pos_x += (ch.ax >> 6) * scale;
       continue;
     }
-    else if (*it == 0x0a)
+    // Character is a newline break "\n"
+    else if (*it == 0x0A)
     {
       last_word_index = characters.end() - 1;
       char_pos_x = 0;
       char_pos_y += max_character_top * scale * line_height;
+      continue;
+    }
+    // Escape character "\"
+    else if (*it == 0x5C)
+    {
+      ++it;
+      ch = m_font->get_char_data(*it);
+    }
+    // Character is part of a modifier "["
+    else if (*it == 0x5B)
+    {
+      ++it;
+
+      const auto command = *it;
+
+      // Finish last command "/"
+      if (command == 0x2F)
+      {
+        ++it;
+        if (*it == 0x23)
+        {
+          character_color = color;
+        }
+      }
+
+      // Color command "#"
+      else if (command == 0x23)
+      {
+        character_color = Color{0xFF0000FF};
+      }
+
+      // Skip command characters
+      while (*it != 0x5D && it != value.end())
+      {
+        ++it;
+      }
+
       continue;
     }
 
@@ -166,7 +199,7 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
     character.sprite = std::make_unique<Sprite>(typeface);
     character.sprite->texture = m_font->get_atlas();
     character.sprite->set_custom_uv(ch.bh, ch.tx, ch.bw, ch.bh);
-    character.sprite->color = color;
+    character.sprite->color = character_color;
 
     if (m_font_size != m_font->get_size())
     {

@@ -11,8 +11,9 @@
 namespace dl::ui
 {
 const std::string test_text =
-    "Lorem\nipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore "
-    "magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore "
+    "magna aliqua. \\[Ut\\] enim ad minim veniam, quis [b]nostrud[/b] [#ff000000]exercitation[/#] ullamco laboris nisi "
+    "ut aliquip ex ea commodo "
     "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. "
     "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
@@ -25,7 +26,8 @@ Inventory::Inventory(UIContext& context, const std::function<void(const int i)>&
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_window_frame->emplace<Label>(test_text);
+  auto label = m_window_frame->emplace<Label>(test_text);
+  label->margin = Vector2i{20, 20};
 
   /* m_scrollable_list = m_window_frame->emplace<ScrollableList>(); */
   /* m_scrollable_list->size = Vector2i{452, 352}; */

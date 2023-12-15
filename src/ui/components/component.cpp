@@ -41,27 +41,27 @@ void UIComponent::m_update_geometry()
     const auto& window_size = Display::get_window_size();
     const auto& matrix = m_context.matrix_stack->back();
 
-    glm::vec3 transformed_position{position.x, position.y, position.z};
+    glm::vec3 transformed_position{position.x + margin.x, position.y + margin.y, position.z};
 
     if (x_alignment == XAlignement::Right)
     {
       const int anchor_w = (parent == nullptr || parent->size.x == 0) ? window_size.x : parent->size.x;
-      transformed_position.x = anchor_w - size.x - position.x;
+      transformed_position.x = anchor_w - size.x - position.x - margin.x;
     }
     else if (x_alignment == XAlignement::Center)
     {
       const int anchor_w = (parent == nullptr || parent->size.x == 0) ? window_size.x : parent->size.x;
-      transformed_position.x = anchor_w / 2 - size.x / 2 + position.x;
+      transformed_position.x = anchor_w / 2 - size.x / 2 + position.x + margin.x;
     }
     if (y_alignment == YAlignement::Bottom)
     {
       const int anchor_h = (parent == nullptr || parent->size.y == 0) ? window_size.y : parent->size.y;
-      transformed_position.y = anchor_h - size.y - position.y;
+      transformed_position.y = anchor_h - size.y - position.y - margin.y;
     }
     else if (y_alignment == YAlignement::Center)
     {
       const int anchor_h = (parent == nullptr || parent->size.y == 0) ? window_size.y : parent->size.y;
-      transformed_position.y = anchor_h / 2 - size.y / 2 + position.y;
+      transformed_position.y = anchor_h / 2 - size.y / 2 + position.y + margin.y;
     }
     m_transform_matrix =
         glm::translate(matrix, glm::vec3(transformed_position.x, transformed_position.y, transformed_position.z));

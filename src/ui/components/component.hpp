@@ -54,9 +54,10 @@ class UIComponent
   bool has_initialized = false;
   bool dirty = true;
   State state = State::Visible;
-  Vector3i position;
-  Vector3i absolute_position;
-  Vector2i size;
+  Vector3i position{};
+  Vector3i absolute_position{};
+  Vector2i size{};
+  Vector2i margin{};
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
