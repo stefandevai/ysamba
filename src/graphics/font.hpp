@@ -27,9 +27,9 @@ class Font : public Asset
 {
  public:
   Font(const std::string& path, std::size_t size = 16);
-  inline CharacterData get_char_data(char32_t c)
+  const CharacterData& get_char_data(char32_t c) const
   {
-    return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars[c] : m_empty_char_data);
+    return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
   };
   inline std::shared_ptr<Texture> get_atlas() const { return m_texture_atlas; };
   inline size_t get_size() const { return m_size; };

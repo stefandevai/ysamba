@@ -16,10 +16,11 @@ DebugInfo::DebugInfo(UIContext& context) : UIComponent(context)
 
   m_label = m_container->emplace<Label>("FPS: ");
   m_label->position = {15, 15, 0};
+  m_label->wrap = false;
 
   placement = Placement::Absolute;
 }
 
-void DebugInfo::set_content(const std::string& text) { m_label->text.set_text(text); }
+void DebugInfo::set_content(const std::string_view text) { m_label->set_text(text); }
 
 }  // namespace dl::ui

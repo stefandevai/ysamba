@@ -12,7 +12,7 @@ class DebugInfo : public UIComponent
  public:
   DebugInfo(UIContext& context);
 
-  void set_content(const std::string& text);
+  void set_content(const std::string_view text);
 
  private:
   Container* m_container;

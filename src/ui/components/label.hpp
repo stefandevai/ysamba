@@ -9,14 +9,18 @@ class Label : public UIComponent
 {
  public:
   Text text;
+  bool wrap = true;
+
   Label(UIContext& context);
   Label(UIContext& context, const std::string_view value);
 
-  void set_text(const std::string_view value);
-
+  void init();
   void render(Batch& batch);
 
+  void set_text(const std::string_view value);
+
  private:
+  std::string m_value;
 };
 
 }  // namespace dl::ui

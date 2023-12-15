@@ -28,6 +28,7 @@ class Text
   std::string typeface = "font-1980";
   std::vector<Character> characters{};
   Color color{0xFFFFFFFF};
+  double line_height = 1.2;
 
   Text(const std::string_view text,
        const std::string_view typeface = "font-1980",
@@ -50,6 +51,7 @@ class Text
   Vector2i get_size() const { return m_size; }
 
   void set_text(const std::string_view text);
+  void set_text_wrapped(const std::string_view text, const int wrap_width);
   void set_typeface(const std::string_view typeface);
   void set_font_size(const size_t font_size) { m_font_size = font_size; }
   void set_is_static(const bool is_static) { m_is_static = is_static; }

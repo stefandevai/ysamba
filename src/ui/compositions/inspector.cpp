@@ -27,7 +27,7 @@ Inspector::Inspector(UIContext& context) : UIComponent(context)
 void Inspector::set_content(const std::string& text)
 {
   dirty = true;
-  m_label->text.set_text(text);
+  m_label->set_text(text);
 }
 
 void Inspector::show() { animate<AnimationFadeIn>(0.3, Easing::OutQuart); }
