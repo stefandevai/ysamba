@@ -12,5 +12,6 @@ enum class JobType
   PrepareFirecamp,
   StartFire,
   Wear,
+  Wield,
 };
 }

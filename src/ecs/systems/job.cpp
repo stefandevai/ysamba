@@ -5,6 +5,7 @@
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/action_wear.hpp"
+#include "ecs/components/action_wield.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
@@ -44,6 +45,9 @@ void JobSystem::update(entt::registry& registry, const double delta)
         break;
       case JobType::Wear:
         registry.emplace<ActionWear>(entity, &current_job);
+        break;
+      case JobType::Wield:
+        registry.emplace<ActionWield>(entity, &current_job);
         break;
       default:
         m_create_or_assign_job_progress(current_job, registry);

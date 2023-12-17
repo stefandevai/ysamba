@@ -9,6 +9,7 @@
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/visibility.hpp"
 #include "ecs/components/weared_items.hpp"
+#include "ecs/components/wielded_items.hpp"
 
 namespace dl
 {
@@ -26,6 +27,7 @@ class SocietyGenerator
     Visibility visibility;
     CarriedItems carried_items;
     WearedItems weared_items;
+    WieldedItems wielded_items;
   };
 
   // Generate society

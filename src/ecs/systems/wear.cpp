@@ -53,6 +53,7 @@ void WearSystem::update(entt::registry& registry)
       if (std::find(body_parts.begin(), body_parts.end(), body_part) == body_parts.end())
       {
         has_all_body_parts = false;
+        break;
       }
     }
 
@@ -63,6 +64,11 @@ void WearSystem::update(entt::registry& registry)
 
       auto& weared_items = registry.get<WearedItems>(entity);
       weared_items.items.push_back(item);
+    }
+    else
+    {
+      // TODO: Handle when agent doesn't have the necessary body parts
+      spdlog::warn("Agent doesn't have the body parts to wear '{}'", item_data.name);
     }
 
     stop_wear(registry, entity, job);
