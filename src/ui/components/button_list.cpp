@@ -26,6 +26,8 @@ void ButtonList<T>::init()
 template <typename T>
 void ButtonList<T>::m_create_buttons()
 {
+  children.clear();
+
   if (m_items.empty())
   {
     return;
@@ -33,7 +35,6 @@ void ButtonList<T>::m_create_buttons()
 
   const auto items_size = m_items.size();
 
-  children.clear();
   children.reserve(items_size);
 
   for (size_t i = 0; i < items_size; ++i)
@@ -65,6 +66,7 @@ void ButtonList<T>::set_items(const ItemList<T>& items)
 {
   m_items = items;
   has_initialized = false;
+  dirty = true;
 }
 
 template <typename T>
@@ -72,6 +74,7 @@ void ButtonList<T>::set_on_select(const std::function<void(const T)>& on_select)
 {
   this->on_select = on_select;
   has_initialized = false;
+  dirty = true;
 }
 
 // Explicit instantiation of use cases

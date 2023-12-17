@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "ecs/components/action_drop.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/action_wear.hpp"
@@ -48,6 +49,9 @@ void JobSystem::update(entt::registry& registry, const double delta)
         break;
       case JobType::Wield:
         registry.emplace<ActionWield>(entity, &current_job);
+        break;
+      case JobType::Drop:
+        registry.emplace<ActionDrop>(entity, &current_job);
         break;
       default:
         m_create_or_assign_job_progress(current_job, registry);

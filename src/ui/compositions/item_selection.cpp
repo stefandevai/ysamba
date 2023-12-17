@@ -10,7 +10,7 @@
 
 namespace dl::ui
 {
-ItemSelection::ItemSelection(UIContext& context, const std::function<void(const int i)>& on_select)
+ItemSelection::ItemSelection(UIContext& context, const std::function<void(const EntityPair&)>& on_select)
     : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
@@ -20,14 +20,14 @@ ItemSelection::ItemSelection(UIContext& context, const std::function<void(const 
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_items = m_window_frame->emplace<ScrollableList<uint32_t>>();
+  m_items = m_window_frame->emplace<ScrollableList<EntityPair>>();
   m_items->title = "Select Item";
   m_items->size = Vector2i{252, 352};
   m_items->position = Vector3i{24, 24, 0};
   m_items->set_on_select(on_select);
 }
 
-void ItemSelection::set_items(const ItemList<uint32_t>& items)
+void ItemSelection::set_items(const ItemList<EntityPair>& items)
 {
   m_items->set_items(items);
   dirty = true;

@@ -37,9 +37,11 @@ class DropSystem
   ui::UIManager& m_ui_manager;
 
   static const ui::ItemList<uint32_t> m_menu_items;
-  ui::ItemList<uint32_t> m_items{};
+  ui::ItemList<std::pair<entt::entity, entt::entity>> m_items{};
   ui::ItemSelection* m_drop_menu = nullptr;
   ui::Label* m_select_target_label = nullptr;
+  entt::entity m_selected_entity = entt::null;
+  entt::entity m_target_item = entt::null;
 
   DropMenuState m_state = DropMenuState::Closed;
   InputManager& m_input_manager = InputManager::get_instance();

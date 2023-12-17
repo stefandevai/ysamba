@@ -13,5 +13,6 @@ enum class JobType
   StartFire,
   Wear,
   Wield,
+  Drop,
 };
 }

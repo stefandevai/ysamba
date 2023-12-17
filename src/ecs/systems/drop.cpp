@@ -4,16 +4,16 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "ecs/components/action_drop.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/visibility.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/text.hpp"
 #include "ui/components/label.hpp"
 #include "ui/compositions/item_selection.hpp"
 #include "ui/ui_manager.hpp"
@@ -21,9 +21,18 @@
 
 namespace dl
 {
+const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+  registry.remove<ActionDrop>(entity);
+  job->status = JobStatus::Finished;
+};
+
 DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  const auto on_select = [this](const uint32_t entity) { m_state = DropMenuState::SelectingTarget; };
+  const auto on_select = [this](const ui::EntityPair entities) {
+    m_selected_entity = entities.first;
+    m_target_item = entities.second;
+    m_state = DropMenuState::SelectingTarget;
+  };
 
   m_drop_menu = m_ui_manager.emplace<ui::ItemSelection>(std::move(on_select));
 
@@ -35,6 +44,75 @@ DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world)
 
 void DropSystem::update(entt::registry& registry, const Camera& camera)
 {
+  auto view = registry.view<ActionDrop>();
+
+  for (const auto entity : view)
+  {
+    auto& action_drop = registry.get<ActionDrop>(entity);
+    const auto& job = action_drop.job;
+    const auto& target = job->target;
+    const entt::entity item = static_cast<entt::entity>(target.id);
+
+    if (!registry.valid(item))
+    {
+      stop_drop(registry, entity, job);
+      continue;
+    }
+
+    auto& wielded = registry.get<WieldedItems>(entity);
+    auto& weared = registry.get<WearedItems>(entity);
+    auto& carried = registry.get<CarriedItems>(entity);
+
+    bool removed = false;
+
+    if (wielded.left_hand == item)
+    {
+      wielded.left_hand = entt::null;
+      removed = true;
+    }
+    else if (wielded.right_hand == item)
+    {
+      wielded.right_hand = entt::null;
+      removed = true;
+    }
+
+    if (!removed)
+    {
+      for (auto it = carried.items.begin(); it != carried.items.end(); ++it)
+      {
+        if (*it == item)
+        {
+          carried.items.erase(it);
+          removed = true;
+          break;
+        }
+      }
+    }
+
+    if (!removed)
+    {
+      for (auto it = weared.items.begin(); it != weared.items.end(); ++it)
+      {
+        if (*it == item)
+        {
+          weared.items.erase(it);
+          removed = true;
+          break;
+        }
+      }
+    }
+
+    // Only update item components if we were able to find the item in the agent inventory
+    if (removed)
+    {
+      auto& item_component = registry.get<Item>(item);
+      registry.emplace<Position>(item, target.position.x, target.position.y, target.position.z);
+      registry.emplace<Visibility>(item, m_world.get_texture_id(), item_component.id, "item", 1);
+    }
+
+    stop_drop(registry, entity, job);
+  }
+
   if (m_state == DropMenuState::Open)
   {
     m_update_drop_menu();
@@ -43,7 +121,7 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
   {
     m_update_closed_menu(registry, camera);
   }
-  else
+  else if (m_state == DropMenuState::SelectingTarget)
   {
     m_update_selecting_target(registry, camera);
   }
@@ -105,13 +183,13 @@ void DropSystem::m_update_closed_menu(entt::registry& registry, const Camera& ca
         {
           const auto& item_component = registry.get<Item>(left_hand);
           const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({static_cast<uint32_t>(left_hand), item.name});
+          m_items.push_back({{entity, left_hand}, item.name});
         }
         if (registry.valid(right_hand) && right_hand != left_hand)
         {
           const auto& item_component = registry.get<Item>(right_hand);
           const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({static_cast<uint32_t>(right_hand), item.name});
+          m_items.push_back({{entity, right_hand}, item.name});
         }
       }
       if (registry.all_of<WearedItems>(entity))
@@ -122,7 +200,7 @@ void DropSystem::m_update_closed_menu(entt::registry& registry, const Camera& ca
         {
           const auto& item_component = registry.get<Item>(item_entity);
           const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({static_cast<uint32_t>(item_entity), item.name});
+          m_items.push_back({{entity, item_entity}, item.name});
         }
       }
       if (registry.all_of<CarriedItems>(entity))
@@ -133,7 +211,7 @@ void DropSystem::m_update_closed_menu(entt::registry& registry, const Camera& ca
         {
           const auto& item_component = registry.get<Item>(item_entity);
           const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({static_cast<uint32_t>(item_entity), item.name});
+          m_items.push_back({{entity, item_entity}, item.name});
         }
       }
     }
@@ -148,6 +226,12 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
 {
   using namespace entt::literals;
 
+  if (!registry.valid(m_selected_entity) || !registry.valid(m_target_item))
+  {
+    m_dispose();
+    return;
+  }
+
   m_close_drop_menu();
   m_show_select_target_text();
 
@@ -157,11 +241,6 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    /* if (!registry.valid(agent_entity) || !registry.valid(item_entity)) */
-    /* { */
-    /*   return; */
-    /* } */
-
     const auto& mouse_position = m_input_manager.get_mouse_position();
     const auto& camera_position = camera.get_position();
     const auto& tile_size = camera.get_tile_size();
@@ -170,18 +249,11 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
     tile_position.x = (mouse_position.x + camera_position.x) / tile_size.x;
     tile_position.y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-    /* auto& agent = registry.get<SocietyAgent>(entity); */
-    /* agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{position.x, position.y, 0}}}); */
-    /* agent.jobs.push(Job{job_type, 2, Target{Vector3i{position.x, position.y, 0}, id}}); */
+    auto& agent = registry.get<SocietyAgent>(m_selected_entity);
+    agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
+    agent.jobs.push(Job{
+        JobType::Drop, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, static_cast<uint32_t>(m_target_item)}});
 
-    /* switch (m_state) */
-    /* { */
-    /* default: */
-    /* { */
-    /*   m_dispose(); */
-    /*   break; */
-    /* } */
-    /* } */
     m_dispose();
   }
 }
@@ -228,6 +300,8 @@ void DropSystem::m_dispose()
   m_close_select_target();
 
   m_state = DropMenuState::Closed;
+  m_target_item = entt::null;
+  m_selected_entity = entt::null;
   m_input_manager.pop_context();
 }
 
