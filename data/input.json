@@ -25,6 +25,7 @@
         "open_action_menu": ["k_a"],
         "open_inventory": ["k_i"],
         "inspect": ["k_x"],
+        "drop_item": ["k_d"],
         "add_item": ["k_z"]
     },
     "action_menu": {
@@ -32,6 +33,9 @@
         "harvest": ["k_h"],
         "break": ["k_b"],
         "dig": ["k_d"]
+    },
+    "item_selection_menu": {
+        "close_menu": ["k_escape"]
     },
     "inventory": {
         "close_inventory": ["k_escape"]

@@ -38,8 +38,8 @@ class ActionSystem
   World& m_world;
   ui::UIManager& m_ui_manager;
 
-  static const ui::ItemList m_menu_items;
-  ui::ItemList m_actions{};
+  static const ui::ItemList<uint32_t> m_menu_items;
+  ui::ItemList<uint32_t> m_actions{};
   ui::ActionMenu* m_action_menu = nullptr;
   ui::Label* m_select_target_label = nullptr;
 

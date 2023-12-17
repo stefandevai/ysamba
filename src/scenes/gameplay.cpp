@@ -89,6 +89,7 @@ void Gameplay::update()
   m_wield_system.update(m_registry);
   m_inspector_system.update(m_registry, m_camera);
   m_inventory_system.update(m_registry);
+  m_drop_system.update(m_registry, m_camera);
 
   m_ui_manager.update();
 

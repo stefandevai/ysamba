@@ -20,7 +20,7 @@
 
 namespace dl
 {
-const ui::ItemList ActionSystem::m_menu_items = {
+const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
     {0, "Harvest"}, {1, "Break"}, {2, "Dig"},
     /* {0, "Harvest"}, */
     /* {1, "Break"}, */

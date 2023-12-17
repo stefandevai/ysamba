@@ -2,5 +2,6 @@
 
 namespace dl::ui
 {
-using ItemList = std::vector<std::pair<uint32_t, std::string>>;
+template <typename T = uint32_t>
+using ItemList = std::vector<std::pair<T, std::string>>;
 }

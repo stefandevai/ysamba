@@ -9,7 +9,9 @@
 
 namespace dl::ui
 {
-ActionMenu::ActionMenu(UIContext& context, const ItemList& items, const std::function<void(const uint32_t)>& on_select)
+ActionMenu::ActionMenu(UIContext& context,
+                       const ItemList<uint32_t>& items,
+                       const std::function<void(const uint32_t)>& on_select)
     : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
@@ -19,7 +21,7 @@ ActionMenu::ActionMenu(UIContext& context, const ItemList& items, const std::fun
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_scrollable_list = m_window_frame->emplace<ScrollableList>();
+  m_scrollable_list = m_window_frame->emplace<ScrollableList<uint32_t>>();
   m_scrollable_list->size = Vector2i{152, 252};
   m_scrollable_list->position = Vector3i{24, 24, 0};
   m_scrollable_list->set_on_select(on_select);
@@ -30,7 +32,7 @@ ActionMenu::ActionMenu(UIContext& context, const ItemList& items, const std::fun
   }
 }
 
-void ActionMenu::set_actions(const ItemList& actions)
+void ActionMenu::set_actions(const ItemList<uint32_t>& actions)
 {
   dirty = true;
   m_scrollable_list->set_items(actions);

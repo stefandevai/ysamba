@@ -6,6 +6,7 @@
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
 #include "ecs/systems/action.hpp"
+#include "ecs/systems/drop.hpp"
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/inspector.hpp"
 #include "ecs/systems/inventory.hpp"
@@ -69,6 +70,7 @@ class Gameplay : public Scene
   InventorySystem m_inventory_system{m_world, m_ui_manager};
   WearSystem m_wear_system{m_world};
   WieldSystem m_wield_system{m_world};
+  DropSystem m_drop_system{m_world, m_ui_manager};
 
   bool m_update_input(GameContext& game_context);
 };

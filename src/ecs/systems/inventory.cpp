@@ -8,6 +8,8 @@
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
+#include "ecs/components/weared_items.hpp"
+#include "ecs/components/wielded_items.hpp"
 #include "ui/compositions/inventory.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
@@ -70,10 +72,12 @@ void InventorySystem::m_open_inventory(entt::registry& registry)
 
   if (m_inventory->state == ui::UIComponent::State::Hidden)
   {
-    m_item_names.clear();
-    m_item_names.reserve(m_items.size());
+    m_weared_items_names.clear();
+    m_weared_items_names.reserve(m_weared_items.size());
+    m_carried_items_names.clear();
+    m_carried_items_names.reserve(m_carried_items.size());
 
-    for (const auto entity : m_items)
+    for (const auto entity : m_weared_items)
     {
       if (!registry.all_of<Item>(entity))
       {
@@ -82,10 +86,23 @@ void InventorySystem::m_open_inventory(entt::registry& registry)
 
       const auto& item = registry.get<Item>(entity);
       const auto& item_data = m_world.get_item_data(item.id);
-      m_item_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+      m_weared_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
     }
 
-    m_inventory->set_items(m_item_names);
+    for (const auto entity : m_carried_items)
+    {
+      if (!registry.all_of<Item>(entity))
+      {
+        continue;
+      }
+
+      const auto& item = registry.get<Item>(entity);
+      const auto& item_data = m_world.get_item_data(item.id);
+      m_carried_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+    }
+
+    m_inventory->set_weared_items(m_weared_items_names);
+    m_inventory->set_carried_items(m_carried_items_names);
     m_inventory->show();
   }
 }
@@ -101,7 +118,8 @@ void InventorySystem::m_dispose()
 
 void InventorySystem::m_update_items(entt::registry& registry)
 {
-  m_items.clear();
+  m_carried_items.clear();
+  m_weared_items.clear();
   std::vector<entt::entity> selected_entities{};
   auto view = registry.view<Selectable>();
 
@@ -121,14 +139,31 @@ void InventorySystem::m_update_items(entt::registry& registry)
   {
     for (const auto entity : selected_entities)
     {
-      if (!registry.all_of<CarriedItems>(entity))
+      if (registry.all_of<WieldedItems>(entity))
       {
-        continue;
+        const auto& items = registry.get<WieldedItems>(entity);
+        const auto left_hand = items.left_hand;
+        const auto right_hand = items.right_hand;
+
+        if (registry.valid(left_hand))
+        {
+          m_weared_items.push_back(left_hand);
+        }
+        if (registry.valid(right_hand) && right_hand != left_hand)
+        {
+          m_weared_items.push_back(right_hand);
+        }
       }
-
-      const auto& items = registry.get<CarriedItems>(entity);
-
-      m_items.insert(m_items.begin(), items.items.begin(), items.items.end());
+      if (registry.all_of<WearedItems>(entity))
+      {
+        const auto& items = registry.get<WearedItems>(entity);
+        m_weared_items.insert(m_weared_items.end(), items.items.begin(), items.items.end());
+      }
+      if (registry.all_of<CarriedItems>(entity))
+      {
+        const auto& items = registry.get<CarriedItems>(entity);
+        m_carried_items.insert(m_carried_items.begin(), items.items.begin(), items.items.end());
+      }
     }
     return;
   }

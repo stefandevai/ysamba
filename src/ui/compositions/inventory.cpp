@@ -19,23 +19,32 @@ Inventory::Inventory(UIContext& context, const std::function<void(const int i)>&
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_scrollable_list = m_window_frame->emplace<ScrollableList>();
-  m_scrollable_list->size = Vector2i{452, 352};
-  m_scrollable_list->position = Vector3i{24, 24, 0};
-  m_scrollable_list->set_on_select(on_select);
+  m_weared_items = m_window_frame->emplace<ScrollableList<uint32_t>>();
+  m_weared_items->title = "Weared Items";
+  m_weared_items->size = Vector2i{452, 352};
+  m_weared_items->position = Vector3i{24, 24, 0};
+  m_weared_items->set_on_select(on_select);
+
+  m_carried_items = m_window_frame->emplace<ScrollableList<uint32_t>>();
+  m_carried_items->title = "Carried Items";
+  m_carried_items->size = Vector2i{452, 352};
+  m_carried_items->position = Vector3i{224, 24, 0};
+  m_carried_items->set_on_select(on_select);
 }
 
-void Inventory::set_items(const ItemList& items)
+void Inventory::set_weared_items(const ItemList<uint32_t>& items)
 {
-  m_scrollable_list->set_items(items);
+  m_weared_items->set_items(items);
   dirty = true;
 }
 
-void Inventory::show()
+void Inventory::set_carried_items(const ItemList<uint32_t>& items)
 {
-  m_scrollable_list->reset_scroll();
-  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+  m_carried_items->set_items(items);
+  dirty = true;
 }
+
+void Inventory::show() { animate<AnimationFadeIn>(0.3, Easing::OutQuart); }
 
 void Inventory::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
 

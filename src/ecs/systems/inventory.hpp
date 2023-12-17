@@ -32,8 +32,10 @@ class InventorySystem
 
   World& m_world;
   ui::UIManager& m_ui_manager;
-  std::vector<entt::entity> m_items{};
-  ui::ItemList m_item_names{};
+  std::vector<entt::entity> m_carried_items{};
+  std::vector<entt::entity> m_weared_items{};
+  ui::ItemList<uint32_t> m_carried_items_names{};
+  ui::ItemList<uint32_t> m_weared_items_names{};
   ui::Inventory* m_inventory = nullptr;
   InventoryState m_state = InventoryState::Closed;
   InputManager& m_input_manager = InputManager::get_instance();

@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/entity/entity.hpp>
+
 #include "./button.hpp"
 #include "./container.hpp"
 #include "core/asset_manager.hpp"
@@ -10,11 +12,19 @@
 
 namespace dl::ui
 {
-ButtonList::ButtonList(UIContext& context) : UIComponent(context) {}
+template <typename T>
+ButtonList<T>::ButtonList(UIContext& context) : UIComponent(context)
+{
+}
 
-void ButtonList::init() { m_create_buttons(); }
+template <typename T>
+void ButtonList<T>::init()
+{
+  m_create_buttons();
+}
 
-void ButtonList::m_create_buttons()
+template <typename T>
+void ButtonList<T>::m_create_buttons()
 {
   if (m_items.empty())
   {
@@ -50,16 +60,22 @@ void ButtonList::m_create_buttons()
   size = {button_size.x, height};
 }
 
-void ButtonList::set_items(const ItemList& items)
+template <typename T>
+void ButtonList<T>::set_items(const ItemList<T>& items)
 {
   m_items = items;
   has_initialized = false;
 }
 
-void ButtonList::set_on_select(const std::function<void(const uint32_t)>& on_select)
+template <typename T>
+void ButtonList<T>::set_on_select(const std::function<void(const T)>& on_select)
 {
   this->on_select = on_select;
   has_initialized = false;
 }
 
+// Explicit instantiation of use cases
+template class ButtonList<uint32_t>;
+template class ButtonList<entt::entity>;
+template class ButtonList<std::pair<entt::entity, entt::entity>>;
 }  // namespace dl::ui

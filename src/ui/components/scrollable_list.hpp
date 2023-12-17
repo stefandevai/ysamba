@@ -5,27 +5,32 @@
 
 namespace dl::ui
 {
+template <class T>
 class ButtonList;
 class Scrollable;
 class WindowFrame;
+class Label;
 
+template <class T = uint32_t>
 class ScrollableList : public UIComponent
 {
  public:
   uint32_t color = 0x1b2420aa;
+  std::string title{};
 
   ScrollableList(UIContext& context);
 
   void init();
-  void set_items(const ItemList& items);
-  void set_on_select(const std::function<void(const uint32_t)>& on_select);
+  void set_items(const ItemList<T>& items);
+  void set_on_select(const std::function<void(const T)>& on_select);
   void reset_scroll();
 
  private:
-  ButtonList* m_list = nullptr;
+  ButtonList<T>* m_list = nullptr;
   Scrollable* m_scrollable = nullptr;
-  std::function<void(const uint32_t i)> m_on_select;
-  ItemList m_items;
+  Label* m_title_label = nullptr;
+  std::function<void(const T i)> m_on_select;
+  ItemList<T> m_items;
 };
 
 }  // namespace dl::ui
