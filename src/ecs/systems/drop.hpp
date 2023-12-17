@@ -48,7 +48,7 @@ class DropSystem
 
   void m_update_drop_menu();
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);
-  void m_update_closed_menu(entt::registry& registry, const Camera& camera);
+  void m_update_closed_menu(entt::registry& registry);
   void m_show_select_target_text();
   void m_open_drop_menu();
   void m_close_drop_menu();

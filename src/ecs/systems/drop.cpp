@@ -119,7 +119,7 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
   }
   else if (m_state == DropMenuState::Closed)
   {
-    m_update_closed_menu(registry, camera);
+    m_update_closed_menu(registry);
   }
   else if (m_state == DropMenuState::SelectingTarget)
   {
@@ -139,7 +139,7 @@ void DropSystem::m_update_drop_menu()
   }
 }
 
-void DropSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
+void DropSystem::m_update_closed_menu(entt::registry& registry)
 {
   using namespace entt::literals;
 
