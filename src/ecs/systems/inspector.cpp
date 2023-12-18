@@ -108,7 +108,8 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
     }
 
     const auto& item_data = m_world.get_item_data(item.id);
-    m_inspector->set_content(item_data.name);
+    m_inspector->set_content(item_data.name + "\nWeight: " + item_data.weight_string +
+                             "\nVolume: " + item_data.volume_string);
   }
 }
 

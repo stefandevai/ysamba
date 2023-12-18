@@ -1,0 +1,14 @@
+[
+    {
+        "id": 0,
+        "name": "any"
+    },
+    {
+        "id": 1,
+        "name": "solids"
+    },
+    {
+        "id": 2,
+        "name": "liquids"
+    }
+]

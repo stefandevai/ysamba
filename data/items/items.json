@@ -1,41 +1,57 @@
 [
     {
         "id": 0,
-        "name": ""
+        "name": "",
+        "weight": "0g",
+        "volume": "0L"
     },
     {
         "id": 1,
         "flags": ["PICKABLE", "WIELDABLE"],
-        "name": "yuca roots"
+        "name": "yuca roots",
+        "weight": "200g",
+        "volume": "2L"
     },
     {
         "id": 2,
         "flags": ["PICKABLE"],
-        "name": "some yuca flour"
+        "name": "some yuca flour",
+        "weight": "500g",
+        "volume": "1L"
     },
     {
         "id": 3,
         "flags": ["PICKABLE"],
-        "name": "a lot of yuca flour"
+        "name": "a lot of yuca flour",
+        "weight": "1kg",
+        "volume": "2L"
     },
     {
         "id": 4,
         "flags": ["PICKABLE", "WIELDABLE"],
-        "name": "mushrooms"
+        "name": "mushrooms",
+        "weight": "100g",
+        "volume": "700ml"
     },
     {
         "id": 5,
         "flags": ["PICKABLE", "WIELDABLE"],
-        "name": "crushed rocks"
+        "name": "crushed rocks",
+        "weight": "100g",
+        "volume": "700ml"
     },
     {
         "id": 6,
         "flags": ["PICKABLE"],
-        "name": "dirt"
+        "name": "dirt",
+        "weight": "1kg",
+        "volume": "1L"
     },
     {
         "id": 7,
         "name": "stone hammer",
+        "weight": "1.5kg",
+        "volume": "2L",
         "flags": ["PICKABLE", "WIELDABLE"],
         "qualities": [
             {
@@ -47,6 +63,8 @@
     {
         "id": 8,
         "name": "wooden shovel",
+        "weight": "1kg",
+        "volume": "2L",
         "flags": ["PICKABLE", "WIELDABLE"],
         "qualities": [
             {
@@ -58,11 +76,15 @@
     {
         "id": 9,
         "name": "thin wooden sticks",
+        "weight": "80g",
+        "volume": "400ml",
         "flags": ["PICKABLE", "WIELDABLE", "FLAMMABLE"]
     },
     {
         "id": 10,
         "name": "improvised fire kit",
+        "weight": "800g",
+        "volume": "1L",
         "flags": ["PICKABLE", "WIELDABLE"],
         "qualities": [
             {
@@ -74,13 +96,14 @@
     {
         "id": 11,
         "name": "bag",
-        "flags": ["PICKABLE", "WIELDABLE", "WEARABLE"],
-        "qualities": [
-            {
-                "name": "fire_starter",
-                "level": 1
-            }
-        ],
+        "flags": ["PICKABLE", "WIELDABLE", "WEARABLE", "CONTAINER"],
+        "weight": "300g",
+        "volume": "100ml",
+        "container": {
+          "materials": [1],
+          "weight_capacity": "20kg",
+          "volume_capacity": "3L"
+        },
         "weared_on": [4]
     }
 ]

@@ -387,6 +387,17 @@ void World::m_load_item_data()
 
     item_data.id = item["id"].get<uint32_t>();
     item_data.name = item["name"].get<std::string>();
+
+    const std::string& weight_string = item["weight"].get<std::string>();
+    const double weight = item_factory::parse_weight(weight_string);
+    item_data.weight = weight;
+    item_data.weight_string = std::move(weight_string);
+
+    const std::string& volume_string = item["volume"].get<std::string>();
+    const double volume = item_factory::parse_volume(volume_string);
+    item_data.volume = volume;
+    item_data.volume_string = std::move(volume_string);
+
     if (item.contains("qualities"))
     {
       for (const auto& quality : item["qualities"])
@@ -401,6 +412,14 @@ void World::m_load_item_data()
     if (item.contains("weared_on"))
     {
       item_data.weared_on = item["weared_on"].get<std::vector<uint32_t>>();
+    }
+    if (item.contains("container"))
+    {
+      item_data.container.materials = item["container"]["materials"].get<std::vector<uint32_t>>();
+      item_data.container.weight_capacity =
+          item_factory::parse_weight(item["container"]["weight_capacity"].get<std::string>());
+      item_data.container.volume_capacity =
+          item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
     }
 
     m_item_data[item_data.id] = item_data;

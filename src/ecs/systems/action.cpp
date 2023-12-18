@@ -11,6 +11,7 @@
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/systems/pickup.hpp"
 #include "graphics/camera.hpp"
 #include "ui/components/label.hpp"
 #include "ui/compositions/action_menu.hpp"
@@ -164,7 +165,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       const auto& item_data = m_world.get_item_data(item.id);
       m_actions.clear();
 
-      if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1)
+      if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1 &&
+          PickupSystem::can_pickup(registry, m_selected_entities[0], item_data))
       {
         m_actions.push_back({static_cast<uint32_t>(JobType::Pickup), "pickup"});
       }
