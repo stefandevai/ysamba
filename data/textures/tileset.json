@@ -173,7 +173,7 @@
     {
         "type": "item",
         "tile_type": "single",
-        "frame": 10,
+        "frame": 25,
         "id": 11
     }
 ]

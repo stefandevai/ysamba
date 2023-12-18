@@ -14,9 +14,9 @@ void WindowFrame::init()
   nine_patch.texture = m_context.asset_manager->get<Texture>("ui");
   nine_patch.top = 0;
   nine_patch.left = 0;
-  nine_patch.bottom = 32;
-  nine_patch.right = 32;
-  nine_patch.border = 12;
+  nine_patch.bottom = 33;
+  nine_patch.right = 33;
+  nine_patch.border = 16;
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;
 }
