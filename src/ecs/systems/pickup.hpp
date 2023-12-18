@@ -17,6 +17,12 @@ class PickupSystem
                                                          entt::entity entity,
                                                          const ItemData& item_data);
   static bool can_pickup(entt::registry& registry, entt::entity entity, const ItemData& item_data);
+  static entt::entity iterate_containers(entt::registry& registry,
+                                         const ItemData& item_data,
+                                         const std::vector<entt::entity>& items);
+  static entt::entity search_container(entt::registry& registry,
+                                       const ItemData& item_data,
+                                       const std::vector<entt::entity>& items);
 
  private:
   World& m_world;

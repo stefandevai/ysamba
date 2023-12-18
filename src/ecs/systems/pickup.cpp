@@ -44,7 +44,7 @@ void PickupSystem::update(entt::registry& registry)
     }
 
     // Check if we still have the capacity to pickup
-    const auto& item_component = registry.get<Item>(item);
+    auto& item_component = registry.get<Item>(item);
     const auto& item_data = m_world.get_item_data(item_component.id);
     const auto container_entity = get_container_with_enough_capacity(registry, entity, item_data);
 
@@ -84,8 +84,13 @@ void PickupSystem::update(entt::registry& registry)
       container.volume_occupied += item_data.volume;
       container.items.push_back(item);
 
-      /* auto& carried_items = registry.get<CarriedItems>(entity); */
-      /* carried_items.items.push_back(item); */
+      item_component.container = container_entity;
+
+      // Duplicate item entity in CarriedItems component to
+      // make item lookup easier
+      // TODO: Implement binary tree with item id as index
+      auto& carried_items = registry.get<CarriedItems>(entity);
+      carried_items.items.push_back(item);
     }
     else
     {
@@ -97,7 +102,6 @@ void PickupSystem::update(entt::registry& registry)
 
     registry.remove<Position>(item);
     registry.remove<Visibility>(item);
-
     stop_pickup(registry, entity, job);
   }
 }
@@ -107,62 +111,86 @@ bool PickupSystem::can_pickup(entt::registry& registry, entt::entity entity, con
   return registry.valid(get_container_with_enough_capacity(registry, entity, item_data));
 }
 
+entt::entity PickupSystem::iterate_containers(entt::registry& registry,
+                                              const ItemData& item_data,
+                                              const std::vector<entt::entity>& items)
+{
+  std::vector<const std::vector<entt::entity>*> item_stack = {&items};
+
+  while (!item_stack.empty())
+  {
+    const auto current_items = item_stack.back();
+    item_stack.pop_back();
+
+    for (auto item : *current_items)
+    {
+      if (registry.all_of<Container>(item))
+      {
+        const auto& container = registry.get<Container>(item);
+
+        // TODO: Check materials that the container can carry
+        if (container.volume_occupied + item_data.volume <= container.volume_capacity &&
+            container.weight_occupied + item_data.weight <= container.weight_capacity)
+        {
+          return item;
+        }
+        else
+        {
+          item_stack.push_back(&container.items);
+        }
+      }
+    }
+  }
+
+  return entt::null;
+};
+
+entt::entity PickupSystem::search_container(entt::registry& registry,
+                                            const ItemData& item_data,
+                                            const std::vector<entt::entity>& items)
+{
+  for (const auto item : items)
+  {
+    if (registry.all_of<Container>(item))
+    {
+      const auto& container = registry.get<Container>(item);
+
+      // TODO: Check materials that the container can carry
+      if (container.volume_occupied + item_data.volume <= container.volume_capacity &&
+          container.weight_occupied + item_data.weight <= container.weight_capacity)
+      {
+        return item;
+      }
+    }
+  }
+
+  return entt::null;
+}
+
 entt::entity PickupSystem::get_container_with_enough_capacity(entt::registry& registry,
                                                               entt::entity entity,
                                                               const ItemData& item_data)
 {
-  const std::function<entt::entity(const std::vector<entt::entity>&)> has_enough_capacity =
-      [&registry, &item_data, &has_enough_capacity](const std::vector<entt::entity>& items) -> entt::entity {
-    std::vector<const std::vector<entt::entity>*> item_stack = {&items};
-
-    while (!item_stack.empty())
-    {
-      const auto current_items = item_stack.back();
-      item_stack.pop_back();
-
-      for (auto item : *current_items)
-      {
-        if (registry.all_of<Container>(item))
-        {
-          const auto& container = registry.get<Container>(item);
-
-          // TODO: Check materials that the container can carry
-          if (container.volume_occupied + item_data.volume <= container.volume_capacity &&
-              container.weight_occupied + item_data.weight <= container.weight_capacity)
-          {
-            return item;
-          }
-          else
-          {
-            item_stack.push_back(&container.items);
-          }
-        }
-      }
-    }
-
-    return entt::null;
-  };
-
   if (registry.all_of<WearedItems>(entity))
   {
     const auto& weared = registry.get<WearedItems>(entity);
-    const auto container = has_enough_capacity(weared.items);
+    const auto container = search_container(registry, item_data, weared.items);
 
     if (registry.valid(container))
     {
       return container;
     }
   }
-  /* if (registry.all_of<CarriedItems>(entity)) */
-  /* { */
-  /*   const auto& carried = registry.get<CarriedItems>(entity); */
-  /*   const auto container = has_enough_capacity(carried.items); */
+  if (registry.all_of<CarriedItems>(entity))
+  {
+    const auto& carried = registry.get<CarriedItems>(entity);
+    const auto container = search_container(registry, item_data, carried.items);
 
-  /*   if (registry.valid(container)) */
-  /*   { */
-  /*     return container; */
-  /*   } */
-  /* } */
+    if (registry.valid(container))
+    {
+      return container;
+    }
+  }
   if (registry.all_of<WieldedItems>(entity))
   {
     const auto& wielded = registry.get<WieldedItems>(entity);
@@ -176,27 +204,6 @@ entt::entity PickupSystem::get_container_with_enough_capacity(entt::registry& re
     else if (!registry.valid(wielded.right_hand))
     {
       return entity;
-    }
-    // Is wielding a container
-    else if (registry.all_of<Container>(wielded.left_hand))
-    {
-      const auto& container = registry.get<Container>(wielded.left_hand);
-      const auto container_entity = has_enough_capacity(container.items);
-
-      if (registry.valid(container_entity))
-      {
-        return container_entity;
-      }
-    }
-    else if (registry.all_of<Container>(wielded.right_hand))
-    {
-      const auto& container = registry.get<Container>(wielded.right_hand);
-      const auto container_entity = has_enough_capacity(container.items);
-
-      if (registry.valid(container_entity))
-      {
-        return container_entity;
-      }
     }
   }
 

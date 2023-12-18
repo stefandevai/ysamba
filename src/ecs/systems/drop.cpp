@@ -6,6 +6,7 @@
 
 #include "ecs/components/action_drop.hpp"
 #include "ecs/components/carried_items.hpp"
+#include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
@@ -80,12 +81,25 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     {
       for (auto it = carried.items.begin(); it != carried.items.end(); ++it)
       {
-        if (*it == item)
+        if (*it != item)
         {
-          carried.items.erase(it);
-          removed = true;
-          break;
+          continue;
         }
+
+        auto& item_component = registry.get<Item>(*it);
+        const auto& item_data = m_world.get_item_data(item_component.id);
+
+        assert(registry.valid(item_component.container) && "Encountered carried item without container");
+
+        auto& container = registry.get<Container>(item_component.container);
+        container.weight_occupied -= item_data.weight;
+        container.volume_occupied -= item_data.volume;
+
+        item_component.container = entt::null;
+        container.items.erase(std::find(container.items.begin(), container.items.end(), *it));
+        carried.items.erase(it);
+        removed = true;
+        break;
       }
     }
 
