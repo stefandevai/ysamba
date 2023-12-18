@@ -6,6 +6,7 @@
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
 #include "ui/components/scrollable_list.hpp"
+#include "ui/components/text_input.hpp"
 #include "ui/components/window_frame.hpp"
 
 namespace dl::ui
@@ -30,6 +31,10 @@ Inventory::Inventory(UIContext& context, const std::function<void(const int i)>&
   m_carried_items->size = Vector2i{452, 352};
   m_carried_items->position = Vector3i{224, 24, 0};
   m_carried_items->set_on_select(on_select);
+
+  auto text_input = m_window_frame->emplace<TextInput>();
+  text_input->position.y = 200;
+  text_input->position.x = 24;
 }
 
 void Inventory::set_weared_items(const ItemList<uint32_t>& items)

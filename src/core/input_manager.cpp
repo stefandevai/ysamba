@@ -130,6 +130,22 @@ bool InputManager::has_clicked(const MouseButton button)
   return false;
 }
 
+bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size)
+{
+  if (has_clicked(button))
+  {
+    const auto& mouse_position = get_mouse_position();
+
+    if (mouse_position.x > position.x && mouse_position.x < position.x + size.x && mouse_position.y > position.y &&
+        mouse_position.y < position.y + size.y)
+    {
+      return true;
+    }
+
+    return false;
+  }
+}
+
 const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
 
 const Vector2i InputManager::get_mouse_tile_position(const Camera& camera) const

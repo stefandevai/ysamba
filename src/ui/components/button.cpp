@@ -31,15 +31,10 @@ void Button::update()
     return;
   }
 
-  if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
+  if (m_input_manager.has_clicked_bounds(
+          InputManager::MouseButton::Left, {absolute_position.x, absolute_position.y}, size))
   {
-    const auto& mouse_position = m_input_manager.get_mouse_position();
-
-    if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x &&
-        mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
-    {
-      on_click();
-    }
+    on_click();
   }
 }
 

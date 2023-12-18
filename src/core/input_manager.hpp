@@ -46,6 +46,7 @@ class InputManager
   [[nodiscard]] bool is_key_up(const uint32_t key);
   [[nodiscard]] bool is_clicking(const MouseButton button);
   [[nodiscard]] bool has_clicked(const MouseButton button);
+  [[nodiscard]] bool has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size);
   [[nodiscard]] bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
   [[nodiscard]] bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
   [[nodiscard]] const Vector2i& get_scroll() const { return m_sdl_input_wrapper.get_scroll(); }

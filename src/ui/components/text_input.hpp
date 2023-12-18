@@ -1,0 +1,24 @@
+#pragma once
+
+#include "./component.hpp"
+
+namespace dl::ui
+{
+class Label;
+class Container;
+
+class TextInput : public UIComponent
+{
+ public:
+  std::string text{};
+  TextInput(UIContext& context);
+
+  void init();
+  void update();
+
+ private:
+  Container* m_container = nullptr;
+  Label* m_label = nullptr;
+};
+
+}  // namespace dl::ui
