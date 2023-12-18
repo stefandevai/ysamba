@@ -4,6 +4,7 @@
 #include <entt/core/hashed_string.hpp>
 
 #include "./input_manager.hpp"
+#include "core/utf8.hpp"
 
 namespace
 {
@@ -358,40 +359,61 @@ void SDLInputWrapper::update()
       break;
     }
 
+    case SDL_TEXTINPUT:
+    {
+      if (m_capture_text_input)
+      {
+        m_text_input += event.text.text;
+      }
+      break;
+    }
+
     default:
       break;
+    }
+  }
+
+  if (m_capture_text_input)
+  {
+    if (m_key_down[SDLK_BACKSPACE] && !m_text_input.empty())
+    {
+      UTF8Iterator it = m_text_input.end();
+      --it;
+      m_text_input.erase(it.string_iterator, m_text_input.end());
+    }
+    else if (m_key_down[SDLK_v] && SDL_GetModState() & KMOD_CTRL)
+    {
+      char* temp = SDL_GetClipboardText();
+      m_text_input += temp;
+      SDL_free(temp);
     }
   }
 }
 
 bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }
 
-bool SDLInputWrapper::is_key_down(const uint32_t key)
-{
-  const auto it = m_key_down.find(key_map.at(key));
+bool SDLInputWrapper::is_key_down(const uint32_t key) { return m_key_down[key_map.at(key)]; }
 
-  if (it == m_key_down.end())
-  {
-    return false;
-  }
-
-  return it->second;
-}
-
-bool SDLInputWrapper::is_key_up(const uint32_t key)
-{
-  const auto it = m_key_up.find(key_map.at(key));
-
-  if (it == m_key_up.end())
-  {
-    return false;
-  }
-
-  return it->second;
-}
+bool SDLInputWrapper::is_key_up(const uint32_t key) { return m_key_up[key_map.at(key)]; }
 
 bool SDLInputWrapper::should_quit() { return m_should_quit; }
 
 void SDLInputWrapper::quit() { m_should_quit = true; }
+
+void SDLInputWrapper::text_input_start()
+{
+  m_text_input.clear();
+  SDL_StartTextInput();
+  m_capture_text_input = true;
+}
+
+void SDLInputWrapper::text_input_stop()
+{
+  m_capture_text_input = false;
+  SDL_StopTextInput();
+  m_text_input.clear();
+}
+
+const std::string& SDLInputWrapper::get_text_input() const { return m_text_input; }
 
 }  // namespace dl

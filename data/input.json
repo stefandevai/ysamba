@@ -42,5 +42,8 @@
     },
     "inspector": {
         "quit": ["k_escape"]
+    },
+    "text_input": {
+        "quit": ["k_escape"]
     }
 }

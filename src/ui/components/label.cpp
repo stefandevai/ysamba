@@ -13,11 +13,6 @@ Label::Label(UIContext& context, const std::string_view value) : UIComponent(con
 
 void Label::init()
 {
-  if (m_value.empty())
-  {
-    return;
-  }
-
   if (wrap)
   {
     const auto& window_size = Display::get_window_size();
@@ -50,6 +45,11 @@ void Label::render(Batch& batch)
 
 void Label::set_text(const std::string_view value)
 {
+  if (value == m_value)
+  {
+    return;
+  }
+
   m_value = value;
   has_initialized = false;
 }

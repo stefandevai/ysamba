@@ -28,6 +28,9 @@ class SDLInputWrapper
   void set_window_size_changed(bool value) { m_window_size_changed = value; }
   bool should_quit();
   void quit();
+  void text_input_start();
+  void text_input_stop();
+  const std::string& get_text_input() const;
 
  private:
   bool m_any_key_down = false;
@@ -39,5 +42,7 @@ class SDLInputWrapper
   Vector2i m_mouse_position{0, 0};
   Vector2i m_scroll{0, 0};
   bool m_window_size_changed = false;
+  bool m_capture_text_input = false;
+  std::string m_text_input{};
 };
 }  // namespace dl

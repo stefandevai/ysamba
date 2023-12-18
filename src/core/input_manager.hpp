@@ -54,6 +54,9 @@ class InputManager
   [[nodiscard]] const Vector2i get_mouse_tile_position(const Camera& camera) const;
   [[nodiscard]] const std::shared_ptr<InputContext> get_current_context();
   [[nodiscard]] bool window_size_changed() const;
+  void text_input_start();
+  void text_input_stop();
+  const std::string& get_text_input() const;
   void set_window_size_changed(const bool value);
   [[nodiscard]] bool should_quit();
   void quit();

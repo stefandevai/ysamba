@@ -40,6 +40,11 @@ void InventorySystem::m_update_inventory(entt::registry& registry)
 
   m_open_inventory(registry);
 
+  if (!m_input_manager.is_context("inventory"_hs))
+  {
+    return;
+  }
+
   if (m_input_manager.poll_action("close_inventory"_hs))
   {
     m_dispose();

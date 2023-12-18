@@ -141,9 +141,9 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
     {
       return true;
     }
-
-    return false;
   }
+
+  return false;
 }
 
 const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
@@ -174,6 +174,12 @@ bool InputManager::should_quit() { return m_sdl_input_wrapper.should_quit(); }
 void InputManager::quit() { m_sdl_input_wrapper.quit(); }
 
 bool InputManager::window_size_changed() const { return m_sdl_input_wrapper.window_size_changed(); }
+
+void InputManager::text_input_start() { m_sdl_input_wrapper.text_input_start(); }
+
+void InputManager::text_input_stop() { m_sdl_input_wrapper.text_input_stop(); }
+
+const std::string& InputManager::get_text_input() const { return m_sdl_input_wrapper.get_text_input(); }
 
 void InputManager::set_window_size_changed(const bool value) { m_sdl_input_wrapper.set_window_size_changed(value); }
 

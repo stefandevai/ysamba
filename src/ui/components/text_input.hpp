@@ -17,8 +17,15 @@ class TextInput : public UIComponent
   void update();
 
  private:
+  enum class State
+  {
+    Display,
+    Focus,
+  };
+
   Container* m_container = nullptr;
   Label* m_label = nullptr;
+  State m_state = State::Display;
 };
 
 }  // namespace dl::ui
