@@ -402,7 +402,6 @@ void SDLInputWrapper::quit() { m_should_quit = true; }
 
 void SDLInputWrapper::text_input_start()
 {
-  m_text_input.clear();
   SDL_StartTextInput();
   m_capture_text_input = true;
 }
@@ -416,4 +415,5 @@ void SDLInputWrapper::text_input_stop()
 
 const std::string& SDLInputWrapper::get_text_input() const { return m_text_input; }
 
+void SDLInputWrapper::set_text_input(const std::string& text) { m_text_input = text; }
 }  // namespace dl

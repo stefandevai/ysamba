@@ -17,6 +17,8 @@ class SDLInputWrapper
   void operator=(SDLInputWrapper const&){};
 
   void update();
+  void quit();
+
   bool is_any_key_down();
   bool is_key_down(const uint32_t key);
   bool is_key_up(const uint32_t key);
@@ -25,12 +27,13 @@ class SDLInputWrapper
   const Vector2i& get_mouse_position() { return m_mouse_position; };
   bool window_size_changed() const { return m_window_size_changed; }
   const Vector2i& get_scroll() const { return m_scroll; }
-  void set_window_size_changed(bool value) { m_window_size_changed = value; }
   bool should_quit();
-  void quit();
   void text_input_start();
   void text_input_stop();
   const std::string& get_text_input() const;
+
+  void set_window_size_changed(bool value) { m_window_size_changed = value; }
+  void set_text_input(const std::string& text);
 
  private:
   bool m_any_key_down = false;

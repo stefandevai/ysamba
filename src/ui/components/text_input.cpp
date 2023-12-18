@@ -11,15 +11,15 @@ namespace dl::ui
 {
 TextInput::TextInput(UIContext& context) : UIComponent(context)
 {
-  size = {100, 32};
-  m_container = emplace<Container>(size, 0xaa5533ff);
+  size = {160, 32};
+  m_container = emplace<Container>(size, 0x2f4241ff);
   m_label = m_container->emplace<Label>("");
   m_label->wrap = false;
+  m_label->margin = {8, 0};
+  m_label->y_alignment = YAlignement::Center;
 }
 
-void TextInput::init()
-{ /* m_label->set_text(text); */
-}
+void TextInput::init() { m_label->set_text(text); }
 
 void TextInput::update()
 {
@@ -43,6 +43,7 @@ void TextInput::update()
     {
       m_state = State::Focus;
       m_input_manager.push_context("text_input"_hs);
+      m_input_manager.set_text_input(text);
       m_input_manager.text_input_start();
     }
   }

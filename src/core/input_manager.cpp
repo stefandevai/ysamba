@@ -181,6 +181,8 @@ void InputManager::text_input_stop() { m_sdl_input_wrapper.text_input_stop(); }
 
 const std::string& InputManager::get_text_input() const { return m_sdl_input_wrapper.get_text_input(); }
 
+void InputManager::set_text_input(const std::string& text) { m_sdl_input_wrapper.set_text_input(text); }
+
 void InputManager::set_window_size_changed(const bool value) { m_sdl_input_wrapper.set_window_size_changed(value); }
 
 void InputManager::m_parse_input()

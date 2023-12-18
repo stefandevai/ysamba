@@ -10,7 +10,7 @@ class Container;
 class TextInput : public UIComponent
 {
  public:
-  std::string text{};
+  std::string text = "Initial state";
   TextInput(UIContext& context);
 
   void init();

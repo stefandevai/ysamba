@@ -39,6 +39,7 @@ class InputManager
   void update();
   void push_context(const uint32_t context_key);
   void pop_context();
+
   [[nodiscard]] bool is_context(const uint32_t key);
   [[nodiscard]] bool poll_action(const uint32_t action);
   [[nodiscard]] bool is_key_down(const uint32_t key);
@@ -57,6 +58,8 @@ class InputManager
   void text_input_start();
   void text_input_stop();
   const std::string& get_text_input() const;
+
+  void set_text_input(const std::string& text);
   void set_window_size_changed(const bool value);
   [[nodiscard]] bool should_quit();
   void quit();
