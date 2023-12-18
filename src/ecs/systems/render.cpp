@@ -25,6 +25,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 {
   using namespace entt::literals;
 
+  const int highest_z = 1;
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
@@ -35,26 +36,48 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     {
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
-      const auto& world_tile = m_world.get_all(index_x, index_y, 0.0);
 
-      if (world_tile.terrain.id > 0)
+      for (int z = highest_z; z >= 0; --z)
       {
-        const auto& sprite = std::make_unique<Sprite>(m_world_texture_id, 0);
+        const auto& world_tile2 = m_world.get_all(index_x, index_y, z);
 
-        if (sprite->texture == nullptr)
+        if (world_tile2.terrain.id > 0)
         {
-          const auto& world_texture = renderer.get_texture(m_world_texture_id);
-          const auto& frame_data = world_texture->id_to_frame(world_tile.terrain.id, frame_data_type::tile);
-          sprite->texture = world_texture;
-          sprite->set_frame(frame_data.frame);
-        }
+          auto sprite = Sprite{m_world_texture_id, 0};
 
-        renderer.batch("world"_hs,
-                       sprite.get(),
-                       i * tile_size.x + camera_position.x * tile_size.x,
-                       j * tile_size.y + camera_position.y * tile_size.y,
-                       0.0);
+          const auto& world_texture = renderer.get_texture(m_world_texture_id);
+          const auto& frame_data = world_texture->id_to_frame(world_tile2.terrain.id, frame_data_type::tile);
+          sprite.texture = world_texture;
+          sprite.set_frame(frame_data.frame);
+
+          renderer.batch("world"_hs,
+                         &sprite,
+                         i * tile_size.x + camera_position.x * tile_size.x,
+                         j * tile_size.y + camera_position.y * tile_size.y - z * tile_size.y,
+                         z * tile_size.y);
+        }
       }
+
+      const auto& world_tile = m_world.get_all(index_x, index_y, 0);
+
+      /* if (world_tile.terrain.id > 0) */
+      /* { */
+      /*   const auto& sprite = std::make_unique<Sprite>(m_world_texture_id, 0); */
+
+      /*   if (sprite->texture == nullptr) */
+      /*   { */
+      /*     const auto& world_texture = renderer.get_texture(m_world_texture_id); */
+      /*     const auto& frame_data = world_texture->id_to_frame(world_tile.terrain.id, frame_data_type::tile); */
+      /*     sprite->texture = world_texture; */
+      /*     sprite->set_frame(frame_data.frame); */
+      /*   } */
+
+      /*   renderer.batch("world"_hs, */
+      /*                  sprite.get(), */
+      /*                  i * tile_size.x + camera_position.x * tile_size.x, */
+      /*                  j * tile_size.y + camera_position.y * tile_size.y, */
+      /*                  0.0); */
+      /* } */
 
       if (world_tile.over_terrain.id > 0)
       {

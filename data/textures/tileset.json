@@ -175,5 +175,11 @@
         "tile_type": "single",
         "frame": 25,
         "id": 11
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 168,
+        "id": 15
     }
 ]

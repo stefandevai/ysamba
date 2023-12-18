@@ -187,6 +187,27 @@
       "id": 14,
       "name": "firecamp",
       "flags": ["WALKABLE", "FIRE", "HURTS"]
+    },
+    {
+      "id": 15,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 0,
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 6
+        }
+      ]
     }
   ]
 }
