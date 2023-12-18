@@ -31,10 +31,13 @@ class WorldCreation : public Scene
   World m_world{m_game_context};
   std::unique_ptr<Sprite> m_world_sprite = nullptr;
   WorldRepresentation m_world_representation;
+  std::vector<double> m_height_map{512 * 512};
   InputManager& m_input_manager = InputManager::get_instance();
   int m_seed = 110;
 
   void m_generate_map(const int seed = 0);
   void m_create_world_representation();
+  void m_generate_height_map(const int seed = 0);
+  void m_create_height_map_representation();
 };
 }  // namespace dl

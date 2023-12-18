@@ -7,8 +7,9 @@
 #include <nlohmann/json.hpp>
 #include <queue>
 #include <set>
-/* #include "./generators/terrain_generator.hpp" */
-#include "./generators/dummy_generator.hpp"
+/* #include "./generators/erosion_generator.hpp" */
+#include "./generators/terrain_generator.hpp"
+/* #include "./generators/dummy_generator.hpp" */
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
@@ -37,8 +38,8 @@ void World::generate(const int width, const int height, const int seed)
   m_terrains.clear();
   m_over_terrains.clear();
 
-  /* auto tilemap_generator = TerrainGenerator(width, height); */
-  auto tilemap_generator = DummyGenerator(width, height);
+  auto tilemap_generator = TerrainGenerator(width, height);
+  /* auto tilemap_generator = DummyGenerator(width, height); */
   auto tilemap = tilemap_generator.generate(seed);
   m_terrains.push_back(tilemap);
 

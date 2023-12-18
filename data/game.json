@@ -1,6 +1,6 @@
 {
     "title": "Dialectics",
-    "width": 1024,
-    "height": 576,
-    "initial_scene": "gameplay"
+    "width": 512,
+    "height": 512,
+    "initial_scene": "world_creation"
 }

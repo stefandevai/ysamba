@@ -13,6 +13,7 @@
 #include "graphics/renderer.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/texture.hpp"
+#include "world/generators/erosion_generator.hpp"
 
 namespace dl
 {
@@ -33,13 +34,13 @@ void WorldCreation::load()
 
   if (seed)
   {
-    m_generate_map(seed.value());
+    m_generate_height_map(seed.value());
   }
   else
   {
-    m_generate_map();
+    m_generate_height_map();
   }
-  m_create_world_representation();
+  m_create_height_map_representation();
   m_has_loaded = true;
 }
 
@@ -58,13 +59,13 @@ void WorldCreation::update()
   }
   else if (m_input_manager.poll_action("generate_world"_hs))
   {
-    m_generate_map();
-    m_create_world_representation();
+    m_generate_height_map();
+    m_create_height_map_representation();
   }
   else if (m_input_manager.poll_action("reload_world"_hs))
   {
-    m_generate_map(m_seed);
-    m_create_world_representation();
+    m_generate_height_map(m_seed);
+    m_create_height_map_representation();
   }
   else if (m_input_manager.poll_action("save_world"_hs))
   {
@@ -73,7 +74,7 @@ void WorldCreation::update()
   else if (m_input_manager.poll_action("load_world"_hs))
   {
     load_world();
-    m_create_world_representation();
+    m_create_height_map_representation();
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {
@@ -205,4 +206,33 @@ void WorldCreation::m_create_world_representation()
   const auto texture = std::make_shared<Texture>(pixel_data, tilemap_size.w, tilemap_size.h);
   m_world_sprite->texture = texture;
 }
+
+void WorldCreation::m_generate_height_map(const int seed)
+{
+  auto generator = ErosionGenerator(512, 512);
+  m_height_map = generator.generate(seed);
+}
+
+void WorldCreation::m_create_height_map_representation()
+{
+  std::vector<unsigned char> pixel_data((512 * 512) * 4);
+
+  for (auto i = 0; i < 512; ++i)
+  {
+    for (auto j = 0; j < 512; ++j)
+    {
+      const auto map_value = m_height_map[j * 512 + i];
+      const uint8_t value = std::round(map_value * 255);
+
+      pixel_data[j * 512 * 4 + i * 4] = value;
+      pixel_data[j * 512 * 4 + i * 4 + 1] = value;
+      pixel_data[j * 512 * 4 + i * 4 + 2] = value;
+      pixel_data[j * 512 * 4 + i * 4 + 3] = 255;
+    }
+  }
+
+  const auto texture = std::make_shared<Texture>(pixel_data, 512, 512);
+  m_world_sprite->texture = texture;
+}
+
 }  // namespace dl
