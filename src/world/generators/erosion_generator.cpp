@@ -22,6 +22,14 @@
 
 namespace dl
 {
+struct Particle
+{
+  glm::vec2 pos;
+  glm::vec2 speed = glm::vec2(0.0);
+  float volume = 1.0;
+  float sediment = 0.0;
+};
+
 std::vector<double> ErosionGenerator::generate(const int seed)
 {
   // TEMP
@@ -36,11 +44,14 @@ std::vector<double> ErosionGenerator::generate(const int seed)
   spdlog::info("HEIGHT: {}\n", m_height);
 
   std::vector<double> height_map(m_width * m_height);
+  const uint32_t cycles = 1000 * 20;
 
   auto start = std::chrono::high_resolution_clock::now();
 
   spdlog::info("Generating silhouette...");
   m_generate_silhouette(height_map, seed);
+
+  m_erode(height_map, cycles);
 
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -48,6 +59,102 @@ std::vector<double> ErosionGenerator::generate(const int seed)
   spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 
   return height_map;
+}
+
+void ErosionGenerator::m_erode(std::vector<double>& tiles, const uint32_t cycles)
+{
+  const float minVol = 0.01f;
+  float dt = 1.2;
+  float density = 1.0;  // This gives varying amounts of inertia and stuff...
+  float evapRate = 0.001;
+  float depositionRate = 0.1;
+  float friction = 0.05;
+
+  for (uint32_t i = 0; i < cycles; ++i)
+  {
+    glm::vec2 newpos = glm::vec2(rand() % (int)502 + 5, rand() % (int)502 + 5);
+    Particle drop{newpos};
+
+    while (drop.volume > minVol)
+    {
+      glm::ivec2 ipos = drop.pos;
+      glm::vec3 n = m_surface_normal(tiles, ipos.x, ipos.y);
+
+      drop.speed += dt * glm::vec2(n.x, n.z) / (drop.volume * density);  // F = ma, so a = F/m
+      drop.pos += dt * drop.speed;
+      drop.speed *= (1.0 - dt * friction);
+
+      // Check if Particle is still in-bounds
+      if (!glm::all(glm::greaterThanEqual(drop.pos, glm::vec2(5))) ||
+          !glm::all(glm::lessThan(drop.pos, glm::vec2(507.f, 507.f))))
+        break;
+
+      // Compute sediment capacity difference
+      float maxsediment =
+          drop.volume * glm::length(drop.speed) * (tiles[ipos.x + ipos.y * 512] - tiles[drop.pos.x + drop.pos.y * 512]);
+      if (maxsediment < 0.0)
+        maxsediment = 0.0;
+      float sdiff = maxsediment - drop.sediment;
+
+      // Act on the Heightmap and Droplet!
+      drop.sediment += dt * depositionRate * sdiff;
+      tiles[ipos.x + ipos.y * 512] -= dt * drop.volume * depositionRate * sdiff;
+
+      // Evaporate the Droplet (Note: Proportional to Volume! Better: Use shape factor to make proportional to the area
+      // instead.)
+      drop.volume *= (1.0 - dt * evapRate);
+    }
+  }
+}
+
+glm::vec3 ErosionGenerator::m_surface_normal(const std::vector<double>& height_map, int i, int j)
+{
+  if (i + 1 >= 512 || i - 1 < 0 || j + 1 >= 512 || j - 1 < 0)
+  {
+    return glm::vec3(0.0);
+  }
+
+  const float scale = 60.f;
+  /*
+    Note: Surface normal is computed in this way, because the square-grid surface is meshed using triangles.
+    To avoid spatial artifacts, you need to weight properly with all neighbors.
+  */
+
+  glm::vec3 n =
+      glm::vec3(0.15) * glm::normalize(glm::vec3(
+                            scale * (height_map[i + j * 512] - height_map[i + 1 + j * 512]), 1.0, 0.0));  // Positive X
+  n += glm::vec3(0.15) * glm::normalize(glm::vec3(
+                             scale * (height_map[i - 1 + j * 512] - height_map[i + j * 512]), 1.0, 0.0));  // Negative X
+  n += glm::vec3(0.15) *
+       glm::normalize(
+           glm::vec3(0.0, 1.0, scale * (height_map[i + j * 512] - height_map[i + (j + 1) * 512])));  // Positive Y
+  n += glm::vec3(0.15) *
+       glm::normalize(
+           glm::vec3(0.0, 1.0, scale * (height_map[i + (j - 1) * 512] - height_map[i + j * 512])));  // Negative Y
+
+  // Diagonals! (This removes the last spatial artifacts)
+  n += glm::vec3(0.1) *
+       glm::normalize(
+           glm::vec3(scale * (height_map[i + j * 512] - height_map[i + 1 + (j + 1) * 512]) / sqrt(2),
+                     sqrt(2),
+                     scale * (height_map[i + j * 512] - height_map[i + 1 + (j + 1) * 512]) / sqrt(2)));  // Positive Y
+  n += glm::vec3(0.1) *
+       glm::normalize(
+           glm::vec3(scale * (height_map[i + j * 512] - height_map[i + 1 + (j - 1) * 512]) / sqrt(2),
+                     sqrt(2),
+                     scale * (height_map[i + j * 512] - height_map[i + 1 + (j - 1) * 512]) / sqrt(2)));  // Positive Y
+  n += glm::vec3(0.1) *
+       glm::normalize(
+           glm::vec3(scale * (height_map[i + j * 512] - height_map[i - 1 + (j + 1) * 512]) / sqrt(2),
+                     sqrt(2),
+                     scale * (height_map[i + j * 512] - height_map[i - 1 + (j + 1) * 512]) / sqrt(2)));  // Positive Y
+  n += glm::vec3(0.1) *
+       glm::normalize(
+           glm::vec3(scale * (height_map[i + j * 512] - height_map[i - 1 + (j - 1) * 512]) / sqrt(2),
+                     sqrt(2),
+                     scale * (height_map[i + j * 512] - height_map[i - 1 + (j - 1) * 512]) / sqrt(2)));  // Positive Y
+
+  return n;
 }
 
 void ErosionGenerator::m_generate_silhouette(std::vector<double>& tiles, const int seed)

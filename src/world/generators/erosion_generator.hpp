@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <queue>
 #include <vector>
 
@@ -50,6 +51,8 @@ class ErosionGenerator
   const int m_height;
 
   void m_generate_silhouette(std::vector<double>& tiles, const int seed);
+  void m_erode(std::vector<double>& tiles, const uint32_t cycles);
+  glm::vec3 m_surface_normal(const std::vector<double>& height_map, int i, int j);
   float m_get_rectangle_gradient_value(const int x, const int y);
   std::vector<IslandData> m_get_islands(std::vector<int>& tiles);
   IslandQueue m_get_island_queue(const std::vector<int>& tiles);
