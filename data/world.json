@@ -192,22 +192,49 @@
       "id": 15,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
-      "climbs_to": 0,
-      "actions": [
-        {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 6
-        }
-      ]
+      "climbs_to": 0
+    },
+    {
+      "id": 16,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 1
+    },
+    {
+      "id": 17,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 2
+    },
+    {
+      "id": 18,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 3
+    },
+    {
+      "id": 19,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 4
+    },
+    {
+      "id": 20,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 5
+    },
+    {
+      "id": 21,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 6
+    },
+    {
+      "id": 22,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 7
     }
   ]
 }
