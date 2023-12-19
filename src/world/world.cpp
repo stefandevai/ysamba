@@ -333,6 +333,10 @@ void World::m_load_tile_data()
     {
       tile_data.flags = tile["flags"].get<std::unordered_set<std::string>>();
     }
+    if (tile.contains("climbs_to"))
+    {
+      tile_data.climbs_to = tile["climbs_to"].get<int>();
+    }
     if (tile.contains("actions"))
     {
       const auto actions = tile["actions"].get<std::vector<nlohmann::json>>();

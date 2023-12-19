@@ -24,5 +24,6 @@ struct TileData
   std::string name;
   std::unordered_set<std::string> flags;
   std::unordered_map<JobType, Action> actions{};
+  int climbs_to = -1;
 };
 }  // namespace dl

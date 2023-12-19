@@ -44,6 +44,7 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
     auto target_x = position.x;
     auto target_y = position.y;
+    auto target_z = position.z;
 
     // Test collision for the tiles we want advance
     if (advance_x > 0 || advance_y > 0)
@@ -82,13 +83,33 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       // if it's not the current position.
       else
       {
-        advance_x = std::abs(last_position_x - position.x);
-        advance_y = std::abs(last_position_y - position.y);
+        const auto walkable_advance_x = std::abs(last_position_x - position.x);
+        const auto walkable_advance_y = std::abs(last_position_y - position.y);
 
-        if (advance_x > 0 || advance_y > 0)
+        if (walkable_advance_x > 0 || walkable_advance_y > 0)
         {
-          target_x = position.x + advance_x * velocity.x;
-          target_y = position.y + advance_y * velocity.y;
+          target_x = position.x + walkable_advance_x * velocity.x;
+          target_y = position.y + walkable_advance_y * velocity.y;
+        }
+        // Check if current tile is a slope
+        else
+        {
+          const auto& entity_position = registry.get<Position>(entity);
+          const auto& tiles = m_world.get_all(std::round(entity_position.x), std::round(entity_position.y), position.z);
+
+          spdlog::debug("HREEEEEE1 {} {} {} {}", tiles.terrain.climbs_to, tiles.terrain.name, advance_y, advance_x);
+          spdlog::debug("POS: {} {} {}", entity_position.x, entity_position.y, position.z);
+
+          if (tiles.terrain.flags.contains("SLOPE"))
+          {
+            spdlog::debug("HREEEEEE2 {} {} {}", tiles.terrain.climbs_to, advance_y, advance_x);
+            if (tiles.terrain.climbs_to == 0 && advance_y > 0 && advance_x == 0)
+            {
+              target_x = std::round(entity_position.x);
+              target_y = std::round(entity_position.y);
+              target_z += 1;
+            }
+          }
         }
       }
     }
@@ -100,11 +121,12 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     }
 
     // Update the position if it's different from the last position
-    if (target_x != position.x || target_y != position.y)
+    if (target_x != position.x || target_y != position.y || target_z != position.z)
     {
-      registry.patch<Position>(entity, [target_x, target_y](auto& position) {
+      registry.patch<Position>(entity, [target_x, target_y, target_z](auto& position) {
         position.x = target_x;
         position.y = target_y;
+        position.z = target_z;
       });
     }
 

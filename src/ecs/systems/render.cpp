@@ -160,8 +160,10 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto sprite_size = visibility.sprite->get_size();
     const auto position_x = std::round(position.x) * sprite_size.x;
     const auto position_y = std::round(position.y) * sprite_size.y;
+    const auto position_z = std::round(position.z) * sprite_size.y;
 
-    renderer.batch("world"_hs, visibility.sprite.get(), position_x, position_y, visibility.layer_z);
+    renderer.batch(
+        "world"_hs, visibility.sprite.get(), position_x, position_y - position_z, position_z + visibility.layer_z);
   }
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -174,8 +176,8 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     renderer.batch("world"_hs,
                    rectangle.quad.get(),
                    std::round(position.x) * tile_size.x,
-                   std::round(position.y) * tile_size.y,
-                   position.z);
+                   (std::round(position.y) - position.z) * tile_size.y,
+                   position.z * tile_size.y);
   }
 
   auto text_view = registry.view<const Text, const Position>();

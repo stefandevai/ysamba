@@ -38,7 +38,7 @@ void WalkSystem::update(entt::registry& registry)
 
     // If the target is not adjacent, move towards the target
     if (std::abs(target.position.x - std::round(position.x)) > target.distance_offset ||
-        std::abs(target.position.y - std::round(position.y)) > target.distance_offset)
+        std::abs(target.position.y - std::round(position.y - position.z)) > target.distance_offset)
     {
       // If the target path is empty, that means that the target disappeared.
       if (walk_path.steps.empty())
