@@ -8,6 +8,8 @@
 
 namespace dl
 {
+enum class Direction;
+
 struct Action
 {
   std::string name{};
@@ -24,6 +26,6 @@ struct TileData
   std::string name;
   std::unordered_set<std::string> flags;
   std::unordered_map<JobType, Action> actions{};
-  int climbs_to = -1;
+  Direction climbs_to;
 };
 }  // namespace dl

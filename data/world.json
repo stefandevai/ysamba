@@ -192,49 +192,55 @@
       "id": 15,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
-      "climbs_to": 0
+      "climbs_to": 1
     },
     {
       "id": 16,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
-      "climbs_to": 1
+      "climbs_to": 2
     },
     {
-      "id": 17,
+      "id": 23,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 2
     },
     {
-      "id": 18,
+      "id": 17,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 3
     },
     {
-      "id": 19,
+      "id": 18,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 4
     },
     {
-      "id": 20,
+      "id": 19,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 5
     },
     {
-      "id": 21,
+      "id": 20,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 6
     },
     {
-      "id": 22,
+      "id": 21,
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 7
+    },
+    {
+      "id": 22,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 8
     }
   ]
 }

@@ -94,19 +94,59 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         // Check if current tile is a slope
         else
         {
+          const int signed_advance_x = std::round(x_candidate) - std::round(position.x);
+          const int signed_advance_y = std::round(y_candidate) - std::round(position.y);
           const auto& entity_position = registry.get<Position>(entity);
           const auto& tiles = m_world.get_all(std::round(entity_position.x), std::round(entity_position.y), position.z);
 
-          spdlog::debug("HREEEEEE1 {} {} {} {}", tiles.terrain.climbs_to, tiles.terrain.name, advance_y, advance_x);
-          spdlog::debug("POS: {} {} {}", entity_position.x, entity_position.y, position.z);
-
           if (tiles.terrain.flags.contains("SLOPE"))
           {
-            spdlog::debug("HREEEEEE2 {} {} {}", tiles.terrain.climbs_to, advance_y, advance_x);
-            if (tiles.terrain.climbs_to == 0 && advance_y > 0 && advance_x == 0)
+            if (tiles.terrain.climbs_to == Direction::Top && signed_advance_y < 0 && signed_advance_x == 0)
             {
               target_x = std::round(entity_position.x);
+              target_y = std::round(entity_position.y - 1);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::Right && signed_advance_y == 0 && signed_advance_x > 0)
+            {
+              target_x = std::round(entity_position.x + 1);
               target_y = std::round(entity_position.y);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::Bottom && signed_advance_y > 0 && signed_advance_x == 0)
+            {
+              target_x = std::round(entity_position.x);
+              target_y = std::round(entity_position.y + 1);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::Left && signed_advance_y == 0 && signed_advance_x < 0)
+            {
+              target_x = std::round(entity_position.x - 1);
+              target_y = std::round(entity_position.y);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::TopLeft && signed_advance_y < 0 && signed_advance_x < 0)
+            {
+              target_x = std::round(entity_position.x - 1);
+              target_y = std::round(entity_position.y - 1);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::TopRight && signed_advance_y < 0 && signed_advance_x > 0)
+            {
+              target_x = std::round(entity_position.x + 1);
+              target_y = std::round(entity_position.y - 1);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::BottomRight && signed_advance_y > 0 && signed_advance_x > 0)
+            {
+              target_x = std::round(entity_position.x + 1);
+              target_y = std::round(entity_position.y + 1);
+              target_z += 1;
+            }
+            else if (tiles.terrain.climbs_to == Direction::BottomLeft && signed_advance_y > 0 && signed_advance_x < 0)
+            {
+              target_x = std::round(entity_position.x - 1);
+              target_y = std::round(entity_position.y + 1);
               target_z += 1;
             }
           }

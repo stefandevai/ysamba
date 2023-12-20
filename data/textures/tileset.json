@@ -191,6 +191,12 @@
     {
         "type": "tile",
         "tile_type": "single",
+        "frame": 174,
+        "id": 23
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
         "frame": 168,
         "id": 17
     },

@@ -17,6 +17,19 @@ namespace dl
 {
 struct GameContext;
 
+enum class Direction
+{
+  Center,
+  Top,
+  Right,
+  Bottom,
+  Left,
+  TopLeft,
+  TopRight,
+  BottomRight,
+  BottomLeft,
+};
+
 struct TileTarget
 {
   TileTarget(uint32_t id, int x, int y, int z) : id(id), x(x), y(y), z(z) {}

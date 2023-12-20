@@ -335,7 +335,7 @@ void World::m_load_tile_data()
     }
     if (tile.contains("climbs_to"))
     {
-      tile_data.climbs_to = tile["climbs_to"].get<int>();
+      tile_data.climbs_to = tile["climbs_to"].get<Direction>();
     }
     if (tile.contains("actions"))
     {

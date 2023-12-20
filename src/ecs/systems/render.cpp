@@ -54,6 +54,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
                          &sprite,
                          i * tile_size.x + camera_position.x * tile_size.x,
                          j * tile_size.y + camera_position.y * tile_size.y - z * tile_size.y,
+                         /* j * tile_size.y + camera_position.y * tile_size.y, */
                          z * tile_size.y);
         }
       }
@@ -164,6 +165,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
 
     renderer.batch(
         "world"_hs, visibility.sprite.get(), position_x, position_y - position_z, position_z + visibility.layer_z);
+    /* "world"_hs, visibility.sprite.get(), position_x, position_y, position_z + visibility.layer_z); */
   }
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -176,7 +178,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     renderer.batch("world"_hs,
                    rectangle.quad.get(),
                    std::round(position.x) * tile_size.x,
-                   (std::round(position.y) - position.z) * tile_size.y,
+                   std::round(position.y) * tile_size.y,
                    position.z * tile_size.y);
   }
 
