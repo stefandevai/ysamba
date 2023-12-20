@@ -35,18 +35,18 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     const auto speed_divide_factor = 100.0;
     const auto position_variation = (biology.speed / speed_divide_factor);
 
-    Vector3 candidate_position{
+    Position candidate_position{
         position.x + velocity.x * position_variation,
         position.y + velocity.y * position_variation,
         position.z,
     };
 
+    Position target_position = Position{position};
+
     Vector2i absolute_advance{
         std::abs(std::round(candidate_position.x) - std::round(position.x)),
         std::abs(std::round(candidate_position.y) - std::round(position.y)),
     };
-
-    auto target_position = Position{position};
 
     // Test collision for the tiles we want advance
     if (absolute_advance.x > 0 || absolute_advance.y > 0)
@@ -91,21 +91,33 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         const auto walkable_advance_x = std::abs(last_position_x - position.x);
         const auto walkable_advance_y = std::abs(last_position_y - position.y);
 
+        // Entity can move to a position that is closer than the target
         if (walkable_advance_x > 0 || walkable_advance_y > 0)
         {
           target_position.x = position.x + walkable_advance_x * velocity.x;
           target_position.y = position.y + walkable_advance_y * velocity.y;
         }
-        // Check if current tile is a slope
+        // Entity collided and can't advance
         else
         {
           const auto& tiles = m_world.get_all(std::round(position.x), std::round(position.y), std::round(position.z));
 
           if (tiles.terrain.flags.contains("SLOPE"))
           {
-            target_position = m_climb_slope(position,
-                                            Position{candidate_position.x, candidate_position.y, position.z + 1},
-                                            tiles.terrain.climbs_to);
+            candidate_position.z += 1;
+            target_position = m_climb_slope(position, candidate_position, tiles.terrain.climbs_to);
+          }
+          else
+          {
+            const auto& target_tile = m_world.get_all(
+                std::round(candidate_position.x), std::round(candidate_position.y), std::round(candidate_position.z));
+
+            // Empty tile, fall down
+            if (target_tile.terrain.id == 0)
+            {
+              candidate_position.z -= 1;
+              target_position = candidate_position;
+            }
           }
         }
       }
@@ -113,8 +125,7 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     // If there was a fractional advance without tile change, just update our position
     else
     {
-      target_position.x = candidate_position.x;
-      target_position.y = candidate_position.y;
+      target_position = candidate_position;
     }
 
     // Update the position if it's different from the last position
