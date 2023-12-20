@@ -5,8 +5,8 @@
 #include <entt/entity/registry.hpp>
 #include <libtcod.hpp>
 
+#include "core/maths/vector.hpp"
 #include "ecs/components/biology.hpp"
-#include "ecs/components/position.hpp"
 #include "ecs/components/velocity.hpp"
 #include "world/world.hpp"
 
@@ -35,19 +35,21 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     const auto speed_divide_factor = 100.0;
     const auto position_variation = (biology.speed / speed_divide_factor);
 
-    const double z_candidate = position.z;
-    double x_candidate = position.x + velocity.x * position_variation;
-    double y_candidate = position.y + velocity.y * position_variation;
+    Vector3 candidate_position{
+        position.x + velocity.x * position_variation,
+        position.y + velocity.y * position_variation,
+        position.z,
+    };
 
-    size_t advance_x = std::abs(std::round(x_candidate) - std::round(position.x));
-    size_t advance_y = std::abs(std::round(y_candidate) - std::round(position.y));
+    Vector2i absolute_advance{
+        std::abs(std::round(candidate_position.x) - std::round(position.x)),
+        std::abs(std::round(candidate_position.y) - std::round(position.y)),
+    };
 
-    auto target_x = position.x;
-    auto target_y = position.y;
-    auto target_z = position.z;
+    auto target_position = Position{position};
 
     // Test collision for the tiles we want advance
-    if (advance_x > 0 || advance_y > 0)
+    if (absolute_advance.x > 0 || absolute_advance.y > 0)
     {
       bool distant_collide = false;
       auto last_position_x = position.x;
@@ -57,13 +59,16 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       int x_round = std::round(position.x);
       int y_round = std::round(position.y);
 
-      TCOD_line_init_mt(
-          x_round, y_round, x_round + advance_x * velocity.x, y_round + advance_y * velocity.y, &bresenham_data);
+      TCOD_line_init_mt(x_round,
+                        y_round,
+                        x_round + absolute_advance.x * velocity.x,
+                        y_round + absolute_advance.y * velocity.y,
+                        &bresenham_data);
 
       // While loop instead of do while to avoid checking the current position
       while (!TCOD_line_step_mt(&x_round, &y_round, &bresenham_data))
       {
-        distant_collide = m_collides(registry, entity, x_round, y_round, z_candidate);
+        distant_collide = m_collides(registry, entity, x_round, y_round, candidate_position.z);
 
         if (distant_collide)
         {
@@ -76,8 +81,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       // Confirm position if there was no collision
       if (!distant_collide)
       {
-        target_x = x_candidate;
-        target_y = y_candidate;
+        target_position.x = candidate_position.x;
+        target_position.y = candidate_position.y;
       }
       // Otherwise, advance to the last walkable position
       // if it's not the current position.
@@ -88,67 +93,19 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
         if (walkable_advance_x > 0 || walkable_advance_y > 0)
         {
-          target_x = position.x + walkable_advance_x * velocity.x;
-          target_y = position.y + walkable_advance_y * velocity.y;
+          target_position.x = position.x + walkable_advance_x * velocity.x;
+          target_position.y = position.y + walkable_advance_y * velocity.y;
         }
         // Check if current tile is a slope
         else
         {
-          const int signed_advance_x = std::round(x_candidate) - std::round(position.x);
-          const int signed_advance_y = std::round(y_candidate) - std::round(position.y);
-          const auto& entity_position = registry.get<Position>(entity);
-          const auto& tiles = m_world.get_all(std::round(entity_position.x), std::round(entity_position.y), position.z);
+          const auto& tiles = m_world.get_all(std::round(position.x), std::round(position.y), std::round(position.z));
 
           if (tiles.terrain.flags.contains("SLOPE"))
           {
-            if (tiles.terrain.climbs_to == Direction::Top && signed_advance_y < 0 && signed_advance_x == 0)
-            {
-              target_x = std::round(entity_position.x);
-              target_y = std::round(entity_position.y - 1);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::Right && signed_advance_y == 0 && signed_advance_x > 0)
-            {
-              target_x = std::round(entity_position.x + 1);
-              target_y = std::round(entity_position.y);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::Bottom && signed_advance_y > 0 && signed_advance_x == 0)
-            {
-              target_x = std::round(entity_position.x);
-              target_y = std::round(entity_position.y + 1);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::Left && signed_advance_y == 0 && signed_advance_x < 0)
-            {
-              target_x = std::round(entity_position.x - 1);
-              target_y = std::round(entity_position.y);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::TopLeft && signed_advance_y < 0 && signed_advance_x < 0)
-            {
-              target_x = std::round(entity_position.x - 1);
-              target_y = std::round(entity_position.y - 1);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::TopRight && signed_advance_y < 0 && signed_advance_x > 0)
-            {
-              target_x = std::round(entity_position.x + 1);
-              target_y = std::round(entity_position.y - 1);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::BottomRight && signed_advance_y > 0 && signed_advance_x > 0)
-            {
-              target_x = std::round(entity_position.x + 1);
-              target_y = std::round(entity_position.y + 1);
-              target_z += 1;
-            }
-            else if (tiles.terrain.climbs_to == Direction::BottomLeft && signed_advance_y > 0 && signed_advance_x < 0)
-            {
-              target_x = std::round(entity_position.x - 1);
-              target_y = std::round(entity_position.y + 1);
-              target_z += 1;
-            }
+            target_position = m_climb_slope(position,
+                                            Position{candidate_position.x, candidate_position.y, position.z + 1},
+                                            tiles.terrain.climbs_to);
           }
         }
       }
@@ -156,18 +113,14 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     // If there was a fractional advance without tile change, just update our position
     else
     {
-      target_x = x_candidate;
-      target_y = y_candidate;
+      target_position.x = candidate_position.x;
+      target_position.y = candidate_position.y;
     }
 
     // Update the position if it's different from the last position
-    if (target_x != position.x || target_y != position.y || target_z != position.z)
+    if (target_position.x != position.x || target_position.y != position.y || target_position.z != position.z)
     {
-      registry.patch<Position>(entity, [target_x, target_y, target_z](auto& position) {
-        position.x = target_x;
-        position.y = target_y;
-        position.z = target_z;
-      });
+      registry.patch<Position>(entity, [&target_position](auto& position) { position = target_position; });
     }
 
     velocity.x = 0.;
@@ -205,5 +158,83 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
   }
 
   return false;
+}
+
+Position PhysicsSystem::m_climb_slope(const Position& position,
+                                      const Position& candidate_position,
+                                      const Direction climbs_to)
+{
+  Position rounded_position{std::round(position.x), std::round(position.y), std::round(position.z)};
+  Vector2i advance{
+      std::round(candidate_position.x) - rounded_position.x,
+      std::round(candidate_position.y) - rounded_position.y,
+  };
+
+  if (climbs_to == Direction::Top && advance.y < 0 && advance.x == 0)
+  {
+    return Position{
+        rounded_position.x,
+        rounded_position.y - 1,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::Right && advance.y == 0 && advance.x > 0)
+  {
+    return Position{
+        rounded_position.x + 1,
+        rounded_position.y,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::Bottom && advance.y > 0 && advance.x == 0)
+  {
+    return Position{
+        rounded_position.x,
+        rounded_position.y + 1,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::Left && advance.y == 0 && advance.x < 0)
+  {
+    return Position{
+        rounded_position.x - 1,
+        rounded_position.y,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::TopLeft && advance.y < 0 && advance.x < 0)
+  {
+    return Position{
+        rounded_position.x - 1,
+        rounded_position.y - 1,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::TopRight && advance.y < 0 && advance.x > 0)
+  {
+    return Position{
+        rounded_position.x + 1,
+        rounded_position.y - 1,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::BottomRight && advance.y > 0 && advance.x > 0)
+  {
+    return Position{
+        rounded_position.x + 1,
+        rounded_position.y + 1,
+        rounded_position.z + 1,
+    };
+  }
+  else if (climbs_to == Direction::BottomLeft && advance.y > 0 && advance.x < 0)
+  {
+    return Position{
+        rounded_position.x - 1,
+        rounded_position.y + 1,
+        rounded_position.z + 1,
+    };
+  }
+
+  return position;
 }
 }  // namespace dl
