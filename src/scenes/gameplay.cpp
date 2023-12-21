@@ -171,7 +171,7 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
     const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
     const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-    m_world.create_item(m_registry, id, tile_x, tile_y, 0);
+    m_world.create_item(m_registry, id, tile_x, tile_y, 1);
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {

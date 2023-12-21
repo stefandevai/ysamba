@@ -71,7 +71,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     }
   }
 
-  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y, registry);
+  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y + elevation, registry);
   bool updated_inspector_content = false;
 
   if (registry.valid(entity))
