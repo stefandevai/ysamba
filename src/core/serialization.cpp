@@ -59,8 +59,8 @@ void save_game(World& world, entt::registry& registry)
       .get<Visibility>(archive)
       .get<SocietyAgent>(archive)
       .get<Selectable>(archive)
-      .get<Item>(archive);
-  /* .get<JobProgress>(archive); */
+      .get<Item>(archive)
+      .get<JobProgress>(archive);
 }
 
 void load_game(World& world, entt::registry& registry)
@@ -80,7 +80,7 @@ void load_game(World& world, entt::registry& registry)
       .get<Visibility>(archive)
       .get<SocietyAgent>(archive)
       .get<Selectable>(archive)
-      .get<Item>(archive);
-  /* .get<JobProgress>(archive); */
+      .get<Item>(archive)
+      .get<JobProgress>(archive);
 }
 }  // namespace dl::serialization
