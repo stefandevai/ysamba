@@ -17,6 +17,19 @@ namespace dl
 {
 struct GameContext;
 
+enum class Direction
+{
+  Center,
+  Top,
+  Right,
+  Bottom,
+  Left,
+  TopLeft,
+  TopRight,
+  BottomRight,
+  BottomLeft,
+};
+
 struct TileTarget
 {
   TileTarget(uint32_t id, int x, int y, int z) : id(id), x(x), y(y), z(z) {}
@@ -41,6 +54,10 @@ class World
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
 
+  // Maximum z level
+  // TODO: Infere z_max on map load / generation
+  int z_max = 1;
+
   // Constructor
   World(GameContext& game_context);
 
@@ -62,6 +79,15 @@ class World
 
   // Get all tiles in a tile map coordinate
   [[nodiscard]] const WorldTile get_all(const int x, const int y, const int z) const;
+
+  // Get terrain tile in a tile map coordinate
+  [[nodiscard]] const TileData& get_terrain(const int x, const int y, const int z) const;
+
+  // Get over terrain tile in a tile map coordinate
+  [[nodiscard]] const TileData& get_over_terrain(const int x, const int y, const int z) const;
+
+  // Gets the z elevation for a given (x, z) position
+  [[nodiscard]] int get_elevation(const int x, const int y) const;
 
   // Get size of a specific tilemap
   [[nodiscard]] TilemapSize get_tilemap_size(const int z);

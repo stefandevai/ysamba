@@ -54,7 +54,7 @@ void Text::update()
     const float h = ch.bh * scale;
 
     // Skip if character is a space
-    if (*it == unicode_space)
+    if (w == 0.0 || h == 0.0)
     {
       char_pos_x += (ch.ax >> 6) * scale;
       continue;

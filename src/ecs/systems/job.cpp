@@ -14,6 +14,18 @@
 #include "graphics/constants.hpp"
 #include "graphics/frame_data_types.hpp"
 
+namespace
+{
+template <typename T>
+void check_component(entt::registry& registry, entt::entity entity, const dl::Job* job)
+{
+  if (!registry.all_of<T>(entity))
+  {
+    registry.emplace<T>(entity, job);
+  }
+}
+}  // namespace
+
 namespace dl
 {
 JobSystem::JobSystem(World& world) : m_world(world) {}
@@ -62,17 +74,33 @@ void JobSystem::update(entt::registry& registry, const double delta)
     {
       switch (current_job.type)
       {
+      case JobType::Walk:
+        check_component<ActionWalk>(registry, entity, &current_job);
+        break;
+      case JobType::Pickup:
+        check_component<ActionPickup>(registry, entity, &current_job);
+        break;
+      case JobType::Wear:
+        check_component<ActionWear>(registry, entity, &current_job);
+        break;
+      case JobType::Wield:
+        check_component<ActionWield>(registry, entity, &current_job);
+        break;
+      case JobType::Drop:
+        check_component<ActionDrop>(registry, entity, &current_job);
+        break;
       case JobType::Harvest:
       case JobType::Break:
       case JobType::Dig:
       case JobType::PrepareFirecamp:
       case JobType::StartFire:
         m_update_tile_job(current_job, delta, entity, registry);
+        break;
       default:
         break;
       }
     }
-    else if (current_job.status == JobStatus::Finished)
+    if (current_job.status == JobStatus::Finished)
     {
       agent.jobs.pop();
     }

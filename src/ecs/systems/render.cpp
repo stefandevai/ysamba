@@ -19,9 +19,12 @@
 
 namespace dl
 {
-RenderSystem::RenderSystem(World& world) : m_world(world), m_world_texture_id(m_world.get_texture_id()) {}
+RenderSystem::RenderSystem(Renderer& renderer, World& world)
+    : m_renderer(renderer), m_world(world), m_world_texture_id(m_world.get_texture_id())
+{
+}
 
-void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Camera& camera)
+void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
 
@@ -35,77 +38,14 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     {
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
-      const auto& world_tile = m_world.get_all(index_x, index_y, 0.0);
 
-      if (world_tile.terrain.id > 0)
+      for (int z = m_world.z_max; z >= 0; --z)
       {
-        const auto& sprite = std::make_unique<Sprite>(m_world_texture_id, 0);
+        const auto& terrain = m_world.get_terrain(index_x, index_y, z);
+        m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
 
-        if (sprite->texture == nullptr)
-        {
-          const auto& world_texture = renderer.get_texture(m_world_texture_id);
-          const auto& frame_data = world_texture->id_to_frame(world_tile.terrain.id, frame_data_type::tile);
-          sprite->texture = world_texture;
-          sprite->set_frame(frame_data.frame);
-        }
-
-        renderer.batch("world"_hs,
-                       sprite.get(),
-                       i * tile_size.x + camera_position.x * tile_size.x,
-                       j * tile_size.y + camera_position.y * tile_size.y,
-                       0.0);
-      }
-
-      if (world_tile.over_terrain.id > 0)
-      {
-        const auto& world_texture = renderer.get_texture(m_world_texture_id);
-        const auto& frame_data = world_texture->id_to_frame(world_tile.over_terrain.id, frame_data_type::tile);
-
-        if (frame_data.tile_type == "multiple")
-        {
-          assert(frame_data.pattern.size() > 0);
-          assert(frame_data.width > 0);
-          assert(frame_data.height > 0);
-          assert(frame_data.pattern_width > 0);
-          assert(frame_data.pattern_height > 0);
-
-          if (!m_world.has_pattern(frame_data.pattern,
-                                   Vector2i{(int)frame_data.pattern_width, (int)frame_data.pattern_height},
-                                   Vector3i{i + camera_position.x, j + camera_position.y, 0}))
-          {
-            continue;
-          }
-
-          const auto& multi_sprite =
-              std::make_unique<MultiSprite>(m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height);
-
-          if (multi_sprite->texture == nullptr)
-          {
-            multi_sprite->texture = world_texture;
-          }
-
-          renderer.batch("world"_hs,
-                         multi_sprite.get(),
-                         (i - frame_data.anchor_x) * tile_size.x + camera_position.x * tile_size.x,
-                         (j - frame_data.anchor_y) * tile_size.y + camera_position.y * tile_size.y,
-                         1.0);
-        }
-        else
-        {
-          const auto& sprite = std::make_unique<Sprite>(m_world_texture_id, 0);
-
-          if (sprite->texture == nullptr)
-          {
-            sprite->texture = world_texture;
-            sprite->set_frame(frame_data.frame);
-          }
-
-          renderer.batch("world"_hs,
-                         sprite.get(),
-                         i * tile_size.x + camera_position.x * tile_size.x,
-                         j * tile_size.y + camera_position.y * tile_size.y,
-                         1.0);
-        }
+        const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
+        m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1);
       }
     }
   }
@@ -123,7 +63,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     }
     if (visibility.sprite->texture == nullptr)
     {
-      visibility.sprite->texture = renderer.get_texture(visibility.sprite->resource_id);
+      visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
 
       // Set specific frame according to the texture data loaded in a separated json file.
       // This allows flexibility by separating the texture frames from game ids.
@@ -135,10 +75,7 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     }
 
     const auto sprite_size = visibility.sprite->get_size();
-    const auto position_x = std::round(position.x) * sprite_size.x;
-    const auto position_y = std::round(position.y) * sprite_size.y;
-
-    renderer.batch("world"_hs, visibility.sprite.get(), position_x, position_y, visibility.layer_z);
+    m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
   }
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -146,22 +83,85 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
   for (auto entity : quad_view)
   {
     const auto& position = registry.get<Position>(entity);
-    const auto& rectangle = registry.get<Rectangle>(entity);
+    auto& rectangle = registry.get<Rectangle>(entity);
 
-    renderer.batch("world"_hs,
-                   rectangle.quad.get(),
-                   std::round(position.x) * tile_size.x,
-                   std::round(position.y) * tile_size.y,
-                   position.z);
+    m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
   }
 
   auto text_view = registry.view<const Text, const Position>();
+
   for (auto entity : text_view)
   {
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    renderer.batch("world"_hs, text, position.x, position.y, 3);
+    m_renderer.batch("world"_hs, text, position.x, position.y - position.z * tile_size.y, position.z * tile_size.y + 3);
   }
 }
+
+template <typename T>
+void RenderSystem::m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index)
+{
+  using namespace entt::literals;
+
+  const auto position_z = std::round(position.z) * size.y;
+  const auto position_x = std::round(position.x) * size.x;
+  const auto position_y = perspective == Perspective::TopDown45 ? std::round(position.y) * size.y - position_z
+                                                                : std::round(position.y) * size.y;
+
+  m_renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index);
+}
+
+void RenderSystem::m_render_tile(const uint32_t tile_id,
+                                 const Vector2i& camera_position,
+                                 const Vector2i& tile_size,
+                                 const int x,
+                                 const int y,
+                                 const int z,
+                                 const int z_index)
+{
+  using namespace entt::literals;
+
+  if (tile_id <= 0)
+  {
+    return;
+  }
+
+  const auto& world_texture = m_renderer.get_texture(m_world_texture_id);
+  const auto& frame_data = world_texture->id_to_frame(tile_id, frame_data_type::tile);
+
+  const int transformed_x = x + camera_position.x;
+  const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y + camera_position.y;
+
+  if (frame_data.tile_type == "single")
+  {
+    // TODO: Add sprite pool
+    auto sprite = Sprite{m_world_texture_id, 0};
+    sprite.texture = world_texture;
+    sprite.set_frame(frame_data.frame);
+
+    m_renderer.batch(
+        "world"_hs, &sprite, transformed_x * tile_size.x, transformed_y * tile_size.y, z * tile_size.y + z_index);
+  }
+  else if (frame_data.tile_type == "multiple")
+  {
+    if (!m_world.has_pattern(frame_data.pattern,
+                             Vector2i{(int)frame_data.pattern_width, (int)frame_data.pattern_height},
+                             Vector3i{transformed_x, transformed_y, z}))
+    {
+      return;
+    }
+
+    // TODO: Add multi sprite pool
+    auto multi_sprite = MultiSprite{m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height};
+    multi_sprite.texture = world_texture;
+
+    m_renderer.batch("world"_hs,
+                     &multi_sprite,
+                     (transformed_x - frame_data.anchor_x) * tile_size.x,
+                     (transformed_y - frame_data.anchor_y) * tile_size.y,
+                     z * tile_size.y + z_index);
+  }
+}
+
 }  // namespace dl

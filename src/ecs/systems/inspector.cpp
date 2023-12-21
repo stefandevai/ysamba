@@ -49,25 +49,45 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   if (!registry.valid(m_target_quad))
   {
     m_target_quad = registry.create();
-    registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, 0xe3c16488);
-    registry.emplace<Position>(m_target_quad, 0, 0, 4);
+    registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, 0xe3c16488, 4);
+    registry.emplace<Position>(m_target_quad, 0, 0, 0);
   }
 
   auto& quad_position = registry.get<Position>(m_target_quad);
   quad_position.x = std::floor(tile_x);
   quad_position.y = std::floor(tile_y);
 
-  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y, registry);
+  int elevation = 0;
+
+  // Check elevation in the current mouse position
+  for (int z = m_world.z_max; z >= 0; --z)
+  {
+    int queried_elevation = m_world.get_elevation(std::floor(tile_x), std::floor(tile_y) + z);
+
+    if (queried_elevation == z)
+    {
+      elevation = queried_elevation;
+      break;
+    }
+  }
+
+  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y + elevation, registry);
   bool updated_inspector_content = false;
 
   if (registry.valid(entity))
   {
-    m_update_inspector_content(entity, registry);
-    updated_inspector_content = true;
+    const auto& position = registry.get<Position>(entity);
+
+    if (position.z >= elevation)
+    {
+      m_update_inspector_content(entity, registry);
+      updated_inspector_content = true;
+    }
   }
-  else
+
+  if (!updated_inspector_content)
   {
-    const auto& tile_data = m_world.get(tile_x, tile_y, 0);
+    const auto& tile_data = m_world.get(tile_x, tile_y + elevation, elevation);
 
     if (tile_data.id > 0)
     {

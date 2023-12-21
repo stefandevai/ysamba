@@ -175,5 +175,59 @@
         "tile_type": "single",
         "frame": 25,
         "id": 11
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 168,
+        "id": 15
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 168,
+        "id": 16
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 174,
+        "id": 23
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 168,
+        "id": 17
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 168,
+        "id": 18
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 169,
+        "id": 19
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 170,
+        "id": 20
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 172,
+        "id": 21
+    },
+    {
+        "type": "tile",
+        "tile_type": "single",
+        "frame": 171,
+        "id": 22
     }
 ]
