@@ -24,6 +24,8 @@
 #include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
 #include "ecs/components/walk_path.hpp"
+#include "ecs/components/weared_items.hpp"
+#include "ecs/components/wielded_items.hpp"
 #include "world/world.hpp"
 
 namespace dl::serialization
@@ -55,6 +57,8 @@ void save_game(World& world, entt::registry& registry)
       .get<Velocity>(archive)
       .get<Biology>(archive)
       .get<CarriedItems>(archive)
+      .get<WearedItems>(archive)
+      .get<WieldedItems>(archive)
       .get<WalkPath>(archive)
       .get<Visibility>(archive)
       .get<SocietyAgent>(archive)
@@ -76,6 +80,8 @@ void load_game(World& world, entt::registry& registry)
       .get<Velocity>(archive)
       .get<Biology>(archive)
       .get<CarriedItems>(archive)
+      .get<WearedItems>(archive)
+      .get<WieldedItems>(archive)
       .get<WalkPath>(archive)
       .get<Visibility>(archive)
       .get<SocietyAgent>(archive)
