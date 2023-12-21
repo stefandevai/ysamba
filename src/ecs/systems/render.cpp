@@ -19,12 +19,6 @@
 
 namespace dl
 {
-enum RenderingType
-{
-  TopDown90,
-  TopDown45,
-};
-
 RenderSystem::RenderSystem(World& world) : m_world(world), m_world_texture_id(m_world.get_texture_id()) {}
 
 void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Camera& camera)
@@ -78,12 +72,8 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     }
 
     const auto sprite_size = visibility.sprite->get_size();
-    const auto position_x = std::round(position.x) * sprite_size.x;
-    const auto position_y = std::round(position.y) * sprite_size.y;
-    const auto position_z = std::round(position.z) * sprite_size.y;
-
-    renderer.batch(
-        "world"_hs, visibility.sprite.get(), position_x, position_y - position_z, position_z + visibility.layer_z);
+    m_batch<Sprite>(
+        renderer, position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
   }
 
   auto quad_view = registry.view<const Position, const Rectangle>();
@@ -93,21 +83,32 @@ void RenderSystem::render(entt::registry& registry, Renderer& renderer, const Ca
     const auto& position = registry.get<Position>(entity);
     const auto& rectangle = registry.get<Rectangle>(entity);
 
-    renderer.batch("world"_hs,
-                   rectangle.quad.get(),
-                   std::round(position.x) * tile_size.x,
-                   std::round(position.y) * tile_size.y - position.z * tile_size.y,
-                   position.z * tile_size.y);
+    m_batch<Quad>(renderer, position, rectangle.quad.get(), tile_size);
   }
 
   auto text_view = registry.view<const Text, const Position>();
+
   for (auto entity : text_view)
   {
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    renderer.batch("world"_hs, text, position.x, position.y, position.z * tile_size.y + 3);
+    renderer.batch("world"_hs, text, position.x, position.y - position.z * tile_size.y, position.z * tile_size.y + 3);
   }
+}
+
+template <typename T>
+void RenderSystem::m_batch(
+    Renderer& renderer, const Position& position, T* renderable, const Vector2i& size, const int z_index)
+{
+  using namespace entt::literals;
+
+  const auto position_z = std::round(position.z) * size.y;
+  const auto position_x = std::round(position.x) * size.x;
+  const auto position_y = perspective == Perspective::TopDown45 ? std::round(position.y) * size.y - position_z
+                                                                : std::round(position.y) * size.y;
+
+  renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index);
 }
 
 void RenderSystem::m_render_tile(Renderer& renderer,
@@ -129,11 +130,24 @@ void RenderSystem::m_render_tile(Renderer& renderer,
   const auto& world_texture = renderer.get_texture(m_world_texture_id);
   const auto& frame_data = world_texture->id_to_frame(tile_id, frame_data_type::tile);
 
-  if (frame_data.tile_type == "multiple")
+  const int transformed_x = x + camera_position.x;
+  const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y + camera_position.y;
+
+  if (frame_data.tile_type == "single")
+  {
+    // TODO: Add sprite pool
+    auto sprite = Sprite{m_world_texture_id, 0};
+    sprite.texture = world_texture;
+    sprite.set_frame(frame_data.frame);
+
+    renderer.batch(
+        "world"_hs, &sprite, transformed_x * tile_size.x, transformed_y * tile_size.y, z * tile_size.y + z_index);
+  }
+  else if (frame_data.tile_type == "multiple")
   {
     if (!m_world.has_pattern(frame_data.pattern,
                              Vector2i{(int)frame_data.pattern_width, (int)frame_data.pattern_height},
-                             Vector3i{x + camera_position.x, y + camera_position.y, z}))
+                             Vector3i{transformed_x, transformed_y, z}))
     {
       return;
     }
@@ -144,22 +158,8 @@ void RenderSystem::m_render_tile(Renderer& renderer,
 
     renderer.batch("world"_hs,
                    &multi_sprite,
-                   (x - frame_data.anchor_x) * tile_size.x + camera_position.x * tile_size.x,
-                   (y - frame_data.anchor_y) * tile_size.y + camera_position.y * tile_size.y - z * tile_size.y,
-                   z * tile_size.y + z_index);
-  }
-  else if (frame_data.tile_type == "single")
-  {
-    // TODO: Add sprite pool
-    auto sprite = Sprite{m_world_texture_id, 0};
-    sprite.texture = world_texture;
-    sprite.set_frame(frame_data.frame);
-
-    renderer.batch("world"_hs,
-                   &sprite,
-                   x * tile_size.x + camera_position.x * tile_size.x,
-                   y * tile_size.y + camera_position.y * tile_size.y - z * tile_size.y,
-                   /* j * tile_size.y + camera_position.y * tile_size.y, */
+                   (transformed_x - frame_data.anchor_x) * tile_size.x,
+                   (transformed_y - frame_data.anchor_y) * tile_size.y,
                    z * tile_size.y + z_index);
   }
 }
