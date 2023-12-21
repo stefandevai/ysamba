@@ -130,6 +130,18 @@ const WorldTile World::get_all(const int x, const int y, const int z) const
   return WorldTile{m_tile_data.at(terrain_id), m_tile_data.at(over_terrain_id)};
 }
 
+const TileData& World::get_terrain(const int x, const int y, const int z) const
+{
+  const auto terrain_id = m_terrains[z - m_depth_min].at(x, y);
+  return m_tile_data.at(terrain_id);
+}
+
+const TileData& World::get_over_terrain(const int x, const int y, const int z) const
+{
+  const auto over_terrain_id = m_over_terrains[z - m_depth_min].at(x, y);
+  return m_tile_data.at(over_terrain_id);
+}
+
 std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, const Vector3i& to)
 {
   std::stack<std::pair<int, int>> path{};

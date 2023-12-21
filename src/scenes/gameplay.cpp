@@ -114,7 +114,7 @@ void Gameplay::render()
   }
 
   m_renderer.push_matrix("world"_hs, m_camera.get_view_matrix());
-  m_render_system.render(m_registry, m_renderer, m_camera);
+  m_render_system.render(m_registry, m_camera);
   m_renderer.pop_matrix("world"_hs);
 
   m_ui_manager.render();

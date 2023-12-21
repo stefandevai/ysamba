@@ -54,6 +54,10 @@ class World
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
 
+  // Maximum z level
+  // TODO: Infere z_max on map load / generation
+  int z_max = 1;
+
   // Constructor
   World(GameContext& game_context);
 
@@ -75,6 +79,12 @@ class World
 
   // Get all tiles in a tile map coordinate
   [[nodiscard]] const WorldTile get_all(const int x, const int y, const int z) const;
+
+  // Get terrain tile in a tile map coordinate
+  [[nodiscard]] const TileData& get_terrain(const int x, const int y, const int z) const;
+
+  // Get over terrain tile in a tile map coordinate
+  [[nodiscard]] const TileData& get_over_terrain(const int x, const int y, const int z) const;
 
   // Get size of a specific tilemap
   [[nodiscard]] TilemapSize get_tilemap_size(const int z);

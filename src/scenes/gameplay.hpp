@@ -60,7 +60,7 @@ class Gameplay : public Scene
 
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
-  RenderSystem m_render_system{m_world};
+  RenderSystem m_render_system{m_renderer, m_world};
   SocietySystem m_society_system{};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager};
