@@ -7,7 +7,8 @@ namespace dl
 {
 struct Rectangle
 {
-  Rectangle(int w, int h, const uint32_t color) { quad = std::make_unique<Quad>(w, h, Color{color}); }
-  std::unique_ptr<Quad> quad = nullptr;
+  Quad quad;
+
+  Rectangle(int w, int h, const uint32_t color) : quad(Quad{w, h, Color{color}}) {}
 };
 }  // namespace dl
