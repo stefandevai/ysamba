@@ -34,9 +34,9 @@ void Display::load(const int width, const int height, const std::string& title)
     throw std::runtime_error("It was not possible to initialize SDL2");
   }
 
-  const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-  /* const SDL_WindowFlags window_flags = */
-  /*     (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL); */
+  /* const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL); */
+  const SDL_WindowFlags window_flags =
+      (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL);
   m_window = SDL_CreateWindow(
       m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, window_flags);
   SDL_SetWindowMinimumSize(m_window, width, height);

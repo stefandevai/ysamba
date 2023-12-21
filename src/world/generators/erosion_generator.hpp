@@ -16,7 +16,7 @@ class ErosionGenerator
   {
   }
 
-  std::vector<double> generate(const int seed);
+  std::vector<int> generate(const int seed);
 
  private:
   LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};

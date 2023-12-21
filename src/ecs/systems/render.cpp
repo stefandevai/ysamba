@@ -39,7 +39,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
 
-      for (int z = m_world.z_max; z >= 0; --z)
+      for (int z = m_world.size.z - 1; z >= 0; --z)
       {
         const auto& terrain = m_world.get_terrain(index_x, index_y, z);
         m_render_tile(terrain.id, camera_position, tile_size, i, j, z);

@@ -28,8 +28,11 @@ void Gameplay::load()
 
   m_renderer.add_batch("world"_hs, "default");
 
-  /* m_world.load("./data/world/test_map.json"); */
-  load_game();
+  spdlog::debug("HERE1");
+  m_world.generate(100, 100, 1337);
+  spdlog::debug("HERE2");
+  /* m_world.load("./data/world/test_map2.json"); */
+  /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
   m_debug_info = m_ui_manager.emplace<ui::DebugInfo>(m_camera);

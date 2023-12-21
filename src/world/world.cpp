@@ -8,7 +8,8 @@
 #include <queue>
 #include <set>
 /* #include "./generators/erosion_generator.hpp" */
-#include "./generators/terrain_generator.hpp"
+/* #include "./generators/terrain_generator.hpp" */
+#include "./generators/erosion_generator.hpp"
 /* #include "./generators/dummy_generator.hpp" */
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
@@ -35,17 +36,26 @@ World::World(GameContext& game_context) : m_game_context(game_context)
 void World::generate(const int width, const int height, const int seed)
 {
   m_seed = seed;
-  m_terrains.clear();
-  m_over_terrains.clear();
 
-  /* auto tilemap_generator = ErosionGenerator(width, height, 10); */
-  auto tilemap_generator = TerrainGenerator(width, height);
-  /* auto tilemap_generator = DummyGenerator(width, height); */
-  auto tilemap = tilemap_generator.generate(seed);
-  m_terrains.push_back(tilemap);
+  size.x = width;
+  size.y = height;
+  size.z = 10;
 
-  // TODO: Generate over terrains as well
-  m_over_terrains.resize(m_terrains.size());
+  /* m_tiles.clear(); */
+  /* m_tiles.reserve(size.x * size.y * size.z); */
+  /* m_terrains.clear(); */
+  /* m_over_terrains.clear(); */
+
+  auto terrain_generator = ErosionGenerator(size.x, size.y, size.z);
+  m_tiles = terrain_generator.generate(m_seed);
+  m_over_tiles.reserve(size.x * size.y * size.z);
+  /* auto tilemap_generator = TerrainGenerator(width, height); */
+  /* /1* auto tilemap_generator = DummyGenerator(width, height); *1/ */
+  /* auto tilemap = tilemap_generator.generate(seed); */
+  /* m_terrains.push_back(tilemap); */
+
+  /* // TODO: Generate over terrains as well */
+  /* m_over_terrains.resize(m_terrains.size()); */
 
   auto society = SocietyGenerator::generate_blueprint();
   m_societies[society.id] = society;
@@ -57,103 +67,184 @@ void World::load(const std::string& filepath)
   m_societies[society.id] = society;
 
   m_json.load(filepath);
-  const auto& layers = m_json.object.get<std::vector<nlohmann::json>>();
+  const auto& layers = m_json.object["layers"].get<std::vector<nlohmann::json>>();
 
-  m_terrains.clear();
-  m_terrains.resize(layers.size());
+  size.x = m_json.object["width"].get<int>();
+  size.y = m_json.object["height"].get<int>();
+  size.z = layers.size();
 
-  m_over_terrains.clear();
-  m_over_terrains.resize(layers.size());
+  m_tiles.clear();
+  m_tiles.reserve(size.x * size.y * size.z);
 
-  for (size_t i = 0; i < layers.size(); ++i)
+  m_over_tiles.clear();
+  m_over_tiles.reserve(size.x * size.y * size.z);
+
+  for (size_t z = 0; z < layers.size(); ++z)
   {
-    const auto width = layers[i]["width"].get<uint32_t>();
-    const auto height = layers[i]["width"].get<uint32_t>();
-    const auto terrain_data = layers[i]["terrain"].get<std::vector<int>>();
-    const auto over_terrain_data = layers[i]["over_terrain"].get<std::vector<int>>();
+    const auto terrain_data = layers[z]["terrain"].get<std::vector<int>>();
+    const auto over_terrain_data = layers[z]["over_terrain"].get<std::vector<int>>();
 
-    m_terrains[i] = Tilemap(terrain_data, width, height);
-    m_over_terrains[i] = Tilemap(over_terrain_data, width, height);
+    for (auto j = 0; j < size.y; ++j)
+    {
+      for (auto i = 0; i < size.x; ++i)
+      {
+        m_tiles[i + j * size.x + z * size.x * size.y] = terrain_data[i + j * size.x];
+      }
+    }
+
+    for (auto j = 0; j < size.y; ++j)
+    {
+      for (auto i = 0; i < size.x; ++i)
+      {
+        m_over_tiles[i + j * size.x + z * size.x * size.y] = over_terrain_data[i + j * size.x];
+      }
+    }
   }
+
+  /* m_terrains.clear(); */
+  /* m_terrains.resize(layers.size()); */
+
+  /* m_over_terrains.clear(); */
+  /* m_over_terrains.resize(layers.size()); */
+
+  /* for (size_t i = 0; i < layers.size(); ++i) */
+  /* { */
+  /*   const auto width = layers[i]["width"].get<uint32_t>(); */
+  /*   const auto height = layers[i]["width"].get<uint32_t>(); */
+  /*   const auto terrain_data = layers[i]["terrain"].get<std::vector<int>>(); */
+  /*   const auto over_terrain_data = layers[i]["over_terrain"].get<std::vector<int>>(); */
+
+  /*   m_terrains[i] = Tilemap(terrain_data, width, height); */
+  /*   m_over_terrains[i] = Tilemap(over_terrain_data, width, height); */
+  /* } */
 }
 
 void World::set_terrain(const uint32_t tile_id, const int x, const int y, const int z)
 {
-  m_terrains[z - m_depth_min].set(tile_id, x, y);
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return;
+  }
+
+  m_tiles[x + y * size.x + z * size.y * size.x] = tile_id;
+  /* m_terrains[z - m_depth_min].set(tile_id, x, y); */
 }
 
 void World::set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z)
 {
-  m_over_terrains[z - m_depth_min].set(tile_id, x, y);
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return;
+  }
+
+  m_over_tiles[x + y * size.x + z * size.y * size.x] = tile_id;
+  /* m_over_terrains[z - m_depth_min].set(tile_id, x, y); */
 }
 
 void World::replace(const int from, const int to, const int x, const int y, const int z)
 {
-  const int over_tile_index = m_over_terrains[z - m_depth_min].at(x, y);
-  const int terrain_index = m_terrains[z - m_depth_min].at(x, y);
-
-  if (over_tile_index == from && terrain_index != to)
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
   {
-    m_over_terrains[z - m_depth_min].set(to, x, y);
+    return;
+  }
+
+  const int over_tile_index = m_over_tiles[x + y * size.x + z * size.y * size.x];
+  const int tile_index = m_tiles[x + y * size.x + z * size.y * size.x];
+
+  /* const int over_tile_index = m_over_terrains[z - m_depth_min].at(x, y); */
+  /* const int terrain_index = m_terrains[z - m_depth_min].at(x, y); */
+
+  if (over_tile_index == from && tile_index != to)
+  {
+    m_over_tiles[x + y * size.x + z * size.y * size.x] = to;
+    /* m_over_terrains[z - m_depth_min].set(to, x, y); */
     return;
   }
   // If the terrain already has the target tile, just assign the null tile to the over tile
-  else if (over_tile_index == from && terrain_index == to)
+  else if (over_tile_index == from && tile_index == to)
   {
-    m_over_terrains[z - m_depth_min].set(0, x, y);
+    m_over_tiles[x + y * size.x + z * size.y * size.x] = 0;
+    /* m_over_terrains[z - m_depth_min].set(0, x, y); */
     return;
   }
 
-  if (terrain_index == from)
+  if (tile_index == from)
   {
-    m_terrains[z - m_depth_min].set(to, x, y);
+    /* m_terrains[z - m_depth_min].set(to, x, y); */
+    m_tiles[x + y * size.x + z * size.y * size.x] = to;
   }
 }
 
 const TileData& World::get(const int x, const int y, const int z) const
 {
-  const int over_tile_index = m_over_terrains[z - m_depth_min].at(x, y);
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return m_tile_data.at(0);
+  }
+
+  const int over_tile_index = m_over_tiles[x + y * size.x + z * size.y * size.x];
 
   if (over_tile_index != 0)
   {
     return m_tile_data.at(over_tile_index);
   }
 
-  const int terrain_index = m_terrains[z - m_depth_min].at(x, y);
+  const int tile_index = m_tiles[x + y * size.x + z * size.y * size.x];
 
-  return m_tile_data.at(terrain_index);
+  return m_tile_data.at(tile_index);
 }
 
 const WorldTile World::get_all(const int x, const int y, const int z) const
 {
-  const auto terrain_id = m_terrains[z - m_depth_min].at(x, y);
-  const auto over_terrain_id = m_over_terrains[z - m_depth_min].at(x, y);
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return WorldTile{m_tile_data.at(0), m_tile_data.at(0)};
+  }
 
-  return WorldTile{m_tile_data.at(terrain_id), m_tile_data.at(over_terrain_id)};
+  const int over_tile_index = m_over_tiles[x + y * size.x + z * size.y * size.x];
+  const int tile_index = m_tiles[x + y * size.x + z * size.y * size.x];
+
+  /* const auto terrain_id = m_terrains[z - m_depth_min].at(x, y); */
+  /* const auto over_terrain_id = m_over_terrains[z - m_depth_min].at(x, y); */
+
+  return WorldTile{m_tile_data.at(tile_index), m_tile_data.at(over_tile_index)};
 }
 
 const TileData& World::get_terrain(const int x, const int y, const int z) const
 {
-  const auto terrain_id = m_terrains[z - m_depth_min].at(x, y);
-  return m_tile_data.at(terrain_id);
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return m_tile_data.at(0);
+  }
+
+  const int tile_index = m_tiles[x + y * size.x + z * size.y * size.x];
+  /* const auto terrain_id = m_terrains[z - m_depth_min].at(x, y); */
+  return m_tile_data.at(tile_index);
 }
 
 const TileData& World::get_over_terrain(const int x, const int y, const int z) const
 {
-  const auto over_terrain_id = m_over_terrains[z - m_depth_min].at(x, y);
-  return m_tile_data.at(over_terrain_id);
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return m_tile_data.at(0);
+  }
+
+  const int over_tile_index = m_over_tiles[x + y * size.x + z * size.y * size.x];
+  /* const auto over_terrain_id = m_over_terrains[z - m_depth_min].at(x, y); */
+  return m_tile_data.at(over_tile_index);
 }
 
 int World::get_elevation(const int x, const int y) const
 {
-  if (x < 0 || y < 0)
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y)
   {
     return 0;
   }
 
-  for (int z = z_max; z >= 0; --z)
+  for (int z = size.z; z >= 0; --z)
   {
-    if (m_terrains[z - m_depth_min].at(x, y) != 0)
+    /* if (m_terrains[z - m_depth_min].at(x, y) != 0) */
+    if (m_tiles[x + y * size.x + z * size.y * size.x] != 0)
     {
       return z;
     }
@@ -301,6 +392,12 @@ bool World::is_walkable(const int x, const int y, const int z) const
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
 {
+  if (position.x < 0 || position.x >= this->size.x || position.y < 0 || position.y >= this->size.y || position.z < 0 ||
+      position.z >= this->size.z)
+  {
+    return false;
+  }
+
   bool found_pattern = true;
 
   for (int j = 0; j < size.y; ++j)
@@ -314,16 +411,21 @@ bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& si
         continue;
       }
 
-      const uint32_t over_terrain_index = m_over_terrains[position.z - m_depth_min].at(position.x + i, position.y + j);
+      /* const uint32_t over_terrain_index = m_over_terrains[position.z - m_depth_min].at(position.x + i, position.y +
+       * j); */
+      const int over_tile_index =
+          m_over_tiles[(position.x + i) + (position.y + j) * this->size.x + position.z * this->size.y * this->size.x];
 
-      if (over_terrain_index == pattern_value)
+      if (over_tile_index == pattern_value)
       {
         continue;
       }
 
-      const uint32_t terrain_index = m_terrains[position.z - m_depth_min].at(position.x + i, position.y + j);
+      const int tile_index =
+          m_tiles[(position.x + i) + (position.y + j) * this->size.x + position.z * this->size.y * this->size.x];
+      /* const uint32_t terrain_index = m_terrains[position.z - m_depth_min].at(position.x + i, position.y + j); */
 
-      if (terrain_index != pattern_value)
+      if (tile_index != pattern_value)
       {
         return false;
       }
@@ -333,7 +435,8 @@ bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& si
   return found_pattern;
 }
 
-TilemapSize World::get_tilemap_size(const int z) { return m_terrains[z - m_depth_min].get_size(); }
+/* TilemapSize World::get_tilemap_size(const int z) { return m_terrains[z - m_depth_min].get_size(); } */
+TilemapSize World::get_tilemap_size(const int z) { return TilemapSize{size.x, size.y, size.z}; }
 
 const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }
 

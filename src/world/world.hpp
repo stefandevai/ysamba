@@ -54,9 +54,8 @@ class World
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
 
-  // Maximum z level
-  // TODO: Infere z_max on map load / generation
-  int z_max = 1;
+  // World dimensions
+  Vector3i size{};
 
   // Constructor
   World(GameContext& game_context);
@@ -157,6 +156,8 @@ class World
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};
   std::map<uint32_t, SocietyBlueprint> m_societies;
+  std::vector<int> m_tiles{};
+  std::vector<int> m_over_tiles{};
 
   // Load information about tiles
   void m_load_tile_data();
