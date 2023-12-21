@@ -5,13 +5,25 @@ draw_bays = false
 draw_structure = false
 
 -- Silhouette
-simplex_freq = 0.005
-simplex_octaves = 4
-simplex_lacunarity = 3.2
-simplex_gain = 0.32
-simplex_weighted_strength = 0.25
+-- simplex_freq = 0.005
+-- simplex_octaves = 4
+-- simplex_lacunarity = 3.2
+-- simplex_gain = 0.32
+-- simplex_weighted_strength = 0.25
 tier_land = 0.002
 islands_to_keep = 4
+
+-- simplex_freq = 0.010
+-- simplex_octaves = 2
+-- simplex_lacunarity = 3.1
+-- simplex_gain = 0.50
+-- simplex_weighted_strength = 0.0
+
+simplex_freq = 0.020
+simplex_octaves = 1
+simplex_lacunarity = 3.3
+simplex_gain = 0.00
+simplex_weighted_strength = 0.0
 
 -- Strucutre
 coast_min_area = 100

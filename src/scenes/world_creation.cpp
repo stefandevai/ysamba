@@ -207,31 +207,42 @@ void WorldCreation::m_create_world_representation()
   m_world_sprite->texture = texture;
 }
 
+const int hm_width = 256;
+const int hm_height = 256;
+
 void WorldCreation::m_generate_height_map(const int seed)
 {
-  auto generator = ErosionGenerator(512, 512);
-  m_height_map = generator.generate(seed);
+  (void)seed;
+
+  /* auto generator = ErosionGenerator(hm_width, hm_width); */
+
+  const auto s = random::get_integer(0, INT_MAX);
+  m_height_map.clear();
+  m_height_map.reserve(hm_width * hm_height);
+  /* m_height_map = generator.generate(s); */
 }
 
 void WorldCreation::m_create_height_map_representation()
 {
-  std::vector<unsigned char> pixel_data((512 * 512) * 4);
+  std::vector<unsigned char> pixel_data((hm_width * hm_height) * 4);
+  const int z_levels = 10;
 
-  for (auto i = 0; i < 512; ++i)
+  for (auto i = 0; i < hm_width; ++i)
   {
-    for (auto j = 0; j < 512; ++j)
+    for (auto j = 0; j < hm_height; ++j)
     {
-      const auto map_value = m_height_map[j * 512 + i];
-      const uint8_t value = std::round(map_value * 255);
+      const auto map_value = m_height_map[j * hm_width + i];
+      const int z = static_cast<int>(map_value * z_levels);
+      const uint8_t value = z * 255 / z_levels;
 
-      pixel_data[j * 512 * 4 + i * 4] = value;
-      pixel_data[j * 512 * 4 + i * 4 + 1] = value;
-      pixel_data[j * 512 * 4 + i * 4 + 2] = value;
-      pixel_data[j * 512 * 4 + i * 4 + 3] = 255;
+      pixel_data[j * hm_width * 4 + i * 4] = 0;
+      pixel_data[j * hm_width * 4 + i * 4 + 1] = value;
+      pixel_data[j * hm_width * 4 + i * 4 + 2] = 50;
+      pixel_data[j * hm_width * 4 + i * 4 + 3] = 255;
     }
   }
 
-  const auto texture = std::make_shared<Texture>(pixel_data, 512, 512);
+  const auto texture = std::make_shared<Texture>(pixel_data, hm_width, hm_height);
   m_world_sprite->texture = texture;
 }
 

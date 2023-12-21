@@ -38,6 +38,7 @@ void World::generate(const int width, const int height, const int seed)
   m_terrains.clear();
   m_over_terrains.clear();
 
+  /* auto tilemap_generator = ErosionGenerator(width, height, 10); */
   auto tilemap_generator = TerrainGenerator(width, height);
   /* auto tilemap_generator = DummyGenerator(width, height); */
   auto tilemap = tilemap_generator.generate(seed);
