@@ -9,6 +9,7 @@ class Label : public UIComponent
 {
  public:
   Text text;
+  std::string value;
   bool wrap = true;
 
   Label(UIContext& context);
@@ -20,7 +21,6 @@ class Label : public UIComponent
   void set_text(const std::string_view value);
 
  private:
-  std::string m_value;
 };
 
 }  // namespace dl::ui

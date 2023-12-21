@@ -9,7 +9,7 @@ namespace dl::ui
 {
 Label::Label(UIContext& context) : UIComponent(context) {}
 
-Label::Label(UIContext& context, const std::string_view value) : UIComponent(context), m_value(value) {}
+Label::Label(UIContext& context, const std::string_view value) : UIComponent(context), value(value) {}
 
 void Label::init()
 {
@@ -18,11 +18,11 @@ void Label::init()
     const auto& window_size = Display::get_window_size();
     const auto wrap_width =
         (parent == nullptr || parent->size.x == 0) ? window_size.x - 2 * margin.x : parent->size.x - 2 * margin.x;
-    text.set_text_wrapped(m_value, wrap_width);
+    text.set_text_wrapped(value, wrap_width);
   }
   else
   {
-    text.set_text(m_value);
+    text.set_text(value);
   }
 
   size = text.get_size();
@@ -45,12 +45,12 @@ void Label::render(Batch& batch)
 
 void Label::set_text(const std::string_view value)
 {
-  if (value == m_value)
+  if (this->value == value)
   {
     return;
   }
 
-  m_value = value;
+  this->value = value;
   has_initialized = false;
 }
 }  // namespace dl::ui

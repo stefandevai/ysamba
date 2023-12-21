@@ -32,7 +32,7 @@ void Gameplay::load()
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
-  m_debug_info = m_ui_manager.emplace<ui::DebugInfo>();
+  m_debug_info = m_ui_manager.emplace<ui::DebugInfo>(m_camera);
 
   auto society_blueprint = m_world.get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
@@ -40,8 +40,6 @@ void Gameplay::load()
 
   m_has_loaded = true;
 }
-
-double delay = 0.0;
 
 void Gameplay::update()
 {
@@ -92,16 +90,6 @@ void Gameplay::update()
   m_drop_system.update(m_registry, m_camera);
 
   m_ui_manager.update();
-
-  if (delay <= 0.0)
-  {
-    m_debug_info->set_content("FPS: " + std::to_string(1.0 / delta));
-    delay = 0.8;
-  }
-  else
-  {
-    delay -= delta;
-  }
 }
 
 void Gameplay::render()
@@ -171,7 +159,7 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
     const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
     const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
 
-    m_world.create_item(m_registry, id, tile_x, tile_y, 1);
+    m_world.create_item(m_registry, id, tile_x, tile_y, 0);
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {
