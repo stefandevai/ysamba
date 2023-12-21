@@ -85,7 +85,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
     const auto& position = registry.get<Position>(entity);
     auto& rectangle = registry.get<Rectangle>(entity);
 
-    m_batch<Quad>(position, &rectangle.quad, tile_size);
+    m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
   }
 
   auto text_view = registry.view<const Text, const Position>();

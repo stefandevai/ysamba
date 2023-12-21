@@ -22,5 +22,4 @@ DebugInfo::DebugInfo(UIContext& context) : UIComponent(context)
 }
 
 void DebugInfo::set_content(const std::string_view text) { m_label->set_text(text); }
-
 }  // namespace dl::ui

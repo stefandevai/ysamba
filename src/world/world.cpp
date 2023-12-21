@@ -142,6 +142,29 @@ const TileData& World::get_over_terrain(const int x, const int y, const int z) c
   return m_tile_data.at(over_terrain_id);
 }
 
+int World::get_elevation(const int x, const int y) const
+{
+  if (x < 0 || y < 0)
+  {
+    return 0;
+  }
+
+  for (int z = z_max; z >= 0; --z)
+  {
+    if (m_terrains[z - m_depth_min].at(x, y) != 0)
+    {
+      return z;
+    }
+
+    if (z == 0)
+    {
+      return z;
+    }
+  }
+
+  return 0;
+}
+
 std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, const Vector3i& to)
 {
   std::stack<std::pair<int, int>> path{};

@@ -86,6 +86,9 @@ class World
   // Get over terrain tile in a tile map coordinate
   [[nodiscard]] const TileData& get_over_terrain(const int x, const int y, const int z) const;
 
+  // Gets the z elevation for a given (x, z) position
+  [[nodiscard]] int get_elevation(const int x, const int y) const;
+
   // Get size of a specific tilemap
   [[nodiscard]] TilemapSize get_tilemap_size(const int z);
 
