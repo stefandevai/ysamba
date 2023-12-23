@@ -14,6 +14,12 @@
 #endif
 
 #include "core/maths/vector.hpp"
+#include "debug/debug.hpp"
+
+namespace
+{
+auto& debug = dl::Debug::get_instance();
+}
 
 namespace dl
 {
@@ -63,6 +69,8 @@ void Display::load(const int width, const int height, const std::string& title)
   {
     spdlog::critical("Failed to initialize GLAD");
   }
+
+  debug.init(m_window, m_gl_context);
 }
 
 Display::~Display()
@@ -76,7 +84,11 @@ const Vector2i Display::get_size() const { return {m_width, m_height}; }
 
 const Vector2i Display::get_window_size() { return {m_width, m_height}; }
 
-void Display::render() { SDL_GL_SwapWindow(m_window); }
+void Display::render()
+{
+  debug.render();
+  SDL_GL_SwapWindow(m_window);
+}
 
 void Display::set_title(const std::string& title) { SDL_SetWindowTitle(m_window, title.c_str()); }
 

@@ -57,6 +57,7 @@ find_package(EnTT CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(freetype CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -80,4 +81,5 @@ target_link_libraries(
         nlohmann_json::nlohmann_json
         freetype
         spdlog::spdlog
+        imgui::imgui
 )
