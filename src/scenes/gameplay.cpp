@@ -174,19 +174,23 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
   }
   else if (m_input_manager.poll_action("camera_move_west"_hs))
   {
-    m_camera.move({-8., 0., 0.});
+    const double speed = m_game_context.clock->delta * 400.0;
+    m_camera.move({-speed, 0., 0.});
   }
   else if (m_input_manager.poll_action("camera_move_east"_hs))
   {
-    m_camera.move({8., 0., 0.});
+    const double speed = m_game_context.clock->delta * 400.0;
+    m_camera.move({speed, 0., 0.});
   }
   else if (m_input_manager.poll_action("camera_move_south"_hs))
   {
-    m_camera.move({0., 8., 0.});
+    const double speed = m_game_context.clock->delta * 400.0;
+    m_camera.move({0., speed, 0.});
   }
   else if (m_input_manager.poll_action("camera_move_north"_hs))
   {
-    m_camera.move({0., -8., 0.});
+    const double speed = m_game_context.clock->delta * 400.0;
+    m_camera.move({0., -speed, 0.});
   }
 
   return will_quit;
