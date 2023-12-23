@@ -113,10 +113,10 @@ std::vector<int> ErosionGenerator::generate(const int seed)
       /*   tiles[(k - 1) * m_width * m_height + j * m_width + i] = 15; */
       /* } */
 
-      /* for (int z = 0; z < k; ++z) */
-      /* { */
-      /*   tiles[z * m_width * m_height + j * m_width + i] = 5; */
-      /* } */
+      for (int z = 0; z < k; ++z)
+      {
+        tiles[z * m_width * m_height + j * m_width + i] = 5;
+      }
     }
   }
 
