@@ -5,9 +5,12 @@
 
 #include "./input_manager.hpp"
 #include "core/utf8.hpp"
+#include "debug/debug.hpp"
 
 namespace
 {
+auto& debug = dl::Debug::get_instance();
+
 using namespace entt::literals;
 const std::unordered_map<uint32_t, int> key_map = {
     {"k_backspace"_hs, SDLK_BACKSPACE},
@@ -281,6 +284,8 @@ void SDLInputWrapper::update()
 
   while (SDL_PollEvent(&event))
   {
+    debug.process_event(&event);
+
     switch (event.type)
     {
     case SDL_QUIT:
@@ -388,6 +393,8 @@ void SDLInputWrapper::update()
       SDL_free(temp);
     }
   }
+
+  debug.update();
 }
 
 bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }
