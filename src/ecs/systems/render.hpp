@@ -19,7 +19,7 @@ class RenderSystem
     TopDown45,
   };
 
-  Perspective perspective = TopDown90;
+  Perspective perspective = TopDown45;
 
   RenderSystem(Renderer& renderer, World& world);
   void render(entt::registry& registry, const Camera& camera);

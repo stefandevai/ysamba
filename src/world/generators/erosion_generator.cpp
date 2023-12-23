@@ -49,50 +49,59 @@ std::vector<int> ErosionGenerator::generate(const int seed)
       const auto map_value = height_map[j * m_width + i];
       const int k = static_cast<int>(map_value * (m_z_levels - 1));
 
-      if (k == 0)
+      if (k < 2)
       {
         tiles[k * m_width * m_height + j * m_width + i] = 1;
       }
-      else if (k == 1)
+      else
       {
         tiles[k * m_width * m_height + j * m_width + i] = 2;
       }
-      else if (k == 2)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 3;
-      }
-      else if (k == 3)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 6;
-      }
-      else if (k == 4)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 12;
-      }
-      else if (k == 5)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 13;
-      }
-      else if (k == 6)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 14;
-      }
-      else if (k == 7)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 23;
-      }
-      else if (k == 8)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 15;
-      }
-      else if (k == 9)
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 18;
-      }
-      else
-      {
-        tiles[k * m_width * m_height + j * m_width + i] = 19;
-      }
+
+      /* if (k == 0) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 1; */
+      /* } */
+      /* else if (k == 1) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 2; */
+      /* } */
+      /* else if (k == 2) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 3; */
+      /* } */
+      /* else if (k == 3) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 6; */
+      /* } */
+      /* else if (k == 4) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 12; */
+      /* } */
+      /* else if (k == 5) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 13; */
+      /* } */
+      /* else if (k == 6) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 14; */
+      /* } */
+      /* else if (k == 7) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 23; */
+      /* } */
+      /* else if (k == 8) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 15; */
+      /* } */
+      /* else if (k == 9) */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 18; */
+      /* } */
+      /* else */
+      /* { */
+      /*   tiles[k * m_width * m_height + j * m_width + i] = 19; */
+      /* } */
 
       /* else */
       /* { */
