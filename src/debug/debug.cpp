@@ -58,7 +58,7 @@ void Debug::process_event(SDL_Event* event)
   ImGui_ImplSDL2_ProcessEvent(event);
 }
 
-bool show_demo_window = true;
+bool show_demo_window = false;
 
 void Debug::update()
 {
@@ -71,7 +71,15 @@ void Debug::update()
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
-  ImGui::ShowDemoWindow(&show_demo_window);
+  if (show_demo_window)
+  {
+    ImGui::ShowDemoWindow(&show_demo_window);
+  }
+
+  if (m_camera_editor != nullptr)
+  {
+    m_camera_editor->update();
+  }
 }
 
 void Debug::render()
@@ -84,4 +92,7 @@ void Debug::render()
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+void Debug::init_camera_editor(Camera& camera) { m_camera_editor = std::make_unique<CameraEditor>(camera); }
+
 }  // namespace dl

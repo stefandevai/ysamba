@@ -8,6 +8,7 @@
 #include "core/json.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
+#include "debug/debug.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/visibility.hpp"
@@ -40,6 +41,9 @@ void Gameplay::load()
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */
   /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
+
+  auto& debug = Debug::get_instance();
+  debug.init_camera_editor(m_camera);
 
   m_has_loaded = true;
 }

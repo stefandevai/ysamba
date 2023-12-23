@@ -2,12 +2,16 @@
 
 #include <memory>
 
+#include "./camera_editor.hpp"
+
 union SDL_Event;
 struct SDL_Window;
 typedef void* SDL_GLContext;
 
 namespace dl
 {
+class Camera;
+
 class Debug
 {
  public:
@@ -23,9 +27,14 @@ class Debug
   void update();
   void render();
 
+  // Custom widgets
+  void init_camera_editor(Camera& camera);
+
  private:
-  bool m_has_initialized = false;
   static std::unique_ptr<Debug> m_instance;
+  bool m_has_initialized = false;
+
+  std::unique_ptr<CameraEditor> m_camera_editor = nullptr;
 };
 
 }  // namespace dl

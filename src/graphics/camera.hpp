@@ -60,5 +60,7 @@ class Camera
   Vector2 m_size{};
   Vector2i m_tile_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
+
+  friend class CameraEditor;
 };
 }  // namespace dl
