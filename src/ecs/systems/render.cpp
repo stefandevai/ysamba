@@ -20,7 +20,10 @@
 namespace dl
 {
 RenderSystem::RenderSystem(Renderer& renderer, World& world)
-    : m_renderer(renderer), m_world(world), m_world_texture_id(m_world.get_texture_id())
+    : m_renderer(renderer),
+      m_world(world),
+      m_world_texture_id(m_world.get_texture_id()),
+      m_world_texture(m_renderer.get_texture(m_world.get_texture_id()))
 {
 }
 
@@ -31,6 +34,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
+  /* const auto& temp_terrain = m_world.get_terrain(0, 0, 0); */
 
   for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
   {
@@ -127,8 +131,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     return;
   }
 
-  const auto& world_texture = m_renderer.get_texture(m_world_texture_id);
-  const auto& frame_data = world_texture->id_to_frame(tile_id, frame_data_type::tile);
+  const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile);
 
   const int transformed_x = x + camera_position.x;
   const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y + camera_position.y;
@@ -137,7 +140,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
   {
     // TODO: Add sprite pool
     auto sprite = Sprite{m_world_texture_id, 0};
-    sprite.texture = world_texture;
+    sprite.texture = m_world_texture;
     sprite.set_frame(frame_data.frame);
 
     m_renderer.batch(
@@ -150,7 +153,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
       if (bottom_tile.id == 0)
       {
         auto bottom_sprite = Sprite{m_world_texture_id, 0};
-        bottom_sprite.texture = world_texture;
+        bottom_sprite.texture = m_world_texture;
         bottom_sprite.set_frame(168);
         m_renderer.batch("world"_hs,
                          &bottom_sprite,
@@ -171,7 +174,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
 
     // TODO: Add multi sprite pool
     auto multi_sprite = MultiSprite{m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height};
-    multi_sprite.texture = world_texture;
+    multi_sprite.texture = m_world_texture;
 
     m_renderer.batch("world"_hs,
                      &multi_sprite,

@@ -76,6 +76,10 @@ void Debug::update()
     ImGui::ShowDemoWindow(&show_demo_window);
   }
 
+  if (m_general_info != nullptr)
+  {
+    m_general_info->update();
+  }
   if (m_camera_editor != nullptr)
   {
     m_camera_editor->update();
@@ -92,6 +96,8 @@ void Debug::render()
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+void Debug::init_general_info(GameContext& context) { m_general_info = std::make_unique<GeneralInfo>(context); }
 
 void Debug::init_camera_editor(Camera& camera) { m_camera_editor = std::make_unique<CameraEditor>(camera); }
 

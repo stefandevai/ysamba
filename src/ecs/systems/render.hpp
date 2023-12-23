@@ -7,6 +7,7 @@ namespace dl
 class World;
 class Camera;
 class Renderer;
+class Texture;
 struct Position;
 struct Vector2i;
 
@@ -28,6 +29,7 @@ class RenderSystem
   Renderer& m_renderer;
   World& m_world;
   const std::string& m_world_texture_id;
+  const std::shared_ptr<Texture> m_world_texture = nullptr;
   const int m_frustum_tile_padding = 1;
 
   template <typename T>

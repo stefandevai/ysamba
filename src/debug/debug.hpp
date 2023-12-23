@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "./camera_editor.hpp"
+#include "./general_info.hpp"
 
 union SDL_Event;
 struct SDL_Window;
@@ -28,12 +29,14 @@ class Debug
   void render();
 
   // Custom widgets
+  void init_general_info(GameContext& context);
   void init_camera_editor(Camera& camera);
 
  private:
   static std::unique_ptr<Debug> m_instance;
   bool m_has_initialized = false;
 
+  std::unique_ptr<GeneralInfo> m_general_info = nullptr;
   std::unique_ptr<CameraEditor> m_camera_editor = nullptr;
 };
 
