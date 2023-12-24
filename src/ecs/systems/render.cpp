@@ -34,29 +34,29 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
-  /* const auto& temp_terrain = m_world.get_terrain(0, 0, 0); */
 
   /* for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i) */
   /* { */
   /*   for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j) */
   for (int j = 0; j < m_world.size.y; ++j)
   {
-    for (int i = 0; i < m_world.size.x; ++i)
+    for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
     {
-      /* const auto index_x = i + camera_position.x; */
+      if (i < 0 || j < 0 || i >= m_world.size.x || j >= m_world.size.y)
+      {
+        continue;
+      }
+      const auto index_x = i + camera_position.x;
       /* const auto index_y = j + camera_position.y; */
-      const auto index_x = i;
+      /* const auto index_x = i; */
       const auto index_y = j;
       const auto z = m_world.height_map[index_y * m_world.size.x + index_x];
 
-      /* for (int z = m_world.size.z - 1; z >= 0; --z) */
-      /* { */
       const auto& terrain = m_world.get_terrain(index_x, index_y, z);
       m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
 
-      /* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); */
-      /* m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1); */
-      /* } */
+      const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
+      m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1);
     }
   }
 
@@ -139,7 +139,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
 
   const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile);
 
-  const int transformed_x = x;
+  const int transformed_x = x + camera_position.x;
   const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y;
 
   if (frame_data.tile_type == "single")

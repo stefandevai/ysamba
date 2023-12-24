@@ -83,7 +83,12 @@ void World::load(const std::string& filepath)
   m_over_tiles.clear();
   m_over_tiles.reserve(size.x * size.y * size.z);
 
-  for (size_t z = 0; z < layers.size(); ++z)
+  height_map.clear();
+  height_map.resize(size.x * size.y);
+
+  spdlog::debug("HM");
+
+  for (int z = 0; z < layers.size(); ++z)
   {
     const auto terrain_data = layers[z]["terrain"].get<std::vector<int>>();
     const auto over_terrain_data = layers[z]["over_terrain"].get<std::vector<int>>();
@@ -93,6 +98,11 @@ void World::load(const std::string& filepath)
       for (auto i = 0; i < size.x; ++i)
       {
         m_tiles[i + j * size.x + z * size.x * size.y] = terrain_data[i + j * size.x];
+
+        if (m_tiles[i + j * size.x + z * size.x * size.y] != 0)
+        {
+          height_map[i + j * size.x] = std::max(z, height_map[i + j * size.x]);
+        }
       }
     }
 

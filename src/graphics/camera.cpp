@@ -31,12 +31,13 @@ const Vector2i Camera::get_position_in_tiles() const
 {
   assert(m_tile_size.x != 0.f && m_tile_size.y != 0.f && "Tile size was not set");
 
-  return Vector2i{m_position.x / m_tile_size.x, m_position.y / m_tile_size.y};
+  return Vector2i{position.x / m_tile_size.x, position.y / m_tile_size.y};
 }
 
 void Camera::move(const Vector3& quantity)
 {
   m_position += quantity;
+  position += quantity;
   m_front.x += quantity.x;
   m_front.y += quantity.y;
   m_front.z += quantity.z;
@@ -44,11 +45,14 @@ void Camera::move(const Vector3& quantity)
 
 void Camera::set_position(const Vector3& position)
 {
-  m_position = position;
+  this->position = position;
+  m_position.x = position.x;
+  m_position.y = position.y + camera_z;
+  m_position.z = position.z + camera_z;
 
   m_front.x = position.x;
   m_front.y = position.y;
-  m_front.z = position.z - 501;
+  m_front.z = position.z;
 }
 
 void Camera::set_size(const Vector2& size)
