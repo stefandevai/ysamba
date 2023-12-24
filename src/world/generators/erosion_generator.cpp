@@ -18,7 +18,7 @@ struct Particle
   float sediment = 0.0;
 };
 
-std::vector<int> ErosionGenerator::generate(const int seed)
+void ErosionGenerator::generate(const int seed)
 {
   // TEMP
   m_lua.load("generators/terrain.lua");
@@ -31,13 +31,15 @@ std::vector<int> ErosionGenerator::generate(const int seed)
   spdlog::info("WIDTH: {}", m_width);
   spdlog::info("HEIGHT: {}\n", m_height);
 
-  std::vector<double> height_map(m_width * m_height);
+  std::vector<double> raw_height_map(m_width * m_height);
 
   auto start = std::chrono::high_resolution_clock::now();
 
   spdlog::info("Generating silhouette...");
-  m_generate_silhouette(height_map, seed);
+  m_generate_silhouette(raw_height_map, seed);
 
+  tiles.clear();
+  height_map.clear();
   /* const uint32_t cycles = 1000 * 10; */
   /* m_erode(height_map, cycles); */
   /* std::vector<int> tiles(m_width * m_height * m_z_levels); */
@@ -46,8 +48,10 @@ std::vector<int> ErosionGenerator::generate(const int seed)
   {
     for (int i = 0; i < m_width; ++i)
     {
-      const auto map_value = height_map[j * m_width + i];
+      const auto map_value = raw_height_map[j * m_width + i];
       const int k = static_cast<int>(map_value * (m_z_levels - 1));
+
+      height_map[j * m_width + i] = k;
 
       /* if (k < 2) */
       /* { */
@@ -124,8 +128,6 @@ std::vector<int> ErosionGenerator::generate(const int seed)
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
   spdlog::info("World generation finished! It took {} milliseconds", duration.count());
-
-  return tiles;
 }
 
 void ErosionGenerator::m_generate_silhouette(std::vector<double>& tiles, const int seed)

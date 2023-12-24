@@ -47,20 +47,16 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       /* const auto index_y = j + camera_position.y; */
       const auto index_x = i;
       const auto index_y = j;
+      const auto z = m_world.height_map[index_y * m_world.size.x + index_x];
 
-      for (int z = m_world.size.z - 1; z >= 0; --z)
-      {
-        const auto& terrain = m_world.get_terrain(index_x, index_y, z);
-        m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
+      /* for (int z = m_world.size.z - 1; z >= 0; --z) */
+      /* { */
+      const auto& terrain = m_world.get_terrain(index_x, index_y, z);
+      m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
 
-        if (terrain.id > 0)
-        {
-          break;
-        }
-
-        /* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); */
-        /* m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1); */
-      }
+      /* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); */
+      /* m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1); */
+      /* } */
     }
   }
 

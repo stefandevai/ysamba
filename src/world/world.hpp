@@ -53,6 +53,7 @@ class World
  public:
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
+  std::vector<int> height_map{};
 
   // World dimensions
   Vector3i size{};

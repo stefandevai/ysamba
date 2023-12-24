@@ -47,10 +47,10 @@ void World::generate(const int width, const int height, const int seed)
   /* m_over_terrains.clear(); */
 
   auto terrain_generator = ErosionGenerator(size.x, size.y, size.z);
-  m_tiles = terrain_generator.generate(m_seed);
+  terrain_generator.generate(m_seed);
 
-  /* m_tiles = std::move(terrain_generator.tiles); */
-  /* m_height_map = terrain_generator.height_map; */
+  m_tiles = std::move(terrain_generator.tiles);
+  height_map = std::move(terrain_generator.height_map);
 
   m_over_tiles.reserve(size.x * size.y * size.z);
   /* auto tilemap_generator = TerrainGenerator(width, height); */

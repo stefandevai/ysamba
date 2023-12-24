@@ -17,13 +17,14 @@ class ErosionGenerator
 
  public:
   std::vector<int> tiles = std::vector<int>(m_width * m_height * m_z_levels);
+  std::vector<int> height_map = std::vector<int>(m_width * m_height);
 
   ErosionGenerator(const int width, const int height, const int z_levels = 10)
       : m_width(width), m_height(height), m_z_levels(z_levels)
   {
   }
 
-  std::vector<int> generate(const int seed);
+  void generate(const int seed);
 
  private:
   LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
