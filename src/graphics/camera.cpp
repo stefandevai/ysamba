@@ -34,7 +34,7 @@ glm::mat4 Camera::get_view_matrix() const
   if (m_resize_view_matrix)
   {
     auto view_matrix = glm::lookAt(pos, pos + glm::normalize(direction), m_up);
-    return glm::scale(view_matrix, glm::vec3(1.0f, std::sqrt(2.0f), 1.0f));
+    return glm::scale(view_matrix, glm::vec3(1.0f, std::sqrt(2.0f), std::sqrt(2.0f)));
   }
 
   return glm::lookAt(pos, pos + glm::normalize(direction), m_up);

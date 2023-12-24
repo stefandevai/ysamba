@@ -55,7 +55,7 @@ class Camera
   Vector2 m_size{};
   Vector2i m_tile_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
-  bool m_resize_view_matrix = false;
+  bool m_resize_view_matrix = true;
 
   friend class CameraEditor;
 };
