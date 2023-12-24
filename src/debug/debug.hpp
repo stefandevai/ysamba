@@ -4,6 +4,7 @@
 
 #include "./camera_editor.hpp"
 #include "./general_info.hpp"
+#include "./render_editor.hpp"
 
 union SDL_Event;
 struct SDL_Window;
@@ -11,11 +12,11 @@ typedef void* SDL_GLContext;
 
 namespace dl
 {
-class Camera;
-
 class Debug
 {
  public:
+  bool open = true;
+
   Debug() = default;
   ~Debug();
 
@@ -31,6 +32,7 @@ class Debug
   // Custom widgets
   void init_general_info(GameContext& context);
   void init_camera_editor(Camera& camera);
+  void init_render_editor(RenderSystem& render);
 
  private:
   static std::unique_ptr<Debug> m_instance;
@@ -38,6 +40,7 @@ class Debug
 
   std::unique_ptr<GeneralInfo> m_general_info = nullptr;
   std::unique_ptr<CameraEditor> m_camera_editor = nullptr;
+  std::unique_ptr<RenderEditor> m_render_editor = nullptr;
 };
 
 }  // namespace dl

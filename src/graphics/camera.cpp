@@ -22,9 +22,22 @@ glm::mat4 Camera::get_view_matrix() const
   direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
   glm::vec3 pos{m_position.x, m_position.y, m_position.z};
 
-  return glm::scale(glm::lookAt(pos, pos + glm::normalize(direction), m_up),
-                    glm::vec3(1.0f, std::sqrt(2.0f), std::sqrt(2.0f)));
-  /* return glm::lookAt(pos, pos + glm::normalize(direction), m_up); */
+  /* auto view_matrix = glm::lookAt(pos, pos + glm::normalize(direction), m_up); */
+  /* view_matrix = glm::translate(view_matrix, glm::vec3(m_size.x / 2, m_size.y / 2, 0.0)); */
+  /* view_matrix = glm::scale(view_matrix, glm::vec3(1.0f, std::sqrt(2.0f), 1.0f)); */
+  /* view_matrix = glm::translate(view_matrix, glm::vec3(-m_size.x / 2, -m_size.y / 2, 0.0)); */
+
+  /* return view_matrix; */
+  /* return glm::scale(glm::lookAt(pos, pos + glm::normalize(direction), m_up), */
+  /*                   glm::vec3(1.0f, std::sqrt(2.0f), 1.0f)); */
+
+  if (m_resize_view_matrix)
+  {
+    auto view_matrix = glm::lookAt(pos, pos + glm::normalize(direction), m_up);
+    return glm::scale(view_matrix, glm::vec3(1.0f, std::sqrt(2.0f), 1.0f));
+  }
+
+  return glm::lookAt(pos, pos + glm::normalize(direction), m_up);
 }
 
 const Vector2i Camera::get_position_in_tiles() const
@@ -36,8 +49,10 @@ const Vector2i Camera::get_position_in_tiles() const
 
 void Camera::move(const Vector3& quantity)
 {
-  m_position += quantity;
   position += quantity;
+  m_position.x += quantity.x;
+  m_position.y += quantity.y * std::sqrt(2.0f);
+  m_position.z += quantity.z;
   m_front.x += quantity.x;
   m_front.y += quantity.y;
   m_front.z += quantity.z;
@@ -47,7 +62,7 @@ void Camera::set_position(const Vector3& position)
 {
   this->position = position;
   m_position.x = position.x;
-  m_position.y = position.y + camera_z;
+  m_position.y = position.y * std::sqrt(2.0f) + camera_z;
   m_position.z = position.z + camera_z;
 
   m_front.x = position.x;

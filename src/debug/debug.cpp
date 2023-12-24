@@ -50,7 +50,7 @@ void Debug::init(SDL_Window* window, SDL_GLContext& context)
 
 void Debug::process_event(SDL_Event* event)
 {
-  if (!m_has_initialized)
+  if (!m_has_initialized || !open)
   {
     return;
   }
@@ -62,7 +62,7 @@ bool show_demo_window = false;
 
 void Debug::update()
 {
-  if (!m_has_initialized)
+  if (!m_has_initialized || !open)
   {
     return;
   }
@@ -84,11 +84,15 @@ void Debug::update()
   {
     m_camera_editor->update();
   }
+  if (m_render_editor != nullptr)
+  {
+    m_render_editor->update();
+  }
 }
 
 void Debug::render()
 {
-  if (!m_has_initialized)
+  if (!m_has_initialized || !open)
   {
     return;
   }
@@ -100,5 +104,7 @@ void Debug::render()
 void Debug::init_general_info(GameContext& context) { m_general_info = std::make_unique<GeneralInfo>(context); }
 
 void Debug::init_camera_editor(Camera& camera) { m_camera_editor = std::make_unique<CameraEditor>(camera); }
+
+void Debug::init_render_editor(RenderSystem& render) { m_render_editor = std::make_unique<RenderEditor>(render); }
 
 }  // namespace dl

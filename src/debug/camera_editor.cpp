@@ -1,5 +1,7 @@
 #include "./camera_editor.hpp"
 
+#include <string>
+
 #include "graphics/camera.hpp"
 #include "imgui.h"
 
@@ -10,6 +12,11 @@ CameraEditor::CameraEditor(Camera& camera) : m_camera(camera) {}
 void CameraEditor::update()
 {
   ImGui::Begin("Camera Editor", &m_open);
+  ImGui::SeparatorText("Virtual Position");
+  ImGui::DragScalar("vx", ImGuiDataType_Double, &m_camera.position.x, 1.0);
+  ImGui::DragScalar("vy", ImGuiDataType_Double, &m_camera.position.y, 1.0);
+  ImGui::DragScalar("vz", ImGuiDataType_Double, &m_camera.position.z, 1.0);
+
   ImGui::SeparatorText("Position");
   ImGui::DragScalar("x", ImGuiDataType_Double, &m_camera.m_position.x, 1.0);
   ImGui::DragScalar("y", ImGuiDataType_Double, &m_camera.m_position.y, 1.0);
@@ -31,6 +38,22 @@ void CameraEditor::update()
   ImGui::DragFloat("Frustrum top", &m_camera.m_frustrum_top, 1.0f);
   ImGui::DragFloat("Near", &m_camera.m_near, 1.0f);
   ImGui::DragFloat("Far", &m_camera.m_far, 1.0f);
+  ImGui::Checkbox("Resize View Matrix", &m_camera.m_resize_view_matrix);
+
+  ImGui::SeparatorText("Info");
+  const auto& position = m_camera.get_position();
+  const auto& tile_position = m_camera.get_position_in_tiles();
+  ImGui::Text("get_position: (%s, %s, %s)",
+              std::to_string(position.x).c_str(),
+              std::to_string(position.y).c_str(),
+              std::to_string(position.z).c_str());
+  ImGui::Text("get_position_in_tiles: (%s, %s)",
+              std::to_string(tile_position.x).c_str(),
+              std::to_string(tile_position.y).c_str());
+  ImGui::Text("m_size: (%s, %s)", std::to_string(m_camera.m_size.x).c_str(), std::to_string(m_camera.m_size.y).c_str());
+  ImGui::Text("m_size_in_tiles: (%s, %s)",
+              std::to_string(m_camera.m_size_in_tiles.x).c_str(),
+              std::to_string(m_camera.m_size_in_tiles.y).c_str());
   ImGui::End();
 }
 }  // namespace dl

@@ -30,7 +30,7 @@ void Gameplay::load()
   m_renderer.add_batch("world"_hs, "default");
 
   /* m_world.generate(30, 30, 1337); */
-  m_world.load("./data/world/test_map.json");
+  m_world.load("./data/world/test_map4.json");
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
@@ -43,6 +43,7 @@ void Gameplay::load()
   auto& debug = Debug::get_instance();
   debug.init_general_info(m_game_context);
   debug.init_camera_editor(m_camera);
+  debug.init_render_editor(m_render_system);
 
   m_has_loaded = true;
 }
@@ -133,6 +134,9 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
   {
     m_game_context.scene_manager->pop_scene();
     will_quit = true;
+
+    auto& debug = Debug::get_instance();
+    debug.open = false;
   }
   else if (m_input_manager.poll_action("toggle_pause"_hs))
   {
