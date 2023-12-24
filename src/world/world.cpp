@@ -48,6 +48,10 @@ void World::generate(const int width, const int height, const int seed)
 
   auto terrain_generator = ErosionGenerator(size.x, size.y, size.z);
   m_tiles = terrain_generator.generate(m_seed);
+
+  /* m_tiles = std::move(terrain_generator.tiles); */
+  /* m_height_map = terrain_generator.height_map; */
+
   m_over_tiles.reserve(size.x * size.y * size.z);
   /* auto tilemap_generator = TerrainGenerator(width, height); */
   /* /1* auto tilemap_generator = DummyGenerator(width, height); *1/ */
@@ -57,8 +61,8 @@ void World::generate(const int width, const int height, const int seed)
   /* // TODO: Generate over terrains as well */
   /* m_over_terrains.resize(m_terrains.size()); */
 
-  auto society = SocietyGenerator::generate_blueprint();
-  m_societies[society.id] = society;
+  /* auto society = SocietyGenerator::generate_blueprint(); */
+  /* m_societies[society.id] = society; */
 }
 
 void World::load(const std::string& filepath)

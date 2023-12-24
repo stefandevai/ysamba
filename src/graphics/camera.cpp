@@ -24,6 +24,7 @@ glm::mat4 Camera::get_view_matrix() const
 
   return glm::scale(glm::lookAt(pos, pos + glm::normalize(direction), m_up),
                     glm::vec3(1.0f, std::sqrt(2.0f), std::sqrt(2.0f)));
+  /* return glm::lookAt(pos, pos + glm::normalize(direction), m_up); */
 }
 
 const Vector2i Camera::get_position_in_tiles() const

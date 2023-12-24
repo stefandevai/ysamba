@@ -40,7 +40,7 @@ std::vector<int> ErosionGenerator::generate(const int seed)
 
   /* const uint32_t cycles = 1000 * 10; */
   /* m_erode(height_map, cycles); */
-  std::vector<int> tiles(m_width * m_height * m_z_levels);
+  /* std::vector<int> tiles(m_width * m_height * m_z_levels); */
 
   for (int j = 0; j < m_height; ++j)
   {

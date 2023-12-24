@@ -36,12 +36,17 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_position = camera.get_position_in_tiles();
   /* const auto& temp_terrain = m_world.get_terrain(0, 0, 0); */
 
-  for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
+  /* for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i) */
+  /* { */
+  /*   for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j) */
+  for (int j = 0; j < m_world.size.y; ++j)
   {
-    for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j)
+    for (int i = 0; i < m_world.size.x; ++i)
     {
-      const auto index_x = i + camera_position.x;
-      const auto index_y = j + camera_position.y;
+      /* const auto index_x = i + camera_position.x; */
+      /* const auto index_y = j + camera_position.y; */
+      const auto index_x = i;
+      const auto index_y = j;
 
       for (int z = m_world.size.z - 1; z >= 0; --z)
       {
@@ -138,8 +143,8 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
 
   const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile);
 
-  const int transformed_x = x + camera_position.x;
-  const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y + camera_position.y;
+  const int transformed_x = x;
+  const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y;
 
   if (frame_data.tile_type == "single")
   {

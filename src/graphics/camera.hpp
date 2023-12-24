@@ -49,9 +49,9 @@ class Camera
   float m_frustrum_right = 0.0f;
   float m_frustrum_bottom = 0.0f;
   float m_frustrum_top = 0.0f;
-  float m_near = 0.1f;
-  float m_far = 1000.0f;
-  Vector3 m_position{0.0, 0.0, 3.0};
+  float m_near = 1.0f;
+  float m_far = 2000.0f;
+  Vector3 m_position{0.0, 600.0, 600.0};
   glm::vec3 m_front{0.0f, 0.0f, -1.0f};
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   glm::mat4 m_projection = glm::mat4{1.f};

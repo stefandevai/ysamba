@@ -10,7 +10,14 @@ namespace dl
 {
 class ErosionGenerator
 {
+ private:
+  const int m_width;
+  const int m_height;
+  const int m_z_levels;
+
  public:
+  std::vector<int> tiles = std::vector<int>(m_width * m_height * m_z_levels);
+
   ErosionGenerator(const int width, const int height, const int z_levels = 10)
       : m_width(width), m_height(height), m_z_levels(z_levels)
   {
@@ -20,9 +27,6 @@ class ErosionGenerator
 
  private:
   LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
-  const int m_width;
-  const int m_height;
-  const int m_z_levels;
 
   void m_generate_silhouette(std::vector<double>& tiles, const int seed);
   float m_get_rectangle_gradient_value(const int x, const int y);
