@@ -29,10 +29,8 @@ void Gameplay::load()
 
   m_renderer.add_batch("world"_hs, "default");
 
-  spdlog::debug("HERE1");
-  m_world.generate(100, 100, 1337);
-  spdlog::debug("HERE2");
-  /* m_world.load("./data/world/test_map2.json"); */
+  /* m_world.generate(100, 100, 1337); */
+  m_world.load("./data/world/test_map2.json");
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());

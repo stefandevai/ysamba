@@ -15,6 +15,10 @@ void CameraEditor::update()
   ImGui::DragScalar("y", ImGuiDataType_Double, &m_camera.m_position.y, 1.0);
   ImGui::DragScalar("z", ImGuiDataType_Double, &m_camera.m_position.z, 1.0);
 
+  ImGui::SeparatorText("Rotation");
+  ImGui::DragFloat("yaw", &m_camera.yaw, 1.0);
+  ImGui::DragFloat("pitch", &m_camera.pitch, 1.0);
+
   ImGui::SeparatorText("Front");
   ImGui::DragFloat("fx", &m_camera.m_front.x, 1.0);
   ImGui::DragFloat("fy", &m_camera.m_front.y, 1.0);

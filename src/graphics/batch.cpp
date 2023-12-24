@@ -154,22 +154,47 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
   }
 
   // Top left vertex
-  glm::vec4 top_left = m_matrix * glm::vec4(x, y, z, 1.f);
+  glm::vec3 camera_right_world_space = {m_matrix[0][0], m_matrix[0][1], m_matrix[0][2]};
+  glm::vec3 camera_up_world_space = {m_matrix[1][0], m_matrix[1][1], m_matrix[1][2]};
+
+  /* glm::mat4 transform = glm::translate(m_matrix, glm::vec3(x + 16.0, y + 32.0, z)); */
+  glm::mat4 transform = glm::translate(m_matrix, glm::vec3(x, y, z));
+  /* transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(1.0, 0.0, 0.0)); */
+  /* transform = glm::scale(transform, glm::vec3(1.0, std::sqrt(2.0f), 1.0)); */
+  /* transform = glm::translate(transform, glm::vec3(-16.0, -32.0, 0.0)); */
+  glm::vec3 transformation_result = transform * glm::vec4(0.f, 0.f, 1.f, 1.f);
+  /* transformation_result += camera_right_world_space * static_cast<float>(size.x) + camera_up_world_space *
+   * static_cast<float>(size.y); */
 
   m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{top_left.x, top_left.y, top_left.z}, texture_coordinates[0], texture_index, color};
+      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                 texture_coordinates[0],
+                 texture_index,
+                 color};
 
   // Top right vertex
+  transformation_result = transform * glm::vec4(size.x, 0.f, 1.f, 1.f);
   m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{top_left.x + size.x, top_left.y, top_left.z}, texture_coordinates[1], texture_index, color};
+      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                 texture_coordinates[1],
+                 texture_index,
+                 color};
 
   // Bottom right vertex
-  m_vertices[m_vertices_index++] = VertexData{
-      glm::vec3{top_left.x + size.x, top_left.y + size.y, top_left.z}, texture_coordinates[2], texture_index, color};
+  transformation_result = transform * glm::vec4(size.x, size.y, 1.f, 1.f);
+  m_vertices[m_vertices_index++] =
+      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                 texture_coordinates[2],
+                 texture_index,
+                 color};
 
   // Bottom left vertex
+  transformation_result = transform * glm::vec4(0.f, size.y, 1.f, 1.f);
   m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{top_left.x, top_left.y + size.y, top_left.z}, texture_coordinates[3], texture_index, color};
+      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
+                 texture_coordinates[3],
+                 texture_index,
+                 color};
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   m_index_count += 6;

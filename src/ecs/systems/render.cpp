@@ -48,8 +48,13 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
         const auto& terrain = m_world.get_terrain(index_x, index_y, z);
         m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
 
-        const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
-        m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1);
+        if (terrain.id > 0)
+        {
+          break;
+        }
+
+        /* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); */
+        /* m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1); */
       }
     }
   }
@@ -146,22 +151,22 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     m_renderer.batch(
         "world"_hs, &sprite, transformed_x * tile_size.x, transformed_y * tile_size.y, z * tile_size.y + z_index);
 
-    if (perspective == TopDown45)
-    {
-      const auto& bottom_tile = m_world.get_terrain(x + camera_position.x, y + camera_position.y + 1, z);
+    /* if (perspective == TopDown45) */
+    /* { */
+    /*   const auto& bottom_tile = m_world.get_terrain(x + camera_position.x, y + camera_position.y + 1, z); */
 
-      if (bottom_tile.id == 0)
-      {
-        auto bottom_sprite = Sprite{m_world_texture_id, 0};
-        bottom_sprite.texture = m_world_texture;
-        bottom_sprite.set_frame(168);
-        m_renderer.batch("world"_hs,
-                         &bottom_sprite,
-                         transformed_x * tile_size.x,
-                         (y - z + 1 + camera_position.y) * tile_size.y,
-                         (z - 1) * tile_size.y + z_index);
-      }
-    }
+    /*   if (bottom_tile.id == 0) */
+    /*   { */
+    /*     auto bottom_sprite = Sprite{m_world_texture_id, 0}; */
+    /*     bottom_sprite.texture = m_world_texture; */
+    /*     bottom_sprite.set_frame(168); */
+    /*     m_renderer.batch("world"_hs, */
+    /*                      &bottom_sprite, */
+    /*                      transformed_x * tile_size.x, */
+    /*                      (y - z + 1 + camera_position.y) * tile_size.y, */
+    /*                      (z - 1) * tile_size.y + z_index); */
+    /*   } */
+    /* } */
   }
   else if (frame_data.tile_type == "multiple")
   {

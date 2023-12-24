@@ -14,6 +14,18 @@ Camera::Camera(const Display& display)
   set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
 }
 
+glm::mat4 Camera::get_view_matrix() const
+{
+  glm::vec3 direction{};
+  direction.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+  direction.y = std::sin(glm::radians(pitch));
+  direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+  glm::vec3 pos{m_position.x, m_position.y, m_position.z};
+
+  return glm::scale(glm::lookAt(pos, pos + glm::normalize(direction), m_up),
+                    glm::vec3(1.0f, std::sqrt(2.0f), std::sqrt(2.0f)));
+}
+
 const Vector2i Camera::get_position_in_tiles() const
 {
   assert(m_tile_size.x != 0.f && m_tile_size.y != 0.f && "Tile size was not set");
