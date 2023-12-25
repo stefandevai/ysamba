@@ -74,6 +74,9 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   }
 
   // Render visible tiles with y coordinate to the bottom of the camera frustum
+  // Each z level translates to tile_size.y increase in height in clip space,
+  // therefore the highest y that can appear on the screen is
+  // camera_position.y + camera_size.y + world_size.z
   for (int offset = world_size.z; offset > 0; --offset)
   {
     for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
@@ -89,11 +92,15 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
       const auto height = m_world.tiles.height_map[index_y * world_size.x + index_x];
 
+      // If the height is below the offset, we know
+      // it's not high enough to have its sprite shifted
+      // to the frustum
       if (height < offset)
       {
         continue;
       }
 
+      // Render sprites only from the maximum viewed height to the actual height
       for (auto z = offset; z <= height; ++z)
       {
         if (!m_world.tiles.has_flags(DL_CELL_FLAG_VISIBLE, index_x, index_y, z))
