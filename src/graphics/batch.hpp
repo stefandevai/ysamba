@@ -27,6 +27,7 @@ class Batch
  public:
   std::shared_ptr<ShaderProgram> shader = nullptr;
   std::string shader_id{};
+  uint32_t index_count = 0;
   int priority = 0;
   bool has_scissor = false;
   bool has_depth = true;
@@ -66,20 +67,19 @@ class Batch
     ColorIndex,
   };
 
-  static constexpr unsigned m_max_quads = 10000;
-  static constexpr unsigned m_vertex_size = sizeof(VertexData);
-  static constexpr unsigned m_quad_size = 4 * m_vertex_size;
-  static constexpr unsigned m_buffer_size = m_max_quads * m_quad_size;
-  static constexpr unsigned m_indices_size = 6 * m_max_quads;
+  static constexpr uint32_t m_max_quads = 10000;
+  static constexpr uint32_t m_vertex_size = sizeof(VertexData);
+  static constexpr uint32_t m_quad_size = 4 * m_vertex_size;
+  static constexpr uint32_t m_buffer_size = m_max_quads * m_quad_size;
+  static constexpr uint32_t m_indices_size = 6 * m_max_quads;
 
-  std::vector<VertexData> m_vertices;
-  std::vector<glm::mat4> m_matrix_stack;
+  std::vector<VertexData> m_vertices{};
+  std::vector<glm::mat4> m_matrix_stack{};
   glm::mat4 m_matrix = glm::mat4{1.f};
-  unsigned int m_vao;
-  unsigned int m_vbo;
-  unsigned int m_ebo;
-  unsigned int m_index_count = 0;
-  unsigned int m_vertices_index = 0;
+  uint32_t m_vao;
+  uint32_t m_vbo;
+  uint32_t m_ebo;
+  uint32_t m_vertices_index = 0;
   std::vector<std::shared_ptr<Texture>> m_textures;
 };
 }  // namespace dl

@@ -5,11 +5,17 @@
 
 #include "./input_manager.hpp"
 #include "core/utf8.hpp"
+#include "definitions.hpp"
+
+#ifdef DL_BUILD_DEBUG_TOOLS
 #include "debug/debug.hpp"
+#endif
 
 namespace
 {
+#ifdef DL_BUILD_DEBUG_TOOLS
 auto& debug = dl::Debug::get_instance();
+#endif
 
 using namespace entt::literals;
 const std::unordered_map<uint32_t, int> key_map = {
@@ -284,7 +290,9 @@ void SDLInputWrapper::update()
 
   while (SDL_PollEvent(&event))
   {
+#ifdef DL_BUILD_DEBUG_TOOLS
     debug.process_event(&event);
+#endif
 
     switch (event.type)
     {
@@ -394,7 +402,9 @@ void SDLInputWrapper::update()
     }
   }
 
+#ifdef DL_BUILD_DEBUG_TOOLS
   debug.update();
+#endif
 }
 
 bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }

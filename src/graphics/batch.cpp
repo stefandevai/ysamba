@@ -75,7 +75,7 @@ void Batch::load()
 void Batch::render()
 {
   // Return early if no sprites were added to the batch
-  if (m_index_count == 0)
+  if (index_count == 0)
   {
     return;
   }
@@ -93,9 +93,9 @@ void Batch::render()
   glActiveTexture(GL_TEXTURE0);
 
   glBindVertexArray(m_vao);
-  glDrawElements(GL_TRIANGLES, m_index_count, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
-  m_index_count = 0;
+  index_count = 0;
   m_vertices_index = 0;
 }
 
@@ -117,7 +117,7 @@ const glm::mat4& Batch::peek_matrix() { return m_matrix; }
 
 void Batch::emplace(Sprite* sprite, const double x, const double y, const double z)
 {
-  assert(m_index_count <= m_indices_size);
+  assert(index_count <= m_indices_size);
 
   const glm::vec2& size = sprite->get_size();
   const auto& texture_coordinates = sprite->get_texture_coordinates();
@@ -197,12 +197,12 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
                  color};
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  m_index_count += 6;
+  index_count += 6;
 }
 
 void Batch::emplace(const MultiSprite* sprite, const double x, const double y, const double z)
 {
-  assert(m_index_count <= m_indices_size);
+  assert(index_count <= m_indices_size);
 
   unsigned int color = sprite->color.int_color;
 
@@ -276,12 +276,12 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
                  color};
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  m_index_count += 6;
+  index_count += 6;
 }
 
 void Batch::quad(const Quad* quad, const double x, const double y, const double z)
 {
-  assert(m_index_count <= m_indices_size);
+  assert(index_count <= m_indices_size);
 
   uint32_t color = quad->color.int_color;
 
@@ -316,7 +316,7 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
       glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  m_index_count += 6;
+  index_count += 6;
 }
 
 void Batch::text(Text& text, const double x, const double y, const double z)
@@ -346,6 +346,8 @@ void Batch::text(Text& text, const double x, const double y, const double z)
     {
       character.sprite->color.opacity_factor = text.color.opacity_factor;
     }
+
+    const auto& size = character.sprite->get_size();
 
     emplace(character.sprite.get(), character.x + x, character.y + y, z);
   }

@@ -24,10 +24,10 @@ class Game
 
  private:
   JSON m_json{"./data/game.json"};
-  Display m_display;
+  Display m_display{};
   AssetManager m_asset_manager{"./data/assets.json"};
-  SceneManager m_scene_manager{};
-  Camera m_camera;
+  SceneManager m_scene_manager{m_display};
+  Camera m_camera{};
   Clock m_clock{};
   InputManager& m_input_manager = InputManager::get_instance();
 

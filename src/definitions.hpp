@@ -1,0 +1,1 @@
+#define DL_BUILD_DEBUG_TOOLS

@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include "./game_context.hpp"
 #include "core/input_manager.hpp"
 
 namespace dl
@@ -51,9 +50,27 @@ void SceneManager::render()
   {
     return;
   }
-  current_scene->check_window_size();
+
+  m_check_window_size();
   current_scene->render();
   current_scene->render_call();
+}
+
+void SceneManager::m_check_window_size()
+{
+  auto& input_manager = InputManager::get_instance();
+
+  if (input_manager.window_size_changed())
+  {
+    m_display.update_viewport();
+
+    for (auto& scene : m_scenes)
+    {
+      scene->resize();
+    }
+
+    input_manager.set_window_size_changed(false);
+  }
 }
 
 }  // namespace dl

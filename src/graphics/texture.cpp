@@ -137,6 +137,12 @@ std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
 
 void Texture::m_load_empty()
 {
+  GLenum err;
+  while ((err = glGetError()) != GL_NO_ERROR)
+  {
+    spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
+  }
+
   glGenTextures(1, &m_id);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glBindTexture(GL_TEXTURE_2D, m_id);
@@ -147,7 +153,6 @@ void Texture::m_load_empty()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  GLenum err;
   while ((err = glGetError()) != GL_NO_ERROR)
   {
     spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);

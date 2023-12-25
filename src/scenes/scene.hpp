@@ -21,6 +21,7 @@ class Scene
   virtual void load();
   virtual void update() = 0;
   virtual void render() = 0;
+  void resize();
   void render_call() { m_renderer.render(); }
   void check_window_size();
   bool has_loaded() const { return m_has_loaded; }

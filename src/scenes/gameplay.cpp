@@ -8,7 +8,7 @@
 #include "core/json.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
-#include "debug/debug.hpp"
+#include "definitions.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/visibility.hpp"
@@ -16,6 +16,10 @@
 #include "graphics/text.hpp"
 #include "ui/compositions/debug_info.hpp"
 #include "world/society/society_generator.hpp"
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+#include "debug/debug.hpp"
+#endif
 
 namespace dl
 {
@@ -40,10 +44,12 @@ void Gameplay::load()
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
+#ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug = Debug::get_instance();
   debug.init_general_info(m_game_context);
   debug.init_camera_editor(m_camera);
   /* debug.init_render_editor(m_render_system); */
+#endif
 
   m_has_loaded = true;
 }
@@ -135,8 +141,10 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
     m_game_context.scene_manager->pop_scene();
     will_quit = true;
 
+#ifdef DL_BUILD_DEBUG_TOOLS
     auto& debug = Debug::get_instance();
     debug.open = false;
+#endif
   }
   else if (m_input_manager.poll_action("toggle_pause"_hs))
   {

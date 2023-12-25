@@ -85,6 +85,11 @@ void Renderer::render()
 
   for (const auto& batch : m_ordered_batches)
   {
+    if (batch->index_count == 0)
+    {
+      continue;
+    }
+
     if (batch->shader == nullptr)
     {
       batch->shader = m_asset_manager.get<ShaderProgram>(batch->shader_id);
@@ -108,7 +113,7 @@ void Renderer::render()
     {
       glDisable(GL_DEPTH_TEST);
     }
-    if (batch->has_scissor)
+    if (batch->has_scissor && batch->scissor.z - batch->scissor.x > 0 && batch->scissor.w - batch->scissor.y > 0)
     {
       glEnable(GL_SCISSOR_TEST);
       glScissor(batch->scissor.x, batch->scissor.y, batch->scissor.z, batch->scissor.w);

@@ -4,17 +4,20 @@
 #include <memory>
 
 #include "./json.hpp"
+#include "core/display.hpp"
 #include "core/input_manager.hpp"
 #include "scenes/scene.hpp"
 
 namespace dl
 {
 class Renderer;
-struct GameContext;
+class Display;
 
 class SceneManager
 {
  public:
+  SceneManager(Display& display) : m_display(display) {}
+
   template <typename Type, typename... Args>
   void push_scene(Args&&... args)
   {
@@ -28,9 +31,11 @@ class SceneManager
   void render();
 
  private:
+  Display& m_display;
   JSON m_json{"./data/game.json"};
   std::vector<std::unique_ptr<Scene>> m_scenes;
 
   void m_load();
+  void m_check_window_size();
 };
 }  // namespace dl

@@ -24,6 +24,8 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
   }
   FT_Set_Pixel_Sizes(m_face, 0, m_size);
 
+  spdlog::debug("HREEEEEE1 {}", m_size);
+
   unsigned int atlas_width = 0, atlas_height = 0;
   for (const auto& char_range : m_char_ranges)
   {
