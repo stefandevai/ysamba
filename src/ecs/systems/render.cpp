@@ -48,13 +48,27 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
         continue;
       }
 
-      const auto z = m_world.tiles.height_map[index_y * world_size.x + index_x];
+      const auto height = m_world.tiles.height_map[index_y * world_size.x + index_x];
 
-      const auto& terrain = m_world.get_terrain(index_x, index_y, z);
-      m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
+      for (auto z = 0; z <= height; ++z)
+      {
+        if (!m_world.tiles.has_flags(DL_CELL_FLAG_VISIBLE, index_x, index_y, z))
+        {
+          continue;
+        }
 
-      const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
-      m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1);
+        const auto& terrain = m_world.get_terrain(index_x, index_y, z);
+
+        if (terrain.id == 0)
+        {
+          continue;
+        }
+
+        m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
+
+        const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
+        m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1);
+      }
     }
   }
 

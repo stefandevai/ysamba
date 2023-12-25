@@ -29,6 +29,19 @@ class Grid3D
   void set(const uint32_t id, const Vector3& position);
   void set_size(const int width, const int height, const int depth);
   void set_size(const Vector3i& size);
+
+  bool has_flags(const CellFlag flags, const int x, const int y, const int z) const;
+  void set_flags(const CellFlag flags, const int x, const int y, const int z);
+  void toggle_flags(const CellFlag flags, const int x, const int y, const int z);
+  void unset_flags(const CellFlag flags, const int x, const int y, const int z);
+  void reset_flags(const CellFlag flags, const int x, const int y, const int z);
+
+  void compute_visibility();
+
+ private:
+  uint32_t m_index(const int x, const int y, const int z) const;
+  bool m_in_bounds(const int x, const int y, const int z) const;
+  bool m_is_any_neighbour_empty(const int x, const int y, const int z) const;
 };
 
 template <typename Archive>

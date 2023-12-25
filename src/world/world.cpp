@@ -45,6 +45,8 @@ void World::generate(const int width, const int height, const int seed)
   tiles.values = std::move(map_generator.tiles);
   tiles.height_map = std::move(map_generator.height_map);
 
+  tiles.compute_visibility();
+
   over_tiles.values.reserve(tiles.size.x * tiles.size.y * tiles.size.z);
   /* auto tilemap_generator = TerrainGenerator(width, height); */
   /* auto tilemap_generator = DummyGenerator(width, height); */
@@ -107,6 +109,8 @@ void World::load(const std::string& filepath)
       }
     }
   }
+
+  tiles.compute_visibility();
 }
 
 void World::set_terrain(const uint32_t tile_id, const int x, const int y, const int z) { tiles.set(tile_id, x, y, z); }
@@ -235,9 +239,9 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
     const auto [center_x, center_y] = position_queue.front();
     position_queue.pop();
 
-    for (const auto& x_displacement : displacements)
+    for (const auto x_displacement : displacements)
     {
-      for (const auto& y_displacement : displacements)
+      for (const auto y_displacement : displacements)
       {
         if (x_displacement == 0 && y_displacement == 0)
         {
