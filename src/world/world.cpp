@@ -86,9 +86,12 @@ void World::load(const std::string& filepath)
     {
       for (auto i = 0; i < tiles.size.x; ++i)
       {
-        tiles.values[i + j * tiles.size.x + z * tiles.size.x * tiles.size.y] = terrain_data[i + j * tiles.size.x];
+        Cell cell{};
+        cell.id = terrain_data[i + j * tiles.size.x];
 
-        if (tiles.values[i + j * tiles.size.x + z * tiles.size.x * tiles.size.y] != 0)
+        tiles.values[i + j * tiles.size.x + z * tiles.size.x * tiles.size.y] = std::move(cell);
+
+        if (tiles.id_at(i, j, z) != 0)
         {
           tiles.height_map[i + j * tiles.size.x] =
               std::max(static_cast<int>(z), tiles.height_map[i + j * tiles.size.x]);
@@ -120,8 +123,8 @@ void World::replace(const uint32_t from, const uint32_t to, const int x, const i
     return;
   }
 
-  const auto over_tile_index = over_tiles.at(x, y, z);
-  const auto tile_index = tiles.at(x, y, z);
+  const auto over_tile_index = over_tiles.id_at(x, y, z);
+  const auto tile_index = tiles.id_at(x, y, z);
 
   if (over_tile_index == from && tile_index != to)
   {
@@ -148,35 +151,35 @@ const TileData& World::get(const int x, const int y, const int z) const
     return m_tile_data.at(0);
   }
 
-  const int over_tile_index = over_tiles.at(x, y, z);
+  const int over_tile_index = over_tiles.id_at(x, y, z);
 
   if (over_tile_index != 0)
   {
     return m_tile_data.at(over_tile_index);
   }
 
-  const int tile_index = tiles.at(x, y, z);
+  const int tile_index = tiles.id_at(x, y, z);
 
   return m_tile_data.at(tile_index);
 }
 
 const WorldTile World::get_all(const int x, const int y, const int z) const
 {
-  const auto over_tile_index = over_tiles.at(x, y, z);
-  const auto tile_index = tiles.at(x, y, z);
+  const auto over_tile_index = over_tiles.id_at(x, y, z);
+  const auto tile_index = tiles.id_at(x, y, z);
 
   return WorldTile{m_tile_data.at(tile_index), m_tile_data.at(over_tile_index)};
 }
 
 const TileData& World::get_terrain(const int x, const int y, const int z) const
 {
-  const auto tile_index = tiles.at(x, y, z);
+  const auto tile_index = tiles.id_at(x, y, z);
   return m_tile_data.at(tile_index);
 }
 
 const TileData& World::get_over_terrain(const int x, const int y, const int z) const
 {
-  const auto over_tile_index = over_tiles.at(x, y, z);
+  const auto over_tile_index = over_tiles.id_at(x, y, z);
   return m_tile_data.at(over_tile_index);
 }
 
@@ -343,15 +346,14 @@ bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& si
         continue;
       }
 
-      const uint32_t over_tile_index = over_tiles.at(position.x + i, position.y + j, position.z);
+      const uint32_t over_tile_index = over_tiles.id_at(position.x + i, position.y + j, position.z);
 
       if (over_tile_index == pattern_value)
       {
         continue;
       }
 
-      const uint32_t tile_index =
-          tiles.values[(position.x + i) + (position.y + j) * tiles.size.x + position.z * tiles.size.y * tiles.size.x];
+      const uint32_t tile_index = tiles.id_at(position.x + i, position.y + j, position.z);
 
       if (tile_index != pattern_value)
       {

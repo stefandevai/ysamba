@@ -13,7 +13,7 @@ namespace dl
 void MapGenerator::generate(const int seed)
 {
   // TEMP
-  m_json.load("./data/scripts/generators/terrain.json");
+  m_json.load("./data/world/map_generators/terrain.json");
   // TEMP
 
   spdlog::info("=============================");
@@ -53,47 +53,47 @@ void MapGenerator::generate(const int seed)
 
       if (k == 0)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 1;
+        tiles[k * m_width * m_height + j * m_width + i].id = 1;
       }
       else if (k == 1)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 2;
+        tiles[k * m_width * m_height + j * m_width + i].id = 2;
       }
       else if (k == 2)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 3;
+        tiles[k * m_width * m_height + j * m_width + i].id = 3;
       }
       else if (k == 3)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 6;
+        tiles[k * m_width * m_height + j * m_width + i].id = 6;
       }
       else if (k == 4)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 12;
+        tiles[k * m_width * m_height + j * m_width + i].id = 12;
       }
       else if (k == 5)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 13;
+        tiles[k * m_width * m_height + j * m_width + i].id = 13;
       }
       else if (k == 6)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 14;
+        tiles[k * m_width * m_height + j * m_width + i].id = 14;
       }
       else if (k == 7)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 23;
+        tiles[k * m_width * m_height + j * m_width + i].id = 23;
       }
       else if (k == 8)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 15;
+        tiles[k * m_width * m_height + j * m_width + i].id = 15;
       }
       else if (k == 9)
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 18;
+        tiles[k * m_width * m_height + j * m_width + i].id = 18;
       }
       else
       {
-        tiles[k * m_width * m_height + j * m_width + i] = 19;
+        tiles[k * m_width * m_height + j * m_width + i].id = 19;
       }
 
       /* else */

@@ -2,21 +2,40 @@
 
 namespace dl
 {
-uint32_t Grid3D::at(const int x, const int y, const int z) const
+const Cell Grid3D::null = Cell{};
+
+uint32_t Grid3D::id_at(const int x, const int y, const int z) const
 {
   if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
   {
     return 0;
   }
 
+  return values[x + y * size.x + z * size.y * size.x].id;
+}
+
+uint32_t Grid3D::id_at(const Vector3i& position) const { return id_at(position.x, position.y, position.z); }
+
+uint32_t Grid3D::id_at(const Vector3& position) const
+{
+  return id_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+}
+
+const Cell& Grid3D::cell_at(const int x, const int y, const int z) const
+{
+  if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z)
+  {
+    return Grid3D::null;
+  }
+
   return values[x + y * size.x + z * size.y * size.x];
 }
 
-uint32_t Grid3D::at(const Vector3i& position) const { return at(position.x, position.y, position.z); }
+const Cell& Grid3D::cell_at(const Vector3i& position) const { return cell_at(position.x, position.y, position.z); }
 
-uint32_t Grid3D::at(const Vector3& position) const
+const Cell& Grid3D::cell_at(const Vector3& position) const
 {
-  return at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+  return cell_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
 }
 
 void Grid3D::set(const uint32_t id, const int x, const int y, const int z)
@@ -26,7 +45,7 @@ void Grid3D::set(const uint32_t id, const int x, const int y, const int z)
     return;
   }
 
-  values[x + y * size.x + z * size.y * size.x] = id;
+  values[x + y * size.x + z * size.y * size.x].id = id;
 }
 
 void Grid3D::set(const uint32_t id, const Vector3i& position) { set(id, position.x, position.y, position.z); }
