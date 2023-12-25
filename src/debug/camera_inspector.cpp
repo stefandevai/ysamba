@@ -1,4 +1,4 @@
-#include "./camera_editor.hpp"
+#include "./camera_inspector.hpp"
 
 #include <string>
 
@@ -7,11 +7,16 @@
 
 namespace dl
 {
-CameraEditor::CameraEditor(Camera& camera) : m_camera(camera) {}
+CameraInspector::CameraInspector(Camera& camera) : m_camera(camera) {}
 
-void CameraEditor::update()
+void CameraInspector::update()
 {
-  ImGui::Begin("Camera Editor", &m_open);
+  if (!open)
+  {
+    return;
+  }
+
+  ImGui::Begin("Camera Editor", &open);
   ImGui::SeparatorText("Virtual Position");
   ImGui::DragScalar("vx", ImGuiDataType_Double, &m_camera.position.x, 1.0);
   ImGui::DragScalar("vy", ImGuiDataType_Double, &m_camera.position.y, 1.0);

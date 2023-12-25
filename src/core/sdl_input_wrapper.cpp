@@ -8,13 +8,13 @@
 #include "definitions.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-#include "debug/debug.hpp"
+#include "debug/debug_tools.hpp"
 #endif
 
 namespace
 {
 #ifdef DL_BUILD_DEBUG_TOOLS
-auto& debug = dl::Debug::get_instance();
+auto& debug_tools = dl::DebugTools::get_instance();
 #endif
 
 using namespace entt::literals;
@@ -291,7 +291,7 @@ void SDLInputWrapper::update()
   while (SDL_PollEvent(&event))
   {
 #ifdef DL_BUILD_DEBUG_TOOLS
-    debug.process_event(&event);
+    debug_tools.process_event(&event);
 #endif
 
     switch (event.type)
@@ -403,7 +403,7 @@ void SDLInputWrapper::update()
   }
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  debug.update();
+  debug_tools.update();
 #endif
 }
 

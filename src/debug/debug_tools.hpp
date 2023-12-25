@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "./camera_editor.hpp"
+#include "./camera_inspector.hpp"
 #include "./general_info.hpp"
 #include "./render_editor.hpp"
 
@@ -12,18 +12,18 @@ typedef void* SDL_GLContext;
 
 namespace dl
 {
-class Debug
+class DebugTools
 {
  public:
   bool open = true;
 
-  Debug() = default;
-  ~Debug();
+  DebugTools() = default;
+  ~DebugTools();
 
-  Debug(Debug const&) = delete;
-  void operator=(Debug const&) = delete;
+  DebugTools(DebugTools const&) = delete;
+  void operator=(DebugTools const&) = delete;
 
-  static Debug& get_instance();
+  static DebugTools& get_instance();
   void init(SDL_Window* window, SDL_GLContext& context);
   void process_event(SDL_Event* event);
   void update();
@@ -31,16 +31,18 @@ class Debug
 
   // Custom widgets
   void init_general_info(GameContext& context);
-  void init_camera_editor(Camera& camera);
+  void init_camera_inspector(Camera& camera);
   void init_render_editor(RenderSystem& render);
 
  private:
-  static std::unique_ptr<Debug> m_instance;
+  static std::unique_ptr<DebugTools> m_instance;
   bool m_has_initialized = false;
 
   std::unique_ptr<GeneralInfo> m_general_info = nullptr;
-  std::unique_ptr<CameraEditor> m_camera_editor = nullptr;
+  std::unique_ptr<CameraInspector> m_camera_inspector = nullptr;
   std::unique_ptr<RenderEditor> m_render_editor = nullptr;
+
+  void m_update_menu_bar();
 };
 
 }  // namespace dl

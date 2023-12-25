@@ -42,7 +42,7 @@ class Camera
   void set_pitch(const float pitch);
 
  private:
-  friend class CameraEditor;
+  friend class CameraInspector;
 
   float m_frustrum_left = 0.0f;
   float m_frustrum_right = 0.0f;

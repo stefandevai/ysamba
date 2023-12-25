@@ -4,14 +4,16 @@ namespace dl
 {
 class Camera;
 
-class CameraEditor
+class CameraInspector
 {
  public:
-  CameraEditor(Camera& camera);
+  bool open = true;
+
+  CameraInspector(Camera& camera);
   void update();
+  void toggle() { open = !open; }
 
  private:
   Camera& m_camera;
-  bool m_open = true;
 };
 }  // namespace dl

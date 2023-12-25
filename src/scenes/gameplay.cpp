@@ -14,11 +14,10 @@
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
-#include "ui/compositions/debug_info.hpp"
 #include "world/society/society_generator.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-#include "debug/debug.hpp"
+#include "debug/debug_tools.hpp"
 #endif
 
 namespace dl
@@ -38,17 +37,17 @@ void Gameplay::load()
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
-  /* m_debug_info = m_ui_manager.emplace<ui::DebugInfo>(m_camera); */
+  /* m_debug_info = m_ui_manager.emplace<ui::DebugToolsInfo>(m_camera); */
 
   auto society_blueprint = m_world.get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  auto& debug = Debug::get_instance();
-  debug.init_general_info(m_game_context);
-  debug.init_camera_editor(m_camera);
-  /* debug.init_render_editor(m_render_system); */
+  auto& debug_tools = DebugTools::get_instance();
+  debug_tools.init_general_info(m_game_context);
+  debug_tools.init_camera_inspector(m_camera);
+  /* debug_tools.init_render_editor(m_render_system); */
 #endif
 
   m_has_loaded = true;
@@ -142,8 +141,8 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
     will_quit = true;
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-    auto& debug = Debug::get_instance();
-    debug.open = false;
+    auto& debug_tools = DebugTools::get_instance();
+    debug_tools.open = false;
 #endif
   }
   else if (m_input_manager.poll_action("toggle_pause"_hs))

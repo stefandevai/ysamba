@@ -9,7 +9,12 @@ GeneralInfo::GeneralInfo(GameContext& context) : m_game_context(context) {}
 
 void GeneralInfo::update()
 {
-  ImGui::Begin("General Info", &m_open);
+  if (!open)
+  {
+    return;
+  }
+
+  ImGui::Begin("General Info", &open);
   ImGui::Text("FPS: %s", std::to_string(1.0 / m_game_context.clock->delta).c_str());
   ImGui::Text("MS: %s", std::to_string(m_game_context.clock->delta).c_str());
   ImGui::End();

@@ -1,4 +1,4 @@
-#include "./debug.hpp"
+#include "./debug_tools.hpp"
 
 #include <glad/glad.h>
 
@@ -9,9 +9,9 @@
 
 namespace dl
 {
-std::unique_ptr<Debug> Debug::m_instance = nullptr;
+std::unique_ptr<DebugTools> DebugTools::m_instance = nullptr;
 
-Debug::~Debug()
+DebugTools::~DebugTools()
 {
   if (!m_has_initialized)
   {
@@ -23,17 +23,17 @@ Debug::~Debug()
   ImGui::DestroyContext();
 }
 
-Debug& Debug::get_instance()
+DebugTools& DebugTools::get_instance()
 {
   if (m_instance == nullptr)
   {
-    m_instance = std::make_unique<Debug>();
+    m_instance = std::make_unique<DebugTools>();
   }
 
   return *m_instance;
 }
 
-void Debug::init(SDL_Window* window, SDL_GLContext& context)
+void DebugTools::init(SDL_Window* window, SDL_GLContext& context)
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -48,7 +48,7 @@ void Debug::init(SDL_Window* window, SDL_GLContext& context)
   m_has_initialized = true;
 }
 
-void Debug::process_event(SDL_Event* event)
+void DebugTools::process_event(SDL_Event* event)
 {
   if (!m_has_initialized || !open)
   {
@@ -60,7 +60,7 @@ void Debug::process_event(SDL_Event* event)
 
 bool show_demo_window = false;
 
-void Debug::update()
+void DebugTools::update()
 {
   if (!m_has_initialized || !open)
   {
@@ -71,6 +71,8 @@ void Debug::update()
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
+  m_update_menu_bar();
+
   if (show_demo_window)
   {
     ImGui::ShowDemoWindow(&show_demo_window);
@@ -80,9 +82,9 @@ void Debug::update()
   {
     m_general_info->update();
   }
-  if (m_camera_editor != nullptr)
+  if (m_camera_inspector != nullptr)
   {
-    m_camera_editor->update();
+    m_camera_inspector->update();
   }
   if (m_render_editor != nullptr)
   {
@@ -90,7 +92,7 @@ void Debug::update()
   }
 }
 
-void Debug::render()
+void DebugTools::render()
 {
   if (!m_has_initialized || !open)
   {
@@ -101,10 +103,34 @@ void Debug::render()
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Debug::init_general_info(GameContext& context) { m_general_info = std::make_unique<GeneralInfo>(context); }
+void DebugTools::m_update_menu_bar()
+{
+  if (ImGui::BeginMainMenuBar())
+  {
+    if (ImGui::BeginMenu("View"))
+    {
+      if (m_general_info != nullptr && ImGui::MenuItem("General Info"))
+      {
+        m_general_info->toggle();
+      }
+      if (m_camera_inspector != nullptr && ImGui::MenuItem("Camera Inspector"))
+      {
+        m_camera_inspector->toggle();
+      }
+      ImGui::EndMenu();
+    }
 
-void Debug::init_camera_editor(Camera& camera) { m_camera_editor = std::make_unique<CameraEditor>(camera); }
+    ImGui::EndMainMenuBar();
+  }
+}
 
-void Debug::init_render_editor(RenderSystem& render) { m_render_editor = std::make_unique<RenderEditor>(render); }
+void DebugTools::init_general_info(GameContext& context) { m_general_info = std::make_unique<GeneralInfo>(context); }
+
+void DebugTools::init_camera_inspector(Camera& camera)
+{
+  m_camera_inspector = std::make_unique<CameraInspector>(camera);
+}
+
+void DebugTools::init_render_editor(RenderSystem& render) { m_render_editor = std::make_unique<RenderEditor>(render); }
 
 }  // namespace dl
