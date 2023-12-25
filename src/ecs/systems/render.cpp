@@ -36,7 +36,8 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& world_size = m_world.tiles.size;
 
-  for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j)
+  // Render tiles with y coordinate within the camera frustum
+  for (int j = -m_frustum_tile_padding; j <= camera_size.y; ++j)
   {
     for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
     {
@@ -72,52 +73,99 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
     }
   }
 
-  auto items_view = registry.view<const Position, const Visibility>();
-
-  for (auto entity : items_view)
+  // Render visible tiles with y coordinate to the bottom of the camera frustum
+  for (int offset = world_size.z; offset > 0; --offset)
   {
-    const auto& position = registry.get<Position>(entity);
-    auto& visibility = registry.get<Visibility>(entity);
-
-    if (visibility.sprite == nullptr)
+    for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
     {
-      visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame);
-    }
-    if (visibility.sprite->texture == nullptr)
-    {
-      visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
+      const auto index_x = i + camera_position.x;
+      const auto view_y = offset + camera_size.y;
+      const auto index_y = view_y + camera_position.y;
 
-      // Set specific frame according to the texture data loaded in a separated json file.
-      // This allows flexibility by separating the texture frames from game ids.
-      if (visibility.frame_id > 0 && !visibility.frame_type.empty())
+      if (index_x < 0 || index_y < 0 || index_x >= world_size.x || index_y >= world_size.y)
       {
-        const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
-        visibility.sprite->set_frame(frame_data.frame);
+        continue;
+      }
+
+      const auto height = m_world.tiles.height_map[index_y * world_size.x + index_x];
+
+      if (height < offset)
+      {
+        continue;
+      }
+
+      for (auto z = offset; z <= height; ++z)
+      {
+        if (!m_world.tiles.has_flags(DL_CELL_FLAG_VISIBLE, index_x, index_y, z))
+        {
+          continue;
+        }
+
+        const auto& terrain = m_world.get_terrain(index_x, index_y, z);
+
+        if (terrain.id == 0)
+        {
+          continue;
+        }
+
+        m_render_tile(terrain.id, camera_position, tile_size, i, view_y, z);
+
+        const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
+        m_render_tile(over_terrain.id, camera_position, tile_size, i, view_y, z, 1);
       }
     }
-
-    const auto sprite_size = visibility.sprite->get_size();
-    m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
   }
 
-  auto quad_view = registry.view<const Position, const Rectangle>();
-
-  for (auto entity : quad_view)
   {
-    const auto& position = registry.get<Position>(entity);
-    auto& rectangle = registry.get<Rectangle>(entity);
+    auto items_view = registry.view<const Position, const Visibility>();
 
-    m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
+    for (auto entity : items_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& visibility = registry.get<Visibility>(entity);
+
+      if (visibility.sprite == nullptr)
+      {
+        visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame);
+      }
+      if (visibility.sprite->texture == nullptr)
+      {
+        visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
+
+        // Set specific frame according to the texture data loaded in a separated json file.
+        // This allows flexibility by separating the texture frames from game ids.
+        if (visibility.frame_id > 0 && !visibility.frame_type.empty())
+        {
+          const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
+          visibility.sprite->set_frame(frame_data.frame);
+        }
+      }
+
+      const auto sprite_size = visibility.sprite->get_size();
+      m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
+    }
   }
 
-  auto text_view = registry.view<const Text, const Position>();
-
-  for (auto entity : text_view)
   {
-    const auto& position = registry.get<Position>(entity);
-    auto& text = registry.get<Text>(entity);
+    auto quad_view = registry.view<const Position, const Rectangle>();
 
-    m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
+    for (auto entity : quad_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& rectangle = registry.get<Rectangle>(entity);
+
+      m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
+    }
+
+    auto text_view = registry.view<const Text, const Position>();
+
+    for (auto entity : text_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& text = registry.get<Text>(entity);
+
+      m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
+    }
   }
 }
 
