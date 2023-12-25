@@ -10,16 +10,14 @@
 namespace dl
 {
 Scene::Scene(const std::string& scene_key, GameContext& game_context)
-    : m_scene_key(entt::hashed_string{scene_key.c_str()}),
-      m_scene_dir("./data/scripts/scenes/" + scene_key + "/"),
-      m_game_context(game_context)
+    : m_scene_key(entt::hashed_string{scene_key.c_str()}), m_scene_key_string(scene_key), m_game_context(game_context)
 {
   const auto& display_size = Display::get_window_size();
   m_renderer.set_projection_matrix(m_camera.get_projection_matrix());
   m_camera.set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
 }
 
-void Scene::load() { m_json.load(m_scene_dir / "main.json"); }
+void Scene::load() { m_json.load("./data/scenes/" + m_scene_key_string + "/data.json"); }
 
 void Scene::check_window_size()
 {

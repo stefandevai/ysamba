@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <string>
 
 #include "core/game_context.hpp"
@@ -28,10 +27,10 @@ class Scene
   uint32_t get_key() const { return m_scene_key; }
 
  protected:
-  const uint32_t m_scene_key;
-  const std::filesystem::path m_scene_dir;
+  const uint32_t m_scene_key{};
+  const std::string m_scene_key_string{};
   GameContext& m_game_context;
-  JSON m_json;
+  JSON m_json{};
   Renderer m_renderer{*m_game_context.asset_manager};
   Camera m_camera{*m_game_context.display};
   bool m_has_loaded = false;
