@@ -103,7 +103,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
     const auto& position = registry.get<Position>(entity);
     auto& text = registry.get<Text>(entity);
 
-    m_renderer.batch("world"_hs, text, position.x, position.y - position.z * tile_size.y, position.z * tile_size.y + 3);
+    m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
   }
 }
 
@@ -116,7 +116,7 @@ void RenderSystem::m_batch(const Position& position, T* renderable, const Vector
   const auto position_x = std::round(position.x) * size.x;
   const auto position_y = std::round(position.y) * size.y;
 
-  m_renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index);
+  m_renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index * m_z_index_increment);
 }
 
 void RenderSystem::m_render_tile(const uint32_t tile_id,
@@ -146,8 +146,11 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     sprite.texture = m_world_texture;
     sprite.set_frame(frame_data.frame);
 
-    m_renderer.batch(
-        "world"_hs, &sprite, transformed_x * tile_size.x, transformed_y * tile_size.y, z * tile_size.y + z_index);
+    m_renderer.batch("world"_hs,
+                     &sprite,
+                     transformed_x * tile_size.x,
+                     transformed_y * tile_size.y,
+                     z * tile_size.y + z_index * m_z_index_increment);
 
     /* if (perspective == TopDown45) */
     /* { */

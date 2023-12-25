@@ -22,7 +22,8 @@ class RenderSystem
   World& m_world;
   const std::string& m_world_texture_id;
   const std::shared_ptr<Texture> m_world_texture = nullptr;
-  int m_frustum_tile_padding = 1;
+  static constexpr int m_frustum_tile_padding = 1;
+  static constexpr double m_z_index_increment = 0.02;
 
   template <typename T>
   void m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index = 0);

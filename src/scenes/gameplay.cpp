@@ -43,7 +43,7 @@ void Gameplay::load()
   auto& debug = Debug::get_instance();
   debug.init_general_info(m_game_context);
   debug.init_camera_editor(m_camera);
-  debug.init_render_editor(m_render_system);
+  /* debug.init_render_editor(m_render_system); */
 
   m_has_loaded = true;
 }

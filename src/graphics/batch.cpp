@@ -293,7 +293,7 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
   }
 
   auto general_transform = m_matrix;
-  general_transform = glm::translate(general_transform, glm::vec3(x, y, z + y));
+  general_transform = glm::translate(general_transform, glm::vec3(x, y, z));
 
   // Top left vertex
   glm::vec4 transformation_result = general_transform * glm::vec4(0.f, 0.f, 1.f, 1.f);

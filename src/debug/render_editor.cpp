@@ -9,9 +9,10 @@ RenderEditor::RenderEditor(RenderSystem& render) : m_render(render) {}
 
 void RenderEditor::update()
 {
+  (void)m_render;
   ImGui::Begin("Render Editor", &m_open);
-  ImGui::SeparatorText("Virtual Position");
-  ImGui::DragInt("Frustum padding", &m_render.m_frustum_tile_padding, 1);
+  /* ImGui::SeparatorText("Virtual Position"); */
+  /* ImGui::DragInt("Frustum padding", &m_render.m_frustum_tile_padding, 1); */
   /* ImGui::DragScalar("vy", ImGuiDataType_Double, &m_render.position.y, 1.0); */
   /* ImGui::DragScalar("vz", ImGuiDataType_Double, &m_render.position.z, 1.0); */
 
