@@ -10,7 +10,6 @@
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"
 #include "core/json.hpp"
-#include "core/lua_api.hpp"
 #include "core/maths/vector.hpp"
 
 namespace dl

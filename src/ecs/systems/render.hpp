@@ -14,14 +14,6 @@ struct Vector2i;
 class RenderSystem
 {
  public:
-  enum Perspective
-  {
-    TopDown90,
-    TopDown45,
-  };
-
-  Perspective perspective = TopDown90;
-
   RenderSystem(Renderer& renderer, World& world);
   void render(entt::registry& registry, const Camera& camera);
 

@@ -36,13 +36,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& world_size = m_world.tiles.size;
 
-  int tiles_rendered = 0;
-
-  /* for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i) */
-  /* { */
-  /*   for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j) */
   for (int j = -m_frustum_tile_padding; j < camera_size.y + m_frustum_tile_padding; ++j)
-  /* for (int j = 0; j < m_world.size.y; ++j) */
   {
     for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
     {
@@ -54,11 +48,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
         continue;
       }
 
-      /* const auto index_x = i; */
-      /* const auto index_y = j; */
       const auto z = m_world.tiles.height_map[index_y * world_size.x + index_x];
-
-      ++tiles_rendered;
 
       const auto& terrain = m_world.get_terrain(index_x, index_y, z);
       m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
@@ -67,8 +57,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1);
     }
   }
-
-  /* spdlog::debug("RH {}", tiles_rendered); */
 
   auto items_view = registry.view<const Position, const Visibility>();
 
@@ -126,8 +114,7 @@ void RenderSystem::m_batch(const Position& position, T* renderable, const Vector
 
   const auto position_z = std::round(position.z) * size.y;
   const auto position_x = std::round(position.x) * size.x;
-  const auto position_y = perspective == Perspective::TopDown45 ? std::round(position.y) * size.y - position_z
-                                                                : std::round(position.y) * size.y;
+  const auto position_y = std::round(position.y) * size.y;
 
   m_renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index);
 }
@@ -151,7 +138,6 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
 
   const int transformed_x = x + camera_position.x;
   const int transformed_y = y + camera_position.y;
-  /* const int transformed_y = perspective == TopDown45 ? y - z + camera_position.y : y; */
 
   if (frame_data.tile_type == "single")
   {
