@@ -1,13 +1,13 @@
 #include "./camera.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <cmath>
 
 #include "core/display.hpp"
 
 namespace dl
 {
-Camera::Camera() {}
-
 Camera::Camera(const Display& display)
 {
   const auto& display_size = display.get_size();
@@ -16,28 +16,13 @@ Camera::Camera(const Display& display)
 
 glm::mat4 Camera::get_view_matrix() const
 {
-  glm::vec3 direction{};
-  direction.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
-  direction.y = std::sin(glm::radians(pitch));
-  direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
-  glm::vec3 pos{m_position.x, m_position.y, m_position.z};
-
-  /* auto view_matrix = glm::lookAt(pos, pos + glm::normalize(direction), m_up); */
-  /* view_matrix = glm::translate(view_matrix, glm::vec3(m_size.x / 2, m_size.y / 2, 0.0)); */
-  /* view_matrix = glm::scale(view_matrix, glm::vec3(1.0f, std::sqrt(2.0f), 1.0f)); */
-  /* view_matrix = glm::translate(view_matrix, glm::vec3(-m_size.x / 2, -m_size.y / 2, 0.0)); */
-
-  /* return view_matrix; */
-  /* return glm::scale(glm::lookAt(pos, pos + glm::normalize(direction), m_up), */
-  /*                   glm::vec3(1.0f, std::sqrt(2.0f), 1.0f)); */
-
   if (m_resize_view_matrix)
   {
-    auto view_matrix = glm::lookAt(pos, pos + glm::normalize(direction), m_up);
-    return glm::scale(view_matrix, glm::vec3(1.0f, std::sqrt(2.0f), std::sqrt(2.0f)));
+    auto view_matrix = glm::lookAt(m_position, m_center, m_up);
+    return glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor));
   }
 
-  return glm::lookAt(pos, pos + glm::normalize(direction), m_up);
+  return glm::lookAt(m_position, m_center, m_up);
 }
 
 const Vector2i Camera::get_position_in_tiles() const
@@ -51,23 +36,20 @@ void Camera::move(const Vector3& quantity)
 {
   position += quantity;
   m_position.x += quantity.x;
-  m_position.y += quantity.y * std::sqrt(2.0f);
+  m_position.y += quantity.y * m_scaling_factor;
   m_position.z += quantity.z;
-  m_front.x += quantity.x;
-  m_front.y += quantity.y;
-  m_front.z += quantity.z;
+
+  m_calculate_center();
 }
 
 void Camera::set_position(const Vector3& position)
 {
   this->position = position;
   m_position.x = position.x;
-  m_position.y = position.y * std::sqrt(2.0f) + camera_z;
-  m_position.z = position.z + camera_z;
+  m_position.y = position.y * m_scaling_factor + m_camera_z;
+  m_position.z = position.z + m_camera_z;
 
-  m_front.x = position.x;
-  m_front.y = position.y;
-  m_front.z = position.z;
+  m_calculate_center();
 }
 
 void Camera::set_size(const Vector2& size)
@@ -103,6 +85,29 @@ void Camera::set_tile_size(const Vector2i& size)
   m_tile_size = size;
   m_size_in_tiles.x = std::ceil(m_size.x / size.x);
   m_size_in_tiles.y = std::ceil(m_size.y / size.y);
+}
+
+void Camera::set_yaw(const float yaw)
+{
+  this->yaw = yaw;
+  m_calculate_center();
+}
+
+void Camera::set_pitch(const float pitch)
+{
+  this->pitch = pitch;
+  m_scaling_factor = 1.0 / std::sin(glm::radians(-pitch));
+  m_calculate_center();
+}
+
+void Camera::m_calculate_center()
+{
+  glm::vec3 direction{};
+  direction.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+  direction.y = std::sin(glm::radians(pitch));
+  direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+
+  m_center = m_position + glm::normalize(std::move(direction));
 }
 
 }  // namespace dl

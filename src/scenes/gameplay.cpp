@@ -36,9 +36,9 @@ void Gameplay::load()
   m_camera.set_tile_size(m_world.get_tile_size());
   /* m_debug_info = m_ui_manager.emplace<ui::DebugInfo>(m_camera); */
 
-  /* auto society_blueprint = m_world.get_society("otomi"_hs); */
-  /* auto components = SocietyGenerator::generate_members(society_blueprint); */
-  /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
+  auto society_blueprint = m_world.get_society("otomi"_hs);
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
   auto& debug = Debug::get_instance();
   debug.init_general_info(m_game_context);

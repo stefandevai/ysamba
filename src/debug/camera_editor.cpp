@@ -18,18 +18,25 @@ void CameraEditor::update()
   ImGui::DragScalar("vz", ImGuiDataType_Double, &m_camera.position.z, 1.0);
 
   ImGui::SeparatorText("Position");
-  ImGui::DragScalar("x", ImGuiDataType_Double, &m_camera.m_position.x, 1.0);
-  ImGui::DragScalar("y", ImGuiDataType_Double, &m_camera.m_position.y, 1.0);
-  ImGui::DragScalar("z", ImGuiDataType_Double, &m_camera.m_position.z, 1.0);
+  ImGui::DragFloat("x", &m_camera.m_position.x, 1.0f);
+  ImGui::DragFloat("y", &m_camera.m_position.y, 1.0f);
+  ImGui::DragFloat("z", &m_camera.m_position.z, 1.0f);
+
+  static float yaw = m_camera.yaw;
+  static float pitch = m_camera.pitch;
 
   ImGui::SeparatorText("Rotation");
-  ImGui::DragFloat("yaw", &m_camera.yaw, 1.0);
-  ImGui::DragFloat("pitch", &m_camera.pitch, 1.0);
+  ImGui::DragFloat("yaw", &yaw, 1.0);
+  ImGui::DragFloat("pitch", &pitch, 1.0);
 
-  ImGui::SeparatorText("Front");
-  ImGui::DragFloat("fx", &m_camera.m_front.x, 1.0);
-  ImGui::DragFloat("fy", &m_camera.m_front.y, 1.0);
-  ImGui::DragFloat("fz", &m_camera.m_front.z, 1.0);
+  if (yaw != m_camera.yaw)
+  {
+    m_camera.set_yaw(yaw);
+  }
+  if (pitch != m_camera.pitch)
+  {
+    m_camera.set_pitch(pitch);
+  }
 
   ImGui::SeparatorText("Other");
   ImGui::DragFloat("Frustrum left", &m_camera.m_frustrum_left, 1.0f);
