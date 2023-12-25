@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "./grid_3d.hpp"
 #include "./item_data.hpp"
 #include "./society/society_blueprint.hpp"
 #include "./spatial_hash.hpp"
@@ -53,10 +54,7 @@ class World
  public:
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
-  std::vector<int> height_map{};
-
-  // World dimensions
-  Vector3i size{};
+  Grid3D tiles{};
 
   // Constructor
   World(GameContext& game_context);
@@ -72,7 +70,7 @@ class World
   void set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z);
 
   // Replace tile by coordinates
-  void replace(const int from, const int to, const int x, const int y, const int z);
+  void replace(const uint32_t from, const uint32_t to, const int x, const int y, const int z);
 
   // Get tile data by coordinates
   [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
@@ -88,9 +86,6 @@ class World
 
   // Gets the z elevation for a given (x, z) position
   [[nodiscard]] int get_elevation(const int x, const int y) const;
-
-  // Get size of a specific tilemap
-  [[nodiscard]] TilemapSize get_tilemap_size(const int z);
 
   // Get size of the tiles in the current tileset
   [[nodiscard]] Vector2i get_tile_size() { return m_tile_size; }
@@ -157,8 +152,8 @@ class World
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};
   std::map<uint32_t, SocietyBlueprint> m_societies;
-  std::vector<int> m_tiles{};
-  std::vector<int> m_over_tiles{};
+  /* std::vector<uint32_t> m_tiles{}; */
+  std::vector<uint32_t> m_over_tiles{};
 
   // Load information about tiles
   void m_load_tile_data();

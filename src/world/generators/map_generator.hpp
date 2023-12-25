@@ -8,7 +8,7 @@
 
 namespace dl
 {
-class ErosionGenerator
+class MapGenerator
 {
  private:
   const int m_width;
@@ -16,10 +16,10 @@ class ErosionGenerator
   const int m_z_levels;
 
  public:
-  std::vector<int> tiles = std::vector<int>(m_width * m_height * m_z_levels);
+  std::vector<uint32_t> tiles = std::vector<uint32_t>(m_width * m_height * m_z_levels);
   std::vector<int> height_map = std::vector<int>(m_width * m_height);
 
-  ErosionGenerator(const int width, const int height, const int z_levels = 10)
+  MapGenerator(const int width, const int height, const int z_levels = 10)
       : m_width(width), m_height(height), m_z_levels(z_levels)
   {
   }
@@ -29,9 +29,7 @@ class ErosionGenerator
  private:
   LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
 
-  void m_generate_silhouette(std::vector<double>& tiles, const int seed);
+  void m_get_height_map(std::vector<double>& height_values, const int seed);
   float m_get_rectangle_gradient_value(const int x, const int y);
-  void m_erode(std::vector<double>& tiles, const uint32_t cycles);
-  glm::vec3 m_surface_normal(const std::vector<double>& height_map, int i, int j);
 };
 }  // namespace dl

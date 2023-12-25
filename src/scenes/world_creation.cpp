@@ -13,7 +13,7 @@
 #include "graphics/renderer.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/texture.hpp"
-#include "world/generators/erosion_generator.hpp"
+#include "world/generators/map_generator.hpp"
 
 namespace dl
 {
@@ -151,9 +151,9 @@ void WorldCreation::m_generate_map(const int seed)
 
 void WorldCreation::m_create_world_representation()
 {
-  const auto tilemap_size = m_world.get_tilemap_size(0);
+  const auto& size = m_world.tiles.size;
 
-  std::vector<unsigned char> pixel_data((tilemap_size.w * tilemap_size.h) * 4);
+  std::vector<unsigned char> pixel_data((size.x * size.y) * 4);
 
   const auto water_color = Color(0x3772ebff);
   const auto terrain_color = Color(0x37c737ff);
@@ -161,49 +161,49 @@ void WorldCreation::m_create_world_representation()
   const auto wall_color = Color(0x636b5cff);
   const auto default_color = Color(0x000000ff);
 
-  for (auto i = 0; i < tilemap_size.w; ++i)
+  for (auto i = 0; i < size.x; ++i)
   {
-    for (auto j = 0; j < tilemap_size.h; ++j)
+    for (auto j = 0; j < size.y; ++j)
     {
       const auto& tile = m_world.get(i, j, 0);
 
       switch (tile.id)
       {
       case 1:
-        pixel_data[j * tilemap_size.w * 4 + i * 4] = water_color.rgba_color.r;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = water_color.rgba_color.g;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = water_color.rgba_color.b;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = water_color.rgba_color.a;
+        pixel_data[j * size.x * 4 + i * 4] = water_color.rgba_color.r;
+        pixel_data[j * size.x * 4 + i * 4 + 1] = water_color.rgba_color.g;
+        pixel_data[j * size.x * 4 + i * 4 + 2] = water_color.rgba_color.b;
+        pixel_data[j * size.x * 4 + i * 4 + 3] = water_color.rgba_color.a;
         break;
       case 2:
-        pixel_data[j * tilemap_size.w * 4 + i * 4] = terrain_color.rgba_color.r;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = terrain_color.rgba_color.g;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = terrain_color.rgba_color.b;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = terrain_color.rgba_color.a;
+        pixel_data[j * size.x * 4 + i * 4] = terrain_color.rgba_color.r;
+        pixel_data[j * size.x * 4 + i * 4 + 1] = terrain_color.rgba_color.g;
+        pixel_data[j * size.x * 4 + i * 4 + 2] = terrain_color.rgba_color.b;
+        pixel_data[j * size.x * 4 + i * 4 + 3] = terrain_color.rgba_color.a;
         break;
       case 3:
-        pixel_data[j * tilemap_size.w * 4 + i * 4] = sand_color.rgba_color.r;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = sand_color.rgba_color.g;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = sand_color.rgba_color.b;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = sand_color.rgba_color.a;
+        pixel_data[j * size.x * 4 + i * 4] = sand_color.rgba_color.r;
+        pixel_data[j * size.x * 4 + i * 4 + 1] = sand_color.rgba_color.g;
+        pixel_data[j * size.x * 4 + i * 4 + 2] = sand_color.rgba_color.b;
+        pixel_data[j * size.x * 4 + i * 4 + 3] = sand_color.rgba_color.a;
         break;
       case 4:
-        pixel_data[j * tilemap_size.w * 4 + i * 4] = wall_color.rgba_color.r;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = wall_color.rgba_color.g;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = wall_color.rgba_color.b;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = wall_color.rgba_color.a;
+        pixel_data[j * size.x * 4 + i * 4] = wall_color.rgba_color.r;
+        pixel_data[j * size.x * 4 + i * 4 + 1] = wall_color.rgba_color.g;
+        pixel_data[j * size.x * 4 + i * 4 + 2] = wall_color.rgba_color.b;
+        pixel_data[j * size.x * 4 + i * 4 + 3] = wall_color.rgba_color.a;
         break;
       default:
-        pixel_data[j * tilemap_size.w * 4 + i * 4] = default_color.rgba_color.r;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 1] = default_color.rgba_color.g;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 2] = default_color.rgba_color.b;
-        pixel_data[j * tilemap_size.w * 4 + i * 4 + 3] = default_color.rgba_color.a;
+        pixel_data[j * size.x * 4 + i * 4] = default_color.rgba_color.r;
+        pixel_data[j * size.x * 4 + i * 4 + 1] = default_color.rgba_color.g;
+        pixel_data[j * size.x * 4 + i * 4 + 2] = default_color.rgba_color.b;
+        pixel_data[j * size.x * 4 + i * 4 + 3] = default_color.rgba_color.a;
         break;
       }
     }
   }
 
-  const auto texture = std::make_shared<Texture>(pixel_data, tilemap_size.w, tilemap_size.h);
+  const auto texture = std::make_shared<Texture>(pixel_data, size.x, size.y);
   m_world_sprite->texture = texture;
 }
 
@@ -214,9 +214,8 @@ void WorldCreation::m_generate_height_map(const int seed)
 {
   (void)seed;
 
-  /* auto generator = ErosionGenerator(hm_width, hm_width); */
+  /* auto generator = MapGenerator(hm_width, hm_width); */
 
-  const auto s = random::get_integer(0, INT_MAX);
   m_height_map.clear();
   m_height_map.reserve(hm_width * hm_height);
   /* m_height_map = generator.generate(s); */

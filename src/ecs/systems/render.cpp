@@ -34,6 +34,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = camera.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
+  const auto& world_size = m_world.tiles.size;
 
   int tiles_rendered = 0;
 
@@ -48,14 +49,14 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
 
-      if (index_x < 0 || index_y < 0 || index_x >= m_world.size.x || index_y >= m_world.size.y)
+      if (index_x < 0 || index_y < 0 || index_x >= world_size.x || index_y >= world_size.y)
       {
         continue;
       }
 
       /* const auto index_x = i; */
       /* const auto index_y = j; */
-      const auto z = m_world.height_map[index_y * m_world.size.x + index_x];
+      const auto z = m_world.tiles.height_map[index_y * world_size.x + index_x];
 
       ++tiles_rendered;
 

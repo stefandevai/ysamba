@@ -60,7 +60,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   int elevation = 0;
 
   // Check elevation in the current mouse position
-  for (int z = m_world.size.z - 1; z >= 0; --z)
+  for (int z = m_world.tiles.size.z - 1; z >= 0; --z)
   {
     int queried_elevation = m_world.get_elevation(std::floor(tile_x), std::floor(tile_y) + z);
 

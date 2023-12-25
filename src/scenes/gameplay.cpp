@@ -29,7 +29,7 @@ void Gameplay::load()
 
   m_renderer.add_batch("world"_hs, "default");
 
-  /* m_world.generate(100, 100, 1337); */
+  /* m_world.generate(100, 100, 1893); */
   m_world.load("./data/world/test_map.json");
   /* load_game(); */
 
