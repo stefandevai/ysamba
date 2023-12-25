@@ -11,7 +11,7 @@ namespace dl
 {
 Scene::Scene(const std::string& scene_key, GameContext& game_context)
     : m_scene_key(entt::hashed_string{scene_key.c_str()}),
-      m_scene_dir("scenes/" + scene_key + "/"),
+      m_scene_dir("./data/scripts/scenes/" + scene_key + "/"),
       m_game_context(game_context)
 {
   const auto& display_size = Display::get_window_size();
@@ -19,9 +19,7 @@ Scene::Scene(const std::string& scene_key, GameContext& game_context)
   m_camera.set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
 }
 
-Scene::~Scene() {}
-
-void Scene::load() { m_lua.load(m_scene_dir / "main.lua"); }
+void Scene::load() { m_json.load(m_scene_dir / "main.json"); }
 
 void Scene::check_window_size()
 {

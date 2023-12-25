@@ -4,7 +4,6 @@
 #include <unordered_map>
 
 #include "./json.hpp"
-#include "./lua_api.hpp"
 #include "./maths/vector.hpp"
 #include "./sdl_input_wrapper.hpp"
 

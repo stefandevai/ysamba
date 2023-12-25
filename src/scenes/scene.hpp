@@ -4,7 +4,7 @@
 #include <string>
 
 #include "core/game_context.hpp"
-#include "core/lua_api.hpp"
+#include "core/json.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/renderer.hpp"
 
@@ -17,7 +17,7 @@ class Scene
 {
  public:
   Scene(const std::string& scene_key, GameContext& game_context);
-  virtual ~Scene();
+  virtual ~Scene(){};
 
   virtual void load();
   virtual void update() = 0;
@@ -31,7 +31,7 @@ class Scene
   const uint32_t m_scene_key;
   const std::filesystem::path m_scene_dir;
   GameContext& m_game_context;
-  LuaAPI m_lua;
+  JSON m_json;
   Renderer m_renderer{*m_game_context.asset_manager};
   Camera m_camera{*m_game_context.display};
   bool m_has_loaded = false;

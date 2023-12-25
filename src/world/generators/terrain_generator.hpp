@@ -6,7 +6,7 @@
 #include "./island_data.hpp"
 #include "./lib/spline.hpp"
 #include "./river_segment.hpp"
-#include "core/lua_api.hpp"
+#include "core/json.hpp"
 #include "world/point.hpp"
 #include "world/tilemap.hpp"
 
@@ -45,7 +45,7 @@ class TerrainGenerator
   Tilemap generate(const int seed);
 
  private:
-  LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
+  JSON m_json{"./data/scripts/generators/terrain.json"};
   const int m_width;
   const int m_height;
 

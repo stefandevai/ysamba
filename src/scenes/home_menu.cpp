@@ -22,8 +22,8 @@ void HomeMenu::load()
 
   m_renderer.add_batch("text"_hs, "default", 2);
 
-  const auto game_title = m_lua.get_variable<std::string>("game_title");
-  const auto instructions = m_lua.get_variable<std::string>("instructions");
+  const auto game_title = m_json.object["game_title"].get<std::string>();
+  const auto instructions = m_json.object["instructions"].get<std::string>();
 
   m_game_title.set_font_size(16);
   m_game_title.set_typeface("font-1980");

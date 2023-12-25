@@ -30,11 +30,11 @@ void WorldCreation::load()
 
   m_world_sprite = std::make_unique<Sprite>();
 
-  const auto seed = m_lua.get_optional_variable<int>("seed");
+  const auto seed = m_json.object["seed"].get<int>();
 
   if (seed)
   {
-    m_generate_height_map(seed.value());
+    m_generate_height_map(seed);
   }
   else
   {
@@ -134,8 +134,8 @@ void WorldCreation::load_world()
 
 void WorldCreation::m_generate_map(const int seed)
 {
-  const int map_width = m_lua.get_variable<int>("map_width");
-  const int map_height = m_lua.get_variable<int>("map_height");
+  const int map_width = m_json.object["map_width"].get<int>();
+  const int map_height = m_json.object["map_height"].get<int>();
 
   if (seed != 0)
   {

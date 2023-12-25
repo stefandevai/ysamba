@@ -50,8 +50,6 @@ endif()
 find_package(SDL2 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
-find_package(Lua REQUIRED)
-find_package(sol2 CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -62,7 +60,6 @@ find_package(imgui CONFIG REQUIRED)
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
-    ${LUA_INCLUDE_DIR}
     "./lib/gal/include"
     "./src"
 )
@@ -74,8 +71,6 @@ target_link_libraries(
         SDL2::SDL2main
         glad::glad
         libtcod::libtcod
-        ${LUA_LIBRARIES}
-        sol2
         cereal::cereal
         EnTT::EnTT
         nlohmann_json::nlohmann_json

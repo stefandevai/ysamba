@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "core/lua_api.hpp"
+#include "core/json.hpp"
 #include "world/tilemap.hpp"
 
 namespace dl
@@ -27,7 +27,7 @@ class MapGenerator
   void generate(const int seed);
 
  private:
-  LuaAPI m_lua = LuaAPI{"generators/terrain.lua"};
+  JSON m_json{"./data/scripts/generators/terrain.json"};
 
   void m_get_height_map(std::vector<double>& height_values, const int seed);
   float m_get_rectangle_gradient_value(const int x, const int y);

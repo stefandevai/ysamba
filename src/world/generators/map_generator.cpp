@@ -13,7 +13,7 @@ namespace dl
 void MapGenerator::generate(const int seed)
 {
   // TEMP
-  m_lua.load("generators/terrain.lua");
+  m_json.load("./data/scripts/generators/terrain.json");
   // TEMP
 
   spdlog::info("=============================");
@@ -121,11 +121,11 @@ void MapGenerator::generate(const int seed)
 
 void MapGenerator::m_get_height_map(std::vector<double>& height_values, const int seed)
 {
-  const auto simplex_freq = m_lua.get_variable<float>("simplex_freq");
-  const auto simplex_octaves = m_lua.get_variable<int>("simplex_octaves");
-  const auto simplex_lacunarity = m_lua.get_variable<float>("simplex_lacunarity");
-  const auto simplex_gain = m_lua.get_variable<float>("simplex_gain");
-  const auto simplex_weighted_strength = m_lua.get_variable<float>("simplex_weighted_strength");
+  const auto simplex_freq = m_json.object["simplex_freq"].get<float>();
+  const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>();
+  const auto simplex_lacunarity = m_json.object["simplex_lacunarity"].get<float>();
+  const auto simplex_gain = m_json.object["simplex_gain"].get<float>();
+  const auto simplex_weighted_strength = m_json.object["simplex_weighted_strength"].get<float>();
 
   auto noise = FastNoiseLite{seed};
   noise.SetSeed(seed);

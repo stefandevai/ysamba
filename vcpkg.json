@@ -16,8 +16,6 @@
     "entt",
     "sdl2",
     "glad",
-    "lua",
-    "sol2",
     "cereal",
     "glm",
     "nlohmann-json",

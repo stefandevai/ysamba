@@ -25,7 +25,7 @@ namespace dl
 Tilemap TerrainGenerator::generate(const int seed)
 {
   // TEMP
-  m_lua.load("generators/terrain.lua");
+  m_json.load("./data/scripts/generators/terrain.json");
   // TEMP
 
   spdlog::info("=============================");
@@ -70,12 +70,12 @@ Tilemap TerrainGenerator::generate(const int seed)
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-  const auto draw_features = m_lua.get_variable<bool>("draw_features");
+  const auto draw_features = m_json.object["draw_features"].get<bool>();
 
   if (draw_features)
   {
     // Draw structure
-    const auto draw_structure = m_lua.get_variable<bool>("draw_structure");
+    const auto draw_structure = m_json.object["draw_structure"].get<bool>();
     if (draw_structure)
     {
       for (auto site : main_island.structure.diagram.get_sites())
@@ -102,7 +102,7 @@ Tilemap TerrainGenerator::generate(const int seed)
     }
 
     // Draw coastline
-    const auto draw_coastline = m_lua.get_variable<bool>("draw_coastline");
+    const auto draw_coastline = m_json.object["draw_coastline"].get<bool>();
     if (draw_coastline)
     {
       for (const auto& coastline_point : coastline)
@@ -112,7 +112,7 @@ Tilemap TerrainGenerator::generate(const int seed)
     }
 
     // Draw bays
-    const auto draw_bays = m_lua.get_variable<bool>("draw_bays");
+    const auto draw_bays = m_json.object["draw_bays"].get<bool>();
     if (draw_bays)
     {
       for (const auto& bay : bays)
@@ -129,11 +129,11 @@ Tilemap TerrainGenerator::generate(const int seed)
 
 void TerrainGenerator::m_generate_silhouette(std::vector<int>& tiles, const int seed)
 {
-  const auto simplex_freq = m_lua.get_variable<float>("simplex_freq");
-  const auto simplex_octaves = m_lua.get_variable<int>("simplex_octaves");
-  const auto simplex_lacunarity = m_lua.get_variable<float>("simplex_lacunarity");
-  const auto simplex_gain = m_lua.get_variable<float>("simplex_gain");
-  const auto simplex_weighted_strength = m_lua.get_variable<float>("simplex_weighted_strength");
+  const auto simplex_freq = m_json.object["simplex_freq"].get<float>();
+  const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>();
+  const auto simplex_lacunarity = m_json.object["simplex_lacunarity"].get<float>();
+  const auto simplex_gain = m_json.object["simplex_gain"].get<float>();
+  const auto simplex_weighted_strength = m_json.object["simplex_weighted_strength"].get<float>();
 
   auto noise = FastNoiseLite{seed};
   noise.SetSeed(seed);
@@ -146,7 +146,7 @@ void TerrainGenerator::m_generate_silhouette(std::vector<int>& tiles, const int 
   noise.SetFractalGain(simplex_gain);
   noise.SetFractalWeightedStrength(simplex_weighted_strength);
 
-  const auto tier_land = m_lua.get_variable<float>("tier_land");
+  const auto tier_land = m_json.object["tier_land"].get<float>();
 
   for (int j = 0; j < m_height; ++j)
   {
@@ -221,7 +221,7 @@ std::vector<IslandData> TerrainGenerator::m_get_islands(std::vector<int>& tiles)
 {
   auto all_islands = m_get_island_queue(tiles);
 
-  const auto number_of_islands_to_keep = m_lua.get_variable<std::uint32_t>("islands_to_keep");
+  const auto number_of_islands_to_keep = m_json.object["islands_to_keep"].get<std::uint32_t>();
 
   while (all_islands.size() > number_of_islands_to_keep)
   {
@@ -697,9 +697,9 @@ std::vector<Point<int>> TerrainGenerator::m_get_bays(std::vector<Point<int>>& co
 {
   std::vector<Point<int>> bays;
 
-  const auto minimum_area = m_lua.get_variable<int>("coast_min_area");
-  const auto points_min_distance = m_lua.get_variable<int>("coast_points_min_distance");
-  const auto points_max_distance = m_lua.get_variable<int>("coast_points_max_distance");
+  const auto minimum_area = m_json.object["coast_min_area"].get<int>();
+  const auto points_min_distance = m_json.object["coast_points_min_distance"].get<int>();
+  const auto points_max_distance = m_json.object["coast_points_max_distance"].get<int>();
 
   std::vector<std::pair<Point<int>, Point<int>>> candidates;
   Point<int>* coast_point_a = nullptr;
@@ -918,7 +918,7 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
 
   const auto delta_candidate_x = std::abs(static_cast<int>(start_x) - static_cast<int>(middle_x));
   const auto delta_candidate_y = std::abs(static_cast<int>(start_y) - static_cast<int>(middle_y));
-  const auto min_land_distance_delta = m_lua.get_variable<int>("min_land_distance_delta");
+  const auto min_land_distance_delta = m_json.object["min_land_distance_delta"].get<int>();
 
   // Ignore when land is found very close to the center point
   if (delta_candidate_x < min_land_distance_delta && delta_candidate_y < min_land_distance_delta)
@@ -1000,7 +1000,7 @@ void TerrainGenerator::m_build_island_structure(IslandData& island)
   std::array<float, 2> max_point = {static_cast<float>(island.bottom_right.x + 20),
                                     static_cast<float>(island.bottom_right.y + 20)};
 
-  const auto poisson_disk_sampling_radius = m_lua.get_variable<float>("poisson_disk_sampling_radius");
+  const auto poisson_disk_sampling_radius = m_json.object["poisson_disk_sampling_radius"].get<float>();
   const auto poisson_points = thinks::PoissonDiskSampling(poisson_disk_sampling_radius, min_point, max_point);
   std::vector<gal::Vector2<double>> points{};
 
@@ -1169,7 +1169,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
     }
   }
 
-  const auto coast_length = m_lua.get_variable<int>("coast_length");
+  const auto coast_length = m_json.object["coast_length"].get<int>();
   if (distance_to_water <= coast_length)
   {
     return true;
@@ -1226,8 +1226,8 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
   /* std::mt19937 rng(seed); */
   /* std::uniform_int_distribution<unsigned int> land_indexes_dist(0, island.structure.land_sites.size() - 1); */
   /* std::uniform_int_distribution<unsigned int> bay_indexes_dist(0, bays.size() - 1); */
-  const auto min_source_mouth_distance_x = m_lua.get_variable<int>("min_source_mouth_distance_x");
-  const auto min_source_mouth_distance_y = m_lua.get_variable<int>("min_source_mouth_distance_y");
+  const auto min_source_mouth_distance_x = m_json.object["min_source_mouth_distance_x"].get<int>();
+  const auto min_source_mouth_distance_y = m_json.object["min_source_mouth_distance_y"].get<int>();
 
   auto source_site = island.structure.land_sites[0];
   auto source_point = source_site->point.convert(m_width, m_height);
@@ -1362,7 +1362,7 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
 RiverData TerrainGenerator::m_get_river_data(const Point<int>& source, const Point<int>& mouth)
 {
   RiverData river;
-  const auto step = m_lua.get_variable<double>("river_bezier_step");
+  const auto step = m_json.object["river_bezier_step"].get<double>();
 
   auto noise = FastNoiseLite{1337};
   noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
@@ -1427,20 +1427,21 @@ void TerrainGenerator::m_create_meanders(RiverData& river,
                                          const Point<int>& mouth,
                                          std::vector<int>& tiles)
 {
+  (void)mouth;
   std::vector<std::pair<Point<double>, Point<double>>> normals;
 
-  const auto spline_step = m_lua.get_variable<double>("river_spline_step");
-  const auto min_curvature = m_lua.get_variable<double>("river_min_curvature");
-  const auto max_curvature = m_lua.get_variable<double>("river_max_curvature");
-  const auto normal_scale = m_lua.get_variable<double>("river_normal_scale");
-  const auto tangent_scale = m_lua.get_variable<double>("river_tangent_scale");
-  const auto bitangent_factor = m_lua.get_variable<double>("river_bitangent_factor");
-  const auto n_iterations = m_lua.get_variable<int>("river_n_iterations");
-  const auto curvature_delta = m_lua.get_variable<double>("river_curvature_delta");
+  const auto spline_step = m_json.object["river_spline_step"].get<double>();
+  const auto min_curvature = m_json.object["river_min_curvature"].get<double>();
+  const auto max_curvature = m_json.object["river_max_curvature"].get<double>();
+  const auto normal_scale = m_json.object["river_normal_scale"].get<double>();
+  const auto tangent_scale = m_json.object["river_tangent_scale"].get<double>();
+  const auto bitangent_factor = m_json.object["river_bitangent_factor"].get<double>();
+  const auto n_iterations = m_json.object["river_n_iterations"].get<int>();
+  const auto curvature_delta = m_json.object["river_curvature_delta"].get<double>();
 
-  const auto draw_normals = m_lua.get_variable<bool>("temp_draw_normals");
-  const auto draw_tangents = m_lua.get_variable<bool>("temp_draw_tangents");
-  const auto draw_combined = m_lua.get_variable<bool>("temp_draw_combined");
+  const auto draw_normals = m_json.object["temp_draw_normals"].get<bool>();
+  const auto draw_tangents = m_json.object["temp_draw_tangents"].get<bool>();
+  const auto draw_combined = m_json.object["temp_draw_combined"].get<bool>();
 
   int n_points = river.max_length / spline_step;
   assert(n_points > 3 && "There should be at least 3 river points for spline");
