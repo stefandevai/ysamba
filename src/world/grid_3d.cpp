@@ -110,7 +110,7 @@ void Grid3D::unset_flags(const CellFlag flags, const int x, const int y, const i
   cell.flags &= ~flags;
 }
 
-void Grid3D::reset_flags(const CellFlag flags, const int x, const int y, const int z)
+void Grid3D::reset_flags(const int x, const int y, const int z)
 {
   if (!m_in_bounds(x, y, z))
   {

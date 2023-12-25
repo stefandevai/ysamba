@@ -34,7 +34,7 @@ class Grid3D
   void set_flags(const CellFlag flags, const int x, const int y, const int z);
   void toggle_flags(const CellFlag flags, const int x, const int y, const int z);
   void unset_flags(const CellFlag flags, const int x, const int y, const int z);
-  void reset_flags(const CellFlag flags, const int x, const int y, const int z);
+  void reset_flags(const int x, const int y, const int z);
 
   void compute_visibility();
 
