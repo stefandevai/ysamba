@@ -25,4 +25,10 @@ class Grid3D
   void set_size(const int width, const int height, const int depth);
   void set_size(const Vector3i& size);
 };
+
+template <typename Archive>
+void serialize(Archive& archive, Grid3D& grid)
+{
+  archive(grid.size, grid.values, grid.height_map);
+}
 }  // namespace dl

@@ -9,7 +9,6 @@
 #include "./society/society_blueprint.hpp"
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"
-#include "./tilemap.hpp"
 #include "core/json.hpp"
 #include "core/lua_api.hpp"
 #include "core/maths/vector.hpp"
@@ -55,6 +54,7 @@ class World
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
   Grid3D tiles{};
+  Grid3D over_tiles{};
 
   // Constructor
   World(GameContext& game_context);
@@ -135,25 +135,19 @@ class World
   template <class Archive>
   void serialize(Archive& archive)
   {
-    archive(m_depth_min, m_depth_max, m_terrains, m_over_terrains, m_seed, m_societies);
+    archive(tiles, over_tiles, m_seed, m_societies);
   }
 
  private:
   GameContext& m_game_context;
   JSON m_json{"./data/world.json"};
-  std::vector<Tilemap> m_terrains;
-  std::vector<Tilemap> m_over_terrains;
   std::unordered_map<uint32_t, TileData> m_tile_data;
   std::unordered_map<uint32_t, ItemData> m_item_data;
   size_t m_chunk_size = 0;
   std::string m_texture_id;
-  int m_depth_min = 0;
-  int m_depth_max = 1;
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};
   std::map<uint32_t, SocietyBlueprint> m_societies;
-  /* std::vector<uint32_t> m_tiles{}; */
-  std::vector<uint32_t> m_over_tiles{};
 
   // Load information about tiles
   void m_load_tile_data();
