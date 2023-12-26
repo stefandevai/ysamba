@@ -6,6 +6,12 @@
 
 #include "core/display.hpp"
 
+namespace
+{
+constexpr float MAX_ZOOM = 4.0f;
+constexpr float MIN_ZOOM = 0.25f;
+}  // namespace
+
 namespace dl
 {
 Camera::Camera(const Display& display)
@@ -65,10 +71,10 @@ void Camera::set_frustrum(const float left, const float right, const float botto
   m_frustrum_bottom = bottom;
   m_frustrum_top = top;
 
+  m_calculate_projection_matrix();
+
   m_size.x = std::abs(right - left);
   m_size.y = std::abs(top - bottom);
-
-  m_projection = glm::ortho(m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far);
 
   if (m_tile_size.x > 0 && m_tile_size.y > 0)
   {
@@ -100,6 +106,45 @@ void Camera::set_pitch(const float pitch)
   m_calculate_center();
 }
 
+void Camera::set_zoom(const float zoom)
+{
+  if (zoom > MAX_ZOOM || zoom < MIN_ZOOM)
+  {
+    return;
+  }
+
+  this->zoom = zoom;
+  m_calculate_projection_matrix();
+}
+
+void Camera::zoom_in()
+{
+  if (zoom >= MAX_ZOOM)
+  {
+    return;
+  }
+
+  zoom *= 2.0f;
+  zoom = std::min(zoom, MAX_ZOOM);
+
+  m_calculate_projection_matrix();
+}
+
+void Camera::zoom_out()
+{
+  if (zoom <= MIN_ZOOM)
+  {
+    return;
+  }
+
+  zoom *= 0.5f;
+  zoom = std::max(zoom, MIN_ZOOM);
+
+  m_calculate_projection_matrix();
+}
+
+void Camera::reset_zoom() { zoom = DEFAULT_ZOOM; }
+
 void Camera::m_calculate_center()
 {
   glm::vec3 direction{};
@@ -108,6 +153,18 @@ void Camera::m_calculate_center()
   direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
 
   m_center = m_position + glm::normalize(std::move(direction));
+}
+
+void Camera::m_calculate_projection_matrix()
+{
+  assert(zoom > 0.0f);
+
+  projection_matrix = glm::ortho(m_frustrum_left - static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_frustrum_right + static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_frustrum_bottom + static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_frustrum_top - static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_near,
+                                 m_far);
 }
 
 }  // namespace dl

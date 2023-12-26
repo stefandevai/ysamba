@@ -16,7 +16,7 @@ void CameraInspector::update()
     return;
   }
 
-  ImGui::Begin("Camera Editor", &open);
+  ImGui::Begin("Camera Inspector", &open);
   ImGui::SeparatorText("Virtual Position");
   ImGui::DragScalar("vx", ImGuiDataType_Double, &m_camera.position.x, 1.0);
   ImGui::DragScalar("vy", ImGuiDataType_Double, &m_camera.position.y, 1.0);
@@ -26,6 +26,18 @@ void CameraInspector::update()
   ImGui::DragFloat("x", &m_camera.m_position.x, 1.0f);
   ImGui::DragFloat("y", &m_camera.m_position.y, 1.0f);
   ImGui::DragFloat("z", &m_camera.m_position.z, 1.0f);
+
+  ImGui::SeparatorText("Zoom");
+  ImGui::Text("%f", m_camera.zoom);
+  if (ImGui::Button("+"))
+  {
+    m_camera.zoom_in();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("-"))
+  {
+    m_camera.zoom_out();
+  }
 
   static float yaw = m_camera.yaw;
   static float pitch = m_camera.pitch;

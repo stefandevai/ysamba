@@ -22,7 +22,7 @@ class Scene
   virtual void update() = 0;
   virtual void render() = 0;
   void resize();
-  void render_call() { m_renderer.render(); }
+  void render_call() { m_renderer.render(m_camera.projection_matrix); }
   void check_window_size();
   bool has_loaded() const { return m_has_loaded; }
   uint32_t get_key() const { return m_scene_key; }

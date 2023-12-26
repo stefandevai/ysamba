@@ -26,7 +26,9 @@
         "open_inventory": ["k_i"],
         "inspect": ["k_x"],
         "drop_item": ["k_d"],
-        "add_item": ["k_z"]
+        "add_item": ["k_z"],
+        "zoom_in": ["k_equals"],
+        "zoom_out": ["k_minus"]
     },
     "action_menu": {
         "close_menu": ["k_escape"],

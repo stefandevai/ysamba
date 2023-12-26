@@ -5,6 +5,11 @@
 
 #include "core/maths/vector.hpp"
 
+namespace
+{
+constexpr float DEFAULT_ZOOM = 1.0f;
+}
+
 namespace dl
 {
 class Display;
@@ -20,7 +25,9 @@ class Camera
  public:
   float yaw = -90.0f;
   float pitch = -45.0f;
+  float zoom = DEFAULT_ZOOM;
   Vector3 position{0.0, 0.0, 0.0};
+  glm::mat4 projection_matrix = glm::mat4{1.f};
 
   Camera() = default;
   Camera(const Display& display);
@@ -29,7 +36,6 @@ class Camera
   const Vector3& get_position() const { return position; }
   const Vector2i get_position_in_tiles() const;
   glm::mat4 get_view_matrix() const;
-  glm::mat4 get_projection_matrix() const { return m_projection; }
   const Vector3& get_saved_position() const { return m_saved_position; }
   const Vector2& get_size() const { return m_size; }
   const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
@@ -40,6 +46,10 @@ class Camera
   void set_tile_size(const Vector2i& size);
   void set_yaw(const float yaw);
   void set_pitch(const float pitch);
+  void set_zoom(const float zoom);
+  void zoom_in();
+  void zoom_out();
+  void reset_zoom();
 
  private:
   friend class CameraInspector;
@@ -58,7 +68,6 @@ class Camera
                                                       std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch))})};
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   double m_scaling_factor = 1.0 / std::sin(glm::radians(-pitch));
-  glm::mat4 m_projection = glm::mat4{1.f};
   Vector3 m_saved_position{0., 0., 0.};
   Vector2 m_size{};
   Vector2i m_tile_size{0, 0};
@@ -66,5 +75,6 @@ class Camera
   bool m_resize_view_matrix = true;
 
   void m_calculate_center();
+  void m_calculate_projection_matrix();
 };
 }  // namespace dl

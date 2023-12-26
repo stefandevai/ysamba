@@ -79,7 +79,7 @@ void Renderer::batch(const uint32_t batch_id, const Quad* quad, const double x, 
   m_batches.at(batch_id)->quad(quad, x, y, z);
 }
 
-void Renderer::render()
+void Renderer::render(const glm::mat4& projection_matrix)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -124,7 +124,7 @@ void Renderer::render()
     }
 
     batch->shader->use();
-    batch->shader->set_mat_4("mvp", m_projection_matrix * m_default_view_matrix);
+    batch->shader->set_mat_4("mvp", projection_matrix * m_default_view_matrix);
 
     batch->render();
   }

@@ -117,6 +117,10 @@ void DebugTools::m_update_menu_bar()
       {
         m_camera_inspector->toggle();
       }
+      if (ImGui::MenuItem("Demo Window"))
+      {
+        show_demo_window = !show_demo_window;
+      }
       ImGui::EndMenu();
     }
 

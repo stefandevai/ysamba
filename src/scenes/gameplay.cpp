@@ -32,16 +32,18 @@ void Gameplay::load()
 
   m_renderer.add_batch("world"_hs, "default");
 
-  m_world.generate(100, 100, 1893);
-  /* m_world.load("./data/world/test_map.json"); */
+  const auto default_zoom = m_json.object["default_zoom"].get<float>();
+  m_camera.set_zoom(default_zoom);
+
+  /* m_world.generate(100, 100, 1893); */
+  m_world.load("./data/world/test_map.json");
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
-  /* m_debug_info = m_ui_manager.emplace<ui::DebugToolsInfo>(m_camera); */
 
-  /* auto society_blueprint = m_world.get_society("otomi"_hs); */
-  /* auto components = SocietyGenerator::generate_members(society_blueprint); */
-  /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
+  auto society_blueprint = m_world.get_society("otomi"_hs);
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();
@@ -201,6 +203,14 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
   {
     const double speed = m_game_context.clock->delta * 400.0;
     m_camera.move({0., -speed, 0.});
+  }
+  else if (m_input_manager.poll_action("zoom_in"_hs))
+  {
+    m_camera.zoom_in();
+  }
+  else if (m_input_manager.poll_action("zoom_out"_hs))
+  {
+    m_camera.zoom_out();
   }
 
   return will_quit;

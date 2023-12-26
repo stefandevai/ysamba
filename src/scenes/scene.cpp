@@ -21,6 +21,5 @@ void Scene::resize()
 {
   const auto& display_size = Display::get_window_size();
   m_camera.set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
-  m_renderer.set_projection_matrix(m_camera.get_projection_matrix());
 }
 }  // namespace dl
