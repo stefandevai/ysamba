@@ -123,7 +123,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       if (selectable.selected)
       {
-        auto& rectangle = registry.emplace<Rectangle>(selected_entity, 32, 32, 0x5588cc88);
+        const auto& tile_size = m_world.get_tile_size();
+        auto& rectangle = registry.emplace<Rectangle>(selected_entity, tile_size.x, tile_size.y, 0x5588cc88);
         rectangle.z_index = 4;
         m_selected_entities.push_back(selected_entity);
       }
@@ -233,11 +234,11 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   {
     const auto& mouse_position = m_input_manager.get_mouse_position();
     const auto& camera_position = camera.get_position();
-    const auto& tile_size = camera.get_tile_size();
+    const auto& grid_size = camera.get_tile_size();
 
     Vector2i tile_position{};
-    tile_position.x = (mouse_position.x + camera_position.x) / tile_size.x;
-    tile_position.y = (mouse_position.y + camera_position.y) / tile_size.y;
+    tile_position.x = (mouse_position.x + camera_position.x) / grid_size.x;
+    tile_position.y = (mouse_position.y + camera_position.y) / grid_size.y;
 
     switch (m_state)
     {

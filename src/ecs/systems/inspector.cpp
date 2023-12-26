@@ -42,12 +42,13 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     return;
   }
 
-  const auto& tile_size = camera.get_tile_size();
-  const auto tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
-  const auto tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
+  const auto& grid_size = camera.get_tile_size();
+  const auto tile_x = (mouse_position.x + camera_position.x) / grid_size.x;
+  const auto tile_y = (mouse_position.y + camera_position.y) / grid_size.y;
 
   if (!registry.valid(m_target_quad))
   {
+    const auto& tile_size = m_world.get_tile_size();
     m_target_quad = registry.create();
     registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, 0xe3c16488, 4);
     registry.emplace<Position>(m_target_quad, 0, 0, 0);

@@ -39,7 +39,7 @@ class Camera
   const Vector3& get_saved_position() const { return m_saved_position; }
   const Vector2& get_size() const { return m_size; }
   const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
-  const Vector2i& get_tile_size() const { return m_tile_size; }
+  const Vector2i& get_tile_size() const { return m_grid_size; }
   void set_position(const Vector3& position);
   void set_size(const Vector2& size);
   void set_frustrum(const float left, const float right, const float bottom, const float top);
@@ -71,6 +71,7 @@ class Camera
   Vector3 m_saved_position{0., 0., 0.};
   Vector2 m_size{};
   Vector2i m_tile_size{0, 0};
+  Vector2i m_grid_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
   bool m_resize_view_matrix = true;
 

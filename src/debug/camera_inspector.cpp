@@ -78,6 +78,9 @@ void CameraInspector::update()
   ImGui::Text("m_size_in_tiles: (%s, %s)",
               std::to_string(m_camera.m_size_in_tiles.x).c_str(),
               std::to_string(m_camera.m_size_in_tiles.y).c_str());
+  ImGui::Text("m_grid_size: (%s, %s)",
+              std::to_string(m_camera.m_grid_size.x).c_str(),
+              std::to_string(m_camera.m_grid_size.y).c_str());
   ImGui::End();
 }
 }  // namespace dl
