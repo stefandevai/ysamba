@@ -145,6 +145,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
         {
           const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
           visibility.sprite->set_frame(frame_data.frame);
+          visibility.sprite->frame_angle = frame_data.angle;
         }
       }
 
@@ -214,6 +215,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     auto sprite = Sprite{m_world_texture_id, 0};
     sprite.texture = m_world_texture;
     sprite.set_frame(frame_data.frame);
+    sprite.frame_angle = frame_data.angle;
 
     m_renderer.batch("world"_hs,
                      &sprite,
@@ -250,6 +252,7 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     // TODO: Add multi sprite pool
     auto multi_sprite = MultiSprite{m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height};
     multi_sprite.texture = m_world_texture;
+    multi_sprite.frame_angle = frame_data.angle;
 
     m_renderer.batch("world"_hs,
                      &multi_sprite,

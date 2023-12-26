@@ -15,11 +15,13 @@ class Sprite
   std::shared_ptr<Texture> texture = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
   Color color{0xFFFFFFFF};
+  int frame = 0;
+  FrameAngle frame_angle = FrameAngle::Parallel;
 
   Sprite() {}
-  Sprite(const std::string& resource_id, const int frame = 0) : resource_id(resource_id), m_frame(frame) {}
+  Sprite(const std::string& resource_id, const int frame = 0) : resource_id(resource_id), frame(frame) {}
 
-  int get_frame() const { return m_frame; };
+  int get_frame() const { return frame; };
   const glm::vec2& get_size();
 
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
@@ -33,7 +35,6 @@ class Sprite
   void set_litteral_uv(const float top, const float left, const float bottom, const float right);
 
  private:
-  int m_frame = 0;
   bool m_dirty = true;
   bool m_has_custom_uv = false;
   glm::vec2 m_size;

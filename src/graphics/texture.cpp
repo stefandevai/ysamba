@@ -179,6 +179,22 @@ void Texture::load_data(const std::string& filepath)
 
     frame_data.tile_type = item["tile_type"].get<std::string>();
 
+    if (item.contains("angle"))
+    {
+      if (item["angle"] == "orthogonal")
+      {
+        frame_data.angle = FrameAngle::Orthogonal;
+      }
+      else
+      {
+        frame_data.angle = FrameAngle::Parallel;
+      }
+    }
+    else
+    {
+      frame_data.angle = FrameAngle::Parallel;
+    }
+
     if (frame_data.tile_type == "multiple")
     {
       /* frame_data.frames = item["frames"].get<std::vector<uint32_t>>(); */

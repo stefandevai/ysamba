@@ -153,19 +153,19 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
     texture_index = it - m_textures.begin();
   }
 
-  // Top left vertex
-  glm::vec3 camera_right_world_space = {m_matrix[0][0], m_matrix[0][1], m_matrix[0][2]};
-  glm::vec3 camera_up_world_space = {m_matrix[1][0], m_matrix[1][1], m_matrix[1][2]};
-
-  /* glm::mat4 transform = glm::translate(m_matrix, glm::vec3(x + 16.0, y + 32.0, z)); */
   glm::mat4 transform = glm::translate(m_matrix, glm::vec3(x, y, z));
-  /* transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(1.0, 0.0, 0.0)); */
-  /* transform = glm::scale(transform, glm::vec3(1.0, std::sqrt(2.0f), 1.0)); */
-  /* transform = glm::translate(transform, glm::vec3(-16.0, -32.0, 0.0)); */
-  glm::vec3 transformation_result = transform * glm::vec4(0.f, 0.f, 1.f, 1.f);
-  /* transformation_result += camera_right_world_space * static_cast<float>(size.x) + camera_up_world_space *
-   * static_cast<float>(size.y); */
 
+  glm::vec3 transformation_result;
+
+  // Top left vertex
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    transformation_result = transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  }
+  else
+  {
+    transformation_result = transform * glm::vec4(0.0f, size.y, size.y, 1.0f);
+  }
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[0],
@@ -173,7 +173,14 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
                  color};
 
   // Top right vertex
-  transformation_result = transform * glm::vec4(size.x, 0.f, 1.f, 1.f);
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    transformation_result = transform * glm::vec4(size.x, 0.0f, 0.0f, 1.0f);
+  }
+  else
+  {
+    transformation_result = transform * glm::vec4(size.x, size.y, size.y, 1.0f);
+  }
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[1],
@@ -181,7 +188,7 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
                  color};
 
   // Bottom right vertex
-  transformation_result = transform * glm::vec4(size.x, size.y, 1.f, 1.f);
+  transformation_result = transform * glm::vec4(size.x, size.y, 0.0f, 1.0f);
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[2],
@@ -189,7 +196,7 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
                  color};
 
   // Bottom left vertex
-  transformation_result = transform * glm::vec4(0.f, size.y, 1.f, 1.f);
+  transformation_result = transform * glm::vec4(0.0f, size.y, 0.0f, 1.0f);
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[3],
@@ -240,11 +247,21 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
   const int frame_height = texture->get_frame_height() * (size.y);
 
   // Get transformations and apply them to the sprite vertices
-  auto general_transform = m_matrix;
-  general_transform = glm::translate(general_transform, glm::vec3(x, y, z));
+  auto general_transform = glm::translate(m_matrix, glm::vec3(x, y, z));
 
   // Top left vertex
-  glm::vec4 transformation_result = general_transform * glm::vec4(0.f, 0.f, 1.f, 1.f);
+  glm::vec4 transformation_result;
+
+  // Change according to the angle that the quad will be rendered
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    transformation_result = general_transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
+  }
+  else
+  {
+    transformation_result = general_transform * glm::vec4(0.f, frame_height, frame_height, 1.f);
+  }
+
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[0],
@@ -252,7 +269,14 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
                  color};
 
   // Top right vertex
-  transformation_result = general_transform * glm::vec4(frame_width, 0.f, 1.f, 1.f);
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    transformation_result = general_transform * glm::vec4(frame_width, 0.f, 0.f, 1.f);
+  }
+  else
+  {
+    transformation_result = general_transform * glm::vec4(frame_width, frame_height, frame_height, 1.f);
+  }
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[1],
@@ -260,7 +284,7 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
                  color};
 
   // Bottom right vertex
-  transformation_result = general_transform * glm::vec4(frame_width, frame_height, 1.f, 1.f);
+  transformation_result = general_transform * glm::vec4(frame_width, frame_height, 0.f, 1.f);
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[2],
@@ -268,7 +292,7 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
                  color};
 
   // Bottom left vertex
-  transformation_result = general_transform * glm::vec4(0.f, frame_height, 1.f, 1.f);
+  transformation_result = general_transform * glm::vec4(0.f, frame_height, 0.f, 1.f);
   m_vertices[m_vertices_index++] =
       VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
                  texture_coordinates[3],
@@ -296,22 +320,22 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
   general_transform = glm::translate(general_transform, glm::vec3(x, y, z));
 
   // Top left vertex
-  glm::vec4 transformation_result = general_transform * glm::vec4(0.f, 0.f, 1.f, 1.f);
+  glm::vec4 transformation_result = general_transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
   m_vertices[m_vertices_index++] = VertexData{
       glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
 
   // Top right vertex
-  transformation_result = general_transform * glm::vec4(quad->w, 0.f, 1.f, 1.f);
+  transformation_result = general_transform * glm::vec4(quad->w, 0.f, 0.f, 1.f);
   m_vertices[m_vertices_index++] = VertexData{
       glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
 
   // Bottom right vertex
-  transformation_result = general_transform * glm::vec4(quad->w, quad->h, 1.f, 1.f);
+  transformation_result = general_transform * glm::vec4(quad->w, quad->h, 0.f, 1.f);
   m_vertices[m_vertices_index++] = VertexData{
       glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
 
   // Bottom left vertex
-  transformation_result = general_transform * glm::vec4(0.f, quad->h, 1.f, 1.f);
+  transformation_result = general_transform * glm::vec4(0.f, quad->h, 0.f, 1.f);
   m_vertices[m_vertices_index++] = VertexData{
       glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
 
@@ -346,8 +370,6 @@ void Batch::text(Text& text, const double x, const double y, const double z)
     {
       character.sprite->color.opacity_factor = text.color.opacity_factor;
     }
-
-    const auto& size = character.sprite->get_size();
 
     emplace(character.sprite.get(), character.x + x, character.y + y, z);
   }

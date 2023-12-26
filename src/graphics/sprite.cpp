@@ -6,7 +6,7 @@ const glm::vec2& Sprite::get_size()
 {
   if (m_dirty && !m_has_custom_uv)
   {
-    m_uv_coordinates = texture->get_frame_coords(m_frame);
+    m_uv_coordinates = texture->get_frame_coords(frame);
     m_size.x = texture->get_frame_width();
     m_size.y = texture->get_frame_height();
     m_dirty = false;
@@ -24,7 +24,7 @@ const std::array<glm::vec2, 4>& Sprite::get_texture_coordinates()
 
   if (m_dirty && !m_has_custom_uv)
   {
-    m_uv_coordinates = texture->get_frame_coords(m_frame);
+    m_uv_coordinates = texture->get_frame_coords(frame);
     m_size.x = texture->get_frame_width();
     m_size.y = texture->get_frame_height();
     m_dirty = false;
@@ -35,19 +35,19 @@ const std::array<glm::vec2, 4>& Sprite::get_texture_coordinates()
 
 void Sprite::set_frame(const int frame)
 {
-  m_frame = frame;
+  this->frame = frame;
   m_dirty = true;
 }
 
 void Sprite::increment_frame()
 {
-  ++m_frame;
+  ++frame;
   m_dirty = true;
 }
 
 void Sprite::decrement_frame()
 {
-  --m_frame;
+  --frame;
   m_dirty = true;
 }
 

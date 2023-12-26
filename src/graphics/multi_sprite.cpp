@@ -16,8 +16,8 @@ std::array<glm::vec2, 4> MultiSprite::get_texture_coordinates() const
   const float frame_height = 1.f / static_cast<float>(vertical_frames);
 
   const int max_frames = horizontal_frames * vertical_frames;
-  const float frame_x = static_cast<float>(m_frame % horizontal_frames);
-  const float frame_y = static_cast<float>((m_frame % max_frames) / horizontal_frames);
+  const float frame_x = static_cast<float>(frame % horizontal_frames);
+  const float frame_y = static_cast<float>((frame % max_frames) / horizontal_frames);
 
   const float top_left_x = frame_width * frame_x;
   const float top_left_y = frame_height * frame_y;

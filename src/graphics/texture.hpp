@@ -17,6 +17,12 @@ enum class TextureType
   NORMAL,
 };
 
+enum class FrameAngle
+{
+  Parallel,
+  Orthogonal,
+};
+
 struct FrameData
 {
   uint32_t frame = 0;
@@ -26,6 +32,7 @@ struct FrameData
   uint32_t pattern_height = 0;
   uint32_t anchor_x = 0;
   uint32_t anchor_y = 0;
+  FrameAngle angle = FrameAngle::Parallel;
   std::string tile_type = "";
   /* std::vector<uint32_t> frames{}; */
   std::vector<uint32_t> pattern{};

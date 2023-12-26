@@ -20,6 +20,7 @@
     {
         "type": "tile",
         "tile_type": "single",
+        "angle": "orthogonal",
         "frame": 3,
         "id": 6
     },
@@ -86,6 +87,7 @@
     {
         "type": "tile",
         "tile_type": "multiple",
+        "angle": "orthogonal",
         "frame": 45,
         "width": 2,
         "height": 4,
@@ -99,6 +101,7 @@
     {
         "type": "tile",
         "tile_type": "multiple",
+        "angle": "orthogonal",
         "frame": 53,
         "width": 1,
         "height": 2,
@@ -112,6 +115,7 @@
     {
         "type": "tile",
         "tile_type": "multiple",
+        "angle": "orthogonal",
         "frame": 54,
         "width": 1,
         "height": 2,
