@@ -25,7 +25,12 @@ glm::mat4 Camera::get_view_matrix() const
   if (m_resize_view_matrix)
   {
     auto view_matrix = glm::lookAt(m_position, m_center, m_up);
-    return glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor));
+    view_matrix = glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor));
+    view_matrix = glm::translate(view_matrix, glm::vec3(m_size.x / 2.0f, m_size.y / 2.0f, 0.0f));
+    view_matrix = glm::scale(view_matrix, glm::vec3(zoom, zoom, zoom));
+    view_matrix = glm::translate(view_matrix, glm::vec3(-m_size.x / 2.0f, -m_size.y / 2.0f, 0.0f));
+    return view_matrix;
+    /* return glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor)); */
   }
 
   return glm::lookAt(m_position, m_center, m_up);
@@ -40,9 +45,9 @@ const Vector2i Camera::get_position_in_tiles() const
 
 void Camera::move(const Vector3& quantity)
 {
-  position.x += quantity.x * zoom;
-  position.y += quantity.y * zoom;
-  position.z += quantity.z * zoom;
+  position.x += quantity.x;
+  position.y += quantity.y;
+  position.z += quantity.z;
   m_position.x += quantity.x;
   m_position.y += quantity.y * m_scaling_factor;
   m_position.z += quantity.z;
@@ -117,7 +122,7 @@ void Camera::set_zoom(const float zoom)
   }
 
   this->zoom = zoom;
-  m_calculate_projection_matrix();
+  /* m_calculate_projection_matrix(); */
 }
 
 void Camera::zoom_in()
@@ -133,7 +138,12 @@ void Camera::zoom_in()
   zoom *= 2.0f;
   zoom = std::min(zoom, MAX_ZOOM);
 
-  m_calculate_projection_matrix();
+  m_grid_size.x = m_tile_size.x * zoom;
+  m_grid_size.y = m_tile_size.y * zoom;
+  m_size_in_tiles.x = std::ceil(m_size.x / m_grid_size.x);
+  m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
+
+  /* m_calculate_projection_matrix(); */
 }
 
 void Camera::zoom_out()
@@ -149,7 +159,12 @@ void Camera::zoom_out()
   position.x -= m_size.x * zoom / 2.0;
   position.y -= m_size.y * zoom / 2.0;
 
-  m_calculate_projection_matrix();
+  m_grid_size.x = m_tile_size.x * zoom;
+  m_grid_size.y = m_tile_size.y * zoom;
+  m_size_in_tiles.x = std::ceil(m_size.x / m_grid_size.x);
+  m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
+
+  /* m_calculate_projection_matrix(); */
 }
 
 void Camera::reset_zoom() { zoom = DEFAULT_ZOOM; }
@@ -168,17 +183,13 @@ void Camera::m_calculate_projection_matrix()
 {
   assert(zoom > 0.0f);
 
-  m_grid_size.x = m_tile_size.x * zoom;
-  m_grid_size.y = m_tile_size.y * zoom;
-  m_size_in_tiles.x = std::ceil(m_size.x / m_grid_size.x);
-  m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
-
-  projection_matrix = glm::ortho(m_frustrum_left - static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f),
-                                 m_frustrum_right + static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f),
-                                 m_frustrum_bottom + static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f),
-                                 m_frustrum_top - static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f),
-                                 m_near,
-                                 m_far);
+  projection_matrix = glm::ortho(m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far);
+  /* projection_matrix = glm::ortho(m_frustrum_left - static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f), */
+  /*                                m_frustrum_right + static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f), */
+  /*                                m_frustrum_bottom + static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f), */
+  /*                                m_frustrum_top - static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f), */
+  /*                                m_near, */
+  /*                                m_far); */
 }
 
 }  // namespace dl
