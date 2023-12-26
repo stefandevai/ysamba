@@ -129,26 +129,10 @@ void Camera::zoom_in()
 
   position.x += m_size.x * zoom / 2.0;
   position.y += m_size.y * zoom / 2.0;
-  m_position.x += (m_frustrum_right - m_frustrum_left) * 0.5f * 0.5f;
-  m_position.y += 100.0f;
-  /* m_position.y -= m_size.y*zoom/2.0*m_scaling_factor; */
-
-  /* m_position.x += m_size.x*zoom; */
-  /* m_position.y += m_size.y*zoom; */
-  /* m_position.x += (static_cast<float>(m_size.x) * (1.0f / zoom - 1.0f))*zoom; */
-  /* m_position.y += (static_cast<float>(m_size.y) * (1.0f / zoom - 1.0f))*zoom; */
-  /* m_position.x += static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f)*1.0f/zoom; */
-  /* m_position.y += static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f)*1.0f/zoom; */
-  /* m_position.x += m_size.x*zoom; */
 
   zoom *= 2.0f;
   zoom = std::min(zoom, MAX_ZOOM);
 
-  /* m_position.x += (m_frustrum_right - m_frustrum_left) * 0.5f * 0.5f; */
-  /* m_position.y += (m_frustrum_bottom - m_frustrum_top) * 0.5f * 0.5f * m_scaling_factor; */
-  /* m_position.z -= 10.f; */
-  /* m_position.z += (m_frustrum_bottom - m_frustrum_top) * 0.5f * 0.5f * m_scaling_factor; */
-  m_calculate_center();
   m_calculate_projection_matrix();
 }
 
@@ -162,24 +146,10 @@ void Camera::zoom_out()
   zoom *= 0.5f;
   zoom = std::max(zoom, MIN_ZOOM);
 
-  /* position.x -= m_size.x*zoom/2.0; */
-  /* position.y -= m_size.y*zoom/2.0; */
-  /* m_position.y -= m_size.y*zoom/2.0*m_scaling_factor; */
+  position.x -= m_size.x * zoom / 2.0;
+  position.y -= m_size.y * zoom / 2.0;
 
-  /* m_position.x -= m_size.x*zoom; */
-  /* m_position.y -= m_size.y*zoom; */
-  /* m_position.x -= (static_cast<float>(m_size.x) * (1.0f / zoom - 1.0f))*zoom; */
-  /* m_position.y -= (static_cast<float>(m_size.y) * (1.0f / zoom - 1.0f))*zoom; */
-  /* m_position.x -= static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f)*1.0f/zoom; */
-  /* m_position.y -= static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f)*1.0f/zoom; */
   m_calculate_projection_matrix();
-  /* m_position.x -= (m_frustrum_right - m_frustrum_left) * 0.5f * 0.5f; */
-  m_position.y -= 100.0f * m_scaling_factor * (1.0f / zoom);
-
-  /* m_position.x -= (m_frustrum_right - m_frustrum_left) * 0.5f * 0.5f; */
-  /* m_position.y -= (m_frustrum_bottom - m_frustrum_top) * 0.5f * 0.5f * m_scaling_factor; */
-  /* m_position.z += 100.f; */
-  m_calculate_center();
 }
 
 void Camera::reset_zoom() { zoom = DEFAULT_ZOOM; }
@@ -203,21 +173,12 @@ void Camera::m_calculate_projection_matrix()
   m_size_in_tiles.x = std::ceil(m_size.x / m_grid_size.x);
   m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
 
-  /* m_frustrum_left = -static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f); */
-  m_frustrum_right = m_size.x + static_cast<float>(m_size.x) * (1.0f / zoom - 1.0f);
-  m_frustrum_bottom = m_size.y + static_cast<float>(m_size.y) * (1.0f / zoom - 1.0f),
-  /* m_frustrum_top = -static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f), */
-
-      /* m_size.x = m_frustrum_right - m_frustrum_left; */
-      /* m_size.y = m_frustrum_bottom - m_frustrum_top; */
-
-      projection_matrix =
-          glm::ortho(m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far);
-
-  /* position.x = m_position.x + m_frustrum_left*zoom; */
-  /* position.y = m_position.y - m_camera_z + m_frustrum_top*zoom; */
-  /* position.x = m_position.x + m_frustrum_left*zoom; */
-  /* position.y = m_position.y*(1.0f/m_scaling_factor) - m_camera_z*(1.0f/m_scaling_factor) + m_frustrum_top*zoom; */
+  projection_matrix = glm::ortho(m_frustrum_left - static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_frustrum_right + static_cast<float>(m_size.x) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_frustrum_bottom + static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_frustrum_top - static_cast<float>(m_size.y) / 2.0f * (1.0f / zoom - 1.0f),
+                                 m_near,
+                                 m_far);
 }
 
 }  // namespace dl
