@@ -223,6 +223,17 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
                      transformed_y * tile_size.y,
                      z * tile_size.y + z_index * m_z_index_increment);
 
+    if (m_world.tiles.is_bottom_empty(transformed_x, transformed_y, z))
+    {
+      auto bottom_sprite = Sprite{m_world_texture_id, 0};
+      bottom_sprite.texture = m_world_texture;
+      bottom_sprite.set_frame(frame_data.front_face_frame);
+      bottom_sprite.frame_angle = FrameAngle::Orthogonal;
+
+      m_renderer.batch(
+          "world"_hs, &bottom_sprite, transformed_x * tile_size.x, transformed_y * tile_size.y, (z - 1) * tile_size.y);
+    }
+
     /* if (perspective == TopDown45) */
     /* { */
     /*   const auto& bottom_tile = m_world.get_terrain(x + camera_position.x, y + camera_position.y + 1, z); */

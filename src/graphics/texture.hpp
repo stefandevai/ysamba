@@ -32,6 +32,7 @@ struct FrameData
   uint32_t pattern_height = 0;
   uint32_t anchor_x = 0;
   uint32_t anchor_y = 0;
+  uint32_t front_face_frame = 0;
   FrameAngle angle = FrameAngle::Parallel;
   std::string tile_type = "";
   /* std::vector<uint32_t> frames{}; */

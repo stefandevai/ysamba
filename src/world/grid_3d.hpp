@@ -37,6 +37,7 @@ class Grid3D
   void reset_flags(const int x, const int y, const int z);
 
   void compute_visibility();
+  bool is_bottom_empty(const int x, const int y, const int z) const;
 
  private:
   uint32_t m_index(const int x, const int y, const int z) const;

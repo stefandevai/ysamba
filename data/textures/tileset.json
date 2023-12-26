@@ -15,12 +15,12 @@
         "type": "tile",
         "tile_type": "single",
         "frame": 2,
+        "front_face_frame": 168,
         "id": 2
     },
     {
         "type": "tile",
         "tile_type": "single",
-        "angle": "orthogonal",
         "frame": 3,
         "id": 6
     },

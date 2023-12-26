@@ -188,6 +188,8 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
   return false;
 }
 
+bool Grid3D::is_bottom_empty(const int x, const int y, const int z) const { return id_at(x, y + 1, z) == 0; }
+
 uint32_t Grid3D::m_index(const int x, const int y, const int z) const { return x + y * size.x + z * size.y * size.x; }
 
 bool Grid3D::m_in_bounds(const int x, const int y, const int z) const
