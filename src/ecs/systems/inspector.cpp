@@ -42,7 +42,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     return;
   }
 
-  const auto& grid_size = camera.get_tile_size();
+  const auto& grid_size = camera.get_grid_size();
   const auto tile_x = (mouse_position.x + camera_position.x) / grid_size.x;
   const auto tile_y = (mouse_position.y + camera_position.y) / grid_size.y;
 

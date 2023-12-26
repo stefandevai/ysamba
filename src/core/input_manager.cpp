@@ -152,10 +152,10 @@ const Vector2i InputManager::get_mouse_tile_position(const Camera& camera) const
 {
   const auto& mouse_position = get_mouse_position();
   const auto& camera_position = camera.get_position();
-  const auto& tile_size = camera.get_tile_size();
+  const auto& grid_size = camera.get_grid_size();
 
-  return Vector2i{(mouse_position.x + camera_position.x) / tile_size.x,
-                  (mouse_position.y + camera_position.y) / tile_size.y};
+  return Vector2i{(mouse_position.x + camera_position.x) / grid_size.x,
+                  (mouse_position.y + camera_position.y) / grid_size.y};
 }
 
 const std::shared_ptr<InputContext> InputManager::get_current_context()

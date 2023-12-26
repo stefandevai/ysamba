@@ -234,7 +234,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   {
     const auto& mouse_position = m_input_manager.get_mouse_position();
     const auto& camera_position = camera.get_position();
-    const auto& grid_size = camera.get_tile_size();
+    const auto& grid_size = camera.get_grid_size();
 
     Vector2i tile_position{};
     tile_position.x = (mouse_position.x + camera_position.x) / grid_size.x;

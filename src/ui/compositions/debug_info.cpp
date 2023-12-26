@@ -39,9 +39,9 @@ void DebugInfo::update()
 
   const auto mouse_position = m_input_manager.get_mouse_position();
   const auto& camera_position = m_camera.get_position();
-  const auto& tile_size = m_camera.get_tile_size();
-  const int tile_x = std::floor((mouse_position.x + camera_position.x) / tile_size.x);
-  const int tile_y = std::floor((mouse_position.y + camera_position.y) / tile_size.y);
+  const auto& grid_size = m_camera.get_grid_size();
+  const int tile_x = std::floor((mouse_position.x + camera_position.x) / grid_size.x);
+  const int tile_y = std::floor((mouse_position.y + camera_position.y) / grid_size.y);
 
   m_label->set_text(m_fps + "\nTile: (" + std::to_string(tile_x) + ", " + std::to_string(tile_y) + ")" + "\nMouse: (" +
                     std::to_string(mouse_position.x) + ", " + std::to_string(mouse_position.y) + ")");

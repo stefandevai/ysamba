@@ -173,12 +173,12 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
 
     const auto& mouse_position = m_input_manager.get_mouse_position();
     const auto& camera_position = m_camera.get_position();
-    const auto& tile_size = m_camera.get_tile_size();
+    const auto& grid_size = m_camera.get_grid_size();
 
-    const int tile_x = (mouse_position.x + camera_position.x) / tile_size.x;
-    const int tile_y = (mouse_position.y + camera_position.y) / tile_size.y;
+    const int grid_x = (mouse_position.x + camera_position.x) / grid_size.x;
+    const int grid_y = (mouse_position.y + camera_position.y) / grid_size.y;
 
-    m_world.create_item(m_registry, id, tile_x, tile_y, 0);
+    m_world.create_item(m_registry, id, grid_x, grid_y, 0);
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {
