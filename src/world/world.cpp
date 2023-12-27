@@ -47,7 +47,7 @@ void World::generate(const int width, const int height, const int seed)
 
   tiles.compute_visibility();
 
-  over_tiles.values.reserve(tiles.size.x * tiles.size.y * tiles.size.z);
+  over_tiles.values.resize(tiles.size.x * tiles.size.y * tiles.size.z);
   /* auto tilemap_generator = TerrainGenerator(width, height); */
   /* auto tilemap_generator = DummyGenerator(width, height); */
 

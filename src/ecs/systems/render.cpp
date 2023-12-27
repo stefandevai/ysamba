@@ -27,25 +27,14 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
 {
 }
 
-int sprites_rendered = 0;
-int ticks = 0;
-
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
-  ++ticks;
-  sprites_rendered = 0;
-
   using namespace entt::literals;
 
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = m_world.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& world_size = m_world.tiles.size;
-
-  /* int min_index_x = 0; */
-  /* int min_index_y = 0; */
-  /* int max_index_x = 0; */
-  /* int max_index_y = 0; */
 
   // Render tiles with y coordinate within the camera frustum
   for (int j = -m_frustum_tile_padding; j <= camera_size.y; ++j)
@@ -75,10 +64,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
         {
           continue;
         }
-        /* min_index_x = std::min(index_x, min_index_x); */
-        /* min_index_y = std::min(index_y, min_index_y); */
-        /* max_index_x = std::max(index_x, max_index_x); */
-        /* max_index_y = std::max(index_y, max_index_y); */
 
         m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
 
@@ -87,8 +72,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       }
     }
   }
-
-  /* spdlog::debug("X {} {} Y {} {}", min_index_x, max_index_x, min_index_y, max_index_y); */
 
   // Render visible tiles with y coordinate to the bottom of the camera frustum
   // Each z level translates to tile_size.y increase in height in clip space,
@@ -192,11 +175,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
     }
   }
-
-  if (ticks % 100 == 0)
-  {
-    /* spdlog::debug("RENDERED: {}", sprites_rendered); */
-  }
 }
 
 template <typename T>
@@ -208,7 +186,6 @@ void RenderSystem::m_batch(const Position& position, T* renderable, const Vector
   const auto position_x = std::round(position.x) * size.x;
   const auto position_y = std::round(position.y) * size.y;
 
-  ++sprites_rendered;
   m_renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index * m_z_index_increment);
 }
 
@@ -240,7 +217,6 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     sprite.set_frame(frame_data.frame);
     sprite.frame_angle = frame_data.angle;
 
-    ++sprites_rendered;
     m_renderer.batch("world"_hs,
                      &sprite,
                      transformed_x * tile_size.x,
@@ -254,7 +230,6 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
       bottom_sprite.set_frame(frame_data.front_face_frame);
       bottom_sprite.frame_angle = FrameAngle::Orthogonal;
 
-      ++sprites_rendered;
       m_renderer.batch(
           "world"_hs, &bottom_sprite, transformed_x * tile_size.x, transformed_y * tile_size.y, (z - 1) * tile_size.y);
     }
@@ -273,7 +248,6 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
     multi_sprite.texture = m_world_texture;
     multi_sprite.frame_angle = frame_data.angle;
 
-    ++sprites_rendered;
     m_renderer.batch("world"_hs,
                      &multi_sprite,
                      (transformed_x - frame_data.anchor_x) * tile_size.x,

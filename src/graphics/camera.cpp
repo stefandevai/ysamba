@@ -59,6 +59,8 @@ void Camera::move_in_grid(const Vector3i& quantity)
 
 void Camera::set_position(const Vector3& position)
 {
+  (void)position;
+
   // TODO
 }
 

@@ -34,18 +34,17 @@ void Gameplay::load()
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
-  /* m_world.generate(100, 100, 1893); */
-  m_world.load("./data/world/test_map.json");
+  m_world.generate(40, 40, 1893);
+  /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
   m_camera.set_zoom(default_zoom);
-  m_camera.set_position({0.0, 0.0, 0.0});
-  /* m_camera.zoom_in(); */
+  /* m_camera.set_position({0.0, 0.0, 0.0}); */
 
-  auto society_blueprint = m_world.get_society("otomi"_hs);
-  auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  /* auto society_blueprint = m_world.get_society("otomi"_hs); */
+  /* auto components = SocietyGenerator::generate_members(society_blueprint); */
+  /* SocietyGenerator::place_members(components, m_world, m_camera, m_registry); */
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();
@@ -80,7 +79,6 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
-  m_camera.set_position({0.0, 0.0, 0.0});
   m_camera.update(delta);
 
   if (m_current_state == State::PLAYING)
