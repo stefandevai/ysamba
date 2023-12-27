@@ -1,0 +1,40 @@
+    /* { */
+    /*   const auto left_chunk = Vector3i{target_chunk_position.x - 1, target_chunk_position.y, target_chunk_position.z}; */
+    /*   if (!is_loaded(left_chunk)) */
+    /*   { */
+    /*     load(left_chunk); */
+    /*   } */
+    /* } */
+
+    /* { */
+    /*   const auto top_left_chunk = Vector3i{target_chunk_position.x - 1, target_chunk_position.y - 1, target_chunk_position.z}; */
+    /*   if (!is_loaded(top_left_chunk)) */
+    /*   { */
+    /*     load(top_left_chunk); */
+    /*   } */
+    /* } */
+
+    /* { */
+    /*   const auto top_right_chunk = Vector3i{target_chunk_position.x + 1, target_chunk_position.y - 1, target_chunk_position.z}; */
+    /*   if (!is_loaded(top_right_chunk)) */
+    /*   { */
+    /*     load(top_right_chunk); */
+    /*   } */
+    /* } */
+
+    /* { */
+    /*   const auto right_chunk = Vector3i{target_chunk_position.x + 1, target_chunk_position.y, target_chunk_position.z}; */
+    /*   if (!is_loaded(right_chunk)) */
+    /*   { */
+    /*     load(right_chunk); */
+    /*   } */
+    /* } */
+
+    /* { */
+    /*   const auto bottom_right_chunk = Vector3i{target_chunk_position.x + 1, target_chunk_position.y + 1, target_chunk_position.z}; */
+    /*   if (!is_loaded(bottom_right_chunk)) */
+    /*   { */
+    /*     load(bottom_right_chunk); */
+    /*   } */
+    /* } */
+
