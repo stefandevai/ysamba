@@ -22,13 +22,13 @@ class MapGenerator
   MapGenerator() = default;
   MapGenerator(const int width, const int height, const int depth = 32) : width(width), height(height), depth(depth) {}
 
-  void generate(const int seed);
+  void generate(const int seed, const Vector3i& offset = Vector3i{});
   void set_size(const Vector3i& size);
 
  private:
   JSON m_json{"./data/world/map_generators/terrain.json"};
 
-  void m_get_height_map(std::vector<double>& height_values, const int seed);
+  void m_get_height_map(std::vector<double>& height_values, const int seed, const Vector3i& offset);
   float m_get_rectangle_gradient_value(const int x, const int y);
 };
 }  // namespace dl

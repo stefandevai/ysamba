@@ -27,6 +27,8 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
 {
 }
 
+bool flag = true;
+
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
@@ -34,7 +36,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = m_world.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
-  const auto& world_size = m_world.tiles.size;
+  /* const auto& world_size = m_world.tiles.size; */
 
   // Render tiles with y coordinate within the camera frustum
   for (int j = -m_frustum_tile_padding; j <= camera_size.y; ++j)
@@ -44,19 +46,63 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto index_x = i + camera_position.x;
       const auto index_y = j + camera_position.y;
 
-      if (index_x < 0 || index_y < 0 || index_x >= world_size.x || index_y >= world_size.y)
-      {
-        continue;
-      }
+      /* if (index_x < 0 || index_y < 0 || index_x >= world_size.x || index_y >= world_size.y) */
+      /* { */
+      /*   continue; */
+      /* } */
 
-      const auto height = m_world.tiles.height_map[index_y * world_size.x + index_x];
+      /* spdlog::debug("HRE1"); */
+      /* const auto& chunk = m_world.chunk_manager.at(index_y, index_x, 0); */
+      /* spdlog::debug("HRE2"); */
+
+      /* if (index_y * m_world.chunk_manager.chunk_size.x + index_x < chunk.tiles.height_map.size()) */
+      /* { */
+      /* spdlog::debug("HRE3"); */
+      /*   continue; */
+      /* } */
+      /* spdlog::debug("HRE4 {}", chunk.tiles.height_map.size()); */
+
+      /* const auto height = chunk.tiles.height_map[index_y * m_world.chunk_manager.chunk_size.x + index_x]; */
+      const auto height = m_world.get_elevation(index_x, index_y);
+
+      /* spdlog::debug("HEIGH {}", height); */
+
+      const auto& chunk = m_world.chunk_manager.at(index_x, index_y, 0);
+
+      /* if (height == 0 && flag) */
+      /* { */
+      /*   spdlog::debug("ZEROOOOOOOOO {} {} {}", chunk.position.x, chunk.position.y, chunk.position.z); */
+      /*   spdlog::debug("POS {} {} {}", index_x, index_y); */
+      /*   flag = false; */
+      /* } */
 
       for (auto z = 0; z <= height; ++z)
       {
-        if (!m_world.tiles.has_flags(DL_CELL_FLAG_VISIBLE, index_x, index_y, z))
+      /* if (index_x == 90 && index_y == 40 && height == 13) */
+      /* { */
+      /*   const auto& chunk2 = m_world.chunk_manager.at(index_x, index_y, 0); */
+      /*   spdlog::debug("chunk pos {} {} height {}", chunk.position.x, chunk.position.y, height); */
+      /*   spdlog::debug("chunk2 pos {} {} height {}", chunk2.position.x, chunk2.position.y, height); */
+      /*   spdlog::debug ("{}", chunk2.tiles.has_flags(DL_CELL_FLAG_VISIBLE, std::abs(index_x - chunk.position.x), std::abs(index_y - chunk.position.y), 13)); */
+      /*   spdlog::debug ("{}", chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, std::abs(index_x - chunk.position.x), std::abs(index_y - chunk.position.y), 13)); */
+
+      /*   spdlog::debug("idx {} {} {} {}", index_x, index_y, chunk2.tiles.values.size(), chunk2.tiles.height_map.size()); */
+  /* /1* for (auto j = 0; j < 32; ++j) *1/ */
+  /* /1* { *1/ */
+  /* /1*   for (auto i = 0; i < 32; ++i) *1/ */
+  /* /1*   { *1/ */
+  /* /1*     printf("%d ", chunk2.tiles.height_map[j * 32 + i]); *1/ */
+  /* /1*   } *1/ */
+  /* /1*   printf("\n"); *1/ */
+  /* /1* } *1/ */
+  /* /1* printf("\n\n"); *1/ */
+      /* } */
+
+        if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, std::abs(index_x - chunk.position.x), std::abs(index_y - chunk.position.y), std::abs(z - chunk.position.z)))
         {
           continue;
         }
+
 
         const auto& terrain = m_world.get_terrain(index_x, index_y, z);
 
@@ -64,6 +110,8 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
         {
           continue;
         }
+
+
 
         m_render_tile(terrain.id, camera_position, tile_size, i, j, z);
 
@@ -77,7 +125,9 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   // Each z level translates to tile_size.y increase in height in clip space,
   // therefore the highest y that can appear on the screen is
   // camera_position.y + camera_size.y + world_size.z
-  for (int offset = world_size.z; offset > 0; --offset)
+  /* for (int offset = world_size.z; offset > 0; --offset) */
+  // TODO: Replace with world max elevation
+  for (int offset = 31; offset > 0; --offset)
   {
     for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i)
     {
@@ -85,12 +135,14 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto view_y = offset + camera_size.y;
       const auto index_y = view_y + camera_position.y;
 
-      if (index_x < 0 || index_y < 0 || index_x >= world_size.x || index_y >= world_size.y)
-      {
-        continue;
-      }
+      /* if (index_x < 0 || index_y < 0 || index_x >= world_size.x || index_y >= world_size.y) */
+      /* { */
+      /*   continue; */
+      /* } */
 
-      const auto height = m_world.tiles.height_map[index_y * world_size.x + index_x];
+      /* const auto height = m_world.tiles.height_map[index_y * world_size.x + index_x]; */
+      const auto& chunk = m_world.chunk_manager.at(index_x, index_y, 0);
+      const auto height = m_world.get_elevation(index_x, index_y);
 
       // If the height is below the offset, we know
       // it's not high enough to have its sprite shifted
@@ -103,7 +155,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       // Render sprites only from the maximum viewed height to the actual height
       for (auto z = offset; z <= height; ++z)
       {
-        if (!m_world.tiles.has_flags(DL_CELL_FLAG_VISIBLE, index_x, index_y, z))
+        if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, std::abs(index_x - chunk.position.x), std::abs(index_y - chunk.position.y), std::abs(z - chunk.position.z)))
         {
           continue;
         }
@@ -117,8 +169,8 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
         m_render_tile(terrain.id, camera_position, tile_size, i, view_y, z);
 
-        const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z);
-        m_render_tile(over_terrain.id, camera_position, tile_size, i, view_y, z, 1);
+        /* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); */
+        /* m_render_tile(over_terrain.id, camera_position, tile_size, i, view_y, z, 1); */
       }
     }
   }
@@ -223,7 +275,8 @@ void RenderSystem::m_render_tile(const uint32_t tile_id,
                      transformed_y * tile_size.y,
                      z * tile_size.y + z_index * m_z_index_increment);
 
-    if (m_world.tiles.is_bottom_empty(transformed_x, transformed_y, z))
+    const auto& chunk = m_world.chunk_manager.at(transformed_x, transformed_y, z);
+    if (chunk.tiles.is_bottom_empty(transformed_x, transformed_y, z))
     {
       auto bottom_sprite = Sprite{m_world_texture_id, 0};
       bottom_sprite.texture = m_world_texture;

@@ -17,6 +17,8 @@ class ChunkManager
   // Frustum in tiles
   Vector2i frustum{80, 48};
 
+  static Chunk null;
+
   ChunkManager();
 
   // Update chunks based on a tile position
@@ -25,8 +27,10 @@ class ChunkManager
   Chunk& generate(const Vector3i& position);
   void set_chunk_size(const Vector3i& chunk_size);
   void set_frustum(const Vector2i& frustum);
-  Chunk& at(const Vector3i& position);
-  uint32_t index_at(const Vector3i& position);
+  Chunk& at(const int x, const int y, const int z) const;
+  Chunk& at(const Vector3i& position) const;
+  uint32_t index_at(const int x, const int y, const int z) const;
+  uint32_t index_at(const Vector3i& position) const;
 
   bool is_loaded(const Vector3i& position) const;
   bool is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;

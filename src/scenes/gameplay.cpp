@@ -27,6 +27,7 @@
 
 namespace dl
 {
+std::vector<entt::entity> chunk_quads{};
 Gameplay::Gameplay(GameContext& game_context) : Scene("gameplay", game_context) {}
 
 void Gameplay::load()
@@ -93,7 +94,7 @@ void Gameplay::update()
 
   m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
 
-  /* for (const auto& chunk : m_chunk_manager.chunks) */
+  /* for (const auto& chunk : m_world.chunk_manager.chunks) */
   /* { */
   /*   bool found = false; */
 
@@ -123,14 +124,14 @@ void Gameplay::update()
   /*   { */
   /*     auto color = chunk->active ? 0xCC8844FF : 0x4477AAFF; */
   /*     auto entity = m_registry.create(); */
-  /*     /1* spdlog::debug("SIZE X {} {} {}", grid_size.x, m_chunk_manager.chunk_size.x, grid_size.x * */
-  /*      * m_chunk_manager.chunk_size.x); *1/ */
+  /*     /1* spdlog::debug("SIZE X {} {} {}", grid_size.x, m_world.chunk_manager.chunk_size.x, grid_size.x * */
+  /*      * m_world.chunk_manager.chunk_size.x); *1/ */
   /*     /1* spdlog::debug("POS X {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z); *1/ */
   /*     /1* puts("\n"); *1/ */
   /*     m_registry.emplace<Rectangle>( */
-  /*         entity, m_chunk_manager.chunk_size.x * grid_size.x, m_chunk_manager.chunk_size.y * grid_size.y, color); */
-  /*     /1* m_registry.emplace<Position>(entity, chunk->position.x * grid_size.x, chunk->position.y * grid_size.x, */
-  /*      * chunk->position.z * grid_size.x); *1/ */
+  /*         entity, m_world.chunk_manager.chunk_size.x * grid_size.x, m_world.chunk_manager.chunk_size.y * grid_size.y, color); */
+  /*     /1* m_registry.emplace<Position>(entity, chunk->position.x * grid_size.x, chunk->position.y * grid_size.x, *1/ */
+  /*     /1*  chunk->position.z * grid_size.x); *1/ */
   /*     m_registry.emplace<Position>(entity, chunk->position.x, chunk->position.y, chunk->position.z); */
   /*     chunk_quads.push_back(entity); */
   /*   } */
@@ -141,7 +142,7 @@ void Gameplay::update()
   /*   const auto& position = m_registry.get<Position>(entity); */
   /*   bool found = false; */
 
-  /*   for (const auto& chunk : m_chunk_manager.chunks) */
+  /*   for (const auto& chunk : m_world.chunk_manager.chunks) */
   /*   { */
   /*     if (position.x == chunk->position.x && position.y == chunk->position.y && position.z == chunk->position.z) */
   /*     { */

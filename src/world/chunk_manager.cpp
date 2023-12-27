@@ -8,6 +8,8 @@
 
 namespace dl
 {
+Chunk ChunkManager::null = Chunk{};
+
 ChunkManager::ChunkManager() { m_generator.set_size(chunk_size); }
 
 void ChunkManager::update(const Vector3i& target)
@@ -63,11 +65,25 @@ void ChunkManager::load(const Vector3i& position) { generate(position); }
 
 Chunk& ChunkManager::generate(const Vector3i& position)
 {
-  m_generator.generate(1337);
+  m_generator.generate(1337, position);
   auto chunk = std::make_unique<Chunk>(position, true);
   chunk->tiles.set_size(chunk_size);
   chunk->tiles.values = std::move(m_generator.tiles);
   chunk->tiles.height_map = std::move(m_generator.height_map);
+  chunk->tiles.compute_visibility();
+
+  spdlog::debug("CHUNK POSITION: {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z);
+
+  for (auto j = 0; j < 32; ++j)
+  {
+    for (auto i = 0; i < 32; ++i)
+    {
+      printf("%d ", chunk->tiles.height_map[j * 32 + i]);
+    }
+    printf("\n");
+  }
+  printf("\n\n");
+
   chunks.push_back(std::move(chunk));
 
   return *chunks[chunks.size() - 1].get();
@@ -81,41 +97,78 @@ void ChunkManager::set_chunk_size(const Vector3i& chunk_size)
 
 void ChunkManager::set_frustum(const Vector2i& frustum) { this->frustum = frustum; }
 
-Chunk& ChunkManager::at(const Vector3i& position)
+Chunk& ChunkManager::at(const int x, const int y, const int z) const
 {
-  const Vector3i chunk_position{std::floor(position.x / chunk_size.x) * chunk_size.x,
-                                std::floor(position.y / chunk_size.y) * chunk_size.y,
-                                std::floor(position.z / chunk_size.z) * chunk_size.z};
+  /* const Vector3i chunk_position{std::floor(x / chunk_size.x) * chunk_size.x, */
+  /*                               std::floor(y / chunk_size.y) * chunk_size.y, */
+  /*                               std::floor(z / chunk_size.z) * chunk_size.z}; */
+  Vector3i chunk_position{};
 
-  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
+  if (x >= 0)
+  {
+    chunk_position.x = std::floor(x / (float)chunk_size.x) * chunk_size.x;
+  }
+  else
+  {
+    chunk_position.x = std::ceil(x / (float)chunk_size.x) * chunk_size.x;
+  }
+  if (y >= 0)
+  {
+    chunk_position.y = std::floor(y / (float)chunk_size.y) * chunk_size.y;
+  }
+  else
+  {
+    chunk_position.y = std::ceil(y / (float)chunk_size.y) * chunk_size.y;
+  }
+  if (z >= 0)
+  {
+    chunk_position.z = std::floor(z / (float)chunk_size.z) * chunk_size.z;
+  }
+  else
+  {
+    chunk_position.z = std::ceil(z / (float)chunk_size.z) * chunk_size.z;
+  }
+
+  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](auto& chunk) {
     return (chunk->position == chunk_position);
   });
 
-  assert(chunk != chunks.end() && "Chunk should be already generated during update");
+  /* assert(chunk != chunks.end() && "Chunk should be already generated during update"); */
 
   if (chunk != chunks.end())
   {
     return *(*chunk).get();
   }
 
-  spdlog::warn("Should't be generating a chunk here");
 
-  return generate(chunk_position);
+  /* spdlog::warn("Should't be generating a chunk here"); */
+
+  return ChunkManager::null;
 }
 
-uint32_t ChunkManager::index_at(const Vector3i& position)
+Chunk& ChunkManager::at(const Vector3i& position) const
+{
+  return at(position.x, position.y, position.z);
+}
+
+uint32_t ChunkManager::index_at(const int x, const int y, const int z) const
 {
   for (uint32_t i = 0; i < chunks.size(); ++i)
   {
-    if (chunks[i]->position == position)
+    if (chunks[i]->position.x == x && chunks[i]->position.y == y && chunks[i]->position.z == z)
     {
       return i;
     }
   }
 
-  assert(true && "Chunk should be already generated during update");
+  /* assert(true && "Chunk should be already generated during update"); */
 
   return chunks.size();
+}
+
+uint32_t ChunkManager::index_at(const Vector3i& position) const
+{
+  return index_at(position.x, position.y, position.z);
 }
 
 bool ChunkManager::is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const

@@ -61,16 +61,17 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   int elevation = 0;
 
   // Check elevation in the current mouse position
-  for (int z = m_world.tiles.size.z - 1; z >= 0; --z)
-  {
-    int queried_elevation = m_world.get_elevation(std::floor(tile_x), std::floor(tile_y) + z);
+  // TODO: Update with chunks
+  /* for (int z = m_world.tiles.size.z - 1; z >= 0; --z) */
+  /* { */
+  /*   int queried_elevation = m_world.get_elevation(std::floor(tile_x), std::floor(tile_y) + z); */
 
-    if (queried_elevation == z)
-    {
-      elevation = queried_elevation;
-      break;
-    }
-  }
+  /*   if (queried_elevation == z) */
+  /*   { */
+  /*     elevation = queried_elevation; */
+  /*     break; */
+  /*   } */
+  /* } */
 
   const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y + elevation, registry);
   bool updated_inspector_content = false;

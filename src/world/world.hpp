@@ -53,8 +53,8 @@ class World
  public:
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
-  Grid3D tiles{};
-  Grid3D over_tiles{};
+  /* Grid3D tiles{}; */
+  /* Grid3D over_tiles{}; */
   ChunkManager chunk_manager{};
 
   // Constructor
@@ -72,6 +72,9 @@ class World
 
   // Replace tile by coordinates
   void replace(const uint32_t from, const uint32_t to, const int x, const int y, const int z);
+
+  // Get tile id by coordinates
+  [[nodiscard]] uint32_t id_at(const int x, const int y, const int z) const;
 
   // Get tile data by coordinates
   [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
@@ -136,7 +139,7 @@ class World
   template <class Archive>
   void serialize(Archive& archive)
   {
-    archive(tiles, over_tiles, m_seed, m_societies);
+    archive(m_seed, m_societies);
   }
 
  private:

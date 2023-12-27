@@ -10,7 +10,7 @@
 
 namespace dl
 {
-void MapGenerator::generate(const int seed)
+void MapGenerator::generate(const int seed, const Vector3i& offset )
 {
   // TEMP
   m_json.load("./data/world/map_generators/terrain.json");
@@ -31,7 +31,7 @@ void MapGenerator::generate(const int seed)
 
   spdlog::info("Generating silhouette...");
 
-  m_get_height_map(raw_height_map, seed);
+  m_get_height_map(raw_height_map, seed, offset);
 
   for (int j = 0; j < height; ++j)
   {
@@ -126,7 +126,7 @@ void MapGenerator::set_size(const Vector3i& size)
   depth = size.z;
 }
 
-void MapGenerator::m_get_height_map(std::vector<double>& height_values, const int seed)
+void MapGenerator::m_get_height_map(std::vector<double>& height_values, const int seed, const Vector3i& offset)
 {
   const auto simplex_freq = m_json.object["simplex_freq"].get<float>();
   const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>();
@@ -153,7 +153,8 @@ void MapGenerator::m_get_height_map(std::vector<double>& height_values, const in
     for (int i = 0; i < width; ++i)
     {
       const float gradient = m_get_rectangle_gradient_value(i, j);
-      const float noise_value = noise.GetNoise(static_cast<float>(i), static_cast<float>(j)) - gradient;
+      /* const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i), static_cast<float>(offset.y) + static_cast<float>(j)) - gradient; */
+      const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i), static_cast<float>(offset.y) + static_cast<float>(j));
 
       height_values[j * width + i] = noise_value;
       max_value = std::max(max_value, noise_value);
