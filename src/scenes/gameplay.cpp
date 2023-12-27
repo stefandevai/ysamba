@@ -33,13 +33,14 @@ void Gameplay::load()
   m_renderer.add_batch("world"_hs, "default");
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
-  m_camera.set_zoom(default_zoom);
 
   m_world.generate(100, 100, 1893);
   /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 
   m_camera.set_tile_size(m_world.get_tile_size());
+  /* m_camera.zoom_in(); */
+  /* m_camera.set_zoom(default_zoom); */
 
   /* auto society_blueprint = m_world.get_society("otomi"_hs); */
   /* auto components = SocietyGenerator::generate_members(society_blueprint); */

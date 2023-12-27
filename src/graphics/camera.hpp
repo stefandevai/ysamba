@@ -33,7 +33,7 @@ class Camera
   Camera(const Display& display);
 
   void move(const Vector3& quantity);
-  const Vector3& get_position() const { return position; }
+  const Vector3 get_position() const;
   const Vector2i get_position_in_tiles() const;
   glm::mat4 get_view_matrix() const;
   const Vector3& get_saved_position() const { return m_saved_position; }

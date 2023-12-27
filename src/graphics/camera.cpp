@@ -26,20 +26,56 @@ glm::mat4 Camera::get_view_matrix() const
   {
     auto view_matrix = glm::lookAt(m_position, m_center, m_up);
     view_matrix = glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor));
-    view_matrix = glm::translate(view_matrix, glm::vec3(m_size.x / 2.0f, m_size.y / 2.0f, 0.0f));
+    view_matrix =
+        glm::translate(view_matrix, glm::vec3(position.x + m_size.x / 2.0f, position.y + m_size.y / 2.0f, 0.0f));
     view_matrix = glm::scale(view_matrix, glm::vec3(zoom, zoom, zoom));
-    view_matrix = glm::translate(view_matrix, glm::vec3(-m_size.x / 2.0f, -m_size.y / 2.0f, 0.0f));
+    view_matrix =
+        glm::translate(view_matrix, glm::vec3(-position.x - m_size.x / 2.0f, -position.y - m_size.y / 2.0f, 0.0f));
     return view_matrix;
   }
 
   return glm::lookAt(m_position, m_center, m_up);
 }
 
+const Vector3 Camera::get_position() const
+{
+  auto matrix = get_view_matrix();
+
+  glm::vec4 pos = matrix * glm::vec4(0.0, 0.0, 0.0, 1.0);
+
+  return Vector3{-pos.x, -pos.y, -pos.z};
+
+  /* if (zoom > 1.0) */
+  /* { */
+  /*   auto pos = position; */
+  /*   auto original_zoom = zoom / 2.0; */
+  /*   /1* spdlog::debug("OR1 {}", original_zoom); *1/ */
+
+  /*   while (original_zoom >= 1.0) */
+  /*   { */
+  /*     pos.x += m_size.x * original_zoom / 2.0; */
+  /*     pos.y += m_size.y * original_zoom / 2.0; */
+  /*     original_zoom /= 2.0; */
+  /*   } */
+  /*   /1* spdlog::debug("pos1 {} {} {}", pos.x, pos.y, pos.z); *1/ */
+  /*   return pos; */
+  /*   /1* return Vector3{position.x + m_size.x * zoom / 4.0, position.y + m_size.y * zoom / 4.0, position.z}; *1/ */
+  /* } */
+
+  /* if (zoom < 1.0) */
+  /* { */
+  /*   return Vector3{position.x - m_size.x * zoom / 2.0, position.y - m_size.y * zoom / 2.0, position.z}; */
+  /* } */
+
+  /* return position; */
+}
+
 const Vector2i Camera::get_position_in_tiles() const
 {
   assert(m_grid_size.x != 0.f && m_grid_size.y != 0.f && "Tile size was not set");
 
-  return Vector2i{position.x / m_grid_size.x, position.y / m_grid_size.y};
+  const auto pos = get_position();
+  return Vector2i{pos.x / m_grid_size.x, pos.y / m_grid_size.y};
 }
 
 void Camera::move(const Vector3& quantity)
@@ -120,7 +156,26 @@ void Camera::set_zoom(const float zoom)
     return;
   }
 
+  const auto original_zoom = this->zoom;
+
+  if (zoom > original_zoom)
+  {
+    position.x += m_size.x * original_zoom / 2.0;
+    position.y += m_size.y * original_zoom / 2.0;
+  }
+
   this->zoom = zoom;
+
+  if (zoom < original_zoom)
+  {
+    position.x -= m_size.x * zoom / 2.0;
+    position.y -= m_size.y * zoom / 2.0;
+  }
+
+  m_grid_size.x = m_tile_size.x * zoom;
+  m_grid_size.y = m_tile_size.y * zoom;
+  m_size_in_tiles.x = std::ceil(m_size.x / m_grid_size.x);
+  m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
 }
 
 void Camera::zoom_in()
@@ -130,8 +185,11 @@ void Camera::zoom_in()
     return;
   }
 
-  position.x += m_size.x * zoom / 2.0;
-  position.y += m_size.y * zoom / 2.0;
+  /* position.x += m_size.x * zoom / 2.0; */
+  /* position.y += m_size.y * zoom / 2.0; */
+
+  /* spdlog::debug("OR1 {}", zoom); */
+  /* spdlog::debug("pos1 {} {} {}", position.x, position.y, position.z); */
 
   zoom *= 2.0f;
   zoom = std::min(zoom, MAX_ZOOM);
@@ -152,8 +210,8 @@ void Camera::zoom_out()
   zoom *= 0.5f;
   zoom = std::max(zoom, MIN_ZOOM);
 
-  position.x -= m_size.x * zoom / 2.0;
-  position.y -= m_size.y * zoom / 2.0;
+  /* position.x -= m_size.x * zoom / 2.0; */
+  /* position.y -= m_size.y * zoom / 2.0; */
 
   m_grid_size.x = m_tile_size.x * zoom;
   m_grid_size.y = m_tile_size.y * zoom;
