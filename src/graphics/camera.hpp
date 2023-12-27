@@ -26,16 +26,21 @@ class Camera
   float yaw = -90.0f;
   float pitch = -45.0f;
   float zoom = DEFAULT_ZOOM;
-  Vector3 position{0.0, 0.0, 0.0};
+  Vector3 movement_offset{0.0, 0.0, 0.0};
+  Vector3 view_position{0.0, 0.0, 0.0};
+  Vector2i position_in_tiles{0, 0};
   glm::mat4 projection_matrix = glm::mat4{1.f};
+  glm::mat4 view_matrix = glm::mat4{1.f};
+  bool dirty = true;
 
   Camera() = default;
   Camera(const Display& display);
 
+  void update(const float dt);
   void move(const Vector3& quantity);
-  const Vector3 get_position() const;
-  const Vector2i get_position_in_tiles() const;
-  glm::mat4 get_view_matrix() const;
+  const Vector3& get_position() const;
+  const Vector2i& get_position_in_tiles() const;
+  const glm::mat4& get_view_matrix() const;
   const Vector3& get_saved_position() const { return m_saved_position; }
   const Vector2& get_size() const { return m_size; }
   const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
@@ -76,6 +81,8 @@ class Camera
   bool m_resize_view_matrix = true;
 
   void m_calculate_center();
-  void m_calculate_projection_matrix();
+  void m_calculate_view_matrix();
+  void m_calculate_position();
+  void m_calculate_grid_size();
 };
 }  // namespace dl

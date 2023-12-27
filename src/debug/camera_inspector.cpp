@@ -18,9 +18,9 @@ void CameraInspector::update()
 
   ImGui::Begin("Camera Inspector", &open);
   ImGui::SeparatorText("Virtual Position");
-  ImGui::DragScalar("vx", ImGuiDataType_Double, &m_camera.position.x, 1.0);
-  ImGui::DragScalar("vy", ImGuiDataType_Double, &m_camera.position.y, 1.0);
-  ImGui::DragScalar("vz", ImGuiDataType_Double, &m_camera.position.z, 1.0);
+  ImGui::DragScalar("vx", ImGuiDataType_Double, &m_camera.movement_offset.x, 1.0);
+  ImGui::DragScalar("vy", ImGuiDataType_Double, &m_camera.movement_offset.y, 1.0);
+  ImGui::DragScalar("vz", ImGuiDataType_Double, &m_camera.movement_offset.z, 1.0);
 
   ImGui::SeparatorText("Position");
   ImGui::DragFloat("x", &m_camera.m_position.x, 1.0f);

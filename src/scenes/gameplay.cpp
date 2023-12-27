@@ -79,6 +79,8 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
+  m_camera.update(delta);
+
   if (m_current_state == State::PLAYING)
   {
     if (m_turn_delay > 0.0)

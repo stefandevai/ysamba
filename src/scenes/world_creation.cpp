@@ -53,6 +53,10 @@ void WorldCreation::update()
     return;
   }
 
+  const auto delta = m_game_context.clock->delta;
+
+  m_camera.update(delta);
+
   if (m_input_manager.poll_action("quit"_hs))
   {
     m_game_context.scene_manager->pop_scene();
