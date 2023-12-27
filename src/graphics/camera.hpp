@@ -38,6 +38,7 @@ class Camera
 
   void update(const float dt);
   void move(const Vector3& quantity);
+  void move_in_grid(const Vector3i& quantity);
   const Vector3& get_position() const;
   const Vector2i& get_position_in_tiles() const;
   const glm::mat4& get_view_matrix() const;

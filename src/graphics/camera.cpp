@@ -52,20 +52,21 @@ void Camera::move(const Vector3& quantity)
   dirty = true;
 }
 
+void Camera::move_in_grid(const Vector3i& quantity)
+{
+  move(Vector3{quantity.x * m_grid_size.x, quantity.y * m_grid_size.y, quantity.z * m_grid_size.y});
+}
+
 void Camera::set_position(const Vector3& position)
 {
-  movement_offset = position;
-  m_position.x = position.x;
-  m_position.y = position.y * m_scaling_factor + m_camera_z;
-  m_position.z = position.z + m_camera_z;
-
-  dirty = true;
+  // TODO
 }
 
 void Camera::set_size(const Vector2& size)
 {
   m_size = size;
   set_frustrum(0.f, size.x, size.y, 0.f);
+  dirty = true;
 }
 
 void Camera::set_frustrum(const float left, const float right, const float bottom, const float top)

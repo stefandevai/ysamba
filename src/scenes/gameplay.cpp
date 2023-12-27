@@ -40,6 +40,8 @@ void Gameplay::load()
 
   m_camera.set_tile_size(m_world.get_tile_size());
   m_camera.set_zoom(default_zoom);
+  m_camera.set_position({0.0, 0.0, 0.0});
+  /* m_camera.zoom_in(); */
 
   auto society_blueprint = m_world.get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
@@ -78,6 +80,7 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
+  m_camera.set_position({0.0, 0.0, 0.0});
   m_camera.update(delta);
 
   if (m_current_state == State::PLAYING)
@@ -188,23 +191,19 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
   }
   else if (m_input_manager.poll_action("camera_move_west"_hs))
   {
-    const double speed = m_game_context.clock->delta * 400.0;
-    m_camera.move({-speed, 0., 0.});
+    m_camera.move_in_grid({-1, 0, 0});
   }
   else if (m_input_manager.poll_action("camera_move_east"_hs))
   {
-    const double speed = m_game_context.clock->delta * 400.0;
-    m_camera.move({speed, 0., 0.});
+    m_camera.move_in_grid({1, 0, 0});
   }
   else if (m_input_manager.poll_action("camera_move_south"_hs))
   {
-    const double speed = m_game_context.clock->delta * 400.0;
-    m_camera.move({0., speed, 0.});
+    m_camera.move_in_grid({0, 1, 0});
   }
   else if (m_input_manager.poll_action("camera_move_north"_hs))
   {
-    const double speed = m_game_context.clock->delta * 400.0;
-    m_camera.move({0., -speed, 0.});
+    m_camera.move_in_grid({0, -1, 0});
   }
   else if (m_input_manager.poll_action("zoom_in"_hs))
   {
