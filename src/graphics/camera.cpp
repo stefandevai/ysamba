@@ -42,12 +42,12 @@ const Vector2i& Camera::get_position_in_tiles() const { return position_in_tiles
 
 void Camera::move(const Vector3& quantity)
 {
-  movement_offset.x += quantity.x;
-  movement_offset.y += quantity.y;
-  movement_offset.z += quantity.z;
-  m_position.x += quantity.x;
-  m_position.y += quantity.y * m_scaling_factor;
-  m_position.z += quantity.z;
+  movement_offset.x += quantity.x * (1.0 / zoom);
+  movement_offset.y += quantity.y * (1.0 / zoom);
+  movement_offset.z += quantity.z * (1.0 / zoom);
+  m_position.x += quantity.x * (1.0 / zoom);
+  m_position.y += quantity.y * m_scaling_factor * (1.0 / zoom);
+  m_position.z += quantity.z * (1.0 / zoom);
 
   dirty = true;
 }

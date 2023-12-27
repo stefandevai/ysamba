@@ -22,7 +22,7 @@
         {
             "id": "spritesheet-tileset",
             "type": "texture-atlas",
-            "path": "textures/tileset_2x.png",
+            "path": "textures/tileset.png",
             "textureType": "diffuse",
             "uniform": true,
             "horizontalFrames": 32,
@@ -33,7 +33,7 @@
         {
             "id": "spritesheet-characters",
             "type": "texture-atlas",
-            "path": "textures/characters_2x.png",
+            "path": "textures/characters.png",
             "textureType": "diffuse",
             "uniform": true,
             "horizontalFrames": 32,
