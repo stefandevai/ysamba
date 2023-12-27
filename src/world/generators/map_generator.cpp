@@ -20,95 +20,95 @@ void MapGenerator::generate(const int seed)
   spdlog::info("= STARTING WORLD GENERATION =");
   spdlog::info("=============================\n");
   spdlog::info("SEED: {}", seed);
-  spdlog::info("WIDTH: {}", m_width);
-  spdlog::info("HEIGHT: {}\n", m_height);
+  spdlog::info("WIDTH: {}", width);
+  spdlog::info("HEIGHT: {}\n", height);
 
-  std::vector<double> raw_height_map(m_width * m_height);
+  std::vector<double> raw_height_map(width * height);
+  tiles = std::vector<Cell>(width * height * depth);
+  height_map = std::vector<int>(width * height);
 
   auto start = std::chrono::high_resolution_clock::now();
 
   spdlog::info("Generating silhouette...");
+
   m_get_height_map(raw_height_map, seed);
 
-  tiles.clear();
-  height_map.clear();
-
-  for (int j = 0; j < m_height; ++j)
+  for (int j = 0; j < height; ++j)
   {
-    for (int i = 0; i < m_width; ++i)
+    for (int i = 0; i < width; ++i)
     {
-      const auto map_value = raw_height_map[j * m_width + i];
-      const int k = static_cast<int>(map_value * (m_z_levels - 1));
+      const auto map_value = raw_height_map[j * width + i];
+      const int k = static_cast<int>(map_value * (depth - 1));
 
-      height_map[j * m_width + i] = k;
+      height_map[j * width + i] = k;
 
       if (k < 2)
       {
-        tiles[k * m_width * m_height + j * m_width + i].id = 1;
+        tiles[k * width * height + j * width + i].id = 1;
       }
       else
       {
-        tiles[k * m_width * m_height + j * m_width + i].id = 2;
+        tiles[k * width * height + j * width + i].id = 2;
       }
 
       /* if (k == 0) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 1; */
+      /*   tiles[k * width * height + j * width + i].id = 1; */
       /* } */
       /* else if (k == 1) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 2; */
+      /*   tiles[k * width * height + j * width + i].id = 2; */
       /* } */
       /* else if (k == 2) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 3; */
+      /*   tiles[k * width * height + j * width + i].id = 3; */
       /* } */
       /* else if (k == 3) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 6; */
+      /*   tiles[k * width * height + j * width + i].id = 6; */
       /* } */
       /* else if (k == 4) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 12; */
+      /*   tiles[k * width * height + j * width + i].id = 12; */
       /* } */
       /* else if (k == 5) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 13; */
+      /*   tiles[k * width * height + j * width + i].id = 13; */
       /* } */
       /* else if (k == 6) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 14; */
+      /*   tiles[k * width * height + j * width + i].id = 14; */
       /* } */
       /* else if (k == 7) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 23; */
+      /*   tiles[k * width * height + j * width + i].id = 23; */
       /* } */
       /* else if (k == 8) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 15; */
+      /*   tiles[k * width * height + j * width + i].id = 15; */
       /* } */
       /* else if (k == 9) */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 18; */
+      /*   tiles[k * width * height + j * width + i].id = 18; */
       /* } */
       /* else */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i].id = 19; */
+      /*   tiles[k * width * height + j * width + i].id = 19; */
       /* } */
 
       /* else */
       /* { */
-      /*   tiles[k * m_width * m_height + j * m_width + i] = 2; */
+      /*   tiles[k * width * height + j * width + i] = 2; */
       /* } */
 
       /* if (k > 0) */
       /* { */
-      /*   tiles[(k - 1) * m_width * m_height + j * m_width + i] = 15; */
+      /*   tiles[(k - 1) * width * height + j * width + i] = 15; */
       /* } */
 
       /* for (int z = 0; z < k; ++z) */
       /* { */
-      /*   tiles[z * m_width * m_height + j * m_width + i].id = 5; */
+      /*   tiles[z * width * height + j * width + i].id = 5; */
       /* } */
     }
   }
@@ -117,6 +117,13 @@ void MapGenerator::generate(const int seed)
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
   spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+}
+
+void MapGenerator::set_size(const Vector3i& size)
+{
+  width = size.x;
+  height = size.y;
+  depth = size.z;
 }
 
 void MapGenerator::m_get_height_map(std::vector<double>& height_values, const int seed)
@@ -141,14 +148,14 @@ void MapGenerator::m_get_height_map(std::vector<double>& height_values, const in
   float max_value = 0.0;
   float min_value = 1.0;
 
-  for (int j = 0; j < m_height; ++j)
+  for (int j = 0; j < height; ++j)
   {
-    for (int i = 0; i < m_width; ++i)
+    for (int i = 0; i < width; ++i)
     {
       const float gradient = m_get_rectangle_gradient_value(i, j);
       const float noise_value = noise.GetNoise(static_cast<float>(i), static_cast<float>(j)) - gradient;
 
-      height_values[j * m_width + i] = noise_value;
+      height_values[j * width + i] = noise_value;
       max_value = std::max(max_value, noise_value);
       min_value = std::min(min_value, noise_value);
     }
@@ -165,10 +172,10 @@ void MapGenerator::m_get_height_map(std::vector<double>& height_values, const in
 
 float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
 {
-  auto distance_to_edge = std::min(abs(x - m_width), x);
-  distance_to_edge = std::min(distance_to_edge, abs(y - m_height));
+  auto distance_to_edge = std::min(abs(x - width), x);
+  distance_to_edge = std::min(distance_to_edge, abs(y - height));
   distance_to_edge = std::min(distance_to_edge, y) * 2;
-  return 1.f - static_cast<float>(distance_to_edge) / (m_width / 2.0f);
+  return 1.f - static_cast<float>(distance_to_edge) / (width / 2.0f);
 }
 
 }  // namespace dl

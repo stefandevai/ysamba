@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/json.hpp"
+#include "core/maths/vector.hpp"
 #include "world/cell.hpp"
 #include "world/tilemap.hpp"
 
@@ -11,21 +12,18 @@ namespace dl
 {
 class MapGenerator
 {
- private:
-  const int m_width;
-  const int m_height;
-  const int m_z_levels;
-
  public:
-  std::vector<Cell> tiles = std::vector<Cell>(m_width * m_height * m_z_levels);
-  std::vector<int> height_map = std::vector<int>(m_width * m_height);
+  int width = 1;
+  int height = 1;
+  int depth = 1;
+  std::vector<Cell> tiles;
+  std::vector<int> height_map;
 
-  MapGenerator(const int width, const int height, const int z_levels = 10)
-      : m_width(width), m_height(height), m_z_levels(z_levels)
-  {
-  }
+  MapGenerator() = default;
+  MapGenerator(const int width, const int height, const int depth = 32) : width(width), height(height), depth(depth) {}
 
   void generate(const int seed);
+  void set_size(const Vector3i& size);
 
  private:
   JSON m_json{"./data/world/map_generators/terrain.json"};

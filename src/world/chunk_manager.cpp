@@ -8,6 +8,8 @@
 
 namespace dl
 {
+ChunkManager::ChunkManager() { m_generator.set_size(chunk_size); }
+
 void ChunkManager::update(const Vector3i& target)
 {
   // Load visible chunks
@@ -59,15 +61,62 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
 
 void ChunkManager::load(const Vector3i& position) { generate(position); }
 
-void ChunkManager::generate(const Vector3i& position)
+Chunk& ChunkManager::generate(const Vector3i& position)
 {
+  m_generator.generate(1337);
   auto chunk = std::make_unique<Chunk>(position, true);
+  chunk->tiles.set_size(chunk_size);
+  chunk->tiles.values = std::move(m_generator.tiles);
+  chunk->tiles.height_map = std::move(m_generator.height_map);
   chunks.push_back(std::move(chunk));
+
+  return *chunks[chunks.size() - 1].get();
 }
 
-void ChunkManager::set_chunk_size(const Vector3i& chunk_size) { this->chunk_size = chunk_size; }
+void ChunkManager::set_chunk_size(const Vector3i& chunk_size)
+{
+  this->chunk_size = chunk_size;
+  m_generator.set_size(chunk_size);
+}
 
 void ChunkManager::set_frustum(const Vector2i& frustum) { this->frustum = frustum; }
+
+Chunk& ChunkManager::at(const Vector3i& position)
+{
+  const Vector3i chunk_position{std::floor(position.x / chunk_size.x) * chunk_size.x,
+                                std::floor(position.y / chunk_size.y) * chunk_size.y,
+                                std::floor(position.z / chunk_size.z) * chunk_size.z};
+
+  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
+    return (chunk->position == chunk_position);
+  });
+
+  assert(chunk != chunks.end() && "Chunk should be already generated during update");
+
+  if (chunk != chunks.end())
+  {
+    return *(*chunk).get();
+  }
+
+  spdlog::warn("Should't be generating a chunk here");
+
+  return generate(chunk_position);
+}
+
+uint32_t ChunkManager::index_at(const Vector3i& position)
+{
+  for (uint32_t i = 0; i < chunks.size(); ++i)
+  {
+    if (chunks[i]->position == position)
+    {
+      return i;
+    }
+  }
+
+  assert(true && "Chunk should be already generated during update");
+
+  return chunks.size();
+}
 
 bool ChunkManager::is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const
 {

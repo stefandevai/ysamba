@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "./chunk_manager.hpp"
 #include "./grid_3d.hpp"
 #include "./item_data.hpp"
 #include "./society/society_blueprint.hpp"
@@ -54,6 +55,7 @@ class World
   SpatialHash spatial_hash;
   Grid3D tiles{};
   Grid3D over_tiles{};
+  ChunkManager chunk_manager{};
 
   // Constructor
   World(GameContext& game_context);
