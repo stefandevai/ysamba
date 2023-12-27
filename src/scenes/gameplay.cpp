@@ -94,9 +94,11 @@ void Gameplay::update()
   m_camera.update(delta);
 
   const auto& mouse_position = m_input_manager.get_mouse_tile_position(m_camera);
-  const auto& grid_size = m_camera.get_grid_size();
+  const auto& camera_position = m_camera.get_position_in_tiles();
+  const auto& camera_size = m_camera.get_size_in_tiles();
+  const auto& grid_size = m_world.get_tile_size();
 
-  m_chunk_manager.update({mouse_position.x, mouse_position.y, 0});
+  m_chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
 
   for (const auto& chunk : m_chunk_manager.chunks)
   {
@@ -128,6 +130,10 @@ void Gameplay::update()
     {
       auto color = chunk->active ? 0xCC8844FF : 0x4477AAFF;
       auto entity = m_registry.create();
+      /* spdlog::debug("SIZE X {} {} {}", grid_size.x, m_chunk_manager.chunk_size.x, grid_size.x *
+       * m_chunk_manager.chunk_size.x); */
+      /* spdlog::debug("POS X {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z); */
+      /* puts("\n"); */
       m_registry.emplace<Rectangle>(
           entity, m_chunk_manager.chunk_size.x * grid_size.x, m_chunk_manager.chunk_size.y * grid_size.y, color);
       /* m_registry.emplace<Position>(entity, chunk->position.x * grid_size.x, chunk->position.y * grid_size.x,

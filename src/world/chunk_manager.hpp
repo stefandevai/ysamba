@@ -12,9 +12,9 @@ class ChunkManager
  public:
   std::vector<std::unique_ptr<Chunk>> chunks{};
   // Size in tiles
-  Vector3i chunk_size{4, 4, 4};
+  Vector3i chunk_size{32, 32, 32};
   // Frustum in tiles
-  Vector2i frustum{3, 3};
+  Vector2i frustum{80, 48};
 
   ChunkManager() = default;
 
@@ -23,8 +23,11 @@ class ChunkManager
   void load(const Vector3i& position);
   void generate(const Vector3i& position);
   void set_chunk_size(const Vector3i& chunk_size);
+  void set_frustum(const Vector2i& frustum);
 
   bool is_loaded(const Vector3i& position) const;
-  bool is_within_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;
+  bool is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;
+  bool is_within_chunk_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;
+  void activate_if(const std::function<bool(const std::unique_ptr<Chunk>&)>& condition);
 };
 };  // namespace dl
