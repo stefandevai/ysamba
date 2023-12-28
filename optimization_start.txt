@@ -49,3 +49,42 @@
 [2023-12-28 03:06:46.587] [debug] Update took: 0ms
 [2023-12-28 03:06:46.587] [debug] Batching took: 122ms
 [2023-12-28 03:06:46.587] [debug] Render took: 11ms
+
+=========================================================
+
+Refactor render system, render tiles by chunk instead of checking the frustum in order
+Zoom = 0.5
+
+[2023-12-28 09:33:42.287] [debug] Update took: 0ms
+[2023-12-28 09:33:42.287] [debug] Batching took: 75ms
+[2023-12-28 09:33:42.287] [debug] Render took: 6ms
+[2023-12-28 09:33:43.950] [debug] Update took: 0ms
+[2023-12-28 09:33:43.950] [debug] Batching took: 76ms
+[2023-12-28 09:33:43.950] [debug] Render took: 6ms
+[2023-12-28 09:33:45.612] [debug] Update took: 0ms
+[2023-12-28 09:33:45.613] [debug] Batching took: 75ms
+[2023-12-28 09:33:45.613] [debug] Render took: 7ms
+[2023-12-28 09:33:47.325] [debug] Update took: 0ms
+[2023-12-28 09:33:47.325] [debug] Batching took: 76ms
+[2023-12-28 09:33:47.325] [debug] Render took: 7ms
+[2023-12-28 09:33:48.988] [debug] Update took: 0ms
+[2023-12-28 09:33:48.988] [debug] Batching took: 74ms
+[2023-12-28 09:33:48.988] [debug] Render took: 8ms
+[2023-12-28 09:33:50.667] [debug] Update took: 0ms
+[2023-12-28 09:33:50.667] [debug] Batching took: 79ms
+[2023-12-28 09:33:50.667] [debug] Render took: 3ms
+[2023-12-28 09:33:52.347] [debug] Update took: 0ms
+[2023-12-28 09:33:52.347] [debug] Batching took: 76ms
+[2023-12-28 09:33:52.347] [debug] Render took: 5ms
+[2023-12-28 09:33:54.008] [debug] Update took: 0ms
+[2023-12-28 09:33:54.008] [debug] Batching took: 78ms
+[2023-12-28 09:33:54.008] [debug] Render took: 3ms
+[2023-12-28 09:33:55.722] [debug] Update took: 0ms
+[2023-12-28 09:33:55.722] [debug] Batching took: 75ms
+[2023-12-28 09:33:55.722] [debug] Render took: 7ms
+[2023-12-28 09:33:57.385] [debug] Update took: 0ms
+[2023-12-28 09:33:57.385] [debug] Batching took: 74ms
+[2023-12-28 09:33:57.385] [debug] Render took: 8ms
+[2023-12-28 09:33:59.047] [debug] Update took: 0ms
+[2023-12-28 09:33:59.047] [debug] Batching took: 75ms
+[2023-12-28 09:33:59.047] [debug] Render took: 7ms
