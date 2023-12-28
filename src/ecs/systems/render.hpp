@@ -10,6 +10,7 @@ class Renderer;
 class Texture;
 struct Position;
 struct Vector2i;
+struct Chunk;
 
 class RenderSystem
 {
@@ -28,8 +29,13 @@ class RenderSystem
   template <typename T>
   void m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index = 0);
 
-  void m_render_tile(
-      const uint32_t tile_id, const Vector2i& tile_size, const int x, const int y, const int z, const int z_index = 0);
+  void m_render_tile(const Chunk& chunk,
+                     const uint32_t tile_id,
+                     const Vector2i& tile_size,
+                     const int x,
+                     const int y,
+                     const int z,
+                     const int z_index = 0);
 
   friend class RenderEditor;
 };
