@@ -17,6 +17,7 @@ class Sprite;
 class MultiSprite;
 class Text;
 class Texture;
+class Camera;
 
 class Renderer
 {
@@ -27,7 +28,7 @@ class Renderer
   void batch(const uint32_t batch_id, MultiSprite* multi_sprite, const double x, const double y, const double z);
   void batch(const uint32_t batch_id, Text& text, const double x, const double y, const double z);
   void batch(const uint32_t batch_id, const Quad* quad, const double x, const double y, const double z);
-  void render();
+  void render(const Camera& camera);
   void add_batch(const uint32_t batch_id, const std::string& shader_id, const int priority = 0);
   void add_batch(Batch* batch);
   void push_matrix(const uint32_t batch_id, const glm::mat4& matrix);

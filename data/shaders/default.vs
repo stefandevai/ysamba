@@ -13,11 +13,12 @@ out DATA
   vec2 pos;
 } v_out;
 
-uniform mat4 view_projection;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-  gl_Position = view_projection * vec4(position, 1.0);
+  gl_Position = projection * view * vec4(position, 1.0);
 
   v_out.uv = vec2(uv.x, uv.y);
   v_out.tid = tid;

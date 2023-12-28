@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include <glm/gtc/matrix_transform.hpp>  // IWYU pragma: export
+#include <glm/gtc/type_ptr.hpp>
 
 #include "./multi_sprite.hpp"
 #include "./nine_patch.hpp"
@@ -29,6 +30,29 @@ Batch::~Batch()
 void Batch::load()
 {
   m_vertices.reserve(m_indices_size);
+
+  // Push a default view matrix for an orthographic projection
+  // as a fallback
+  std::array<float, 16> values{
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      1.0f,
+      0.0f,
+      0.0f,
+      0.0f,
+      -1.0f,
+      1.0f,
+  };
+  glm::mat4 default_view_matrix = glm::make_mat4(values.data());
+  push_matrix(default_view_matrix);
 
   glGenVertexArrays(1, &m_vao);
   glGenBuffers(1, &m_vbo);

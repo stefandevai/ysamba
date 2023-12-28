@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "./camera.hpp"
 #include "./multi_sprite.hpp"
 #include "./shader_loader.hpp"
 #include "./shader_program.hpp"
@@ -79,7 +80,7 @@ void Renderer::batch(const uint32_t batch_id, const Quad* quad, const double x, 
   m_batches.at(batch_id)->quad(quad, x, y, z);
 }
 
-void Renderer::render()
+void Renderer::render(const Camera& camera)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -124,7 +125,8 @@ void Renderer::render()
     /* } */
 
     batch->shader->use();
-    batch->shader->set_mat_4("view_projection", batch->peek_matrix());
+    batch->shader->set_mat_4("projection", camera.projection_matrix);
+    batch->shader->set_mat_4("view", batch->peek_matrix());
 
     batch->render();
   }

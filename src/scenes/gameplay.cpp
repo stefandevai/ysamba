@@ -200,10 +200,10 @@ void Gameplay::render()
     return;
   }
 
-  m_renderer.push_matrix("world"_hs, m_camera.view_projection_matrix);
+  m_renderer.push_matrix("world"_hs, m_camera.view_matrix);
   m_render_system.render(m_registry, m_camera);
   m_ui_manager.render();
-  m_renderer.render();
+  m_renderer.render(m_camera);
   m_renderer.pop_matrix("world"_hs);
 }
 
