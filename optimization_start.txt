@@ -1,31 +1,8 @@
-[2023-12-28 03:06:19.025] [debug] Update took: 0ms
-[2023-12-28 03:06:19.025] [debug] Batching took: 62ms
-[2023-12-28 03:06:19.025] [debug] Render took: 9ms
-[2023-12-28 03:06:20.017] [debug] Update took: 0ms
-[2023-12-28 03:06:20.017] [debug] Batching took: 33ms
-[2023-12-28 03:06:20.017] [debug] Render took: 16ms
-[2023-12-28 03:06:20.881] [debug] Update took: 0ms
-[2023-12-28 03:06:20.881] [debug] Batching took: 32ms
-[2023-12-28 03:06:20.881] [debug] Render took: 16ms
-[2023-12-28 03:06:21.663] [debug] Update took: 0ms
-[2023-12-28 03:06:21.663] [debug] Batching took: 32ms
-[2023-12-28 03:06:21.663] [debug] Render took: 1ms
-[2023-12-28 03:06:22.611] [debug] Update took: 0ms
-[2023-12-28 03:06:22.611] [debug] Batching took: 32ms
-[2023-12-28 03:06:22.611] [debug] Render took: 16ms
-[2023-12-28 03:06:23.608] [debug] Update took: 0ms
-[2023-12-28 03:06:23.608] [debug] Batching took: 34ms
-[2023-12-28 03:06:23.608] [debug] Render took: 14ms
-[2023-12-28 03:06:24.623] [debug] Update took: 0ms
-[2023-12-28 03:06:24.623] [debug] Batching took: 34ms
-[2023-12-28 03:06:24.623] [debug] Render took: 15ms
-[2023-12-28 03:06:25.587] [debug] Update took: 0ms
-[2023-12-28 03:06:25.587] [debug] Batching took: 32ms
-[2023-12-28 03:06:25.587] [debug] Render took: 16ms
-[2023-12-28 03:06:26.585] [debug] Update took: 0ms
-[2023-12-28 03:06:26.585] [debug] Batching took: 34ms
-[2023-12-28 03:06:26.585] [debug] Render took: 14ms
-[2023-12-28 03:06:27.931] [debug] Update took: 0ms
+=========================================================
+
+Start
+Zoom = 0.5
+
 [2023-12-28 03:06:27.932] [debug] Batching took: 124ms
 [2023-12-28 03:06:27.932] [debug] Render took: 7ms
 [2023-12-28 03:06:30.592] [debug] Update took: 0ms
@@ -50,10 +27,54 @@
 [2023-12-28 03:06:46.587] [debug] Batching took: 122ms
 [2023-12-28 03:06:46.587] [debug] Render took: 11ms
 
+[2023-12-28 09:43:56.924] [debug] Update took: 0ms
+[2023-12-28 09:43:56.924] [debug] Batching took: 124ms
+[2023-12-28 09:43:56.924] [debug] Render took: 7ms
+[2023-12-28 09:43:59.584] [debug] Update took: 0ms
+[2023-12-28 09:43:59.584] [debug] Batching took: 115ms
+[2023-12-28 09:43:59.584] [debug] Render took: 16ms
+[2023-12-28 09:44:02.261] [debug] Update took: 0ms
+[2023-12-28 09:44:02.261] [debug] Batching took: 123ms
+[2023-12-28 09:44:02.261] [debug] Render took: 9ms
+[2023-12-28 09:44:04.922] [debug] Update took: 0ms
+[2023-12-28 09:44:04.922] [debug] Batching took: 122ms
+[2023-12-28 09:44:04.922] [debug] Render took: 10ms
+[2023-12-28 09:44:07.582] [debug] Update took: 3ms
+[2023-12-28 09:44:07.582] [debug] Batching took: 120ms
+[2023-12-28 09:44:07.582] [debug] Render took: 8ms
+[2023-12-28 09:44:10.242] [debug] Update took: 0ms
+[2023-12-28 09:44:10.242] [debug] Batching took: 123ms
+[2023-12-28 09:44:10.242] [debug] Render took: 9ms
+[2023-12-28 09:44:12.919] [debug] Update took: 0ms
+[2023-12-28 09:44:12.919] [debug] Batching took: 123ms
+[2023-12-28 09:44:12.919] [debug] Render took: 9ms
+[2023-12-28 09:44:15.579] [debug] Update took: 0ms
+[2023-12-28 09:44:15.580] [debug] Batching took: 121ms
+[2023-12-28 09:44:15.580] [debug] Render took: 11ms
+[2023-12-28 09:44:18.240] [debug] Update took: 5ms
+[2023-12-28 09:44:18.240] [debug] Batching took: 123ms
+[2023-12-28 09:44:18.240] [debug] Render took: 4ms
+[2023-12-28 09:44:20.917] [debug] Update took: 0ms
+[2023-12-28 09:44:20.917] [debug] Batching took: 116ms
+[2023-12-28 09:44:20.917] [debug] Render took: 16ms
+[2023-12-28 09:44:23.577] [debug] Update took: 0ms
+[2023-12-28 09:44:23.577] [debug] Batching took: 122ms
+[2023-12-28 09:44:23.577] [debug] Render took: 9ms
+[2023-12-28 09:44:26.271] [debug] Update took: 0ms
+[2023-12-28 09:44:26.271] [debug] Batching took: 119ms
+[2023-12-28 09:44:26.271] [debug] Render took: 13ms
+[2023-12-28 09:44:28.948] [debug] Update took: 0ms
+[2023-12-28 09:44:28.948] [debug] Batching took: 121ms
+[2023-12-28 09:44:28.948] [debug] Render took: 11ms
+[2023-12-28 09:44:31.159] [debug] Update took: 0ms
+[2023-12-28 09:44:31.159] [debug] Batching took: 0ms
+[2023-12-28 09:44:31.159] [debug] Render took: 16ms
+
 =========================================================
 
 Refactor render system, render tiles by chunk instead of checking the frustum in order
 Zoom = 0.5
+MS improved 40% from previous version
 
 [2023-12-28 09:33:42.287] [debug] Update took: 0ms
 [2023-12-28 09:33:42.287] [debug] Batching took: 75ms
