@@ -12,6 +12,8 @@ Chunk ChunkManager::null = Chunk{};
 
 ChunkManager::ChunkManager() { m_generator.set_size(chunk_size); }
 
+int chunks_loaded = 0;
+
 void ChunkManager::update(const Vector3i& target)
 {
   // Load visible chunks
@@ -25,13 +27,50 @@ void ChunkManager::update(const Vector3i& target)
          i <= target.x + frustum.x / 2 + padding * chunk_size.x;
          i += chunk_size.x)
     {
-      Vector3i chunk_position{std::floor(i / chunk_size.x) * chunk_size.x,
-                              std::floor(j / chunk_size.y) * chunk_size.y,
-                              std::floor(target.z / chunk_size.z) * chunk_size.z};
+      /* if (chunks_loaded > 0) */
+      /* { */
+      /*   continue; */
+      /* } */
+      Vector3i chunk_position{std::floor(i / static_cast<float>(chunk_size.x)) * chunk_size.x,
+                              std::floor(j / static_cast<float>(chunk_size.y)) * chunk_size.y,
+                              std::floor(target.z / static_cast<float>(chunk_size.z)) * chunk_size.z};
+      /* if (chunk_position.x < -32 || chunk_position.y < -32 || chunk_position.z < 0) continue; */
+      /* if (chunk_position.x < 0 || chunk_position.y < 0 || chunk_position.z < 0) continue; */
+      /* spdlog::debug("SIZEEEEEEEEEEEEEEEEEEEEE {}", chunks.size()); */
+      /* Vector3i chunk_position{}; */
+
+      /* if (i >= 0) */
+      /* { */
+      /*   chunk_position.x = std::floor(i / (float)chunk_size.x) * chunk_size.x; */
+      /* } */
+      /* else */
+      /* { */
+      /*   chunk_position.x = std::ceil(i / (float)chunk_size.x) * chunk_size.x; */
+      /* } */
+      /* if (j >= 0) */
+      /* { */
+      /*   chunk_position.y = std::floor(j / (float)chunk_size.y) * chunk_size.y; */
+      /* } */
+      /* else */
+      /* { */
+      /*   chunk_position.y = std::ceil(j / (float)chunk_size.y) * chunk_size.y; */
+      /* } */
+      /* if (target.z >= 0) */
+      /* { */
+      /*   chunk_position.z = std::floor(target.z / (float)chunk_size.z) * chunk_size.z; */
+      /* } */
+      /* else */
+      /* { */
+      /*   chunk_position.z = std::ceil(target.z / (float)chunk_size.z) * chunk_size.z; */
+      /* } */
 
       if (!is_loaded(chunk_position))
       {
+        /* spdlog::debug("CHUNK AT {} {}", i, j); */
+        /* spdlog::debug("POS {} {} {}", chunk_position.x, chunk_position.y, chunk_position.z); */
+        /* printf("\n"); */
         load(chunk_position);
+        ++chunks_loaded;
       }
     }
   }
@@ -48,7 +87,7 @@ void ChunkManager::update(const Vector3i& target)
 
     // Unload chunks within a certain radius
     std::erase_if(chunks, [this, &target_chunk_position](const auto& chunk) {
-      return !is_within_chunk_radius(chunk->position, target_chunk_position, 6);
+      return !is_within_chunk_radius(chunk->position, target_chunk_position, 4);
     });
   }
 }
@@ -72,17 +111,17 @@ Chunk& ChunkManager::generate(const Vector3i& position)
   chunk->tiles.height_map = std::move(m_generator.height_map);
   chunk->tiles.compute_visibility();
 
-  spdlog::debug("CHUNK POSITION: {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z);
+  /* spdlog::debug("CHUNK POSITION: {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z); */
 
-  for (auto j = 0; j < 32; ++j)
-  {
-    for (auto i = 0; i < 32; ++i)
-    {
-      printf("%d ", chunk->tiles.height_map[j * 32 + i]);
-    }
-    printf("\n");
-  }
-  printf("\n\n");
+  /* for (auto j = 0; j < chunk_size.y; ++j) */
+  /* { */
+  /*   for (auto i = 0; i < chunk_size.x; ++i) */
+  /*   { */
+  /*     printf("%d ", chunk->tiles.height_map[j * chunk_size.x + i]); */
+  /*   } */
+  /*   printf("\n"); */
+  /* } */
+  /* printf("\n\n"); */
 
   chunks.push_back(std::move(chunk));
 
@@ -99,39 +138,38 @@ void ChunkManager::set_frustum(const Vector2i& frustum) { this->frustum = frustu
 
 Chunk& ChunkManager::at(const int x, const int y, const int z) const
 {
-  /* const Vector3i chunk_position{std::floor(x / chunk_size.x) * chunk_size.x, */
-  /*                               std::floor(y / chunk_size.y) * chunk_size.y, */
-  /*                               std::floor(z / chunk_size.z) * chunk_size.z}; */
-  Vector3i chunk_position{};
+  const Vector3i chunk_position{std::floor(x / static_cast<float>(chunk_size.x)) * chunk_size.x,
+                                std::floor(y / static_cast<float>(chunk_size.y)) * chunk_size.y,
+                                std::floor(z / static_cast<float>(chunk_size.z)) * chunk_size.z};
+  /* Vector3i chunk_position{}; */
 
-  if (x >= 0)
-  {
-    chunk_position.x = std::floor(x / (float)chunk_size.x) * chunk_size.x;
-  }
-  else
-  {
-    chunk_position.x = std::ceil(x / (float)chunk_size.x) * chunk_size.x;
-  }
-  if (y >= 0)
-  {
-    chunk_position.y = std::floor(y / (float)chunk_size.y) * chunk_size.y;
-  }
-  else
-  {
-    chunk_position.y = std::ceil(y / (float)chunk_size.y) * chunk_size.y;
-  }
-  if (z >= 0)
-  {
-    chunk_position.z = std::floor(z / (float)chunk_size.z) * chunk_size.z;
-  }
-  else
-  {
-    chunk_position.z = std::ceil(z / (float)chunk_size.z) * chunk_size.z;
-  }
+  /* if (x >= 0) */
+  /* { */
+  /*   chunk_position.x = std::floor(x / (float)chunk_size.x) * chunk_size.x; */
+  /* } */
+  /* else */
+  /* { */
+  /*   chunk_position.x = std::ceil(x / (float)chunk_size.x) * chunk_size.x; */
+  /* } */
+  /* if (y >= 0) */
+  /* { */
+  /*   chunk_position.y = std::floor(y / (float)chunk_size.y) * chunk_size.y; */
+  /* } */
+  /* else */
+  /* { */
+  /*   chunk_position.y = std::ceil(y / (float)chunk_size.y) * chunk_size.y; */
+  /* } */
+  /* if (z >= 0) */
+  /* { */
+  /*   chunk_position.z = std::floor(z / (float)chunk_size.z) * chunk_size.z; */
+  /* } */
+  /* else */
+  /* { */
+  /*   chunk_position.z = std::ceil(z / (float)chunk_size.z) * chunk_size.z; */
+  /* } */
 
-  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](auto& chunk) {
-    return (chunk->position == chunk_position);
-  });
+  const auto chunk = std::find_if(
+      chunks.begin(), chunks.end(), [&chunk_position](auto& chunk) { return (chunk->position == chunk_position); });
 
   /* assert(chunk != chunks.end() && "Chunk should be already generated during update"); */
 
@@ -140,16 +178,12 @@ Chunk& ChunkManager::at(const int x, const int y, const int z) const
     return *(*chunk).get();
   }
 
-
   /* spdlog::warn("Should't be generating a chunk here"); */
 
   return ChunkManager::null;
 }
 
-Chunk& ChunkManager::at(const Vector3i& position) const
-{
-  return at(position.x, position.y, position.z);
-}
+Chunk& ChunkManager::at(const Vector3i& position) const { return at(position.x, position.y, position.z); }
 
 uint32_t ChunkManager::index_at(const int x, const int y, const int z) const
 {
@@ -166,10 +200,7 @@ uint32_t ChunkManager::index_at(const int x, const int y, const int z) const
   return chunks.size();
 }
 
-uint32_t ChunkManager::index_at(const Vector3i& position) const
-{
-  return index_at(position.x, position.y, position.z);
-}
+uint32_t ChunkManager::index_at(const Vector3i& position) const { return index_at(position.x, position.y, position.z); }
 
 bool ChunkManager::is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const
 {

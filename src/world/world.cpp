@@ -116,7 +116,8 @@ void World::load(const std::string& filepath)
 void World::set_terrain(const uint32_t tile_id, const int x, const int y, const int z)
 {
   auto& chunk = chunk_manager.at(x, y, z);
-  chunk.tiles.set(tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+  chunk.tiles.set(
+      tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
 void World::set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z)
@@ -155,7 +156,8 @@ void World::replace(const uint32_t from, const uint32_t to, const int x, const i
 uint32_t World::id_at(const int x, const int y, const int z) const
 {
   const auto& chunk = chunk_manager.at(x, y, z);
-  return chunk.tiles.id_at(std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+  return chunk.tiles.id_at(
+      std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
 const TileData& World::get(const int x, const int y, const int z) const
@@ -354,7 +356,8 @@ bool World::is_walkable(const int x, const int y, const int z) const
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
 {
-  /* if (position.x < 0 || position.x >= tiles.size.x || position.y < 0 || position.y >= tiles.size.y || position.z < 0 || */
+  /* if (position.x < 0 || position.x >= tiles.size.x || position.y < 0 || position.y >= tiles.size.y || position.z < 0
+   * || */
   /*     position.z >= tiles.size.z) */
   /* { */
   /*   return false; */

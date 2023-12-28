@@ -67,7 +67,7 @@ class Batch
     ColorIndex,
   };
 
-  static constexpr uint32_t m_max_quads = 20000;
+  static constexpr uint32_t m_max_quads = 40000;
   static constexpr uint32_t m_vertex_size = sizeof(VertexData);
   static constexpr uint32_t m_quad_size = 4 * m_vertex_size;
   static constexpr uint32_t m_buffer_size = m_max_quads * m_quad_size;

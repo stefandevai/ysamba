@@ -2,26 +2,33 @@
 
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 
 #include "./lib/fast_noise_lite.hpp"
 #include "core/random.hpp"
 
+double smoothstep(double edge0, double edge1, double x)
+{
+  x = std::clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  return x * x * (3 - 2 * x);
+}
+
 namespace dl
 {
-void MapGenerator::generate(const int seed, const Vector3i& offset )
+void MapGenerator::generate(const int seed, const Vector3i& offset)
 {
   // TEMP
   m_json.load("./data/world/map_generators/terrain.json");
   // TEMP
 
-  spdlog::info("=============================");
-  spdlog::info("= STARTING WORLD GENERATION =");
-  spdlog::info("=============================\n");
-  spdlog::info("SEED: {}", seed);
-  spdlog::info("WIDTH: {}", width);
-  spdlog::info("HEIGHT: {}\n", height);
+  /* spdlog::info("============================="); */
+  /* spdlog::info("= STARTING WORLD GENERATION ="); */
+  /* spdlog::info("=============================\n"); */
+  /* spdlog::info("SEED: {}", seed); */
+  /* spdlog::info("WIDTH: {}", width); */
+  /* spdlog::info("HEIGHT: {}\n", height); */
 
   std::vector<double> raw_height_map(width * height);
   tiles = std::vector<Cell>(width * height * depth);
@@ -29,7 +36,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset )
 
   auto start = std::chrono::high_resolution_clock::now();
 
-  spdlog::info("Generating silhouette...");
+  /* spdlog::info("Generating silhouette..."); */
 
   m_get_height_map(raw_height_map, seed, offset);
 
@@ -42,59 +49,59 @@ void MapGenerator::generate(const int seed, const Vector3i& offset )
 
       height_map[j * width + i] = k;
 
-      if (k < 2)
-      {
-        tiles[k * width * height + j * width + i].id = 1;
-      }
-      else
-      {
-        tiles[k * width * height + j * width + i].id = 2;
-      }
-
-      /* if (k == 0) */
+      /* if (k < 2) */
       /* { */
       /*   tiles[k * width * height + j * width + i].id = 1; */
       /* } */
-      /* else if (k == 1) */
+      /* else */
       /* { */
       /*   tiles[k * width * height + j * width + i].id = 2; */
       /* } */
-      /* else if (k == 2) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 3; */
-      /* } */
-      /* else if (k == 3) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 6; */
-      /* } */
-      /* else if (k == 4) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 12; */
-      /* } */
-      /* else if (k == 5) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 13; */
-      /* } */
-      /* else if (k == 6) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 14; */
-      /* } */
-      /* else if (k == 7) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 23; */
-      /* } */
-      /* else if (k == 8) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 15; */
-      /* } */
-      /* else if (k == 9) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 18; */
-      /* } */
-      /* else */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 19; */
-      /* } */
+
+      if (k == 0)
+      {
+        tiles[k * width * height + j * width + i].id = 1;
+      }
+      else if (k == 1)
+      {
+        tiles[k * width * height + j * width + i].id = 2;
+      }
+      else if (k == 2)
+      {
+        tiles[k * width * height + j * width + i].id = 3;
+      }
+      else if (k == 3)
+      {
+        tiles[k * width * height + j * width + i].id = 6;
+      }
+      else if (k == 4)
+      {
+        tiles[k * width * height + j * width + i].id = 12;
+      }
+      else if (k == 5)
+      {
+        tiles[k * width * height + j * width + i].id = 13;
+      }
+      else if (k == 6)
+      {
+        tiles[k * width * height + j * width + i].id = 14;
+      }
+      else if (k == 7)
+      {
+        tiles[k * width * height + j * width + i].id = 23;
+      }
+      else if (k == 8)
+      {
+        tiles[k * width * height + j * width + i].id = 15;
+      }
+      else if (k == 9)
+      {
+        tiles[k * width * height + j * width + i].id = 18;
+      }
+      else
+      {
+        tiles[k * width * height + j * width + i].id = 19;
+      }
 
       /* else */
       /* { */
@@ -116,7 +123,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset )
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+  /* spdlog::info("World generation finished! It took {} milliseconds", duration.count()); */
 }
 
 void MapGenerator::set_size(const Vector3i& size)
@@ -153,21 +160,36 @@ void MapGenerator::m_get_height_map(std::vector<double>& height_values, const in
     for (int i = 0; i < width; ++i)
     {
       const float gradient = m_get_rectangle_gradient_value(i, j);
-      /* const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i), static_cast<float>(offset.y) + static_cast<float>(j)) - gradient; */
-      const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i), static_cast<float>(offset.y) + static_cast<float>(j));
+      /* const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i),
+       * static_cast<float>(offset.y) + static_cast<float>(j)) - gradient; */
+      const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i),
+                                               static_cast<float>(offset.y) + static_cast<float>(j));
 
       height_values[j * width + i] = noise_value;
       max_value = std::max(max_value, noise_value);
       min_value = std::min(min_value, noise_value);
+      /* printf("%.1f ", noise_value); */
     }
+    /* printf("\n"); */
   }
 
-  const double distance = max_value - min_value;
+  /* const double distance = max_value - min_value; */
+  const double distance = 0.9;
+  /* spdlog::debug("DISTANCE: ({}, {}) {}", min_value, max_value, distance); */
+  /* printf("\n\n"); */
 
   // Normalize values between 0.0 and 1.0
   for (size_t i = 0; i < height_values.size(); ++i)
   {
-    height_values[i] = (height_values[i] - min_value) / distance;
+    /* height_values[i] = (height_values[i] - min_value) / distance; */
+    if (height_values[i] < 0.0)
+    {
+      height_values[i] = 0.0;
+    }
+    if (height_values[i] > 1.0)
+    {
+      height_values[i] = 1.0;
+    }
   }
 }
 

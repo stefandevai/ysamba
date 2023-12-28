@@ -85,14 +85,16 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
+  if (m_camera.dirty)
+  {
+    const auto& camera_position = m_camera.get_position_in_tiles();
+    const auto& camera_size = m_camera.get_size_in_tiles();
+    m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
+  }
   m_camera.update(delta);
 
   /* const auto& mouse_position = m_input_manager.get_mouse_tile_position(m_camera); */
-  const auto& camera_position = m_camera.get_position_in_tiles();
-  const auto& camera_size = m_camera.get_size_in_tiles();
   /* const auto& grid_size = m_world.get_tile_size(); */
-
-  m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
 
   /* for (const auto& chunk : m_world.chunk_manager.chunks) */
   /* { */
@@ -129,8 +131,10 @@ void Gameplay::update()
   /*     /1* spdlog::debug("POS X {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z); *1/ */
   /*     /1* puts("\n"); *1/ */
   /*     m_registry.emplace<Rectangle>( */
-  /*         entity, m_world.chunk_manager.chunk_size.x * grid_size.x, m_world.chunk_manager.chunk_size.y * grid_size.y, color); */
-  /*     /1* m_registry.emplace<Position>(entity, chunk->position.x * grid_size.x, chunk->position.y * grid_size.x, *1/ */
+  /*         entity, m_world.chunk_manager.chunk_size.x * grid_size.x, m_world.chunk_manager.chunk_size.y * grid_size.y,
+   * color); */
+  /*     /1* m_registry.emplace<Position>(entity, chunk->position.x * grid_size.x, chunk->position.y * grid_size.x, *1/
+   */
   /*     /1*  chunk->position.z * grid_size.x); *1/ */
   /*     m_registry.emplace<Position>(entity, chunk->position.x, chunk->position.y, chunk->position.z); */
   /*     chunk_quads.push_back(entity); */
