@@ -27,8 +27,6 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
 {
 }
 
-bool first_time = false;
-
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
@@ -37,10 +35,8 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   const auto& tile_size = m_world.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& chunk_size = m_world.chunk_manager.chunk_size;
-  /* const auto& world_size = m_world.tiles.size; */
 
   {
-    auto rendered_n = 0;
     const auto first_chunk_position =
         m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y, 0});
 
@@ -51,7 +47,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       {
         const auto& chunk = m_world.chunk_manager.at(i, j, 0);
 
-        if (chunk.tiles.height_map.size() < chunk_size.x * chunk_size.y)
+        if (chunk.tiles.height_map.empty())
         {
           continue;
         }
@@ -98,59 +94,20 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
                 continue;
               }
 
-              ++rendered_n;
               m_render_tile(chunk, terrain_id, tile_size, i + local_i, j + local_j, z);
             }
           }
         }
       }
     }
-
-    /* if (rendered_n > 18000) */
-    /* { */
-    /* spdlog::debug("rendered {}", rendered_n); */
-    /* } */
   }
 
-  // Render tiles with y coordinate within the camera frustum
-  /* for (int j = -m_frustum_tile_padding; j <= camera_size.y; ++j) */
-  /* { */
-  /*   for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i) */
-  /*   { */
-  /*     const auto index_x = i + camera_position.x; */
-  /*     const auto index_y = j + camera_position.y; */
-
-  /*     const auto height = m_world.get_elevation(index_x, index_y); */
-
-  /*     const auto& chunk = m_world.chunk_manager.at(index_x, index_y, 0); */
-
-  /*     for (auto z = 0; z <= height; ++z) */
-  /*     { */
-  /*       if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, */
-  /*                                  std::abs(index_x - chunk.position.x), */
-  /*                                  std::abs(index_y - chunk.position.y), */
-  /*                                  std::abs(z - chunk.position.z))) */
-  /*       { */
-  /*         continue; */
-  /*       } */
-
-  /*       const auto& terrain = m_world.get_terrain(index_x, index_y, z); */
-
-  /*       if (terrain.id == 0) */
-  /*       { */
-  /*         continue; */
-  /*       } */
-
-  /*       m_render_tile(terrain.id, camera_position, tile_size, i, j, z); */
-
-  /*     /1*   /2* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); *2/ *1/ */
-  /*     /1*   /2* m_render_tile(over_terrain.id, camera_position, tile_size, i, j, z, 1); *2/ *1/ */
-  /*     } */
-  /*   } */
-  /* } */
-
+  // Render visible tiles with y coordinate to the bottom of the camera frustum
+  // Each z level translates to tile_size.y increase in height in clip space,
+  // therefore the highest y that can appear on the screen is
+  // camera_position.y + camera_size.y + world_size.z.
   // Loop through chunks below the camera bottom to render tiles in other chunks
-  // that are high enough to be viewed from the current camera position
+  // that are high enough to be viewed from the current camera position.
   const auto first_chunk_position =
       m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y + camera_size.y + 1, 0});
   const auto last_chunk_position = m_world.chunk_manager.world_to_chunk(
@@ -161,7 +118,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
     {
       const auto& chunk = m_world.chunk_manager.at(i, j, 0);
 
-      if (chunk.tiles.height_map.size() < chunk_size.x * chunk_size.y)
+      if (chunk.tiles.height_map.empty())
       {
         continue;
       }
@@ -186,11 +143,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       {
         upper_bound_i = chunk_size.x - ((i + chunk_size.x) - (camera_position.x + camera_size.x));
       }
-
-      /* spdlog::debug("Camera {}", camera_position.y); */
-      /* spdlog::debug("Chunk {} {}", i, j); */
-      /* spdlog::debug("BOUNDS L {} U {}", lower_bound_j, upper_bound_j); */
-      /* printf("\n"); */
 
       for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)
       {
@@ -228,173 +180,58 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
     }
   }
 
-  /* spdlog::debug("FC {} {} {}", first_chunk_position.x, first_chunk_position.y, first_chunk_position.z); */
+  {
+    auto items_view = registry.view<const Position, const Visibility>();
 
-  /*   bool rendered = false; */
-  /*   int min_y = 999999; */
-  /*   int max_y = 0; */
-  /*   const auto camera_bottom = camera_position.y + camera_size.y; */
+    for (auto entity : items_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& visibility = registry.get<Visibility>(entity);
 
-  /*   for (int i = first_chunk_position.x; i < camera_position.x + camera_size.x; i += chunk_size.y) */
-  /*   { */
-  /*     const auto& chunk = m_world.chunk_manager.at(i, first_chunk_position.y, 0); */
+      if (visibility.sprite == nullptr)
+      {
+        visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame);
+      }
+      if (visibility.sprite->texture == nullptr)
+      {
+        visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
 
-  /*     if (chunk.tiles.height_map.size() < chunk_size.x * chunk_size.y) */
-  /*     { */
-  /*       continue; */
-  /*     } */
+        // Set specific frame according to the texture data loaded in a separated json file.
+        // This allows flexibility by separating the texture frames from game ids.
+        if (visibility.frame_id > 0 && !visibility.frame_type.empty())
+        {
+          const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
+          visibility.sprite->set_frame(frame_data.frame);
+          visibility.sprite->frame_angle = frame_data.angle;
+        }
+      }
 
-  /*     for (int local_j = 0; local_j < chunk_size.x; ++local_j) */
-  /*     { */
-  /*     for (int offset = chunk_size.z - 1; offset > 0; --offset) */
-  /*     { */
-  /*       for (int local_i = 0; local_i < chunk_size.x; ++local_i) */
-  /*       { */
-  /*         const auto world_y = chunk.position.y + offset; */
+      const auto sprite_size = visibility.sprite->get_size();
+      m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
+    }
+  }
 
-  /*         if (world_y < camera_position.y + camera_size.y) */
-  /*         { */
-  /*           continue; */
-  /*         } */
+  {
+    auto quad_view = registry.view<const Position, const Rectangle>();
 
-  /*         const auto height = chunk.tiles.height_map[local_i + offset * chunk_size.x]; */
+    for (auto entity : quad_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& rectangle = registry.get<Rectangle>(entity);
 
-  /*         if (height < offset) */
-  /*         { */
-  /*           continue; */
-  /*         } */
+      m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
+    }
 
-  /*         for (auto z = offset; z <= height; ++z) */
-  /*         { */
-  /*           if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, local_i, offset, z)) */
-  /*           { */
-  /*             continue; */
-  /*           } */
+    auto text_view = registry.view<const Text, const Position>();
 
-  /*           const auto& terrain_id = chunk.tiles.id_at(local_i, offset, z); */
+    for (auto entity : text_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& text = registry.get<Text>(entity);
 
-  /*           if (terrain_id == 0) */
-  /*           { */
-  /*             continue; */
-  /*           } */
-  /*           min_y = std::min(camera_size.y + offset + camera_position.y, min_y); */
-  /*           max_y = std::max(camera_size.y + offset + camera_position.y, max_y); */
-
-  /*           /1* spdlog::debug("POS {} {}", i + local_i, camera_position.y + offset); *1/ */
-
-  /*           m_render_tile(terrain_id, tile_size, i + local_i, chunk.position.y + offset, z); */
-  /*         } */
-  /*       } */
-  /*     } */
-  /*   } */
-  /* spdlog::debug("MINMAX {} {}", min_y, max_y); */
-  /* printf("\n"); */
-
-  /* // Render visible tiles with y coordinate to the bottom of the camera frustum */
-  /* // Each z level translates to tile_size.y increase in height in clip space, */
-  /* // therefore the highest y that can appear on the screen is */
-  /* // camera_position.y + camera_size.y + world_size.z */
-  /* /1* for (int offset = world_size.z; offset > 0; --offset) *1/ */
-  /* // TODO: Replace with world max elevation */
-  /* for (int offset = 9; offset > 0; --offset) */
-  /* { */
-  /*   for (int i = -m_frustum_tile_padding; i < camera_size.x + m_frustum_tile_padding; ++i) */
-  /*   { */
-  /*     const auto index_x = i + camera_position.x; */
-  /*     const auto view_y = offset + camera_size.y; */
-  /*     const auto index_y = view_y + camera_position.y; */
-
-  /*     const auto& chunk = m_world.chunk_manager.at(index_x, index_y, 0); */
-  /*     const auto height = m_world.get_elevation(index_x, index_y); */
-
-  /*     // If the height is below the offset, we know */
-  /*     // it's not high enough to have its sprite shifted */
-  /*     // to the frustum */
-  /*     if (height < offset) */
-  /*     { */
-  /*       continue; */
-  /*     } */
-
-  /*     // Render sprites only from the maximum viewed height to the actual height */
-  /*     for (auto z = offset; z <= height; ++z) */
-  /*     { */
-  /*       if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, */
-  /*                                  std::abs(index_x - chunk.position.x), */
-  /*                                  std::abs(index_y - chunk.position.y), */
-  /*                                  std::abs(z - chunk.position.z))) */
-  /*       { */
-  /*         continue; */
-  /*       } */
-
-  /*       const auto& terrain = m_world.get_terrain(index_x, index_y, z); */
-
-  /*       if (terrain.id == 0) */
-  /*       { */
-  /*         continue; */
-  /*       } */
-
-  /*       m_render_tile(terrain.id, camera_position, tile_size, i, view_y, z); */
-
-  /*       /1* const auto& over_terrain = m_world.get_over_terrain(index_x, index_y, z); *1/ */
-  /*       /1* m_render_tile(over_terrain.id, camera_position, tile_size, i, view_y, z, 1); *1/ */
-  /*     } */
-  /*   } */
-  /* } */
-
-  /* { */
-  /*   auto items_view = registry.view<const Position, const Visibility>(); */
-
-  /*   for (auto entity : items_view) */
-  /*   { */
-  /*     const auto& position = registry.get<Position>(entity); */
-  /*     auto& visibility = registry.get<Visibility>(entity); */
-
-  /*     if (visibility.sprite == nullptr) */
-  /*     { */
-  /*       visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame); */
-  /*     } */
-  /*     if (visibility.sprite->texture == nullptr) */
-  /*     { */
-  /*       visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id); */
-
-  /*       // Set specific frame according to the texture data loaded in a separated json file. */
-  /*       // This allows flexibility by separating the texture frames from game ids. */
-  /*       if (visibility.frame_id > 0 && !visibility.frame_type.empty()) */
-  /*       { */
-  /*         const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id,
-   * visibility.frame_type); */
-  /*         visibility.sprite->set_frame(frame_data.frame); */
-  /*         visibility.sprite->frame_angle = frame_data.angle; */
-  /*       } */
-  /*     } */
-
-  /*     const auto sprite_size = visibility.sprite->get_size(); */
-  /*     m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
-   */
-  /*   } */
-  /* } */
-
-  /* { */
-  /*   auto quad_view = registry.view<const Position, const Rectangle>(); */
-
-  /*   for (auto entity : quad_view) */
-  /*   { */
-  /*     const auto& position = registry.get<Position>(entity); */
-  /*     auto& rectangle = registry.get<Rectangle>(entity); */
-
-  /*     m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index); */
-  /*   } */
-
-  /*   auto text_view = registry.view<const Text, const Position>(); */
-
-  /*   for (auto entity : text_view) */
-  /*   { */
-  /*     const auto& position = registry.get<Position>(entity); */
-  /*     auto& text = registry.get<Text>(entity); */
-
-  /*     m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3); */
-  /*   } */
-  /* } */
+      m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
+    }
+  }
 }
 
 template <typename T>
