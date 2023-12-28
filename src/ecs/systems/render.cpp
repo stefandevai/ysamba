@@ -180,60 +180,58 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
     }
   }
 
-  /* { */
-  /*   auto items_view = registry.view<const Position, const Visibility>(); */
+  {
+    auto items_view = registry.view<const Position, const Visibility>();
 
-  /*   for (auto entity : items_view) */
-  /*   { */
-  /*     const auto& position = registry.get<Position>(entity); */
-  /*     auto& visibility = registry.get<Visibility>(entity); */
+    for (auto entity : items_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& visibility = registry.get<Visibility>(entity);
 
-  /*     if (visibility.sprite == nullptr) */
-  /*     { */
-  /*       visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame); */
-  /*     } */
-  /*     if (visibility.sprite->texture == nullptr) */
-  /*     { */
-  /*       visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id); */
+      if (visibility.sprite == nullptr)
+      {
+        visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame);
+      }
+      if (visibility.sprite->texture == nullptr)
+      {
+        visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
 
-  /*       // Set specific frame according to the texture data loaded in a separated json file. */
-  /*       // This allows flexibility by separating the texture frames from game ids. */
-  /*       if (visibility.frame_id > 0 && !visibility.frame_type.empty()) */
-  /*       { */
-  /*         const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id,
-   * visibility.frame_type); */
-  /*         visibility.sprite->set_frame(frame_data.frame); */
-  /*         visibility.sprite->frame_angle = frame_data.angle; */
-  /*       } */
-  /*     } */
+        // Set specific frame according to the texture data loaded in a separated json file.
+        // This allows flexibility by separating the texture frames from game ids.
+        if (visibility.frame_id > 0 && !visibility.frame_type.empty())
+        {
+          const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
+          visibility.sprite->set_frame(frame_data.frame);
+          visibility.sprite->frame_angle = frame_data.angle;
+        }
+      }
 
-  /*     const auto sprite_size = visibility.sprite->get_size(); */
-  /*     m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
-   */
-  /*   } */
-  /* } */
+      const auto sprite_size = visibility.sprite->get_size();
+      m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
+    }
+  }
 
-  /* { */
-  /*   auto quad_view = registry.view<const Position, const Rectangle>(); */
+  {
+    auto quad_view = registry.view<const Position, const Rectangle>();
 
-  /*   for (auto entity : quad_view) */
-  /*   { */
-  /*     const auto& position = registry.get<Position>(entity); */
-  /*     auto& rectangle = registry.get<Rectangle>(entity); */
+    for (auto entity : quad_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& rectangle = registry.get<Rectangle>(entity);
 
-  /*     m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index); */
-  /*   } */
+      m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
+    }
 
-  /*   auto text_view = registry.view<const Text, const Position>(); */
+    auto text_view = registry.view<const Text, const Position>();
 
-  /*   for (auto entity : text_view) */
-  /*   { */
-  /*     const auto& position = registry.get<Position>(entity); */
-  /*     auto& text = registry.get<Text>(entity); */
+    for (auto entity : text_view)
+    {
+      const auto& position = registry.get<Position>(entity);
+      auto& text = registry.get<Text>(entity);
 
-  /*     m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3); */
-  /*   } */
-  /* } */
+      m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
+    }
+  }
 }
 
 template <typename T>
