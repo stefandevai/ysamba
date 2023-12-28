@@ -58,11 +58,28 @@ void Game::run()
   {
     m_clock.tick();
 
+    auto start_update = std::chrono::high_resolution_clock::now();
+
     m_input_manager.update();
     m_scene_manager.update();
+    auto stop_update = std::chrono::high_resolution_clock::now();
 
+    auto start_batching = std::chrono::high_resolution_clock::now();
     m_scene_manager.render();
+    auto stop_batching = std::chrono::high_resolution_clock::now();
+    auto start_render = std::chrono::high_resolution_clock::now();
     m_display.render();
+    auto stop_render = std::chrono::high_resolution_clock::now();
+
+    if (m_clock.frame % 20 == 0)
+    {
+      auto duration_update = std::chrono::duration_cast<std::chrono::milliseconds>(stop_update - start_update);
+      auto duration_render = std::chrono::duration_cast<std::chrono::milliseconds>(stop_render - start_render);
+      auto duration_batching = std::chrono::duration_cast<std::chrono::milliseconds>(stop_batching - start_batching);
+      spdlog::debug("Update took: {}ms", duration_update.count());
+      spdlog::debug("Batching took: {}ms", duration_batching.count());
+      spdlog::debug("Render took: {}ms", duration_render.count());
+    }
   }
 }
 }  // namespace dl

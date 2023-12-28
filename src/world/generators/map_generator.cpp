@@ -20,7 +20,7 @@ namespace dl
 void MapGenerator::generate(const int seed, const Vector3i& offset)
 {
   // TEMP
-  m_json.load("./data/world/map_generators/terrain.json");
+  /* m_json.load("./data/world/map_generators/terrain.json"); */
   // TEMP
 
   /* spdlog::info("============================="); */
@@ -123,7 +123,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-  /* spdlog::info("World generation finished! It took {} milliseconds", duration.count()); */
+  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 }
 
 void MapGenerator::set_size(const Vector3i& size)
@@ -159,26 +159,18 @@ void MapGenerator::m_get_height_map(std::vector<double>& height_values, const in
   {
     for (int i = 0; i < width; ++i)
     {
-      const float gradient = m_get_rectangle_gradient_value(i, j);
-      /* const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i),
-       * static_cast<float>(offset.y) + static_cast<float>(j)) - gradient; */
-      const float noise_value = noise.GetNoise(static_cast<float>(offset.x) + static_cast<float>(i),
-                                               static_cast<float>(offset.y) + static_cast<float>(j));
+      /* const float gradient = m_get_rectangle_gradient_value(i, j); */
+      const float noise_value = noise.GetNoise(static_cast<float>(offset.x + i), static_cast<float>(offset.y + j));
 
       height_values[j * width + i] = noise_value;
       max_value = std::max(max_value, noise_value);
       min_value = std::min(min_value, noise_value);
-      /* printf("%.1f ", noise_value); */
     }
-    /* printf("\n"); */
   }
 
   /* const double distance = max_value - min_value; */
-  const double distance = 0.9;
-  /* spdlog::debug("DISTANCE: ({}, {}) {}", min_value, max_value, distance); */
-  /* printf("\n\n"); */
+  /* const double distance = 0.9; */
 
-  // Normalize values between 0.0 and 1.0
   for (size_t i = 0; i < height_values.size(); ++i)
   {
     /* height_values[i] = (height_values[i] - min_value) / distance; */

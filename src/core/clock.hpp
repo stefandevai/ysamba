@@ -6,6 +6,7 @@ namespace dl
 {
 struct Clock
 {
+  uint32_t frame = 0;
   uint32_t last_tick_time = 0;
   uint32_t delta_ms = 0;
   double delta = 0;
@@ -16,6 +17,7 @@ struct Clock
     delta_ms = tick_time - last_tick_time;
     delta = delta_ms / 1000.0;
     last_tick_time = tick_time;
+    ++frame;
   }
 };
 }  // namespace dl

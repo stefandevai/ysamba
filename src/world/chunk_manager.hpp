@@ -31,6 +31,7 @@ class ChunkManager
   Chunk& at(const Vector3i& position) const;
   uint32_t index_at(const int x, const int y, const int z) const;
   uint32_t index_at(const Vector3i& position) const;
+  Vector3i world_to_chunk(const Vector3i& position) const;
 
   bool is_loaded(const Vector3i& position) const;
   bool is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;
