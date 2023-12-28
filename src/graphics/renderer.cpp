@@ -79,7 +79,7 @@ void Renderer::batch(const uint32_t batch_id, const Quad* quad, const double x, 
   m_batches.at(batch_id)->quad(quad, x, y, z);
 }
 
-void Renderer::render(const glm::mat4& projection_matrix)
+void Renderer::render()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -124,12 +124,12 @@ void Renderer::render(const glm::mat4& projection_matrix)
     /* } */
 
     batch->shader->use();
-    batch->shader->set_mat_4("mvp", projection_matrix * m_default_view_matrix);
+    batch->shader->set_mat_4("view_projection", batch->peek_matrix());
 
     batch->render();
   }
 
-  glDisable(GL_SCISSOR_TEST);
+  /* glDisable(GL_SCISSOR_TEST); */
 }
 
 void Renderer::push_matrix(const uint32_t batch_id, const glm::mat4& matrix)

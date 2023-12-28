@@ -200,11 +200,11 @@ void Gameplay::render()
     return;
   }
 
-  m_renderer.push_matrix("world"_hs, m_camera.get_view_matrix());
+  m_renderer.push_matrix("world"_hs, m_camera.view_projection_matrix);
   m_render_system.render(m_registry, m_camera);
-  m_renderer.pop_matrix("world"_hs);
-
   m_ui_manager.render();
+  m_renderer.render();
+  m_renderer.pop_matrix("world"_hs);
 }
 
 void Gameplay::save_game() { serialization::save_game(m_world, m_registry); }

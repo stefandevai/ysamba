@@ -71,7 +71,10 @@ void HomeMenu::render()
     return;
   }
 
+  m_renderer.push_matrix("text"_hs, m_camera.view_projection_matrix);
   m_renderer.batch("text"_hs, m_game_title, 60, 60, 0);
   m_renderer.batch("text"_hs, m_instructions, 60, 108, 0);
+  m_renderer.render();
+  m_renderer.pop_matrix("text"_hs);
 }
 }  // namespace dl

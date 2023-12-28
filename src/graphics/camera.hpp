@@ -31,6 +31,7 @@ class Camera
   Vector2i position_in_tiles{0, 0};
   glm::mat4 projection_matrix = glm::mat4{1.f};
   glm::mat4 view_matrix = glm::mat4{1.f};
+  glm::mat4 view_projection_matrix = glm::mat4{1.f};
   bool dirty = true;
 
   Camera() = default;
@@ -66,7 +67,7 @@ class Camera
   float m_frustrum_top = 0.0f;
   float m_near = 1.0f;
   float m_far = 2000.0f;
-  double m_camera_z = 600.0;
+  double m_camera_z = 1000.0;
   glm::vec3 m_position{0.0, m_camera_z, m_camera_z};
   glm::vec3 m_center =
       m_position + glm::vec3{glm::normalize(glm::vec3{std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch)),

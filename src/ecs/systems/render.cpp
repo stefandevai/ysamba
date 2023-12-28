@@ -146,9 +146,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
       for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)
       {
-        // Since we are checking the height of tiles below the camera to be visible,
-        // it must have at least 1 height, that's why we add it
-        const auto offset = (j + local_j) - (camera_position.y + camera_size.y) + 1;
+        const auto offset = (j + local_j) - (camera_position.y + camera_size.y);
 
         for (int local_i = lower_bound_i; local_i < upper_bound_i; ++local_i)
         {

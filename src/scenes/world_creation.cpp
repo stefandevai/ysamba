@@ -95,7 +95,10 @@ void WorldCreation::render()
     return;
   }
 
+  m_renderer.push_matrix("gui"_hs, m_camera.view_projection_matrix);
   m_renderer.batch("gui"_hs, m_world_sprite.get(), 0, 0, 0);
+  m_renderer.render();
+  m_renderer.pop_matrix("gui"_hs);
 }
 
 /* void WorldCreation::screenshot(tcod::Context& context, TCOD_Console& console, const std::string& filename) */

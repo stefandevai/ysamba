@@ -30,6 +30,8 @@ void Camera::update(const float dt)
     m_calculate_view_matrix();
     m_calculate_position();
     m_calculate_grid_size();
+
+    view_projection_matrix = projection_matrix * view_matrix;
     dirty = false;
   }
 }
@@ -168,6 +170,7 @@ void Camera::m_calculate_center()
 
 void Camera::m_calculate_view_matrix()
 {
+  /* view_matrix = glm::lookAt(glm::vec3{0.f, 0.f, 500.f}, glm::vec3{0.f, 0.f, -1.f}, glm::vec3{0.0f, 1.0f, 0.0f}); */
   if (m_resize_view_matrix)
   {
     view_matrix = glm::lookAt(m_position, m_center, m_up);

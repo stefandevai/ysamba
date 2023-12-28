@@ -53,7 +53,7 @@ void SceneManager::render()
 
   m_check_window_size();
   current_scene->render();
-  current_scene->render_call();
+  /* current_scene->render_call(); */
 }
 
 void SceneManager::m_check_window_size()
