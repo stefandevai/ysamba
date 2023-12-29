@@ -36,7 +36,8 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
     size.x = m_world_texture->get_frame_width();
     size.y = m_world_texture->get_frame_height();
     auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame);
-    m_tiles.insert({tile_data.first, Tile{world_texture_ptr, &frame_data, std::move(size), std::move(uv_coordinates)}});
+    m_tiles.insert(
+        {tile_data.first, TileRenderData{world_texture_ptr, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
 }
 

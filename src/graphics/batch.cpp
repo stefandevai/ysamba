@@ -13,7 +13,7 @@
 #include "./sprite.hpp"
 #include "./text.hpp"
 #include "./texture.hpp"
-#include "world/tile.hpp"
+#include "./tile_render_data.hpp"
 
 namespace dl
 {
@@ -139,7 +139,7 @@ const glm::mat4 Batch::pop_matrix()
 
 const glm::mat4& Batch::peek_matrix() { return m_matrix; }
 
-void Batch::tile(const Tile& tile, const double x, const double y, const double z)
+void Batch::tile(const TileRenderData& tile, const double x, const double y, const double z)
 {
   /* assert(index_count <= m_indices_size); */
 

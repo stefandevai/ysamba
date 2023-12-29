@@ -21,7 +21,7 @@ class MultiSprite;
 struct Quad;
 class Text;
 struct NinePatch;
-struct Tile;
+struct TileRenderData;
 
 class Batch
 {
@@ -46,7 +46,7 @@ class Batch
   const glm::mat4& peek_matrix();
   void emplace(Sprite* sprite, const double x, const double y, const double z);
   void emplace(const MultiSprite* sprite, const double x, const double y, const double z);
-  void tile(const Tile& tile, const double x, const double y, const double z);
+  void tile(const TileRenderData& tile, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);

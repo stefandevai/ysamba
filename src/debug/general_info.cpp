@@ -12,6 +12,10 @@
 #include "imgui.h"
 #include "implot.h"
 
+#if defined(__APPLE__) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__linux__)
+#define DL_HAS_SUPPORTED_PLATFORM_FOR_USAGE
+#endif
+
 namespace
 {
 struct ScrollingBuffer
@@ -51,6 +55,7 @@ struct ScrollingBuffer
   }
 };
 
+#ifdef __APPLE__
 float get_cpu_usage_macos()
 {
   kern_return_t kr;
@@ -135,6 +140,7 @@ float get_ram_usage_macos()
 
   return t_info.resident_size / 1000000.0f;
 }
+#endif
 }  // namespace
 
 namespace dl
@@ -184,7 +190,9 @@ void GeneralInfo::update()
     ImGui::Text("FPS: %.1f", static_cast<float>(1.0 / m_game_context.clock->delta));
     ImGui::Text("MS: %.3f", static_cast<float>(m_game_context.clock->delta));
 
+#ifdef DL_HAS_SUPPORTED_PLATFORM_FOR_USAGE
     m_render_usage_info();
+#endif
   }
 
   /* ImPlot::ShowDemoWindow(); */
@@ -192,6 +200,7 @@ void GeneralInfo::update()
   ImGui::End();
 }
 
+#ifdef DL_HAS_SUPPORTED_PLATFORM_FOR_USAGE
 void GeneralInfo::m_render_usage_info()
 {
   static float ram_usage = 0.0f;
@@ -203,8 +212,10 @@ void GeneralInfo::m_render_usage_info()
 
   if (elapsed > 500)
   {
+#ifdef __APPLE__
     cpu_usage = get_cpu_usage_macos();
     ram_usage = get_ram_usage_macos();
+#endif
     last = now;
   }
 
@@ -243,5 +254,6 @@ void GeneralInfo::m_render_usage_info()
     ImPlot::PopStyleVar(3);
   }
 }
+#endif
 
 }  // namespace dl

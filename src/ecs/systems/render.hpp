@@ -3,7 +3,7 @@
 #include <entt/entity/fwd.hpp>
 #include <unordered_map>
 
-#include "world/tile.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -26,7 +26,7 @@ class RenderSystem
   Renderer& m_renderer;
   Batch* m_batch = nullptr;
   World& m_world;
-  std::unordered_map<uint32_t, Tile> m_tiles{};
+  std::unordered_map<uint32_t, TileRenderData> m_tiles{};
   const std::string& m_world_texture_id;
   const std::shared_ptr<Texture> m_world_texture = nullptr;
   static constexpr int m_frustum_tile_padding = 1;

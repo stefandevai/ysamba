@@ -8,7 +8,7 @@ namespace dl
 class Texture;
 struct FrameData;
 
-struct Tile
+struct TileRenderData
 {
   Texture* texture;
   const FrameData* frame_data;
