@@ -9,12 +9,9 @@
 #include <chrono>
 
 #include "core/game_context.hpp"
+#include "definitions.hpp"
 #include "imgui.h"
 #include "implot.h"
-
-#if defined(__APPLE__) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__linux__)
-#define DL_HAS_SUPPORTED_PLATFORM_FOR_USAGE
-#endif
 
 namespace
 {

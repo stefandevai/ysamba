@@ -85,13 +85,14 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
-  if (m_camera.dirty)
-  {
-    const auto& camera_position = m_camera.get_position_in_tiles();
-    const auto& camera_size = m_camera.get_size_in_tiles();
-    m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
-  }
+  // TODO: Add event emmiter on camera class to notify when it is dirty
+  /* if (m_camera.dirty) */
+  /* { */
+  /* } */
   m_camera.update(delta);
+  const auto& camera_position = m_camera.get_position_in_tiles();
+  const auto& camera_size = m_camera.get_size_in_tiles();
+  m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
 
   /* const auto& mouse_position = m_input_manager.get_mouse_tile_position(m_camera); */
   /* const auto& grid_size = m_world.get_tile_size(); */

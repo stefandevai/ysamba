@@ -279,3 +279,72 @@ MS improved 89% from start
 [2023-12-29 08:58:46.897] [debug] Update took: 0ms
 [2023-12-29 08:58:46.897] [debug] Batching took: 0ms
 [2023-12-29 08:58:46.897] [debug] Render took: 16ms
+
+===============================================================
+
+Compiling with -O3
+Zoom = 0.5
+
+[2023-12-29 09:29:00.040] [debug] Update took: 0ms
+[2023-12-29 09:29:00.040] [debug] Batching took: 2ms
+[2023-12-29 09:29:00.040] [debug] Render took: 13ms
+[2023-12-29 09:29:00.373] [debug] Update took: 0ms
+[2023-12-29 09:29:00.373] [debug] Batching took: 2ms
+[2023-12-29 09:29:00.373] [debug] Render took: 13ms
+[2023-12-29 09:29:00.705] [debug] Update took: 0ms
+[2023-12-29 09:29:00.705] [debug] Batching took: 2ms
+[2023-12-29 09:29:00.705] [debug] Render took: 14ms
+[2023-12-29 09:29:01.037] [debug] Update took: 0ms
+[2023-12-29 09:29:01.037] [debug] Batching took: 2ms
+[2023-12-29 09:29:01.037] [debug] Render took: 12ms
+[2023-12-29 09:29:01.371] [debug] Update took: 0ms
+[2023-12-29 09:29:01.371] [debug] Batching took: 2ms
+[2023-12-29 09:29:01.371] [debug] Render took: 13ms
+[2023-12-29 09:29:01.703] [debug] Update took: 0ms
+[2023-12-29 09:29:01.703] [debug] Batching took: 2ms
+[2023-12-29 09:29:01.703] [debug] Render took: 13ms
+[2023-12-29 09:29:02.035] [debug] Update took: 0ms
+[2023-12-29 09:29:02.035] [debug] Batching took: 2ms
+[2023-12-29 09:29:02.035] [debug] Render took: 13ms
+[2023-12-29 09:29:02.368] [debug] Update took: 0ms
+[2023-12-29 09:29:02.368] [debug] Batching took: 2ms
+[2023-12-29 09:29:02.368] [debug] Render took: 13ms
+[2023-12-29 09:29:02.701] [debug] Update took: 0ms
+[2023-12-29 09:29:02.701] [debug] Batching took: 2ms
+[2023-12-29 09:29:02.701] [debug] Render took: 13ms
+[2023-12-29 09:29:03.033] [debug] Update took: 0ms
+[2023-12-29 09:29:03.033] [debug] Batching took: 2ms
+[2023-12-29 09:29:03.033] [debug] Render took: 13ms
+[2023-12-29 09:29:03.366] [debug] Update took: 0ms
+[2023-12-29 09:29:03.366] [debug] Batching took: 2ms
+[2023-12-29 09:29:03.366] [debug] Render took: 13ms
+[2023-12-29 09:29:03.698] [debug] Update took: 0ms
+[2023-12-29 09:29:03.698] [debug] Batching took: 2ms
+[2023-12-29 09:29:03.698] [debug] Render took: 13ms
+[2023-12-29 09:29:04.031] [debug] Update took: 0ms
+[2023-12-29 09:29:04.031] [debug] Batching took: 2ms
+[2023-12-29 09:29:04.031] [debug] Render took: 13ms
+[2023-12-29 09:29:04.363] [debug] Update took: 0ms
+[2023-12-29 09:29:04.363] [debug] Batching took: 2ms
+[2023-12-29 09:29:04.363] [debug] Render took: 13ms
+[2023-12-29 09:29:04.696] [debug] Update took: 0ms
+[2023-12-29 09:29:04.696] [debug] Batching took: 2ms
+[2023-12-29 09:29:04.696] [debug] Render took: 13ms
+[2023-12-29 09:29:05.028] [debug] Update took: 0ms
+[2023-12-29 09:29:05.029] [debug] Batching took: 2ms
+[2023-12-29 09:29:05.029] [debug] Render took: 13ms
+[2023-12-29 09:29:05.361] [debug] Update took: 0ms
+[2023-12-29 09:29:05.361] [debug] Batching took: 2ms
+[2023-12-29 09:29:05.361] [debug] Render took: 13ms
+[2023-12-29 09:29:05.694] [debug] Update took: 0ms
+[2023-12-29 09:29:05.694] [debug] Batching took: 2ms
+[2023-12-29 09:29:05.694] [debug] Render took: 13ms
+[2023-12-29 09:29:06.026] [debug] Update took: 0ms
+[2023-12-29 09:29:06.026] [debug] Batching took: 2ms
+[2023-12-29 09:29:06.026] [debug] Render took: 13ms
+[2023-12-29 09:29:06.359] [debug] Update took: 0ms
+[2023-12-29 09:29:06.359] [debug] Batching took: 2ms
+[2023-12-29 09:29:06.359] [debug] Render took: 13ms
+[2023-12-29 09:29:06.691] [debug] Update took: 2ms
+[2023-12-29 09:29:06.691] [debug] Batching took: 0ms
+[2023-12-29 09:29:06.691] [debug] Render took: 15ms

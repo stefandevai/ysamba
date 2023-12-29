@@ -3,14 +3,25 @@
 #include <spdlog/spdlog.h>
 
 #include <cmath>
+#include <thread>
 
+#include "./generators/map_generator.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 
 namespace dl
 {
 Chunk ChunkManager::null = Chunk{};
+std::mutex ChunkManager::m_chunks_to_add_mutex = std::mutex{};
 
-ChunkManager::ChunkManager() { m_generator.set_size(chunk_size); }
+ChunkManager::ChunkManager() { m_thread_pool.initialize(); }
+
+ChunkManager::~ChunkManager()
+{
+  while (m_thread_pool.is_busy())
+  {
+  }
+  m_thread_pool.finalize();
+}
 
 void ChunkManager::update(const Vector3i& target)
 {
@@ -51,6 +62,21 @@ void ChunkManager::update(const Vector3i& target)
       return !is_within_chunk_radius(chunk->position, target_chunk_position, 4);
     });
   }
+
+  {
+    const std::unique_lock<std::mutex> lock(m_chunks_to_add_mutex);
+    if (m_chunks_to_add.size() > 0)
+    {
+      for (auto& chunk : m_chunks_to_add)
+      {
+        std::erase_if(m_chunks_loading, [&chunk](const auto& position) { return chunk->position == position; });
+      }
+      chunks.insert(chunks.end(),
+                    std::make_move_iterator(m_chunks_to_add.begin()),
+                    std::make_move_iterator(m_chunks_to_add.end()));
+      m_chunks_to_add.clear();
+    }
+  }
 }
 
 bool ChunkManager::is_loaded(const Vector3i& position) const
@@ -58,29 +84,47 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
   const auto found = std::find_if(
       chunks.begin(), chunks.end(), [&position](const auto& chunk) { return chunk->position == position; });
 
-  return found != chunks.end();
+  const auto found_generating = std::find_if(m_chunks_loading.begin(),
+                                             m_chunks_loading.end(),
+                                             [&position](auto chunk_position) { return position == chunk_position; });
+
+  return found != chunks.end() || found_generating != m_chunks_loading.end();
 }
 
-void ChunkManager::load(const Vector3i& position) { generate(position); }
-
-Chunk& ChunkManager::generate(const Vector3i& position)
+void ChunkManager::load(const Vector3i& position)
 {
-  m_generator.generate(1337, position);
+  const auto found =
+      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](Vector3i& generating_position) {
+        return generating_position == position;
+      });
+
+  if (found == m_chunks_loading.end())
+  {
+    m_thread_pool.queue_job([this, position, size = this->chunk_size] {
+      generate(std::ref(position), std::ref(size), std::ref(m_chunks_to_add_mutex));
+    });
+    m_chunks_loading.push_back(position);
+  }
+}
+
+void ChunkManager::generate(const Vector3i& position, const Vector3i& size, std::mutex& mutex)
+{
+  MapGenerator generator{};
+  generator.set_size(size);
+  generator.generate(1337, position);
   auto chunk = std::make_unique<Chunk>(position, true);
-  chunk->tiles.set_size(chunk_size);
-  chunk->tiles.values = std::move(m_generator.tiles);
-  chunk->tiles.height_map = std::move(m_generator.height_map);
+  chunk->tiles.set_size(size);
+  chunk->tiles.values = std::move(generator.tiles);
+  chunk->tiles.height_map = std::move(generator.height_map);
   chunk->tiles.compute_visibility();
-  chunks.push_back(std::move(chunk));
 
-  return *chunks[chunks.size() - 1].get();
+  {
+    const std::unique_lock<std::mutex> lock(mutex);
+    m_chunks_to_add.push_back(std::move(chunk));
+  }
 }
 
-void ChunkManager::set_chunk_size(const Vector3i& chunk_size)
-{
-  this->chunk_size = chunk_size;
-  m_generator.set_size(chunk_size);
-}
+void ChunkManager::set_chunk_size(const Vector3i& chunk_size) { this->chunk_size = chunk_size; }
 
 void ChunkManager::set_frustum(const Vector2i& frustum) { this->frustum = frustum; }
 

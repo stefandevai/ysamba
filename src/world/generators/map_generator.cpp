@@ -34,7 +34,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   tiles = std::vector<Cell>(width * height * depth);
   height_map = std::vector<int>(width * height);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  /* auto start = std::chrono::high_resolution_clock::now(); */
 
   /* spdlog::info("Generating silhouette..."); */
 
@@ -120,10 +120,10 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  /* auto stop = std::chrono::high_resolution_clock::now(); */
+  /* auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); */
 
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+  /* spdlog::info("World generation finished! It took {} milliseconds", duration.count()); */
 }
 
 void MapGenerator::set_size(const Vector3i& size)
