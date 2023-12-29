@@ -179,8 +179,10 @@ void GeneralInfo::update()
 
   if (ImGui::Begin("General Info", &open, window_flags))
   {
-    ImGui::Text("FPS: %s", std::to_string(1.0 / m_game_context.clock->delta).c_str());
-    ImGui::Text("MS: %s", std::to_string(m_game_context.clock->delta).c_str());
+    /* ImGui::Text("FPS: %.0f", std::to_string(1.0 / m_game_context.clock->delta).c_str()); */
+    /* ImGui::Text("MS: %.3f", std::to_string(m_game_context.clock->delta).c_str()); */
+    ImGui::Text("FPS: %.1f", static_cast<float>(1.0 / m_game_context.clock->delta));
+    ImGui::Text("MS: %.3f", static_cast<float>(m_game_context.clock->delta));
 
     m_render_usage_info();
   }
