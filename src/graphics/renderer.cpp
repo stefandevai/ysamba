@@ -125,8 +125,8 @@ void Renderer::render(const Camera& camera)
     /* } */
 
     batch->shader->use();
-    batch->shader->set_mat_4("projection", camera.projection_matrix);
-    batch->shader->set_mat_4("view", batch->peek_matrix());
+    batch->shader->set_mat4("projection", camera.projection_matrix);
+    batch->shader->set_mat4("view", batch->peek_matrix());
 
     batch->render();
   }

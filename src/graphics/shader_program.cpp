@@ -51,18 +51,31 @@ ShaderProgram::~ShaderProgram() { glDeleteProgram(m_program); }
 
 void ShaderProgram::use() { glUseProgram(m_program); }
 
-void ShaderProgram::set_mat_4(const std::string& uniform_name, const glm::mat4& mat) const
+void ShaderProgram::set_mat4(const std::string& uniform_name, const glm::mat4& mat)
 {
-  glUniformMatrix4fv(glGetUniformLocation(m_program, uniform_name.c_str()), 1, GL_FALSE, &mat[0][0]);
+  glUniformMatrix4fv(get_uniform_location(uniform_name), 1, GL_FALSE, &mat[0][0]);
 }
 
-void ShaderProgram::set_float(const std::string& uniform_name, const float value) const
+void ShaderProgram::set_float(const std::string& uniform_name, const float value)
 {
-  glUniform1f(glGetUniformLocation(m_program, uniform_name.c_str()), value);
+  glUniform1f(get_uniform_location(uniform_name), value);
 }
 
-void ShaderProgram::set_int(const std::string& uniform_name, const int value) const
+void ShaderProgram::set_int(const std::string& uniform_name, const int value)
 {
-  glUniform1i(glGetUniformLocation(m_program, uniform_name.c_str()), value);
+  glUniform1i(get_uniform_location(uniform_name), value);
+}
+
+GLint ShaderProgram::get_uniform_location(const std::string& uniform_name)
+{
+  if (m_cached_uniform_locations.contains(uniform_name))
+  {
+    return m_cached_uniform_locations.at(uniform_name);
+  }
+
+  GLint location = glGetUniformLocation(m_program, uniform_name.c_str());
+  m_cached_uniform_locations.insert({uniform_name, location});
+
+  return location;
 }
 }  // namespace dl

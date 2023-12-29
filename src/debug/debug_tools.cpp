@@ -71,7 +71,7 @@ void DebugTools::update()
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
-  /* m_update_menu_bar(); */
+  m_update_menu_bar();
 
   if (show_demo_window)
   {
@@ -109,18 +109,17 @@ void DebugTools::m_update_menu_bar()
   {
     if (ImGui::BeginMenu("View"))
     {
-      if (m_general_info != nullptr && ImGui::MenuItem("General Info"))
+      if (m_general_info != nullptr)
       {
-        m_general_info->toggle();
+        ImGui::MenuItem("General Info", NULL, &m_general_info->open);
       }
-      if (m_camera_inspector != nullptr && ImGui::MenuItem("Camera Inspector"))
+      if (m_camera_inspector != nullptr)
       {
-        m_camera_inspector->toggle();
+        ImGui::MenuItem("Camera Inspector", NULL, &m_camera_inspector->open);
       }
-      if (ImGui::MenuItem("Demo Window"))
-      {
-        show_demo_window = !show_demo_window;
-      }
+
+      ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
+
       ImGui::EndMenu();
     }
 

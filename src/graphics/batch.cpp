@@ -118,7 +118,6 @@ void Batch::render()
 
   glBindVertexArray(m_vao);
   glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
   index_count = 0;
   m_vertices_index = 0;
 }
