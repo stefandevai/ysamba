@@ -177,8 +177,18 @@ void Texture::load_data(const std::string& filepath)
 
     FrameData frame_data{};
 
-    frame_data.tile_type = item["tile_type"].get<std::string>();
     frame_data.frame = item["frame"].get<uint32_t>();
+
+    const auto& tile_type_str = item["tile_type"].get<std::string>();
+
+    if (tile_type_str == "single")
+    {
+      frame_data.tile_type = TileType::Single;
+    }
+    else if (tile_type_str == "multiple")
+    {
+      frame_data.tile_type = TileType::Multiple;
+    }
 
     if (item.contains("angle"))
     {
@@ -196,16 +206,16 @@ void Texture::load_data(const std::string& filepath)
       frame_data.angle = FrameAngle::Parallel;
     }
 
-    if (item.contains("front_face_frame"))
+    if (item.contains("front_face_id"))
     {
-      frame_data.front_face_frame = item["front_face_frame"].get<std::uint32_t>();
+      frame_data.front_face_id = item["front_face_id"].get<std::uint32_t>();
     }
     else
     {
-      frame_data.front_face_frame = frame_data.frame;
+      frame_data.front_face_id = game_id;
     }
 
-    if (frame_data.tile_type == "multiple")
+    if (frame_data.tile_type == TileType::Multiple)
     {
       frame_data.width = item["width"].get<uint32_t>();
       frame_data.height = item["height"].get<uint32_t>();

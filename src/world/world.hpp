@@ -56,6 +56,8 @@ class World
   /* Grid3D tiles{}; */
   /* Grid3D over_tiles{}; */
   ChunkManager chunk_manager{};
+  std::unordered_map<uint32_t, TileData> tile_data;
+  std::unordered_map<uint32_t, ItemData> item_data;
 
   // Constructor
   World(GameContext& game_context);
@@ -145,8 +147,6 @@ class World
  private:
   GameContext& m_game_context;
   JSON m_json{"./data/world.json"};
-  std::unordered_map<uint32_t, TileData> m_tile_data;
-  std::unordered_map<uint32_t, ItemData> m_item_data;
   size_t m_chunk_size = 0;
   std::string m_texture_id;
   int m_seed = 0;

@@ -21,6 +21,7 @@ class MultiSprite;
 struct Quad;
 class Text;
 struct NinePatch;
+struct Tile;
 
 class Batch
 {
@@ -45,6 +46,7 @@ class Batch
   const glm::mat4& peek_matrix();
   void emplace(Sprite* sprite, const double x, const double y, const double z);
   void emplace(const MultiSprite* sprite, const double x, const double y, const double z);
+  void tile(const Tile& tile, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
@@ -55,8 +57,8 @@ class Batch
   {
     glm::vec3 position;
     glm::vec2 texture_coordinates;
-    GLfloat texture_id;
-    unsigned int color;
+    float texture_id;
+    uint32_t color;
   };
 
   enum Index
@@ -80,6 +82,6 @@ class Batch
   uint32_t m_vbo;
   uint32_t m_ebo;
   uint32_t m_vertices_index = 0;
-  std::vector<std::shared_ptr<Texture>> m_textures;
+  std::vector<Texture*> m_textures;
 };
 }  // namespace dl

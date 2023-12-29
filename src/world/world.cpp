@@ -164,19 +164,19 @@ const TileData& World::get(const int x, const int y, const int z) const
 {
   /* if (x < 0 || x >= tiles.size.x || y < 0 || y >= tiles.size.y || z < 0 || z >= tiles.size.z) */
   /* { */
-  /*   return m_tile_data.at(0); */
+  /*   return tile_data.at(0); */
   /* } */
 
   /* const int over_tile_index = over_tiles.id_at(x, y, z); */
 
   /* if (over_tile_index != 0) */
   /* { */
-  /*   return m_tile_data.at(over_tile_index); */
+  /*   return tile_data.at(over_tile_index); */
   /* } */
 
   const int tile_index = id_at(x, y, z);
 
-  return m_tile_data.at(tile_index);
+  return tile_data.at(tile_index);
 }
 
 const WorldTile World::get_all(const int x, const int y, const int z) const
@@ -184,24 +184,24 @@ const WorldTile World::get_all(const int x, const int y, const int z) const
   /* const auto over_tile_index = over_tiles.id_at(x, y, z); */
   /* const auto tile_index = tiles.id_at(x, y, z); */
 
-  /* return WorldTile{m_tile_data.at(tile_index), m_tile_data.at(over_tile_index)}; */
+  /* return WorldTile{tile_data.at(tile_index), tile_data.at(over_tile_index)}; */
 
   const auto tile_index = id_at(x, y, z);
-  return WorldTile{m_tile_data.at(tile_index), m_tile_data.at(0)};
+  return WorldTile{tile_data.at(tile_index), tile_data.at(0)};
 }
 
 const TileData& World::get_terrain(const int x, const int y, const int z) const
 {
   const auto tile_index = id_at(x, y, z);
-  return m_tile_data.at(tile_index);
+  return tile_data.at(tile_index);
 }
 
 const TileData& World::get_over_terrain(const int x, const int y, const int z) const
 {
   /* const auto over_tile_index = over_tiles.id_at(x, y, z); */
-  /* return m_tile_data.at(over_tile_index); */
+  /* return tile_data.at(over_tile_index); */
 
-  return m_tile_data.at(0);
+  return tile_data.at(0);
 }
 
 int World::get_elevation(const int x, const int y) const
@@ -395,9 +395,9 @@ bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& si
   return found_pattern;
 }
 
-const TileData& World::get_tile_data(const uint32_t id) const { return m_tile_data.at(id); }
+const TileData& World::get_tile_data(const uint32_t id) const { return tile_data.at(id); }
 
-const ItemData& World::get_item_data(const uint32_t id) const { return m_item_data.at(id); }
+const ItemData& World::get_item_data(const uint32_t id) const { return item_data.at(id); }
 
 entt::entity World::create_item(
     entt::registry& registry, const uint32_t id, const int x, const int y, const int z) const
@@ -472,7 +472,7 @@ void World::m_load_tile_data()
       }
     }
 
-    m_tile_data[tile_data.id] = tile_data;
+    this->tile_data[tile_data.id] = tile_data;
   }
 }
 
@@ -523,7 +523,7 @@ void World::m_load_item_data()
           item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
     }
 
-    m_item_data[item_data.id] = item_data;
+    this->item_data[item_data.id] = item_data;
   }
 }
 }  // namespace dl

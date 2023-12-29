@@ -15,7 +15,7 @@
         "type": "tile",
         "tile_type": "single",
         "frame": 2,
-        "front_face_frame": 168,
+        "front_face_id": 15,
         "id": 2
     },
     {

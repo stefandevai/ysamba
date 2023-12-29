@@ -23,6 +23,12 @@ enum class FrameAngle
   Orthogonal,
 };
 
+enum class TileType
+{
+  Single,
+  Multiple,
+};
+
 struct FrameData
 {
   uint32_t frame = 0;
@@ -32,10 +38,9 @@ struct FrameData
   uint32_t pattern_height = 0;
   uint32_t anchor_x = 0;
   uint32_t anchor_y = 0;
-  uint32_t front_face_frame = 0;
+  uint32_t front_face_id = 0;
   FrameAngle angle = FrameAngle::Parallel;
-  std::string tile_type = "";
-  /* std::vector<uint32_t> frames{}; */
+  TileType tile_type = TileType::Single;
   std::vector<uint32_t> pattern{};
 };
 

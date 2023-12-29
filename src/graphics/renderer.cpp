@@ -95,34 +95,34 @@ void Renderer::render(const Camera& camera)
     {
       batch->shader = m_asset_manager.get<ShaderProgram>(batch->shader_id);
     }
-    /* assert(batch->shader != nullptr); */
+    assert(batch->shader != nullptr);
 
-    /* if (batch->has_blend) */
-    /* { */
-    /*   glEnable(GL_BLEND); */
-    /*   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
-    /* } */
-    /* else */
-    /* { */
-    /*   glDisable(GL_BLEND); */
-    /* } */
-    /* if (batch->has_depth) */
-    /* { */
-    /*   glEnable(GL_DEPTH_TEST); */
-    /* } */
-    /* else */
-    /* { */
-    /*   glDisable(GL_DEPTH_TEST); */
-    /* } */
-    /* if (batch->has_scissor && batch->scissor.z - batch->scissor.x > 0 && batch->scissor.w - batch->scissor.y > 0) */
-    /* { */
-    /*   glEnable(GL_SCISSOR_TEST); */
-    /*   glScissor(batch->scissor.x, batch->scissor.y, batch->scissor.z, batch->scissor.w); */
-    /* } */
-    /* else */
-    /* { */
-    /*   glDisable(GL_SCISSOR_TEST); */
-    /* } */
+    if (batch->has_blend)
+    {
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+      glDisable(GL_BLEND);
+    }
+    if (batch->has_depth)
+    {
+      glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+      glDisable(GL_DEPTH_TEST);
+    }
+    if (batch->has_scissor && batch->scissor.z - batch->scissor.x > 0 && batch->scissor.w - batch->scissor.y > 0)
+    {
+      glEnable(GL_SCISSOR_TEST);
+      glScissor(batch->scissor.x, batch->scissor.y, batch->scissor.z, batch->scissor.w);
+    }
+    else
+    {
+      glDisable(GL_SCISSOR_TEST);
+    }
 
     batch->shader->use();
     batch->shader->set_mat4("projection", camera.projection_matrix);
@@ -131,7 +131,7 @@ void Renderer::render(const Camera& camera)
     batch->render();
   }
 
-  /* glDisable(GL_SCISSOR_TEST); */
+  glDisable(GL_SCISSOR_TEST);
 }
 
 void Renderer::push_matrix(const uint32_t batch_id, const glm::mat4& matrix)

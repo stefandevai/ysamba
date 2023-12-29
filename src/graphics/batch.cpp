@@ -13,6 +13,7 @@
 #include "./sprite.hpp"
 #include "./text.hpp"
 #include "./texture.hpp"
+#include "world/tile.hpp"
 
 namespace dl
 {
@@ -61,7 +62,7 @@ void Batch::load()
   glBindVertexArray(m_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-  glBufferData(GL_ARRAY_BUFFER, m_buffer_size, NULL, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, m_buffer_size, nullptr, GL_DYNAMIC_DRAW);
   glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)0);
   glEnableVertexAttribArray(PositionIndex);
 
@@ -138,6 +139,63 @@ const glm::mat4 Batch::pop_matrix()
 
 const glm::mat4& Batch::peek_matrix() { return m_matrix; }
 
+void Batch::tile(const Tile& tile, const double x, const double y, const double z)
+{
+  /* assert(index_count <= m_indices_size); */
+
+  const auto& size = tile.size;
+  const auto& uv_coordinates = tile.uv_coordinates;
+  const uint32_t color = 0xFFFFFFFF;
+
+  /* assert(tile.texture != nullptr); */
+  /* assert(size.x != 0); */
+  /* assert(size.y != 0); */
+
+  float texture_index = 0.00f;
+  const auto it = std::find(m_textures.begin(), m_textures.end(), tile.texture);
+  if (it == m_textures.end())
+  {
+    texture_index = m_textures.size();
+    m_textures.push_back(tile.texture);
+  }
+  else
+  {
+    texture_index = it - m_textures.begin();
+  }
+
+  // Top left vertex
+  if (tile.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y, z}, uv_coordinates[0], texture_index, color};
+  }
+  else
+  {
+    m_vertices[m_vertices_index++] =
+        VertexData{glm::vec3{x, y + size.y, z + size.y}, uv_coordinates[0], texture_index, color};
+  }
+
+  // Top right vertex
+  if (tile.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_vertices[m_vertices_index++] = VertexData{glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color};
+  }
+  else
+  {
+    m_vertices[m_vertices_index++] =
+        VertexData{glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color};
+  }
+
+  // Bottom right vertex
+  m_vertices[m_vertices_index++] =
+      VertexData{glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color};
+
+  // Bottom left vertex
+  m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color};
+
+  // Each quad has 6 vertices, we have therefore to increment by 6 each time
+  index_count += 6;
+}
+
 void Batch::emplace(Sprite* sprite, const double x, const double y, const double z)
 {
   assert(index_count <= m_indices_size);
@@ -164,12 +222,13 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
   // Build vector of textures to bind when rendering
   // texture_index is the index in m_textures that will
   // be translated to a index in the shader.
-  float texture_index = 0.f;
-  const auto it = std::find(m_textures.begin(), m_textures.end(), texture);
+  float texture_index = 0.00f;
+  auto texture_ptr = texture.get();
+  const auto it = std::find(m_textures.begin(), m_textures.end(), texture_ptr);
   if (it == m_textures.end())
   {
     texture_index = m_textures.size();
-    m_textures.emplace_back(texture);
+    m_textures.push_back(texture_ptr);
   }
   else
   {
@@ -233,12 +292,13 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
   // Build vector of textures to bind when rendering
   // texture_index is the index in m_textures that will
   // be translated to a index in the shader.
-  float texture_index = 0.f;
-  const auto it = std::find(m_textures.begin(), m_textures.end(), texture);
+  float texture_index = 0.00f;
+  auto texture_ptr = texture.get();
+  const auto it = std::find(m_textures.begin(), m_textures.end(), texture_ptr);
   if (it == m_textures.end())
   {
     texture_index = m_textures.size();
-    m_textures.emplace_back(texture);
+    m_textures.push_back(texture_ptr);
   }
   else
   {

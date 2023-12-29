@@ -76,9 +76,9 @@ void Game::run()
       auto duration_update = std::chrono::duration_cast<std::chrono::milliseconds>(stop_update - start_update);
       auto duration_render = std::chrono::duration_cast<std::chrono::milliseconds>(stop_render - start_render);
       auto duration_batching = std::chrono::duration_cast<std::chrono::milliseconds>(stop_batching - start_batching);
-      /* spdlog::debug("Update took: {}ms", duration_update.count()); */
-      /* spdlog::debug("Batching took: {}ms", duration_batching.count()); */
-      /* spdlog::debug("Render took: {}ms", duration_render.count()); */
+      spdlog::debug("Update took: {}ms", duration_update.count());
+      spdlog::debug("Batching took: {}ms", duration_batching.count());
+      spdlog::debug("Render took: {}ms", duration_render.count());
     }
   }
 }

@@ -10,6 +10,7 @@
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/visibility.hpp"
+#include "graphics/batch.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"
 #include "graphics/multi_sprite.hpp"
@@ -25,11 +26,28 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
       m_world_texture_id(m_world.get_texture_id()),
       m_world_texture(m_renderer.get_texture(m_world.get_texture_id()))
 {
+  Texture* world_texture_ptr = m_world_texture.get();
+
+  for (const auto& tile_data : m_world.tile_data)
+  {
+    const auto& frame_data = m_world_texture->id_to_frame(tile_data.first, frame_data_type::tile);
+
+    glm::vec2 size{};
+    size.x = m_world_texture->get_frame_width();
+    size.y = m_world_texture->get_frame_height();
+    auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame);
+    m_tiles.insert({tile_data.first, Tile{world_texture_ptr, &frame_data, std::move(size), std::move(uv_coordinates)}});
+  }
 }
 
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
+
+  if (m_batch == nullptr)
+  {
+    m_batch = m_renderer.get_batch("world"_hs);
+  }
 
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = m_world.get_tile_size();
@@ -205,7 +223,13 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       }
 
       const auto sprite_size = visibility.sprite->get_size();
-      m_batch<Sprite>(position, visibility.sprite.get(), Vector2i{sprite_size.x, sprite_size.y}, visibility.layer_z);
+
+      const auto position_x = std::round(position.x) * sprite_size.x;
+      const auto position_y = std::round(position.y) * sprite_size.y;
+      const auto position_z = std::round(position.z) * sprite_size.y;
+
+      m_batch->emplace(
+          visibility.sprite.get(), position_x, position_y, position_z + visibility.layer_z * m_z_index_increment);
     }
   }
 
@@ -217,7 +241,11 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto& position = registry.get<Position>(entity);
       auto& rectangle = registry.get<Rectangle>(entity);
 
-      m_batch<Quad>(position, &rectangle.quad, tile_size, rectangle.z_index);
+      const auto position_z = std::round(position.z) * tile_size.y;
+      const auto position_x = std::round(position.x) * tile_size.x;
+      const auto position_y = std::round(position.y) * tile_size.y;
+
+      m_batch->quad(&rectangle.quad, position_x, position_y, position_z + rectangle.z_index * m_z_index_increment);
     }
 
     auto text_view = registry.view<const Text, const Position>();
@@ -227,22 +255,82 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto& position = registry.get<Position>(entity);
       auto& text = registry.get<Text>(entity);
 
-      m_renderer.batch("world"_hs, text, position.x, position.y, position.z + 3);
+      m_batch->text(text, position.x, position.y, position.z + 3);
     }
   }
 }
 
-template <typename T>
-void RenderSystem::m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index)
-{
-  using namespace entt::literals;
+/* template <typename T> */
+/* void RenderSystem::m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index) */
+/* { */
+/*   using namespace entt::literals; */
 
-  const auto position_z = std::round(position.z) * size.y;
-  const auto position_x = std::round(position.x) * size.x;
-  const auto position_y = std::round(position.y) * size.y;
+/*   const auto position_z = std::round(position.z) * size.y; */
+/*   const auto position_x = std::round(position.x) * size.x; */
+/*   const auto position_y = std::round(position.y) * size.y; */
 
-  m_renderer.batch("world"_hs, renderable, position_x, position_y, position_z + z_index * m_z_index_increment);
-}
+/*   m_batch(renderable, position_x, position_y, position_z + z_index * m_z_index_increment); */
+/* } */
+
+/* void RenderSystem::m_render_tile(const Chunk& chunk, */
+/*                                  const uint32_t tile_id, */
+/*                                  const Vector2i& tile_size, */
+/*                                  const int x, */
+/*                                  const int y, */
+/*                                  const int z, */
+/*                                  const int z_index) */
+/* { */
+/*   using namespace entt::literals; */
+
+/*   if (tile_id <= 0) */
+/*   { */
+/*     return; */
+/*   } */
+
+/*   const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile); */
+
+/*   if (frame_data.tile_type == "single") */
+/*   { */
+/*     // TODO: Add sprite pool */
+/*     auto sprite = Sprite{m_world_texture_id, 0}; */
+/*     sprite.texture = m_world_texture; */
+/*     sprite.set_frame(frame_data.frame); */
+/*     sprite.frame_angle = frame_data.angle; */
+
+/*     m_batch->emplace(&sprite, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment); */
+
+/*     if (chunk.tiles.is_bottom_empty(x, y, z)) */
+/*     { */
+/*       auto bottom_sprite = Sprite{m_world_texture_id, 0}; */
+/*       bottom_sprite.texture = m_world_texture; */
+/*       bottom_sprite.set_frame(frame_data.front_face_frame); */
+/*       bottom_sprite.frame_angle = FrameAngle::Orthogonal; */
+
+/*       m_batch->emplace(&bottom_sprite, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y); */
+/*     } */
+/*   } */
+/*   else if (frame_data.tile_type == "multiple") */
+/*   { */
+/*     // TODO: Check pattern directly on chunk to avoid another lookup */
+/*     if (!m_world.has_pattern(frame_data.pattern, */
+/*                              Vector2i{(int)frame_data.pattern_width, (int)frame_data.pattern_height}, */
+/*                              Vector3i{x, y, z})) */
+/*     { */
+/*       return; */
+/*     } */
+
+/*     // TODO: Add multi sprite pool */
+/*     auto multi_sprite = MultiSprite{m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height}; */
+/*     multi_sprite.texture = m_world_texture; */
+/*     multi_sprite.frame_angle = frame_data.angle; */
+
+/*     m_renderer.batch("world"_hs, */
+/*                      &multi_sprite, */
+/*                      (x - frame_data.anchor_x) * tile_size.x, */
+/*                      (y - frame_data.anchor_y) * tile_size.y, */
+/*                      z * tile_size.y + z_index); */
+/*   } */
+/* } */
 
 void RenderSystem::m_render_tile(const Chunk& chunk,
                                  const uint32_t tile_id,
@@ -259,48 +347,53 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     return;
   }
 
-  const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile);
+  const auto& tile = m_tiles.at(tile_id);
 
-  if (frame_data.tile_type == "single")
+  /* const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile); */
+
+  if (tile.frame_data->tile_type == TileType::Single)
   {
     // TODO: Add sprite pool
-    auto sprite = Sprite{m_world_texture_id, 0};
-    sprite.texture = m_world_texture;
-    sprite.set_frame(frame_data.frame);
-    sprite.frame_angle = frame_data.angle;
+    /* auto sprite = Sprite{m_world_texture_id, 0}; */
+    /* sprite.texture = m_world_texture; */
+    /* sprite.set_frame(frame_data.frame); */
+    /* sprite.frame_angle = frame_data.angle; */
 
-    m_renderer.batch(
-        "world"_hs, &sprite, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment);
+    /* m_batch->emplace(&sprite, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment); */
+    m_batch->tile(tile, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment);
 
     if (chunk.tiles.is_bottom_empty(x, y, z))
     {
-      auto bottom_sprite = Sprite{m_world_texture_id, 0};
-      bottom_sprite.texture = m_world_texture;
-      bottom_sprite.set_frame(frame_data.front_face_frame);
-      bottom_sprite.frame_angle = FrameAngle::Orthogonal;
+      const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
+      /* auto bottom_sprite = Sprite{m_world_texture_id, 0}; */
+      /* bottom_sprite.texture = m_world_texture; */
+      /* bottom_sprite.set_frame(frame_data.front_face_frame); */
+      /* bottom_sprite.frame_angle = FrameAngle::Orthogonal; */
 
-      m_renderer.batch("world"_hs, &bottom_sprite, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y);
+      /* m_batch->emplace(&bottom_sprite, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y); */
+      m_batch->tile(bottom_tile, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y);
     }
   }
-  else if (frame_data.tile_type == "multiple")
+  else if (tile.frame_data->tile_type == TileType::Multiple)
   {
     // TODO: Check pattern directly on chunk to avoid another lookup
-    if (!m_world.has_pattern(frame_data.pattern,
-                             Vector2i{(int)frame_data.pattern_width, (int)frame_data.pattern_height},
+    if (!m_world.has_pattern(tile.frame_data->pattern,
+                             Vector2i{(int)tile.frame_data->pattern_width, (int)tile.frame_data->pattern_height},
                              Vector3i{x, y, z}))
     {
       return;
     }
 
     // TODO: Add multi sprite pool
-    auto multi_sprite = MultiSprite{m_world_texture_id, frame_data.frame, frame_data.width, frame_data.height};
+    auto multi_sprite =
+        MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
     multi_sprite.texture = m_world_texture;
-    multi_sprite.frame_angle = frame_data.angle;
+    multi_sprite.frame_angle = tile.frame_data->angle;
 
     m_renderer.batch("world"_hs,
                      &multi_sprite,
-                     (x - frame_data.anchor_x) * tile_size.x,
-                     (y - frame_data.anchor_y) * tile_size.y,
+                     (x - tile.frame_data->anchor_x) * tile_size.x,
+                     (y - tile.frame_data->anchor_y) * tile_size.y,
                      z * tile_size.y + z_index);
   }
 }

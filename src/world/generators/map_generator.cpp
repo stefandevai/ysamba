@@ -173,15 +173,16 @@ void MapGenerator::m_get_height_map(std::vector<double>& height_values, const in
 
   for (size_t i = 0; i < height_values.size(); ++i)
   {
-    /* height_values[i] = (height_values[i] - min_value) / distance; */
-    if (height_values[i] < 0.0)
-    {
-      height_values[i] = 0.0;
-    }
-    if (height_values[i] > 1.0)
-    {
-      height_values[i] = 1.0;
-    }
+    height_values[i] = smoothstep(-1.3, 1.3, height_values[i]);
+    /* /1* height_values[i] = (height_values[i] - min_value) / distance; *1/ */
+    /* if (height_values[i] < 0.0) */
+    /* { */
+    /*   height_values[i] = 0.0; */
+    /* } */
+    /* if (height_values[i] > 1.0) */
+    /* { */
+    /*   height_values[i] = 1.0; */
+    /* } */
   }
 }
 

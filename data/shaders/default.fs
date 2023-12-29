@@ -19,15 +19,15 @@ void main()
   int tid = int(f_in.tid + 0.5);
   vec4 texture_color = texture(textures[tid], f_in.uv);
 
-  if (f_in.tid > -0.5)
+  if (f_in.tid > -0.05)
   {
     final_color = texture_color * f_in.color;
   }
 
-  if (final_color.a < 0.0001)
-  {
-    discard;
-  }
+  /* if (final_color.a < 0.0001) */
+  /* { */
+  /*   discard; */
+  /* } */
 
   color = final_color;
 }
