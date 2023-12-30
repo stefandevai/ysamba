@@ -6,6 +6,7 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
         CACHE STRING "Vcpkg toolchain file")
 endif()
 
+
 project(
     dialectics
     LANGUAGES C CXX
@@ -47,6 +48,9 @@ if (EMSCRIPTEN)
     )
 endif()
 
+set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build Noise Tool" FORCE)
+add_subdirectory("lib/FastNoise2")
+
 find_package(SDL2 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
@@ -79,4 +83,5 @@ target_link_libraries(
         spdlog::spdlog
         imgui::imgui
         implot::implot
+        FastNoise
 )

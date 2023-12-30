@@ -9,7 +9,6 @@
 #include <set>
 /* #include "./generators/terrain_generator.hpp" */
 /* #include "./generators/dummy_generator.hpp" */
-#include "./generators/map_generator.hpp"
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"

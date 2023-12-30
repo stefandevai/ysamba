@@ -18,6 +18,7 @@ class MapGenerator
   int depth = 1;
   std::vector<Cell> tiles;
   std::vector<int> height_map;
+  std::vector<float> raw_height_map;
 
   MapGenerator() = default;
   MapGenerator(const int width, const int height, const int depth = 32) : width(width), height(height), depth(depth) {}
@@ -27,8 +28,7 @@ class MapGenerator
 
  private:
   JSON m_json{"./data/world/map_generators/terrain.json"};
-
-  void m_get_height_map(std::vector<double>& height_values, const int seed, const Vector3i& offset);
+  void m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset);
   float m_get_rectangle_gradient_value(const int x, const int y);
 };
 }  // namespace dl

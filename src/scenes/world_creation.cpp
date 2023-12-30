@@ -221,11 +221,12 @@ void WorldCreation::m_generate_height_map(const int seed)
 {
   (void)seed;
 
-  /* auto generator = MapGenerator(hm_width, hm_width); */
-
+  const auto s = random::get_integer(1, INT_MAX);
+  auto generator = MapGenerator(hm_width, hm_width);
   m_height_map.clear();
   m_height_map.reserve(hm_width * hm_height);
-  /* m_height_map = generator.generate(s); */
+  generator.generate(s);
+  m_height_map = std::move(generator.raw_height_map);
 }
 
 void WorldCreation::m_create_height_map_representation()
