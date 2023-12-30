@@ -84,9 +84,10 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
   const auto found = std::find_if(
       chunks.begin(), chunks.end(), [&position](const auto& chunk) { return chunk->position == position; });
 
-  const auto found_generating = std::find_if(m_chunks_loading.begin(),
-                                             m_chunks_loading.end(),
-                                             [&position](auto chunk_position) { return position == chunk_position; });
+  const auto found_generating =
+      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const auto& chunk_position) {
+        return position == chunk_position;
+      });
 
   return found != chunks.end() || found_generating != m_chunks_loading.end();
 }
@@ -94,7 +95,7 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
 void ChunkManager::load(const Vector3i& position)
 {
   const auto found =
-      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](Vector3i& generating_position) {
+      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const Vector3i& generating_position) {
         return generating_position == position;
       });
 

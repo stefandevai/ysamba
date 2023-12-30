@@ -49,59 +49,59 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       height_map[j * width + i] = k;
 
-      /* if (k < 2) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 1; */
-      /* } */
-      /* else */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].id = 2; */
-      /* } */
-
-      if (k == 0)
+      if (k < 2)
       {
         tiles[k * width * height + j * width + i].id = 1;
       }
-      else if (k == 1)
+      else
       {
         tiles[k * width * height + j * width + i].id = 2;
       }
-      else if (k == 2)
-      {
-        tiles[k * width * height + j * width + i].id = 3;
-      }
-      else if (k == 3)
-      {
-        tiles[k * width * height + j * width + i].id = 6;
-      }
-      else if (k == 4)
-      {
-        tiles[k * width * height + j * width + i].id = 12;
-      }
-      else if (k == 5)
-      {
-        tiles[k * width * height + j * width + i].id = 13;
-      }
-      else if (k == 6)
-      {
-        tiles[k * width * height + j * width + i].id = 14;
-      }
-      else if (k == 7)
-      {
-        tiles[k * width * height + j * width + i].id = 23;
-      }
-      else if (k == 8)
-      {
-        tiles[k * width * height + j * width + i].id = 15;
-      }
-      else if (k == 9)
-      {
-        tiles[k * width * height + j * width + i].id = 18;
-      }
-      else
-      {
-        tiles[k * width * height + j * width + i].id = 19;
-      }
+
+      /* if (k == 0) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 1; */
+      /* } */
+      /* else if (k == 1) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 2; */
+      /* } */
+      /* else if (k == 2) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 3; */
+      /* } */
+      /* else if (k == 3) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 6; */
+      /* } */
+      /* else if (k == 4) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 12; */
+      /* } */
+      /* else if (k == 5) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 13; */
+      /* } */
+      /* else if (k == 6) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 14; */
+      /* } */
+      /* else if (k == 7) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 23; */
+      /* } */
+      /* else if (k == 8) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 15; */
+      /* } */
+      /* else if (k == 9) */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 18; */
+      /* } */
+      /* else */
+      /* { */
+      /*   tiles[k * width * height + j * width + i].id = 19; */
+      /* } */
 
       /* else */
       /* { */
@@ -113,10 +113,10 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
       /*   tiles[(k - 1) * width * height + j * width + i] = 15; */
       /* } */
 
-      /* for (int z = 0; z < k; ++z) */
-      /* { */
-      /*   tiles[z * width * height + j * width + i].id = 5; */
-      /* } */
+      for (int z = 0; z < k; ++z)
+      {
+        tiles[z * width * height + j * width + i].id = 5;
+      }
     }
   }
 

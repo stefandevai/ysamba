@@ -71,13 +71,16 @@ struct Vector3i
       : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z))
   {
   }
+
   Vector3i(const Vector3i& other)
   {
     x = other.x;
     y = other.y;
     z = other.z;
   }
-  bool operator==(const Vector3i& rhs) { return x == rhs.x && y == rhs.y && z == rhs.z; }
+
+  bool operator==(const Vector3i& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
+
   Vector3i& operator=(const Vector3i& rhs)
   {
     x = rhs.x;
