@@ -35,6 +35,7 @@ class RenderSystem
   /* template <typename T> */
   /* void m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index = 0); */
 
+  void m_render_tiles(const Camera& camera);
   void m_render_tile(const Chunk& chunk,
                      const uint32_t tile_id,
                      const Vector2i& tile_size,

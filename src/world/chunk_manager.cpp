@@ -25,45 +25,44 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::update(const Vector3i& target)
 {
-  // Load visible chunks
-  const int padding = 1;
-
-  for (int j = target.y - padding * chunk_size.y - frustum.y / 2;
-       j <= target.y + frustum.y / 2 + padding * chunk_size.y;
-       j += chunk_size.y)
   {
-    for (int i = target.x - padding * chunk_size.x - frustum.x / 2;
-         i <= target.x + frustum.x / 2 + padding * chunk_size.x;
-         i += chunk_size.x)
-    {
-      Vector3i chunk_position{std::floor(i / static_cast<float>(chunk_size.x)) * chunk_size.x,
-                              std::floor(j / static_cast<float>(chunk_size.y)) * chunk_size.y,
-                              std::floor(target.z / static_cast<float>(chunk_size.z)) * chunk_size.z};
+    const int padding = 1;
 
-      if (!is_loaded(chunk_position))
+    // Load visible chunks
+    const auto top_left_position = world_to_chunk(Vector3i{target.x - frustum.x / 2 - padding * chunk_size.x,
+                                                           target.y - frustum.y / 2 - padding * chunk_size.y,
+                                                           target.z});
+
+    for (int j = top_left_position.y; j < target.y + frustum.y / 2 + padding * chunk_size.y; j += chunk_size.y)
+    {
+      for (int i = top_left_position.x; i < target.x + frustum.x / 2 + padding * chunk_size.x; i += chunk_size.y)
       {
-        load(chunk_position);
+        const auto& candidate = world_to_chunk(Vector3i{i, j, target.z});
+
+        if (!is_loaded(candidate))
+        {
+          load(candidate);
+        }
       }
     }
   }
 
   {
-    Vector3i target_chunk_position{std::floor(target.x / chunk_size.x) * chunk_size.x,
-                                   std::floor(target.y / chunk_size.y) * chunk_size.y,
-                                   std::floor(target.z / chunk_size.z) * chunk_size.z};
+    const auto target_chunk_position = world_to_chunk(target);
 
     // Activate / Deactivate chunks within a certain radius
     activate_if([this, &target_chunk_position](const auto& chunk) {
-      return is_within_chunk_radius(chunk->position, target_chunk_position, 3);
+      return is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 2, frustum.y * 2});
     });
 
     // Unload chunks within a certain radius
     std::erase_if(chunks, [this, &target_chunk_position](const auto& chunk) {
-      return !is_within_chunk_radius(chunk->position, target_chunk_position, 4);
+      return !is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 4, frustum.y * 4});
     });
   }
 
   {
+    // Incorporate newly loaded / generated chunks
     const std::unique_lock<std::mutex> lock(m_chunks_to_add_mutex);
     if (m_chunks_to_add.size() > 0)
     {
@@ -180,6 +179,13 @@ bool ChunkManager::is_within_tile_radius(const Vector3i& origin, const Vector3i&
 {
   return std::abs(origin.x - target.x) <= radius && std::abs(origin.y - target.y) <= radius &&
          std::abs(origin.z - target.z) <= radius;
+}
+
+bool ChunkManager::is_within_tile_distance(const Vector3i& origin,
+                                           const Vector3i& target,
+                                           const Vector2i& distance) const
+{
+  return std::abs(origin.x - target.x) <= distance.x && std::abs(origin.y - target.y) <= distance.y;
 }
 
 bool ChunkManager::is_within_chunk_radius(const Vector3i& origin, const Vector3i& target, const int radius) const

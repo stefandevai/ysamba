@@ -9,7 +9,7 @@
 namespace
 {
 constexpr float MAX_ZOOM = 4.0f;
-constexpr float MIN_ZOOM = 0.25f;
+constexpr float MIN_ZOOM = 0.125f;
 }  // namespace
 
 namespace dl
@@ -189,9 +189,9 @@ void Camera::m_calculate_view_matrix()
 void Camera::m_calculate_position()
 {
   glm::vec3 inverse_position = view_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  view_position.x = -inverse_position.x;
-  view_position.y = -inverse_position.y;
-  view_position.z = -inverse_position.z;
+  view_position.x = std::round(-inverse_position.x);
+  view_position.y = std::round(-inverse_position.y);
+  view_position.z = std::round(-inverse_position.z);
 }
 
 void Camera::m_calculate_grid_size()

@@ -37,6 +37,7 @@ class ChunkManager
 
   bool is_loaded(const Vector3i& position) const;
   bool is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;
+  bool is_within_tile_distance(const Vector3i& origin, const Vector3i& target, const Vector2i& distance) const;
   bool is_within_chunk_radius(const Vector3i& origin, const Vector3i& target, const int radius) const;
   void activate_if(const std::function<bool(const std::unique_ptr<Chunk>&)>& condition);
 

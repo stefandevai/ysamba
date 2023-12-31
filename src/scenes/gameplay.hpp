@@ -22,11 +22,6 @@
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
-namespace dl::ui
-{
-class DebugInfo;
-}
-
 namespace dl
 {
 struct GameContext;
@@ -44,6 +39,8 @@ class Gameplay : public Scene
   void load_game();
 
  private:
+  friend class ChunkDebugger;
+
   enum State
   {
     PLAYING,

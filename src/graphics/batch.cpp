@@ -380,28 +380,17 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
         quad_color.r, quad_color.g, quad_color.b, static_cast<uint8_t>(quad_color.a * quad->color.opacity_factor));
   }
 
-  auto general_transform = m_matrix;
-  general_transform = glm::translate(general_transform, glm::vec3(x, y, z));
-
   // Top left vertex
-  glm::vec4 transformation_result = general_transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
-  m_vertices[m_vertices_index++] = VertexData{
-      glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
+  m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y, z}, glm::vec2{0}, -1, color};
 
   // Top right vertex
-  transformation_result = general_transform * glm::vec4(quad->w, 0.f, 0.f, 1.f);
-  m_vertices[m_vertices_index++] = VertexData{
-      glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
+  m_vertices[m_vertices_index++] = VertexData{glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1, color};
 
   // Bottom right vertex
-  transformation_result = general_transform * glm::vec4(quad->w, quad->h, 0.f, 1.f);
-  m_vertices[m_vertices_index++] = VertexData{
-      glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
+  m_vertices[m_vertices_index++] = VertexData{glm::vec3{x + quad->w, y + quad->h, z}, glm::vec2{0}, -1, color};
 
   // Bottom left vertex
-  transformation_result = general_transform * glm::vec4(0.f, quad->h, 0.f, 1.f);
-  m_vertices[m_vertices_index++] = VertexData{
-      glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z}, glm::vec2{0}, -1, color};
+  m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1, color};
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   index_count += 6;

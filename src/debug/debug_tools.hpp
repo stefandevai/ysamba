@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "./camera_inspector.hpp"
+#include "./chunk_debugger.hpp"
 #include "./general_info.hpp"
 #include "./render_editor.hpp"
 
@@ -33,6 +34,7 @@ class DebugTools
   void init_general_info(GameContext& context);
   void init_camera_inspector(Camera& camera);
   void init_render_editor(RenderSystem& render);
+  void init_chunk_debugger(Gameplay& gameplay);
 
  private:
   static std::unique_ptr<DebugTools> m_instance;
@@ -41,6 +43,7 @@ class DebugTools
   std::unique_ptr<GeneralInfo> m_general_info = nullptr;
   std::unique_ptr<CameraInspector> m_camera_inspector = nullptr;
   std::unique_ptr<RenderEditor> m_render_editor = nullptr;
+  std::unique_ptr<ChunkDebugger> m_chunk_debugger = nullptr;
 
   void m_update_menu_bar();
 };

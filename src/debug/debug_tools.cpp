@@ -90,6 +90,10 @@ void DebugTools::update()
   {
     m_render_editor->update();
   }
+  if (m_chunk_debugger != nullptr)
+  {
+    m_chunk_debugger->update();
+  }
 }
 
 void DebugTools::render()
@@ -117,6 +121,10 @@ void DebugTools::m_update_menu_bar()
       {
         ImGui::MenuItem("Camera Inspector", NULL, &m_camera_inspector->open);
       }
+      if (m_camera_inspector != nullptr)
+      {
+        ImGui::MenuItem("Chunk Debugger", NULL, &m_chunk_debugger->open);
+      }
 
       ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
 
@@ -135,5 +143,10 @@ void DebugTools::init_camera_inspector(Camera& camera)
 }
 
 void DebugTools::init_render_editor(RenderSystem& render) { m_render_editor = std::make_unique<RenderEditor>(render); }
+
+void DebugTools::init_chunk_debugger(Gameplay& gameplay)
+{
+  m_chunk_debugger = std::make_unique<ChunkDebugger>(gameplay);
+}
 
 }  // namespace dl
