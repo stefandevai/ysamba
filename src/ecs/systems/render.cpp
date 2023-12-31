@@ -198,7 +198,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
     // Loop through chunks below the camera bottom to render tiles in other chunks
     // that are high enough to be viewed from the current camera position.
     const auto first_chunk_position =
-        m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y + camera_size.y + 1, 0});
+        m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y + camera_size.y, 0});
     const auto last_chunk_position = m_world.chunk_manager.world_to_chunk(
         Vector3i{camera_position.x, camera_position.y + camera_size.y + chunk_size.z, 0});
     for (int j = first_chunk_position.y; j <= last_chunk_position.y; j += chunk_size.y)
@@ -286,28 +286,13 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
 
   const auto& tile = m_tiles.at(tile_id);
 
-  /* const auto& frame_data = m_world_texture->id_to_frame(tile_id, frame_data_type::tile); */
-
   if (tile.frame_data->tile_type == TileType::Single)
   {
-    // TODO: Add sprite pool
-    /* auto sprite = Sprite{m_world_texture_id, 0}; */
-    /* sprite.texture = m_world_texture; */
-    /* sprite.set_frame(frame_data.frame); */
-    /* sprite.frame_angle = frame_data.angle; */
-
-    /* m_batch->emplace(&sprite, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment); */
     m_batch->tile(tile, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment);
 
     if (chunk.tiles.is_bottom_empty(x, y, z))
     {
       const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
-      /* auto bottom_sprite = Sprite{m_world_texture_id, 0}; */
-      /* bottom_sprite.texture = m_world_texture; */
-      /* bottom_sprite.set_frame(frame_data.front_face_frame); */
-      /* bottom_sprite.frame_angle = FrameAngle::Orthogonal; */
-
-      /* m_batch->emplace(&bottom_sprite, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y); */
       m_batch->tile(bottom_tile, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y);
     }
   }
