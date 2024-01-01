@@ -50,8 +50,8 @@ void World::generate(const int width, const int height, const int seed)
   /* /1* auto tilemap_generator = TerrainGenerator(width, height); *1/ */
   /* /1* auto tilemap_generator = DummyGenerator(width, height); *1/ */
 
-  /* auto society = SocietyGenerator::generate_blueprint(); */
-  /* m_societies[society.id] = society; */
+  auto society = SocietyGenerator::generate_blueprint();
+  m_societies[society.id] = society;
 }
 
 void World::load(const std::string& filepath)

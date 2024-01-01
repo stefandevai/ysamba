@@ -114,25 +114,25 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
 
 Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
 {
-  const auto& camera_position = camera.get_position_in_tiles();
-  const auto& camera_size = camera.get_size_in_tiles();
-  const auto placement_margin = 5;
+  const auto& chunk_size = world.chunk_manager.chunk_size;
+  const auto& chunk = world.chunk_manager.in(camera.center_in_tiles);
 
   auto position = Position{0., 0., 0.};
   const uint32_t max_tries = 10;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = static_cast<double>(random::get_integer(camera_position.x + placement_margin,
-                                                           camera_position.x + camera_size.x - placement_margin));
-    const auto y = static_cast<double>(random::get_integer(camera_position.y + placement_margin,
-                                                           camera_position.y + camera_size.y - placement_margin));
+    const auto x = static_cast<double>(random::get_integer(0, chunk_size.x));
+    const auto y = static_cast<double>(random::get_integer(0, chunk_size.y));
+    const auto height = chunk.tiles.height_map[x + y * chunk_size.x];
 
-    if (world.is_walkable(x, y, 0.))
+    if (world.is_walkable(x, y, height))
     {
-      position.x = x;
-      position.y = y;
+      position.x = chunk.position.x + x;
+      position.y = chunk.position.y + y;
+      position.z = height;
 
+      spdlog::debug("H REEEEE {} {} {}", position.x, position.y, position.z);
       return position;
     }
   }

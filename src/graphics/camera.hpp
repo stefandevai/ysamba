@@ -28,7 +28,8 @@ class Camera
   float zoom = DEFAULT_ZOOM;
   Vector3 movement_offset{0.0, 0.0, 0.0};
   Vector3 view_position{0.0, 0.0, 0.0};
-  Vector2i position_in_tiles{0, 0};
+  Vector3i position_in_tiles{0, 0, 0};
+  Vector3i center_in_tiles{0, 0, 0};
   glm::mat4 projection_matrix = glm::mat4{1.f};
   glm::mat4 view_matrix = glm::mat4{1.f};
   glm::mat4 view_projection_matrix = glm::mat4{1.f};
@@ -38,10 +39,11 @@ class Camera
   Camera(const Display& display);
 
   void update(const float dt);
+  void update_dirty();
   void move(const Vector3& quantity);
   void move_in_grid(const Vector3i& quantity);
   const Vector3& get_position() const;
-  const Vector2i& get_position_in_tiles() const;
+  const Vector3i& get_position_in_tiles() const;
   const glm::mat4& get_view_matrix() const;
   const Vector3& get_saved_position() const { return m_saved_position; }
   const Vector2& get_size() const { return m_size; }
@@ -82,7 +84,8 @@ class Camera
   Vector2i m_size_in_tiles{0, 0};
   bool m_resize_view_matrix = true;
 
-  void m_calculate_center();
+  void m_calculate_center_position();
+  void m_calculate_center_vector();
   void m_calculate_view_matrix();
   void m_calculate_position();
   void m_calculate_grid_size();

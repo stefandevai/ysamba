@@ -25,14 +25,23 @@ class ChunkManager
 
   // Update chunks based on a tile position
   void update(const Vector3i& target);
-  void load(const Vector3i& position);
-  void generate(const Vector3i& position, const Vector3i& size, std::mutex& mutex);
+  void load_initial_chunks(const Vector3i& position);
+  void load_async(const Vector3i& position);
+  void load_sync(const Vector3i& position);
+  void generate_async(const Vector3i& position, const Vector3i& size, std::mutex& mutex);
+  void generate_sync(const Vector3i& position, const Vector3i& size);
   void set_chunk_size(const Vector3i& chunk_size);
   void set_frustum(const Vector2i& frustum);
+
+  // Gets chunk at a precise location
   Chunk& at(const int x, const int y, const int z) const;
   Chunk& at(const Vector3i& position) const;
-  uint32_t index_at(const int x, const int y, const int z) const;
-  uint32_t index_at(const Vector3i& position) const;
+
+  // Gets chunk that contains a position
+  Chunk& in(const int x, const int y, const int z) const;
+  Chunk& in(const Vector3i& position) const;
+
+  Vector3i world_to_chunk(const int x, const int y, const int z) const;
   Vector3i world_to_chunk(const Vector3i& position) const;
 
   bool is_loaded(const Vector3i& position) const;

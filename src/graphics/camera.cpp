@@ -26,21 +26,27 @@ void Camera::update(const float dt)
 
   if (dirty)
   {
-    m_calculate_center();
-    m_calculate_view_matrix();
-    m_calculate_position();
-    m_calculate_grid_size();
-
-    view_projection_matrix = projection_matrix * view_matrix;
-    dirty = false;
+    update_dirty();
   }
+}
+
+void Camera::update_dirty()
+{
+  m_calculate_center_vector();
+  m_calculate_view_matrix();
+  m_calculate_position();
+  m_calculate_grid_size();
+  m_calculate_center_position();
+
+  view_projection_matrix = projection_matrix * view_matrix;
+  dirty = false;
 }
 
 const glm::mat4& Camera::get_view_matrix() const { return view_matrix; }
 
 const Vector3& Camera::get_position() const { return view_position; }
 
-const Vector2i& Camera::get_position_in_tiles() const { return position_in_tiles; }
+const Vector3i& Camera::get_position_in_tiles() const { return position_in_tiles; }
 
 void Camera::move(const Vector3& quantity)
 {
@@ -158,7 +164,14 @@ void Camera::reset_zoom()
   dirty = true;
 }
 
-void Camera::m_calculate_center()
+void Camera::m_calculate_center_position()
+{
+  center_in_tiles.x = position_in_tiles.x + m_size_in_tiles.x / 2;
+  center_in_tiles.y = position_in_tiles.y + m_size_in_tiles.y / 2;
+  center_in_tiles.y = position_in_tiles.z;
+}
+
+void Camera::m_calculate_center_vector()
 {
   glm::vec3 direction{};
   direction.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
