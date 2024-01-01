@@ -197,13 +197,6 @@ Chunk& ChunkManager::in(const int x, const int y, const int z) const
 {
   const Vector3i chunk_position = world_to_chunk(x, y, z);
 
-  /* spdlog::debug("CHM {} {} {}", chunk_position.x, chunk_position.y, chunk_position.z); */
-
-  /* for (const auto& chunk : chunks) */
-  /* { */
-  /* spdlog::debug("SCH {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z); */
-  /* } */
-
   const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
     return (chunk->position == chunk_position);
   });
@@ -212,7 +205,6 @@ Chunk& ChunkManager::in(const int x, const int y, const int z) const
   {
     return *(*chunk).get();
   }
-  /* spdlog::debug("NOTFOUND"); */
 
   return ChunkManager::null;
 }

@@ -59,11 +59,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   auto& quad_position = registry.get<Position>(m_target_quad);
   quad_position.x = floor_x;
 
-  const auto& chunk = m_world.chunk_manager.in(tile_x, tile_y, 0);
   const auto& chunk_size = m_world.chunk_manager.chunk_size;
-  const int local_x = floor_x % chunk_size.x;
-  const int local_y = floor_y % chunk_size.y;
-
   int elevation = 0;
 
   // Check elevation in the current mouse position

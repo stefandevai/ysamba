@@ -112,8 +112,23 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
   {
     const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
 
+    const auto& chunk_size = m_world.chunk_manager.chunk_size;
+    int elevation = 0;
+
+    // Check elevation in the current mouse position
+    for (int z = chunk_size.z - 1; z >= 0; --z)
+    {
+      int queried_elevation = m_world.get_elevation(mouse_position.x, mouse_position.y + z);
+
+      if (queried_elevation == z)
+      {
+        elevation = queried_elevation;
+        break;
+      }
+    }
+
     const auto selected_entity =
-        m_world.spatial_hash.get_by_component<Selectable>(mouse_position.x, mouse_position.y, registry);
+        m_world.spatial_hash.get_by_component<Selectable>(mouse_position.x, mouse_position.y + elevation, registry);
 
     // If a selectable entity was clicked, toggle its selected state
     if (registry.valid(selected_entity))
