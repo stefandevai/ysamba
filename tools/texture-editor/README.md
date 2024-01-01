@@ -1,0 +1,1 @@
+# Dialectics - Texture Editor
