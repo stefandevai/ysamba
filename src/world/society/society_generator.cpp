@@ -118,7 +118,7 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
   const auto& chunk = world.chunk_manager.in(camera.center_in_tiles);
 
   auto position = Position{0., 0., 0.};
-  const uint32_t max_tries = 10;
+  const uint32_t max_tries = 30;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
@@ -132,7 +132,6 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
       position.y = chunk.position.y + y;
       position.z = height;
 
-      spdlog::debug("H REEEEE {} {} {}", position.x, position.y, position.z);
       return position;
     }
   }

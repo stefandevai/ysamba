@@ -45,6 +45,8 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   const auto& grid_size = camera.get_grid_size();
   const auto tile_x = (mouse_position.x + camera_position.x) / grid_size.x;
   const auto tile_y = (mouse_position.y + camera_position.y) / grid_size.y;
+  const int floor_x = std::floor(tile_x);
+  const int floor_y = std::floor(tile_y);
 
   if (!registry.valid(m_target_quad))
   {
@@ -55,23 +57,29 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   }
 
   auto& quad_position = registry.get<Position>(m_target_quad);
-  quad_position.x = std::floor(tile_x);
-  quad_position.y = std::floor(tile_y);
+  quad_position.x = floor_x;
+
+  const auto& chunk = m_world.chunk_manager.in(tile_x, tile_y, 0);
+  const auto& chunk_size = m_world.chunk_manager.chunk_size;
+  const int local_x = floor_x % chunk_size.x;
+  const int local_y = floor_y % chunk_size.y;
 
   int elevation = 0;
 
   // Check elevation in the current mouse position
-  // TODO: Update with chunks
-  /* for (int z = m_world.tiles.size.z - 1; z >= 0; --z) */
-  /* { */
-  /*   int queried_elevation = m_world.get_elevation(std::floor(tile_x), std::floor(tile_y) + z); */
+  for (int z = chunk_size.z - 1; z >= 0; --z)
+  {
+    int queried_elevation = m_world.get_elevation(floor_x, floor_y + z);
 
-  /*   if (queried_elevation == z) */
-  /*   { */
-  /*     elevation = queried_elevation; */
-  /*     break; */
-  /*   } */
-  /* } */
+    if (queried_elevation == z)
+    {
+      elevation = queried_elevation;
+      break;
+    }
+  }
+
+  quad_position.y = floor_y + elevation;
+  quad_position.z = elevation;
 
   const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y + elevation, registry);
   bool updated_inspector_content = false;

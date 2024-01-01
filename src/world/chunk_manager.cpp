@@ -175,8 +175,9 @@ Chunk& ChunkManager::at(const int x, const int y, const int z) const
 {
   const Vector3i chunk_position = world_to_chunk(x, y, z);
 
-  const auto chunk = std::find_if(
-      chunks.begin(), chunks.end(), [&chunk_position](auto& chunk) { return (chunk->position == chunk_position); });
+  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
+    return (chunk->position == chunk_position);
+  });
 
   /* assert(chunk != chunks.end() && "Chunk should be already generated during update"); */
 
@@ -196,13 +197,22 @@ Chunk& ChunkManager::in(const int x, const int y, const int z) const
 {
   const Vector3i chunk_position = world_to_chunk(x, y, z);
 
-  const auto chunk = std::find_if(
-      chunks.begin(), chunks.end(), [&chunk_position](auto& chunk) { return (chunk->position == chunk_position); });
+  /* spdlog::debug("CHM {} {} {}", chunk_position.x, chunk_position.y, chunk_position.z); */
+
+  /* for (const auto& chunk : chunks) */
+  /* { */
+  /* spdlog::debug("SCH {} {} {}", chunk->position.x, chunk->position.y, chunk->position.z); */
+  /* } */
+
+  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
+    return (chunk->position == chunk_position);
+  });
 
   if (chunk != chunks.end())
   {
     return *(*chunk).get();
   }
+  /* spdlog::debug("NOTFOUND"); */
 
   return ChunkManager::null;
 }
