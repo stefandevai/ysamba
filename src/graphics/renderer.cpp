@@ -99,8 +99,8 @@ void Renderer::render(const Camera& camera)
 
     if (batch->has_blend)
     {
-      glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_BLEND);
     }
     else
     {
@@ -131,7 +131,7 @@ void Renderer::render(const Camera& camera)
     batch->render();
   }
 
-  glDisable(GL_SCISSOR_TEST);
+  /* glDisable(GL_SCISSOR_TEST); */
 }
 
 void Renderer::push_matrix(const uint32_t batch_id, const glm::mat4& matrix)

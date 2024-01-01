@@ -174,12 +174,17 @@ void Camera::m_calculate_view_matrix()
   if (m_resize_view_matrix)
   {
     view_matrix = glm::lookAt(m_position, m_center, m_up);
+    /* view_matrix = glm::translate(view_matrix, glm::vec3(movement_offset.x, movement_offset.y, 0.0f)); */
     view_matrix = glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor));
     view_matrix = glm::translate(
-        view_matrix, glm::vec3(movement_offset.x + m_size.x / 2.0f, movement_offset.y + m_size.y / 2.0f, 0.0f));
+        view_matrix,
+        glm::vec3(
+            std::round(movement_offset.x + m_size.x / 2.0f), std::round(movement_offset.y + m_size.y / 2.0f), 0.0f));
     view_matrix = glm::scale(view_matrix, glm::vec3(zoom, zoom, zoom));
     view_matrix = glm::translate(
-        view_matrix, glm::vec3(-movement_offset.x - m_size.x / 2.0f, -movement_offset.y - m_size.y / 2.0f, 0.0f));
+        view_matrix,
+        glm::vec3(
+            std::round(-movement_offset.x - m_size.x / 2.0f), std::round(-movement_offset.y - m_size.y / 2.0f), 0.0f));
     return;
   }
 
