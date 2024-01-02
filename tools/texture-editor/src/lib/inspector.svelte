@@ -93,7 +93,7 @@
 {#if currentFrame && $selectedTiles.length > 0}
   <div class="inspector">
     <div class="header">
-      <h2 class="is-size-4">Frame {currentFrame[0].frame}</h2>
+      <h2 class="is-size-4">Frame {$selectedTiles[0].index}</h2>
     </div>
     <div class="frames">
       {#each currentFrame as item, index}
@@ -159,7 +159,7 @@
           {/if}
 
           <div class="buttons">
-            <button class="button is-primary is-fullwidth" on:click={() => handleSave(item)}>Save</button>
+            <button class="button is-success is-fullwidth" on:click={() => handleSave(item)}>Save</button>
             <button class="button is-danger is-light is-fullwidth" on:click={() => handleDelete(item)}>Delete</button>
           </div>
         </Accordion>

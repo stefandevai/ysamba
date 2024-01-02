@@ -1,7 +1,7 @@
 <script lang="ts">
   import SvgIcon from '@jamescoyle/svelte-icon';
   import { mdiPlus, mdiMinus } from '@mdi/js';
-  import { tileSize, zoom } from './store';
+  import { tileSize, zoom, textureSource } from './store';
 
   const onWidthChange = (event) => {
     tileSize.update((size) => ({
@@ -38,20 +38,22 @@
   }
 </script>
 
-<div class="controls">
-  <input class="input" type="number" on:input={onWidthChange} value={$tileSize.width} />
-  <input class="input" type="number" on:input={onHeightChange} value={$tileSize.height} />
-  <button class="button" on:click={handleZoomIn}>
-    <span class="icon is-small">
-      <SvgIcon class="te-icon" type="mdi" path={mdiPlus} />
-    </span>
-  </button>
-  <button class="button" on:click={handleZoomOut}>
-    <span class="icon is-small">
-      <SvgIcon class="te-icon" type="mdi" path={mdiMinus} />
-    </span>
-  </button>
-</div>
+{#if $textureSource}
+  <div class="controls">
+    <input class="input" type="number" on:input={onWidthChange} value={$tileSize.width} />
+    <input class="input" type="number" on:input={onHeightChange} value={$tileSize.height} />
+    <button class="button" on:click={handleZoomIn}>
+      <span class="icon is-small">
+        <SvgIcon class="te-icon" type="mdi" path={mdiPlus} />
+      </span>
+    </button>
+    <button class="button" on:click={handleZoomOut}>
+      <span class="icon is-small">
+        <SvgIcon class="te-icon" type="mdi" path={mdiMinus} />
+      </span>
+    </button>
+  </div>
+{/if}
 
 <style>
   .controls {
