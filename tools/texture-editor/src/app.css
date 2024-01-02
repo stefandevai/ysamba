@@ -1,5 +1,4 @@
 @import 'bulma/css/bulma.css';
-@import 'material-icons/iconfont/material-icons.css';
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -55,11 +54,11 @@ body, html {
 /* } */
 
 select {
-  min-width: 120px;
+  /* min-width: 120px; */
 }
 
 input[type=number] {
-  max-width: 60px;
+  /* max-width: 60px; */
 }
 
 /* button { */

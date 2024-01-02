@@ -1,14 +1,21 @@
 <script lang="ts">
   import Tooltip from './tooltip.svelte';
-  import { textureSource, hoveredTile, selectedTiles, tileSize } from './store';
-  import type { DrawParams } from './types';
+  import GridControls from './grid-controls.svelte';
+  import { textureSource, hoveredTile, selectedTiles, tileSize, zoom } from './store';
+  import type { DrawParams, Size } from './types';
 
   let canvas;
+  let originalSize: Size = {
+    width: 0,
+    height: 0,
+  };
 
   const fitCanvasToTexture = (textureData: string) => {
     const texture = new Image();
     texture.src = textureData;
     texture.onload = () => {
+      originalSize.width = texture.naturalWidth;
+      originalSize.height = texture.naturalHeight;
       canvas.width = texture.naturalWidth;
       canvas.height = texture.naturalHeight;
     };
@@ -19,7 +26,7 @@
   });
 
   const drawGrid = (params: DrawParams) => {
-    if (params.cellSize.width <= 0 || params.cellSize.height <= 0 || isNaN(params.cellSize.width) || isNaN(params.cellSize.height)) {
+    if (params.cellSize.width <= 0 || params.cellSize.height <= 0 || isNaN(params.cellSize.width) || isNaN(params.cellSize.height) || !canvas) {
       return;
     }
 
@@ -30,10 +37,10 @@
     if (params.hoveredCell != null) {
       context.fillStyle = "rgba(96, 200, 235, 0.5)";
       context.fillRect(
-        params.hoveredCell.x * params.cellSize.width,
-        params.hoveredCell.y * params.cellSize.height,
-        params.cellSize.width,
-        params.cellSize.height,
+        params.hoveredCell.x * params.cellSize.width * $zoom,
+        params.hoveredCell.y * params.cellSize.height * $zoom,
+        params.cellSize.width * $zoom,
+        params.cellSize.height * $zoom,
       );
     }
 
@@ -41,10 +48,10 @@
       for (const cell of params.selectedCells) {
         context.fillStyle = "rgba(222, 85, 80, 0.5)";
         context.fillRect(
-          cell.x * params.cellSize.width,
-          cell.y * params.cellSize.height,
-          params.cellSize.width,
-          params.cellSize.height,
+          cell.x * params.cellSize.width * $zoom,
+          cell.y * params.cellSize.height * $zoom,
+          params.cellSize.width * $zoom,
+          params.cellSize.height * $zoom,
         );
       }
     }
@@ -53,12 +60,12 @@
     context.lineWidth = 1;
     context.strokeStyle = "rgba(200, 200, 200, 0.5)";
 
-    for (let x = 0; x < canvas.width; x += params.cellSize.width) {
+    for (let x = 0; x < canvas.width; x += params.cellSize.width * $zoom) {
       context.moveTo(x, 0);
       context.lineTo(x, canvas.height);
     }
 
-    for (let y = 0; y < canvas.height; y += params.cellSize.height) {
+    for (let y = 0; y < canvas.height; y += params.cellSize.height * $zoom) {
       context.moveTo(0, y);
       context.lineTo(canvas.width, y);
     }
@@ -77,15 +84,25 @@
       return;
     }
 
-    const widthInTiles = Math.ceil(width / $tileSize.width);
-    const tileX = Math.floor(x / $tileSize.width);
-    const tileY = Math.floor(y / $tileSize.height);
+    const widthInTiles = Math.ceil(width / ($tileSize.width * $zoom));
+    const tileX = Math.floor(x / ($tileSize.width * $zoom));
+    const tileY = Math.floor(y / ($tileSize.height * $zoom));
+    const tileIndex = tileX + tileY * widthInTiles;
 
-    hoveredTile.set({
-      index: tileX + tileY * widthInTiles,
-      x: tileX,
-      y: tileY,
-    });
+    if ($hoveredTile != null && $hoveredTile.index != tileIndex) {
+      hoveredTile.set({
+        index: tileIndex,
+        x: tileX,
+        y: tileY,
+      });
+    }
+    else if ($hoveredTile == null) {
+      hoveredTile.set({
+        index: tileIndex,
+        x: tileX,
+        y: tileY,
+      });
+    }
   };
 
   const handleGridLeave = () => {
@@ -104,24 +121,31 @@
       return;
     }
 
-    const widthInTiles = Math.ceil(width / $tileSize.width);
-    const tileX = Math.floor(x / $tileSize.width);
-    const tileY = Math.floor(y / $tileSize.height);
+    const widthInTiles = Math.ceil(width / ($tileSize.width * $zoom));
+    const tileX = Math.floor(x / ($tileSize.width * $zoom));
+    const tileY = Math.floor(y / ($tileSize.height * $zoom));
     const tileIndex = tileX + tileY * widthInTiles;
 
     const found = $selectedTiles.find((tile) => tile.index == tileIndex);
 
-    if (found != null) {
+    if (found != null && $selectedTiles.length > 0) {
       selectedTiles.set([]);
     }
-    else {
+    else if (found == null) {
       selectedTiles.set([{
-        index: tileX + tileY * widthInTiles,
+        index: tileIndex,
         x: tileX,
         y: tileY,
       }]);
     }
   };
+
+  const applyZoom = (zoomLevel: number) => {
+    canvas.width = originalSize.width * $zoom;
+    canvas.height = originalSize.height * $zoom;
+  };
+
+  $: canvas && applyZoom($zoom)
 
   $: canvas && drawGrid({
     cellSize: $tileSize,
@@ -134,14 +158,14 @@
 
 {#if $textureSource !== ''}
   <Tooltip title={tooltipValue} class="frame-tooltip">
-    <div class="wrapper" >
+    <div class="grid-wrapper" >
       <canvas
         bind:this={canvas}
         on:mousemove={handleGridHover}
         on:mouseleave={handleGridLeave}
         on:mouseup={handleGridClick}
       />
-      <img src={$textureSource} alt="" style="height: {canvas?.height ?? 0}px; width: {canvas?.width ?? 0}px;" />
+      <img src={$textureSource} alt="" style="height: {canvas?.height ?? 0}px; width: {canvas?.width ?? 0}px; transform-origin: left top; transform: scale({1});" />
     </div>
   </Tooltip>
 {/if}
@@ -152,7 +176,7 @@
     flex: 1;
   }
 
-  .wrapper {
+  .grid-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -170,6 +194,7 @@
   }
 
   img {
+    image-rendering: pixelated;
     max-width: unset;
     position: absolute;
     z-index: 1;

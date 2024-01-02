@@ -10,3 +10,4 @@ export const selectedTiles = writable<Position[]>([]);
 export const textureSource = writable<string>('');
 export const textureData = writable<TextureData | null>(null);
 export const textureFrames = writable<Frame[] | null>(null);
+export const zoom = writable<number>(1);

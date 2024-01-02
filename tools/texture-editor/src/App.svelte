@@ -3,7 +3,6 @@
 </script>
 
 <main>
-  <h1 class="is-size-2">Texture Editor</h1>
   <Editor />
 </main>
 
@@ -18,9 +17,5 @@
     margin: 1rem 8rem;
     display: flex;
     flex-direction: column;
-  }
-
-  h1 {
-    margin-bottom: 1rem;
   }
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { mdiTextureBox, mdiText } from '@mdi/js';
   import { textureSource, textureFrames, textureData, tileSize } from './store';
-  import type { TextureData, Frame, FrameArray } from './types';
-  import { defaultFrame } from './frame';
+  import type { TextureData, Frame } from './types';
   import { saveObject } from './utils';
   import FileInput from './file-input.svelte';
 
@@ -69,20 +69,6 @@
     textureData.set(textureJSONData);
   };
 
-  const onWidthChange = (event) => {
-    tileSize.update((size) => ({
-      ...size,
-      width: parseInt(event.target.value),
-    }));
-  }
-
-  const onHeightChange = (event) => {
-    tileSize.update((size) => ({
-      ...size,
-      height: parseInt(event.target.value),
-    }));
-  }
-
   const handleSave = () => {
     if (!$textureData || !$textureFrames || $textureFrames.length === 0) {
       return;
@@ -105,22 +91,17 @@
 </script>
 
 <div class="controls">
-  {#if $textureSource}
-    <input class="input" type="number" on:input={onWidthChange} value={$tileSize.width} />
-    <input class="input" type="number" on:input={onHeightChange} value={$tileSize.height} />
-  {/if}
-  <FileInput class="te-file-input" label="Load Texture" accept="image/*" onChange={onTextureLoad} />
-  <FileInput class="te-file-input" label="Load Data" accept="application/JSON" onChange={onDataLoad} />
+  <FileInput class="te-file-input" icon={mdiTextureBox} label="Load Texture" accept="image/*" onChange={onTextureLoad} />
+  <FileInput class="te-file-input" icon={mdiText} label="Load Data" accept="application/JSON" onChange={onDataLoad} />
 
-  {#if $textureData && $textureSource}
-    <button class="button is-primary" on:click={handleSave}>Save</button>
-  {/if}
+  <button class="button is-primary" on:click={handleSave} disabled={!$textureData || !$textureSource}>Save</button>
 </div>
 
 <style>
   .controls {
+    flex: 1;
     display: flex;
-    margin-bottom: 1rem;
+    justify-content: flex-end;
   }
 
   .controls > *:not(:last-child) {

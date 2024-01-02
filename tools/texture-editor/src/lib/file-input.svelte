@@ -1,18 +1,38 @@
 <script lang="ts">
+  import { mdiUpload } from '@mdi/js';
+  import SvgIcon from '@jamescoyle/svelte-icon';
+
   export let label: string;
   export let accept: string;
+  export let icon = '';
   export let onChange: (event: Event) => void;
+
+  let fileName = '';
+
+  const localOnChange = (event: Event) => {
+    if (event.target.files && event.target.files.length > 0) {
+      fileName = event.target.files[0].name;
+    }
+
+    if (onChange != null) {
+      onChange(event);
+    }
+  }
 </script>
 
 <div class="file {$$restProps.class}">
   <label class="file-label">
-    <input class="file-input" type="file" accept={accept} on:change={onChange}>
+    <input class="file-input" type="file" accept={accept} on:change={localOnChange}>
     <span class="file-cta">
       <span class="file-icon">
-        <i class="material-icons">upload</i>
+        <SvgIcon type="mdi" path={icon ?? mdiUpload} />
       </span>
       <span class="file-label">
-        {label}
+        {#if fileName}
+          {fileName}
+        {:else}
+          {label}
+        {/if}
       </span>
     </span>
   </label>
