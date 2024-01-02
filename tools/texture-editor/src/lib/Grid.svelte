@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Tooltip from './tooltip.svelte';
   import { textureSource, hoveredTile, selectedTiles, tileSize } from './store';
   import type { DrawParams } from './types';
 
@@ -127,18 +128,22 @@
     hoveredCell: $hoveredTile,
     selectedCells: $selectedTiles,
   });
+
+  $: tooltipValue = $hoveredTile ? $hoveredTile.index.toString() : undefined;
 </script>
 
 {#if $textureSource !== ''}
-  <div class="wrapper">
-    <canvas
-      bind:this={canvas}
-      on:mousemove={handleGridHover}
-      on:mouseleave={handleGridLeave}
-      on:mouseup={handleGridClick}
-    />
-    <img src={$textureSource} alt="" />
-  </div>
+  <Tooltip title={tooltipValue}>
+    <div class="wrapper" style="height: {canvas?.height ?? 0}px; width: {canvas?.width ?? 0}px;">
+      <canvas
+        bind:this={canvas}
+        on:mousemove={handleGridHover}
+        on:mouseleave={handleGridLeave}
+        on:mouseup={handleGridClick}
+      />
+      <img src={$textureSource} alt="" />
+    </div>
+  </Tooltip>
 {/if}
 
 
@@ -146,6 +151,7 @@
   .wrapper {
     position: relative;
   }
+
   canvas {
     position: absolute;
     border: 1px solid rgba(80, 80, 80, 0.6);
@@ -153,6 +159,7 @@
     cursor: pointer;
     z-index: 2;
   }
+
   img {
     position: absolute;
     z-index: 1;

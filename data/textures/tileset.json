@@ -1,6 +1,8 @@
 {
     "name": "Main Tileset",
     "filepath": "textures/tileset.png",
+    "width": 512,
+    "height": 512,
     "tile_width": 16,
     "tile_height": 16,
     "frames": [

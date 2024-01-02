@@ -1,7 +1,17 @@
 <script lang="ts">
-  import Controls from './Controls.svelte';
-  import Grid from './Grid.svelte';
+  import Controls from './controls.svelte';
+  import Grid from './grid.svelte';
+  import Inspector from './inspector.svelte';
 </script>
 
 <Controls />
-<Grid />
+<section class="editor">
+  <Grid />
+  <Inspector />
+</section>
+
+<style>
+  .editor {
+    display: flex;
+  }
+</style>

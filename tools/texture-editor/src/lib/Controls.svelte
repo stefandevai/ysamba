@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { textureSource, tileSize } from './store';
+  import { textureSource, textureFrames, textureData, tileSize } from './store';
+  import type { TextureData, Frame } from './types';
+  import { defaultFrame } from './frame';
 
   const readTextureJSONData = (file: File) => {
     const reader = new FileReader();
@@ -36,9 +38,21 @@
     }
 
     const file = event.target.files[0];
-    const textureJSONData = await readTextureJSONData(file);
+    const textureJSONData: TextureData = await readTextureJSONData(file);
 
-    console.log(textureJSONData);
+    tileSize.set({
+      width: textureJSONData.tile_width,
+      height: textureJSONData.tile_height,
+    });
+
+    const loadedFrames = Array<Frame>(textureJSONData.width * textureJSONData.height);
+    loadedFrames.fill(defaultFrame);
+
+    for (const frame of textureJSONData.frames) {
+      loadedFrames[frame.frame] = frame;
+    }
+
+    textureFrames.set(loadedFrames);
   };
 
   const onWidthChange = (event) => {
