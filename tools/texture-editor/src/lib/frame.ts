@@ -1,6 +1,7 @@
 import type { Frame } from './types';
 
 export const defaultFrame : Frame = {
+  key: -1,
   type: 'tile',
   tile_type: 'single',
   angle: 'parallel',

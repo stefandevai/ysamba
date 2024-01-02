@@ -16,11 +16,12 @@ export const TileTypes = ['single', 'multiple'] as const;
 export const AngleTypes = ['orthogonal', 'parallel'] as const;
 
 type AnyFrame = {
+  key: number;
+  frame: number;
+  id: number;
   type: typeof FrameTypes[number];
   tile_type: typeof TileTypes[number];
   angle: typeof AngleTypes[number];
-  frame: number;
-  id: number;
   front_face_id?: number;
 };
 
@@ -40,6 +41,8 @@ type MultipleFrame = AnyFrame & {
 };
 
 export type Frame = SingleFrame | MultipleFrame;
+
+export type FrameArray = Array<Frame[]>;
 
 export type TextureData = {
   name: string;

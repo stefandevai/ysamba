@@ -27,7 +27,7 @@
             "uniform": true,
             "horizontalFrames": 32,
             "verticalFrames": 32,
-            "data_filepath": "./data/textures/tileset.json"
+            "data_filepath": "./data/textures/tileset2.json"
         },
 
         {

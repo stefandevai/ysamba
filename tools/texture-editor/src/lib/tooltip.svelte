@@ -44,12 +44,13 @@
 
 <style>
 	.tooltip {
-		border: 1px solid #ddd;
-		box-shadow: 1px 1px 1px #ddd;
-		background: white;
-		border-radius: 4px;
+		color: white;
+		background: black;
 		padding: 4px;
+		min-width: 20px;
 		position: absolute;
 		z-index: 3;
+		display: flex;
+		justify-content: center;
 	}
 </style>

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { textureSource, textureFrames, textureData, tileSize } from './store';
-  import type { TextureData, Frame } from './types';
+  import type { TextureData, Frame, FrameArray } from './types';
   import { defaultFrame } from './frame';
+  import { saveObject } from './utils';
 
   const readTextureJSONData = (file: File) => {
     const reader = new FileReader();
@@ -45,14 +46,26 @@
       height: textureJSONData.tile_height,
     });
 
-    const loadedFrames = Array<Frame>(textureJSONData.width * textureJSONData.height);
-    loadedFrames.fill(defaultFrame);
+    const horizontalTiles = textureJSONData.width / textureJSONData.tile_width;
+    const verticalTiles = textureJSONData.height / textureJSONData.tile_height;
+
+    const loadedFrames = Array<Frame[]>(horizontalTiles * verticalTiles);
+
+    for (let i = 0; i < loadedFrames.length; i++) {
+      loadedFrames[i] = [];
+    }
 
     for (const frame of textureJSONData.frames) {
-      loadedFrames[frame.frame] = frame;
+      const key = loadedFrames[frame.frame].length;
+
+      loadedFrames[frame.frame].push({
+        ...frame,
+        key,
+      });
     }
 
     textureFrames.set(loadedFrames);
+    textureData.set(textureJSONData);
   };
 
   const onWidthChange = (event) => {
@@ -68,13 +81,39 @@
       height: parseInt(event.target.value),
     }));
   }
+
+  const handleSave = () => {
+    if (!$textureData || !$textureFrames || $textureFrames.length === 0) {
+      return;
+    }
+
+    const allFrames = $textureFrames.reduce((acc, current) => [...acc, ...current]);
+
+    for (const frame of allFrames) {
+      delete frame.key;
+    }
+
+    const newTextureData = {
+      ...$textureData,
+      frames: allFrames,
+    };
+
+    saveObject('tileset.json', newTextureData);
+  }
+
 </script>
 
 <div>
-  <input type="number" on:input={onWidthChange} value={$tileSize.width} />
-  <input type="number" on:input={onHeightChange} value={$tileSize.height} />
+  {#if $textureSource}
+    <input type="number" on:input={onWidthChange} value={$tileSize.width} />
+    <input type="number" on:input={onHeightChange} value={$tileSize.height} />
+  {/if}
   <input type="file" accept="image/*" on:change={onTextureLoad} />
   <input type="file" accept="application/JSON" on:change={onDataLoad} />
+
+  {#if $textureData && $textureSource}
+    <button on:click={handleSave}>Save</button>
+  {/if}
 </div>
 
 <style>
