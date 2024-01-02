@@ -168,7 +168,13 @@ void Texture::load_data(const std::string& filepath)
 {
   m_json.load(filepath);
 
-  const auto items = m_json.object.get<std::vector<nlohmann::json>>();
+  if (!m_json.object.contains("frames"))
+  {
+    spdlog::warn("Trying to load tileset data without frames: {}", filepath);
+    return;
+  }
+
+  const auto items = m_json.object["frames"].get<std::vector<nlohmann::json>>();
 
   for (const auto& item : items)
   {
