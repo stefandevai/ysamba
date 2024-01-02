@@ -51,7 +51,7 @@
 
     context.beginPath();
     context.lineWidth = 1;
-    context.strokeStyle = "rgba(80, 80, 80, 0.6)";
+    context.strokeStyle = "rgba(200, 200, 200, 0.5)";
 
     for (let x = 0; x < canvas.width; x += params.cellSize.width) {
       context.moveTo(x, 0);
@@ -133,36 +133,47 @@
 </script>
 
 {#if $textureSource !== ''}
-  <Tooltip title={tooltipValue}>
-    <div class="wrapper" style="height: {canvas?.height ?? 0}px; width: {canvas?.width ?? 0}px;">
+  <Tooltip title={tooltipValue} class="frame-tooltip">
+    <div class="wrapper" >
       <canvas
         bind:this={canvas}
         on:mousemove={handleGridHover}
         on:mouseleave={handleGridLeave}
         on:mouseup={handleGridClick}
       />
-      <img src={$textureSource} alt="" />
+      <img src={$textureSource} alt="" style="height: {canvas?.height ?? 0}px; width: {canvas?.width ?? 0}px;" />
     </div>
   </Tooltip>
 {/if}
 
 
 <style>
+  :global(.frame-tooltip) {
+    flex: 1;
+  }
+
   .wrapper {
     position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+    margin-right: 2rem;
+    background-color: var(--color-light-gray);
   }
 
   canvas {
     position: absolute;
-    border: 1px solid rgba(80, 80, 80, 0.6);
+    border: 1px solid var(--color-light-gray);
     image-rendering: pixelated;
     cursor: pointer;
     z-index: 2;
   }
 
   img {
+    max-width: unset;
     position: absolute;
     z-index: 1;
+    background-color: white;
   }
 </style>
 

@@ -13,5 +13,7 @@
 <style>
   .editor {
     display: flex;
+    height: 100%;
+    overflow: hidden;
   }
 </style>

@@ -90,69 +90,136 @@
 </script>
 
 {#if currentFrame && $selectedTiles.length > 0}
-  <div>
-    {#each currentFrame as item}
-      <div>
-        <label>Frame:</label>
-        {item.frame}
-        <label>ID:</label>
-        <input id="id" type="number" bind:value={item.id} />
-        <label for="type">Type:</label>
-        <select bind:value={item.type}>
-          {#each FrameTypes as option}
-            <option value={option}>
-              {option}
-            </option>
-          {/each}
-        </select>
+  <div class="inspector">
+    <div class="header">
+      <h2 class="is-size-3">Frames</h2>
+    </div>
+    <div class="frames">
+      {#each currentFrame as item}
+        <div class="frame">
+          <p>Frame:</p>
+          {item.frame}
+          <p>ID:</p>
+          <input class="input" id="id" type="number" bind:value={item.id} />
+          <p for="type">Type:</p>
+          <div class="select">
+            <select bind:value={item.type}>
+              {#each FrameTypes as option}
+                <option value={option}>
+                  {option}
+                </option>
+              {/each}
+            </select>
+          </div>
 
-        <label for="tile_type">Tile Type:</label>
-        <select on:change={(event) => handleTileTypeChange(event, item.key)}>
-          {#each TileTypes as option}
-            <option value={option}>
-              {option}
-            </option>
-          {/each}
-        </select>
+          <p for="tile_type">Tile Type:</p>
+          <div class="select">
+            <select on:change={(event) => handleTileTypeChange(event, item.key)}>
+              {#each TileTypes as option}
+                <option value={option}>
+                  {option}
+                </option>
+              {/each}
+            </select>
+          </div>
 
-        <label for="angle">Angle:</label>
-        <select bind:value={item.angle}>
-          {#each AngleTypes as option}
-            <option value={option}>
-              {option}
-            </option>
-          {/each}
-        </select>
+          <p for="angle">Angle:</p>
+          <div class="select">
+            <select bind:value={item.angle}>
+              {#each AngleTypes as option}
+                <option value={option}>
+                  {option}
+                </option>
+              {/each}
+            </select>
+          </div>
 
-        {#if item.front_face_id != null}
-          <label for="front_face_id">Front Face ID:</label>
-          <input id="front_face_id" type="number" bind:value={item.front_face_id} />
-        {/if}
-        
-        {#if item.tile_type == 'multiple'}
-          <label>Size:</label>
-          <input type="number" bind:value={item.width} />
-          <input type="number" bind:value={item.height} />
-          <label>Pattern:</label>
-          {item.pattern.toString()}
-          <label>Pattern Size:</label>
-          <input type="number" bind:value={item.pattern_width} />
-          <input type="number" bind:value={item.pattern_height} />
-          <label>Anchor Size:</label>
-          <input type="number" bind:value={item.anchor_x} />
-          <input type="number" bind:value={item.anchor_y} />
-        {/if}
+          {#if item.front_face_id != null}
+            <p for="front_face_id">Front Face ID:</p>
+            <input class="input" id="front_face_id" type="number" bind:value={item.front_face_id} />
+          {/if}
+          
+          {#if item.tile_type == 'multiple'}
+            <p>Size:</p>
+            <input class="input" type="number" bind:value={item.width} />
+            <input class="input" type="number" bind:value={item.height} />
+            <p>Pattern:</p>
+            {item.pattern.toString()}
+            <p>Pattern Size:</p>
+            <input class="input" type="number" bind:value={item.pattern_width} />
+            <input class="input" type="number" bind:value={item.pattern_height} />
+            <p>Anchor Size:</p>
+            <input class="input" type="number" bind:value={item.anchor_x} />
+            <input class="input" type="number" bind:value={item.anchor_y} />
+          {/if}
 
-        <button on:click={() => handleSave(item)}>Save</button>
-        <button on:click={() => handleDelete(item)}>Delete</button>
-      </div>
-    {/each}
-    <button on:click={() => handleAdd($selectedTiles[0].index)}>Add</button>
+          <div class="buttons">
+            <button class="button is-primary" on:click={() => handleSave(item)}>Save</button>
+            <button class="button is-danger is-light" on:click={() => handleDelete(item)}>Delete</button>
+          </div>
+        </div>
+      {/each}
+      <button class="add-button button is-link is-fullwidth" on:click={() => handleAdd($selectedTiles[0].index)}>+ Add</button>
+    </div>
   </div>
 {/if}
 
 <style>
-  label {
+  .inspector {
+    width: calc(250px + 1rem);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-light-gray);
+  }
+
+  .header {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-light-gray);
+  }
+
+  h2 {
+    margin-left: 1.5rem;
+
+  }
+
+  .frames {
+    flex: 1;
+    overflow: auto;
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .frame:first-child {
+    margin-top: 1rem;
+  }
+
+  p {
+    font-weight: bold;
     display: block;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  p:not(:first-child) {
+    margin-top: 1rem;
+  }
+
+  .buttons {
+    display: flex;
+    margin: 1rem 0 0 0;
+  }
+
+  .buttons > button {
+    margin: 0;
+  }
+
+  .add-button {
+    margin-top: 1rem;
   }
 </style>

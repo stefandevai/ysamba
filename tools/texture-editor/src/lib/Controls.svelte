@@ -3,6 +3,7 @@
   import type { TextureData, Frame, FrameArray } from './types';
   import { defaultFrame } from './frame';
   import { saveObject } from './utils';
+  import FileInput from './file-input.svelte';
 
   const readTextureJSONData = (file: File) => {
     const reader = new FileReader();
@@ -103,18 +104,30 @@
 
 </script>
 
-<div>
+<div class="controls">
   {#if $textureSource}
-    <input type="number" on:input={onWidthChange} value={$tileSize.width} />
-    <input type="number" on:input={onHeightChange} value={$tileSize.height} />
+    <input class="input" type="number" on:input={onWidthChange} value={$tileSize.width} />
+    <input class="input" type="number" on:input={onHeightChange} value={$tileSize.height} />
   {/if}
-  <input type="file" accept="image/*" on:change={onTextureLoad} />
-  <input type="file" accept="application/JSON" on:change={onDataLoad} />
+  <FileInput class="te-file-input" label="Load Texture" accept="image/*" onChange={onTextureLoad} />
+  <FileInput class="te-file-input" label="Load Data" accept="application/JSON" onChange={onDataLoad} />
 
   {#if $textureData && $textureSource}
-    <button on:click={handleSave}>Save</button>
+    <button class="button is-primary" on:click={handleSave}>Save</button>
   {/if}
 </div>
 
 <style>
+  .controls {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .controls > *:not(:last-child) {
+    margin-right: 1rem;
+  }
+
+  .controls > :global(.te-file-input) {
+    margin-right: 1rem;
+  }
 </style>

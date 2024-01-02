@@ -23,6 +23,7 @@
 </script>
 
 <div
+	class="{$$restProps.class}"
 	on:mouseover={handleMouseOver}
 	on:focus={handleMouseOver}
 	on:blur={handleMouseOver}
