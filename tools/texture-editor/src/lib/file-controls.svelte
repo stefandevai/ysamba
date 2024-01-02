@@ -91,8 +91,8 @@
 </script>
 
 <div class="controls">
-  <FileInput class="te-file-input" icon={mdiTextureBox} label="Load Texture" accept="image/*" onChange={onTextureLoad} />
-  <FileInput class="te-file-input" icon={mdiText} label="Load Data" accept="application/JSON" onChange={onDataLoad} />
+  <FileInput class="te-file-input {!$textureSource ? 'is-warning is-light' : ''}" icon={mdiTextureBox} label="Load Texture" accept="image/*" onChange={onTextureLoad} />
+  <FileInput class="te-file-input {!$textureData ? 'is-warning is-light' : ''}" icon={mdiText} label="Load Data" accept="application/JSON" onChange={onDataLoad} />
 
   <button class="button is-success" on:click={handleSave} disabled={!$textureData || !$textureSource}>Save</button>
 </div>
