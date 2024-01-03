@@ -10,8 +10,11 @@ export const tileSize = writable<Size>({
 export const hoveredTile = writable<Position | null>(null);
 export const selectedTiles = writable<Position[]>([]);
 export const textureSource = writable<string>('');
+export const textureFilename = writable<string | null>(null);
 export const textureData = writable<TextureData | null>(null);
+export const textureDataFilename = writable<string | null>(null);
 export const textureFrames = writable<Frame[] | null>(null);
 export const zoom = writable<number>(1);
 
 export const tileData = writable<TileData | null>(null);
+export const tileDataFilename = writable<string | null>(null);

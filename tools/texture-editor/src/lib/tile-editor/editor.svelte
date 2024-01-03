@@ -22,7 +22,9 @@
   <SidebarControls />
 </div>
 <section class="editor">
-  <Grid />
+  <div class="grid">
+    <Grid />
+  </div>
 
   {#if $sidebar === 'inspector'}
     <SidebarInspector />
@@ -45,6 +47,12 @@
     display: flex;
     height: 100%;
     overflow: hidden;
+  }
+
+  .grid {
+    flex: 1;
+    display: flex;
+    background-color: var(--color-light-gray);
   }
 
   .te-header {

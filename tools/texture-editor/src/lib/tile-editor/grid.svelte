@@ -188,15 +188,14 @@
     height: 100%;
     overflow: scroll;
     margin-right: 2rem;
-    background-color: var(--color-light-gray);
   }
 
   canvas {
     position: absolute;
     border: 1px solid var(--color-light-gray);
     image-rendering: pixelated;
-    cursor: pointer;
     z-index: 2;
+    cursor: pointer;
   }
 
   img {
@@ -205,6 +204,7 @@
     position: absolute;
     z-index: 1;
     background-color: white;
+    cursor: pointer;
   }
 </style>
 
