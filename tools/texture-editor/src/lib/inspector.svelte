@@ -99,72 +99,75 @@
     </div>
     <div class="frames">
       {#each currentFrame as item, index}
-        <Accordion title="Game ID: {item.id}" open={index === 0}>
-          <p>Game ID:</p>
-          <input class="input" id="id" type="number" bind:value={item.id} />
-          <p for="type">Type:</p>
-          <div class="select input-group">
-            <select bind:value={item.type}>
-              {#each FrameTypes as option}
-                <option value={option}>
-                  {option}
-                </option>
-              {/each}
-            </select>
-          </div>
-
-          <p for="tile_type">Tile Type:</p>
-          <div class="select input-group">
-            <select on:change={(event) => handleTileTypeChange(event, item.key)}>
-              {#each TileTypes as option}
-                <option value={option}>
-                  {option}
-                </option>
-              {/each}
-            </select>
-          </div>
-
-          <p for="angle">Angle:</p>
-          <div class="select input-group">
-            <select bind:value={item.angle}>
-              {#each AngleTypes as option}
-                <option value={option}>
-                  {option}
-                </option>
-              {/each}
-            </select>
-          </div>
-
-          {#if item.front_face_id != null}
-            <p for="front_face_id">Front Face ID:</p>
-            <input class="input" id="front_face_id" type="number" bind:value={item.front_face_id} />
-          {/if}
-          
-          {#if item.tile_type == 'multiple'}
-            <p>Size:</p>
-            <div class="input-group">
-              <input class="input" type="number" bind:value={item.width} />
-              <input class="input" type="number" bind:value={item.height} />
+        {#key `${item.frame}${item.id}`}
+          <Accordion title="Game ID: {item.id}" open={index === 0}>
+            <p>Game ID:</p>
+            <input class="input" id="id" type="number" bind:value={item.id} />
+            <p>Type:</p>
+            <div class="select input-group">
+              <select bind:value={item.type}>
+                <option value="" disabled selected>- Select -</option>
+                {#each FrameTypes as option}
+                  <option value={option}>
+                    {option}
+                  </option>
+                {/each}
+              </select>
             </div>
-            <p>Pattern:</p>
-            {item.pattern.toString()}
-            <p>Pattern Size:</p>
-            <div class="input-group">
-              <input class="input" type="number" bind:value={item.pattern_width} />
-              <input class="input" type="number" bind:value={item.pattern_height} />
-            </div>
-            <p>Anchor Size:</p>
-            <div class="input-group">
-              <input class="input" type="number" bind:value={item.anchor_x} />
-              <input class="input" type="number" bind:value={item.anchor_y} />
-            </div>
-          {/if}
 
-          <div class="buttons">
-            <button class="button is-success is-fullwidth" on:click={() => handleSave(item)}>Save</button>
-            <button class="button is-danger is-light is-fullwidth" on:click={() => handleDelete(item)}>Delete</button>
-          </div>
-        </Accordion>
+            <p>Tile Type:</p>
+            <div class="select input-group">
+              <select bind:value={item.tile_type} on:change={(event) => handleTileTypeChange(event, item.key)}>
+                <option value="" disabled selected>- Select -</option>
+                {#each TileTypes as option}
+                  <option value={option}>
+                    {option}
+                  </option>
+                {/each}
+              </select>
+            </div>
+
+            <p>Angle:</p>
+            <div class="select input-group">
+              <select bind:value={item.angle}>
+                <option value="" disabled selected>- Select -</option>
+                {#each AngleTypes as option}
+                  <option value={option}>
+                    {option}
+                  </option>
+                {/each}
+              </select>
+            </div>
+
+            <p>Front Face ID:</p>
+            <input class="input" id="front_face_id" type="number" placeholder="Game ID" bind:value={item.front_face_id} />
+            
+            {#if item.tile_type == 'multiple'}
+              <p>Size:</p>
+              <div class="input-group">
+                <input class="input" type="number" bind:value={item.width} />
+                <input class="input" type="number" bind:value={item.height} />
+              </div>
+              <p>Pattern:</p>
+              {item.pattern.toString()}
+              <p>Pattern Size:</p>
+              <div class="input-group">
+                <input class="input" type="number" bind:value={item.pattern_width} />
+                <input class="input" type="number" bind:value={item.pattern_height} />
+              </div>
+              <p>Anchor Size:</p>
+              <div class="input-group">
+                <input class="input" type="number" bind:value={item.anchor_x} />
+                <input class="input" type="number" bind:value={item.anchor_y} />
+              </div>
+            {/if}
+
+            <div class="buttons">
+              <button class="button is-success is-fullwidth" on:click={() => handleSave(item)}>Save</button>
+              <button class="button is-danger is-light is-fullwidth" on:click={() => handleDelete(item)}>Delete</button>
+            </div>
+          </Accordion>
+        {/key}
       {/each}
       <button class="add-button button is-link is-fullwidth" on:click={() => handleAdd($selectedTiles[0].index)}>+ Add</button>
     </div>

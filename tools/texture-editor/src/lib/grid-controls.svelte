@@ -44,14 +44,14 @@
 
 {#if $textureSource}
   <div class="controls">
-    <input class="input" type="number" on:input={onWidthChange} value={$tileSize.width} />
-    <input class="input" type="number" on:input={onHeightChange} value={$tileSize.height} />
-    <button class="button" on:click={handleZoomIn}>
+    <input title="Grid cell width" class="input" type="number" on:input={onWidthChange} value={$tileSize.width} />
+    <input title="Grid cell height" class="input" type="number" on:input={onHeightChange} value={$tileSize.height} />
+    <button title="Zoom in" class="button" on:click={handleZoomIn}>
       <span class="icon is-small">
         <SvgIcon class="te-icon" type="mdi" path={mdiPlus} />
       </span>
     </button>
-    <button class="button" on:click={handleZoomOut}>
+    <button title="Zoom out" class="button" on:click={handleZoomOut}>
       <span class="icon is-small">
         <SvgIcon class="te-icon" type="mdi" path={mdiMinus} />
       </span>
