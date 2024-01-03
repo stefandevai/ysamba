@@ -1469,6 +1469,11 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
+regexparam@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/regexparam/-/regexparam-2.0.2.tgz#a0f6aa057c67b1c9c09508c45823c0755b1f6e58"
+  integrity sha512-A1PeDEYMrkLrfyOwv2jwihXbo9qxdGD3atBYQA9JJgreAx8/7rC6IUkWOw2NQlOxLp2wL0ifQbh1HuidDfYA6w==
+
 resolve-from@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
@@ -1649,6 +1654,13 @@ svelte-preprocess@^5.1.0:
     magic-string "^0.30.5"
     sorcery "^0.11.0"
     strip-indent "^3.0.0"
+
+svelte-spa-router@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/svelte-spa-router/-/svelte-spa-router-4.0.0.tgz#87c060566763c4eac0573f351145f5b75cb6328a"
+  integrity sha512-Z9OjOgF6n6N+N30aKZi20DypEfQAYY4USSChQd9UTlV6X7A2BvZ+Dm9uXx4Sw3FqwQUKelyKhEWjlD71yvLdgw==
+  dependencies:
+    regexparam "2.0.2"
 
 svelte@^4.2.8:
   version "4.2.8"

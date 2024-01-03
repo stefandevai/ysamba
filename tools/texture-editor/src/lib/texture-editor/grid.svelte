@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Tooltip from './tooltip.svelte';
+  import Tooltip from '../../common/tooltip.svelte';
   import { textureSource, hoveredTile, selectedTiles, tileSize, zoom } from './store';
   import type { DrawParams, Size } from './types';
 

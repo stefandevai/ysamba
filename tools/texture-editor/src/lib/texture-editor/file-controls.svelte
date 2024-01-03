@@ -1,9 +1,9 @@
 <script lang="ts">
   import { mdiTextureBox, mdiText } from '@mdi/js';
+  import { saveObject } from '../../common/utils';
+  import FileInput from '../../common/file-input.svelte';
   import { textureSource, textureFrames, textureData, tileSize } from './store';
   import type { TextureData, Frame } from './types';
-  import { saveObject } from './utils';
-  import FileInput from './file-input.svelte';
 
   const readTextureJSONData = (file: File) => {
     const reader = new FileReader();

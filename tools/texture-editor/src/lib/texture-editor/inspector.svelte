@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Accordion from './accordion.svelte';
+  import Accordion from '../../common/accordion.svelte';
   import { selectedTiles, textureFrames } from './store';
   import type { Position, Frame } from './types';
   import { FrameTypes, TileTypes, AngleTypes } from './types';
@@ -99,7 +99,7 @@
     </div>
     <div class="frames">
       {#each currentFrame as item, index}
-        {#key `${item.frame}${item.id}`}
+        {#key item.frame}
           <Accordion title="Game ID: {item.id}" open={index === 0}>
             <p>Game ID:</p>
             <input class="input" id="id" type="number" bind:value={item.id} />
