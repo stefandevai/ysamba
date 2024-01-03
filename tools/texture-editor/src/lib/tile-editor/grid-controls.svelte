@@ -62,7 +62,6 @@
 <style>
   .controls {
     display: flex;
-    margin-bottom: 1rem;
   }
 
   .controls > *:not(:last-child) {

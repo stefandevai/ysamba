@@ -2,8 +2,8 @@
   import { mdiTextureBox, mdiText } from '@mdi/js';
   import { saveObject } from '../../common/utils';
   import FileInput from '../../common/file-input.svelte';
-  import { textureSource, textureFrames, textureData, tileSize } from './store';
-  import type { TextureData, Frame } from './types';
+  import { textureSource, textureFrames, textureData, tileSize, tileData } from './store';
+  import type { TextureData, TileData, Frame } from './types';
 
   const readTextureJSONData = (file: File) => {
     const reader = new FileReader();
@@ -36,7 +36,7 @@
     textureSource.set(await readTextureData(file));
   };
 
-  const onDataLoad = async (event: Event) => {
+  const onTextureDataLoad = async (event: Event) => {
     const target = (event.target as HTMLInputElement);
 
     if (!target.files || target.files.length !== 1) {
@@ -73,6 +73,19 @@
     textureData.set(textureJSONData);
   };
 
+  const onTileDataLoad = async (event: Event) => {
+    const target = (event.target as HTMLInputElement);
+
+    if (!target.files || target.files.length !== 1) {
+      return;
+    }
+
+    const file = target.files[0];
+    const tileJSONData: TileData = await readTextureJSONData(file);
+
+    tileData.set(tileJSONData);
+  };
+
   const handleSave = () => {
     if (!$textureData || !$textureFrames || $textureFrames.length === 0) {
       return;
@@ -96,7 +109,8 @@
 
 <div class="controls">
   <FileInput class="te-file-input {!$textureSource ? 'is-warning is-light' : ''}" icon={mdiTextureBox} label="Load Texture" accept="image/*" onChange={onTextureLoad} />
-  <FileInput class="te-file-input {!$textureData ? 'is-warning is-light' : ''}" icon={mdiText} label="Load Data" accept="application/JSON" onChange={onDataLoad} />
+  <FileInput class="te-file-input {!$textureData ? 'is-warning is-light' : ''}" icon={mdiText} label="Load Texture Data" accept="application/JSON" onChange={onTextureDataLoad} />
+  <FileInput class="te-file-input {!$tileData ? 'is-warning is-light' : ''}" icon={mdiText} label="Load Tile Data" accept="application/JSON" onChange={onTileDataLoad} />
 
   <button class="button is-success" on:click={handleSave} disabled={!$textureData || !$textureSource}>Save</button>
 </div>

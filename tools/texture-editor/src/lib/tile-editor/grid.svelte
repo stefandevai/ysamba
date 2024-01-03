@@ -1,6 +1,6 @@
 <script lang="ts">
   import Tooltip from '../../common/tooltip.svelte';
-  import { textureSource, hoveredTile, selectedTiles, tileSize, zoom } from './store';
+  import { textureSource, hoveredTile, selectedTiles, tileSize, zoom, sidebar } from './store';
   import type { DrawParams, Size } from './types';
 
   let canvas: HTMLCanvasElement;
@@ -133,9 +133,11 @@
     const found = $selectedTiles.find((tile) => tile.index == tileIndex);
 
     if (found != null && $selectedTiles.length > 0) {
+      sidebar.set(null);
       selectedTiles.set([]);
     }
     else if (found == null) {
+      sidebar.set('inspector');
       selectedTiles.set([{
         index: tileIndex,
         x: tileX,

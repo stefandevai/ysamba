@@ -1,0 +1,245 @@
+{
+  "tiles": [
+    {
+      "id": 0,
+      "name": "void",
+      "flags": []
+    },
+    {
+      "id": 1,
+      "name": "water",
+      "flags": []
+    },
+    {
+      "id": 2,
+      "name": "grass",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "sand",
+      "flags": ["WALKABLE"],
+      "drop_ids": [6],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "wall",
+      "flags": []
+    },
+    {
+      "id": 5,
+      "name": "yuca plant",
+      "flags": [],
+      "actions": [
+        {
+          "type": 1,
+          "name": "harvest",
+          "gives_in_place": true,
+          "gives": [
+            {
+              "item_id": 1,
+              "quantity": [3, 10]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "dirt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 7,
+      "name": "mushrooms",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 1,
+          "name": "harvest",
+          "gives_in_place": true,
+          "gives": [
+            {
+              "item_id": 4,
+              "quantity": [1, 6]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "rock",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 2,
+          "name": "break",
+          "gives_in_place": true,
+          "qualities_required": ["hammer"],
+          "gives": [
+            {
+              "item_id": 5,
+              "quantity": [1, 10]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "rock",
+      "flags": [],
+      "actions": [
+        {
+          "type": 2,
+          "name": "break",
+          "gives_in_place": true,
+          "qualities_required": ["hammer"],
+          "gives": [
+            {
+              "item_id": 5,
+              "quantity": [1, 10]
+            }
+          ],
+          "turns_into": 2
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "nopal",
+      "flags": []
+    },
+    {
+      "id": 11,
+      "name": "nopal with tunas",
+      "flags": []
+    },
+    {
+      "id": 12,
+      "name": "hole in dirt",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 5,
+          "name": "prepare firecamp",
+          "turns_into": 13,
+          "consumes": [
+            {
+              "id": 9,
+              "quantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "prepared firecamp",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 6,
+          "name": "start fire",
+          "turns_into": 14,
+          "qualities_required": ["fire_starter"]
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "firecamp",
+      "flags": ["WALKABLE", "FIRE", "HURTS"]
+    },
+    {
+      "id": 15,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 1
+    },
+    {
+      "id": 16,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 2
+    },
+    {
+      "id": 23,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 2
+    },
+    {
+      "id": 17,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 3
+    },
+    {
+      "id": 18,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 4
+    },
+    {
+      "id": 19,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 5
+    },
+    {
+      "id": 20,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 6
+    },
+    {
+      "id": 21,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 7
+    },
+    {
+      "id": 22,
+      "name": "grass slope",
+      "flags": ["WALKABLE", "SLOPE"],
+      "climbs_to": 8
+    }
+  ]
+}
+
+

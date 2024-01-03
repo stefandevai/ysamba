@@ -3,8 +3,13 @@
   import { mdiCollage } from '@mdi/js';
   import FileControls from './file-controls.svelte';
   import GridControls from './grid-controls.svelte';
+  import SidebarControls from './sidebar-controls.svelte';
   import Grid from './grid.svelte';
-  import Inspector from './inspector.svelte';
+  import SidebarInspector from './sidebar-inspector.svelte';
+  import SidebarTiles from './sidebar-tiles.svelte';
+  import SidebarTileDetails from './sidebar-tile-details.svelte';
+  import SidebarRules from './sidebar-rules.svelte';
+  import { sidebar } from './store';
 </script>
 
 <div class="te-header">
@@ -12,13 +17,30 @@
   <h1 class="is-size-2">Tile Editor</h1>
   <FileControls />
 </div>
-<GridControls />
+<div class="main-controls">
+  <GridControls />
+  <SidebarControls />
+</div>
 <section class="editor">
   <Grid />
-  <Inspector />
+
+  {#if $sidebar === 'inspector'}
+    <SidebarInspector />
+  {:else if $sidebar === 'tiles'}
+    <SidebarTiles />
+  {:else if $sidebar === 'tile'}
+    <SidebarTileDetails />
+  {:else if $sidebar === 'rules'}
+    <SidebarRules />
+  {/if}
 </section>
 
 <style>
+  .main-controls {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
   .editor {
     display: flex;
     height: 100%;

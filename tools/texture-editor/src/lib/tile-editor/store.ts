@@ -1,5 +1,7 @@
 import { writable } from 'svelte/store';
-import type { Position, Size, TextureData, Frame } from './types';
+import type { Position, Size, TextureData, Frame, TileData } from './types';
+
+export const sidebar = writable<'inspector' | 'tiles' | 'tile' | 'rules' | null>(null);
 
 export const tileSize = writable<Size>({ 
   width: 16,
@@ -12,3 +14,4 @@ export const textureData = writable<TextureData | null>(null);
 export const textureFrames = writable<Frame[] | null>(null);
 export const zoom = writable<number>(1);
 
+export const tileData = writable<TileData | null>(null);

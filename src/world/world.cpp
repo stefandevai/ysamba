@@ -410,7 +410,10 @@ entt::entity World::create_item(
 
 void World::m_load_tile_data()
 {
+  m_json.load("./data/world/tiles.json");
+
   const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
+
   assert(texture != nullptr && "World texture is not loaded in order to get tile size");
 
   m_tile_size.x = texture->get_frame_width();
