@@ -3,17 +3,21 @@
   import { mdiPlus, mdiMinus } from '@mdi/js';
   import { tileSize, zoom, textureSource } from './store';
 
-  const onWidthChange = (event) => {
+  const onWidthChange = (event: Event) => {
+    const target = (event.target as HTMLInputElement);
+
     tileSize.update((size) => ({
       ...size,
-      width: parseInt(event.target.value),
+      width: parseInt(target.value),
     }));
   }
 
-  const onHeightChange = (event) => {
+  const onHeightChange = (event: Event) => {
+    const target = (event.target as HTMLInputElement);
+
     tileSize.update((size) => ({
       ...size,
-      height: parseInt(event.target.value),
+      height: parseInt(target.value),
     }));
   }
 

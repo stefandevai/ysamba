@@ -1,4 +1,4 @@
-export const saveObject = (name: string, object: any) => {
+export const saveObject = (name: string, object: unknown) => {
   // Save with line breaks and spaces
   // const objectString = JSON.stringify(object, null, 2);
   const objectString = JSON.stringify(object);

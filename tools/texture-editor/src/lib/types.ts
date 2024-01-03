@@ -55,7 +55,7 @@ export type TextureData = {
 };
 
 export type DrawParams = {
-  tileSize: Size;
+  cellSize: Size;
   hoveredCell: Position | null;
   selectedCells: Position[] | null;
 };

@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Position, Size, Optional, TextureData, Frame } from './types';
+import type { Position, Size, TextureData, Frame } from './types';
 
 export const tileSize = writable<Size>({ 
   width: 16,
@@ -11,3 +11,4 @@ export const textureSource = writable<string>('');
 export const textureData = writable<TextureData | null>(null);
 export const textureFrames = writable<Frame[] | null>(null);
 export const zoom = writable<number>(1);
+

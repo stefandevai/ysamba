@@ -1,18 +1,18 @@
 <script lang="ts">
 	import type { Optional } from './types';
 
-	export let title: Opional<string> = undefined;
+	export let title: Optional<string> = undefined;
 	let isHovering = false;
 	let x: number;
 	let y: number;
 	
-  const handleMouseOver = (event) => {
+  const handleMouseOver = (event: MouseEvent) => {
 		isHovering = true;
 		x = event.pageX + 5;
 		y = event.pageY + 5;
 	}
 
-  const handleMouseMove = (event) => {
+  const handleMouseMove = (event: MouseEvent) => {
 		x = event.pageX + 5;
 		y = event.pageY + 5;
 	}

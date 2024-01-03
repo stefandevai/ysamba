@@ -10,8 +10,10 @@
   let fileName = '';
 
   const localOnChange = (event: Event) => {
-    if (event.target.files && event.target.files.length > 0) {
-      fileName = event.target.files[0].name;
+    const target = (event.target as HTMLInputElement);
+
+    if (target.files && target.files.length > 0) {
+      fileName = target.files[0].name;
     }
 
     if (onChange != null) {

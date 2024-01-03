@@ -25,21 +25,25 @@
     });
   };
 
-  const onTextureLoad = async (event) => {
-    if (!event.target.files || event.target.files.length !== 1) {
+  const onTextureLoad = async (event: Event) => {
+    const target = (event.target as HTMLInputElement);
+
+    if (!target.files || target.files.length !== 1) {
       return;
     }
 
-    const file = event.target.files[0];
+    const file = target.files[0];
     textureSource.set(await readTextureData(file));
   };
 
-  const onDataLoad = async (event) => {
-    if (!event.target.files || event.target.files.length !== 1) {
+  const onDataLoad = async (event: Event) => {
+    const target = (event.target as HTMLInputElement);
+
+    if (!target.files || target.files.length !== 1) {
       return;
     }
 
-    const file = event.target.files[0];
+    const file = target.files[0];
     const textureJSONData: TextureData = await readTextureJSONData(file);
 
     tileSize.set({
@@ -74,7 +78,7 @@
       return;
     }
 
-    const allFrames = $textureFrames.reduce((acc, current) => [...acc, ...current]);
+    const allFrames: Frame[] = $textureFrames.reduce((acc, current) => [...acc, ...current] as Frame[]);
 
     for (const frame of allFrames) {
       delete frame.key;

@@ -11,7 +11,13 @@
 </script>
 
 <div class="wrapper {$$restProps.class}">
-  <div class="header {open ? 'header-open' : 'header-closed'} has-background-dark has-text-white" on:click={handleHeaderClick}>
+  <div
+    role="button"
+    class="header {open ? 'header-open' : 'header-closed'} has-background-dark has-text-white"
+    on:click={handleHeaderClick}
+    on:keydown={handleHeaderClick}
+    tabindex={0}
+  >
     <span>{title}</span>
     <SvgIcon class="te-icon" type="mdi" path={open ? mdiChevronUp : mdiChevronDown} />
   </div>

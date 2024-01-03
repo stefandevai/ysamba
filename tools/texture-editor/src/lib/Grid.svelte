@@ -1,10 +1,9 @@
 <script lang="ts">
   import Tooltip from './tooltip.svelte';
-  import GridControls from './grid-controls.svelte';
   import { textureSource, hoveredTile, selectedTiles, tileSize, zoom } from './store';
   import type { DrawParams, Size } from './types';
 
-  let canvas;
+  let canvas: HTMLCanvasElement;
   let originalSize: Size = {
     width: 0,
     height: 0,
@@ -16,6 +15,11 @@
     texture.onload = () => {
       originalSize.width = texture.naturalWidth;
       originalSize.height = texture.naturalHeight;
+
+      if (!canvas) {
+        return;
+      }
+
       canvas.width = texture.naturalWidth;
       canvas.height = texture.naturalHeight;
     };
@@ -73,7 +77,7 @@
     context.stroke();
   };
 
-  const handleGridHover = (event) => {
+  const handleGridHover = (event: MouseEvent) => {
     const x = event.offsetX;
     const y = event.offsetY;
     const width = canvas.width;
@@ -111,7 +115,7 @@
     }
   };
 
-  const handleGridClick = (event) => {
+  const handleGridClick = (event: MouseEvent) => {
     const x = event.offsetX;
     const y = event.offsetY;
     const width = canvas.width;
@@ -141,8 +145,8 @@
   };
 
   const applyZoom = (zoomLevel: number) => {
-    canvas.width = originalSize.width * $zoom;
-    canvas.height = originalSize.height * $zoom;
+    canvas.width = originalSize.width * zoomLevel;
+    canvas.height = originalSize.height * zoomLevel;
   };
 
   $: canvas && applyZoom($zoom)

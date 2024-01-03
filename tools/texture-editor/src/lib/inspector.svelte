@@ -25,7 +25,7 @@
   }
 
   const handleSave = (frame: Frame) => {
-    const newFrames = structuredClone($textureFrames);
+    const newFrames: Array<Array<Frame>> = structuredClone($textureFrames);
     const selectedFrames = newFrames[frame.frame].filter((item) => item.key != frame.key);
     selectedFrames.push(frame);
     newFrames[frame.frame] = selectedFrames;
@@ -33,13 +33,13 @@
   }
 
   const handleDelete = (frame: Frame) => {
-    const newFrames = structuredClone($textureFrames);
+    const newFrames: Array<Array<Frame>> = structuredClone($textureFrames);
     newFrames[frame.frame] = newFrames[frame.frame].filter((item) => item.key != frame.key);
     textureFrames.set(newFrames);
   }
 
   const handleAdd = (frameNumber: number) => {
-    const newFrames = structuredClone($textureFrames);
+    const newFrames: Array<Array<Frame>> = structuredClone($textureFrames);
     newFrames[frameNumber].push({
       ...defaultFrame,
       frame: frameNumber,
@@ -48,15 +48,17 @@
     textureFrames.set(newFrames);
   }
 
-  const handleTileTypeChange = (event, key: number) => {
+  const handleTileTypeChange = (event: Event, key: number) => {
     const item = currentFrame.find((frame) => frame.key == key);
 
     if (!item) {
       return;
     }
 
-    if (event.target.value == 'multiple') {
-      item.tile_type = event.target.value;
+    const target = (event.target as HTMLSelectElement)
+
+    if (target.value == 'multiple') {
+      item.tile_type = target.value;
       item.width = 1;
       item.height = 1;
       item.pattern = [];
@@ -67,8 +69,8 @@
       currentFrame = currentFrame.filter((frame) => frame.key != item.key);
       currentFrame.push(item);
     }
-    else if (event.target.value == 'single') {
-      item.tile_type = event.target.value;
+    else if (target.value == 'single') {
+      item.tile_type = target.value;
       delete item.width;
       delete item.height;
       delete item.pattern;
