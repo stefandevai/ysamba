@@ -1,29 +1,55 @@
 <script lang="ts">
-  import type { RuleEightSidedTerrain } from './types';
+  import SvgIcon from '@jamescoyle/svelte-icon';
+  import { mdiEyedropper } from '@mdi/js';
+  import { gridMode, selectingBitmask } from './store';
+  import { GridMode } from './types';
+  import type { RuleEightSidedTerrain, SideBitmask } from './types';
   export let rule: RuleEightSidedTerrain;
+
+  const handleSelectTile = (bitmask: SideBitmask) => {
+    gridMode.set(GridMode.EIGHT_SIDED_BITMASK_SELECTION);
+    selectingBitmask.set(bitmask.sides);
+  };
 </script>
 
 <div class="wrapper">
-  <p>Tile 1 ID:</p>
+  <div class="input-title">
+    <span class="icon is-small" on:click={() => handleSelectTile(rule.tile1)}>
+      <SvgIcon class="te-icon" type="mdi" path={mdiEyedropper} />
+    </span>
+    <p>Tile 1 ID:</p>
+  </div>
   <input class="input" type="number" bind:value={rule.tile1.id} />
 
-  <p>Tile 3 ID:</p>
+  <div class="input-title">
+    <span class="icon is-small" on:click={() => handleSelectTile(rule.tile3)}>
+      <SvgIcon class="te-icon" type="mdi" path={mdiEyedropper} />
+    </span>
+    <p>Tile 3 ID:</p>
+  </div>
   <input class="input" type="number" bind:value={rule.tile3.id} />
 </div>
 
 <style>
-  p {
-    font-weight: bold;
-    display: block;
-    margin-left: 0;
-    margin-right: 0;
+  .input-title {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
   }
 
-  p:not(:last-child) {
+  .input-title > p {
+    font-weight: bold;
+    display: block;
+    margin-left: 0.25rem;
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  .input-title:not(:last-child) {
     margin-bottom: 0.5rem;
   }
 
-  p {
-    margin-top: 1rem;
+  .icon {
+    cursor: pointer;
   }
 </style>

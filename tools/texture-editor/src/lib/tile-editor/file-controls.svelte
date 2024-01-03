@@ -148,7 +148,7 @@
     tileData.set(tileJSONData);
     tileDataFilename.set(file.name);
     await idbSet('tileData', JSON.stringify($tileData));
-    await idbSet('tileDataFilename', JSON.stringify($tileDataFilename));
+    await idbSet('tileDataFilename', $tileDataFilename);
   };
 
   const handleSave = () => {

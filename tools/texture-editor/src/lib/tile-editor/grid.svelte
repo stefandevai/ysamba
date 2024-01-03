@@ -1,7 +1,17 @@
 <script lang="ts">
   import Tooltip from '../../common/tooltip.svelte';
-  import { textureSource, hoveredTile, selectedTiles, tileSize, zoom, sidebar } from './store';
+  import { GridMode, Side } from './types';
   import type { DrawParams, Size } from './types';
+  import {
+    textureSource,
+    hoveredTile,
+    selectedTiles,
+    tileSize,
+    zoom,
+    sidebar,
+    gridMode,
+    selectingBitmask,
+  } from './store';
 
   let canvas: HTMLCanvasElement;
   let originalSize: Size = {
@@ -29,6 +39,70 @@
     fitCanvasToTexture(value);
   });
 
+  const drawHoveredCellByMode = (mode: GridMode, params: DrawParams, context: CanvasRenderingContext2D) => {
+    context.fillStyle = "rgba(96, 200, 235, 0.5)";
+
+    const top = params.hoveredCell.y * params.cellSize.height * params.gridZoom;
+    const left = params.hoveredCell.x * params.cellSize.width * params.gridZoom;
+    const cellWidth = params.cellSize.width * params.gridZoom;
+    const cellHeight = params.cellSize.height * params.gridZoom;
+
+    switch(mode) {
+      case GridMode.NORMAL: {
+        context.fillRect(left, top, cellWidth, cellHeight);
+        break;
+      }
+      case GridMode.EIGHT_SIDED_BITMASK_SELECTION: {
+        const bitmask = params.bitmask;
+
+        if (!bitmask) {
+          return;
+        }
+
+        const padding = params.gridZoom / 2;
+        const bitmaskTop = top + padding;
+        const bitmaskLeft = left + padding;
+        const bitmaskWidth = Math.floor(cellWidth / 3);
+        const bitmaskHeight = Math.floor(cellHeight / 3);
+        const bitmaskPaddedWidth = bitmaskWidth - padding * 2;
+        const bitmaskPaddedHeight = bitmaskHeight - padding * 2;
+
+        /* const bitmask = Side.TOP | Side.BOTTOM | Side.TOP_LEFT | Side.TOP_RIGHT | Side.RIGHT | Side.BOTTOM_RIGHT | Side.BOTTOM_LEFT | Side.LEFT; */
+        /* const bitmask = Side.TOP_LEFT | Side.TOP; */
+
+        if (bitmask & Side.TOP_LEFT) {
+          context.fillRect(bitmaskLeft, bitmaskTop, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.TOP) {
+          context.fillRect(bitmaskLeft + bitmaskWidth, bitmaskTop, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.TOP_RIGHT) {
+          context.fillRect(bitmaskLeft + bitmaskWidth * 2, bitmaskTop, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.RIGHT) {
+          context.fillRect(bitmaskLeft + bitmaskWidth * 2, bitmaskTop + bitmaskHeight, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.BOTTOM_RIGHT) {
+          context.fillRect(bitmaskLeft + bitmaskWidth * 2, bitmaskTop + bitmaskHeight * 2, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.BOTTOM) {
+          context.fillRect(bitmaskLeft + bitmaskWidth, bitmaskTop + bitmaskHeight * 2, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.BOTTOM_LEFT) {
+          context.fillRect(bitmaskLeft, bitmaskTop + bitmaskHeight * 2, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+        if (bitmask & Side.LEFT) {
+          context.fillRect(bitmaskLeft, bitmaskTop + bitmaskHeight, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        }
+
+        // Center
+        context.fillRect(bitmaskLeft + bitmaskWidth, bitmaskTop + bitmaskHeight, bitmaskPaddedWidth, bitmaskPaddedHeight);
+        break;
+      }
+      default: break;
+    }
+  };
+
   const drawGrid = (params: DrawParams) => {
     if (params.cellSize.width <= 0 || params.cellSize.height <= 0 || isNaN(params.cellSize.width) || isNaN(params.cellSize.height) || !canvas) {
       return;
@@ -39,23 +113,24 @@
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     if (params.hoveredCell != null) {
-      context.fillStyle = "rgba(96, 200, 235, 0.5)";
-      context.fillRect(
-        params.hoveredCell.x * params.cellSize.width * $zoom,
-        params.hoveredCell.y * params.cellSize.height * $zoom,
-        params.cellSize.width * $zoom,
-        params.cellSize.height * $zoom,
-      );
+      drawHoveredCellByMode(params.mode, params, context);
+      /* context.fillStyle = "rgba(96, 200, 235, 0.5)"; */
+      /* context.fillRect( */
+      /*   params.hoveredCell.x * params.cellSize.width * params.gridZoom, */
+      /*   params.hoveredCell.y * params.cellSize.height * params.gridZoom, */
+      /*   params.cellSize.width * params.gridZoom, */
+      /*   params.cellSize.height * params.gridZoom, */
+      /* ); */
     }
 
     if (params.selectedCells != null) {
       for (const cell of params.selectedCells) {
         context.fillStyle = "rgba(222, 85, 80, 0.5)";
         context.fillRect(
-          cell.x * params.cellSize.width * $zoom,
-          cell.y * params.cellSize.height * $zoom,
-          params.cellSize.width * $zoom,
-          params.cellSize.height * $zoom,
+          cell.x * params.cellSize.width * params.gridZoom,
+          cell.y * params.cellSize.height * params.gridZoom,
+          params.cellSize.width * params.gridZoom,
+          params.cellSize.height * params.gridZoom,
         );
       }
     }
@@ -64,12 +139,12 @@
     context.lineWidth = 1;
     context.strokeStyle = "rgba(200, 200, 200, 0.5)";
 
-    for (let x = 0; x < canvas.width; x += params.cellSize.width * $zoom) {
+    for (let x = 0; x < canvas.width; x += params.cellSize.width * params.gridZoom) {
       context.moveTo(x, 0);
       context.lineTo(x, canvas.height);
     }
 
-    for (let y = 0; y < canvas.height; y += params.cellSize.height * $zoom) {
+    for (let y = 0; y < canvas.height; y += params.cellSize.height * params.gridZoom) {
       context.moveTo(0, y);
       context.lineTo(canvas.width, y);
     }
@@ -154,9 +229,12 @@
   $: canvas && applyZoom($zoom)
 
   $: canvas && drawGrid({
+    mode: $gridMode,
     cellSize: $tileSize,
     hoveredCell: $hoveredTile,
     selectedCells: $selectedTiles,
+    gridZoom: $zoom,
+    bitmask: $selectingBitmask,
   });
 
   $: tooltipValue = $hoveredTile ? $hoveredTile.index.toString() : undefined;

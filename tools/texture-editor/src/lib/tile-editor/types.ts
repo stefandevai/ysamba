@@ -54,12 +54,6 @@ export type TextureData = {
   frames: Frame[];
 };
 
-export type DrawParams = {
-  cellSize: Size;
-  hoveredCell: Position | null;
-  selectedCells: Position[] | null;
-};
-
 export type Drop = {
   item_id: number;
   quantity: [number, number];
@@ -98,7 +92,7 @@ export type Rule = {
   type: RuleType;
 };
 
-enum Side {
+export enum Side {
   TOP_LEFT = 0b00000001,
   TOP = 0b00000010,
   TOP_RIGHT = 0b00000100,
@@ -135,3 +129,18 @@ export const createEightSidedTerrainRule = (name: string, id: number): RuleEight
     },
   };
 }
+
+export enum GridMode {
+  NORMAL = 'normal',
+  EIGHT_SIDED_BITMASK_SELECTION = 'eight-sided-bitmask-selection',
+};
+
+export type DrawParams = {
+  mode: GridMode;
+  cellSize: Size;
+  hoveredCell: Position | null;
+  selectedCells: Position[] | null;
+  gridZoom: number;
+  bitmask: number | null;
+};
+

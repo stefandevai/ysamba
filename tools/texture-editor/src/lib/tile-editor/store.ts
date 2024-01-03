@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { GridMode } from './types';
 import type { Position, Size, TextureData, Frame, TileData } from './types';
 
 export const sidebar = writable<'inspector' | 'tiles' | 'tile' | 'rules' | null>(null);
@@ -15,6 +16,9 @@ export const textureData = writable<TextureData | null>(null);
 export const textureDataFilename = writable<string | null>(null);
 export const textureFrames = writable<Frame[] | null>(null);
 export const zoom = writable<number>(1);
+export const gridMode = writable<GridMode>(GridMode.NORMAL);
+export const selectingBitmask = writable<number | null>(null);
 
 export const tileData = writable<TileData | null>(null);
 export const tileDataFilename = writable<string | null>(null);
+
