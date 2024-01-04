@@ -30,5 +30,6 @@ class MapGenerator
   JSON m_json{"./data/world/map_generators/terrain.json"};
   void m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset);
   float m_get_rectangle_gradient_value(const int x, const int y);
+  void m_evaluate_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
 };
 }  // namespace dl

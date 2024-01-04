@@ -238,6 +238,86 @@
       "name": "grass slope",
       "flags": ["WALKABLE", "SLOPE"],
       "climbs_to": 8
+    },
+    {
+      "id": 23,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 24,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 25,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 26,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 27,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 28,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 29,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 30,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 31,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 32,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 33,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 34,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 35,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 36,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 37,
+      "name": "grass",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 38,
+      "name": "grass",
+      "flags": ["WALKABLE"]
     }
   ]
 }

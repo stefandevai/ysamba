@@ -83,6 +83,7 @@ export type TileData = {
 
 export enum RuleType {
   EIGHT_SIDED_TERRAIN = 0,
+  FOUR_SIDED_TERRAIN = 0,
   RANDOM,
 }
 
@@ -92,7 +93,16 @@ export type Rule = {
   type: RuleType;
 };
 
-export enum Side {
+export enum FourSide {
+  NONE = 0b0000,
+  TOP = 0b0001,
+  RIGHT = 0b0010,
+  BOTTOM = 0b0100,
+  LEFT = 0b1000,
+}
+
+export enum EightSide {
+  NONE = 0b00000000,
   TOP_LEFT = 0b00000001,
   TOP = 0b00000010,
   TOP_RIGHT = 0b00000100,
@@ -114,17 +124,109 @@ export type RuleEightSidedTerrain = Rule & {
   tile3: SideBitmask;
 };
 
+export type RuleFourSidedTerrain = Rule & {
+  type: RuleType.FOUR_SIDED_TERRAIN;
+  tile0: SideBitmask;
+  tile1: SideBitmask;
+  tile2: SideBitmask;
+  tile3: SideBitmask;
+  tile4: SideBitmask;
+  tile5: SideBitmask;
+  tile6: SideBitmask;
+  tile7: SideBitmask;
+  tile8: SideBitmask;
+  tile9: SideBitmask;
+  tile10: SideBitmask;
+  tile11: SideBitmask;
+  tile12: SideBitmask;
+  tile13: SideBitmask;
+  tile14: SideBitmask;
+  tile15: SideBitmask;
+};
+
 export const createEightSidedTerrainRule = (name: string, id: number): RuleEightSidedTerrain => {
   return {
     name,
     id,
     type: RuleType.EIGHT_SIDED_TERRAIN,
     tile1: {
-      sides: Side.TOP_LEFT,
+      sides: EightSide.TOP_LEFT,
       id: -1,
     },
     tile3: {
-      sides: Side.TOP_LEFT | Side.TOP,
+      sides: EightSide.TOP_LEFT | EightSide.TOP,
+      id: -1,
+    },
+  };
+}
+
+export const createFourSidedTerrainRule = (name: string, id: number): RuleFourSidedTerrain => {
+  return {
+    name,
+    id,
+    type: RuleType.FOUR_SIDED_TERRAIN,
+    tile0: {
+      sides: FourSide.TOP | FourSide.RIGHT | FourSide.BOTTOM | FourSide.LEFT,
+      id: -1,
+    },
+    tile1: {
+      sides: FourSide.RIGHT | FourSide.BOTTOM | FourSide.LEFT,
+      id: -1,
+    },
+    tile2: {
+      sides: FourSide.TOP | FourSide.RIGHT | FourSide.BOTTOM,
+      id: -1,
+    },
+    tile3: {
+      sides: FourSide.RIGHT | FourSide.BOTTOM,
+      id: -1,
+    },
+    tile4: {
+      sides: FourSide.TOP | FourSide.BOTTOM | FourSide.LEFT,
+      id: -1,
+    },
+    tile5: {
+      sides: FourSide.BOTTOM | FourSide.LEFT,
+      id: -1,
+    },
+    tile6: {
+      sides: FourSide.TOP | FourSide.BOTTOM,
+      id: -1,
+    },
+    tile7: {
+      sides: FourSide.BOTTOM,
+      id: -1,
+    },
+    tile8: {
+      sides: FourSide.TOP | FourSide.RIGHT | FourSide.LEFT,
+      id: -1,
+    },
+    tile9: {
+      sides: FourSide.RIGHT | FourSide.LEFT,
+      id: -1,
+    },
+    tile10: {
+      sides: FourSide.TOP | FourSide.RIGHT,
+      id: -1,
+    },
+    tile11: {
+      sides: FourSide.RIGHT,
+      id: -1,
+    },
+    tile12: {
+      sides: FourSide.TOP | FourSide.LEFT,
+      id: -1,
+    },
+    tile13: {
+      sides: FourSide.LEFT,
+      id: -1,
+    },
+    tile14: {
+      sides: FourSide.TOP,
+      id: -1,
+    },
+    tile15: {
+      sides: FourSide.NONE,
       id: -1,
     },
   };
@@ -133,6 +235,7 @@ export const createEightSidedTerrainRule = (name: string, id: number): RuleEight
 export enum GridMode {
   NORMAL = 'normal',
   EIGHT_SIDED_BITMASK_SELECTION = 'eight-sided-bitmask-selection',
+  FOUR_SIDED_BITMASK_SELECTION = 'eight-sided-bitmask-selection',
 };
 
 export type DrawParams = {

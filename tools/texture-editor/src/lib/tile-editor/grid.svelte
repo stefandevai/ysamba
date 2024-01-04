@@ -1,6 +1,6 @@
 <script lang="ts">
   import Tooltip from '../../common/tooltip.svelte';
-  import { GridMode, Side } from './types';
+  import { GridMode, EightSide } from './types';
   import type { DrawParams, Size } from './types';
   import {
     textureSource,
@@ -59,7 +59,8 @@
           return;
         }
 
-        const padding = params.gridZoom / 2;
+        /* const padding = params.gridZoom / 2; */
+        const padding = 0;
         const bitmaskTop = top + padding;
         const bitmaskLeft = left + padding;
         const bitmaskWidth = Math.floor(cellWidth / 3);
@@ -67,31 +68,31 @@
         const bitmaskPaddedWidth = bitmaskWidth - padding * 2;
         const bitmaskPaddedHeight = bitmaskHeight - padding * 2;
 
-        /* const bitmask = Side.TOP | Side.BOTTOM | Side.TOP_LEFT | Side.TOP_RIGHT | Side.RIGHT | Side.BOTTOM_RIGHT | Side.BOTTOM_LEFT | Side.LEFT; */
-        /* const bitmask = Side.TOP_LEFT | Side.TOP; */
+        /* const bitmask = EightSide.TOP | EightSide.BOTTOM | EightSide.TOP_LEFT | EightSide.TOP_RIGHT | EightSide.RIGHT | EightSide.BOTTOM_RIGHT | EightSide.BOTTOM_LEFT | EightSide.LEFT; */
+        /* const bitmask = EightSide.TOP_LEFT | EightSide.TOP; */
 
-        if (bitmask & Side.TOP_LEFT) {
+        if (bitmask & EightSide.TOP_LEFT) {
           context.fillRect(bitmaskLeft, bitmaskTop, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.TOP) {
+        if (bitmask & EightSide.TOP) {
           context.fillRect(bitmaskLeft + bitmaskWidth, bitmaskTop, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.TOP_RIGHT) {
+        if (bitmask & EightSide.TOP_RIGHT) {
           context.fillRect(bitmaskLeft + bitmaskWidth * 2, bitmaskTop, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.RIGHT) {
+        if (bitmask & EightSide.RIGHT) {
           context.fillRect(bitmaskLeft + bitmaskWidth * 2, bitmaskTop + bitmaskHeight, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.BOTTOM_RIGHT) {
+        if (bitmask & EightSide.BOTTOM_RIGHT) {
           context.fillRect(bitmaskLeft + bitmaskWidth * 2, bitmaskTop + bitmaskHeight * 2, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.BOTTOM) {
+        if (bitmask & EightSide.BOTTOM) {
           context.fillRect(bitmaskLeft + bitmaskWidth, bitmaskTop + bitmaskHeight * 2, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.BOTTOM_LEFT) {
+        if (bitmask & EightSide.BOTTOM_LEFT) {
           context.fillRect(bitmaskLeft, bitmaskTop + bitmaskHeight * 2, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
-        if (bitmask & Side.LEFT) {
+        if (bitmask & EightSide.LEFT) {
           context.fillRect(bitmaskLeft, bitmaskTop + bitmaskHeight, bitmaskPaddedWidth, bitmaskPaddedHeight);
         }
 

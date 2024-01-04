@@ -2,13 +2,15 @@
   import SidebarBase from '../../common/sidebar-base.svelte';
   import Accordion from '../../common/accordion.svelte';
   import EightSidedTerrainForm from './eight-sided-terrain-form.svelte';
-  import { createEightSidedTerrainRule, RuleType } from './types';
+  import FourSidedTerrainForm from './four-sided-terrain-form.svelte';
+  import { createEightSidedTerrainRule, createFourSidedTerrainRule, RuleType } from './types';
   import type { Rule } from './types';
 
   let rules: Rule[] = [];
 
   const handleAdd = () => {
-    const rule = createEightSidedTerrainRule('terrain', 0);
+    /* const rule = createEightSidedTerrainRule('terrain', 0); */
+    const rule = createFourSidedTerrainRule('terrain', 0);
     rules = [
       ...rules,
       rule,
@@ -19,6 +21,8 @@
     switch (type) {
       case RuleType.EIGHT_SIDED_TERRAIN:
         return EightSidedTerrainForm;
+      case RuleType.FOUR_SIDED_TERRAIN:
+        return FourSidedTerrainForm;
       default:
         return EightSidedTerrainForm;
     }

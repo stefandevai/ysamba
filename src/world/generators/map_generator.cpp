@@ -33,6 +33,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   raw_height_map.resize(width * height);
   /* std::vector<float> raw_height_map(width * height); */
   tiles = std::vector<Cell>(width * height * depth);
+  auto terrain = std::vector<int>(width * height * depth);
   height_map = std::vector<int>(width * height);
 
   /* auto start = std::chrono::high_resolution_clock::now(); */
@@ -52,11 +53,11 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       if (k < 2)
       {
-        tiles[k * width * height + j * width + i].id = 1;
+        terrain[k * width * height + j * width + i] = 1;
       }
       else
       {
-        tiles[k * width * height + j * width + i].id = 2;
+        terrain[k * width * height + j * width + i] = 2;
       }
 
       /* if (k == 0) */
@@ -125,6 +126,17 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   /* auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); */
 
   /* spdlog::info("World generation finished! It took {} milliseconds", duration.count()); */
+
+  for (int k = 0; k < depth; ++k)
+  {
+    for (int j = 0; j < height; ++j)
+    {
+      for (int i = 0; i < width; ++i)
+      {
+        m_evaluate_tile(terrain, i, j, k);
+      }
+    }
+  }
 }
 
 void MapGenerator::set_size(const Vector3i& size)
@@ -204,6 +216,19 @@ float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
   distance_to_edge = std::min(distance_to_edge, abs(y - height));
   distance_to_edge = std::min(distance_to_edge, y) * 2;
   return 1.f - static_cast<float>(distance_to_edge) / (width / 2.0f);
+}
+
+void MapGenerator::m_evaluate_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
+{
+  const auto terrain_id = terrain[z * width * height + y * width + x];
+
+  if (terrain_id <= 0)
+  {
+    return;
+  }
+
+  // TODO: Select tile based on rules
+  tiles[z * width * height + y * width + x].id = terrain_id;
 }
 
 }  // namespace dl
