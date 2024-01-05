@@ -123,3 +123,4 @@ build
 vcpkg_installed
 vcpkg
 ./lib
+.cache

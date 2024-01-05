@@ -222,7 +222,7 @@ void MapGenerator::m_evaluate_tile(const std::vector<int>& terrain, const int x,
 {
   const auto terrain_id = terrain[z * width * height + y * width + x];
 
-  if (terrain_id <= 0)
+  if (terrain_id == 0)
   {
     return;
   }
