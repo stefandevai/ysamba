@@ -30,11 +30,14 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   /* spdlog::info("WIDTH: {}", width); */
   /* spdlog::info("HEIGHT: {}\n", height); */
 
-  raw_height_map.resize(width * height);
-  /* std::vector<float> raw_height_map(width * height); */
+  const int padded_width = width + m_generation_padding * 2;
+  const int padded_height = height + m_generation_padding * 2;
+
   tiles = std::vector<Cell>(width * height * depth);
-  auto terrain = std::vector<int>(width * height * depth);
   height_map = std::vector<int>(width * height);
+
+  raw_height_map.resize(padded_width * padded_height);
+  auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
   /* auto start = std::chrono::high_resolution_clock::now(); */
 
@@ -42,14 +45,18 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
   m_get_height_map(raw_height_map, seed, offset);
 
-  for (int j = 0; j < height; ++j)
+  for (int j = 0; j < padded_height; ++j)
   {
-    for (int i = 0; i < width; ++i)
+    for (int i = 0; i < padded_width; ++i)
     {
-      const auto map_value = raw_height_map[j * width + i];
+      const auto map_value = raw_height_map[j * padded_width + i];
       const int k = static_cast<int>(map_value * (depth - 1));
 
-      height_map[j * width + i] = k;
+      if (j >= m_generation_padding && j < padded_width - m_generation_padding && i >= m_generation_padding &&
+          i < padded_height - m_generation_padding)
+      {
+        height_map[(j - 1) * width + (i - 1)] = k;
+      }
 
       int terrain_id = 0;
 
@@ -62,7 +69,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
         terrain_id = 2;
       }
 
-      terrain[k * width * height + j * width + i] = terrain_id;
+      terrain[k * padded_width * padded_height + j * padded_width + i] = terrain_id;
 
       /* if (k == 0) */
       /* { */
@@ -121,7 +128,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       for (int z = 0; z < k; ++z)
       {
-        terrain[z * width * height + j * width + i] = terrain_id;
+        terrain[z * padded_width * padded_height + j * padded_width + i] = terrain_id;
       }
     }
   }
@@ -158,7 +165,13 @@ void MapGenerator::m_get_height_map(std::vector<float>& height_values, const int
   // W0.0, O5, L2.0))) + MinSmooth(S2.46))
   FastNoise::SmartNode<> noise_generator = FastNoise::NewFromEncodedNodeTree(
       "HwAPAAMAAAAAAABAKQAAAAAAPwAAAAAAAQ0ABQAAAAAAAEAWAAoAAAApAAAAAAA/AAAAAAAApHAdQA==");
-  noise_generator->GenUniformGrid2D(height_values.data(), offset.x, offset.y, width, height, frequency, seed);
+  noise_generator->GenUniformGrid2D(height_values.data(),
+                                    offset.x - m_generation_padding,
+                                    offset.y + m_generation_padding,
+                                    width + m_generation_padding * 2,
+                                    height + m_generation_padding * 2,
+                                    frequency,
+                                    seed);
 
   /* const auto simplex_freq = m_json.object["simplex_freq"].get<float>(); */
   /* const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>(); */
@@ -224,7 +237,12 @@ float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
 
 void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
 {
-  const auto terrain_id = terrain[z * width * height + y * width + x];
+  const int padded_width = width + m_generation_padding * 2;
+  const int padded_height = height + m_generation_padding * 2;
+  const int transposed_x = x + m_generation_padding;
+  const int transposed_y = y + m_generation_padding;
+
+  const auto terrain_id = terrain[z * padded_width * padded_height + transposed_y * padded_width + transposed_x];
 
   if (terrain_id == 0)
   {
@@ -236,7 +254,7 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
     return;
   }
 
-  const auto bitmask = m_get_bitmask(terrain, x, y, z);
+  const auto bitmask = m_get_bitmask(terrain, transposed_x, transposed_y, z);
 
   switch (bitmask)
   {
@@ -295,25 +313,27 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
 
 uint32_t MapGenerator::m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z)
 {
+  const int padded_width = width + m_generation_padding * 2;
+  const int padded_height = height + m_generation_padding * 2;
   uint32_t bitmask = 0;
 
   // Top
-  if (y > 0 && terrain[z * width * height + (y - 1) * width + x] == 0)
+  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == 0)
   {
     bitmask |= DL_EDGE_TOP;
   }
   // Right
-  if (x < width - 1 && terrain[z * width * height + y * width + x + 1] == 0)
+  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == 0)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
-  if (y < height - 1 && terrain[z * width * height + (y + 1) * width + x] == 0)
+  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == 0)
   {
     bitmask |= DL_EDGE_BOTTOM;
   }
   // Left
-  if (x > 0 && terrain[z * width * height + y * width + x - 1] == 0)
+  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == 0)
   {
     bitmask |= DL_EDGE_LEFT;
   }

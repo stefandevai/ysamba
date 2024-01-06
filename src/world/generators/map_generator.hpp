@@ -37,6 +37,7 @@ class MapGenerator
   };
 
   JSON m_json{"./data/world/map_generators/terrain.json"};
+  int m_generation_padding = 1;
   void m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset);
   float m_get_rectangle_gradient_value(const int x, const int y);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
