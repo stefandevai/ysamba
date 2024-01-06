@@ -27,9 +27,19 @@ class MapGenerator
   void set_size(const Vector3i& size);
 
  private:
+  enum Edge
+  {
+    DL_EDGE_NONE = 0,
+    DL_EDGE_TOP = 1,
+    DL_EDGE_RIGHT = 2,
+    DL_EDGE_BOTTOM = 4,
+    DL_EDGE_LEFT = 8,
+  };
+
   JSON m_json{"./data/world/map_generators/terrain.json"};
   void m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset);
   float m_get_rectangle_gradient_value(const int x, const int y);
-  void m_evaluate_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
+  void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
+  uint32_t m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z);
 };
 }  // namespace dl

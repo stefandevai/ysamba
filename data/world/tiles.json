@@ -318,6 +318,11 @@
       "id": 38,
       "name": "grass",
       "flags": ["WALKABLE"]
+    },
+    {
+      "id": 39,
+      "name": "grass slope",
+      "flags": ["WALKABLE"]
     }
   ]
 }

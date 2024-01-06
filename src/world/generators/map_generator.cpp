@@ -51,14 +51,18 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       height_map[j * width + i] = k;
 
+      int terrain_id = 0;
+
       if (k < 2)
       {
-        terrain[k * width * height + j * width + i] = 1;
+        terrain_id = 1;
       }
       else
       {
-        terrain[k * width * height + j * width + i] = 2;
+        terrain_id = 2;
       }
+
+      terrain[k * width * height + j * width + i] = terrain_id;
 
       /* if (k == 0) */
       /* { */
@@ -110,15 +114,15 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
       /*   tiles[k * width * height + j * width + i] = 2; */
       /* } */
 
-      /* if (k > 0) */
-      /* { */
-      /*   tiles[(k - 1) * width * height + j * width + i] = 15; */
-      /* } */
+      // if (k > 7)
+      // {
+      //   terrain[(k - 1) * width * height + j * width + i] = terrain_id;
+      // }
 
-      /* for (int z = 0; z < k; ++z) */
-      /* { */
-      /*   tiles[z * width * height + j * width + i].id = 5; */
-      /* } */
+      for (int z = 0; z < k; ++z)
+      {
+        terrain[z * width * height + j * width + i] = terrain_id;
+      }
     }
   }
 
@@ -133,7 +137,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     {
       for (int i = 0; i < width; ++i)
       {
-        m_evaluate_tile(terrain, i, j, k);
+        m_select_tile(terrain, i, j, k);
       }
     }
   }
@@ -218,7 +222,7 @@ float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
   return 1.f - static_cast<float>(distance_to_edge) / (width / 2.0f);
 }
 
-void MapGenerator::m_evaluate_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
+void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
 {
   const auto terrain_id = terrain[z * width * height + y * width + x];
 
@@ -226,9 +230,95 @@ void MapGenerator::m_evaluate_tile(const std::vector<int>& terrain, const int x,
   {
     return;
   }
+  if (terrain_id == 1)
+  {
+    tiles[z * width * height + y * width + x].id = terrain_id;
+    return;
+  }
 
-  // TODO: Select tile based on rules
-  tiles[z * width * height + y * width + x].id = terrain_id;
+  const auto bitmask = m_get_bitmask(terrain, x, y, z);
+
+  switch (bitmask)
+  {
+  case DL_EDGE_NONE:
+    tiles[z * width * height + y * width + x].id = 38;
+    break;
+  case DL_EDGE_TOP:
+    tiles[z * width * height + y * width + x].id = 37;
+    break;
+  case DL_EDGE_RIGHT:
+    tiles[z * width * height + y * width + x].id = 34;
+    break;
+  case DL_EDGE_BOTTOM:
+    tiles[z * width * height + y * width + x].id = 30;
+    break;
+  case DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 36;
+    break;
+  case DL_EDGE_TOP | DL_EDGE_RIGHT:
+    tiles[z * width * height + y * width + x].id = 33;
+    break;
+  case DL_EDGE_TOP | DL_EDGE_BOTTOM:
+    tiles[z * width * height + y * width + x].id = 29;
+    break;
+  case DL_EDGE_TOP | DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 35;
+    break;
+  case DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+    tiles[z * width * height + y * width + x].id = 26;
+    break;
+  case DL_EDGE_RIGHT | DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 32;
+    break;
+  case DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 28;
+    break;
+  case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+    tiles[z * width * height + y * width + x].id = 25;
+    break;
+  case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 31;
+    break;
+  case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 27;
+    break;
+  case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+    tiles[z * width * height + y * width + x].id = 24;
+    break;
+  case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP:
+    tiles[z * width * height + y * width + x].id = 23;
+    break;
+  }
+
+  // tiles[z * width * height + y * width + x].id = terrain_id;
+}
+
+uint32_t MapGenerator::m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z)
+{
+  uint32_t bitmask = 0;
+
+  // Top
+  if (y > 0 && terrain[z * width * height + (y - 1) * width + x] == 0)
+  {
+    bitmask |= DL_EDGE_TOP;
+  }
+  // Right
+  if (x < width - 1 && terrain[z * width * height + y * width + x + 1] == 0)
+  {
+    bitmask |= DL_EDGE_RIGHT;
+  }
+  // Bottom
+  if (y < height - 1 && terrain[z * width * height + (y + 1) * width + x] == 0)
+  {
+    bitmask |= DL_EDGE_BOTTOM;
+  }
+  // Left
+  if (x > 0 && terrain[z * width * height + y * width + x - 1] == 0)
+  {
+    bitmask |= DL_EDGE_LEFT;
+  }
+
+  return bitmask;
 }
 
 }  // namespace dl
