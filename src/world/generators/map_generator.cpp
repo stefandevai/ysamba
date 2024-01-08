@@ -160,7 +160,7 @@ void MapGenerator::set_size(const Vector3i& size)
 void MapGenerator::m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset)
 {
   /* const float frequency = 0.005f; */
-  const float frequency = 0.01f;
+  const float frequency = 0.005f;
   // (2D) (((OpenSimplex2S + FractalRidged(G0.5 W0.0, O3, L2)) + (OpenSimplex2S + SeedOffset(S10) + FractalFBm(G0.5,
   // W0.0, O5, L2.0))) + MinSmooth(S2.46))
   FastNoise::SmartNode<> noise_generator = FastNoise::NewFromEncodedNodeTree(

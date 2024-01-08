@@ -323,6 +323,21 @@
       "id": 39,
       "name": "grass slope",
       "flags": ["WALKABLE"]
+    },
+    {
+      "id": 40,
+      "name": "grass slope",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 41,
+      "name": "grass slope",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 42,
+      "name": "grass slope",
+      "flags": ["WALKABLE"]
     }
   ]
 }
