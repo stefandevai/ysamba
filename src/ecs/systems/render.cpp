@@ -182,7 +182,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
                 continue;
               }
 
-              m_render_tile(chunk, terrain_id, tile_size, i + local_i, j + local_j, z);
+              m_render_tile(chunk, terrain_id, tile_size, local_i, local_j, z);
             }
           }
         }
@@ -260,7 +260,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
                 continue;
               }
 
-              m_render_tile(chunk, terrain_id, tile_size, i + local_i, j + local_j, z);
+              m_render_tile(chunk, terrain_id, tile_size, local_i, local_j, z);
             }
           }
         }
@@ -284,40 +284,45 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     return;
   }
 
+  const int world_x = chunk.position.x + x;
+  const int world_y = chunk.position.y + y;
+  const int world_z = chunk.position.z + z;
+
   const auto& tile = m_tiles.at(tile_id);
 
   if (tile.frame_data->tile_type == TileType::Single)
   {
-    m_batch->tile(tile, x * tile_size.x, y * tile_size.y, z * tile_size.y + z_index * m_z_index_increment);
+    m_batch->tile(
+        tile, world_x * tile_size.x, world_y * tile_size.y, world_z * tile_size.y + z_index * m_z_index_increment);
 
-    if (chunk.tiles.is_bottom_empty(x, y, z))
+    if (y < 31 && chunk.tiles.is_bottom_empty(x, y, z))
     {
       const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
-      m_batch->tile(bottom_tile, x * tile_size.x, y * tile_size.y, (z - 1) * tile_size.y);
+      m_batch->tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
     }
   }
-  else if (tile.frame_data->tile_type == TileType::Multiple)
-  {
-    // TODO: Check pattern directly on chunk to avoid another lookup
-    if (!m_world.has_pattern(tile.frame_data->pattern,
-                             Vector2i{(int)tile.frame_data->pattern_width, (int)tile.frame_data->pattern_height},
-                             Vector3i{x, y, z}))
-    {
-      return;
-    }
-
-    // TODO: Add multi sprite pool
-    auto multi_sprite =
-        MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
-    multi_sprite.texture = m_world_texture;
-    multi_sprite.frame_angle = tile.frame_data->angle;
-
-    m_renderer.batch("world"_hs,
-                     &multi_sprite,
-                     (x - tile.frame_data->anchor_x) * tile_size.x,
-                     (y - tile.frame_data->anchor_y) * tile_size.y,
-                     z * tile_size.y + z_index);
-  }
+  // else if (tile.frame_data->tile_type == TileType::Multiple)
+  // {
+  //   // TODO: Check pattern directly on chunk to avoid another lookup
+  //   if (!m_world.has_pattern(tile.frame_data->pattern,
+  //                            Vector2i{(int)tile.frame_data->pattern_width, (int)tile.frame_data->pattern_height},
+  //                            Vector3i{x, y, z}))
+  //   {
+  //     return;
+  //   }
+  //
+  //   // TODO: Add multi sprite pool
+  //   auto multi_sprite =
+  //       MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
+  //   multi_sprite.texture = m_world_texture;
+  //   multi_sprite.frame_angle = tile.frame_data->angle;
+  //
+  //   m_renderer.batch("world"_hs,
+  //                    &multi_sprite,
+  //                    (x - tile.frame_data->anchor_x) * tile_size.x,
+  //                    (y - tile.frame_data->anchor_y) * tile_size.y,
+  //                    z * tile_size.y + z_index);
+  // }
 }
 
 }  // namespace dl

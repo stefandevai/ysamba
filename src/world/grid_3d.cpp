@@ -10,6 +10,7 @@ uint32_t Grid3D::id_at(const int x, const int y, const int z) const
 {
   if (!m_in_bounds(x, y, z))
   {
+    // spdlog::debug("OUT OF BOUNDS {} {} {}", x, y, z);
     return 0;
   }
 
