@@ -11,6 +11,8 @@
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/weared_items.hpp"
+#include "ecs/components/wielded_items.hpp"
 #include "ecs/systems/pickup.hpp"
 #include "graphics/camera.hpp"
 #include "ui/components/label.hpp"
@@ -105,30 +107,16 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     }
 
     m_action_menu->set_actions(m_menu_items);
+    m_action_menu->set_on_select(m_on_select_generic_action);
     m_input_manager.push_context("action_menu"_hs);
     m_state = ActionMenuState::Open;
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
-
-    const auto& chunk_size = m_world.chunk_manager.chunk_size;
-    int elevation = 0;
-
-    // Check elevation in the current mouse position
-    for (int z = chunk_size.z - 1; z >= 0; --z)
-    {
-      int queried_elevation = m_world.get_elevation(mouse_position.x, mouse_position.y + z);
-
-      if (queried_elevation == z)
-      {
-        elevation = queried_elevation;
-        break;
-      }
-    }
+    const auto mouse_tile = m_input_manager.get_tile_at_mouse_position(m_world, camera);
 
     const auto selected_entity =
-        m_world.spatial_hash.get_by_component<Selectable>(mouse_position.x, mouse_position.y + elevation, registry);
+        m_world.spatial_hash.get_by_component<Selectable>(mouse_tile.x, mouse_tile.y, registry);
 
     // If a selectable entity was clicked, toggle its selected state
     if (registry.valid(selected_entity))
@@ -158,7 +146,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       for (const auto entity : m_selected_entities)
       {
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{JobType::Walk, 0, Target{Vector3i{mouse_position.x, mouse_position.y, 0}, 0, 0}});
+        agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
       }
     }
   }
@@ -171,9 +159,9 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       return;
     }
 
-    const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
-    const auto selected_entity =
-        m_world.spatial_hash.get_by_component<Item>(mouse_position.x, mouse_position.y, registry);
+    // const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
+    const auto& mouse_tile = m_input_manager.get_tile_at_mouse_position(m_world, camera);
+    const auto selected_entity = m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, registry);
 
     if (registry.valid(selected_entity))
     {
@@ -197,11 +185,10 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_position, selected_entity](const uint32_t i) {
+      m_action_menu->set_on_select([this, &registry, mouse_tile, selected_entity](const uint32_t i) {
         for (const auto entity : m_selected_entities)
         {
-          m_create_job(
-              static_cast<JobType>(i), static_cast<uint32_t>(selected_entity), mouse_position, registry, entity);
+          m_create_job(static_cast<JobType>(i), static_cast<uint32_t>(selected_entity), mouse_tile, registry, entity);
         }
         m_dispose();
       });
@@ -211,7 +198,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     else
     {
       // Get tile actions
-      const auto& tile_data = m_world.get(mouse_position.x, mouse_position.y, 0);
+      const auto& tile_data = m_world.get(mouse_tile.x, mouse_tile.y, mouse_tile.z);
       m_actions.clear();
 
       for (const auto& action : tile_data.actions)
@@ -220,10 +207,10 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_position, &tile_data](const uint32_t i) {
+      m_action_menu->set_on_select([this, &registry, mouse_tile, &tile_data](const uint32_t i) {
         for (const auto entity : m_selected_entities)
         {
-          m_create_job(static_cast<JobType>(i), tile_data.id, mouse_position, registry, entity);
+          m_create_job(static_cast<JobType>(i), tile_data.id, mouse_tile, registry, entity);
         }
         m_dispose();
       });
@@ -247,29 +234,30 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager.get_mouse_position();
-    const auto& camera_position = camera.get_position();
-    const auto& grid_size = camera.get_grid_size();
-
-    Vector2i tile_position{};
-    tile_position.x = (mouse_position.x + camera_position.x) / grid_size.x;
-    tile_position.y = (mouse_position.y + camera_position.y) / grid_size.y;
+    const auto mouse_tile = m_input_manager.get_tile_at_mouse_position(m_world, camera);
+    // const auto& mouse_position = m_input_manager.get_mouse_position();
+    // const auto& camera_position = camera.get_position();
+    // const auto& grid_size = camera.get_grid_size();
+    //
+    // Vector2i tile_position{};
+    // tile_position.x = (mouse_position.x + camera_position.x) / grid_size.x;
+    // tile_position.y = (mouse_position.y + camera_position.y) / grid_size.y;
 
     switch (m_state)
     {
     case ActionMenuState::SelectHarvestTarget:
     {
-      m_select_tile_target(tile_position, JobType::Harvest, registry);
+      m_select_tile_target(mouse_tile, JobType::Harvest, registry);
       break;
     }
     case ActionMenuState::SelectBreakTarget:
     {
-      m_select_tile_target(tile_position, JobType::Break, registry);
+      m_select_tile_target(mouse_tile, JobType::Break, registry);
       break;
     }
     case ActionMenuState::SelectDigTarget:
     {
-      m_select_tile_target(tile_position, JobType::Dig, registry);
+      m_select_tile_target(mouse_tile, JobType::Dig, registry);
       break;
     }
     default:
@@ -326,9 +314,9 @@ void ActionSystem::m_dispose()
   m_input_manager.pop_context();
 }
 
-void ActionSystem::m_select_tile_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry)
+void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry)
 {
-  const auto& tile = m_world.get(tile_position.x, tile_position.y, 0);
+  const auto& tile = m_world.get(tile_position.x, tile_position.y, tile_position.z);
 
   if (tile.actions.contains(job_type))
   {
@@ -373,29 +361,31 @@ void ActionSystem::m_select_item_target(const Vector2i& tile_position, const Job
 
   for (const auto entity : m_selected_entities)
   {
-    m_create_job(job_type, static_cast<uint32_t>(item), tile_position, registry, entity);
+    // m_create_job(job_type, static_cast<uint32_t>(item), tile_position, registry, entity);
   }
 
   m_dispose();
 }
 
 void ActionSystem::m_create_job(
-    const JobType job_type, const uint32_t id, const Vector2i& position, entt::registry& registry, entt::entity entity)
+    const JobType job_type, const uint32_t id, const Vector3i& position, entt::registry& registry, entt::entity entity)
 {
   auto& agent = registry.get<SocietyAgent>(entity);
-  agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{position.x, position.y, 0}}});
-  agent.jobs.push(Job{job_type, 2, Target{Vector3i{position.x, position.y, 0}, id}});
+  agent.jobs.push(Job{JobType::Walk, 2, Target{position}});
+  agent.jobs.push(Job{job_type, 2, Target{Vector3i{position}, id}});
 }
 
 bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,
                                             const entt::entity entity,
                                             entt::registry& registry)
 {
+  const auto& carried_items = registry.get<CarriedItems>(entity);
+  const auto& weared_items = registry.get<WearedItems>(entity);
+  const auto& wielded_items = registry.get<WieldedItems>(entity);
+
   for (const auto& quality : qualities_required)
   {
     bool has_quality = false;
-
-    const auto& carried_items = registry.get<CarriedItems>(entity);
 
     for (const auto item_entity : carried_items.items)
     {
@@ -406,6 +396,46 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
       {
         has_quality = true;
         continue;
+      }
+    }
+
+    if (!has_quality)
+    {
+      for (const auto item_entity : weared_items.items)
+      {
+        const auto& item = registry.get<Item>(item_entity);
+        const auto& item_data = m_world.get_item_data(item.id);
+
+        if (item_data.qualities.contains(quality))
+        {
+          has_quality = true;
+          continue;
+        }
+      }
+    }
+
+    if (!has_quality)
+    {
+      if (registry.valid(wielded_items.left_hand))
+      {
+        const auto& item = registry.get<Item>(wielded_items.left_hand);
+        const auto& item_data = m_world.get_item_data(item.id);
+
+        if (item_data.qualities.contains(quality))
+        {
+          has_quality = true;
+        }
+      }
+
+      if (!has_quality && registry.valid(wielded_items.right_hand))
+      {
+        const auto& item = registry.get<Item>(wielded_items.right_hand);
+        const auto& item_data = m_world.get_item_data(item.id);
+
+        if (item_data.qualities.contains(quality))
+        {
+          has_quality = true;
+        }
       }
     }
 

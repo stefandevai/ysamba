@@ -242,82 +242,322 @@
     {
       "id": 23,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 24,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 25,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 26,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 27,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 28,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 29,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 30,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 31,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 32,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 33,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 34,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 35,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 36,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 37,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 38,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     },
     {
       "id": 39,

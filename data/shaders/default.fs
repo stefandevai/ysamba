@@ -23,10 +23,10 @@ void main()
     final_color = texture_color * f_in.color;
   }
 
-  /* if (final_color.a < 0.0001) */
-  /* { */
-  /*   discard; */
-  /* } */
+  if (final_color.a < 0.0001)
+  {
+    discard;
+  }
 
   color = final_color;
 }
