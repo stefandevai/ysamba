@@ -295,7 +295,8 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     m_batch->tile(
         tile, world_x * tile_size.x, world_y * tile_size.y, world_z * tile_size.y + z_index * m_z_index_increment);
 
-    if (y < 31 && chunk.tiles.is_bottom_empty(x, y, z))
+    // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
+    if (chunk.tiles.is_bottom_empty(x, y, z))
     {
       const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
       m_batch->tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
