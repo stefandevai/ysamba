@@ -73,47 +73,47 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       /* if (k == 0) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 1; */
+      /*   tiles[k * width * height + j * width + i].terrain = 1; */
       /* } */
       /* else if (k == 1) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 2; */
+      /*   tiles[k * width * height + j * width + i].terrain = 2; */
       /* } */
       /* else if (k == 2) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 3; */
+      /*   tiles[k * width * height + j * width + i].terrain = 3; */
       /* } */
       /* else if (k == 3) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 6; */
+      /*   tiles[k * width * height + j * width + i].terrain = 6; */
       /* } */
       /* else if (k == 4) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 12; */
+      /*   tiles[k * width * height + j * width + i].terrain = 12; */
       /* } */
       /* else if (k == 5) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 13; */
+      /*   tiles[k * width * height + j * width + i].terrain = 13; */
       /* } */
       /* else if (k == 6) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 14; */
+      /*   tiles[k * width * height + j * width + i].terrain = 14; */
       /* } */
       /* else if (k == 7) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 23; */
+      /*   tiles[k * width * height + j * width + i].terrain = 23; */
       /* } */
       /* else if (k == 8) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 15; */
+      /*   tiles[k * width * height + j * width + i].terrain = 15; */
       /* } */
       /* else if (k == 9) */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 18; */
+      /*   tiles[k * width * height + j * width + i].terrain = 18; */
       /* } */
       /* else */
       /* { */
-      /*   tiles[k * width * height + j * width + i].id = 19; */
+      /*   tiles[k * width * height + j * width + i].terrain = 19; */
       /* } */
 
       /* else */
@@ -250,7 +250,7 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   }
   if (terrain_id == 1)
   {
-    tiles[z * width * height + y * width + x].id = terrain_id;
+    tiles[z * width * height + y * width + x].terrain = terrain_id;
     return;
   }
 
@@ -259,56 +259,56 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   switch (bitmask)
   {
   case DL_EDGE_NONE:
-    tiles[z * width * height + y * width + x].id = 38;
+    tiles[z * width * height + y * width + x].terrain = 38;
     break;
   case DL_EDGE_TOP:
-    tiles[z * width * height + y * width + x].id = 37;
+    tiles[z * width * height + y * width + x].terrain = 37;
     break;
   case DL_EDGE_RIGHT:
-    tiles[z * width * height + y * width + x].id = 34;
+    tiles[z * width * height + y * width + x].terrain = 34;
     break;
   case DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].id = 30;
+    tiles[z * width * height + y * width + x].terrain = 30;
     break;
   case DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 36;
+    tiles[z * width * height + y * width + x].terrain = 36;
     break;
   case DL_EDGE_TOP | DL_EDGE_RIGHT:
-    tiles[z * width * height + y * width + x].id = 33;
+    tiles[z * width * height + y * width + x].terrain = 33;
     break;
   case DL_EDGE_TOP | DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].id = 29;
+    tiles[z * width * height + y * width + x].terrain = 29;
     break;
   case DL_EDGE_TOP | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 35;
+    tiles[z * width * height + y * width + x].terrain = 35;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].id = 26;
+    tiles[z * width * height + y * width + x].terrain = 26;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 32;
+    tiles[z * width * height + y * width + x].terrain = 32;
     break;
   case DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 28;
+    tiles[z * width * height + y * width + x].terrain = 28;
     break;
   case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].id = 25;
+    tiles[z * width * height + y * width + x].terrain = 25;
     break;
   case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 31;
+    tiles[z * width * height + y * width + x].terrain = 31;
     break;
   case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 27;
+    tiles[z * width * height + y * width + x].terrain = 27;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].id = 24;
+    tiles[z * width * height + y * width + x].terrain = 24;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP:
-    tiles[z * width * height + y * width + x].id = 23;
+    tiles[z * width * height + y * width + x].terrain = 23;
     break;
   }
 
-  // tiles[z * width * height + y * width + x].id = terrain_id;
+  // tiles[z * width * height + y * width + x].terrain = terrain_id;
 }
 
 uint32_t MapGenerator::m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z)

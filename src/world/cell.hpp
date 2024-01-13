@@ -12,13 +12,14 @@ enum CellFlag
 
 struct Cell
 {
-  uint32_t id = 0;
+  uint32_t terrain = 0;
+  uint32_t decoration = 0;
   uint32_t flags = DL_CELL_FLAG_NONE;
 };
 
 template <typename Archive>
 void serialize(Archive& archive, Cell& cell)
 {
-  archive(cell.id, cell.flags);
+  archive(cell.terrain, cell.decoration, cell.flags);
 }
 };  // namespace dl

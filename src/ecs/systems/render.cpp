@@ -175,7 +175,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
                 continue;
               }
 
-              const auto& terrain_id = chunk.tiles.id_at(local_i, local_j, z);
+              const auto& terrain_id = chunk.tiles.terrain_at(local_i, local_j, z);
 
               if (terrain_id == 0)
               {
@@ -253,7 +253,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
                 continue;
               }
 
-              const auto& terrain_id = chunk.tiles.id_at(local_i, local_j, z);
+              const auto& terrain_id = chunk.tiles.terrain_at(local_i, local_j, z);
 
               if (terrain_id == 0)
               {

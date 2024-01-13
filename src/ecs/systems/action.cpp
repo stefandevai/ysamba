@@ -113,7 +113,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto mouse_tile = m_input_manager.get_tile_at_mouse_position(m_world, camera);
+    const auto mouse_tile = m_world.mouse_to_world(camera);
 
     const auto selected_entity =
         m_world.spatial_hash.get_by_component<Selectable>(mouse_tile.x, mouse_tile.y, registry);
@@ -159,8 +159,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       return;
     }
 
-    // const auto& mouse_position = m_input_manager.get_mouse_tile_position(camera);
-    const auto& mouse_tile = m_input_manager.get_tile_at_mouse_position(m_world, camera);
+    const auto mouse_tile = m_world.mouse_to_world(camera);
     const auto selected_entity = m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, registry);
 
     if (registry.valid(selected_entity))
@@ -234,7 +233,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto mouse_tile = m_input_manager.get_tile_at_mouse_position(m_world, camera);
+    const auto mouse_tile = m_world.mouse_to_world(camera);
     // const auto& mouse_position = m_input_manager.get_mouse_position();
     // const auto& camera_position = camera.get_position();
     // const auto& grid_size = camera.get_grid_size();

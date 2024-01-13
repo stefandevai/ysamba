@@ -7,14 +7,16 @@
 #include <nlohmann/json.hpp>
 #include <queue>
 #include <set>
-/* #include "./generators/terrain_generator.hpp" */
-/* #include "./generators/dummy_generator.hpp" */
+
+#include "./cell.hpp"
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
 #include "core/game_context.hpp"
+#include "core/input_manager.hpp"
 #include "ecs/components/position.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/texture.hpp"
 
@@ -33,6 +35,10 @@ World::World(GameContext& game_context) : m_game_context(game_context)
 
 void World::generate(const int width, const int height, const int seed)
 {
+  // TODO: Implement world generation instead of current infinite generation
+  (void)width;
+  (void)height;
+  (void)seed;
   /* m_seed = seed; */
 
   /* tiles.set_size(width, height, 10); */
@@ -56,6 +62,8 @@ void World::generate(const int width, const int height, const int seed)
 
 void World::load(const std::string& filepath)
 {
+  // TODO: Implement world generation instead of current infinite generation
+  (void)filepath;
   /* auto society = SocietyGenerator::generate_blueprint(); */
   /* m_societies[society.id] = society; */
 
@@ -81,18 +89,18 @@ void World::load(const std::string& filepath)
   /* for (std::size_t z = 0; z < layers.size(); ++z) */
   /* { */
   /*   const auto terrain_data = layers[z]["terrain"].get<std::vector<uint32_t>>(); */
-  /*   const auto over_terrain_data = layers[z]["over_terrain"].get<std::vector<uint32_t>>(); */
+  /*   const auto decoration_data = layers[z]["decoration"].get<std::vector<uint32_t>>(); */
 
   /*   for (auto j = 0; j < tiles.size.y; ++j) */
   /*   { */
   /*     for (auto i = 0; i < tiles.size.x; ++i) */
   /*     { */
   /*       Cell cell{}; */
-  /*       cell.id = terrain_data[i + j * tiles.size.x]; */
+  /*       cell.terrain = terrain_data[i + j * tiles.size.x]; */
 
   /*       tiles.values[i + j * tiles.size.x + z * tiles.size.x * tiles.size.y] = std::move(cell); */
 
-  /*       if (tiles.id_at(i, j, z) != 0) */
+  /*       if (tiles.terrain_at(i, j, z) != 0) */
   /*       { */
   /*         tiles.height_map[i + j * tiles.size.x] = */
   /*             std::max(static_cast<int>(z), tiles.height_map[i + j * tiles.size.x]); */
@@ -104,7 +112,7 @@ void World::load(const std::string& filepath)
   /*   { */
   /*     for (auto i = 0; i < tiles.size.x; ++i) */
   /*     { */
-  /*       over_tiles.set(over_terrain_data[i + j * tiles.size.x], i, j, z); */
+  /*       over_tiles.set(decoration_data[i + j * tiles.size.x], i, j, z); */
   /*     } */
   /*   } */
   /* } */
@@ -119,97 +127,88 @@ void World::set_terrain(const uint32_t tile_id, const int x, const int y, const 
       tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
-void World::set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z)
+void World::set_decoration(const uint32_t tile_id, const int x, const int y, const int z)
 {
-  /* over_tiles.set(tile_id, x, y, z); */
+  auto& chunk = chunk_manager.at(x, y, z);
+  chunk.tiles.set_decoration(
+      tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
 void World::replace(const uint32_t from, const uint32_t to, const int x, const int y, const int z)
 {
-  /* if (x < 0 || x >= tiles.size.x || y < 0 || y >= tiles.size.y || z < 0 || z >= tiles.size.z) */
-  /* { */
-  /*   return; */
-  /* } */
+  const auto& cell = cell_at(x, y, z);
 
-  /* const auto over_tile_index = over_tiles.id_at(x, y, z); */
-  const auto tile_index = id_at(x, y, z);
+  if (cell.decoration == from && cell.terrain != to)
+  {
+    set_decoration(to, x, y, z);
+    return;
+  }
+  // If the terrain already has the target tile, just assign the null tile to the over tile */
+  else if (cell.decoration == from && cell.terrain == to)
+  {
+    set_decoration(0, x, y, z);
+    return;
+  }
 
-  /* if (over_tile_index == from && tile_index != to) */
-  /* { */
-  /*   over_tiles.set(to, x, y, z); */
-  /*   return; */
-  /* } */
-  /* // If the terrain already has the target tile, just assign the null tile to the over tile */
-  /* else if (over_tile_index == from && tile_index == to) */
-  /* { */
-  /*   over_tiles.set(0, x, y, z); */
-  /*   return; */
-  /* } */
-
-  if (tile_index == from)
+  if (cell.terrain == from)
   {
     set_terrain(to, x, y, z);
   }
 }
 
-uint32_t World::id_at(const int x, const int y, const int z) const
+const Cell& World::cell_at(const int x, const int y, const int z) const
 {
   const auto& chunk = chunk_manager.at(x, y, z);
-  return chunk.tiles.id_at(
+  return chunk.tiles.cell_at(
+      std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+}
+
+uint32_t World::terrain_at(const int x, const int y, const int z) const
+{
+  const auto& chunk = chunk_manager.at(x, y, z);
+  return chunk.tiles.terrain_at(
+      std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+}
+
+uint32_t World::decoration_at(const int x, const int y, const int z) const
+{
+  const auto& chunk = chunk_manager.at(x, y, z);
+  return chunk.tiles.decoration_at(
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
 const TileData& World::get(const int x, const int y, const int z) const
 {
-  /* if (x < 0 || x >= tiles.size.x || y < 0 || y >= tiles.size.y || z < 0 || z >= tiles.size.z) */
-  /* { */
-  /*   return tile_data.at(0); */
-  /* } */
+  const auto& cell = cell_at(x, y, z);
 
-  /* const int over_tile_index = over_tiles.id_at(x, y, z); */
+  if (cell.decoration != 0)
+  {
+    return tile_data.at(cell.decoration);
+  }
 
-  /* if (over_tile_index != 0) */
-  /* { */
-  /*   return tile_data.at(over_tile_index); */
-  /* } */
-
-  const int tile_index = id_at(x, y, z);
-
-  return tile_data.at(tile_index);
+  return tile_data.at(cell.terrain);
 }
 
 const WorldTile World::get_all(const int x, const int y, const int z) const
 {
-  /* const auto over_tile_index = over_tiles.id_at(x, y, z); */
-  /* const auto tile_index = tiles.id_at(x, y, z); */
-
-  /* return WorldTile{tile_data.at(tile_index), tile_data.at(over_tile_index)}; */
-
-  const auto tile_index = id_at(x, y, z);
-  return WorldTile{tile_data.at(tile_index), tile_data.at(0)};
+  const auto& cell = cell_at(x, y, z);
+  return WorldTile{tile_data.at(cell.terrain), tile_data.at(cell.decoration)};
 }
 
 const TileData& World::get_terrain(const int x, const int y, const int z) const
 {
-  const auto tile_index = id_at(x, y, z);
+  const auto tile_index = terrain_at(x, y, z);
   return tile_data.at(tile_index);
 }
 
-const TileData& World::get_over_terrain(const int x, const int y, const int z) const
+const TileData& World::get_decoration(const int x, const int y, const int z) const
 {
-  /* const auto over_tile_index = over_tiles.id_at(x, y, z); */
-  /* return tile_data.at(over_tile_index); */
-
-  return tile_data.at(0);
+  const auto over_tile_index = decoration_at(x, y, z);
+  return tile_data.at(over_tile_index);
 }
 
 int World::get_elevation(const int x, const int y) const
 {
-  /* if (x < 0 || x >= tiles.size.x || y < 0 || y >= tiles.size.y) */
-  /* { */
-  /*   return 0; */
-  /* } */
-
   auto& chunk = chunk_manager.at(x, y, 0);
   const uint32_t index = std::abs(x - chunk.position.x) + std::abs(y - chunk.position.y) * chunk.tiles.size.x;
 
@@ -219,6 +218,35 @@ int World::get_elevation(const int x, const int y) const
   }
 
   return chunk.tiles.height_map[index];
+}
+
+Vector3i World::screen_to_world(const Vector2i& position, const Camera& camera) const
+{
+  const auto& camera_position = camera.get_position();
+  const auto& grid_size = camera.get_grid_size();
+
+  auto world_position =
+      Vector3i{(position.x + camera_position.x) / grid_size.x, (position.y + camera_position.y) / grid_size.y, 0.0};
+
+  for (int z = chunk_manager.chunk_size.z - 1; z >= 0; --z)
+  {
+    int queried_elevation = get_elevation(world_position.x, world_position.y + z);
+
+    if (queried_elevation == z)
+    {
+      world_position.z = queried_elevation;
+      world_position.y += queried_elevation;
+      break;
+    }
+  }
+
+  return world_position;
+}
+
+Vector3i World::mouse_to_world(const Camera& camera) const
+{
+  const auto& mouse_position = InputManager::get_instance().get_mouse_position();
+  return screen_to_world(mouse_position, camera);
 }
 
 std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, const Vector3i& to)
@@ -355,13 +383,6 @@ bool World::is_walkable(const int x, const int y, const int z) const
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
 {
-  /* if (position.x < 0 || position.x >= tiles.size.x || position.y < 0 || position.y >= tiles.size.y || position.z < 0
-   * || */
-  /*     position.z >= tiles.size.z) */
-  /* { */
-  /*   return false; */
-  /* } */
-
   bool found_pattern = true;
 
   for (int j = 0; j < size.y; ++j)
@@ -375,16 +396,14 @@ bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& si
         continue;
       }
 
-      /* const uint32_t over_tile_index = over_tiles.id_at(position.x + i, position.y + j, position.z); */
+      const auto& cell = cell_at(position.x + i, position.y + j, position.z);
 
-      /* if (over_tile_index == pattern_value) */
-      /* { */
-      /*   continue; */
-      /* } */
+      if (cell.decoration == pattern_value)
+      {
+        continue;
+      }
 
-      const uint32_t tile_index = id_at(position.x + i, position.y + j, position.z);
-
-      if (tile_index != pattern_value)
+      if (cell.terrain != pattern_value)
       {
         return false;
       }

@@ -52,8 +52,6 @@ class InputManager
   [[nodiscard]] bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
   [[nodiscard]] const Vector2i& get_scroll() const { return m_sdl_input_wrapper.get_scroll(); }
   [[nodiscard]] const Vector2i& get_mouse_position() const;
-  [[nodiscard]] const Vector2i get_mouse_tile_position(const Camera& camera) const;
-  [[nodiscard]] const Vector3i get_tile_at_mouse_position(const World& world, const Camera& camera) const;
   [[nodiscard]] const std::shared_ptr<InputContext> get_current_context();
   [[nodiscard]] bool window_size_changed() const;
   void text_input_start();

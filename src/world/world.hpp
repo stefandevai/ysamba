@@ -16,6 +16,8 @@
 namespace dl
 {
 struct GameContext;
+struct Cell;
+class Camera;
 
 enum class Direction
 {
@@ -45,7 +47,7 @@ struct TileTarget
 struct WorldTile
 {
   const TileData& terrain;
-  const TileData& over_terrain;
+  const TileData& decoration;
 };
 
 class World
@@ -70,13 +72,19 @@ class World
 
   // Set tile by coordinates
   void set_terrain(const uint32_t tile_id, const int x, const int y, const int z);
-  void set_over_terrain(const uint32_t tile_id, const int x, const int y, const int z);
+  void set_decoration(const uint32_t tile_id, const int x, const int y, const int z);
 
   // Replace tile by coordinates
   void replace(const uint32_t from, const uint32_t to, const int x, const int y, const int z);
 
+  // Get cell by coordinates
+  [[nodiscard]] const Cell& cell_at(const int x, const int y, const int z) const;
+
   // Get tile id by coordinates
-  [[nodiscard]] uint32_t id_at(const int x, const int y, const int z) const;
+  [[nodiscard]] uint32_t terrain_at(const int x, const int y, const int z) const;
+
+  // Get tile decoration by coordinates
+  [[nodiscard]] uint32_t decoration_at(const int x, const int y, const int z) const;
 
   // Get tile data by coordinates
   [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
@@ -88,7 +96,7 @@ class World
   [[nodiscard]] const TileData& get_terrain(const int x, const int y, const int z) const;
 
   // Get over terrain tile in a tile map coordinate
-  [[nodiscard]] const TileData& get_over_terrain(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get_decoration(const int x, const int y, const int z) const;
 
   // Gets the z elevation for a given (x, z) position
   [[nodiscard]] int get_elevation(const int x, const int y) const;
@@ -101,6 +109,12 @@ class World
 
   // Get the size of a loaded chunk
   [[nodiscard]] size_t get_chunk_size() const { return m_chunk_size; };
+
+  // Transform screen coordinates to world coordinates
+  [[nodiscard]] Vector3i screen_to_world(const Vector2i& position, const Camera& camera) const;
+
+  // Transform mouse coordinates to world coordinates
+  [[nodiscard]] Vector3i mouse_to_world(const Camera& camera) const;
 
   // Get the texture id for the tiles used in this world
   [[nodiscard]] const std::string& get_texture_id() const { return m_texture_id; };

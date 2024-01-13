@@ -149,38 +149,6 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
 
 const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
 
-const Vector2i InputManager::get_mouse_tile_position(const Camera& camera) const
-{
-  const auto& mouse_position = get_mouse_position();
-  const auto& camera_position = camera.get_position();
-  const auto& grid_size = camera.get_grid_size();
-
-  return Vector2i{(mouse_position.x + camera_position.x) / grid_size.x,
-                  (mouse_position.y + camera_position.y) / grid_size.y};
-}
-
-const Vector3i InputManager::get_tile_at_mouse_position(const World& world, const Camera& camera) const
-{
-  const auto& mouse_position = get_mouse_tile_position(camera);
-
-  const auto& chunk_size = world.chunk_manager.chunk_size;
-  int elevation = 0;
-
-  // Check elevation in the current mouse position
-  for (int z = chunk_size.z - 1; z >= 0; --z)
-  {
-    int queried_elevation = world.get_elevation(mouse_position.x, mouse_position.y + z);
-
-    if (queried_elevation == z)
-    {
-      elevation = queried_elevation;
-      break;
-    }
-  }
-
-  return Vector3i{mouse_position.x, mouse_position.y + elevation, elevation};
-}
-
 const std::shared_ptr<InputContext> InputManager::get_current_context()
 {
   if (m_context_stack.empty())

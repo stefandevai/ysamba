@@ -185,25 +185,9 @@ bool Gameplay::m_update_input(GameContext& m_game_context)
   {
     JSON json{"./data/debug/item.json"};
     const auto id = json.object["id"].get<uint32_t>();
+    const auto mouse_tile = m_world.mouse_to_world(m_camera);
 
-    const auto& mouse_position = m_input_manager.get_mouse_tile_position(m_camera);
-
-    const auto& chunk_size = m_world.chunk_manager.chunk_size;
-    int elevation = 0;
-
-    // Check elevation in the current mouse position
-    for (int z = chunk_size.z - 1; z >= 0; --z)
-    {
-      int queried_elevation = m_world.get_elevation(mouse_position.x, mouse_position.y + z);
-
-      if (queried_elevation == z)
-      {
-        elevation = queried_elevation;
-        break;
-      }
-    }
-
-    m_world.create_item(m_registry, id, mouse_position.x, mouse_position.y + elevation, elevation);
+    m_world.create_item(m_registry, id, mouse_tile.x, mouse_tile.y, mouse_tile.z);
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {
