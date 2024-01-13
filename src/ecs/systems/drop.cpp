@@ -255,18 +255,11 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto& mouse_position = m_input_manager.get_mouse_position();
-    const auto& camera_position = camera.get_position();
-    const auto& grid_size = camera.get_grid_size();
-
-    Vector2i tile_position{};
-    tile_position.x = (mouse_position.x + camera_position.x) / grid_size.x;
-    tile_position.y = (mouse_position.y + camera_position.y) / grid_size.y;
+    const auto mouse_tile = m_world.mouse_to_world(camera);
 
     auto& agent = registry.get<SocietyAgent>(m_selected_entity);
-    agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}}});
-    agent.jobs.push(Job{
-        JobType::Drop, 2, Target{Vector3i{tile_position.x, tile_position.y, 0}, static_cast<uint32_t>(m_target_item)}});
+    agent.jobs.push(Job{JobType::Walk, 2, Target{mouse_tile}});
+    agent.jobs.push(Job{JobType::Drop, 2, Target{mouse_tile, static_cast<uint32_t>(m_target_item)}});
 
     m_dispose();
   }
