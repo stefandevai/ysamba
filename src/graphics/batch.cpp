@@ -310,58 +310,37 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
   const int frame_width = texture->get_frame_width() * (size.x);
   const int frame_height = texture->get_frame_height() * (size.y);
 
-  // Get transformations and apply them to the sprite vertices
-  auto general_transform = glm::translate(m_matrix, glm::vec3(x, y, z));
-
   // Top left vertex
-  glm::vec4 transformation_result;
-
   // Change according to the angle that the quad will be rendered
   if (sprite->frame_angle == FrameAngle::Parallel)
   {
-    transformation_result = general_transform * glm::vec4(0.f, 0.f, 0.f, 1.f);
+    m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color};
   }
   else
   {
-    transformation_result = general_transform * glm::vec4(0.f, frame_height, frame_height, 1.f);
+    m_vertices[m_vertices_index++] =
+        VertexData{glm::vec3{x, y + frame_height, z + frame_height}, texture_coordinates[0], texture_index, color};
   }
-
-  m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
-                 texture_coordinates[0],
-                 texture_index,
-                 color};
 
   // Top right vertex
   if (sprite->frame_angle == FrameAngle::Parallel)
   {
-    transformation_result = general_transform * glm::vec4(frame_width, 0.f, 0.f, 1.f);
+    m_vertices[m_vertices_index++] =
+        VertexData{glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color};
   }
   else
   {
-    transformation_result = general_transform * glm::vec4(frame_width, frame_height, frame_height, 1.f);
+    m_vertices[m_vertices_index++] = VertexData{
+        glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index, color};
   }
-  m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
-                 texture_coordinates[1],
-                 texture_index,
-                 color};
 
   // Bottom right vertex
-  transformation_result = general_transform * glm::vec4(frame_width, frame_height, 0.f, 1.f);
   m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
-                 texture_coordinates[2],
-                 texture_index,
-                 color};
+      VertexData{glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color};
 
   // Bottom left vertex
-  transformation_result = general_transform * glm::vec4(0.f, frame_height, 0.f, 1.f);
   m_vertices[m_vertices_index++] =
-      VertexData{glm::vec3{transformation_result.x, transformation_result.y, transformation_result.z},
-                 texture_coordinates[3],
-                 texture_index,
-                 color};
+      VertexData{glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color};
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   index_count += 6;

@@ -10,15 +10,18 @@
 
 namespace dl
 {
+struct Chunk;
+
 class MapGenerator
 {
  public:
   int width = 1;
   int height = 1;
   int depth = 1;
-  std::vector<Cell> tiles;
-  std::vector<int> height_map;
+  // std::vector<Cell> tiles;
+  // std::vector<int> height_map;
   std::vector<float> raw_height_map;
+  std::unique_ptr<Chunk> chunk = nullptr;
 
   MapGenerator() = default;
   MapGenerator(const int width, const int height, const int depth = 32) : width(width), height(height), depth(depth) {}

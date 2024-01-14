@@ -175,14 +175,10 @@ void RenderSystem::m_render_tiles(const Camera& camera)
                 continue;
               }
 
-              const auto& terrain_id = chunk.tiles.terrain_at(local_i, local_j, z);
+              const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
 
-              if (terrain_id == 0)
-              {
-                continue;
-              }
-
-              m_render_tile(chunk, terrain_id, tile_size, local_i, local_j, z);
+              m_render_tile(chunk, cell.terrain, tile_size, local_i, local_j, z);
+              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z);
             }
           }
         }
@@ -253,14 +249,10 @@ void RenderSystem::m_render_tiles(const Camera& camera)
                 continue;
               }
 
-              const auto& terrain_id = chunk.tiles.terrain_at(local_i, local_j, z);
+              const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
 
-              if (terrain_id == 0)
-              {
-                continue;
-              }
-
-              m_render_tile(chunk, terrain_id, tile_size, local_i, local_j, z);
+              m_render_tile(chunk, cell.terrain, tile_size, local_i, local_j, z);
+              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z);
             }
           }
         }
@@ -302,28 +294,28 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
       m_batch->tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
     }
   }
-  // else if (tile.frame_data->tile_type == TileType::Multiple)
-  // {
-  //   // TODO: Check pattern directly on chunk to avoid another lookup
-  //   if (!m_world.has_pattern(tile.frame_data->pattern,
-  //                            Vector2i{(int)tile.frame_data->pattern_width, (int)tile.frame_data->pattern_height},
-  //                            Vector3i{x, y, z}))
-  //   {
-  //     return;
-  //   }
-  //
-  //   // TODO: Add multi sprite pool
-  //   auto multi_sprite =
-  //       MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
-  //   multi_sprite.texture = m_world_texture;
-  //   multi_sprite.frame_angle = tile.frame_data->angle;
-  //
-  //   m_renderer.batch("world"_hs,
-  //                    &multi_sprite,
-  //                    (x - tile.frame_data->anchor_x) * tile_size.x,
-  //                    (y - tile.frame_data->anchor_y) * tile_size.y,
-  //                    z * tile_size.y + z_index);
-  // }
+  else if (tile.frame_data->tile_type == TileType::Multiple)
+  {
+    // TODO: Check pattern directly on chunk to avoid another lookup
+    if (!m_world.has_pattern(tile.frame_data->pattern,
+                             Vector2i{(int)tile.frame_data->pattern_width, (int)tile.frame_data->pattern_height},
+                             Vector3i{world_x, world_y, world_z}))
+    {
+      return;
+    }
+
+    // TODO: Add multi sprite pool
+    auto multi_sprite =
+        MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
+    multi_sprite.texture = m_world_texture;
+    multi_sprite.frame_angle = tile.frame_data->angle;
+
+    m_renderer.batch("world"_hs,
+                     &multi_sprite,
+                     (world_x - tile.frame_data->anchor_x) * tile_size.x,
+                     (world_y - tile.frame_data->anchor_y) * tile_size.y,
+                     world_z * tile_size.y + z_index);
+  }
 }
 
 }  // namespace dl

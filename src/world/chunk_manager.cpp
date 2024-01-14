@@ -129,15 +129,15 @@ void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size
   MapGenerator generator{};
   generator.set_size(size);
   generator.generate(1337, position);
-  auto chunk = std::make_unique<Chunk>(position, true);
-  chunk->tiles.set_size(size);
-  chunk->tiles.values = std::move(generator.tiles);
-  chunk->tiles.height_map = std::move(generator.height_map);
-  chunk->tiles.compute_visibility();
+  // auto chunk = std::make_unique<Chunk>(position, true);
+  // chunk->tiles.set_size(size);
+  // chunk->tiles.values = std::move(generator.tiles);
+  // chunk->tiles.height_map = std::move(generator.height_map);
+  // chunk->tiles.compute_visibility();
 
   {
     const std::unique_lock<std::mutex> lock(mutex);
-    m_chunks_to_add.push_back(std::move(chunk));
+    m_chunks_to_add.push_back(std::move(generator.chunk));
   }
 }
 
@@ -159,12 +159,12 @@ void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
   MapGenerator generator{};
   generator.set_size(size);
   generator.generate(1337, position);
-  auto chunk = std::make_unique<Chunk>(position, true);
-  chunk->tiles.set_size(size);
-  chunk->tiles.values = std::move(generator.tiles);
-  chunk->tiles.height_map = std::move(generator.height_map);
-  chunk->tiles.compute_visibility();
-  chunks.push_back(std::move(chunk));
+  // auto chunk = std::make_unique<Chunk>(position, true);
+  // chunk->tiles.set_size(size);
+  // chunk->tiles.values = std::move(generator.tiles);
+  // chunk->tiles.height_map = std::move(generator.height_map);
+  // chunk->tiles.compute_visibility();
+  chunks.push_back(std::move(generator.chunk));
 }
 
 void ChunkManager::set_chunk_size(const Vector3i& chunk_size) { this->chunk_size = chunk_size; }

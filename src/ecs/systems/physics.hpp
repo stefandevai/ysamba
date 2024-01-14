@@ -7,7 +7,6 @@
 namespace dl
 {
 class World;
-enum class Direction;
 
 class PhysicsSystem
 {
@@ -20,6 +19,6 @@ class PhysicsSystem
   World& m_world;
 
   bool m_collides(entt::registry& registry, entt::entity, const int x, const int y, const int z);
-  Position m_climb_slope(const Position& positon, const Position& candidate_position, const Direction climbs_to);
+  Position m_get_climb_position(const Position& positon, const Position& candidate_position);
 };
 }  // namespace dl

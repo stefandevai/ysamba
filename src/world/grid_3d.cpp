@@ -104,9 +104,17 @@ void Grid3D::set_size(const int width, const int height, const int depth)
   size.x = width;
   size.y = height;
   size.z = depth;
+
+  values.resize(size.x * size.y * size.z);
+  height_map.resize(size.x * size.y);
 }
 
-void Grid3D::set_size(const Vector3i& size) { this->size = size; }
+void Grid3D::set_size(const Vector3i& size)
+{
+  this->size = size;
+  values.resize(size.x * size.y * size.z);
+  height_map.resize(size.x * size.y);
+}
 
 bool Grid3D::has_flags(const CellFlag flags, const int x, const int y, const int z) const
 {
@@ -200,10 +208,10 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
     return true;
   }
   // Diagonal bottom tile
-  if (terrain_at(x, y + 1, z + 1) == 0)
-  {
-    return true;
-  }
+  // if (terrain_at(x, y + 1, z + 1) == 0)
+  // {
+  //   return true;
+  // }
 
   // TODO: After adding view rotation, check all the other directions
   /* if (terrain_at(x, y + 1, z) == 0) */

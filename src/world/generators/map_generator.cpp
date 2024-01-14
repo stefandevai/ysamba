@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "core/random.hpp"
+#include "world/chunk.hpp"
 
 float smoothstep(float edge0, float edge1, float x)
 {
@@ -33,8 +34,11 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
 
-  tiles = std::vector<Cell>(width * height * depth);
-  height_map = std::vector<int>(width * height);
+  chunk = std::make_unique<Chunk>(Vector3i{0, 0, 0}, true);
+  chunk->position = offset;
+  chunk->tiles.set_size(width, height, depth);
+  // tiles = std::vector<Cell>(width * height * depth);
+  // height_map = std::vector<int>(width * height);
 
   raw_height_map.resize(padded_width * padded_height);
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
@@ -51,11 +55,12 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     {
       const auto map_value = raw_height_map[j * padded_width + i];
       const int k = static_cast<int>(map_value * (depth - 1));
+      bool inside_chunk = false;
 
       if (j >= m_generation_padding && j < padded_width - m_generation_padding && i >= m_generation_padding &&
           i < padded_height - m_generation_padding)
       {
-        height_map[(j - 1) * width + (i - 1)] = k;
+        inside_chunk = true;
       }
 
       int terrain_id = 0;
@@ -69,69 +74,27 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
         terrain_id = 2;
       }
 
+      if (inside_chunk)
+      {
+        chunk->tiles.height_map[(j - 1) * width + (i - 1)] = k;
+        chunk->tiles.values[k * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
+      }
+
       terrain[k * padded_width * padded_height + j * padded_width + i] = terrain_id;
-
-      /* if (k == 0) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 1; */
-      /* } */
-      /* else if (k == 1) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 2; */
-      /* } */
-      /* else if (k == 2) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 3; */
-      /* } */
-      /* else if (k == 3) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 6; */
-      /* } */
-      /* else if (k == 4) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 12; */
-      /* } */
-      /* else if (k == 5) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 13; */
-      /* } */
-      /* else if (k == 6) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 14; */
-      /* } */
-      /* else if (k == 7) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 23; */
-      /* } */
-      /* else if (k == 8) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 15; */
-      /* } */
-      /* else if (k == 9) */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 18; */
-      /* } */
-      /* else */
-      /* { */
-      /*   tiles[k * width * height + j * width + i].terrain = 19; */
-      /* } */
-
-      /* else */
-      /* { */
-      /*   tiles[k * width * height + j * width + i] = 2; */
-      /* } */
-
-      // if (k > 7)
-      // {
-      //   terrain[(k - 1) * width * height + j * width + i] = terrain_id;
-      // }
 
       for (int z = 0; z < k; ++z)
       {
         terrain[z * padded_width * padded_height + j * padded_width + i] = terrain_id;
+
+        if (inside_chunk)
+        {
+          chunk->tiles.values[z * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
+        }
       }
     }
   }
+
+  chunk->tiles.compute_visibility();
 
   /* auto stop = std::chrono::high_resolution_clock::now(); */
   /* auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); */
@@ -250,7 +213,14 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   }
   if (terrain_id == 1)
   {
-    tiles[z * width * height + y * width + x].terrain = terrain_id;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = terrain_id;
+    return;
+  }
+
+  // Set not walkable block tile if not visible
+  if (!chunk->tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  {
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 1;
     return;
   }
 
@@ -259,52 +229,67 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   switch (bitmask)
   {
   case DL_EDGE_NONE:
-    tiles[z * width * height + y * width + x].terrain = 38;
+  {
+    const auto prob = random::get_real();
+    if (prob < 0.1)
+    {
+      chunk->tiles.values[z * width * height + y * width + x].terrain = 5;
+    }
+    else
+    {
+      chunk->tiles.values[z * width * height + y * width + x].terrain = 38;
+    }
+
+    if (prob > 0.1 && prob < 0.11)
+    {
+      chunk->tiles.values[z * width * height + y * width + x].decoration = 10;
+    }
     break;
+  }
   case DL_EDGE_TOP:
-    tiles[z * width * height + y * width + x].terrain = 37;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 37;
     break;
   case DL_EDGE_RIGHT:
-    tiles[z * width * height + y * width + x].terrain = 34;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 34;
     break;
   case DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].terrain = 30;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 30;
     break;
   case DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 36;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 36;
     break;
   case DL_EDGE_TOP | DL_EDGE_RIGHT:
-    tiles[z * width * height + y * width + x].terrain = 33;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 33;
     break;
   case DL_EDGE_TOP | DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].terrain = 29;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 29;
     break;
   case DL_EDGE_TOP | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 35;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 35;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].terrain = 26;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 26;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 32;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 32;
     break;
   case DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 28;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 28;
     break;
   case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-    tiles[z * width * height + y * width + x].terrain = 25;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 25;
     break;
   case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 31;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 31;
     break;
   case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 27;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 27;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    tiles[z * width * height + y * width + x].terrain = 24;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 24;
     break;
   case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP:
-    tiles[z * width * height + y * width + x].terrain = 23;
+    chunk->tiles.values[z * width * height + y * width + x].terrain = 23;
     break;
   }
 

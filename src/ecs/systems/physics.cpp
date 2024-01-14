@@ -100,12 +100,12 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         // Entity collided and can't advance
         else
         {
-          const auto& tiles = m_world.get_all(std::round(position.x), std::round(position.y), std::round(position.z));
+          const auto climb_position = m_get_climb_position(position, candidate_position);
+          const auto& tile_data = m_world.get_terrain(climb_position.x, climb_position.y, climb_position.z);
 
-          if (tiles.terrain.flags.contains("SLOPE"))
+          if (tile_data.flags.contains("WALKABLE"))
           {
-            candidate_position.z += 1;
-            target_position = m_climb_slope(position, candidate_position, tiles.terrain.climbs_to);
+            target_position = climb_position;
           }
           else
           {
@@ -171,9 +171,7 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
   return false;
 }
 
-Position PhysicsSystem::m_climb_slope(const Position& position,
-                                      const Position& candidate_position,
-                                      const Direction climbs_to)
+Position PhysicsSystem::m_get_climb_position(const Position& position, const Position& candidate_position)
 {
   Position rounded_position{std::round(position.x), std::round(position.y), std::round(position.z)};
   Vector2i advance{
@@ -181,7 +179,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
       std::round(candidate_position.y) - rounded_position.y,
   };
 
-  if (climbs_to == Direction::Top && advance.y < 0 && advance.x == 0)
+  if (advance.y < 0 && advance.x == 0)
   {
     return Position{
         rounded_position.x,
@@ -189,7 +187,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::Right && advance.y == 0 && advance.x > 0)
+  else if (advance.y == 0 && advance.x > 0)
   {
     return Position{
         rounded_position.x + 1,
@@ -197,7 +195,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::Bottom && advance.y > 0 && advance.x == 0)
+  else if (advance.y > 0 && advance.x == 0)
   {
     return Position{
         rounded_position.x,
@@ -205,7 +203,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::Left && advance.y == 0 && advance.x < 0)
+  else if (advance.y == 0 && advance.x < 0)
   {
     return Position{
         rounded_position.x - 1,
@@ -213,7 +211,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::TopLeft && advance.y < 0 && advance.x < 0)
+  else if (advance.y < 0 && advance.x < 0)
   {
     return Position{
         rounded_position.x - 1,
@@ -221,7 +219,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::TopRight && advance.y < 0 && advance.x > 0)
+  else if (advance.y < 0 && advance.x > 0)
   {
     return Position{
         rounded_position.x + 1,
@@ -229,7 +227,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::BottomRight && advance.y > 0 && advance.x > 0)
+  else if (advance.y > 0 && advance.x > 0)
   {
     return Position{
         rounded_position.x + 1,
@@ -237,7 +235,7 @@ Position PhysicsSystem::m_climb_slope(const Position& position,
         rounded_position.z + 1,
     };
   }
-  else if (climbs_to == Direction::BottomLeft && advance.y > 0 && advance.x < 0)
+  else if (advance.y > 0 && advance.x < 0)
   {
     return Position{
         rounded_position.x - 1,
