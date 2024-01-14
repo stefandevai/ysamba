@@ -28,5 +28,5 @@ void main()
     discard;
   }
 
-  color = final_color;
+  color = vec4(final_color.rgb, final_color.a);
 }

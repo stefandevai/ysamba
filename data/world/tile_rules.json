@@ -1,0 +1,96 @@
+{
+  "rules": [
+    {
+      "label": "grass autotile",
+      "input": 2,
+      "type": "autotile_4_sides",
+      "output": [
+        {
+          "bitmask": 0,
+          "value": 38
+        },
+        {
+          "bitmask": 1,
+          "value": 37
+        },
+        {
+          "bitmask": 2,
+          "value": 34
+        },
+        {
+          "bitmask": 4,
+          "value": 30
+        },
+        {
+          "bitmask": 8,
+          "value": 36
+        },
+        {
+          "bitmask": 3,
+          "value": 33
+        },
+        {
+          "bitmask": 5,
+          "value": 29
+        },
+        {
+          "bitmask": 9,
+          "value": 35
+        },
+        {
+          "bitmask": 6,
+          "value": 26
+        },
+        {
+          "bitmask": 10,
+          "value": 32
+        },
+        {
+          "bitmask": 12,
+          "value": 28
+        },
+        {
+          "bitmask": 12,
+          "value": 28
+        },
+        {
+          "bitmask": 7,
+          "value": 25
+        },
+        {
+          "bitmask": 11,
+          "value": 31
+        },
+        {
+          "bitmask": 13,
+          "value": 27
+        },
+        {
+          "bitmask": 14,
+          "value": 24
+        },
+        {
+          "bitmask": 15,
+          "value": 23
+        }
+      ]
+    },
+    {
+      "label": "grass variation",
+      "input": 38,
+      "type": "uniform_distribution",
+      "output": [
+        {
+          "probability": 0.1,
+          "value": 5,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.01,
+          "value": 10,
+          "placement": "decoration"
+        }
+      ]
+    }
+  ]
+}

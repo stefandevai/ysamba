@@ -9,6 +9,7 @@
 #include <set>
 
 #include "./cell.hpp"
+#include "./generators/tile_rules.hpp"
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
@@ -29,6 +30,7 @@ World::World(GameContext& game_context) : m_game_context(game_context)
   const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
   spatial_hash.load(m_chunk_size, m_chunk_size, spatial_hash_cell_size);
 
+  TileRules::load();
   m_load_tile_data();
   m_load_item_data();
 }
