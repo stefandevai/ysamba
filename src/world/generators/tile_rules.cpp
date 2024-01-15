@@ -1,5 +1,7 @@
 #include "./tile_rules.hpp"
 
+#include <spdlog/spdlog.h>
+
 namespace dl
 {
 JSON TileRules::m_json = JSON{"./data/world/tile_rules.json"};
