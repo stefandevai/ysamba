@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cmath>
 
+#include "./tile_rules.hpp"
 #include "core/random.hpp"
 #include "world/chunk.hpp"
 
@@ -211,111 +212,69 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   {
     return;
   }
-  if (terrain_id == 1)
-  {
-    chunk->tiles.values[z * width * height + y * width + x].terrain = terrain_id;
-    return;
-  }
 
-  // Set not walkable block tile if not visible
+  // TODO: Set non walkable block tile if not visible
   if (!chunk->tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
   {
     chunk->tiles.values[z * width * height + y * width + x].terrain = 1;
     return;
   }
 
-  const auto bitmask = m_get_bitmask(terrain, transposed_x, transposed_y, z);
+  TileValues old_values{terrain_id, 0};
+  TileValues new_values{terrain_id, 0};
 
-  // DL_EDGE_NONE = 0,
-  // DL_EDGE_TOP = 1,
-  // DL_EDGE_RIGHT = 2,
-  // DL_EDGE_BOTTOM = 4,
-  // DL_EDGE_LEFT = 8,
-
-  switch (bitmask)
+  do
   {
-  // 0
-  case DL_EDGE_NONE:
-  {
-    const auto prob = random::get_real();
-    if (prob < 0.1)
+    old_values.terrain = new_values.terrain;
+    old_values.decoration = new_values.decoration;
+
+    const auto& rule_object = TileRules::get(old_values.terrain);
+    const auto index = rule_object.index();
+
+    switch (index)
     {
-      chunk->tiles.values[z * width * height + y * width + x].terrain = 5;
+    case 0:
+      break;
+    case 1:
+    {
+      const auto& rule = std::get<AutoTile4SidesRule>(rule_object);
+      const auto bitmask = m_get_bitmask(terrain, transposed_x, transposed_y, z);
+      const auto new_terrain_id = rule.output[bitmask].value;
+      new_values.terrain = new_terrain_id;
+      break;
     }
-    else
+    case 2:
     {
-      chunk->tiles.values[z * width * height + y * width + x].terrain = 38;
+      const auto& rule = std::get<UniformDistributionRule>(rule_object);
+      const auto prob = random::get_real();
+      double cumulative_probability = 0.0;
+
+      for (const auto& transform : rule.output)
+      {
+        cumulative_probability += transform.probability;
+
+        if (prob < cumulative_probability)
+        {
+          if (transform.placement == PlacementType::Terrain)
+          {
+            new_values.terrain = transform.value;
+          }
+          else
+          {
+            new_values.decoration = transform.value;
+          }
+          break;
+        }
+      }
+    }
+    default:
+      break;
     }
 
-    if (prob > 0.1 && prob < 0.11)
-    {
-      chunk->tiles.values[z * width * height + y * width + x].decoration = 10;
-    }
-    break;
-  }
-  // 1
-  case DL_EDGE_TOP:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 37;
-    break;
-  // 2
-  case DL_EDGE_RIGHT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 34;
-    break;
-  // 4
-  case DL_EDGE_BOTTOM:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 30;
-    break;
-  // 8
-  case DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 36;
-    break;
-  // 3
-  case DL_EDGE_TOP | DL_EDGE_RIGHT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 33;
-    break;
-  // 5
-  case DL_EDGE_TOP | DL_EDGE_BOTTOM:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 29;
-    break;
-  // 9
-  case DL_EDGE_TOP | DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 35;
-    break;
-  // 6
-  case DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 26;
-    break;
-  // 10
-  case DL_EDGE_RIGHT | DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 32;
-    break;
-  // 12
-  case DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 28;
-    break;
-  // 7
-  case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 25;
-    break;
-  // 11
-  case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 31;
-    break;
-  // 13
-  case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 27;
-    break;
-  // 14
-  case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 24;
-    break;
-  // 15
-  case DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP:
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 23;
-    break;
-  }
+  } while (old_values.terrain != new_values.terrain);
 
-  // tiles[z * width * height + y * width + x].terrain = terrain_id;
+  chunk->tiles.values[z * width * height + y * width + x].terrain = new_values.terrain;
+  chunk->tiles.values[z * width * height + y * width + x].decoration = new_values.decoration;
 }
 
 uint32_t MapGenerator::m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z)

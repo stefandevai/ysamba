@@ -25,14 +25,13 @@ enum class PlacementType
 
 struct RuleBase
 {
-  uint32_t input;
+  int input;
   std::string label;
-  RuleType type;
 };
 
 struct AutoTile4SidesTransform
 {
-  uint32_t value;
+  int value;
 };
 
 struct AutoTile4SidesRule : public RuleBase
@@ -42,7 +41,7 @@ struct AutoTile4SidesRule : public RuleBase
 
 struct UniformDistributionTransform
 {
-  uint32_t value;
+  int value;
   double probability;
   PlacementType placement;
 };
@@ -52,19 +51,26 @@ struct UniformDistributionRule : public RuleBase
   std::vector<UniformDistributionTransform> output;
 };
 
-using Rule = std::variant<RuleBase, AutoTile4SidesRule, UniformDistributionRule>;
+using IdentityRule = RuleBase;
+using Rule = std::variant<IdentityRule, AutoTile4SidesRule, UniformDistributionRule>;
+
+struct TileValues
+{
+  int terrain;
+  int decoration;
+};
 
 class TileRules
 {
  public:
-  static std::unordered_map<uint32_t, Rule> rules;
+  static std::unordered_map<int, Rule> rules;
   static Rule identity;
   static bool has_loaded;
 
   TileRules() = delete;
 
   static void load();
-  static const Rule& get(const uint32_t input);
+  static const Rule& get(const int input);
 
  private:
   static JSON m_json;

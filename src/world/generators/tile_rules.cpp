@@ -3,8 +3,8 @@
 namespace dl
 {
 JSON TileRules::m_json = JSON{"./data/world/tile_rules.json"};
-std::unordered_map<uint32_t, Rule> TileRules::rules{};
-Rule TileRules::identity = RuleBase{0, "identity", RuleType::Identity};
+std::unordered_map<int, Rule> TileRules::rules{};
+Rule TileRules::identity = IdentityRule{0, "identity"};
 bool TileRules::has_loaded = false;
 
 void TileRules::load()
@@ -28,13 +28,13 @@ void TileRules::load()
     {
       type = RuleType::UniformDistribution;
     }
-
-    if (type == RuleType::None)
+    else
     {
+      spdlog::warn("Invalid rule type: {}", rule["type"].get<std::string>());
       continue;
     }
 
-    const auto input = rule["input"].get<uint32_t>();
+    const auto input = rule["input"].get<int>();
     const auto rule_object = m_create_rule(rule, type);
 
     rules.insert({input, rule_object});
@@ -43,7 +43,7 @@ void TileRules::load()
   has_loaded = true;
 }
 
-const Rule& TileRules::get(const uint32_t input)
+const Rule& TileRules::get(const int input)
 {
   const auto& rule = rules.find(input);
 
@@ -62,15 +62,14 @@ Rule TileRules::m_create_rule(const nlohmann::json& rule, const RuleType type)
   case RuleType::Autotile4Sides:
   {
     AutoTile4SidesRule rule_object;
-    rule_object.input = rule["input"].get<uint32_t>();
+    rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
-    rule_object.type = type;
 
     const auto& output = rule["output"];
     for (const auto& transform : output)
     {
-      const auto value = transform["value"].get<uint32_t>();
-      const auto index = transform["bitmask"].get<uint32_t>();
+      const auto value = transform["value"].get<int>();
+      const auto index = transform["bitmask"].get<int>();
 
       rule_object.output[index].value = value;
     }
@@ -80,15 +79,14 @@ Rule TileRules::m_create_rule(const nlohmann::json& rule, const RuleType type)
   case RuleType::UniformDistribution:
   {
     UniformDistributionRule rule_object;
-    rule_object.input = rule["input"].get<uint32_t>();
+    rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
-    rule_object.type = type;
 
     const auto& output = rule["output"];
     for (const auto& transform : output)
     {
       UniformDistributionTransform transform_object;
-      transform_object.value = transform["value"].get<uint32_t>();
+      transform_object.value = transform["value"].get<int>();
       transform_object.probability = transform["probability"].get<double>();
       transform_object.placement =
           transform["placement"].get<std::string>() == "terrain" ? PlacementType::Terrain : PlacementType::Decoration;
