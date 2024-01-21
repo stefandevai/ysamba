@@ -578,6 +578,106 @@
       "id": 42,
       "name": "grass slope",
       "flags": ["WALKABLE"]
+    },
+    {
+      "id": 43,
+      "name": "grass",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "name": "grass",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "name": "grass",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "name": "grass",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "name": "grass",
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "type": 3,
+          "name": "dig",
+          "qualities_required": ["dig"],
+          "gives_in_place": false,
+          "gives": [
+            {
+              "item_id": 6,
+              "quantity": [1, 1]
+            }
+          ],
+          "turns_into": 12
+        }
+      ]
     }
   ]
 }

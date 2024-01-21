@@ -81,14 +81,29 @@
       "type": "uniform_distribution",
       "output": [
         {
-          "probability": 0.1,
-          "value": 5,
+          "probability": 0.02,
+          "value": 43,
           "placement": "terrain"
         },
         {
-          "probability": 0.01,
-          "value": 10,
-          "placement": "decoration"
+          "probability": 0.02,
+          "value": 44,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.02,
+          "value": 45,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.02,
+          "value": 46,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.02,
+          "value": 47,
+          "placement": "terrain"
         }
       ]
     }
