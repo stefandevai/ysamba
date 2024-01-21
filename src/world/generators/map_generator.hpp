@@ -21,6 +21,8 @@ class MapGenerator
   // std::vector<Cell> tiles;
   // std::vector<int> height_map;
   std::vector<float> raw_height_map;
+  std::vector<float> vegetation_type;
+  std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;
 
   MapGenerator() = default;
@@ -41,9 +43,10 @@ class MapGenerator
 
   JSON m_json{"./data/world/tile_rules.json"};
   int m_generation_padding = 1;
-  void m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset);
+  void m_get_height_map(const int seed, const Vector3i& offset);
   float m_get_rectangle_gradient_value(const int x, const int y);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
+  int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
   uint32_t m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z);
 };
 }  // namespace dl

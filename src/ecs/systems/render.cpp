@@ -178,7 +178,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
 
               m_render_tile(chunk, cell.terrain, tile_size, local_i, local_j, z);
-              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z);
+              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z, 1);
             }
           }
         }
@@ -252,7 +252,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
 
               m_render_tile(chunk, cell.terrain, tile_size, local_i, local_j, z);
-              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z);
+              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z, 1);
             }
           }
         }

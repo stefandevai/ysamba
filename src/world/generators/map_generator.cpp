@@ -41,14 +41,13 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   // tiles = std::vector<Cell>(width * height * depth);
   // height_map = std::vector<int>(width * height);
 
-  raw_height_map.resize(padded_width * padded_height);
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
   /* auto start = std::chrono::high_resolution_clock::now(); */
 
   /* spdlog::info("Generating silhouette..."); */
 
-  m_get_height_map(raw_height_map, seed, offset);
+  m_get_height_map(seed, offset);
 
   for (int j = 0; j < padded_height; ++j)
   {
@@ -121,21 +120,49 @@ void MapGenerator::set_size(const Vector3i& size)
   depth = size.z;
 }
 
-void MapGenerator::m_get_height_map(std::vector<float>& height_values, const int seed, const Vector3i& offset)
+void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 {
+  const int padded_width = width + m_generation_padding * 2;
+  const int padded_height = height + m_generation_padding * 2;
+
+  raw_height_map.resize(padded_width * padded_height);
+  vegetation_type.resize(width * height);
+  vegetation_density.resize(width * height);
+
   /* const float frequency = 0.005f; */
   const float frequency = 0.003f;
   // (2D) (((OpenSimplex2S + FractalRidged(G0.5 W0.0, O3, L2)) + (OpenSimplex2S + SeedOffset(S10) + FractalFBm(G0.5,
   // W0.0, O5, L2.0))) + MinSmooth(S2.46))
-  FastNoise::SmartNode<> noise_generator = FastNoise::NewFromEncodedNodeTree(
+  FastNoise::SmartNode<> elevation_noise = FastNoise::NewFromEncodedNodeTree(
       "HwAPAAMAAAAAAABAKQAAAAAAPwAAAAAAAQ0ABQAAAAAAAEAWAAoAAAApAAAAAAA/AAAAAAAApHAdQA==");
-  noise_generator->GenUniformGrid2D(height_values.data(),
+  elevation_noise->GenUniformGrid2D(raw_height_map.data(),
                                     offset.x - m_generation_padding,
                                     offset.y + m_generation_padding,
                                     width + m_generation_padding * 2,
                                     height + m_generation_padding * 2,
                                     frequency,
                                     seed);
+
+  for (size_t i = 0; i < raw_height_map.size(); ++i)
+  {
+    raw_height_map[i] = smoothstep(-0.9, 0.3, raw_height_map[i]);
+  }
+
+  // Possible rivers
+  // DwACAAAA9ijcPykAAEjhOkAAuB4FwA==
+
+  // Vegetation type lookup
+  // DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==
+  FastNoise::SmartNode<> vegetation_type_noise =
+      FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
+  vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, width, height, 0.05f, seed + 30);
+
+  // Vegetation density lookup
+  // DQACAAAAexROQCkAAFK4Hj8AmpkZPw==
+  FastNoise::SmartNode<> vegetation_density_noise =
+      FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
+  vegetation_density_noise->GenUniformGrid2D(
+      vegetation_density.data(), offset.x, offset.y, width, height, 0.05f, seed + 50);
 
   /* const auto simplex_freq = m_json.object["simplex_freq"].get<float>(); */
   /* const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>(); */
@@ -175,20 +202,6 @@ void MapGenerator::m_get_height_map(std::vector<float>& height_values, const int
 
   /* const double distance = max_value - min_value; */
   /* const double distance = 0.9; */
-
-  for (size_t i = 0; i < height_values.size(); ++i)
-  {
-    height_values[i] = smoothstep(-0.9, 0.3, height_values[i]);
-    /* height_values[i] = (height_values[i] - min_value) / distance; */
-    /* if (height_values[i] < 0.0) */
-    /* { */
-    /*   height_values[i] = 0.0; */
-    /* } */
-    /* if (height_values[i] > 1.0) */
-    /* { */
-    /*   height_values[i] = 1.0; */
-    /* } */
-  }
 }
 
 float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
@@ -274,7 +287,66 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   } while (old_values.terrain != new_values.terrain);
 
   chunk->tiles.values[z * width * height + y * width + x].terrain = new_values.terrain;
+
+  // Select vegetation
+  if (new_values.decoration == 0)
+  {
+    new_values.decoration = m_select_decoration(terrain_id, x, y, z);
+  }
+
   chunk->tiles.values[z * width * height + y * width + x].decoration = new_values.decoration;
+}
+
+int MapGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
+{
+  int decoration = 0;
+
+  // TODO: Integrate to the rule system for any terrain
+  if (terrain_id != 2)
+  {
+    return decoration;
+  }
+
+  const auto density = vegetation_density[y * width + x];
+
+  if (density < 0.3f)
+  {
+    return decoration;
+  }
+
+  const auto prob = random::get_real();
+
+  if (prob < 0.4f)
+  {
+    return decoration;
+  }
+
+  int plant_small = 0;
+  int plant_big = 0;
+
+  const auto type_threshold = vegetation_type[y * width + x];
+
+  if (type_threshold < 0.0f)
+  {
+    plant_small = 54;
+    plant_big = 53;
+  }
+  else
+  {
+    plant_small = 49;
+    plant_big = 48;
+  }
+
+  if (density < 0.4f)
+  {
+    decoration = plant_small;
+  }
+  else
+  {
+    decoration = plant_big;
+  }
+
+  return decoration;
 }
 
 uint32_t MapGenerator::m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z)

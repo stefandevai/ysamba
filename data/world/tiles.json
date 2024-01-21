@@ -678,6 +678,41 @@
           "turns_into": 12
         }
       ]
+    },
+    {
+      "id": 48,
+      "name": "maiz",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 49,
+      "name": "maiz",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 50,
+      "name": "tree",
+      "flags": []
+    },
+    {
+      "id": 51,
+      "name": "blue plant",
+      "flags": []
+    },
+    {
+      "id": 52,
+      "name": "blue plant",
+      "flags": []
+    },
+    {
+      "id": 53,
+      "name": "quinoa plant",
+      "flags": []
+    },
+    {
+      "id": 54,
+      "name": "quinoa plant",
+      "flags": []
     }
   ]
 }

@@ -104,6 +104,11 @@
           "probability": 0.02,
           "value": 47,
           "placement": "terrain"
+        },
+        {
+          "probability": 0.06,
+          "value": 50,
+          "placement": "decoration"
         }
       ]
     }

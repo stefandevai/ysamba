@@ -172,34 +172,6 @@
         },
         {
             "type": "tile",
-            "tile_type": "multiple",
-            "angle": "orthogonal",
-            "frame": 59,
-            "id": 51,
-            "width": 1,
-            "height": 2,
-            "pattern": [51],
-            "pattern_width": 1,
-            "pattern_height": 1,
-            "anchor_x": 0,
-            "anchor_y": 1
-        },
-        {
-            "type": "tile",
-            "tile_type": "multiple",
-            "angle": "orthogonal",
-            "frame": 61,
-            "id": 53,
-            "width": 1,
-            "height": 2,
-            "pattern": [53],
-            "pattern_width": 1,
-            "pattern_height": 1,
-            "anchor_x": 0,
-            "anchor_y": 1
-        },
-        {
-            "type": "tile",
             "tile_type": "single",
             "frame": 71,
             "id": 3
@@ -210,20 +182,6 @@
             "angle": "orthogonal",
             "frame": 88,
             "id": 49
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "orthogonal",
-            "frame": 92,
-            "id": 52
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "orthogonal",
-            "frame": 94,
-            "id": 54
         },
         {
             "type": "item",
@@ -245,17 +203,7 @@
             "id": 50,
             "width": 4,
             "height": 4,
-            "pattern": [
-                0,
-                0,
-                0,
-                0,
-                50,
-                0,
-                0,
-                0,
-                0
-            ],
+            "pattern": [0,0,0,0,50,0,0,0,0],
             "pattern_width": 3,
             "pattern_height": 3,
             "anchor_x": 2,
