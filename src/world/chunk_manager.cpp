@@ -8,6 +8,7 @@
 #include "./generators/map_generator.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "core/random.hpp"
+#include "core/serialization.hpp"
 
 namespace dl
 {
@@ -171,158 +172,12 @@ void ChunkManager::load_sync(const Vector3i& position)
     auto chunk = std::make_unique<Chunk>(position, true);
     chunk->tiles.set_size(chunk_size);
 
+    serialization::load_chunk(*chunk, "test.world");
+
+    if (chunk->tiles.height_map.size() != chunk_size.x * chunk_size.y)
     {
-      const uint32_t magic_number = 0x533d;
-      const uint8_t metadata_marker = 0x01;
-      const uint8_t values_marker = 0x02;
-      const uint8_t height_map_marker = 0x03;
-      const uint8_t end_marker = 0x04;
-
-      uint32_t file_magic_number = 0;
-      uint8_t file_metadata_marker = 0;
-      uint8_t file_values_marker = 0;
-      uint8_t file_height_map_marker = 0;
-      uint8_t file_end_marker = 0;
-
-      FILE* file = fopen("test.world", "r");
-
-      if (!file)
-      {
-        spdlog::critical("Could not open file for loading world.");
-        return;
-      }
-
-      fread(&file_magic_number, sizeof(uint32_t), 1, file);
-
-      if (file_magic_number != magic_number)
-      {
-        spdlog::critical(
-            "Invalid file format when loading world: {0:x}, expected: {0:x}", file_magic_number, magic_number);
-        fclose(file);
-        return;
-      }
-
-      fread(&file_metadata_marker, sizeof(uint8_t), 1, file);
-
-      if (file_metadata_marker != metadata_marker)
-      {
-        spdlog::critical(
-            "Invalid metadata marker when loading world: {}, expected: {}", file_metadata_marker, metadata_marker);
-        fclose(file);
-        return;
-      }
-
-      Vector3i world_size{};
-
-      fread(&world_size.x, sizeof(uint32_t), 1, file);
-      fread(&world_size.y, sizeof(uint32_t), 1, file);
-      fread(&world_size.z, sizeof(uint32_t), 1, file);
-
-      spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
-
-      fread(&file_values_marker, sizeof(uint8_t), 1, file);
-
-      if (file_values_marker != values_marker)
-      {
-        spdlog::critical(
-            "Invalid metadata marker when loading world: {}, expected: {}", file_values_marker, values_marker);
-        fclose(file);
-        return;
-      }
-
-      const uint64_t values_pos = ftell(file);
-      const uint64_t max_cell_pos = world_size.x * world_size.y * world_size.z * sizeof(uint32_t) * 3;
-
-      for (int z = 0; z < chunk_size.z; ++z)
-      {
-        for (int y = 0; y < chunk_size.y; ++y)
-        {
-          for (int x = 0; x < chunk_size.x; ++x)
-          {
-            const uint64_t local_position =
-                ((position.x + x) + (position.y + y) * world_size.x + (position.z + z) * world_size.x * world_size.y) *
-                sizeof(uint32_t) * 3;
-
-            if (local_position > max_cell_pos)
-            {
-              spdlog::critical(
-                  "Invalid cell position when loading world: {}, expected: {}", local_position, max_cell_pos);
-              spdlog::critical("Position: ({} {} {}) ({} {} {}), Chunk Size: {} {} {}",
-                               position.x,
-                               position.y,
-                               position.z,
-                               x,
-                               y,
-                               z,
-                               chunk_size.x,
-                               chunk_size.y,
-                               chunk_size.z);
-              continue;
-            }
-
-            fseek(file, values_pos + local_position, SEEK_SET);
-
-            auto& cell = chunk->tiles.values[x + y * chunk_size.x + z * chunk_size.x * chunk_size.y];
-
-            fread(&cell.terrain, sizeof(uint32_t), 1, file);
-            fread(&cell.decoration, sizeof(uint32_t), 1, file);
-            fread(&cell.flags, sizeof(uint32_t), 1, file);
-          }
-        }
-      }
-
-      fseek(file, values_pos + max_cell_pos, SEEK_SET);
-      fread(&file_height_map_marker, sizeof(uint8_t), 1, file);
-
-      if (file_height_map_marker != height_map_marker)
-      {
-        spdlog::critical(
-            "Invalid metadata marker when loading world: {}, expected: {}", file_height_map_marker, height_map_marker);
-        fclose(file);
-        return;
-      }
-
-      const uint64_t height_map_pos = ftell(file);
-      const uint64_t max_height_map_pos = world_size.x * world_size.y * sizeof(int);
-
-      for (int y = 0; y < chunk_size.y; ++y)
-      {
-        for (int x = 0; x < chunk_size.x; ++x)
-        {
-          const uint64_t local_position = ((position.x + x) + (position.y + y) * world_size.x) * sizeof(int);
-
-          if (local_position > max_height_map_pos)
-          {
-            spdlog::critical(
-                "Invalid height map position when loading world: {}, expected: {}", local_position, max_height_map_pos);
-            spdlog::critical("Position: ({} {} {}) ({} {}), Chunk Size: {} {} {}",
-                             position.x,
-                             position.y,
-                             position.z,
-                             x,
-                             y,
-                             chunk_size.x,
-                             chunk_size.y,
-                             chunk_size.z);
-            continue;
-          }
-
-          fseek(file, height_map_pos + local_position, SEEK_SET);
-          fread(&chunk->tiles.height_map[x + y * chunk_size.x], sizeof(int), 1, file);
-        }
-      }
-
-      fseek(file, height_map_pos + max_height_map_pos, SEEK_SET);
-      fread(&file_end_marker, sizeof(uint8_t), 1, file);
-
-      if (file_end_marker != end_marker)
-      {
-        spdlog::critical("Invalid metadata marker when loading world: {}, expected: {}", file_end_marker, end_marker);
-        fclose(file);
-        return;
-      }
-
-      fclose(file);
+      spdlog::critical("Could not load chunk: invalid height map size");
+      return;
     }
 
     spdlog::debug("Loaded chunk at: {} {} {}", position.x, position.y, position.z);
