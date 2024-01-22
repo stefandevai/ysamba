@@ -55,5 +55,6 @@ class ChunkManager
   std::vector<std::unique_ptr<Chunk>> m_chunks_to_add{};
   static std::mutex m_chunks_to_add_mutex;
   ThreadPool m_thread_pool{};
+  int m_seed = 0;
 };
 };  // namespace dl

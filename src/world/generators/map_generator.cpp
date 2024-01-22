@@ -65,7 +65,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       int terrain_id = 0;
 
-      if (k < 2)
+      if (k < 1)
       {
         terrain_id = 1;
       }

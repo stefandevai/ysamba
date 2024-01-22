@@ -7,13 +7,18 @@
 
 #include "./generators/map_generator.hpp"
 #include "core/maths/neighbor_iterator.hpp"
+#include "core/random.hpp"
 
 namespace dl
 {
 Chunk ChunkManager::null = Chunk{};
 std::mutex ChunkManager::m_chunks_to_add_mutex = std::mutex{};
 
-ChunkManager::ChunkManager() { m_thread_pool.initialize(); }
+ChunkManager::ChunkManager()
+{
+  m_seed = random::get_integer(0, 10000);
+  m_thread_pool.initialize();
+}
 
 ChunkManager::~ChunkManager()
 {
@@ -128,7 +133,7 @@ void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size
 {
   MapGenerator generator{};
   generator.set_size(size);
-  generator.generate(1337, position);
+  generator.generate(m_seed, position);
   // auto chunk = std::make_unique<Chunk>(position, true);
   // chunk->tiles.set_size(size);
   // chunk->tiles.values = std::move(generator.tiles);
@@ -158,7 +163,7 @@ void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
 {
   MapGenerator generator{};
   generator.set_size(size);
-  generator.generate(1337, position);
+  generator.generate(m_seed, position);
   // auto chunk = std::make_unique<Chunk>(position, true);
   // chunk->tiles.set_size(size);
   // chunk->tiles.values = std::move(generator.tiles);
