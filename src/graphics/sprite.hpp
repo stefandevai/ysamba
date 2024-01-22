@@ -19,7 +19,10 @@ class Sprite
   FrameAngle frame_angle = FrameAngle::Parallel;
 
   Sprite() {}
-  Sprite(const std::string& resource_id, const int frame = 0) : resource_id(resource_id), frame(frame) {}
+  Sprite(const std::string& resource_id, const int frame = 0, const FrameAngle frame_angle = FrameAngle::Parallel)
+      : resource_id(resource_id), frame(frame), frame_angle(frame_angle)
+  {
+  }
 
   int get_frame() const { return frame; };
   const glm::vec2& get_size();

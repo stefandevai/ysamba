@@ -25,10 +25,16 @@ struct Visibility
   // A z index to be applied only for rendering
   uint32_t layer_z{};
 
+  // Angle to render the sprite at
+  FrameAngle frame_angle = FrameAngle::Orthogonal;
+
   Visibility() = default;
 
-  Visibility(const std::string& resource_id, const uint32_t frame = 0, const uint32_t layer_z = 0)
-      : resource_id(resource_id), frame(frame), layer_z(layer_z)
+  Visibility(const std::string& resource_id,
+             const uint32_t frame = 0,
+             const uint32_t layer_z = 0,
+             const FrameAngle frame_angle = FrameAngle::Orthogonal)
+      : resource_id(resource_id), frame(frame), layer_z(layer_z), frame_angle(frame_angle)
   {
     sprite = std::make_unique<Sprite>(resource_id, frame);
   };

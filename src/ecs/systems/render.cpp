@@ -62,11 +62,12 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
       if (visibility.sprite == nullptr)
       {
-        visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame);
+        visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame, visibility.frame_angle);
       }
       if (visibility.sprite->texture == nullptr)
       {
         visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
+        visibility.sprite->frame_angle = visibility.frame_angle;
 
         // Set specific frame according to the texture data loaded in a separated json file.
         // This allows flexibility by separating the texture frames from game ids.
@@ -84,8 +85,10 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto position_y = std::round(position.y) * sprite_size.y;
       const auto position_z = std::round(position.z) * sprite_size.y;
 
-      m_batch->emplace(
-          visibility.sprite.get(), position_x, position_y, position_z + visibility.layer_z * m_z_index_increment);
+      m_batch->emplace(visibility.sprite.get(),
+                       position_x,
+                       position_y + visibility.layer_z * m_z_index_increment,
+                       position_z + visibility.layer_z * m_z_index_increment);
     }
   }
 
@@ -102,7 +105,10 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto position_x = std::round(position.x) * tile_size.x;
       const auto position_y = std::round(position.y) * tile_size.y;
 
-      m_batch->quad(&rectangle.quad, position_x, position_y, position_z + rectangle.z_index * m_z_index_increment);
+      m_batch->quad(&rectangle.quad,
+                    position_x,
+                    position_y + rectangle.z_index * m_z_index_increment,
+                    position_z + rectangle.z_index * m_z_index_increment);
     }
 
     auto text_view = registry.view<const Text, const Position>();
@@ -284,8 +290,10 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
 
   if (tile.frame_data->tile_type == TileType::Single)
   {
-    m_batch->tile(
-        tile, world_x * tile_size.x, world_y * tile_size.y, world_z * tile_size.y + z_index * m_z_index_increment);
+    m_batch->tile(tile,
+                  world_x * tile_size.x,
+                  world_y * tile_size.y + z_index * m_z_index_increment,
+                  world_z * tile_size.y + z_index * m_z_index_increment);
 
     // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
     if (chunk.tiles.is_bottom_empty(x, y, z))
@@ -313,8 +321,8 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     m_renderer.batch("world"_hs,
                      &multi_sprite,
                      (world_x - tile.frame_data->anchor_x) * tile_size.x,
-                     (world_y - tile.frame_data->anchor_y) * tile_size.y,
-                     world_z * tile_size.y + z_index);
+                     (world_y - tile.frame_data->anchor_y) * tile_size.y + z_index * m_z_index_increment,
+                     world_z * tile_size.y + z_index * m_z_index_increment);
   }
 }
 

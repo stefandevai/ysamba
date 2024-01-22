@@ -692,27 +692,27 @@
     {
       "id": 50,
       "name": "tree",
-      "flags": []
+      "flags": ["WALKABLE"]
     },
     {
       "id": 51,
       "name": "blue plant",
-      "flags": []
+      "flags": ["WALKABLE"]
     },
     {
       "id": 52,
       "name": "blue plant",
-      "flags": []
+      "flags": ["WALKABLE"]
     },
     {
       "id": 53,
       "name": "quinoa plant",
-      "flags": []
+      "flags": ["WALKABLE"]
     },
     {
       "id": 54,
       "name": "quinoa plant",
-      "flags": []
+      "flags": ["WALKABLE"]
     }
   ]
 }

@@ -103,8 +103,11 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
     const auto position = m_get_member_position(world, camera);
     registry.emplace<Position>(entity, position);
     member.visibility.layer_z = position.z + renderer::layer_z_offset_characters;
-    registry.emplace<Visibility>(
-        entity, member.visibility.resource_id, member.visibility.frame, member.visibility.layer_z);
+    registry.emplace<Visibility>(entity,
+                                 member.visibility.resource_id,
+                                 member.visibility.frame,
+                                 member.visibility.layer_z,
+                                 member.visibility.frame_angle);
     registry.emplace<CarriedItems>(entity, member.carried_items);
     registry.emplace<WearedItems>(entity, member.weared_items);
     registry.emplace<WieldedItems>(entity, member.wielded_items);
@@ -155,12 +158,13 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   // Defined in body_parts.json
   biology.body_parts = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
-  return SocietyGenerator::MemberComponents{agent,
-                                            biology,
-                                            Visibility{"spritesheet-characters", parameters.texture_frame, 0},
-                                            carried_items,
-                                            weared_items,
-                                            wielded_items};
+  return SocietyGenerator::MemberComponents{
+      agent,
+      biology,
+      Visibility{"spritesheet-characters", parameters.texture_frame, 0, FrameAngle::Orthogonal},
+      carried_items,
+      weared_items,
+      wielded_items};
 }
 
 }  // namespace dl
