@@ -150,6 +150,9 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 
   // Possible rivers
   // DwACAAAA9ijcPykAAEjhOkAAuB4FwA==
+  // FastNoise::SmartNode<> river_noise =
+  //     FastNoise::NewFromEncodedNodeTree("DwACAAAA9ijcPykAAEjhOkAAuB4FwA==");
+  // river_noise->GenUniformGrid2D(rivers.data(), offset.x, offset.y, width, height, 0.005f, seed);
 
   // Vegetation type lookup
   // DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==
