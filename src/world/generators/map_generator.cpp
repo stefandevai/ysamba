@@ -25,29 +25,30 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   /* m_json.load("./data/world/map_generators/terrain.json"); */
   // TEMP
 
-  /* spdlog::info("============================="); */
-  /* spdlog::info("= STARTING WORLD GENERATION ="); */
-  /* spdlog::info("=============================\n"); */
-  /* spdlog::info("SEED: {}", seed); */
-  /* spdlog::info("WIDTH: {}", width); */
-  /* spdlog::info("HEIGHT: {}\n", height); */
+  spdlog::info("=============================");
+  spdlog::info("= STARTING WORLD GENERATION =");
+  spdlog::info("=============================\n");
+  spdlog::info("SEED: {}", seed);
+  spdlog::info("WIDTH: {}", width);
+  spdlog::info("HEIGHT: {}\n", height);
 
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
 
-  chunk = std::make_unique<Chunk>(Vector3i{0, 0, 0}, true);
-  chunk->position = offset;
+  chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(width, height, depth);
   // tiles = std::vector<Cell>(width * height * depth);
   // height_map = std::vector<int>(width * height);
 
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
-  /* auto start = std::chrono::high_resolution_clock::now(); */
+  auto start = std::chrono::high_resolution_clock::now();
 
-  /* spdlog::info("Generating silhouette..."); */
+  spdlog::info("Generating height maps...");
 
   m_get_height_map(seed, offset);
+
+  spdlog::info("Setting terrain...");
 
   for (int j = 0; j < padded_height; ++j)
   {
@@ -94,12 +95,11 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
+  spdlog::info("Computing visibility...");
+
   chunk->tiles.compute_visibility();
 
-  /* auto stop = std::chrono::high_resolution_clock::now(); */
-  /* auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); */
-
-  /* spdlog::info("World generation finished! It took {} milliseconds", duration.count()); */
+  spdlog::info("Selecting tiles...");
 
   for (int k = 0; k < depth; ++k)
   {
@@ -111,6 +111,11 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
       }
     }
   }
+
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 }
 
 void MapGenerator::set_size(const Vector3i& size)

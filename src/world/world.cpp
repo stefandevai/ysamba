@@ -3,12 +3,14 @@
 #include <spdlog/spdlog.h>
 
 #include <entt/entity/registry.hpp>
+#include <fstream>
 #include <libtcod.hpp>
 #include <nlohmann/json.hpp>
 #include <queue>
 #include <set>
 
 #include "./cell.hpp"
+#include "./generators/map_generator.hpp"
 #include "./generators/tile_rules.hpp"
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
@@ -35,12 +37,56 @@ World::World(GameContext& game_context) : m_game_context(game_context)
   m_load_item_data();
 }
 
-void World::generate(const int width, const int height, const int seed)
+void World::generate(const int width, const int height, const int depth, const int seed)
 {
-  // TODO: Implement world generation instead of current infinite generation
-  (void)width;
-  (void)height;
-  (void)seed;
+  MapGenerator generator{};
+  generator.set_size({width, height, depth});
+  generator.generate(seed, {0, 0, 0});
+
+  const auto& tiles = generator.chunk->tiles;
+
+  // Save data
+  std::ofstream outfile{"test.world", std::ios::binary | std::ios::out};
+  if (!outfile.is_open())
+  {
+    spdlog::debug("Could not open file to save world");
+    return;
+  }
+
+  const uint32_t magic_number = 0x533d;
+  const uint8_t metadata_marker = 0x01;
+  const uint8_t values_marker = 0x02;
+  const uint8_t height_map_marker = 0x03;
+  const uint8_t end_marker = 0x04;
+
+  outfile.write(reinterpret_cast<const char*>(&magic_number), sizeof(magic_number));
+
+  outfile.write(reinterpret_cast<const char*>(&metadata_marker), sizeof(metadata_marker));
+
+  outfile.write(reinterpret_cast<const char*>(&tiles.size.x), sizeof(tiles.size.x));
+  outfile.write(reinterpret_cast<const char*>(&tiles.size.y), sizeof(tiles.size.y));
+  outfile.write(reinterpret_cast<const char*>(&tiles.size.z), sizeof(tiles.size.z));
+
+  outfile.write(reinterpret_cast<const char*>(&values_marker), sizeof(values_marker));
+
+  for (const auto& cell : tiles.values)
+  {
+    outfile.write(reinterpret_cast<const char*>(&cell.terrain), sizeof(cell.terrain));
+    outfile.write(reinterpret_cast<const char*>(&cell.decoration), sizeof(cell.decoration));
+    outfile.write(reinterpret_cast<const char*>(&cell.flags), sizeof(cell.flags));
+  }
+
+  outfile.write(reinterpret_cast<const char*>(&height_map_marker), sizeof(height_map_marker));
+
+  for (const int value : tiles.height_map)
+  {
+    outfile.write(reinterpret_cast<const char*>(&value), sizeof(value));
+  }
+
+  outfile.write(reinterpret_cast<const char*>(&end_marker), sizeof(end_marker));
+
+  outfile.close();
+
   /* m_seed = seed; */
 
   /* tiles.set_size(width, height, 10); */

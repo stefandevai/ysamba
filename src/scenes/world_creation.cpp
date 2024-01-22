@@ -153,7 +153,7 @@ void WorldCreation::m_generate_map(const int seed)
     m_seed = random::get_integer(1, INT_MAX);
   }
 
-  m_world.generate(map_width, map_height, m_seed);
+  m_world.generate(map_width, map_height, 10, m_seed);
 }
 
 void WorldCreation::m_create_world_representation()

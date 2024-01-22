@@ -65,7 +65,7 @@ class World
   World(GameContext& game_context);
 
   // Generate world
-  void generate(const int width, const int height, const int seed);
+  void generate(const int width, const int height, const int depth, const int seed);
 
   // Load map from a json file
   void load(const std::string& filepath);
