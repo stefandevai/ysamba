@@ -321,8 +321,8 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     m_renderer.batch("world"_hs,
                      &multi_sprite,
                      (world_x - tile.frame_data->anchor_x) * tile_size.x,
-                     (world_y - tile.frame_data->anchor_y) * tile_size.y + z_index * m_z_index_increment,
-                     world_z * tile_size.y + z_index * m_z_index_increment);
+                     (world_y - tile.frame_data->anchor_y) * tile_size.y,
+                     world_z * tile_size.y + z_index);
   }
 }
 

@@ -178,9 +178,25 @@
             "id": 51,
             "width": 1,
             "height": 2,
-            "pattern": [51],
+            "pattern": [
+                51
+            ],
             "pattern_width": 1,
             "pattern_height": 1,
+            "anchor_x": 0,
+            "anchor_y": 1
+        },
+        {
+            "type": "tile",
+            "tile_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 60,
+            "id": 52,
+            "width": 1,
+            "height": 2,
+            "pattern": [52],
+            "pattern_width": 1,
+            "pattern_height": 2,
             "anchor_x": 0,
             "anchor_y": 1
         },
@@ -192,7 +208,23 @@
             "id": 53,
             "width": 1,
             "height": 2,
-            "pattern": [53],
+            "pattern": [
+                53
+            ],
+            "pattern_width": 1,
+            "pattern_height": 1,
+            "anchor_x": 0,
+            "anchor_y": 1
+        },
+        {
+            "type": "tile",
+            "tile_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 62,
+            "id": 54,
+            "width": 1,
+            "height": 2,
+            "pattern": [54],
             "pattern_width": 1,
             "pattern_height": 1,
             "anchor_x": 0,
@@ -212,20 +244,6 @@
             "id": 49
         },
         {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "orthogonal",
-            "frame": 92,
-            "id": 52
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "orthogonal",
-            "frame": 94,
-            "id": 54
-        },
-        {
             "type": "item",
             "tile_type": "single",
             "frame": 102,
@@ -234,7 +252,7 @@
         {
             "type": "tile",
             "tile_type": "single",
-            "frame": 104,
+            "frame": 40,
             "id": 7
         },
         {

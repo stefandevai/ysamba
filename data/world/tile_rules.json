@@ -106,6 +106,51 @@
           "placement": "terrain"
         },
         {
+          "probability": 0.02,
+          "value": 47,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.003,
+          "value": 7,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.001,
+          "value": 8,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.003,
+          "value": 55,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.001,
+          "value": 56,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.001,
+          "value": 57,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.001,
+          "value": 58,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.001,
+          "value": 59,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.001,
+          "value": 60,
+          "placement": "decoration"
+        },
+        {
           "probability": 0.06,
           "value": 50,
           "placement": "decoration"

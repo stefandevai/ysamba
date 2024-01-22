@@ -94,33 +94,6 @@
         {
             "type": "tile",
             "tile_type": "single",
-            "frame": 40,
-            "id": 7
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 41,
-            "id": 58
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 42,
-            "id": 59
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 43,
-            "id": 60
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
             "frame": 44,
             "id": 8
         },
@@ -215,9 +188,7 @@
             "id": 52,
             "width": 1,
             "height": 2,
-            "pattern": [
-                52
-            ],
+            "pattern": [52],
             "pattern_width": 1,
             "pattern_height": 2,
             "anchor_x": 0,
@@ -247,20 +218,11 @@
             "id": 54,
             "width": 1,
             "height": 2,
-            "pattern": [
-                54
-            ],
+            "pattern": [54],
             "pattern_width": 1,
             "pattern_height": 1,
             "anchor_x": 0,
             "anchor_y": 1
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 70,
-            "id": 56
         },
         {
             "type": "tile",
@@ -278,16 +240,8 @@
         {
             "type": "tile",
             "tile_type": "single",
-            "angle": "parallel",
-            "frame": 101,
-            "id": 57
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 102,
-            "id": 55
+            "frame": 40,
+            "id": 7
         },
         {
             "type": "tile",

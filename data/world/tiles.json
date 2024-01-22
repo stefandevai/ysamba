@@ -692,7 +692,7 @@
     {
       "id": 50,
       "name": "tree",
-      "flags": ["WALKABLE"]
+      "flags": []
     },
     {
       "id": 51,
@@ -712,6 +712,36 @@
     {
       "id": 54,
       "name": "quinoa plant",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 55,
+      "name": "flowers",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 56,
+      "name": "plant",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 57,
+      "name": "plant",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 58,
+      "name": "rocks",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 59,
+      "name": "rocks",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 60,
+      "name": "rocks",
       "flags": ["WALKABLE"]
     }
   ]
