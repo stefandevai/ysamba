@@ -151,8 +151,13 @@
           "placement": "decoration"
         },
         {
-          "probability": 0.06,
+          "probability": 0.002,
           "value": 50,
+          "placement": "decoration"
+        },
+        {
+          "probability": 0.002,
+          "value": 61,
           "placement": "decoration"
         }
       ]

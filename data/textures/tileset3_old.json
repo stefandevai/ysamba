@@ -92,10 +92,31 @@
             "id": 4
         },
         {
-            "type": "item",
+            "type": "tile",
             "tile_type": "single",
+            "frame": 40,
+            "id": 7
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 41,
+            "id": 58
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
             "frame": 42,
-            "id": 5
+            "id": 59
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 43,
+            "id": 60
         },
         {
             "type": "tile",
@@ -194,7 +215,9 @@
             "id": 52,
             "width": 1,
             "height": 2,
-            "pattern": [52],
+            "pattern": [
+                52
+            ],
             "pattern_width": 1,
             "pattern_height": 2,
             "anchor_x": 0,
@@ -224,7 +247,9 @@
             "id": 54,
             "width": 1,
             "height": 2,
-            "pattern": [54],
+            "pattern": [
+                54
+            ],
             "pattern_width": 1,
             "pattern_height": 1,
             "anchor_x": 0,
@@ -233,7 +258,14 @@
         {
             "type": "tile",
             "tile_type": "single",
-            "frame": 71,
+            "angle": "parallel",
+            "frame": 70,
+            "id": 56
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "frame": 72,
             "id": 3
         },
         {
@@ -244,16 +276,18 @@
             "id": 49
         },
         {
-            "type": "item",
+            "type": "tile",
             "tile_type": "single",
-            "frame": 102,
-            "id": 2
+            "angle": "parallel",
+            "frame": 101,
+            "id": 57
         },
         {
             "type": "tile",
             "tile_type": "single",
-            "frame": 40,
-            "id": 7
+            "angle": "parallel",
+            "frame": 102,
+            "id": 55
         },
         {
             "type": "tile",

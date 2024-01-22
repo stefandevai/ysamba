@@ -743,6 +743,11 @@
       "id": 60,
       "name": "rocks",
       "flags": ["WALKABLE"]
+    },
+    {
+      "id": 61,
+      "name": "big tree",
+      "flags": []
     }
   ]
 }
