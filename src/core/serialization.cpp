@@ -189,7 +189,7 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   fread(&world_size.y, sizeof(uint32_t), 1, file);
   fread(&world_size.z, sizeof(uint32_t), 1, file);
 
-  spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
+  // spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
 
   fread(&file_values_marker, terrain_ext::marker_size, 1, file);
 
