@@ -47,6 +47,6 @@ class MapGenerator
   float m_get_rectangle_gradient_value(const int x, const int y);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
   int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
-  uint32_t m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z);
+  uint32_t m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
 };
 }  // namespace dl

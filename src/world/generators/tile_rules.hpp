@@ -36,6 +36,7 @@ struct AutoTile4SidesTransform
 
 struct AutoTile4SidesRule : public RuleBase
 {
+  int neighbor;
   std::array<AutoTile4SidesTransform, 16> output;
 };
 

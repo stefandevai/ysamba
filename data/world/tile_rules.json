@@ -1,9 +1,82 @@
 {
   "rules": [
     {
+      "label": "water autotile",
+      "input": 1,
+      "type": "autotile_4_sides",
+      "neighbor": 2,
+      "output": [
+        {
+          "bitmask": 0,
+          "value": 77
+        },
+        {
+          "bitmask": 1,
+          "value": 76
+        },
+        {
+          "bitmask": 2,
+          "value": 73
+        },
+        {
+          "bitmask": 4,
+          "value": 69
+        },
+        {
+          "bitmask": 8,
+          "value": 75
+        },
+        {
+          "bitmask": 3,
+          "value": 72
+        },
+        {
+          "bitmask": 5,
+          "value": 68
+        },
+        {
+          "bitmask": 9,
+          "value": 74
+        },
+        {
+          "bitmask": 6,
+          "value": 65
+        },
+        {
+          "bitmask": 10,
+          "value": 71
+        },
+        {
+          "bitmask": 12,
+          "value": 67
+        },
+        {
+          "bitmask": 7,
+          "value": 64
+        },
+        {
+          "bitmask": 11,
+          "value": 70
+        },
+        {
+          "bitmask": 13,
+          "value": 66
+        },
+        {
+          "bitmask": 14,
+          "value": 63
+        },
+        {
+          "bitmask": 15,
+          "value": 62
+        }
+      ]
+    },
+    {
       "label": "grass autotile",
       "input": 2,
       "type": "autotile_4_sides",
+      "neighbor": 0,
       "output": [
         {
           "bitmask": 0,

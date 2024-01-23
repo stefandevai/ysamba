@@ -66,6 +66,7 @@ Rule TileRules::m_create_rule(const nlohmann::json& rule, const RuleType type)
     AutoTile4SidesRule rule_object;
     rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
+    rule_object.neighbor = rule["neighbor"].get<int>();
 
     const auto& output = rule["output"];
     for (const auto& transform : output)

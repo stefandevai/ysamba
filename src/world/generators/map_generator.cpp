@@ -65,10 +65,12 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
       }
 
       int terrain_id = 0;
+      int resolved_z = k;
 
       if (k < 1)
       {
         terrain_id = 1;
+        ++resolved_z;
       }
       else
       {
@@ -77,13 +79,13 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
       if (inside_chunk)
       {
-        chunk->tiles.height_map[(j - 1) * width + (i - 1)] = k;
-        chunk->tiles.values[k * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
+        chunk->tiles.height_map[(j - 1) * width + (i - 1)] = resolved_z;
+        chunk->tiles.values[resolved_z * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
       }
 
-      terrain[k * padded_width * padded_height + j * padded_width + i] = terrain_id;
+      terrain[resolved_z * padded_width * padded_height + j * padded_width + i] = terrain_id;
 
-      for (int z = 0; z < k; ++z)
+      for (int z = 0; z < resolved_z; ++z)
       {
         terrain[z * padded_width * padded_height + j * padded_width + i] = terrain_id;
 
@@ -274,9 +276,15 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
     case 1:
     {
       const auto& rule = std::get<AutoTile4SidesRule>(rule_object);
-      const auto bitmask = m_get_bitmask(terrain, transposed_x, transposed_y, z);
+      const auto bitmask = m_get_bitmask(terrain, transposed_x, transposed_y, z, rule.neighbor);
       const auto new_terrain_id = rule.output[bitmask].value;
       new_values.terrain = new_terrain_id;
+
+      if (terrain_id == 1)
+      {
+        spdlog::debug("INDEX {} {}", bitmask, new_terrain_id);
+      }
+
       break;
     }
     case 2:
@@ -372,29 +380,30 @@ int MapGenerator::m_select_decoration(const int terrain_id, const int x, const i
   return decoration;
 }
 
-uint32_t MapGenerator::m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z)
+uint32_t MapGenerator::m_get_bitmask(
+    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
 {
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
   uint32_t bitmask = 0;
 
   // Top
-  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == 0)
+  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == neighbor)
   {
     bitmask |= DL_EDGE_TOP;
   }
   // Right
-  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == 0)
+  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == neighbor)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
-  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == 0)
+  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == neighbor)
   {
     bitmask |= DL_EDGE_BOTTOM;
   }
   // Left
-  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == 0)
+  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == neighbor)
   {
     bitmask |= DL_EDGE_LEFT;
   }

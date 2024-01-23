@@ -298,20 +298,26 @@
             "width": 4,
             "height": 4,
             "pattern": [
-                0,
-                0,
-                0,
-                0,
-                50,
-                0,
-                0,
-                0,
-                0
+                50
             ],
-            "pattern_width": 3,
-            "pattern_height": 3,
+            "pattern_width": 1,
+            "pattern_height": 1,
             "anchor_x": 2,
             "anchor_y": 3
+        },
+        {
+            "type": "tile",
+            "tile_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 115,
+            "id": 61,
+            "width": 5,
+            "height": 6,
+            "pattern": [61],
+            "pattern_width": 1,
+            "pattern_height": 1,
+            "anchor_x": 2,
+            "anchor_y": 5
         },
         {
             "type": "tile",

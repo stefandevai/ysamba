@@ -313,7 +313,9 @@
             "id": 61,
             "width": 5,
             "height": 6,
-            "pattern": [61],
+            "pattern": [
+                61
+            ],
             "pattern_width": 1,
             "pattern_height": 1,
             "anchor_x": 2,
@@ -401,6 +403,62 @@
             "type": "tile",
             "tile_type": "single",
             "angle": "parallel",
+            "frame": 225,
+            "id": 62
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 226,
+            "id": 63
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 227,
+            "id": 64
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 228,
+            "id": 65
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 257,
+            "id": 66
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 258,
+            "id": 67
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 259,
+            "id": 68
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 260,
+            "id": 69
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
             "frame": 270,
             "id": 23,
             "front_face_id": 40
@@ -440,6 +498,34 @@
             "type": "tile",
             "tile_type": "single",
             "angle": "parallel",
+            "frame": 289,
+            "id": 70
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 290,
+            "id": 71
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 291,
+            "id": 72
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 292,
+            "id": 73
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
             "frame": 302,
             "id": 27,
             "front_face_id": 42
@@ -474,6 +560,34 @@
             "angle": "orthogonal",
             "frame": 306,
             "id": 40
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 321,
+            "id": 74
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 322,
+            "id": 75
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 323,
+            "id": 76
+        },
+        {
+            "type": "tile",
+            "tile_type": "single",
+            "angle": "parallel",
+            "frame": 324,
+            "id": 77
         },
         {
             "type": "tile",
