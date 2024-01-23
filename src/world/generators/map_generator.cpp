@@ -134,24 +134,29 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   vegetation_type.resize(width * height);
   vegetation_density.resize(width * height);
 
+  auto start1 = std::chrono::high_resolution_clock::now();
+
   /* const float frequency = 0.005f; */
   const float frequency = 0.003f;
   // (2D) (((OpenSimplex2S + FractalRidged(G0.5 W0.0, O3, L2)) + (OpenSimplex2S + SeedOffset(S10) + FractalFBm(G0.5,
   // W0.0, O5, L2.0))) + MinSmooth(S2.46))
   FastNoise::SmartNode<> elevation_noise = FastNoise::NewFromEncodedNodeTree(
       "HwAPAAMAAAAAAABAKQAAAAAAPwAAAAAAAQ0ABQAAAAAAAEAWAAoAAAApAAAAAAA/AAAAAAAApHAdQA==");
-  elevation_noise->GenUniformGrid2D(raw_height_map.data(),
-                                    offset.x - m_generation_padding,
-                                    offset.y + m_generation_padding,
-                                    width + m_generation_padding * 2,
-                                    height + m_generation_padding * 2,
-                                    frequency,
-                                    seed);
+  const auto& output = elevation_noise->GenUniformGrid2D(raw_height_map.data(),
+                                                         offset.x - m_generation_padding,
+                                                         offset.y + m_generation_padding,
+                                                         width + m_generation_padding * 2,
+                                                         height + m_generation_padding * 2,
+                                                         frequency,
+                                                         seed);
 
   for (size_t i = 0; i < raw_height_map.size(); ++i)
   {
-    raw_height_map[i] = smoothstep(-0.9, 0.3, raw_height_map[i]);
+    raw_height_map[i] = smoothstep(output.min, output.max, raw_height_map[i]);
   }
+  auto stop1 = std::chrono::high_resolution_clock::now();
+  auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(stop1 - start1);
+  auto start2 = std::chrono::high_resolution_clock::now();
 
   // Possible rivers
   // DwACAAAA9ijcPykAAEjhOkAAuB4FwA==
@@ -165,12 +170,22 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
       FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
   vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, width, height, 0.05f, seed + 30);
 
+  auto stop2 = std::chrono::high_resolution_clock::now();
+  auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(stop2 - start2);
+  auto start3 = std::chrono::high_resolution_clock::now();
+
   // Vegetation density lookup
   // DQACAAAAexROQCkAAFK4Hj8AmpkZPw==
   FastNoise::SmartNode<> vegetation_density_noise =
       FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
   vegetation_density_noise->GenUniformGrid2D(
       vegetation_density.data(), offset.x, offset.y, width, height, 0.05f, seed + 50);
+
+  auto stop3 = std::chrono::high_resolution_clock::now();
+  auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(stop3 - start3);
+
+  spdlog::info(
+      "INSIDE: height: {} ms, type: {} ms, density: {} ms", duration1.count(), duration2.count(), duration3.count());
 
   /* const auto simplex_freq = m_json.object["simplex_freq"].get<float>(); */
   /* const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>(); */

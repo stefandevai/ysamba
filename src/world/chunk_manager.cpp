@@ -177,7 +177,7 @@ void ChunkManager::load_sync(const Vector3i& position)
 
     auto chunk = std::make_unique<Chunk>(position, true);
     chunk->tiles.set_size(chunk_size);
-    serialization::load_chunk(*chunk, "test.world");
+    serialization::load_chunk(*chunk, "test2.world");
 
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
