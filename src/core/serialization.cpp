@@ -186,9 +186,7 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
 
   Vector3i world_size{};
 
-  fread(&world_size.x, sizeof(uint32_t), 1, file);
-  fread(&world_size.y, sizeof(uint32_t), 1, file);
-  fread(&world_size.z, sizeof(uint32_t), 1, file);
+  fread(&world_size.x, sizeof(uint32_t), 3, file);
 
   const auto stop1 = std::chrono::high_resolution_clock::now();
   auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(stop1 - start1);
@@ -234,9 +232,7 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
       for (int x = 0; x < tiles.size.x; ++x)
       {
         auto& cell = tiles.values[x + y * tiles.size.x + z * tiles.size.x * tiles.size.y];
-        fread(&cell.terrain, sizeof(uint32_t), 1, file);
-        fread(&cell.decoration, sizeof(uint32_t), 1, file);
-        fread(&cell.flags, sizeof(uint32_t), 1, file);
+        fread(&cell.terrain, sizeof(uint32_t), 3, file);
       }
     }
   }

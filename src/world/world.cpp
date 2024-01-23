@@ -63,9 +63,12 @@ void World::generate(const int width, const int height, const int depth, const i
   /* over_tiles.values.resize(tiles.size.x * tiles.size.y * tiles.size.z); */
   /* /1* auto tilemap_generator = TerrainGenerator(width, height); *1/ */
   /* /1* auto tilemap_generator = DummyGenerator(width, height); *1/ */
+}
 
+void World::generate_societies()
+{
   auto society = SocietyGenerator::generate_blueprint();
-  m_societies[society.id] = society;
+  m_societies[society.id] = std::move(society);
 }
 
 void World::load(const std::string& filepath)

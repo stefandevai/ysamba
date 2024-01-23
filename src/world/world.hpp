@@ -67,6 +67,9 @@ class World
   // Generate world
   void generate(const int width, const int height, const int depth, const int seed);
 
+  // Generate all societies for the world
+  void generate_societies();
+
   // Load map from a json file
   void load(const std::string& filepath);
 
