@@ -181,7 +181,8 @@ void ChunkManager::load_sync(const Vector3i& position)
 
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    spdlog::info("Chunk loading took {} milliseconds", duration.count());
+    spdlog::info(
+        "Chunk ({}, {}, {}) loading took {} milliseconds\n\n", position.x, position.y, position.z, duration.count());
 
     if (chunk->tiles.height_map.size() != static_cast<uint32_t>(chunk_size.x * chunk_size.y))
     {

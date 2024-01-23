@@ -145,6 +145,8 @@ void save_terrain(const Grid3D& tiles, const std::string& file_name)
 
 void load_chunk(Chunk& chunk, const std::string& file_name)
 {
+  const auto start1 = std::chrono::high_resolution_clock::now();
+
   const auto& position = chunk.position;
   auto& tiles = chunk.tiles;
 
@@ -152,7 +154,6 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   uint8_t file_metadata_marker = 0;
   uint8_t file_values_marker = 0;
   uint8_t file_height_map_marker = 0;
-  uint8_t file_end_marker = 0;
 
   FILE* file = fopen(file_name.c_str(), "r");
 
@@ -189,6 +190,11 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   fread(&world_size.y, sizeof(uint32_t), 1, file);
   fread(&world_size.z, sizeof(uint32_t), 1, file);
 
+  const auto stop1 = std::chrono::high_resolution_clock::now();
+  auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(stop1 - start1);
+
+  const auto start2 = std::chrono::high_resolution_clock::now();
+
   // spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
 
   fread(&file_values_marker, terrain_ext::marker_size, 1, file);
@@ -204,36 +210,30 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   const uint64_t values_pos = ftell(file);
   const uint64_t max_cell_pos = world_size.x * world_size.y * world_size.z * terrain_ext::cell_size;
 
+  const uint64_t local_position =
+      ((position.x) + (position.y + 0) * world_size.x + (position.z + 0) * world_size.x * world_size.y) *
+      terrain_ext::cell_size;
+
+  fseek(file, local_position, SEEK_CUR);
+
   for (int z = 0; z < tiles.size.z; ++z)
   {
+    if (z > 0)
+    {
+      const auto offset_advanced = (tiles.size.y - 1) * world_size.x + tiles.size.x;
+      fseek(file, (world_size.x * world_size.y - offset_advanced) * terrain_ext::cell_size, SEEK_CUR);
+    }
+
     for (int y = 0; y < tiles.size.y; ++y)
     {
+      if (y > 0)
+      {
+        fseek(file, (world_size.x - tiles.size.x) * terrain_ext::cell_size, SEEK_CUR);
+      }
+
       for (int x = 0; x < tiles.size.x; ++x)
       {
-        const uint64_t local_position =
-            ((position.x + x) + (position.y + y) * world_size.x + (position.z + z) * world_size.x * world_size.y) *
-            terrain_ext::cell_size;
-
-        if (local_position > max_cell_pos)
-        {
-          spdlog::critical("Invalid cell position when loading world: {}, expected: {}", local_position, max_cell_pos);
-          spdlog::critical("Position: ({} {} {}) ({} {} {}), Chunk Size: {} {} {}",
-                           position.x,
-                           position.y,
-                           position.z,
-                           x,
-                           y,
-                           z,
-                           tiles.size.x,
-                           tiles.size.y,
-                           tiles.size.z);
-          continue;
-        }
-
-        fseek(file, values_pos + local_position, SEEK_SET);
-
         auto& cell = tiles.values[x + y * tiles.size.x + z * tiles.size.x * tiles.size.y];
-
         fread(&cell.terrain, sizeof(uint32_t), 1, file);
         fread(&cell.decoration, sizeof(uint32_t), 1, file);
         fread(&cell.flags, sizeof(uint32_t), 1, file);
@@ -241,7 +241,13 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
     }
   }
 
-  fseek(file, values_pos + max_cell_pos, SEEK_SET);
+  const auto stop2 = std::chrono::high_resolution_clock::now();
+  auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(stop2 - start2);
+  const auto start3 = std::chrono::high_resolution_clock::now();
+
+  const auto pos_offset = ftell(file) - values_pos;
+
+  fseek(file, max_cell_pos - pos_offset, SEEK_CUR);
   fread(&file_height_map_marker, terrain_ext::marker_size, 1, file);
 
   if (file_height_map_marker != terrain_ext::height_map_marker)
@@ -253,46 +259,30 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
     return;
   }
 
-  const uint64_t height_map_pos = ftell(file);
-  const uint64_t max_height_map_pos = world_size.x * world_size.y * sizeof(int);
+  const uint64_t local_position2 = ((position.x + 0) + (position.y + 0) * world_size.x) * sizeof(int);
+
+  fseek(file, local_position2, SEEK_CUR);
 
   for (int y = 0; y < tiles.size.y; ++y)
   {
+    if (y > 0)
+    {
+      fseek(file, (world_size.x - tiles.size.x) * sizeof(int), SEEK_CUR);
+    }
+
     for (int x = 0; x < tiles.size.x; ++x)
     {
-      const uint64_t local_position = ((position.x + x) + (position.y + y) * world_size.x) * sizeof(int);
-
-      if (local_position > max_height_map_pos)
-      {
-        spdlog::critical(
-            "Invalid height map position when loading world: {}, expected: {}", local_position, max_height_map_pos);
-        spdlog::critical("Position: ({} {} {}) ({} {}), Chunk Size: {} {} {}",
-                         position.x,
-                         position.y,
-                         position.z,
-                         x,
-                         y,
-                         tiles.size.x,
-                         tiles.size.y,
-                         tiles.size.z);
-        continue;
-      }
-
-      fseek(file, height_map_pos + local_position, SEEK_SET);
       fread(&tiles.height_map[x + y * tiles.size.x], sizeof(int), 1, file);
     }
   }
 
-  fseek(file, height_map_pos + max_height_map_pos, SEEK_SET);
-  fread(&file_end_marker, terrain_ext::marker_size, 1, file);
+  const auto stop3 = std::chrono::high_resolution_clock::now();
+  auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(stop3 - start3);
 
-  if (file_end_marker != terrain_ext::end_marker)
-  {
-    spdlog::critical(
-        "Invalid metadata marker when loading world: {}, expected: {}", file_end_marker, terrain_ext::end_marker);
-    fclose(file);
-    return;
-  }
+  spdlog::info("INSIDE: metadata: {} ms, cells: {} ms, height_map {} ms",
+               duration1.count(),
+               duration2.count(),
+               duration3.count());
 
   fclose(file);
 }
