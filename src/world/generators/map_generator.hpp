@@ -64,5 +64,6 @@ class MapGenerator
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
   uint32_t m_get_bitmask_8_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
+  bool m_has_neighbor(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
 };
 }  // namespace dl

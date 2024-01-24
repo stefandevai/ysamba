@@ -883,6 +883,12 @@ uint32_t MapGenerator::m_get_bitmask_4_sided(
 uint32_t MapGenerator::m_get_bitmask_8_sided(
     const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source)
 {
+  if (!m_has_neighbor(terrain, x, y, z, neighbor))
+  {
+    return DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT |
+           DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
+  }
+
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
   uint32_t bitmask = 0;
@@ -908,35 +914,25 @@ uint32_t MapGenerator::m_get_bitmask_8_sided(
     bitmask |= DL_EDGE_LEFT;
   }
   // Top Left
-  // if (((bitmask & DL_EDGE_TOP) && (bitmask & DL_EDGE_LEFT)) && x > 0 && y > 0 && terrain[z * padded_width *
-  // padded_height + (y - 1) * padded_width + x - 1] == neighbor)
   if (x > 0 && y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x - 1] == source)
   {
     bitmask |= DL_EDGE_TOP_LEFT;
   }
   // Top Right
-  // if (((bitmask & DL_EDGE_TOP) && (bitmask & DL_EDGE_RIGHT)) && x < padded_width - 1 && y > 0 && terrain[z *
-  // padded_width * padded_height + (y - 1) * padded_width + x + 1] == neighbor)
   if (x < padded_width - 1 && y > 0 &&
       terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == source)
   {
     bitmask |= DL_EDGE_TOP_RIGHT;
   }
   // Bottom Right
-  // if (((bitmask & DL_EDGE_BOTTOM) && (bitmask & DL_EDGE_RIGHT)) && x < padded_width - 1 && y < padded_height - 1 &&
-  // terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == neighbor)
   if (x < padded_width - 1 && y < padded_height - 1 &&
       terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_RIGHT;
   }
   // Bottom Left
-  // if (((bitmask & DL_EDGE_BOTTOM) && (bitmask & DL_EDGE_LEFT)) && x > 0 && y < padded_height - 1 && terrain[z *
-  // padded_width * padded_height + (y + 1) * padded_width + x - 1] == neighbor)
   if (x > 0 && y < padded_height - 1 &&
       terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == source)
-  // if (x > 0 && y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] ==
-  // neighbor)
   {
     bitmask |= DL_EDGE_BOTTOM_LEFT;
   }
@@ -959,6 +955,59 @@ uint32_t MapGenerator::m_get_bitmask_8_sided(
   }
 
   return bitmask;
+}
+
+bool MapGenerator::m_has_neighbor(
+    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
+{
+  const int padded_width = width + m_generation_padding * 2;
+  const int padded_height = height + m_generation_padding * 2;
+
+  // Top
+  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == neighbor)
+  {
+    return true;
+  }
+  // Right
+  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == neighbor)
+  {
+    return true;
+  }
+  // Bottom
+  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == neighbor)
+  {
+    return true;
+  }
+  // Left
+  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == neighbor)
+  {
+    return true;
+  }
+  // Top Left
+  if (x > 0 && y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x - 1] == neighbor)
+  {
+    return true;
+  }
+  // Top Right
+  if (x < padded_width - 1 && y > 0 &&
+      terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == neighbor)
+  {
+    return true;
+  }
+  // Bottom Right
+  if (x < padded_width - 1 && y < padded_height - 1 &&
+      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == neighbor)
+  {
+    return true;
+  }
+  // Bottom Left
+  if (x > 0 && y < padded_height - 1 &&
+      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == neighbor)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 }  // namespace dl
