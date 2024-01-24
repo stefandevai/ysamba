@@ -32,13 +32,26 @@ class MapGenerator
   void set_size(const Vector3i& size);
 
  private:
-  enum Edge
+  enum EdgeFourSided
+  {
+    DL_EDGE_NONE_FOUR_SIDED = 0,
+    DL_EDGE_TOP_FOUR_SIDED = 1,
+    DL_EDGE_RIGHT_FOUR_SIDED = 2,
+    DL_EDGE_BOTTOM_FOUR_SIDED = 4,
+    DL_EDGE_LEFT_FOUR_SIDED = 8,
+  };
+
+  enum EdgeEightSided
   {
     DL_EDGE_NONE = 0,
     DL_EDGE_TOP = 1,
     DL_EDGE_RIGHT = 2,
     DL_EDGE_BOTTOM = 4,
     DL_EDGE_LEFT = 8,
+    DL_EDGE_TOP_LEFT = 16,
+    DL_EDGE_TOP_RIGHT = 32,
+    DL_EDGE_BOTTOM_RIGHT = 64,
+    DL_EDGE_BOTTOM_LEFT = 128,
   };
 
   JSON m_json{"./data/world/tile_rules.json"};
@@ -47,6 +60,9 @@ class MapGenerator
   float m_get_rectangle_gradient_value(const int x, const int y);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
   int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
-  uint32_t m_get_bitmask(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
+  uint32_t m_get_bitmask_4_sided(
+      const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
+  uint32_t m_get_bitmask_8_sided(
+      const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
 };
 }  // namespace dl

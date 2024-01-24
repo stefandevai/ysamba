@@ -14,6 +14,7 @@ enum class RuleType
   None,
   Identity,
   Autotile4Sides,
+  Autotile8Sides,
   UniformDistribution,
 };
 
@@ -40,6 +41,17 @@ struct AutoTile4SidesRule : public RuleBase
   std::array<AutoTile4SidesTransform, 16> output;
 };
 
+struct AutoTile8SidesTransform
+{
+  int value;
+};
+
+struct AutoTile8SidesRule : public RuleBase
+{
+  int neighbor;
+  std::array<AutoTile8SidesTransform, 47> output;
+};
+
 struct UniformDistributionTransform
 {
   int value;
@@ -53,7 +65,7 @@ struct UniformDistributionRule : public RuleBase
 };
 
 using IdentityRule = RuleBase;
-using Rule = std::variant<IdentityRule, AutoTile4SidesRule, UniformDistributionRule>;
+using Rule = std::variant<IdentityRule, AutoTile4SidesRule, AutoTile8SidesRule, UniformDistributionRule>;
 
 struct TileValues
 {
