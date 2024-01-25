@@ -762,27 +762,6 @@
             "type": "tile",
             "tile_type": "single",
             "angle": "parallel",
-            "frame": 430,
-            "id": 136
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 431,
-            "id": 137
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
-            "frame": 432,
-            "id": 138
-        },
-        {
-            "type": "tile",
-            "tile_type": "single",
-            "angle": "parallel",
             "frame": 448,
             "id": 68
         },

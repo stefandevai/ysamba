@@ -137,28 +137,43 @@
       "type": "uniform_distribution",
       "output": [
         {
-          "probability": 0.02,
+          "probability": 0.008,
           "value": 43,
           "placement": "terrain"
         },
         {
-          "probability": 0.02,
+          "probability": 0.008,
           "value": 44,
           "placement": "terrain"
         },
         {
-          "probability": 0.02,
+          "probability": 0.008,
           "value": 45,
           "placement": "terrain"
         },
         {
-          "probability": 0.02,
+          "probability": 0.008,
           "value": 46,
           "placement": "terrain"
         },
         {
-          "probability": 0.02,
+          "probability": 0.008,
           "value": 47,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.01,
+          "value": 136,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.01,
+          "value": 137,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.01,
+          "value": 138,
           "placement": "terrain"
         },
         {
@@ -215,6 +230,100 @@
           "probability": 0.002,
           "value": 61,
           "placement": "decoration"
+        }
+      ]
+    },
+    {
+      "label": "lake elements",
+      "input": 66,
+      "type": "uniform_distribution",
+      "output": [
+        {
+          "probability": 0.001,
+          "value": 109,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 110,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 111,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 112,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 113,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 114,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 115,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 116,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 117,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 118,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 119,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.001,
+          "value": 120,
+          "placement": "terrain"
+        }
+      ]
+    },
+    {
+      "label": "lake border elements",
+      "input": 65,
+      "type": "uniform_distribution",
+      "output": [
+        {
+          "probability": 0.1,
+          "value": 132,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.1,
+          "value": 133,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.1,
+          "value": 134,
+          "placement": "terrain"
+        },
+        {
+          "probability": 0.1,
+          "value": 135,
+          "placement": "terrain"
         }
       ]
     }

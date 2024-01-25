@@ -35,7 +35,7 @@ void Gameplay::load()
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
-  // m_world.generate(300, 300, 10, 1893);
+  m_world.generate(300, 300, 10, 1893);
   /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 
