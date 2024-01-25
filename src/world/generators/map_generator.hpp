@@ -32,16 +32,7 @@ class MapGenerator
   void set_size(const Vector3i& size);
 
  private:
-  enum EdgeFourSided
-  {
-    DL_EDGE_NONE_FOUR_SIDED = 0,
-    DL_EDGE_TOP_FOUR_SIDED = 1,
-    DL_EDGE_RIGHT_FOUR_SIDED = 2,
-    DL_EDGE_BOTTOM_FOUR_SIDED = 4,
-    DL_EDGE_LEFT_FOUR_SIDED = 8,
-  };
-
-  enum EdgeEightSided
+  enum Edge
   {
     DL_EDGE_NONE = 0,
     DL_EDGE_TOP = 1,

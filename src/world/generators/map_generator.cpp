@@ -454,7 +454,6 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
 
       switch (bitmask)
       {
-      // Another shape
       case DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[0].value;
         break;
@@ -483,7 +482,6 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
         new_terrain_id = rule.output[8].value;
         break;
-      // Another shape
       case DL_EDGE_RIGHT:
         new_terrain_id = rule.output[9].value;
         break;
@@ -493,7 +491,6 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_LEFT:
         new_terrain_id = rule.output[11].value;
         break;
-      // Another shape
       case DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[12].value;
         break;
@@ -503,11 +500,9 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_TOP:
         new_terrain_id = rule.output[14].value;
         break;
-      // Another shape
       case DL_EDGE_NONE:
         new_terrain_id = rule.output[15].value;
         break;
-      // Another shape
       case DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
         new_terrain_id = rule.output[16].value;
         break;
@@ -560,7 +555,6 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_TOP | DL_EDGE_LEFT:
         new_terrain_id = rule.output[31].value;
         break;
-      // Another shape
       case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[32].value;
         break;
@@ -573,7 +567,6 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_TOP | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[35].value;
         break;
-      // Another shape
       case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
         new_terrain_id = rule.output[36].value;
         break;
@@ -586,11 +579,9 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT:
         new_terrain_id = rule.output[39].value;
         break;
-      // Another shape
       case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
         new_terrain_id = rule.output[40].value;
         break;
-      // Another shape
       case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[41].value;
         break;
@@ -859,22 +850,22 @@ uint32_t MapGenerator::m_get_bitmask_4_sided(
   // Top
   if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == neighbor)
   {
-    bitmask |= DL_EDGE_TOP_FOUR_SIDED;
+    bitmask |= DL_EDGE_TOP;
   }
   // Right
   if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == neighbor)
   {
-    bitmask |= DL_EDGE_RIGHT_FOUR_SIDED;
+    bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
   if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == neighbor)
   {
-    bitmask |= DL_EDGE_BOTTOM_FOUR_SIDED;
+    bitmask |= DL_EDGE_BOTTOM;
   }
   // Left
   if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == neighbor)
   {
-    bitmask |= DL_EDGE_LEFT_FOUR_SIDED;
+    bitmask |= DL_EDGE_LEFT;
   }
 
   return bitmask;
