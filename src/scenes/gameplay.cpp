@@ -6,6 +6,7 @@
 
 #include "core/game_context.hpp"
 #include "core/json.hpp"
+#include "core/random.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
 #include "definitions.hpp"
@@ -35,7 +36,8 @@ void Gameplay::load()
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
-  m_world.generate(300, 300, 10, 1893);
+  const auto seed = random::get_integer(0, 100000);
+  m_world.generate(100, 100, 10, seed);
   /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 
@@ -45,10 +47,10 @@ void Gameplay::load()
 
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
-  // m_world.generate_societies();
-  // auto society_blueprint = m_world.get_society("otomi"_hs);
-  // auto components = SocietyGenerator::generate_members(society_blueprint);
-  // SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  m_world.generate_societies();
+  auto society_blueprint = m_world.get_society("otomi"_hs);
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();
