@@ -1,61 +1,52 @@
 #!/usr/bin/env python
 
 import argparse
-import sys
-import os
 import shutil
+import subprocess
+import sys
+from pathlib import Path
 
 TARGET_NAME='dialectics'
 DATA_DIR_NAME='data'
+THIS_DIR = Path(__file__).parent  # Directory of this script
 
 parser = argparse.ArgumentParser(description=f'Utils for building and running {TARGET_NAME}.')
 parser.add_argument('--run', '-r', action='store_true', help='run an already built binary')
-parser.add_argument('--make', '-m', action='store_true', help='run make in the project')
-parser.add_argument('--build', '-b', action='store_true', help='build dialectics')
+parser.add_argument('--make', '-m', action='store_true', help='build the project')
+parser.add_argument('--build', '-b', action='store_true', help='configure/build dialectics')
 parser.add_argument('--format', '-f', action='store_true', help='format code')
 
-def build(build_path):
-    if os.path.isdir(build_path) == False:
-        os.mkdir(build_path)
-    os.chdir(build_path)
-    return os.system('cmake ..')
+def configure(build_path: Path) -> None:
+    subprocess.run(["cmake", "-B", build_path, "-S", THIS_DIR], check=True)
 
-def make(build_path):
-    os.chdir(build_path)
-    return os.system('make -j 4')
+def build(build_path: Path) -> None:
+    subprocess.run(['cmake', '--build', build_path], check=True)
 
-def run(target_path, data_path):
-    build_data_path = f'{target_path}/{DATA_DIR_NAME}'
+def run(target_path: Path, data_path: Path) -> None:
+    build_data_path = target_path / DATA_DIR_NAME
 
-    if os.path.exists(build_data_path):
+    if build_data_path.exists():
         shutil.rmtree(build_data_path)
-
     shutil.copytree(data_path, build_data_path)
-    os.chdir(target_path)
-    os.system(f'./{TARGET_NAME}')
+    subprocess.run([target_path / TARGET_NAME], check=True, cwd=target_path)
 
-def format():
-    os.system('find src -not \( -path src/world/generators/lib -prune \) \( -iname \*.hpp -or -name \*.cpp \) | xargs clang-format --verbose -i -style=file')
+def format() -> None:
+    source_dir = THIS_DIR / "src"
+    source_files = source_dir.glob("**/*.[ch]pp")
+    subprocess.run(["clang-format", "--verbose", "-i", "-style=file", *source_files], check=True)
 
-def main():
+def main() -> None:
     args = parser.parse_args()
-    old_cwd = os.getcwd()
-    data_path = f'{old_cwd}/{DATA_DIR_NAME}'
-    build_path = f'{old_cwd}/build'
-    target_path = f'{build_path}/bin'
+    data_path = Path(THIS_DIR, DATA_DIR_NAME)
+    build_path = Path(THIS_DIR, 'build')
+    target_path = Path(build_path, 'bin')
 
     if args.build:
-        status = build(build_path)
-        if status != 0:
-            sys.exit()
-        status = make(build_path)
-        if status != 0:
-            sys.exit()
+        configure(build_path)
+        build(build_path)
 
     if args.make:
-        status = make(build_path)
-        if status != 0:
-            sys.exit()
+        build(build_path)
     if args.run:
         run(target_path, data_path)
 
@@ -63,12 +54,8 @@ def main():
         format()
 
     if len(sys.argv) < 2:
-        status = build(build_path)
-        if status != 0:
-            sys.exit()
+        configure(build_path)
         run(target_path, data_path)
-
-    os.chdir(old_cwd)
 
 if __name__ == '__main__':
     main()
