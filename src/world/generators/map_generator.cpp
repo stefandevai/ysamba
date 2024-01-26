@@ -21,10 +21,6 @@ namespace dl
 {
 void MapGenerator::generate(const int seed, const Vector3i& offset)
 {
-  // TEMP
-  /* m_json.load("./data/world/map_generators/terrain.json"); */
-  // TEMP
-
   spdlog::info("=============================");
   spdlog::info("= STARTING WORLD GENERATION =");
   spdlog::info("=============================\n");
@@ -37,8 +33,6 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(width, height, depth);
-  // tiles = std::vector<Cell>(width * height * depth);
-  // height_map = std::vector<int>(width * height);
 
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
@@ -91,8 +85,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
         if (inside_chunk)
         {
-          // chunk->tiles.values[z * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
-          chunk->tiles.values[z * width * height + (j - 1) * width + (i - 1)].terrain = 0;
+          chunk->tiles.values[z * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
         }
       }
     }
@@ -137,8 +130,6 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   vegetation_type.resize(width * height);
   vegetation_density.resize(width * height);
 
-  auto start1 = std::chrono::high_resolution_clock::now();
-
   /* const float frequency = 0.005f; */
   const float frequency = 0.003f;
   // (2D) (((OpenSimplex2S + FractalRidged(G0.5 W0.0, O3, L2)) + (OpenSimplex2S + SeedOffset(S10) + FractalFBm(G0.5,
@@ -157,214 +148,16 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   {
     raw_height_map[i] = smoothstep(output.min, output.max, raw_height_map[i]);
   }
-  auto stop1 = std::chrono::high_resolution_clock::now();
-  auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(stop1 - start1);
-  auto start2 = std::chrono::high_resolution_clock::now();
-
-  // Possible rivers
-  // DwACAAAA9ijcPykAAEjhOkAAuB4FwA==
-  // FastNoise::SmartNode<> river_noise =
-  //     FastNoise::NewFromEncodedNodeTree("DwACAAAA9ijcPykAAEjhOkAAuB4FwA==");
-  // river_noise->GenUniformGrid2D(rivers.data(), offset.x, offset.y, width, height, 0.005f, seed);
-
   // Vegetation type lookup
-  // DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==
   FastNoise::SmartNode<> vegetation_type_noise =
       FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
   vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, width, height, 0.05f, seed + 30);
 
-  auto stop2 = std::chrono::high_resolution_clock::now();
-  auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(stop2 - start2);
-  auto start3 = std::chrono::high_resolution_clock::now();
-
   // Vegetation density lookup
-  // DQACAAAAexROQCkAAFK4Hj8AmpkZPw==
   FastNoise::SmartNode<> vegetation_density_noise =
       FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
   vegetation_density_noise->GenUniformGrid2D(
       vegetation_density.data(), offset.x, offset.y, width, height, 0.05f, seed + 50);
-
-  auto stop3 = std::chrono::high_resolution_clock::now();
-  auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(stop3 - start3);
-
-  spdlog::info(
-      "INSIDE: height: {} ms, type: {} ms, density: {} ms", duration1.count(), duration2.count(), duration3.count());
-
-  // TEMP
-  // Another shape
-  int index = 62;
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_LEFT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_NONE), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_RIGHT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_BOTTOM), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT),
-                index++);
-  // Another shape
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}",
-      static_cast<uint32_t>(DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM),
-      index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP | DL_EDGE_BOTTOM), index++);
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}",
-      static_cast<uint32_t>(DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM),
-      index++);
-  // Another shape
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}",
-      static_cast<uint32_t>(DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT),
-      index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_LEFT | DL_EDGE_RIGHT), index++);
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}",
-      static_cast<uint32_t>(DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT),
-      index++);
-  // Another shape
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT |
-                                      DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT),
-                index++);
-  // Another shape
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT |
-                                      DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT |
-                                      DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_BOTTOM_RIGHT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_TOP_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_RIGHT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_LEFT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_RIGHT |
-                                      DL_EDGE_TOP_LEFT | DL_EDGE_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_RIGHT |
-                                      DL_EDGE_TOP_LEFT | DL_EDGE_RIGHT),
-                index++);
-  // Another shape
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_TOP_RIGHT |
-                                      DL_EDGE_BOTTOM_RIGHT),
-                index++);
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT), index++);
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_LEFT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT |
-                                      DL_EDGE_BOTTOM_LEFT),
-                index++);
-  // Another shape
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT |
-                                      DL_EDGE_BOTTOM_RIGHT),
-                index++);
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT |
-                                      DL_EDGE_TOP_RIGHT),
-                index++);
-  // Another shape
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}",
-      static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT),
-      index++);
-  // Another shape
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT), index++);
-  spdlog::debug(
-      "\"bitmask\": {}, \"value\": {}", static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_RIGHT), index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT),
-                index++);
-  spdlog::debug("\"bitmask\": {}, \"value\": {}",
-                static_cast<uint32_t>(DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT),
-                index++);
-
-  /* const auto simplex_freq = m_json.object["simplex_freq"].get<float>(); */
-  /* const auto simplex_octaves = m_json.object["simplex_octaves"].get<int>(); */
-  /* const auto simplex_lacunarity = m_json.object["simplex_lacunarity"].get<float>(); */
-  /* const auto simplex_gain = m_json.object["simplex_gain"].get<float>(); */
-  /* const auto simplex_weighted_strength = m_json.object["simplex_weighted_strength"].get<float>(); */
-
-  /* auto noise = FastNoiseLite{seed}; */
-  /* noise.SetSeed(seed); */
-  /* noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S); */
-  /* noise.SetRotationType3D(FastNoiseLite::RotationType3D_ImproveXYPlanes); */
-  /* noise.SetFrequency(simplex_freq); */
-  /* noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm); */
-  /* noise.SetFractalOctaves(simplex_octaves); */
-  /* noise.SetFractalLacunarity(simplex_lacunarity); */
-  /* noise.SetFractalGain(simplex_gain); */
-  /* noise.SetFractalWeightedStrength(simplex_weighted_strength); */
-
-  /* float max_value = 0.0; */
-  /* float min_value = 1.0; */
-
-  /* for (int j = 0; j < height; ++j) */
-  /* { */
-  /*   for (int i = 0; i < width; ++i) */
-  /*   { */
-  /*     /1* const float gradient = m_get_rectangle_gradient_value(i, j); *1/ */
-  /*     /1* const float noise_value = noise.GetNoise(static_cast<float>(offset.x + i), static_cast<float>(offset.y +
-   * j)); *1/ */
-
-  /*     /1* height_values[j * width + i] = noise_value; *1/ */
-  /*     max_value = std::max(max_value, height_values[j*width + i]); */
-  /*     min_value = std::min(min_value, height_values[j*width + i]); */
-  /*   } */
-  /* } */
-
-  /* spdlog::debug("MIN MAX {} {}", min_value, max_value); */
-
-  /* const double distance = max_value - min_value; */
-  /* const double distance = 0.9; */
 }
 
 float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
@@ -601,167 +394,6 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
         new_terrain_id = rule.output[46].value;
         break;
       }
-
-      // switch (bitmask)
-      // {
-      //   // Another shape
-      //   case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
-      //     new_terrain_id = rule.output[0].value;
-      //     break;
-      //   case DL_EDGE_TOP:
-      //     new_terrain_id = rule.output[1].value;
-      //     break;
-      //   case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[2].value;
-      //     break;
-      //   case DL_EDGE_LEFT:
-      //     new_terrain_id = rule.output[3].value;
-      //     break;
-      //   case DL_EDGE_NONE:
-      //     new_terrain_id = rule.output[4].value;
-      //     break;
-      //   case DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[5].value;
-      //     break;
-      //   case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
-      //     new_terrain_id = rule.output[6].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM:
-      //     new_terrain_id = rule.output[7].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[8].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
-      //     new_terrain_id = rule.output[9].value;
-      //     break;
-      //   case DL_EDGE_TOP | DL_EDGE_BOTTOM:
-      //     new_terrain_id = rule.output[10].value;
-      //     break;
-      //   case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-      //     new_terrain_id = rule.output[11].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[12].value;
-      //     break;
-      //   case DL_EDGE_LEFT | DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[13].value;
-      //     break;
-      //   case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[14].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT |
-      //   DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-      //     new_terrain_id = rule.output[15].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT |
-      //   DL_EDGE_LEFT:
-      //     new_terrain_id = rule.output[16].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[17].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[18].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_RIGHT |
-      //   DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[19].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[20].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[21].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[22].value;
-      //     break;
-      //   case DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[23].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_TOP_RIGHT:
-      //     new_terrain_id = rule.output[24].value;
-      //     break;
-      //   case DL_EDGE_TOP_RIGHT:
-      //     new_terrain_id = rule.output[25].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT:
-      //     new_terrain_id = rule.output[26].value;
-      //     break;
-      //   case DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT:
-      //     new_terrain_id = rule.output[27].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP_LEFT |
-      //   DL_EDGE_LEFT:
-      //     new_terrain_id = rule.output[28].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_RIGHT:
-      //     new_terrain_id = rule.output[29].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT:
-      //     new_terrain_id = rule.output[30].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP_LEFT |
-      //   DL_EDGE_RIGHT:
-      //     new_terrain_id = rule.output[31].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[32].value;
-      //     break;
-      //   case DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[33].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[34].value;
-      //     break;
-      //   case DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[35].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[36].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[37].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT:
-      //     new_terrain_id = rule.output[38].value;
-      //     break;
-      //   case DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT:
-      //     new_terrain_id = rule.output[39].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[40].value;
-      //     break;
-      //   // Another shape
-      //   case DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[41].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[42].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[43].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[44].value;
-      //     break;
-      //   case DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT:
-      //     new_terrain_id = rule.output[45].value;
-      //     break;
-      //   case DL_EDGE_TOP_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT:
-      //     new_terrain_id = rule.output[46].value;
-      //     break;
-      //   default:
-      //     break;
-      // }
 
       if (new_terrain_id == 0)
       {
