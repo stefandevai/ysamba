@@ -11,7 +11,8 @@
 
 namespace dl
 {
-const auto stop_wear = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_wear = [](entt::registry& registry, const entt::entity entity, const Job* job)
+{
   registry.remove<ActionWear>(entity);
   job->status = JobStatus::Finished;
 };

@@ -13,7 +13,8 @@
 
 namespace dl
 {
-const auto stop_pickup = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_pickup = [](entt::registry& registry, const entt::entity entity, const Job* job)
+{
   registry.remove<ActionPickup>(entity);
   job->status = JobStatus::Finished;
 };

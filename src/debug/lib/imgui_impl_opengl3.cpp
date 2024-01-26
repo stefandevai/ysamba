@@ -207,7 +207,7 @@
 #endif
 
 // [Debugging]
-//#define IMGUI_IMPL_OPENGL_DEBUG
+// #define IMGUI_IMPL_OPENGL_DEBUG
 #ifdef IMGUI_IMPL_OPENGL_DEBUG
 #include <stdio.h>
 #define GL_CALL(_CALL)                                                        \
