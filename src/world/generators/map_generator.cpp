@@ -48,7 +48,7 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
   {
     for (int i = 0; i < padded_width; ++i)
     {
-      const auto map_value = raw_height_map[j * padded_width + i];
+      const auto map_value = raw_height_map[j * padded_width + i] * 0.5f + 0.5f;
       const int k = static_cast<int>(map_value * (depth - 1));
       bool inside_chunk = false;
 
@@ -134,20 +134,29 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   const float frequency = 0.003f;
   // (2D) (((OpenSimplex2S + FractalRidged(G0.5 W0.0, O3, L2)) + (OpenSimplex2S + SeedOffset(S10) + FractalFBm(G0.5,
   // W0.0, O5, L2.0))) + MinSmooth(S2.46))
-  FastNoise::SmartNode<> elevation_noise = FastNoise::NewFromEncodedNodeTree(
-      "HwAPAAMAAAAAAABAKQAAAAAAPwAAAAAAAQ0ABQAAAAAAAEAWAAoAAAApAAAAAAA/AAAAAAAApHAdQA==");
-  const auto& output = elevation_noise->GenUniformGrid2D(raw_height_map.data(),
-                                                         offset.x - m_generation_padding,
-                                                         offset.y + m_generation_padding,
-                                                         width + m_generation_padding * 2,
-                                                         height + m_generation_padding * 2,
-                                                         frequency,
-                                                         seed);
+  // FastNoise::SmartNode<> elevation_noise = FastNoise::NewFromEncodedNodeTree(
+  //     "HwAPAAMAAAAAAABAKQAAAAAAPwAAAAAAAQ0ABQAAAAAAAEAWAAoAAAApAAAAAAA/AAAAAAAApHAdQA==");
+  // const auto& output = elevation_noise->GenUniformGrid2D(raw_height_map.data(),
+  //                                                        offset.x - m_generation_padding,
+  //                                                        offset.y + m_generation_padding,
+  //                                                        width + m_generation_padding * 2,
+  //                                                        height + m_generation_padding * 2,
+  //                                                        frequency,
+  //                                                        seed);
 
-  for (size_t i = 0; i < raw_height_map.size(); ++i)
-  {
-    raw_height_map[i] = smoothstep(output.min, output.max, raw_height_map[i]);
-  }
+  const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
+  fractal->SetSource(simplex);
+  fractal->SetOctaveCount(3);
+
+  fractal->GenUniformGrid2D(raw_height_map.data(),
+                            offset.x - m_generation_padding,
+                            offset.y + m_generation_padding,
+                            width + m_generation_padding * 2,
+                            height + m_generation_padding * 2,
+                            frequency,
+                            seed);
+
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise =
       FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
@@ -425,11 +434,13 @@ int MapGenerator::m_select_decoration(const int terrain_id, const int x, const i
   int decoration = 0;
 
   // TODO: Integrate to the rule system for any terrain
+  // Only select decoration for grass terrain (2)
   if (terrain_id != 2)
   {
     return decoration;
   }
 
+  // Place bigger plants on the center and smaller ones on the edges
   const auto density = vegetation_density[y * width + x];
 
   if (density < 0.3f)

@@ -37,7 +37,7 @@ void Gameplay::load()
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
   const auto seed = random::get_integer(0, 100000);
-  m_world.generate(100, 100, 10, seed);
+  m_world.generate(256, 256, 32, seed);
   /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 

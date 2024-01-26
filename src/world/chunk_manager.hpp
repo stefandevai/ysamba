@@ -14,7 +14,7 @@ class ChunkManager
  public:
   std::vector<std::unique_ptr<Chunk>> chunks{};
   // Size in tiles
-  Vector3i chunk_size{32, 32, 10};
+  Vector3i chunk_size{32, 32, 32};
   // Frustum in tiles
   Vector2i frustum{80, 48};
 
