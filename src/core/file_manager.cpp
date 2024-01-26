@@ -36,6 +36,6 @@ std::filesystem::path FileManager::get_full_path(const std::string& relative_pat
 
 std::filesystem::path FileManager::get_script_path(const std::string& relative_path)
 {
-  return get_full_path(std::filesystem::path{"scripts"} / relative_path);
+  return get_full_path((std::filesystem::path{"scripts"} / relative_path).string());
 }
 }  // namespace dl

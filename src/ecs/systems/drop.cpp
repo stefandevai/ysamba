@@ -122,7 +122,10 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     if (removed)
     {
       auto& item_component = registry.get<Item>(item);
-      registry.emplace<Position>(item, target.position.x, target.position.y, target.position.z);
+      registry.emplace<Position>(item,
+                                 static_cast<double>(target.position.x),
+                                 static_cast<double>(target.position.y),
+                                 static_cast<double>(target.position.z));
       registry.emplace<Visibility>(item, m_world.get_texture_id(), item_component.id, "item", 1);
     }
 

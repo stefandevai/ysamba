@@ -56,7 +56,10 @@ void ChunkDebugger::update()
                                                m_gameplay.m_world.chunk_manager.chunk_size.x * grid_size.x,
                                                m_gameplay.m_world.chunk_manager.chunk_size.y * grid_size.y,
                                                color);
-      m_gameplay.m_registry.emplace<Position>(entity, chunk->position.x, chunk->position.y, chunk->position.z);
+      m_gameplay.m_registry.emplace<Position>(entity,
+                                              static_cast<double>(chunk->position.x),
+                                              static_cast<double>(chunk->position.y),
+                                              static_cast<double>(chunk->position.z));
       chunk_quads.push_back(entity);
     }
   }

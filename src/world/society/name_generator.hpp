@@ -19,7 +19,7 @@ class NameGenerator
 
  private:
   static const std::filesystem::path m_base_path;
-  JSON m_json{m_base_path / "index.json"};
+  JSON m_json{(m_base_path / "index.json").string()};
   JSON m_weights;
   const size_t m_max_tries = 5;
   const size_t m_max_internal_tries = 10;

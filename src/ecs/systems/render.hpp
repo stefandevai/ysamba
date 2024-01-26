@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entity/fwd.hpp>
+#include <string>
 #include <unordered_map>
 
 #include "graphics/tile_render_data.hpp"

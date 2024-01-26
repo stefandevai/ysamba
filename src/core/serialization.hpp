@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entity/fwd.hpp>
+#include <string>
 
 namespace dl
 {

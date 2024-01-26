@@ -30,7 +30,7 @@ class AssetManager
   {
     if (!m_assets.contains(id))
     {
-      spdlog::warn("There's no asset with ID {}.\n{}", id);
+      spdlog::warn("There's no asset with ID {}.\n", id);
       return nullptr;
     }
 

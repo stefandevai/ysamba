@@ -19,7 +19,7 @@ AssetManager::AssetManager(const std::filesystem::path& filepath) : m_filepath(f
   m_base_dir.remove_filename();
 
   // Load config file
-  m_json.load(m_filepath);
+  m_json.load(m_filepath.string());
   m_init_assets();
 }
 
