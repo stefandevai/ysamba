@@ -17,6 +17,10 @@ struct IslandMaskParams
   float gain = 0.32f;
   float weighted_strength = 0.25f;
   float tier_land = 0.002f;
+  float distance_influence = 3.0f;
+  float distance_k = 2.0f;
+  float display_mask = true;
+  std::string noise_string{};
 };
 
 struct CompareVectorSizes

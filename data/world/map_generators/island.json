@@ -2,10 +2,14 @@
     "mask": {
         "octaves": 4,
         "frequency": 0.005,
-        "lacunarity": 3.2,
+        "lacunarity": 3.0,
         "gain": 0.32,
         "weighted_strength": 0.25,
-        "tier_land": 0.002
+        "noise_string": "DQAEAAAAzcxMQCkAAArXoz4AAACAPg==",
+        "tier_land": 0.4,
+        "distance_k": 1.0,
+        "distance_influence": 4.0,
+        "display_mask": true
     }
 }
 

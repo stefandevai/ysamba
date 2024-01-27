@@ -223,7 +223,7 @@ void WorldCreation::m_generate_height_map(const int seed)
   (void)seed;
 
   const auto s = random::get_integer(1, INT_MAX);
-  // const auto s = 340683964;
+  // const auto s = 1334;
   auto generator = IslandGenerator(hm_width, hm_width, hm_depth);
   m_height_map.clear();
   m_height_map.reserve(hm_width * hm_height);
@@ -240,7 +240,8 @@ void WorldCreation::m_create_height_map_representation()
   {
     for (auto j = 0; j < hm_height; ++j)
     {
-      const auto map_value = m_height_map[j * hm_width + i] * 0.5f + 0.5f;
+      // const auto map_value = m_height_map[j * hm_width + i] * 0.5f + 0.5f;
+      const auto map_value = m_height_map[j * hm_width + i];
       const int z = static_cast<int>(map_value * z_levels);
       const uint8_t value = z * 255 / z_levels;
 
