@@ -434,7 +434,7 @@ entt::entity World::create_item(
   const auto item = item_factory::create(get_item_data(id), registry);
 
   registry.emplace<Visibility>(item, get_texture_id(), id, "item", 1);
-  registry.emplace<Position>(item, x, y, z);
+  registry.emplace<Position>(item, static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
   return item;
 }
 

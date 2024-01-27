@@ -20,7 +20,7 @@ void NameGenerator::load(const std::string& key)
   }
 
   const auto& filepath = m_json.object[key].get<std::string>();
-  m_weights.load(m_base_path / filepath);
+  m_weights.load((m_base_path / filepath).string());
 }
 
 std::string NameGenerator::generate()

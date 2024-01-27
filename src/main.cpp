@@ -6,4 +6,5 @@ int main()
 
   game.load();
   game.run();
+  return 0;
 }

@@ -184,13 +184,16 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_tile, selected_entity](const uint32_t i) {
-        for (const auto entity : m_selected_entities)
-        {
-          m_create_job(static_cast<JobType>(i), static_cast<uint32_t>(selected_entity), mouse_tile, registry, entity);
-        }
-        m_dispose();
-      });
+      m_action_menu->set_on_select(
+          [this, &registry, mouse_tile, selected_entity](const uint32_t i)
+          {
+            for (const auto entity : m_selected_entities)
+            {
+              m_create_job(
+                  static_cast<JobType>(i), static_cast<uint32_t>(selected_entity), mouse_tile, registry, entity);
+            }
+            m_dispose();
+          });
       m_input_manager.push_context("action_menu"_hs);
       m_state = ActionMenuState::Open;
     }
@@ -206,13 +209,15 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_tile, &tile_data](const uint32_t i) {
-        for (const auto entity : m_selected_entities)
-        {
-          m_create_job(static_cast<JobType>(i), tile_data.id, mouse_tile, registry, entity);
-        }
-        m_dispose();
-      });
+      m_action_menu->set_on_select(
+          [this, &registry, mouse_tile, &tile_data](const uint32_t i)
+          {
+            for (const auto entity : m_selected_entities)
+            {
+              m_create_job(static_cast<JobType>(i), tile_data.id, mouse_tile, registry, entity);
+            }
+            m_dispose();
+          });
       m_input_manager.push_context("action_menu"_hs);
       m_state = ActionMenuState::Open;
     }

@@ -2,6 +2,7 @@
 
 #include <entt/entity/entity.hpp>
 #include <map>
+#include <stack>
 #include <vector>
 
 #include "./chunk_manager.hpp"

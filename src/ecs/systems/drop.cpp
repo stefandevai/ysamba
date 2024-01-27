@@ -22,14 +22,16 @@
 
 namespace dl
 {
-const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const Job* job)
+{
   registry.remove<ActionDrop>(entity);
   job->status = JobStatus::Finished;
 };
 
 DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  const auto on_select = [this](const ui::EntityPair entities) {
+  const auto on_select = [this](const ui::EntityPair entities)
+  {
     m_selected_entity = entities.first;
     m_target_item = entities.second;
     m_state = DropMenuState::SelectingTarget;
@@ -120,7 +122,10 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     if (removed)
     {
       auto& item_component = registry.get<Item>(item);
-      registry.emplace<Position>(item, target.position.x, target.position.y, target.position.z);
+      registry.emplace<Position>(item,
+                                 static_cast<double>(target.position.x),
+                                 static_cast<double>(target.position.y),
+                                 static_cast<double>(target.position.z));
       registry.emplace<Visibility>(item, m_world.get_texture_id(), item_component.id, "item", 1);
     }
 

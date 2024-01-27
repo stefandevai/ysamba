@@ -1,10 +1,12 @@
 #include "./general_info.hpp"
 
+#ifdef __APPLE__
 #include <mach/mach.h>
-#include <stdlib.h>
 #include <sys/sysctl.h>
-#include <sys/types.h>
 #include <unistd.h>
+#endif
+#include <stdlib.h>
+#include <sys/types.h>
 
 #include <chrono>
 
