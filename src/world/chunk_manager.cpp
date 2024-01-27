@@ -89,18 +89,14 @@ void ChunkManager::update(const Vector3i& target)
     const auto target_chunk_position = world_to_chunk(target);
 
     // Activate / Deactivate chunks within a certain radius
-    activate_if(
-        [this, &target_chunk_position](const auto& chunk) {
-          return is_within_tile_distance(
-              chunk->position, target_chunk_position, Vector2i{frustum.x * 2, frustum.y * 2});
-        });
+    activate_if([this, &target_chunk_position](const auto& chunk) {
+      return is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 2, frustum.y * 2});
+    });
 
     // Unload chunks within a certain radius
-    std::erase_if(chunks,
-                  [this, &target_chunk_position](const auto& chunk) {
-                    return !is_within_tile_distance(
-                        chunk->position, target_chunk_position, Vector2i{frustum.x * 4, frustum.y * 4});
-                  });
+    std::erase_if(chunks, [this, &target_chunk_position](const auto& chunk) {
+      return !is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 4, frustum.y * 4});
+    });
   }
 
   {
@@ -126,9 +122,9 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
       chunks.begin(), chunks.end(), [&position](const auto& chunk) { return chunk->position == position; });
 
   const auto found_generating =
-      std::find_if(m_chunks_loading.begin(),
-                   m_chunks_loading.end(),
-                   [&position](const auto& chunk_position) { return position == chunk_position; });
+      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const auto& chunk_position) {
+        return position == chunk_position;
+      });
 
   return found != chunks.end() || found_generating != m_chunks_loading.end();
 }
@@ -136,14 +132,15 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
 void ChunkManager::load_async(const Vector3i& position)
 {
   const auto found =
-      std::find_if(m_chunks_loading.begin(),
-                   m_chunks_loading.end(),
-                   [&position](const Vector3i& generating_position) { return generating_position == position; });
+      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const Vector3i& generating_position) {
+        return generating_position == position;
+      });
 
   if (found == m_chunks_loading.end())
   {
-    m_thread_pool.queue_job([this, position, size = this->chunk_size]
-                            { generate_async(std::ref(position), std::ref(size), std::ref(m_chunks_to_add_mutex)); });
+    m_thread_pool.queue_job([this, position, size = this->chunk_size] {
+      generate_async(std::ref(position), std::ref(size), std::ref(m_chunks_to_add_mutex));
+    });
     m_chunks_loading.push_back(position);
   }
 }
@@ -168,9 +165,9 @@ void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size
 void ChunkManager::load_sync(const Vector3i& position)
 {
   const auto found =
-      std::find_if(m_chunks_loading.begin(),
-                   m_chunks_loading.end(),
-                   [&position](const Vector3i& generating_position) { return generating_position == position; });
+      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const Vector3i& generating_position) {
+        return generating_position == position;
+      });
 
   if (found == m_chunks_loading.end())
   {
@@ -220,9 +217,9 @@ Chunk& ChunkManager::at(const int x, const int y, const int z) const
 {
   const Vector3i chunk_position = world_to_chunk(x, y, z);
 
-  const auto chunk = std::find_if(chunks.begin(),
-                                  chunks.end(),
-                                  [&chunk_position](const auto& chunk) { return (chunk->position == chunk_position); });
+  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
+    return (chunk->position == chunk_position);
+  });
 
   /* assert(chunk != chunks.end() && "Chunk should be already generated during update"); */
 
@@ -242,9 +239,9 @@ Chunk& ChunkManager::in(const int x, const int y, const int z) const
 {
   const Vector3i chunk_position = world_to_chunk(x, y, z);
 
-  const auto chunk = std::find_if(chunks.begin(),
-                                  chunks.end(),
-                                  [&chunk_position](const auto& chunk) { return (chunk->position == chunk_position); });
+  const auto chunk = std::find_if(chunks.begin(), chunks.end(), [&chunk_position](const auto& chunk) {
+    return (chunk->position == chunk_position);
+  });
 
   if (chunk != chunks.end())
   {

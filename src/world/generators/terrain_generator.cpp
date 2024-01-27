@@ -389,8 +389,7 @@ std::vector<Point<int>> TerrainGenerator::m_get_coastline(const std::vector<int>
     const auto bottom_point = current_point.bottom();
     const auto top_point = current_point.top();
 
-    auto manipulate_point = [this, mask_size, &mask, &point_queue, &tiles](const Point<int>& point)
-    {
+    auto manipulate_point = [this, mask_size, &mask, &point_queue, &tiles](const Point<int>& point) {
       if (m_valid_point(point) && m_is_coast_point(point, tiles) &&
           mask[point.y * m_width + point.x] == TerrainType::Water)
       {
@@ -1240,8 +1239,7 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
   std::size_t tries = 0;
 
   // Check if line crosses sea water to avoid unrealistic rivers
-  auto intersects_water = [this, &island](const Point<int>& source, const Point<int>& mouth)
-  {
+  auto intersects_water = [this, &island](const Point<int>& source, const Point<int>& mouth) {
     int tolerance = 4;
     int x = source.x;
     int y = source.y;

@@ -52,8 +52,14 @@ if (EMSCRIPTEN)
 endif()
 
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build Noise Tool" FORCE)
-set(FASTNOISE_CALC_MIN_MAX FALSE CACHE BOOL "Calc min max" FORCE)
 add_subdirectory("lib/FastNoise2")
+
+# Force an optimized build of FastNoise2
+if (MSVC)
+    target_compile_options(FastNoise PRIVATE /Ox)
+else()
+    target_compile_options(FastNoise PRIVATE -O3)
+endif()
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)

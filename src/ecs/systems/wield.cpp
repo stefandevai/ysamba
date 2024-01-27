@@ -11,8 +11,7 @@
 
 namespace dl
 {
-const auto stop_wield = [](entt::registry& registry, const entt::entity entity, const Job* job)
-{
+const auto stop_wield = [](entt::registry& registry, const entt::entity entity, const Job* job) {
   registry.remove<ActionWield>(entity);
   job->status = JobStatus::Finished;
 };

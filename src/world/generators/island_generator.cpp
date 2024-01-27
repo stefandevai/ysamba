@@ -13,12 +13,12 @@
 
 namespace dl
 {
-IslandGenerator::IslandGenerator() { m_load_params(m_default_params_filepath); }
+IslandGenerator::IslandGenerator() : IslandGenerator(1, 1, 1) {}
 
 IslandGenerator::IslandGenerator(const int width, const int height, const int depth)
     : width(width), height(height), depth(depth)
 {
-  IslandGenerator();
+  m_load_params(m_default_params_filepath);
 }
 
 void IslandGenerator::generate(const int seed)
@@ -86,68 +86,34 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 
 void IslandGenerator::m_get_height_map(const int seed)
 {
-  auto noise = FastNoiseLite{seed};
-  noise.SetSeed(seed);
-  noise.SetNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2S);
-  noise.SetFrequency(island_params.frequency);
-  noise.SetFractalType(FastNoiseLite::FractalType::FractalType_FBm);
-  noise.SetFractalOctaves(island_params.octaves);
-  noise.SetFractalLacunarity(island_params.lacunarity);
-  noise.SetFractalGain(island_params.gain);
-  noise.SetFractalWeightedStrength(island_params.weighted_strength);
+  const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
+  fractal->SetSource(simplex);
+  fractal->SetOctaveCount(island_params.octaves);
+  fractal->SetLacunarity(island_params.lacunarity);
+  fractal->SetGain(island_params.gain);
+  fractal->SetWeightedStrength(island_params.weighted_strength);
+  fractal->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, island_params.frequency, seed);
 
   for (int j = 0; j < height; ++j)
   {
     for (int i = 0; i < width; ++i)
     {
-      const float gradient = m_get_rectangle_gradient_value(i, j);
-      const float noise_value = noise.GetNoise(static_cast<float>(i), static_cast<float>(j)) - gradient;
+      const auto gradient = m_get_rectangle_gradient_value(i, j);
+      const auto array_index = j * width + i;
 
-      int tile_value;
+      raw_height_map[array_index] -= gradient;
 
-      if (noise_value > island_params.tier_land)
+      if (raw_height_map[array_index] > island_params.tier_land)
       {
-        tile_value = TerrainType::Land;
+        island_mask[array_index] = 2;
       }
       else
       {
-        tile_value = TerrainType::None;
+        island_mask[array_index] = 0;
       }
-
-      island_mask[j * width + i] = tile_value;
     }
   }
-
-  // Using FastNoiseLite temporarily
-  // See https://github.com/Auburn/FastNoise2/issues/129
-  // const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-  // const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
-  // fractal->SetSource(simplex);
-  // fractal->SetOctaveCount(octaves);
-  // fractal->SetLacunarity(lacunarity);
-  // fractal->SetGain(gain);
-  // fractal->SetWeightedStrength(weighted_strength);
-  // fractal->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, frequency, seed);
-  //
-  // for (int j = 0; j < height; ++j)
-  // {
-  //   for (int i = 0; i < width; ++i)
-  //   {
-  //     const auto gradient = m_get_rectangle_gradient_value(i, j);
-  //     const auto array_index = j * width + i;
-  //
-  //     raw_height_map[array_index] -= gradient;
-  //
-  //     if (raw_height_map[array_index] > tier_land)
-  //     {
-  //       island_mask[array_index] = 2;
-  //     }
-  //     else
-  //     {
-  //       island_mask[array_index] = 0;
-  //     }
-  //   }
-  // }
 
   // Remove lakes
   bool has_flooded_ocean = false;

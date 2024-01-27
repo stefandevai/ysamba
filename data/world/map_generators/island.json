@@ -1,10 +1,10 @@
 {
     "mask": {
-        "octaves": 1,
-        "frequency": 0.020,
-        "lacunarity": 3.3,
-        "gain": 0.00,
-        "weighted_strength": 0.0,
+        "octaves": 4,
+        "frequency": 0.005,
+        "lacunarity": 3.2,
+        "gain": 0.32,
+        "weighted_strength": 0.25,
         "tier_land": 0.002
     }
 }

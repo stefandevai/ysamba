@@ -10,8 +10,7 @@
 
 namespace dl
 {
-const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const Job* job)
-{
+const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const Job* job) {
   registry.remove<ActionWalk>(entity);
   registry.remove<WalkPath>(entity);
   job->status = JobStatus::Finished;
@@ -62,12 +61,10 @@ void WalkSystem::update(entt::registry& registry)
 
       if (registry.all_of<Velocity>(entity))
       {
-        registry.patch<Velocity>(entity,
-                                 [x_dir, y_dir](auto& velocity)
-                                 {
-                                   velocity.x = x_dir;
-                                   velocity.y = y_dir;
-                                 });
+        registry.patch<Velocity>(entity, [x_dir, y_dir](auto& velocity) {
+          velocity.x = x_dir;
+          velocity.y = y_dir;
+        });
       }
       else
       {

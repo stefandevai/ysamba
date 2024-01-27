@@ -20,9 +20,9 @@ void Renderer::add_batch(const uint32_t batch_id, const std::string& shader_id, 
   auto batch = std::make_unique<Batch>(shader_id, priority);
 
   m_ordered_batches.push_back(batch.get());
-  std::sort(m_ordered_batches.begin(),
-            m_ordered_batches.end(),
-            [](const auto& lhs, const auto& rhs) { return lhs->priority < rhs->priority; });
+  std::sort(m_ordered_batches.begin(), m_ordered_batches.end(), [](const auto& lhs, const auto& rhs) {
+    return lhs->priority < rhs->priority;
+  });
 
   m_batches.emplace(batch_id, std::move(batch));
 }
@@ -31,9 +31,9 @@ void Renderer::add_batch(Batch* batch)
 {
   m_ordered_batches.push_back(batch);
 
-  std::sort(m_ordered_batches.begin(),
-            m_ordered_batches.end(),
-            [](const auto& lhs, const auto& rhs) { return lhs->priority < rhs->priority; });
+  std::sort(m_ordered_batches.begin(), m_ordered_batches.end(), [](const auto& lhs, const auto& rhs) {
+    return lhs->priority < rhs->priority;
+  });
 }
 
 std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
