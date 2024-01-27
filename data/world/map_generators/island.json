@@ -1,0 +1,11 @@
+{
+    "mask": {
+        "octaves": 1,
+        "frequency": 0.020,
+        "lacunarity": 3.3,
+        "gain": 0.00,
+        "weighted_strength": 0.0,
+        "tier_land": 0.002
+    }
+}
+

@@ -13,7 +13,7 @@
 #include "graphics/renderer.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/texture.hpp"
-#include "world/generators/map_generator.hpp"
+#include "world/generators/island_generator.hpp"
 
 namespace dl
 {
@@ -214,15 +214,17 @@ void WorldCreation::m_create_world_representation()
   /* m_world_sprite->texture = texture; */
 }
 
-const int hm_width = 256;
-const int hm_height = 256;
+const int hm_width = 512;
+const int hm_height = 512;
+const int hm_depth = 10;
 
 void WorldCreation::m_generate_height_map(const int seed)
 {
   (void)seed;
 
   const auto s = random::get_integer(1, INT_MAX);
-  auto generator = MapGenerator(hm_width, hm_width);
+  // const auto s = 340683964;
+  auto generator = IslandGenerator(hm_width, hm_width, hm_depth);
   m_height_map.clear();
   m_height_map.reserve(hm_width * hm_height);
   generator.generate(s);
@@ -232,13 +234,13 @@ void WorldCreation::m_generate_height_map(const int seed)
 void WorldCreation::m_create_height_map_representation()
 {
   std::vector<unsigned char> pixel_data((hm_width * hm_height) * 4);
-  const int z_levels = 10;
+  const int z_levels = hm_depth;
 
   for (auto i = 0; i < hm_width; ++i)
   {
     for (auto j = 0; j < hm_height; ++j)
     {
-      const auto map_value = m_height_map[j * hm_width + i];
+      const auto map_value = m_height_map[j * hm_width + i] * 0.5f + 0.5f;
       const int z = static_cast<int>(map_value * z_levels);
       const uint8_t value = z * 255 / z_levels;
 

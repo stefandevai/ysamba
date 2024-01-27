@@ -27,10 +27,8 @@ class WorldCreation : public Scene
   void load_world();
 
  private:
-  using WorldRepresentation = std::vector<std::pair<glm::vec2, std::shared_ptr<Quad>>>;
   World m_world{m_game_context};
   std::unique_ptr<Sprite> m_world_sprite = nullptr;
-  WorldRepresentation m_world_representation;
   std::vector<float> m_height_map{};
   InputManager& m_input_manager = InputManager::get_instance();
   int m_seed = 110;

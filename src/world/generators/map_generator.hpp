@@ -1,11 +1,9 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <vector>
 
 #include "core/json.hpp"
 #include "core/maths/vector.hpp"
-#include "world/cell.hpp"
 #include "world/tilemap.hpp"
 
 namespace dl
@@ -18,8 +16,6 @@ class MapGenerator
   int width = 1;
   int height = 1;
   int depth = 1;
-  // std::vector<Cell> tiles;
-  // std::vector<int> height_map;
   std::vector<float> raw_height_map;
   std::vector<float> vegetation_type;
   std::vector<float> vegetation_density;

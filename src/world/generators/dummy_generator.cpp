@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "./tile_type.hpp"
+#include "./terrain_type.hpp"
 #include "core/random.hpp"
 
 namespace dl
@@ -30,11 +30,11 @@ Tilemap DummyGenerator::generate(const int seed)
       const auto render_yuca = random::get_real();
       if (render_yuca < 0.1f)
       {
-        tilemap.tiles[j * m_width + i] = TileType::Yuca;
+        tilemap.tiles[j * m_width + i] = TerrainType::Yuca;
         continue;
       }
 
-      tilemap.tiles[j * m_width + i] = TileType::Land;
+      tilemap.tiles[j * m_width + i] = TerrainType::Land;
     }
   }
 

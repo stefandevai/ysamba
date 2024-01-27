@@ -13,7 +13,7 @@
 #include "./lib/fast_noise_lite.hpp"
 #include "./lib/gal/fortune_algorithm.hpp"
 #include "./lib/poisson_disk_sampling.hpp"
-#include "./tile_type.hpp"
+#include "./terrain_type.hpp"
 #include "core/random.hpp"
 
 #ifndef M_PI
@@ -80,23 +80,23 @@ Tilemap TerrainGenerator::generate(const int seed)
     {
       for (auto site : main_island.structure.diagram.get_sites())
       {
-        m_draw_big_point(site.point.convert(m_width, m_height), TileType::Yellow, tiles);
+        m_draw_big_point(site.point.convert(m_width, m_height), TerrainType::Yellow, tiles);
       }
       /* for (const auto& site : main_island.structure.sites) */
       /* for (const auto index : main_island.structure.coast_indexes) */
       /* { */
-      /* m_draw_big_point(main_island.structure.sites[index].center, TileType::Yellow, tiles, m_width); */
+      /* m_draw_big_point(main_island.structure.sites[index].center, TerrainType::Yellow, tiles, m_width); */
 
       /* for (const auto& edge : main_island.structure.sites[index].edges) */
       /* { */
-      /*   m_draw_line(edge.first, edge.second, TileType::Yellow, tiles, m_width, m_height); */
+      /*   m_draw_line(edge.first, edge.second, TerrainType::Yellow, tiles, m_width, m_height); */
       /* } */
 
       /* m_draw_big_point(site.center, 5, tiles, m_width); */
 
       /* for (const auto& edge : site.edges) */
       /* { */
-      /*   m_draw_line(edge.first, edge.second, TileType::Yellow, tiles, m_width, m_height); */
+      /*   m_draw_line(edge.first, edge.second, TerrainType::Yellow, tiles, m_width, m_height); */
       /* } */
       /* } */
     }
@@ -107,7 +107,7 @@ Tilemap TerrainGenerator::generate(const int seed)
     {
       for (const auto& coastline_point : coastline)
       {
-        m_draw_point(coastline_point, TileType::Red, tilemap.tiles);
+        m_draw_point(coastline_point, TerrainType::Red, tilemap.tiles);
       }
     }
 
@@ -117,7 +117,7 @@ Tilemap TerrainGenerator::generate(const int seed)
     {
       for (const auto& bay : bays)
       {
-        m_draw_big_point(bay, TileType::None, tilemap.tiles);
+        m_draw_big_point(bay, TerrainType::None, tilemap.tiles);
       }
     }
   }
@@ -160,11 +160,11 @@ void TerrainGenerator::m_generate_silhouette(std::vector<int>& tiles, const int 
 
       if (noise_value > tier_land)
       {
-        tile_value = TileType::Land;
+        tile_value = TerrainType::Land;
       }
       else
       {
-        tile_value = TileType::None;
+        tile_value = TerrainType::None;
       }
 
       tiles[j * m_width + i] = tile_value;
@@ -252,7 +252,7 @@ std::vector<IslandData> TerrainGenerator::m_get_islands(std::vector<int>& tiles)
 
 IslandQueue TerrainGenerator::m_get_island_queue(const std::vector<int>& tiles)
 {
-  std::vector<int> mask(m_width * m_height, TileType::Water);
+  std::vector<int> mask(m_width * m_height, TerrainType::Water);
   IslandQueue islands{};
 
   for (int j = 0; j < m_height; ++j)
@@ -263,7 +263,7 @@ IslandQueue TerrainGenerator::m_get_island_queue(const std::vector<int>& tiles)
       const auto mask_value = mask[j * m_width + i];
 
       // Not water and not masked
-      if (tile_value != TileType::Water && mask_value == TileType::Water)
+      if (tile_value != TerrainType::Water && mask_value == TerrainType::Water)
       {
         const auto island_data = m_get_island(tiles, mask, i, j);
         islands.push(island_data);
@@ -282,7 +282,7 @@ IslandData TerrainGenerator::m_get_island(const std::vector<int>& tiles,
   assert(m_valid_coord(x, y) && "Island coordinates are not valid");
 
   IslandData island_data;
-  island_data.mask.resize(m_width * m_height, TileType::Water);
+  island_data.mask.resize(m_width * m_height, TerrainType::Water);
 
   std::queue<Point<int>> coord_queue;
 
@@ -299,7 +299,7 @@ IslandData TerrainGenerator::m_get_island(const std::vector<int>& tiles,
     const int x0 = coord.x;
     const int y0 = coord.y;
 
-    island_data.mask[y0 * m_width + x0] = TileType::Land;
+    island_data.mask[y0 * m_width + x0] = TerrainType::Land;
     island_data.points.push_back(Point<int>(x0, y0));
     island_data.top_left.x = std::min(x0, island_data.top_left.x);
     island_data.top_left.y = std::min(y0, island_data.top_left.y);
@@ -311,36 +311,36 @@ IslandData TerrainGenerator::m_get_island(const std::vector<int>& tiles,
     // Top coord
     const auto yt = y0 + 1;
     const auto top_coord = yt * m_width + x0;
-    if (m_valid_coord(x0, yt) && tiles[top_coord] != TileType::Water && mask[top_coord] == TileType::Water)
+    if (m_valid_coord(x0, yt) && tiles[top_coord] != TerrainType::Water && mask[top_coord] == TerrainType::Water)
     {
-      mask[top_coord] = TileType::Land;
+      mask[top_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yt));
     }
 
     // Bottom coord
     const auto yb = y0 - 1;
     const auto bottom_coord = yb * m_width + x0;
-    if (m_valid_coord(x0, yb) && tiles[bottom_coord] != TileType::Water && mask[bottom_coord] == TileType::Water)
+    if (m_valid_coord(x0, yb) && tiles[bottom_coord] != TerrainType::Water && mask[bottom_coord] == TerrainType::Water)
     {
-      mask[bottom_coord] = TileType::Land;
+      mask[bottom_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yb));
     }
 
     // Left coord
     const auto xl = x0 - 1;
     const auto left_coord = y0 * m_width + xl;
-    if (m_valid_coord(xl, y0) && tiles[left_coord] != TileType::Water && mask[left_coord] == TileType::Water)
+    if (m_valid_coord(xl, y0) && tiles[left_coord] != TerrainType::Water && mask[left_coord] == TerrainType::Water)
     {
-      mask[left_coord] = TileType::Land;
+      mask[left_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xl, y0));
     }
 
     // Right coord
     const auto xr = x0 + 1;
     const auto right_coord = y0 * m_width + xr;
-    if (m_valid_coord(xr, y0) && tiles[right_coord] != TileType::Water && mask[right_coord] == TileType::Water)
+    if (m_valid_coord(xr, y0) && tiles[right_coord] != TerrainType::Water && mask[right_coord] == TerrainType::Water)
     {
-      mask[right_coord] = TileType::Land;
+      mask[right_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xr, y0));
     }
   }
@@ -361,11 +361,11 @@ bool TerrainGenerator::m_valid_point(const Point<int>& point)
 std::vector<Point<int>> TerrainGenerator::m_get_coastline(const std::vector<int>& tiles, const IslandData& island)
 {
   std::vector<Point<int>> coastline;
-  std::vector<int> mask(m_width * m_height, TileType::Water);
+  std::vector<int> mask(m_width * m_height, TerrainType::Water);
   const std::size_t mask_size = mask.size();
 
   const auto first_point = m_get_first_coastline_point(tiles, island);
-  mask[first_point.y * m_width + first_point.x] = TileType::Land;
+  mask[first_point.y * m_width + first_point.x] = TerrainType::Land;
 
   // TODO: Handle not found
   if (first_point.x == 0 && first_point.y == 0)
@@ -382,7 +382,7 @@ std::vector<Point<int>> TerrainGenerator::m_get_coastline(const std::vector<int>
     point_queue.pop();
 
     coastline.push_back(current_point);
-    mask[current_point.y * m_width + current_point.x] = TileType::Land;
+    mask[current_point.y * m_width + current_point.x] = TerrainType::Land;
 
     const auto left_point = current_point.left();
     const auto right_point = current_point.right();
@@ -391,7 +391,7 @@ std::vector<Point<int>> TerrainGenerator::m_get_coastline(const std::vector<int>
 
     auto manipulate_point = [this, mask_size, &mask, &point_queue, &tiles](const Point<int>& point) {
       if (m_valid_point(point) && m_is_coast_point(point, tiles) &&
-          mask[point.y * m_width + point.x] == TileType::Water)
+          mask[point.y * m_width + point.x] == TerrainType::Water)
       {
         int neighbours = 0;
 
@@ -405,35 +405,35 @@ std::vector<Point<int>> TerrainGenerator::m_get_coastline(const std::vector<int>
         const std::size_t bottom_right_coord = (point.y + 1) * m_width + point.x + 1;
 
         // Top left
-        if (top_left_coord < mask_size && mask[top_left_coord] == TileType::Land)
+        if (top_left_coord < mask_size && mask[top_left_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (top_coord < mask_size && mask[top_coord] == TileType::Land)
+        if (top_coord < mask_size && mask[top_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (top_right_coord < mask_size && mask[top_right_coord] == TileType::Land)
+        if (top_right_coord < mask_size && mask[top_right_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (left_coord < mask_size && mask[left_coord] == TileType::Land)
+        if (left_coord < mask_size && mask[left_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (right_coord < mask_size && mask[right_coord] == TileType::Land)
+        if (right_coord < mask_size && mask[right_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (bottom_left_coord < mask_size && mask[bottom_left_coord] == TileType::Land)
+        if (bottom_left_coord < mask_size && mask[bottom_left_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (bottom_coord < mask_size && mask[bottom_coord] == TileType::Land)
+        if (bottom_coord < mask_size && mask[bottom_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
-        if (bottom_right_coord < mask_size && mask[bottom_right_coord] == TileType::Land)
+        if (bottom_right_coord < mask_size && mask[bottom_right_coord] == TerrainType::Land)
         {
           ++neighbours;
         }
@@ -470,7 +470,7 @@ bool TerrainGenerator::m_contains_island_area(const Point<int>& point,
   {
     for (auto j = top_left_y; j < bottom_right_y; ++j)
     {
-      if (island_mask[j * m_width + i] != TileType::Water)
+      if (island_mask[j * m_width + i] != TerrainType::Water)
       {
         return true;
       }
@@ -486,7 +486,7 @@ void TerrainGenerator::m_flood_fill(const int value, const int x, const int y, s
 
   const int original_value = tiles[y * m_width + x];
   std::queue<Point<int>> coord_queue;
-  std::vector<int> mask(m_width * m_height, TileType::Water);
+  std::vector<int> mask(m_width * m_height, TerrainType::Water);
 
   coord_queue.push(Point<int>(x, y));
   tiles[y * m_width + x] = value;
@@ -502,9 +502,9 @@ void TerrainGenerator::m_flood_fill(const int value, const int x, const int y, s
     // Top coord
     const auto yt = y0 + 1;
     const auto top_coord = yt * m_width + x0;
-    if (m_valid_coord(x0, yt) && tiles[top_coord] == original_value && mask[top_coord] == TileType::Water)
+    if (m_valid_coord(x0, yt) && tiles[top_coord] == original_value && mask[top_coord] == TerrainType::Water)
     {
-      mask[top_coord] = TileType::Land;
+      mask[top_coord] = TerrainType::Land;
       tiles[top_coord] = value;
       coord_queue.push(Point<int>(x0, yt));
     }
@@ -512,9 +512,9 @@ void TerrainGenerator::m_flood_fill(const int value, const int x, const int y, s
     // Bottom coord
     const auto yb = y0 - 1;
     const auto bottom_coord = yb * m_width + x0;
-    if (m_valid_coord(x0, yb) && tiles[bottom_coord] == original_value && mask[bottom_coord] == TileType::Water)
+    if (m_valid_coord(x0, yb) && tiles[bottom_coord] == original_value && mask[bottom_coord] == TerrainType::Water)
     {
-      mask[bottom_coord] = TileType::Land;
+      mask[bottom_coord] = TerrainType::Land;
       tiles[bottom_coord] = value;
       coord_queue.push(Point<int>(x0, yb));
     }
@@ -522,9 +522,9 @@ void TerrainGenerator::m_flood_fill(const int value, const int x, const int y, s
     // Left coord
     const auto xl = x0 - 1;
     const auto left_coord = y0 * m_width + xl;
-    if (m_valid_coord(xl, y0) && tiles[left_coord] == original_value && mask[left_coord] == TileType::Water)
+    if (m_valid_coord(xl, y0) && tiles[left_coord] == original_value && mask[left_coord] == TerrainType::Water)
     {
-      mask[left_coord] = TileType::Land;
+      mask[left_coord] = TerrainType::Land;
       tiles[left_coord] = value;
       coord_queue.push(Point<int>(xl, y0));
     }
@@ -532,9 +532,9 @@ void TerrainGenerator::m_flood_fill(const int value, const int x, const int y, s
     // Right coord
     const auto xr = x0 + 1;
     const auto right_coord = y0 * m_width + xr;
-    if (m_valid_coord(xr, y0) && tiles[right_coord] == original_value && mask[right_coord] == TileType::Water)
+    if (m_valid_coord(xr, y0) && tiles[right_coord] == original_value && mask[right_coord] == TerrainType::Water)
     {
-      mask[right_coord] = TileType::Land;
+      mask[right_coord] = TerrainType::Land;
       tiles[right_coord] = value;
       coord_queue.push(Point<int>(xr, y0));
     }
@@ -585,7 +585,7 @@ Point<int> TerrainGenerator::m_get_first_coastline_point(const std::vector<int>&
 
       for (auto x = point.x - 1; x > 0; --x)
       {
-        if (tiles[point.y * m_width + x] != TileType::Water)
+        if (tiles[point.y * m_width + x] != TerrainType::Water)
         {
           is_coast = false;
         }
@@ -597,7 +597,7 @@ Point<int> TerrainGenerator::m_get_first_coastline_point(const std::vector<int>&
 
       for (auto x = point.x + 1; x < m_width - 1; ++x)
       {
-        if (tiles[point.y * m_width + x] != TileType::Water)
+        if (tiles[point.y * m_width + x] != TerrainType::Water)
         {
           is_coast = false;
         }
@@ -609,7 +609,7 @@ Point<int> TerrainGenerator::m_get_first_coastline_point(const std::vector<int>&
 
       for (auto y = point.y - 1; y > 0; --y)
       {
-        if (tiles[y * m_width + point.x] != TileType::Water)
+        if (tiles[y * m_width + point.x] != TerrainType::Water)
         {
           is_coast = false;
         }
@@ -621,7 +621,7 @@ Point<int> TerrainGenerator::m_get_first_coastline_point(const std::vector<int>&
 
       for (auto y = point.y + 1; y < m_height - 1; ++y)
       {
-        if (tiles[y * m_width + point.x] != TileType::Water)
+        if (tiles[y * m_width + point.x] != TerrainType::Water)
         {
           is_coast = false;
         }
@@ -646,7 +646,7 @@ int TerrainGenerator::m_get_point_value(const Point<int>& point, const std::vect
 bool TerrainGenerator::m_is_coast_point(const Point<int>& point, const std::vector<int>& tiles)
 {
   // If point is water
-  if (m_get_point_value(point, tiles) == TileType::Water)
+  if (m_get_point_value(point, tiles) == TerrainType::Water)
   {
     return false;
   }
@@ -690,7 +690,7 @@ bool TerrainGenerator::m_is_coast_point(const Point<int>& point, const std::vect
 
 bool TerrainGenerator::m_is_water(const Point<int>& point, const std::vector<int>& tiles)
 {
-  return m_valid_point(point) && m_get_point_value(point, tiles) == TileType::Water;
+  return m_valid_point(point) && m_get_point_value(point, tiles) == TerrainType::Water;
 }
 
 std::vector<Point<int>> TerrainGenerator::m_get_bays(std::vector<Point<int>>& coastline, const IslandData& island)
@@ -705,7 +705,7 @@ std::vector<Point<int>> TerrainGenerator::m_get_bays(std::vector<Point<int>>& co
   Point<int>* coast_point_a = nullptr;
   Point<int>* coast_point_b = nullptr;
 
-  std::vector<int> area_mask(m_width * m_height, TileType::Water);
+  std::vector<int> area_mask(m_width * m_height, TerrainType::Water);
 
   for (std::size_t n = 0; n < coastline.size(); ++n)
   {
@@ -728,7 +728,7 @@ std::vector<Point<int>> TerrainGenerator::m_get_bays(std::vector<Point<int>>& co
         continue;
       }
 
-      if (!m_has_land_intersection(point_a, point_b, island.mask, TileType::Water))
+      if (!m_has_land_intersection(point_a, point_b, island.mask, TerrainType::Water))
       {
         found_candidate = true;
         coast_point_a = &point_a;
@@ -737,7 +737,7 @@ std::vector<Point<int>> TerrainGenerator::m_get_bays(std::vector<Point<int>>& co
       else if (found_candidate && coast_point_a != nullptr && coast_point_b != nullptr)
       {
         const auto bay_data =
-            m_get_bay_data(*coast_point_a, *coast_point_b, island.mask, minimum_area, area_mask, TileType::Water);
+            m_get_bay_data(*coast_point_a, *coast_point_b, island.mask, minimum_area, area_mask, TerrainType::Water);
 
         if (bay_data.area >= minimum_area)
         {
@@ -812,12 +812,12 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
 
     do
     {
-      if (mask[y * m_width + x] == TileType::Land)
+      if (mask[y * m_width + x] == TerrainType::Land)
       {
         return BayData(0, bay_point);
       }
 
-      mask[y * m_width + x] = TileType::Land;
+      mask[y * m_width + x] = TerrainType::Land;
     } while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
   }
 
@@ -862,7 +862,7 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
 
         if (py >= 0 && static_cast<int>(py) < m_height && tiles[py * m_width + px] != water_value)
         {
-          if (mask[py * m_width + px] != TileType::Water)
+          if (mask[py * m_width + px] != TerrainType::Water)
           {
             return BayData(0, bay_point);
           }
@@ -885,7 +885,7 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
 
         if (py >= 0 && static_cast<int>(py) < m_height && tiles[py * m_width + px] != water_value)
         {
-          if (mask[py * m_width + px] != TileType::Water)
+          if (mask[py * m_width + px] != TerrainType::Water)
           {
             return BayData(0, bay_point);
           }
@@ -931,7 +931,7 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
   std::queue<Point<int>> coord_queue;
 
   coord_queue.push(Point<int>(start_x, start_y));
-  mask[start_y * m_width + start_x] = TileType::Land;
+  mask[start_y * m_width + start_x] = TerrainType::Land;
   area++;
 
   while (!coord_queue.empty())
@@ -945,9 +945,9 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
     // Top coord
     const auto yt = y0 + 1;
     const auto top_coord = yt * m_width + x0;
-    if (m_valid_coord(x0, yt) && tiles[top_coord] == water_value && mask[top_coord] == TileType::Water)
+    if (m_valid_coord(x0, yt) && tiles[top_coord] == water_value && mask[top_coord] == TerrainType::Water)
     {
-      mask[top_coord] = TileType::Land;
+      mask[top_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yt));
       area++;
     }
@@ -955,9 +955,9 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
     // Bottom coord
     const auto yb = y0 - 1;
     const auto bottom_coord = yb * m_width + x0;
-    if (m_valid_coord(x0, yb) && tiles[bottom_coord] == water_value && mask[bottom_coord] == TileType::Water)
+    if (m_valid_coord(x0, yb) && tiles[bottom_coord] == water_value && mask[bottom_coord] == TerrainType::Water)
     {
-      mask[bottom_coord] = TileType::Land;
+      mask[bottom_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yb));
       area++;
     }
@@ -965,9 +965,9 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
     // Left coord
     const auto xl = x0 - 1;
     const auto left_coord = y0 * m_width + xl;
-    if (m_valid_coord(xl, y0) && tiles[left_coord] == water_value && mask[left_coord] == TileType::Water)
+    if (m_valid_coord(xl, y0) && tiles[left_coord] == water_value && mask[left_coord] == TerrainType::Water)
     {
-      mask[left_coord] = TileType::Land;
+      mask[left_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xl, y0));
       area++;
     }
@@ -975,9 +975,9 @@ BayData TerrainGenerator::m_get_bay_data(const Point<int>& point_a,
     // Right coord
     const auto xr = x0 + 1;
     const auto right_coord = y0 * m_width + xr;
-    if (m_valid_coord(xr, y0) && tiles[right_coord] == water_value && mask[right_coord] == TileType::Water)
+    if (m_valid_coord(xr, y0) && tiles[right_coord] == water_value && mask[right_coord] == TerrainType::Water)
     {
-      mask[right_coord] = TileType::Land;
+      mask[right_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xr, y0));
       area++;
     }
@@ -1024,7 +1024,7 @@ void TerrainGenerator::m_build_island_structure(IslandData& island)
     const auto center = site.point.convert(m_width, m_height);
 
     // Center is outside island
-    if (island.mask[center.y * m_width + center.x] == TileType::Water)
+    if (island.mask[center.y * m_width + center.x] == TerrainType::Water)
     {
       continue;
     }
@@ -1058,8 +1058,8 @@ void TerrainGenerator::m_build_island_structure(IslandData& island)
         const auto destination = half_edge->destination->point.convert(m_width, m_height);
 
         // If any of the edges points lays on water annotate it as coast
-        if (island.mask[origin.y * m_width + origin.x] == TileType::Water ||
-            island.mask[destination.y * m_width + destination.y] == TileType::Water)
+        if (island.mask[origin.y * m_width + origin.x] == TerrainType::Water ||
+            island.mask[destination.y * m_width + destination.y] == TerrainType::Water)
         {
           is_coast = true;
         }
@@ -1092,14 +1092,14 @@ void TerrainGenerator::m_build_island_structure(IslandData& island)
 
 bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::vector<int>& island_mask)
 {
-  assert(island_mask[center.y * m_width + center.x] == TileType::Land && "Center must not be in water");
+  assert(island_mask[center.y * m_width + center.x] == TerrainType::Land && "Center must not be in water");
 
   int distance_to_water = 0;
 
   // Check to the left of center
   for (int n = 0; (center.x - n) >= 0; ++n)
   {
-    if (island_mask[center.y * m_width + (center.x - n)] == TileType::Water)
+    if (island_mask[center.y * m_width + (center.x - n)] == TerrainType::Water)
     {
       distance_to_water = n;
       break;
@@ -1108,7 +1108,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the right of center
   for (int n = 0; (center.x + n) < m_width; ++n)
   {
-    if (island_mask[center.y * m_width + (center.x + n)] == TileType::Water)
+    if (island_mask[center.y * m_width + (center.x + n)] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1117,7 +1117,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the bottom of center
   for (int n = 0; (center.y + n) < m_height; ++n)
   {
-    if (island_mask[(center.y + n) * m_width + center.x] == TileType::Water)
+    if (island_mask[(center.y + n) * m_width + center.x] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1126,7 +1126,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the top of center
   for (int n = 0; (center.y - n) >= 0; ++n)
   {
-    if (island_mask[(center.y - n) * m_width + center.x] == TileType::Water)
+    if (island_mask[(center.y - n) * m_width + center.x] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1135,7 +1135,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the top left of center
   for (int n = 0; (center.y - n) >= 0 && (center.x - n) >= 0; ++n)
   {
-    if (island_mask[(center.y - n) * m_width + (center.x - n)] == TileType::Water)
+    if (island_mask[(center.y - n) * m_width + (center.x - n)] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1144,7 +1144,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the top right of center
   for (int n = 0; (center.y - n) >= 0 && (center.x + n) < m_width; ++n)
   {
-    if (island_mask[(center.y - n) * m_width + (center.x + n)] == TileType::Water)
+    if (island_mask[(center.y - n) * m_width + (center.x + n)] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1153,7 +1153,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the bottom right of center
   for (int n = 0; (center.y + n) < m_height && (center.x + n) < m_width; ++n)
   {
-    if (island_mask[(center.y + n) * m_width + (center.x + n)] == TileType::Water)
+    if (island_mask[(center.y + n) * m_width + (center.x + n)] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1162,7 +1162,7 @@ bool TerrainGenerator::m_center_is_coast(const Point<int>& center, const std::ve
   // Check to the bottom left of center
   for (int n = 0; (center.y + n) < m_height && (center.x - n) >= 0; ++n)
   {
-    if (island_mask[(center.y + n) * m_width + (center.x - n)] == TileType::Water)
+    if (island_mask[(center.y + n) * m_width + (center.x - n)] == TerrainType::Water)
     {
       distance_to_water = std::min(distance_to_water, n);
       break;
@@ -1205,7 +1205,7 @@ void TerrainGenerator::m_generate_main_river(IslandData& island,
 
     m_draw_line(Point<int>(std::round(p1_x), std::round(p1_y)),
                 Point<int>(std::round(p2_x), std::round(p2_y)),
-                TileType::Water,
+                TerrainType::Water,
                 tiles);
 
     p1_x = p2_x;
@@ -1249,7 +1249,7 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
 
     do
     {
-      if (island.mask[y * m_width + x] == TileType::Water)
+      if (island.mask[y * m_width + x] == TerrainType::Water)
       {
         --tolerance;
 
@@ -1400,7 +1400,7 @@ RiverData TerrainGenerator::m_get_river_data(const Point<int>& source, const Poi
     points_x.push_back(point_x);
     points_y.push_back(point_y);
 
-    /* m_draw_point(Point<int>(static_cast<int>(point_x), static_cast<int>(point_y)), TileType::Red, tiles); */
+    /* m_draw_point(Point<int>(static_cast<int>(point_x), static_cast<int>(point_y)), TerrainType::Red, tiles); */
   }
 
   // Add mouth points
@@ -1529,15 +1529,15 @@ void TerrainGenerator::m_create_meanders(RiverData& river,
       {
         if (draw_normals)
         {
-          m_draw_line(origin, normal_destination, TileType::Yellow, tiles);
+          m_draw_line(origin, normal_destination, TerrainType::Yellow, tiles);
         }
         if (draw_tangents)
         {
-          m_draw_line(origin, tangent_destination, TileType::Yellow, tiles);
+          m_draw_line(origin, tangent_destination, TerrainType::Yellow, tiles);
         }
         if (draw_combined)
         {
-          m_draw_line(origin, combined_destination, TileType::Yellow, tiles);
+          m_draw_line(origin, combined_destination, TerrainType::Yellow, tiles);
         }
       }
 

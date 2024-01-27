@@ -2,7 +2,7 @@
 
 namespace dl
 {
-enum TileType
+enum TerrainType
 {
   None = 0,
   Water = 1,
