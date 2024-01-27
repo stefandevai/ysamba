@@ -23,12 +23,7 @@ def build(build_path: Path) -> None:
     subprocess.run(['cmake', '--build', build_path], check=True)
 
 def run(target_path: Path, data_path: Path) -> None:
-    build_data_path = target_path / DATA_DIR_NAME
-
-    if build_data_path.exists():
-        shutil.rmtree(build_data_path)
-    shutil.copytree(data_path, build_data_path)
-    subprocess.run([target_path / TARGET_NAME], check=True, cwd=target_path)
+    subprocess.run([target_path / TARGET_NAME], check=True, cwd=THIS_DIR)
 
 def format() -> None:
     source_dir = THIS_DIR / "src"
