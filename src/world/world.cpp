@@ -40,6 +40,10 @@ World::World(GameContext& game_context) : m_game_context(game_context)
 
 void World::generate(const int width, const int height, const int depth, const int seed)
 {
+  (void)width;
+  (void)height;
+  (void)depth;
+  (void)seed;
   // GameChunkGenerator generator{};
   // generator.set_size({width, height, depth});
 

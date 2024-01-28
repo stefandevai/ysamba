@@ -418,6 +418,8 @@ bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qual
 bool ActionSystem::m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry)
 {
   // TODO: Check society inventory for consumable items
+  (void)consumables;
+  (void)registry;
   return true;
 }
 

@@ -471,6 +471,7 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
 
 int GameChunkGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
 {
+  (void)z;
   int decoration = 0;
 
   // TODO: Integrate to the rule system for any terrain
