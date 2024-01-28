@@ -36,7 +36,7 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::load_or_generate(const Vector3i& position)
 {
-  if (serialization::chunk_exists(position))
+  if (serialization::chunk_exists(position, "test_world"))
   {
     load_sync(position);
     return;
@@ -186,7 +186,7 @@ void ChunkManager::load_sync(const Vector3i& position)
 
   auto chunk = std::make_unique<Chunk>(position, true);
   chunk->tiles.set_size(config::chunk_size);
-  serialization::load_game_chunk(*chunk, "test2.world");
+  serialization::load_game_chunk(*chunk, "test_world");
 
   // spdlog::debug("Chunk size: {} {} {}", chunk->tiles.size.x, chunk->tiles.size.y, chunk->tiles.size.z);
   // timer.stop();
@@ -206,7 +206,7 @@ void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
   GameChunkGenerator generator{};
   generator.set_size(size);
   generator.generate(m_seed, position);
-  serialization::save_game_chunk(*generator.chunk, "test2.world");
+  serialization::save_game_chunk(*generator.chunk, "test_world");
   chunks.push_back(std::move(generator.chunk));
 }
 

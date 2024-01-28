@@ -119,23 +119,23 @@ void load_game(World& world, entt::registry& registry)
       .get<JobProgress>(archive);
 }
 
-bool chunk_exists(const Vector3i& position)
+bool chunk_exists(const Vector3i& position, const std::string& world_id)
 {
   assert(position.x % config::chunk_size.x == 0 && position.y % config::chunk_size.y == 0 &&
          position.z % config::chunk_size.z == 0 && "Position is not a chunk position.");
 
   const auto filename = fmt::format("{}_{}_{}.chunk", position.x, position.y, position.z);
-  const auto full_path = config::data_directory / config::chunks_directory / filename;
+  const auto full_path = config::data_directory / world_id / config::chunks_directory / filename;
   return std::filesystem::exists(full_path);
 }
 
-void save_game_chunk(const Chunk& chunk, const std::filesystem::path& file_name)
+void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 {
-  const auto chunks_directory = config::data_directory / config::chunks_directory;
+  const auto chunks_directory = config::data_directory / world_id / config::chunks_directory;
 
   if (!std::filesystem::exists(chunks_directory))
   {
-    std::filesystem::create_directory(chunks_directory);
+    std::filesystem::create_directories(chunks_directory);
   }
   else if (!std::filesystem::is_directory(chunks_directory))
   {
@@ -144,7 +144,7 @@ void save_game_chunk(const Chunk& chunk, const std::filesystem::path& file_name)
   }
 
   const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = chunks_directory / filename;
+  const auto full_path = world_id / chunks_directory / filename;
   const auto& tiles = chunk.tiles;
 
   std::ofstream outfile{full_path.c_str(), std::ios::binary | std::ios::out};
@@ -184,10 +184,10 @@ void save_game_chunk(const Chunk& chunk, const std::filesystem::path& file_name)
   outfile.close();
 }
 
-void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
+void load_game_chunk(Chunk& chunk, const std::string& world_id)
 {
   const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = config::data_directory / config::chunks_directory / filename;
+  const auto full_path = config::data_directory / world_id / config::chunks_directory / filename;
 
   if (!std::filesystem::exists(full_path))
   {
@@ -202,7 +202,6 @@ void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
 
   FILE* file = fopen(full_path.c_str(), "r");
 
-  const auto& position = chunk.position;
   auto& tiles = chunk.tiles;
 
   uint32_t file_magic_number = 0;
@@ -262,6 +261,7 @@ void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
   const uint64_t values_pos = ftell(file);
   const uint64_t max_cell_pos = world_size.x * world_size.y * world_size.z * terrain_ext::cell_size;
 
+  // const auto& position = chunk.position;
   // const uint64_t local_position =
   //     ((position.x) + (position.y + 0) * world_size.x + (position.z + 0) * world_size.x * world_size.y) *
   //     terrain_ext::cell_size;
