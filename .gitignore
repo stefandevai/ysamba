@@ -126,4 +126,5 @@ imgui.ini
 
 # World save files
 *.world
-
+*.chunk
+dl_data
