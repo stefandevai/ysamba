@@ -21,8 +21,6 @@ Tilemap DummyGenerator::generate(const int seed)
   std::vector<int> tiles(m_width * m_height);
   Tilemap tilemap{tiles, m_width, m_height};
 
-  auto start = std::chrono::high_resolution_clock::now();
-
   for (int j = 0; j < m_height; ++j)
   {
     for (int i = 0; i < m_width; ++i)
@@ -37,11 +35,6 @@ Tilemap DummyGenerator::generate(const int seed)
       tilemap.tiles[j * m_width + i] = TerrainType::Land;
     }
   }
-
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 
   return tilemap;
 }

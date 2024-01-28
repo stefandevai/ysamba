@@ -10,28 +10,30 @@
 #include "./tile_rules.hpp"
 #include "config.hpp"
 #include "core/random.hpp"
+#include "core/timer.hpp"
 #include "world/chunk.hpp"
 
 namespace dl
 {
 void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 {
-  // spdlog::info("=============================");
-  // spdlog::info("= STARTING WORLD GENERATION =");
-  // spdlog::info("=============================\n");
+  // spdlog::info("====================");
+  // spdlog::info("= GENERATING CHUNK =");
+  // spdlog::info("====================\n");
   // spdlog::info("SEED: {}", seed);
   // spdlog::info("WIDTH: {}", width);
   // spdlog::info("HEIGHT: {}\n", height);
 
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
+  Timer timer{};
 
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(width, height, depth);
 
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
-  // auto start = std::chrono::high_resolution_clock::now();
+  timer.start();
 
   // spdlog::info("Generating height maps...");
 
@@ -103,10 +105,8 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  // auto stop = std::chrono::high_resolution_clock::now();
-  // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-  // spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+  timer.stop();
+  timer.print("Chunk generation");
 }
 
 void GameChunkGenerator::set_size(const Vector3i& size)

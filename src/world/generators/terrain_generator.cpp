@@ -2,7 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include <chrono>
 #include <cmath>
 #include <functional>
 #include <libtcod.hpp>
@@ -38,8 +37,6 @@ Tilemap TerrainGenerator::generate(const int seed)
   std::vector<int> tiles(m_width * m_height);
   Tilemap tilemap{tiles, m_width, m_height};
 
-  auto start = std::chrono::high_resolution_clock::now();
-
   spdlog::info("Generating world silhouette...");
   spdlog::info("");
 
@@ -66,9 +63,6 @@ Tilemap TerrainGenerator::generate(const int seed)
   spdlog::info("Generating main river...");
 
   m_generate_main_river(main_island, bays, tilemap.tiles, seed);
-
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
   const auto draw_features = m_json.object["draw_features"].get<bool>();
 
@@ -121,8 +115,6 @@ Tilemap TerrainGenerator::generate(const int seed)
       }
     }
   }
-
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 
   return tilemap;
 }

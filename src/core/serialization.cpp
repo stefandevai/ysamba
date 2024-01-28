@@ -195,7 +195,10 @@ void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
     return;
   }
 
-  const auto start1 = std::chrono::high_resolution_clock::now();
+  // Timer timer1{};
+  // Timer timer2{};
+  // Timer timer3{};
+  // timer1.start();
 
   FILE* file = fopen(full_path.c_str(), "r");
 
@@ -238,10 +241,8 @@ void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
 
   fread(&world_size.x, sizeof(uint32_t), 3, file);
 
-  const auto stop1 = std::chrono::high_resolution_clock::now();
-  auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(stop1 - start1);
-
-  const auto start2 = std::chrono::high_resolution_clock::now();
+  // timer1.stop();
+  // timer2.start();
 
   // spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
 
@@ -290,9 +291,8 @@ void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
     }
   }
 
-  const auto stop2 = std::chrono::high_resolution_clock::now();
-  auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(stop2 - start2);
-  const auto start3 = std::chrono::high_resolution_clock::now();
+  // timer2.stop();
+  // timer3.start();
 
   const auto pos_offset = ftell(file) - values_pos;
 
@@ -325,13 +325,10 @@ void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
     }
   }
 
-  const auto stop3 = std::chrono::high_resolution_clock::now();
-  auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(stop3 - start3);
-
-  // spdlog::info("INSIDE: metadata: {} ms, cells: {} ms, height_map {} ms",
-  //              duration1.count(),
-  //              duration2.count(),
-  //              duration3.count());
+  // timer3.stop();
+  // timer1.print("metadata");
+  // timer2.print("cells");
+  // timer3.print("height_map");
 
   fclose(file);
 }

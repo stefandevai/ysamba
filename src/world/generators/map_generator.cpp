@@ -9,6 +9,7 @@
 
 #include "./tile_rules.hpp"
 #include "core/random.hpp"
+#include "core/timer.hpp"
 #include "world/chunk.hpp"
 
 float smoothstep(float edge0, float edge1, float x)
@@ -36,7 +37,8 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  Timer timer{};
+  timer.start();
 
   spdlog::info("Generating height maps...");
 
@@ -109,10 +111,8 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+  timer.stop();
+  timer.print("World generation");
 }
 
 void MapGenerator::set_size(const Vector3i& size)

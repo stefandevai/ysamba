@@ -9,6 +9,7 @@
 #include "./lib/fast_noise_lite.hpp"
 #include "./terrain_type.hpp"
 #include "core/json.hpp"
+#include "core/timer.hpp"
 #include "world/point.hpp"
 
 namespace dl
@@ -30,7 +31,8 @@ void IslandGenerator::generate(const int seed)
   spdlog::info("WIDTH: {}", width);
   spdlog::info("HEIGHT: {}\n", height);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  Timer timer{};
+  timer.start();
 
   spdlog::info("Generating height map...");
 
@@ -44,10 +46,8 @@ void IslandGenerator::generate(const int seed)
   auto islands = m_get_islands(island_mask, 1);
   auto& main_island = islands.back();
 
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+  timer.stop();
+  timer.print("Island generation");
 
   // TEMP Visualize island mask
   if (island_params.display_mask)

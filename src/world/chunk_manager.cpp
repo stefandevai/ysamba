@@ -181,18 +181,16 @@ void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size
 
 void ChunkManager::load_sync(const Vector3i& position)
 {
-  const auto start = std::chrono::high_resolution_clock::now();
+  // Timer timer{};
+  // timer.start();
 
   auto chunk = std::make_unique<Chunk>(position, true);
   chunk->tiles.set_size(config::chunk_size);
   serialization::load_game_chunk(*chunk, "test2.world");
 
-  const auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   // spdlog::debug("Chunk size: {} {} {}", chunk->tiles.size.x, chunk->tiles.size.y, chunk->tiles.size.z);
-
-  // spdlog::info(
-  //     "Chunk ({}, {}, {}) loading took {} milliseconds\n\n", position.x, position.y, position.z, duration.count());
+  // timer.stop();
+  // timer.print(fmt::format("Chunk ({}, {}, {})", position.x, position.y, position.z));
 
   if (chunk->tiles.height_map.size() != static_cast<uint32_t>(config::chunk_size.x * config::chunk_size.y))
   {
