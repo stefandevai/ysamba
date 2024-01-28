@@ -144,14 +144,14 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
   }
 
   const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = world_id / chunks_directory / filename;
+  const auto full_path = chunks_directory / filename;
   const auto& tiles = chunk.tiles;
 
   std::ofstream outfile{full_path.c_str(), std::ios::binary | std::ios::out};
 
   if (!outfile.is_open())
   {
-    spdlog::debug("Could not open file to save world");
+    spdlog::critical("Could not open file to save chunk: {}", full_path.c_str());
     return;
   }
 
@@ -211,7 +211,7 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
 
   if (!file)
   {
-    spdlog::critical("Could not open file for loading world.");
+    spdlog::critical("Could not open file for loading chunk.");
     return;
   }
 
@@ -229,7 +229,7 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
 
   if (file_metadata_marker != terrain_ext::metadata_marker)
   {
-    spdlog::critical("Invalid metadata marker when loading world: {}, expected: {}",
+    spdlog::critical("Invalid metadata marker when loading chunk: {}, expected: {}",
                      file_metadata_marker,
                      terrain_ext::metadata_marker);
     fclose(file);
@@ -253,7 +253,7 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
   if (file_values_marker != terrain_ext::values_marker)
   {
     spdlog::critical(
-        "Invalid metadata marker when loading world: {}, expected: {}", file_values_marker, terrain_ext::values_marker);
+        "Invalid metadata marker when loading chunk: {}, expected: {}", file_values_marker, terrain_ext::values_marker);
     fclose(file);
     return;
   }
@@ -301,7 +301,7 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
 
   if (file_height_map_marker != terrain_ext::height_map_marker)
   {
-    spdlog::critical("Invalid metadata marker when loading world: {}, expected: {}",
+    spdlog::critical("Invalid metadata marker when loading chunk: {}, expected: {}",
                      file_height_map_marker,
                      terrain_ext::height_map_marker);
     fclose(file);
