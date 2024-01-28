@@ -10,12 +10,13 @@
 #include <set>
 
 #include "./cell.hpp"
-#include "./generators/map_generator.hpp"
+#include "./generators/game_chunk_generator.hpp"
 #include "./generators/tile_rules.hpp"
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
+#include "config.hpp"
 #include "core/game_context.hpp"
 #include "core/input_manager.hpp"
 #include "core/serialization.hpp"
@@ -28,10 +29,9 @@ namespace dl
 {
 World::World(GameContext& game_context) : m_game_context(game_context)
 {
-  m_chunk_size = m_json.object["chunk_size"];
   m_texture_id = m_json.object["texture_id"];
   const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
-  spatial_hash.load(m_chunk_size, m_chunk_size, spatial_hash_cell_size);
+  spatial_hash.load(config::chunk_size.x, config::chunk_size.y, spatial_hash_cell_size);
 
   TileRules::load();
   m_load_tile_data();
@@ -40,12 +40,35 @@ World::World(GameContext& game_context) : m_game_context(game_context)
 
 void World::generate(const int width, const int height, const int depth, const int seed)
 {
-  MapGenerator generator{};
-  generator.set_size({width, height, depth});
-  generator.generate(seed, {0, 0, 0});
+  // GameChunkGenerator generator{};
+  // generator.set_size({width, height, depth});
 
-  const auto& tiles = generator.chunk->tiles;
-  serialization::save_terrain(tiles, "test2.world");
+  // generator.generate(seed, {0 * config::chunk_size.x, 0 * config::chunk_size.y, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+
+  // generator.generate(seed, {1 * 32, 0 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {2 * 32, 0 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {2 * 32, 0 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {0 * 32, 2 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {1 * 32, 1 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {2 * 32, 1 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {1 * 32, 2 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
+  //
+  // generator.generate(seed, {2 * 32, 2 * 32, 0});
+  // serialization::save_game_chunk(*generator.chunk, "test2.world");
 
   /* m_seed = seed; */
 
@@ -239,7 +262,7 @@ Vector3i World::screen_to_world(const Vector2i& position, const Camera& camera) 
   auto world_position =
       Vector3i{(position.x + camera_position.x) / grid_size.x, (position.y + camera_position.y) / grid_size.y, 0.0};
 
-  for (int z = chunk_manager.chunk_size.z - 1; z >= 0; --z)
+  for (int z = config::chunk_size.z - 1; z >= 0; --z)
   {
     int queried_elevation = get_elevation(world_position.x, world_position.y + z);
 

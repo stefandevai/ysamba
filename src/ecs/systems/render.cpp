@@ -6,6 +6,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 
+#include "config.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
@@ -128,16 +129,15 @@ void RenderSystem::m_render_tiles(const Camera& camera)
   const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = m_world.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
-  const auto& chunk_size = m_world.chunk_manager.chunk_size;
 
   {
     const auto first_chunk_position =
         m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y, 0});
 
     // Loop through chunks
-    for (int j = first_chunk_position.y; j < camera_position.y + camera_size.y; j += chunk_size.y)
+    for (int j = first_chunk_position.y; j < camera_position.y + camera_size.y; j += config::chunk_size.y)
     {
-      for (int i = first_chunk_position.x; i < camera_position.x + camera_size.x; i += chunk_size.y)
+      for (int i = first_chunk_position.x; i < camera_position.x + camera_size.x; i += config::chunk_size.x)
       {
         const auto& chunk = m_world.chunk_manager.at(i, j, 0);
 
@@ -148,8 +148,8 @@ void RenderSystem::m_render_tiles(const Camera& camera)
 
         int lower_bound_j = 0;
         int lower_bound_i = 0;
-        int upper_bound_j = chunk_size.y;
-        int upper_bound_i = chunk_size.x;
+        int upper_bound_j = config::chunk_size.y;
+        int upper_bound_i = config::chunk_size.x;
 
         if (j < camera_position.y)
         {
@@ -159,20 +159,20 @@ void RenderSystem::m_render_tiles(const Camera& camera)
         {
           lower_bound_i = camera_position.x - i;
         }
-        if ((j + chunk_size.y) - (camera_position.y + camera_size.y) > 0)
+        if ((j + config::chunk_size.y) - (camera_position.y + camera_size.y) > 0)
         {
-          upper_bound_j = chunk_size.y - ((j + chunk_size.y) - (camera_position.y + camera_size.y));
+          upper_bound_j = config::chunk_size.y - ((j + config::chunk_size.y) - (camera_position.y + camera_size.y));
         }
-        if ((i + chunk_size.x) - (camera_position.x + camera_size.x) > 0)
+        if ((i + config::chunk_size.x) - (camera_position.x + camera_size.x) > 0)
         {
-          upper_bound_i = chunk_size.x - ((i + chunk_size.x) - (camera_position.x + camera_size.x));
+          upper_bound_i = config::chunk_size.x - ((i + config::chunk_size.x) - (camera_position.x + camera_size.x));
         }
 
         for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)
         {
           for (int local_i = lower_bound_i; local_i < upper_bound_i; ++local_i)
           {
-            const auto height = chunk.tiles.height_map[local_i + local_j * chunk_size.x];
+            const auto height = chunk.tiles.height_map[local_i + local_j * config::chunk_size.x];
 
             for (int z = height; z >= 0; --z)
             {
@@ -202,10 +202,10 @@ void RenderSystem::m_render_tiles(const Camera& camera)
     const auto first_chunk_position =
         m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y + camera_size.y, 0});
     const auto last_chunk_position = m_world.chunk_manager.world_to_chunk(
-        Vector3i{camera_position.x, camera_position.y + camera_size.y + chunk_size.z, 0});
-    for (int j = first_chunk_position.y; j <= last_chunk_position.y; j += chunk_size.y)
+        Vector3i{camera_position.x, camera_position.y + camera_size.y + config::chunk_size.z, 0});
+    for (int j = first_chunk_position.y; j <= last_chunk_position.y; j += config::chunk_size.y)
     {
-      for (int i = first_chunk_position.x; i < camera_position.x + camera_size.x; i += chunk_size.y)
+      for (int i = first_chunk_position.x; i < camera_position.x + camera_size.x; i += config::chunk_size.y)
       {
         const auto& chunk = m_world.chunk_manager.at(i, j, 0);
 
@@ -215,24 +215,24 @@ void RenderSystem::m_render_tiles(const Camera& camera)
         }
 
         int lower_bound_j = 0;
-        int upper_bound_j = chunk_size.z;
+        int upper_bound_j = config::chunk_size.z;
 
         if (j < camera_position.y + camera_size.y)
         {
           lower_bound_j = (camera_position.y + camera_size.y) - j;
-          upper_bound_j = std::min(chunk_size.z + lower_bound_j, chunk_size.y);
+          upper_bound_j = std::min(config::chunk_size.z + lower_bound_j, config::chunk_size.y);
         }
 
         int lower_bound_i = 0;
-        int upper_bound_i = chunk_size.x;
+        int upper_bound_i = config::chunk_size.x;
 
         if (i < camera_position.x)
         {
           lower_bound_i = camera_position.x - i;
         }
-        if ((i + chunk_size.x) - (camera_position.x + camera_size.x) > 0)
+        if ((i + config::chunk_size.x) - (camera_position.x + camera_size.x) > 0)
         {
-          upper_bound_i = chunk_size.x - ((i + chunk_size.x) - (camera_position.x + camera_size.x));
+          upper_bound_i = config::chunk_size.x - ((i + config::chunk_size.x) - (camera_position.x + camera_size.x));
         }
 
         for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)
@@ -241,9 +241,9 @@ void RenderSystem::m_render_tiles(const Camera& camera)
 
           for (int local_i = lower_bound_i; local_i < upper_bound_i; ++local_i)
           {
-            const auto height = chunk.tiles.height_map[local_i + local_j * chunk_size.x];
+            const auto height = chunk.tiles.height_map[local_i + local_j * config::chunk_size.x];
 
-            if (height < offset)
+            if (height < offset || height >= config::chunk_size.z)
             {
               continue;
             }

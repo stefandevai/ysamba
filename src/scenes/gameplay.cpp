@@ -36,8 +36,9 @@ void Gameplay::load()
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
-  const auto seed = random::get_integer(0, 100000);
-  m_world.generate(128, 128, 3, seed);
+  // const auto seed = random::get_integer(0, 100000);
+  // const auto seed = 1334;
+  // m_world.generate(32, 32, 2, seed);
   /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 
@@ -45,7 +46,7 @@ void Gameplay::load()
   m_camera.set_zoom(default_zoom);
   m_camera.update_dirty();
 
-  m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
+  // m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
   // m_world.generate_societies();
   // auto society_blueprint = m_world.get_society("otomi"_hs);
@@ -93,7 +94,8 @@ void Gameplay::update()
   m_camera.update(delta);
   const auto& camera_position = m_camera.get_position_in_tiles();
   const auto& camera_size = m_camera.get_size_in_tiles();
-  m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
+  // m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
+  m_world.chunk_manager.update({camera_position.x, camera_position.y, 0});
 
   /* const auto& mouse_position = m_input_manager.get_mouse_tile_position(m_camera); */
   if (m_current_state == State::PLAYING)

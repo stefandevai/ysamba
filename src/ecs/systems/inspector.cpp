@@ -4,6 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "config.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
@@ -58,12 +59,10 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
   auto& quad_position = registry.get<Position>(m_target_quad);
   quad_position.x = floor_x;
-
-  const auto& chunk_size = m_world.chunk_manager.chunk_size;
   int elevation = 0;
 
   // Check elevation in the current mouse position
-  for (int z = chunk_size.z - 1; z >= 0; --z)
+  for (int z = config::chunk_size.z - 1; z >= 0; --z)
   {
     int queried_elevation = m_world.get_elevation(floor_x, floor_y + z);
 

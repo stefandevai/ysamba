@@ -1,4 +1,4 @@
-#include "./map_generator.hpp"
+#include "./game_chunk_generator.hpp"
 
 #include <FastNoise/FastNoise.h>
 #include <spdlog/spdlog.h>
@@ -8,25 +8,20 @@
 #include <cmath>
 
 #include "./tile_rules.hpp"
+#include "config.hpp"
 #include "core/random.hpp"
 #include "world/chunk.hpp"
 
-float smoothstep(float edge0, float edge1, float x)
-{
-  x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
-  return x * x * (3 - 2 * x);
-}
-
 namespace dl
 {
-void MapGenerator::generate(const int seed, const Vector3i& offset)
+void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 {
-  spdlog::info("=============================");
-  spdlog::info("= STARTING WORLD GENERATION =");
-  spdlog::info("=============================\n");
-  spdlog::info("SEED: {}", seed);
-  spdlog::info("WIDTH: {}", width);
-  spdlog::info("HEIGHT: {}\n", height);
+  // spdlog::info("=============================");
+  // spdlog::info("= STARTING WORLD GENERATION =");
+  // spdlog::info("=============================\n");
+  // spdlog::info("SEED: {}", seed);
+  // spdlog::info("WIDTH: {}", width);
+  // spdlog::info("HEIGHT: {}\n", height);
 
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
@@ -36,19 +31,18 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
 
   auto terrain = std::vector<int>(padded_width * padded_height * depth);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  // auto start = std::chrono::high_resolution_clock::now();
 
-  spdlog::info("Generating height maps...");
+  // spdlog::info("Generating height maps...");
 
   m_get_height_map(seed, offset);
 
-  spdlog::info("Setting terrain...");
+  // spdlog::info("Setting terrain...");
 
   for (int j = 0; j < padded_height; ++j)
   {
     for (int i = 0; i < padded_width; ++i)
     {
-      // const auto map_value = raw_height_map[j * padded_width + i] * 0.5f + 0.5f;
       const auto map_value = std::clamp(raw_height_map[j * padded_width + i], 0.0f, 1.0f);
       const int k = static_cast<int>(map_value * (depth - 1));
       bool inside_chunk = false;
@@ -92,11 +86,11 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  spdlog::info("Computing visibility...");
+  // spdlog::info("Computing visibility...");
 
   chunk->tiles.compute_visibility();
 
-  spdlog::info("Selecting tiles...");
+  // spdlog::info("Selecting tiles...");
 
   for (int k = 0; k < depth; ++k)
   {
@@ -109,20 +103,20 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  // auto stop = std::chrono::high_resolution_clock::now();
+  // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-  spdlog::info("World generation finished! It took {} milliseconds", duration.count());
+  // spdlog::info("World generation finished! It took {} milliseconds", duration.count());
 }
 
-void MapGenerator::set_size(const Vector3i& size)
+void GameChunkGenerator::set_size(const Vector3i& size)
 {
   width = size.x;
   height = size.y;
   depth = size.z;
 }
 
-void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
+void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 {
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
@@ -131,32 +125,11 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   vegetation_type.resize(width * height);
   vegetation_density.resize(width * height);
 
-  /* const float frequency = 0.005f; */
-  const float frequency = 0.016f / 32.0f;
-  // (2D) (((OpenSimplex2S + FractalRidged(G0.5 W0.0, O3, L2)) + (OpenSimplex2S + SeedOffset(S10) + FractalFBm(G0.5,
-  // W0.0, O5, L2.0))) + MinSmooth(S2.46))
-  // FastNoise::SmartNode<> elevation_noise = FastNoise::NewFromEncodedNodeTree(
-  //     "HwAPAAMAAAAAAABAKQAAAAAAPwAAAAAAAQ0ABQAAAAAAAEAWAAoAAAApAAAAAAA/AAAAAAAApHAdQA==");
-  // const auto& output = elevation_noise->GenUniformGrid2D(raw_height_map.data(),
-  //                                                        offset.x - m_generation_padding,
-  //                                                        offset.y + m_generation_padding,
-  //                                                        width + m_generation_padding * 2,
-  //                                                        height + m_generation_padding * 2,
-  //                                                        frequency,
-  //                                                        seed);
+  // Quantity of tiles per map texture pixel
+  // const float map_to_tiles = static_cast<float>(config::chunk_size.x);
+  const float map_to_tiles = 1.0f;
 
-  // const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-  // const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
-  // fractal->SetSource(simplex);
-  // fractal->SetOctaveCount(3);
-  //
-  // fractal->GenUniformGrid2D(raw_height_map.data(),
-  //                           offset.x - m_generation_padding,
-  //                           offset.y + m_generation_padding,
-  //                           width + m_generation_padding * 2,
-  //                           height + m_generation_padding * 2,
-  //                           frequency,
-  //                           seed);
+  const float frequency = 0.016f / map_to_tiles;
 
   const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
   const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
@@ -170,12 +143,8 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   fractal->SetGain(0.32f);
   fractal->SetWeightedStrength(0.25f);
 
-  // fractal->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, island_params.frequency, seed);
-
   distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
-  // distance_to_point->SetScale<FastNoise::Dim::X>(2.0f);
-  // distance_to_point->SetScale<FastNoise::Dim::Y>(2.0f);
-  //
+
   subtract->SetLHS(fractal);
   subtract->SetRHS(distance_to_point);
 
@@ -186,13 +155,47 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   remap->SetSource(terrace);
   remap->SetRemap(-1.0f, 1.0f, 0.0f, 8.08f);
 
-  remap->GenUniformGrid2D(raw_height_map.data(),
-                          offset.x - m_generation_padding - 256 / 2 * 32,
-                          offset.y + m_generation_padding - 256 / 2 * 32,
-                          width + m_generation_padding * 2,
-                          height + m_generation_padding * 2,
-                          frequency,
-                          seed);
+  // Second noise
+  const auto& simplex2 = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto& seed_offset = FastNoise::New<FastNoise::SeedOffset>();
+  const auto& fractal2 = FastNoise::New<FastNoise::FractalFBm>();
+  const auto& fade = FastNoise::New<FastNoise::Fade>();
+  const auto& max_smooth = FastNoise::New<FastNoise::MaxSmooth>();
+
+  seed_offset->SetSource(simplex2);
+  seed_offset->SetOffset(7);
+  fractal2->SetSource(seed_offset);
+  fractal2->SetOctaveCount(4);
+  fractal2->SetLacunarity(1.42f);
+  fractal2->SetGain(1.1f);
+  fractal2->SetWeightedStrength(0.42);
+
+  fade->SetA(subtract);
+  fade->SetB(fractal2);
+  fade->SetFade(0.62f);
+
+  max_smooth->SetLHS(fade);
+  max_smooth->SetRHS(-0.68f);
+  max_smooth->SetSmoothness(1.76f);
+
+  const auto& min = FastNoise::New<FastNoise::Min>();
+
+  min->SetLHS(remap);
+  min->SetRHS(max_smooth);
+
+  const auto& remap2 = FastNoise::New<FastNoise::Remap>();
+  remap2->SetSource(min);
+  remap2->SetRemap(-1.0f, 1.0f, 0.0f, 1.00f);
+
+  remap2->GenUniformGrid2D(raw_height_map.data(),
+                           offset.x - m_generation_padding,
+                           offset.y + m_generation_padding,
+                           // offset.x - m_generation_padding - 256 / 2 * map_to_tiles,
+                           // offset.y + m_generation_padding - 256 / 2 * map_to_tiles,
+                           width + m_generation_padding * 2,
+                           height + m_generation_padding * 2,
+                           frequency,
+                           seed);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise =
@@ -206,7 +209,7 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
       vegetation_density.data(), offset.x, offset.y, width, height, 0.05f, seed + 50);
 }
 
-float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
+float GameChunkGenerator::m_get_rectangle_gradient_value(const int x, const int y)
 {
   auto distance_to_edge = std::min(abs(x - width), x);
   distance_to_edge = std::min(distance_to_edge, abs(y - height));
@@ -214,7 +217,7 @@ float MapGenerator::m_get_rectangle_gradient_value(const int x, const int y)
   return 1.f - static_cast<float>(distance_to_edge) / (width / 2.0f);
 }
 
-void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
+void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
 {
   const int padded_width = width + m_generation_padding * 2;
   const int padded_height = height + m_generation_padding * 2;
@@ -466,7 +469,7 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
   chunk->tiles.values[z * width * height + y * width + x].decoration = new_values.decoration;
 }
 
-int MapGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
+int GameChunkGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
 {
   int decoration = 0;
 
@@ -520,7 +523,7 @@ int MapGenerator::m_select_decoration(const int terrain_id, const int x, const i
   return decoration;
 }
 
-uint32_t MapGenerator::m_get_bitmask_4_sided(
+uint32_t GameChunkGenerator::m_get_bitmask_4_sided(
     const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
 {
   const int padded_width = width + m_generation_padding * 2;
@@ -551,7 +554,7 @@ uint32_t MapGenerator::m_get_bitmask_4_sided(
   return bitmask;
 }
 
-uint32_t MapGenerator::m_get_bitmask_8_sided(
+uint32_t GameChunkGenerator::m_get_bitmask_8_sided(
     const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source)
 {
   if (!m_has_neighbor(terrain, x, y, z, neighbor))
@@ -628,7 +631,7 @@ uint32_t MapGenerator::m_get_bitmask_8_sided(
   return bitmask;
 }
 
-bool MapGenerator::m_has_neighbor(
+bool GameChunkGenerator::m_has_neighbor(
     const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
 {
   const int padded_width = width + m_generation_padding * 2;

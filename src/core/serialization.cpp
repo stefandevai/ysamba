@@ -1,5 +1,6 @@
 #include "./serialization.hpp"
 
+#include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
 #include <cereal/archives/binary.hpp>
@@ -14,6 +15,7 @@
 #include <entt/entity/snapshot.hpp>
 #include <fstream>
 
+#include "config.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/biology.hpp"
@@ -44,6 +46,18 @@ constexpr uint8_t end_marker = 0x04;
 constexpr size_t marker_size = sizeof(uint8_t);
 constexpr size_t cell_size = sizeof(uint32_t) * 3;
 }  // namespace terrain_ext
+
+void initialize_directories()
+{
+  if (!std::filesystem::exists(config::data_directory))
+  {
+    std::filesystem::create_directory(config::data_directory);
+  }
+  else if (!std::filesystem::is_directory(config::data_directory))
+  {
+    spdlog::critical("dl_data is not a directory");
+  }
+}
 
 void save_world(World& world)
 {
@@ -105,9 +119,36 @@ void load_game(World& world, entt::registry& registry)
       .get<JobProgress>(archive);
 }
 
-void save_terrain(const Grid3D& tiles, const std::string& file_name)
+bool chunk_exists(const Vector3i& position)
 {
-  std::ofstream outfile{file_name, std::ios::binary | std::ios::out};
+  assert(position.x % config::chunk_size.x == 0 && position.y % config::chunk_size.y == 0 &&
+         position.z % config::chunk_size.z == 0 && "Position is not a chunk position.");
+
+  const auto filename = fmt::format("{}_{}_{}.chunk", position.x, position.y, position.z);
+  const auto full_path = config::data_directory / config::chunks_directory / filename;
+  return std::filesystem::exists(full_path);
+}
+
+void save_game_chunk(const Chunk& chunk, const std::filesystem::path& file_name)
+{
+  const auto chunks_directory = config::data_directory / config::chunks_directory;
+
+  if (!std::filesystem::exists(chunks_directory))
+  {
+    std::filesystem::create_directory(chunks_directory);
+  }
+  else if (!std::filesystem::is_directory(chunks_directory))
+  {
+    spdlog::critical("{} is not a directory", chunks_directory.c_str());
+    return;
+  }
+
+  const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
+  const auto full_path = chunks_directory / filename;
+  const auto& tiles = chunk.tiles;
+
+  std::ofstream outfile{full_path.c_str(), std::ios::binary | std::ios::out};
+
   if (!outfile.is_open())
   {
     spdlog::debug("Could not open file to save world");
@@ -143,9 +184,20 @@ void save_terrain(const Grid3D& tiles, const std::string& file_name)
   outfile.close();
 }
 
-void load_chunk(Chunk& chunk, const std::string& file_name)
+void load_game_chunk(Chunk& chunk, const std::filesystem::path& file_name)
 {
+  const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
+  const auto full_path = config::data_directory / config::chunks_directory / filename;
+
+  if (!std::filesystem::exists(full_path))
+  {
+    spdlog::critical("Chunk file doest not does not exist: {}", filename.c_str());
+    return;
+  }
+
   const auto start1 = std::chrono::high_resolution_clock::now();
+
+  FILE* file = fopen(full_path.c_str(), "r");
 
   const auto& position = chunk.position;
   auto& tiles = chunk.tiles;
@@ -154,8 +206,6 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   uint8_t file_metadata_marker = 0;
   uint8_t file_values_marker = 0;
   uint8_t file_height_map_marker = 0;
-
-  FILE* file = fopen(file_name.c_str(), "r");
 
   if (!file)
   {
@@ -195,6 +245,9 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
 
   // spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
 
+  assert(world_size.x >= tiles.size.x && world_size.y >= tiles.size.y && world_size.z >= tiles.size.z &&
+         "Chunk size is bigger than world size.");
+
   fread(&file_values_marker, terrain_ext::marker_size, 1, file);
 
   if (file_values_marker != terrain_ext::values_marker)
@@ -208,11 +261,11 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   const uint64_t values_pos = ftell(file);
   const uint64_t max_cell_pos = world_size.x * world_size.y * world_size.z * terrain_ext::cell_size;
 
-  const uint64_t local_position =
-      ((position.x) + (position.y + 0) * world_size.x + (position.z + 0) * world_size.x * world_size.y) *
-      terrain_ext::cell_size;
-
-  fseek(file, local_position, SEEK_CUR);
+  // const uint64_t local_position =
+  //     ((position.x) + (position.y + 0) * world_size.x + (position.z + 0) * world_size.x * world_size.y) *
+  //     terrain_ext::cell_size;
+  //
+  // fseek(file, local_position, SEEK_CUR);
 
   for (int z = 0; z < tiles.size.z; ++z)
   {
@@ -255,9 +308,9 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
     return;
   }
 
-  const uint64_t local_position2 = ((position.x + 0) + (position.y + 0) * world_size.x) * sizeof(int);
-
-  fseek(file, local_position2, SEEK_CUR);
+  // const uint64_t local_position2 = ((0 + 0) + (0 + 0) * world_size.x) * sizeof(int);
+  //
+  // fseek(file, local_position2, SEEK_CUR);
 
   for (int y = 0; y < tiles.size.y; ++y)
   {
@@ -275,10 +328,10 @@ void load_chunk(Chunk& chunk, const std::string& file_name)
   const auto stop3 = std::chrono::high_resolution_clock::now();
   auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(stop3 - start3);
 
-  spdlog::info("INSIDE: metadata: {} ms, cells: {} ms, height_map {} ms",
-               duration1.count(),
-               duration2.count(),
-               duration3.count());
+  // spdlog::info("INSIDE: metadata: {} ms, cells: {} ms, height_map {} ms",
+  //              duration1.count(),
+  //              duration2.count(),
+  //              duration3.count());
 
   fclose(file);
 }

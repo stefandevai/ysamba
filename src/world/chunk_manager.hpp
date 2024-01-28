@@ -14,8 +14,6 @@ class ChunkManager
 {
  public:
   std::vector<std::unique_ptr<Chunk>> chunks{};
-  // Size in tiles
-  Vector3i chunk_size{32, 32, 32};
   // Frustum in tiles
   Vector2i frustum{80, 48};
 
@@ -26,12 +24,12 @@ class ChunkManager
 
   // Update chunks based on a tile position
   void update(const Vector3i& target);
+  void load_or_generate(const Vector3i& position);
   void load_initial_chunks(const Vector3i& position);
   void load_async(const Vector3i& position);
   void load_sync(const Vector3i& position);
   void generate_async(const Vector3i& position, const Vector3i& size, std::mutex& mutex);
   void generate_sync(const Vector3i& position, const Vector3i& size);
-  void set_chunk_size(const Vector3i& chunk_size);
   void set_frustum(const Vector2i& frustum);
 
   // Gets chunk at a precise location

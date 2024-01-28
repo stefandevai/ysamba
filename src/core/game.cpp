@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "./file_manager.hpp"
+#include "core/serialization.hpp"
 #include "graphics/texture.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/home_menu.hpp"
@@ -18,6 +19,8 @@ void Game::load()
 
   try
   {
+    serialization::initialize_directories();
+
     const auto width = m_json.object["width"];
     const auto height = m_json.object["height"];
     const auto title = m_json.object["title"];

@@ -111,9 +111,6 @@ class World
   // Get the seed used in this world generation
   [[nodiscard]] int get_seed() const { return m_seed; };
 
-  // Get the size of a loaded chunk
-  [[nodiscard]] size_t get_chunk_size() const { return m_chunk_size; };
-
   // Transform screen coordinates to world coordinates
   [[nodiscard]] Vector3i screen_to_world(const Vector2i& position, const Camera& camera) const;
 
@@ -165,7 +162,6 @@ class World
  private:
   GameContext& m_game_context;
   JSON m_json{"./data/world.json"};
-  size_t m_chunk_size = 0;
   std::string m_texture_id;
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};

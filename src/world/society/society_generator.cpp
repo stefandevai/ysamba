@@ -6,6 +6,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "./name_generator.hpp"
+#include "config.hpp"
 #include "core/random.hpp"
 #include "ecs/components/selectable.hpp"
 #include "graphics/camera.hpp"
@@ -117,7 +118,6 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
 
 Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
 {
-  const auto& chunk_size = world.chunk_manager.chunk_size;
   const auto& chunk = world.chunk_manager.in(camera.center_in_tiles);
 
   auto position = Position{0., 0., 0.};
@@ -125,9 +125,9 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = static_cast<double>(random::get_integer(0, chunk_size.x));
-    const auto y = static_cast<double>(random::get_integer(0, chunk_size.y));
-    const auto height = chunk.tiles.height_map[x + y * chunk_size.x];
+    const auto x = static_cast<double>(random::get_integer(0, config::chunk_size.x));
+    const auto y = static_cast<double>(random::get_integer(0, config::chunk_size.y));
+    const auto height = chunk.tiles.height_map[x + y * config::chunk_size.x];
 
     if (world.is_walkable(x, y, height))
     {

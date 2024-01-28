@@ -5,7 +5,8 @@
 #include <cmath>
 #include <thread>
 
-#include "./generators/map_generator.hpp"
+#include "./generators/game_chunk_generator.hpp"
+#include "config.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "core/random.hpp"
 #include "core/serialization.hpp"
@@ -33,24 +34,34 @@ ChunkManager::~ChunkManager()
   m_thread_pool.finalize();
 }
 
+void ChunkManager::load_or_generate(const Vector3i& position)
+{
+  if (serialization::chunk_exists(position))
+  {
+    load_sync(position);
+    return;
+  }
+  else
+  {
+    generate_sync(position, config::chunk_size);
+    return;
+  }
+}
+
 void ChunkManager::load_initial_chunks(const Vector3i& target)
 {
   const auto top_left_position = world_to_chunk(target.x - frustum.x / 2, target.y - frustum.y / 2, target.z);
 
-  for (int j = top_left_position.y; j < target.y + frustum.y / 2; j += chunk_size.y)
+  for (int j = top_left_position.y; j < target.y + frustum.y / 2; j += config::chunk_size.y)
   {
-    for (int i = top_left_position.x; i < target.x + frustum.x / 2; i += chunk_size.y)
+    for (int i = top_left_position.x; i < target.x + frustum.x / 2; i += config::chunk_size.y)
     {
-      if (i < 0 || j < 0 || target.z < 0)
-      {
-        continue;
-      }
-
       const auto& candidate = world_to_chunk(i, j, target.z);
 
       if (!is_loaded(candidate))
       {
-        load_sync(candidate);
+        // load_sync(candidate);
+        load_or_generate(candidate);
       }
     }
   }
@@ -58,28 +69,31 @@ void ChunkManager::load_initial_chunks(const Vector3i& target)
 
 void ChunkManager::update(const Vector3i& target)
 {
+  const int padding = 1;
+
   {
-    const int padding = 1;
-
     // Load visible chunks
-    const auto top_left_position = world_to_chunk(
-        target.x - frustum.x / 2 - padding * chunk_size.x, target.y - frustum.y / 2 - padding * chunk_size.y, target.z);
+    // const auto top_left_position = world_to_chunk(
+    //     target.x - frustum.x / 2 - padding * config::chunk_size.x, target.y - frustum.y / 2 - padding *
+    //     config::chunk_size.y, target.z);
+    const auto top_left_position =
+        world_to_chunk(target.x - padding * config::chunk_size.x, target.y - padding * config::chunk_size.y, target.z);
 
-    for (int j = top_left_position.y; j < target.y + frustum.y / 2 + padding * chunk_size.y; j += chunk_size.y)
+    const auto bottom_right_position = world_to_chunk(target.x + frustum.x + padding * config::chunk_size.x,
+                                                      target.y + frustum.y + padding * config::chunk_size.y,
+                                                      target.z);
+
+    for (int j = top_left_position.y; j <= bottom_right_position.y; j += config::chunk_size.y)
     {
-      for (int i = top_left_position.x; i < target.x + frustum.x / 2 + padding * chunk_size.x; i += chunk_size.y)
+      for (int i = top_left_position.x; i <= bottom_right_position.x; i += config::chunk_size.y)
       {
-        if (i < 0 || j < 0 || target.z < 0)
-        {
-          continue;
-        }
-
         const auto& candidate = world_to_chunk(i, j, target.z);
 
         if (!is_loaded(candidate))
         {
           // load_async(candidate);
-          load_sync(candidate);
+          // load_sync(candidate);
+          load_or_generate(candidate);
         }
       }
     }
@@ -89,13 +103,16 @@ void ChunkManager::update(const Vector3i& target)
     const auto target_chunk_position = world_to_chunk(target);
 
     // Activate / Deactivate chunks within a certain radius
-    activate_if([this, &target_chunk_position](const auto& chunk) {
-      return is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 2, frustum.y * 2});
-    });
+    // activate_if([this, &target_chunk_position](const auto& chunk) {
+    //   return is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 2, frustum.y * 2});
+    // });
 
     // Unload chunks within a certain radius
     std::erase_if(chunks, [this, &target_chunk_position](const auto& chunk) {
-      return !is_within_tile_distance(chunk->position, target_chunk_position, Vector2i{frustum.x * 4, frustum.y * 4});
+      return !is_within_tile_distance(
+          chunk->position,
+          target_chunk_position,
+          Vector2i{frustum.x + 2 * config::chunk_size.x, frustum.y + 2 * config::chunk_size.y});
     });
   }
 
@@ -138,7 +155,7 @@ void ChunkManager::load_async(const Vector3i& position)
 
   if (found == m_chunks_loading.end())
   {
-    m_thread_pool.queue_job([this, position, size = this->chunk_size] {
+    m_thread_pool.queue_job([this, position, size = config::chunk_size] {
       generate_async(std::ref(position), std::ref(size), std::ref(m_chunks_to_add_mutex));
     });
     m_chunks_loading.push_back(position);
@@ -147,7 +164,7 @@ void ChunkManager::load_async(const Vector3i& position)
 
 void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size, std::mutex& mutex)
 {
-  MapGenerator generator{};
+  GameChunkGenerator generator{};
   generator.set_size(size);
   generator.generate(m_seed, position);
   // auto chunk = std::make_unique<Chunk>(position, true);
@@ -164,52 +181,36 @@ void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size
 
 void ChunkManager::load_sync(const Vector3i& position)
 {
-  const auto found =
-      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const Vector3i& generating_position) {
-        return generating_position == position;
-      });
+  const auto start = std::chrono::high_resolution_clock::now();
 
-  if (found == m_chunks_loading.end())
+  auto chunk = std::make_unique<Chunk>(position, true);
+  chunk->tiles.set_size(config::chunk_size);
+  serialization::load_game_chunk(*chunk, "test2.world");
+
+  const auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  // spdlog::debug("Chunk size: {} {} {}", chunk->tiles.size.x, chunk->tiles.size.y, chunk->tiles.size.z);
+
+  // spdlog::info(
+  //     "Chunk ({}, {}, {}) loading took {} milliseconds\n\n", position.x, position.y, position.z, duration.count());
+
+  if (chunk->tiles.height_map.size() != static_cast<uint32_t>(config::chunk_size.x * config::chunk_size.y))
   {
-    // generate_sync(position, chunk_size);
-
-    const auto start = std::chrono::high_resolution_clock::now();
-
-    auto chunk = std::make_unique<Chunk>(position, true);
-    chunk->tiles.set_size(chunk_size);
-    serialization::load_chunk(*chunk, "test2.world");
-
-    const auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    spdlog::info(
-        "Chunk ({}, {}, {}) loading took {} milliseconds\n\n", position.x, position.y, position.z, duration.count());
-
-    if (chunk->tiles.height_map.size() != static_cast<uint32_t>(chunk_size.x * chunk_size.y))
-    {
-      spdlog::critical("Could not load chunk: invalid height map size");
-      return;
-    }
-
-    // spdlog::debug("Loaded chunk at: {} {} {}", position.x, position.y, position.z);
-
-    chunks.push_back(std::move(chunk));
+    spdlog::critical("Could not load chunk: invalid height map size");
+    return;
   }
+
+  chunks.push_back(std::move(chunk));
 }
 
 void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
 {
-  MapGenerator generator{};
+  GameChunkGenerator generator{};
   generator.set_size(size);
   generator.generate(m_seed, position);
-  // auto chunk = std::make_unique<Chunk>(position, true);
-  // chunk->tiles.set_size(size);
-  // chunk->tiles.values = std::move(generator.tiles);
-  // chunk->tiles.height_map = std::move(generator.height_map);
-  // chunk->tiles.compute_visibility();
+  serialization::save_game_chunk(*generator.chunk, "test2.world");
   chunks.push_back(std::move(generator.chunk));
 }
-
-void ChunkManager::set_chunk_size(const Vector3i& chunk_size) { this->chunk_size = chunk_size; }
 
 void ChunkManager::set_frustum(const Vector2i& frustum) { this->frustum = frustum; }
 
@@ -255,9 +256,9 @@ Chunk& ChunkManager::in(const Vector3i& position) const { return in(position.x, 
 
 Vector3i ChunkManager::world_to_chunk(const int x, const int y, const int z) const
 {
-  return Vector3i{std::floor(x / static_cast<float>(chunk_size.x)) * chunk_size.x,
-                  std::floor(y / static_cast<float>(chunk_size.y)) * chunk_size.y,
-                  std::floor(z / static_cast<float>(chunk_size.z)) * chunk_size.z};
+  return Vector3i{std::floor(x / static_cast<float>(config::chunk_size.x)) * config::chunk_size.x,
+                  std::floor(y / static_cast<float>(config::chunk_size.y)) * config::chunk_size.y,
+                  std::floor(z / static_cast<float>(config::chunk_size.z)) * config::chunk_size.z};
 }
 
 Vector3i ChunkManager::world_to_chunk(const Vector3i& position) const
@@ -280,9 +281,9 @@ bool ChunkManager::is_within_tile_distance(const Vector3i& origin,
 
 bool ChunkManager::is_within_chunk_radius(const Vector3i& origin, const Vector3i& target, const int radius) const
 {
-  return std::abs(origin.x - target.x) <= radius * chunk_size.x &&
-         std::abs(origin.y - target.y) <= radius * chunk_size.y &&
-         std::abs(origin.z - target.z) <= radius * chunk_size.z;
+  return std::abs(origin.x - target.x) <= radius * config::chunk_size.x &&
+         std::abs(origin.y - target.y) <= radius * config::chunk_size.y &&
+         std::abs(origin.z - target.z) <= radius * config::chunk_size.z;
 }
 
 void ChunkManager::activate_if(const std::function<bool(const std::unique_ptr<Chunk>&)>& condition)

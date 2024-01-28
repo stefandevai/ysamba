@@ -71,6 +71,7 @@ find_package(freetype CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(implot CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -90,6 +91,7 @@ target_link_libraries(
         EnTT::EnTT
         nlohmann_json::nlohmann_json
         freetype
+        fmt::fmt
         spdlog::spdlog
         imgui::imgui
         implot::implot
