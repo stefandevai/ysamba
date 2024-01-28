@@ -56,8 +56,6 @@ class World
  public:
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
-  /* Grid3D tiles{}; */
-  /* Grid3D over_tiles{}; */
   ChunkManager chunk_manager{};
   std::unordered_map<uint32_t, TileData> tile_data;
   std::unordered_map<uint32_t, ItemData> item_data;

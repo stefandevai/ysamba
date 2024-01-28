@@ -87,17 +87,11 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
-  // TODO: Add event emmiter on camera class to notify when it is dirty
-  /* if (m_camera.dirty) */
-  /* { */
-  /* } */
+  // TODO: Add event emmiter on camera class to notify when it is dirty and update the chunk manager only when needed
   m_camera.update(delta);
   const auto& camera_position = m_camera.get_position_in_tiles();
-  const auto& camera_size = m_camera.get_size_in_tiles();
-  // m_world.chunk_manager.update({camera_position.x + camera_size.x / 2, camera_position.y + camera_size.y / 2, 0});
   m_world.chunk_manager.update({camera_position.x, camera_position.y, 0});
 
-  /* const auto& mouse_position = m_input_manager.get_mouse_tile_position(m_camera); */
   if (m_current_state == State::PLAYING)
   {
     if (m_turn_delay > 0.0)

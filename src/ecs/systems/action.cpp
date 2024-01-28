@@ -23,16 +23,9 @@
 namespace dl
 {
 const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
-    {0, "Harvest"}, {1, "Break"}, {2, "Dig"},
-    /* {0, "Harvest"}, */
-    /* {1, "Break"}, */
-    /* {2, "Dig"}, */
-    /* {0, "Harvest"}, */
-    /* {1, "Break"}, */
-    /* {2, "Dig"}, */
-    /* {0, "Harvest"}, */
-    /* {1, "Break"}, */
-    /* {2, "Dig"}, */
+    {0, "Harvest"},
+    {1, "Break"},
+    {2, "Dig"},
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
@@ -340,23 +333,6 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
     }
     m_dispose();
   }
-}
-
-void ActionSystem::m_select_item_target(const Vector2i& tile_position, const JobType job_type, entt::registry& registry)
-{
-  const auto item = m_world.spatial_hash.get_by_component<Item>(tile_position.x, tile_position.y, registry);
-
-  if (!registry.valid(item))
-  {
-    return;
-  }
-
-  for (const auto entity : m_selected_entities)
-  {
-    // m_create_job(job_type, static_cast<uint32_t>(item), tile_position, registry, entity);
-  }
-
-  m_dispose();
 }
 
 void ActionSystem::m_create_job(
