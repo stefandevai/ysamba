@@ -1,12 +1,12 @@
 {
     "mask": {
         "octaves": 4,
-        "frequency": 0.005,
-        "lacunarity": 3.0,
+        "frequency": 0.016,
+        "lacunarity": 3.2,
         "gain": 0.32,
         "weighted_strength": 0.25,
-        "noise_string": "DQAEAAAAzcxMQCkAAArXoz4AAACAPg==",
-        "tier_land": 0.4,
+        "noise_string": "FwAAAIC/AACAPwAAAAAAAIA/IgB7FK4+AAAAABoAAQ0ABAAAAM3MTEApAAAK16M+AAAAgD4BBQABAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        "tier_land": 0.1,
         "distance_k": 1.0,
         "distance_influence": 4.0,
         "display_mask": true

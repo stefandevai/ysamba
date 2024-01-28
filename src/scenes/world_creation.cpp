@@ -214,16 +214,16 @@ void WorldCreation::m_create_world_representation()
   /* m_world_sprite->texture = texture; */
 }
 
-const int hm_width = 512;
-const int hm_height = 512;
-const int hm_depth = 10;
+const int hm_width = 256;
+const int hm_height = 256;
+const int hm_depth = 30;
 
 void WorldCreation::m_generate_height_map(const int seed)
 {
   (void)seed;
 
-  const auto s = random::get_integer(1, INT_MAX);
-  // const auto s = 1334;
+  // const auto s = random::get_integer(1, INT_MAX);
+  const auto s = 1334;
   auto generator = IslandGenerator(hm_width, hm_width, hm_depth);
   m_height_map.clear();
   m_height_map.reserve(hm_width * hm_height);
@@ -244,6 +244,7 @@ void WorldCreation::m_create_height_map_representation()
       const auto map_value = m_height_map[j * hm_width + i];
       const int z = static_cast<int>(map_value * z_levels);
       const uint8_t value = z * 255 / z_levels;
+      // const uint8_t value = map_value * 255;
 
       pixel_data[j * hm_width * 4 + i * 4] = 0;
       pixel_data[j * hm_width * 4 + i * 4 + 1] = value;

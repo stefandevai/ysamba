@@ -37,7 +37,7 @@ void Gameplay::load()
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
   const auto seed = random::get_integer(0, 100000);
-  m_world.generate(256, 256, 32, seed);
+  m_world.generate(128, 128, 3, seed);
   /* m_world.load("./data/world/test_map.json"); */
   /* load_game(); */
 
@@ -47,10 +47,10 @@ void Gameplay::load()
 
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
-  m_world.generate_societies();
-  auto society_blueprint = m_world.get_society("otomi"_hs);
-  auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  // m_world.generate_societies();
+  // auto society_blueprint = m_world.get_society("otomi"_hs);
+  // auto components = SocietyGenerator::generate_members(society_blueprint);
+  // SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();

@@ -54,11 +54,7 @@ void IslandGenerator::generate(const int seed)
   {
     for (auto i = 0; i < width * height; ++i)
     {
-      if (main_island.mask[i] == TerrainType::Land)
-      {
-        raw_height_map[i] = 1.0f;
-      }
-      else
+      if (main_island.mask[i] != TerrainType::Land)
       {
         raw_height_map[i] = 0.0f;
       }
@@ -93,14 +89,23 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 
 void IslandGenerator::m_get_height_map(const int seed)
 {
+  // 2 noises (1)
+  // HQAXAAAAgL8AAIA/AAAAAAAAgD8iAHsUrj4AAAAAGgABDQAEAAAAzcxMQCkAAArXoz4AAACAPgEFAAEAAAAAAAAAAAAAAAAAAAAAAAAAARcAAACAvwAAgD8AAAAAAACAPyEAIgCF64FAAAAAAP//AwAWAAcAAAApAAAAAAA/
+  // 2 noises (2)
+  // HQAXAAAAgL8AAIA/AAAAAK5HAUEiAHsUrj4AAAAAGgABDQAEAAAAzcxMQCkAAArXoz4AAACAPgEFAAEAAAAAAAAAAAAAAAAAAAAAAAAAASAAIQD//wMADQAEAAAA4XoUQBYABwAAACkAAAAAAD8ACtcjvgCamRk/AHsULr8ArkfhPw==
+  // 2 noises (3)
+  // HQAXAAAAgL8AAIA/AAAAAK5HAUEiAHsUrj4AAAAAGgABDQAEAAAAzcxMQCkAAArXoz4AAACAPgEFAAEAAAAAAAAAAAAAAAAAAAAAAAAAASAAIQD//wMADQAEAAAAj8K1PxYABwAAACkAAM3MjD8APQrXPgBSuB4/AHsULr8ArkfhPw==
+
   // FastNoise::SmartNode<> generator =
   //   FastNoise::NewFromEncodedNodeTree(island_params.noise_string.c_str());
-  // generator->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, island_params.frequency, seed);
+  // generator->GenUniformGrid2D(raw_height_map.data(), width/-2, height/-2, width, height, island_params.frequency,
+  // seed);
 
   const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
   const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
-  // const auto& distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
-  // const auto& subtract = FastNoise::New<FastNoise::Subtract>();
+  const auto& distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
+  const auto& subtract = FastNoise::New<FastNoise::Subtract>();
+  const auto& terrace = FastNoise::New<FastNoise::Terrace>();
 
   fractal->SetSource(simplex);
   fractal->SetOctaveCount(island_params.octaves);
@@ -108,33 +113,73 @@ void IslandGenerator::m_get_height_map(const int seed)
   fractal->SetGain(island_params.gain);
   fractal->SetWeightedStrength(island_params.weighted_strength);
 
-  fractal->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, island_params.frequency, seed);
+  // fractal->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, island_params.frequency, seed);
 
-  // distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
+  distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
   // distance_to_point->SetScale<FastNoise::Dim::X>(2.0f);
   // distance_to_point->SetScale<FastNoise::Dim::Y>(2.0f);
   //
-  // subtract->SetLHS(fractal);
-  // subtract->SetRHS(distance_to_point);
-  //
-  // subtract->GenUniformGrid2D(raw_height_map.data(), 0, 0, width, height, island_params.frequency, seed);
+  subtract->SetLHS(fractal);
+  subtract->SetRHS(distance_to_point);
+
+  terrace->SetMultiplier(0.34f);
+  terrace->SetSource(subtract);
+
+  const auto& remap = FastNoise::New<FastNoise::Remap>();
+  remap->SetSource(terrace);
+  remap->SetRemap(-1.0f, 1.0f, 0.0f, 8.08f);
+
+  // Second noise
+  const auto& simplex2 = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto& seed_offset = FastNoise::New<FastNoise::SeedOffset>();
+  const auto& fractal2 = FastNoise::New<FastNoise::FractalFBm>();
+  const auto& fade = FastNoise::New<FastNoise::Fade>();
+  const auto& max_smooth = FastNoise::New<FastNoise::MaxSmooth>();
+
+  seed_offset->SetSource(simplex2);
+  seed_offset->SetOffset(7);
+  fractal2->SetSource(seed_offset);
+  fractal2->SetOctaveCount(4);
+  fractal2->SetLacunarity(1.42f);
+  fractal2->SetGain(1.1f);
+  fractal2->SetWeightedStrength(0.42);
+
+  fade->SetA(subtract);
+  fade->SetB(fractal2);
+  fade->SetFade(0.62f);
+
+  max_smooth->SetLHS(fade);
+  max_smooth->SetRHS(-0.68f);
+  max_smooth->SetSmoothness(1.76f);
+
+  const auto& min = FastNoise::New<FastNoise::Min>();
+
+  min->SetLHS(remap);
+  min->SetRHS(max_smooth);
+
+  const auto& remap2 = FastNoise::New<FastNoise::Remap>();
+  remap2->SetSource(min);
+  remap2->SetRemap(-1.0f, 1.0f, 0.0f, 1.00f);
+
+  remap2->GenUniformGrid2D(
+      raw_height_map.data(), width / -2, height / -2, width, height, island_params.frequency, seed);
 
   for (int j = 0; j < height; ++j)
   {
     for (int i = 0; i < width; ++i)
     {
       const auto array_index = j * width + i;
-      const auto gradient = m_get_rectangle_gradient_value(i, j);
+      // const auto gradient = m_get_rectangle_gradient_value(i, j);
 
-      raw_height_map[array_index] = raw_height_map[array_index] * 0.5f + 0.5f;
-      raw_height_map[array_index] = raw_height_map[array_index] + gradient;
+      // raw_height_map[array_index] = raw_height_map[array_index] - gradient;
+      // raw_height_map[array_index] = raw_height_map[array_index] * 0.5f + 0.5f;
 
       // raw_height_map[array_index] = gradient;
 
       raw_height_map[array_index] = std::min(raw_height_map[array_index], 1.0f);
       raw_height_map[array_index] = std::max(raw_height_map[array_index], 0.0f);
 
-      if (raw_height_map[array_index] < island_params.tier_land)
+      if (raw_height_map[array_index] > island_params.tier_land)
       {
         island_mask[array_index] = 2;
       }
@@ -188,6 +233,8 @@ double IslandGenerator::m_get_rectangle_gradient_value(const int x, const int y)
   const auto center = Vector2(width / 2.0, height / 2.0);
   const auto distance_squared = std::pow((x - center.x) / width, 2.0) + std::pow((y - center.y) / height, 2.0);
 
+  return distance_squared;
+
   // auto distance_to_edge = std::min(abs(x - width), x);
   // distance_to_edge = std::min(distance_to_edge, abs(y - height));
   // distance_to_edge = std::min(distance_to_edge, y) * 2;
@@ -195,7 +242,7 @@ double IslandGenerator::m_get_rectangle_gradient_value(const int x, const int y)
 
   // return distance_squared * island_params.distance_influence;
   // return distance_squared * distance_squared;
-  return std::pow(distance_squared, island_params.distance_k) * island_params.distance_influence * 2.0 - 1.0;
+  // return std::pow(distance_squared, island_params.distance_k) * island_params.distance_influence * 2.0 - 1.0;
 }
 
 void IslandGenerator::m_flood_fill(const int value, const int x, const int y, std::vector<int>& tiles)
