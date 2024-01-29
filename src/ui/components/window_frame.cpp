@@ -10,6 +10,7 @@ WindowFrame::WindowFrame(UIContext& context) : UIComponent(context) {}
 
 void WindowFrame::init()
 {
+  spdlog::debug("HREEEEEEEEEEEEEE");
   nine_patch.resource_id = "ui";
   nine_patch.texture = m_context.asset_manager->get<Texture>("ui");
   nine_patch.top = 0;
@@ -19,6 +20,8 @@ void WindowFrame::init()
   nine_patch.border = 16;
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;
+
+  assert(nine_patch.texture != nullptr && "Nine patch texture is null");
 }
 
 void WindowFrame::render(Batch& batch)

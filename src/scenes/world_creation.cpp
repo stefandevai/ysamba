@@ -86,7 +86,7 @@ void WorldCreation::save_world()
 {
   WorldMetadata metadata{};
   metadata.id = utils::generate_id();
-  metadata.name = "Tulancingo";
+  metadata.name = "Agua Blanca";
   metadata.seed = m_seed;
 
   serialization::save_world_metadata(metadata);

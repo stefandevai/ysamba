@@ -11,6 +11,7 @@
 #include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
+#include "world/metadata.hpp"
 
 namespace dl::ui
 {
@@ -72,4 +73,5 @@ void ScrollableList<T>::reset_scroll()
 template class ScrollableList<uint32_t>;
 template class ScrollableList<entt::entity>;
 template class ScrollableList<std::pair<entt::entity, entt::entity>>;
+template class ScrollableList<WorldMetadata>;
 }  // namespace dl::ui

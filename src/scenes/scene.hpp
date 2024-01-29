@@ -6,6 +6,7 @@
 #include "core/json.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/renderer.hpp"
+#include "ui/ui_manager.hpp"
 
 namespace dl
 {
@@ -33,6 +34,7 @@ class Scene
   JSON m_json{};
   Renderer m_renderer{*m_game_context.asset_manager};
   Camera m_camera{*m_game_context.display};
+  ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer};
   bool m_has_loaded = false;
 };
 }  // namespace dl

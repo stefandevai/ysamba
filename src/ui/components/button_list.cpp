@@ -9,6 +9,7 @@
 #include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
+#include "world/metadata.hpp"
 
 namespace dl::ui
 {
@@ -81,4 +82,5 @@ void ButtonList<T>::set_on_select(const std::function<void(const T)>& on_select)
 template class ButtonList<uint32_t>;
 template class ButtonList<entt::entity>;
 template class ButtonList<std::pair<entt::entity, entt::entity>>;
+template class ButtonList<WorldMetadata>;
 }  // namespace dl::ui
