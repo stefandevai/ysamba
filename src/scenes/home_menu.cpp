@@ -72,7 +72,6 @@ void HomeMenu::update()
     {
       if (candidate.is_directory())
       {
-        spdlog::debug("Loading world metadata from {}", candidate.path().filename().string());
         const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
         worlds_metadata.push_back({world_metadata, world_metadata.name});
       }
@@ -80,17 +79,6 @@ void HomeMenu::update()
 
     m_world_list->set_actions(worlds_metadata);
     m_world_list->show();
-
-    // std::vector<WorldMetadata> worlds_metadata = load_worlds_metadata();
-    // std::vector<string> world_names;
-    //
-    // for (const auto& world_metadata : worlds_metadata)
-    // {
-    //   world_names.push_back(world_metadata.name);
-    // }
-
-    // m_game_context.world_metadata = serialization::load_world_metadata("c253100c-43a0-ecea-354b-14ccedf7c40c");
-    // m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   }
   else if (m_input_manager.poll_action("create_world"_hs))
   {
