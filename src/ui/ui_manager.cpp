@@ -49,4 +49,15 @@ void UIManager::render()
   }
 }
 
+void UIManager::force_hide_all()
+{
+  for (auto& component : m_components)
+  {
+    if (component->state != UIComponent::State::Hidden)
+    {
+      component->state = UIComponent::State::Hidden;
+    }
+  }
+}
+
 }  // namespace dl::ui

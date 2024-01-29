@@ -38,7 +38,7 @@ void HomeMenu::load()
 
   m_world_list = m_ui_manager.emplace<ui::WorldList>();
   const auto on_select_world = [this](const WorldMetadata& world_metadata) {
-    m_world_list->hide();
+    m_ui_manager.force_hide_all();
     m_game_context.world_metadata = world_metadata;
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   };

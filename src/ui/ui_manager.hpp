@@ -42,6 +42,7 @@ class UIManager
 
   void update();
   void render();
+  void force_hide_all();
 
  private:
   AssetManager* m_asset_manager = nullptr;
