@@ -6,38 +6,28 @@
             "type": "shader",
             "path": "shaders/default"
         },
-
-        {
-            "id": "tileset",
-            "type": "texture",
-            "path": "textures/tileset.png",
-            "textureType": "diffuse"
-        },
         {
             "id": "ui",
             "type": "texture",
-            "path": "textures/ui.png",
-            "textureType": "diffuse"
+            "path": "textures/ui.png"
         },
         {
             "id": "spritesheet-tileset",
             "type": "texture-atlas",
             "path": "textures/tileset.png",
-            "textureType": "diffuse",
             "uniform": true,
-            "horizontalFrames": 32,
-            "verticalFrames": 32,
-            "data_filepath": "./data/textures/tileset3.json"
+            "horizontal_frames": 32,
+            "vertical_frames": 32,
+            "data_filepath": "./data/textures/tileset.json"
         },
 
         {
             "id": "spritesheet-characters",
             "type": "texture-atlas",
             "path": "textures/characters.png",
-            "textureType": "diffuse",
             "uniform": true,
-            "horizontalFrames": 32,
-            "verticalFrames": 32
+            "horizontal_frames": 32,
+            "vertical_frames": 32
         },
 
         {

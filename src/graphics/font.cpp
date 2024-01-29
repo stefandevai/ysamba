@@ -44,7 +44,7 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_
   m_atlas_width = atlas_width;
   m_atlas_height = atlas_height;
 
-  m_texture_atlas = std::make_shared<Texture>(atlas_width, atlas_height, TextureType::DIFFUSE);
+  m_texture_atlas = std::make_shared<Texture>(atlas_width, atlas_height);
 
   int x_offset = 0;
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

@@ -14,18 +14,11 @@ extern "C"
 namespace dl
 {
 // Load single texture
-Texture::Texture(const std::string& filepath, const TextureType type)
-    : m_type(type), m_horizontal_frames(1), m_vertical_frames(1)
-{
-  load(filepath);
-}
+Texture::Texture(const std::string& filepath) : m_horizontal_frames(1), m_vertical_frames(1) { load(filepath); }
 
 // Load uniform texture atlas
-Texture::Texture(const std::string& filepath,
-                 const TextureType type,
-                 const int horizontal_frames,
-                 const int vertical_frames)
-    : m_type(type), m_horizontal_frames(horizontal_frames), m_vertical_frames(vertical_frames)
+Texture::Texture(const std::string& filepath, const int horizontal_frames, const int vertical_frames)
+    : m_horizontal_frames(horizontal_frames), m_vertical_frames(vertical_frames)
 {
   load(filepath);
 }
@@ -37,8 +30,8 @@ Texture::Texture(const std::vector<unsigned char>& data, const int width, const 
   load(data.data(), width, height, GL_RGBA);
 }
 
-Texture::Texture(const int width, const int height, const TextureType type)
-    : m_type(type), m_horizontal_frames(1), m_vertical_frames(1), m_width(width), m_height(height)
+Texture::Texture(const int width, const int height)
+    : m_horizontal_frames(1), m_vertical_frames(1), m_width(width), m_height(height)
 {
   m_load_empty();
 }

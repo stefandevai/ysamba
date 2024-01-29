@@ -10,13 +10,6 @@
 
 namespace dl
 {
-enum class TextureType
-{
-  DIFFUSE,
-  SPECULAR,
-  NORMAL,
-};
-
 enum class FrameAngle
 {
   Parallel,
@@ -48,11 +41,11 @@ class Texture : public Asset
 {
  public:
   // Create single texture
-  Texture(const std::string& filepath, const TextureType type);
+  Texture(const std::string& filepath);
   // Create uniform texture atlas
-  Texture(const std::string& filepath, const TextureType type, const int horizontal_frames, const int vertical_frames);
+  Texture(const std::string& filepath, const int horizontal_frames, const int vertical_frames);
   // Create empty texture in order to load it later
-  Texture(const int width, const int height, const TextureType type);
+  Texture(const int width, const int height);
   // Create texture providing raw data
   Texture(const std::vector<unsigned char>& data, const int width, const int height);
   ~Texture();
@@ -66,7 +59,6 @@ class Texture : public Asset
   inline int get_height() const { return m_height; }
   inline int get_horizontal_frames() const { return m_horizontal_frames; }
   inline int get_vertical_frames() const { return m_vertical_frames; }
-  inline TextureType get_type() const { return m_type; }
   // TODO: Implement irregular frame calculations
   float get_frame_width() const;
   float get_frame_height() const;
@@ -93,7 +85,6 @@ class Texture : public Asset
 
   JSON m_json{};
   FrameDataMap m_frame_data;
-  const TextureType m_type = TextureType::DIFFUSE;
   const int m_horizontal_frames;
   const int m_vertical_frames;
   unsigned int m_id = 0;

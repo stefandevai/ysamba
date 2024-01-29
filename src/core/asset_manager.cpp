@@ -71,11 +71,7 @@ void AssetManager::m_init_assets()
     case AssetType::TEXTURE:
     {
       const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      // TODO: Parse all texture types
-      // const auto texture_type = asset_info["textureType"].get<std::string>();
-      const auto texture_type = TextureType::DIFFUSE;
-
-      add<TextureLoader>(id, filepath, texture_type);
+      add<TextureLoader>(id, filepath);
     }
     break;
 
@@ -89,20 +85,17 @@ void AssetManager::m_init_assets()
     case AssetType::TEXTURE_ATLAS:
     {
       const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      // TODO: Parse all texture types
-      const auto texture_type = TextureType::DIFFUSE;
-
       const auto horizontal_frames = asset_info[ASSET_PARAMETER_HORIZONTAL_FRAMES].get<int>();
       const auto vertical_frames = asset_info[ASSET_PARAMETER_VERTICAL_FRAMES].get<int>();
 
       if (asset_info.contains(ASSET_PARAMETER_DATA_FILEPATH))
       {
         const auto data_filepath = asset_info[ASSET_PARAMETER_DATA_FILEPATH].get<std::string>();
-        add<TextureLoader>(id, filepath, texture_type, horizontal_frames, vertical_frames, data_filepath);
+        add<TextureLoader>(id, filepath, horizontal_frames, vertical_frames, data_filepath);
         break;
       }
 
-      add<TextureLoader>(id, filepath, texture_type, horizontal_frames, vertical_frames);
+      add<TextureLoader>(id, filepath, horizontal_frames, vertical_frames);
     }
     break;
 

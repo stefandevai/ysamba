@@ -46,12 +46,12 @@ void Gameplay::load()
   m_camera.set_zoom(default_zoom);
   m_camera.update_dirty();
 
-  // m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
+  m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
-  // m_world.generate_societies();
-  // auto society_blueprint = m_world.get_society("otomi"_hs);
-  // auto components = SocietyGenerator::generate_members(society_blueprint);
-  // SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  m_world.generate_societies();
+  auto society_blueprint = m_world.get_society("otomi"_hs);
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();
