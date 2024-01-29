@@ -10,10 +10,12 @@
 #include "core/random.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
+#include "core/utils.hpp"
 #include "graphics/color.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/texture.hpp"
 #include "world/generators/island_generator.hpp"
+#include "world/metadata.hpp"
 
 namespace dl
 {
@@ -57,23 +59,13 @@ void WorldCreation::update()
     m_generate_map();
     m_create_map_representation();
   }
-  else if (m_input_manager.poll_action("reload_world"_hs))
-  {
-    m_generate_map();
-    m_create_map_representation();
-  }
   else if (m_input_manager.poll_action("save_world"_hs))
   {
     save_world();
   }
-  else if (m_input_manager.poll_action("load_world"_hs))
-  {
-    load_world();
-    m_create_map_representation();
-  }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {
-    spdlog::info("SEED: {}", m_world.get_seed());
+    spdlog::info("SEED: {}", m_seed);
   }
 }
 
@@ -90,12 +82,18 @@ void WorldCreation::render()
   m_batch.pop_matrix();
 }
 
-void WorldCreation::save_world() { serialization::save_world(m_world); }
-
-void WorldCreation::load_world()
+void WorldCreation::save_world()
 {
-  serialization::load_world(m_world);
-  m_has_loaded = true;
+  WorldMetadata metadata{};
+  metadata.id = utils::generate_id();
+  metadata.name = "Tulancingo";
+  metadata.seed = m_seed;
+
+  serialization::save_world_metadata(metadata);
+
+  spdlog::debug("World saved: {}", metadata.name);
+  spdlog::debug("Seed: {}", metadata.seed);
+  spdlog::debug("Id: {}", metadata.id);
 }
 
 void WorldCreation::m_generate_map()
@@ -105,7 +103,6 @@ void WorldCreation::m_generate_map()
 
   const auto& json = m_json.object;
   bool use_random_seed = true;
-  int seed = 0;
 
   if (json.contains("random_seed"))
   {
@@ -114,17 +111,17 @@ void WorldCreation::m_generate_map()
 
   if (!use_random_seed && json.contains("seed"))
   {
-    seed = json["seed"].get<int>();
+    m_seed = json["seed"].get<int>();
   }
   else
   {
-    seed = random::get_integer(1, INT_MAX);
+    m_seed = random::get_integer(1, INT_MAX);
   }
 
   auto generator = IslandGenerator(world_size);
   m_height_map.clear();
   m_height_map.reserve(world_size.x * world_size.y);
-  generator.generate(seed);
+  generator.generate(m_seed);
   m_height_map = std::move(generator.raw_height_map);
 }
 

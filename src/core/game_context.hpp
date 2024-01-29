@@ -2,6 +2,7 @@
 
 #include "./asset_manager.hpp"
 #include "./clock.hpp"
+#include "world/metadata.hpp"
 
 namespace dl
 {
@@ -17,5 +18,6 @@ struct GameContext
   Camera* camera;
   SceneManager* scene_manager;
   Clock* clock;
+  WorldMetadata world_metadata;
 };
 }  // namespace dl

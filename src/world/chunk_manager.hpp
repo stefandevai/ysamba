@@ -10,6 +10,8 @@
 
 namespace dl
 {
+struct GameContext;
+
 class ChunkManager
 {
  public:
@@ -19,7 +21,7 @@ class ChunkManager
 
   static Chunk null;
 
-  ChunkManager();
+  ChunkManager(GameContext& game_context);
   ~ChunkManager();
 
   // Update chunks based on a tile position
@@ -50,6 +52,7 @@ class ChunkManager
   void activate_if(const std::function<bool(const std::unique_ptr<Chunk>&)>& condition);
 
  private:
+  GameContext& m_game_context;
   std::vector<Vector3i> m_chunks_loading{};
   std::vector<std::unique_ptr<Chunk>> m_chunks_to_add{};
   static std::mutex m_chunks_to_add_mutex;

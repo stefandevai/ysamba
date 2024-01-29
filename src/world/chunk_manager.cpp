@@ -7,6 +7,7 @@
 
 #include "./generators/game_chunk_generator.hpp"
 #include "config.hpp"
+#include "core/game_context.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "core/random.hpp"
 #include "core/serialization.hpp"
@@ -20,9 +21,9 @@ namespace dl
 Chunk ChunkManager::null = Chunk{};
 std::mutex ChunkManager::m_chunks_to_add_mutex = std::mutex{};
 
-ChunkManager::ChunkManager()
+ChunkManager::ChunkManager(GameContext& game_context) : m_game_context(game_context)
 {
-  m_seed = random::get_integer(0, 10000);
+  m_seed = m_game_context.world_metadata.seed;
   m_thread_pool.initialize();
 }
 
@@ -36,7 +37,9 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::load_or_generate(const Vector3i& position)
 {
-  if (serialization::chunk_exists(position, "test_world"))
+  assert(m_game_context.world_metadata.id != "" && "World metadata id should be set before loading chunks");
+
+  if (serialization::chunk_exists(position, m_game_context.world_metadata.id))
   {
     load_sync(position);
     return;
@@ -186,7 +189,7 @@ void ChunkManager::load_sync(const Vector3i& position)
 
   auto chunk = std::make_unique<Chunk>(position, true);
   chunk->tiles.set_size(config::chunk_size);
-  serialization::load_game_chunk(*chunk, "test_world");
+  serialization::load_game_chunk(*chunk, m_game_context.world_metadata.id);
 
   // spdlog::debug("Chunk size: {} {} {}", chunk->tiles.size.x, chunk->tiles.size.y, chunk->tiles.size.z);
   // timer.stop();
@@ -206,7 +209,7 @@ void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
   GameChunkGenerator generator{};
   generator.set_size(size);
   generator.generate(m_seed, position);
-  serialization::save_game_chunk(*generator.chunk, "test_world");
+  serialization::save_game_chunk(*generator.chunk, m_game_context.world_metadata.id);
   chunks.push_back(std::move(generator.chunk));
 }
 

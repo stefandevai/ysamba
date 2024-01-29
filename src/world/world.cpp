@@ -33,129 +33,19 @@ World::World(GameContext& game_context) : m_game_context(game_context)
   const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
   spatial_hash.load(config::chunk_size.x, config::chunk_size.y, spatial_hash_cell_size);
 
+  spdlog::debug("Loading world \"{}\"", m_game_context.world_metadata.name);
+  spdlog::debug("Seed: {}", m_game_context.world_metadata.seed);
+  spdlog::debug("Id: {}", m_game_context.world_metadata.id);
+
   TileRules::load();
   m_load_tile_data();
   m_load_item_data();
-}
-
-void World::generate(const int width, const int height, const int depth, const int seed)
-{
-  (void)width;
-  (void)height;
-  (void)depth;
-  (void)seed;
-  // GameChunkGenerator generator{};
-  // generator.set_size({width, height, depth});
-
-  // generator.generate(seed, {0 * config::chunk_size.x, 0 * config::chunk_size.y, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-
-  // generator.generate(seed, {1 * 32, 0 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {2 * 32, 0 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {2 * 32, 0 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {0 * 32, 2 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {1 * 32, 1 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {2 * 32, 1 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {1 * 32, 2 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-  //
-  // generator.generate(seed, {2 * 32, 2 * 32, 0});
-  // serialization::save_game_chunk(*generator.chunk, "test2.world");
-
-  /* m_seed = seed; */
-
-  /* tiles.set_size(width, height, 10); */
-  /* over_tiles.set_size(width, height, 10); */
-
-  /* auto map_generator = MapGenerator(tiles.size.x, tiles.size.y, tiles.size.z); */
-  /* map_generator.generate(m_seed); */
-
-  /* tiles.values = std::move(map_generator.tiles); */
-  /* tiles.height_map = std::move(map_generator.height_map); */
-
-  /* tiles.compute_visibility(); */
-
-  /* over_tiles.values.resize(tiles.size.x * tiles.size.y * tiles.size.z); */
-  /* /1* auto tilemap_generator = TerrainGenerator(width, height); *1/ */
-  /* /1* auto tilemap_generator = DummyGenerator(width, height); *1/ */
 }
 
 void World::generate_societies()
 {
   auto society = SocietyGenerator::generate_blueprint();
   m_societies[society.id] = std::move(society);
-}
-
-void World::load(const std::string& filepath)
-{
-  // TODO: Implement world generation instead of current infinite generation
-  (void)filepath;
-  /* auto society = SocietyGenerator::generate_blueprint(); */
-  /* m_societies[society.id] = society; */
-
-  /* m_json.load(filepath); */
-  /* const auto& layers = m_json.object["layers"].get<std::vector<nlohmann::json>>(); */
-
-  /* const auto width = m_json.object["width"].get<int>(); */
-  /* const auto height = m_json.object["height"].get<int>(); */
-  /* const auto depth = layers.size(); */
-
-  /* tiles.set_size(width, height, depth); */
-  /* over_tiles.set_size(width, height, depth); */
-
-  /* tiles.values.clear(); */
-  /* tiles.values.reserve(tiles.size.x * tiles.size.y * tiles.size.z); */
-
-  /* over_tiles.values.clear(); */
-  /* over_tiles.values.reserve(tiles.size.x * tiles.size.y * tiles.size.z); */
-
-  /* tiles.height_map.clear(); */
-  /* tiles.height_map.resize(tiles.size.x * tiles.size.y); */
-
-  /* for (std::size_t z = 0; z < layers.size(); ++z) */
-  /* { */
-  /*   const auto terrain_data = layers[z]["terrain"].get<std::vector<uint32_t>>(); */
-  /*   const auto decoration_data = layers[z]["decoration"].get<std::vector<uint32_t>>(); */
-
-  /*   for (auto j = 0; j < tiles.size.y; ++j) */
-  /*   { */
-  /*     for (auto i = 0; i < tiles.size.x; ++i) */
-  /*     { */
-  /*       Cell cell{}; */
-  /*       cell.terrain = terrain_data[i + j * tiles.size.x]; */
-
-  /*       tiles.values[i + j * tiles.size.x + z * tiles.size.x * tiles.size.y] = std::move(cell); */
-
-  /*       if (tiles.terrain_at(i, j, z) != 0) */
-  /*       { */
-  /*         tiles.height_map[i + j * tiles.size.x] = */
-  /*             std::max(static_cast<int>(z), tiles.height_map[i + j * tiles.size.x]); */
-  /*       } */
-  /*     } */
-  /*   } */
-
-  /*   for (auto j = 0; j < tiles.size.y; ++j) */
-  /*   { */
-  /*     for (auto i = 0; i < tiles.size.x; ++i) */
-  /*     { */
-  /*       over_tiles.set(decoration_data[i + j * tiles.size.x], i, j, z); */
-  /*     } */
-  /*   } */
-  /* } */
-
-  /* tiles.compute_visibility(); */
 }
 
 void World::set_terrain(const uint32_t tile_id, const int x, const int y, const int z)

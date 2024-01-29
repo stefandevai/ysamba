@@ -55,11 +55,52 @@ void initialize_directories()
   }
   else if (!std::filesystem::is_directory(config::data_directory))
   {
-    spdlog::critical("dl_data is not a directory");
+    spdlog::critical("{} is not a directory", config::data_directory.c_str());
+  }
+
+  if (!std::filesystem::exists(config::worlds_directory))
+  {
+    std::filesystem::create_directory(config::worlds_directory);
+  }
+  else if (!std::filesystem::is_directory(config::worlds_directory))
+  {
+    spdlog::critical("{} is not a directory", config::worlds_directory.c_str());
   }
 }
 
-void save_world(World& world)
+void save_world_metadata(const WorldMetadata& metadata)
+{
+  const auto world_directory = config::worlds_directory / metadata.id;
+
+  if (!std::filesystem::exists(world_directory))
+  {
+    std::filesystem::create_directory(world_directory);
+  }
+
+  std::ofstream output{world_directory / ".metadata"};
+  cereal::JSONOutputArchive archive{output};
+  archive(metadata);
+}
+
+WorldMetadata load_world_metadata(const std::string& id)
+{
+  const auto world_directory = config::worlds_directory / id;
+
+  if (!std::filesystem::exists(world_directory))
+  {
+    std::filesystem::create_directory(world_directory);
+  }
+
+  std::ifstream input{world_directory / ".metadata"};
+  cereal::JSONInputArchive archive{input};
+
+  WorldMetadata metadata{};
+  archive(metadata);
+
+  return metadata;
+}
+
+void save_world(const World& world)
 {
   std::ofstream output{"world.dl"};
   cereal::BinaryOutputArchive archive{output};
@@ -125,13 +166,13 @@ bool chunk_exists(const Vector3i& position, const std::string& world_id)
          position.z % config::chunk_size.z == 0 && "Position is not a chunk position.");
 
   const auto filename = fmt::format("{}_{}_{}.chunk", position.x, position.y, position.z);
-  const auto full_path = config::data_directory / world_id / config::chunks_directory / filename;
+  const auto full_path = config::worlds_directory / world_id / config::chunks_directory / filename;
   return std::filesystem::exists(full_path);
 }
 
 void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 {
-  const auto chunks_directory = config::data_directory / world_id / config::chunks_directory;
+  const auto chunks_directory = config::worlds_directory / world_id / config::chunks_directory;
 
   if (!std::filesystem::exists(chunks_directory))
   {
@@ -187,7 +228,7 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 void load_game_chunk(Chunk& chunk, const std::string& world_id)
 {
   const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = config::data_directory / world_id / config::chunks_directory / filename;
+  const auto full_path = config::worlds_directory / world_id / config::chunks_directory / filename;
 
   if (!std::filesystem::exists(full_path))
   {

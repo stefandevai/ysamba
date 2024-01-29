@@ -7,7 +7,6 @@
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "graphics/sprite.hpp"
-#include "world/world.hpp"
 
 namespace dl
 {
@@ -25,12 +24,11 @@ class WorldCreation : public Scene
   void render() override;
 
   void save_world();
-  void load_world();
 
  private:
-  World m_world{m_game_context};
   Batch m_batch{"default"};
   Sprite m_world_sprite{};
+  int m_seed = 0;
   std::vector<float> m_height_map{};
   InputManager& m_input_manager = InputManager::get_instance();
 

@@ -6,6 +6,7 @@
 
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
+#include "core/serialization.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
 #include "world/society/name_generator.hpp"
@@ -54,6 +55,7 @@ void HomeMenu::update()
   }
   else if (m_input_manager.poll_action("play"_hs))
   {
+    m_game_context.world_metadata = serialization::load_world_metadata("c253100c-43a0-ecea-354b-14ccedf7c40c");
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   }
   else if (m_input_manager.poll_action("create_world"_hs))

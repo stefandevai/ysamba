@@ -7,9 +7,7 @@
     "world_creation": {
         "quit": ["k_escape"],
         "generate_world": ["k_g"],
-        "reload_world": ["k_r"],
         "save_world": ["k_s"],
-        "load_world": ["k_l"],
         "display_seed": ["k_e"]
     },
     "gameplay": {

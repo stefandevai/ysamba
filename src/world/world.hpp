@@ -53,24 +53,21 @@ struct WorldTile
 
 class World
 {
+ private:
+  GameContext& m_game_context;
+
  public:
   // Spatial hash for nearby entities search
   SpatialHash spatial_hash;
-  ChunkManager chunk_manager{};
+  ChunkManager chunk_manager{m_game_context};
   std::unordered_map<uint32_t, TileData> tile_data;
   std::unordered_map<uint32_t, ItemData> item_data;
 
   // Constructor
   World(GameContext& game_context);
 
-  // Generate world
-  void generate(const int width, const int height, const int depth, const int seed);
-
   // Generate all societies for the world
   void generate_societies();
-
-  // Load map from a json file
-  void load(const std::string& filepath);
 
   // Set tile by coordinates
   void set_terrain(const uint32_t tile_id, const int x, const int y, const int z);
@@ -158,7 +155,6 @@ class World
   }
 
  private:
-  GameContext& m_game_context;
   JSON m_json{"./data/world.json"};
   std::string m_texture_id;
   int m_seed = 0;

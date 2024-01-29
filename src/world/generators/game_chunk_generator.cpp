@@ -48,14 +48,14 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
   // spdlog::info("WIDTH: {}", width);
   // spdlog::info("HEIGHT: {}\n", size.y);
 
-  Timer timer{};
+  // Timer timer{};
 
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(size);
 
   auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
 
-  timer.start();
+  // timer.start();
 
   // spdlog::info("Generating height maps...");
 
@@ -127,8 +127,8 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  timer.stop();
-  timer.print("Chunk generation");
+  // timer.stop();
+  // timer.print("Chunk generation");
 }
 
 void GameChunkGenerator::set_size(const Vector3i& size)
