@@ -51,6 +51,7 @@ class Batch
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
   void add_scissor(const Vector4i& scissor);
+  void clear_textures();
 
  private:
   struct VertexData

@@ -1,5 +1,7 @@
 {
-  "map_width": 512,
-  "map_height": 512,
+  "world_width": 256,
+  "world_height": 256,
+  "world_depth": 30,
+  "random_seed": true,
   "seed": 340683964
 }

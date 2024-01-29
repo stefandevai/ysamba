@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "./tile_rules.hpp"
+#include "./utils.hpp"
 #include "config.hpp"
 #include "core/random.hpp"
 #include "core/timer.hpp"
@@ -15,6 +16,29 @@
 
 namespace dl
 {
+GameChunkGenerator::GameChunkGenerator() : GameChunkGenerator(config::chunk_size) {}
+
+GameChunkGenerator::GameChunkGenerator(const Vector3i& size) : size(size)
+{
+  // map_to_tiles = static_cast<float>(config::chunk_size.x);
+  const float frequency = 0.016f / map_to_tiles;
+
+  island_params.layer_1_octaves = 4;
+  island_params.frequency = frequency;
+  island_params.layer_1_lacunarity = 3.2f;
+  island_params.layer_1_gain = 0.32f;
+  island_params.layer_1_weighted_strength = 0.25f;
+
+  island_params.layer_2_seed_offset = 7;
+  island_params.layer_2_octave_count = 4;
+  island_params.layer_2_lacunarity = 1.42f;
+  island_params.layer_2_gain = 1.1f;
+  island_params.layer_2_weighted_strength = 0.42f;
+  island_params.layer_2_fade = 0.62f;
+  island_params.layer_2_smooth_rhs = -0.68f;
+  island_params.layer_2_smoothness = 1.76f;
+}
+
 void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 {
   // spdlog::info("====================");
@@ -22,16 +46,14 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
   // spdlog::info("====================\n");
   // spdlog::info("SEED: {}", seed);
   // spdlog::info("WIDTH: {}", width);
-  // spdlog::info("HEIGHT: {}\n", height);
+  // spdlog::info("HEIGHT: {}\n", size.y);
 
-  const int padded_width = width + m_generation_padding * 2;
-  const int padded_height = height + m_generation_padding * 2;
   Timer timer{};
 
   chunk = std::make_unique<Chunk>(offset, true);
-  chunk->tiles.set_size(width, height, depth);
+  chunk->tiles.set_size(size);
 
-  auto terrain = std::vector<int>(padded_width * padded_height * depth);
+  auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
 
   timer.start();
 
@@ -41,16 +63,16 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   // spdlog::info("Setting terrain...");
 
-  for (int j = 0; j < padded_height; ++j)
+  for (int j = 0; j < m_padded_size.y; ++j)
   {
-    for (int i = 0; i < padded_width; ++i)
+    for (int i = 0; i < m_padded_size.x; ++i)
     {
-      const auto map_value = std::clamp(raw_height_map[j * padded_width + i], 0.0f, 1.0f);
-      const int k = static_cast<int>(map_value * (depth - 1));
+      const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
+      const int k = static_cast<int>(map_value * (size.z - 1));
       bool inside_chunk = false;
 
-      if (j >= m_generation_padding && j < padded_width - m_generation_padding && i >= m_generation_padding &&
-          i < padded_height - m_generation_padding)
+      if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding &&
+          i < m_padded_size.y - m_generation_padding)
       {
         inside_chunk = true;
       }
@@ -70,19 +92,19 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 
       if (inside_chunk)
       {
-        chunk->tiles.height_map[(j - 1) * width + (i - 1)] = resolved_z;
-        chunk->tiles.values[resolved_z * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
+        chunk->tiles.height_map[(j - 1) * size.x + (i - 1)] = resolved_z;
+        chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
       }
 
-      terrain[resolved_z * padded_width * padded_height + j * padded_width + i] = terrain_id;
+      terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
 
       for (int z = 0; z < resolved_z; ++z)
       {
-        terrain[z * padded_width * padded_height + j * padded_width + i] = terrain_id;
+        terrain[z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
 
         if (inside_chunk)
         {
-          chunk->tiles.values[z * width * height + (j - 1) * width + (i - 1)].terrain = terrain_id;
+          chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
         }
       }
     }
@@ -94,11 +116,11 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   // spdlog::info("Selecting tiles...");
 
-  for (int k = 0; k < depth; ++k)
+  for (int k = 0; k < size.z; ++k)
   {
-    for (int j = 0; j < height; ++j)
+    for (int j = 0; j < size.y; ++j)
     {
-      for (int i = 0; i < width; ++i)
+      for (int i = 0; i < size.x; ++i)
       {
         m_select_tile(terrain, i, j, k);
       }
@@ -111,120 +133,47 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 
 void GameChunkGenerator::set_size(const Vector3i& size)
 {
-  width = size.x;
-  height = size.y;
-  depth = size.z;
+  this->size = size;
+  m_padded_size = Vector3i{size.x + m_generation_padding * 2, size.y + m_generation_padding * 2, 1};
 }
 
 void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 {
-  const int padded_width = width + m_generation_padding * 2;
-  const int padded_height = height + m_generation_padding * 2;
+  raw_height_map.resize(m_padded_size.x * m_padded_size.y);
+  vegetation_type.resize(size.x * size.y);
+  vegetation_density.resize(size.x * size.y);
 
-  raw_height_map.resize(padded_width * padded_height);
-  vegetation_type.resize(width * height);
-  vegetation_density.resize(width * height);
+  const auto generator = utils::get_island_noise_generator(island_params);
 
-  // Quantity of tiles per map texture pixel
-  // const float map_to_tiles = static_cast<float>(config::chunk_size.x);
-  const float map_to_tiles = 1.0f;
-
-  const float frequency = 0.016f / map_to_tiles;
-
-  const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-  const auto& fractal = FastNoise::New<FastNoise::FractalFBm>();
-  const auto& distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
-  const auto& subtract = FastNoise::New<FastNoise::Subtract>();
-  const auto& terrace = FastNoise::New<FastNoise::Terrace>();
-
-  fractal->SetSource(simplex);
-  fractal->SetOctaveCount(4);
-  fractal->SetLacunarity(3.2f);
-  fractal->SetGain(0.32f);
-  fractal->SetWeightedStrength(0.25f);
-
-  distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
-
-  subtract->SetLHS(fractal);
-  subtract->SetRHS(distance_to_point);
-
-  terrace->SetMultiplier(0.34f);
-  terrace->SetSource(subtract);
-
-  const auto& remap = FastNoise::New<FastNoise::Remap>();
-  remap->SetSource(terrace);
-  remap->SetRemap(-1.0f, 1.0f, 0.0f, 8.08f);
-
-  // Second noise
-  const auto& simplex2 = FastNoise::New<FastNoise::OpenSimplex2S>();
-  const auto& seed_offset = FastNoise::New<FastNoise::SeedOffset>();
-  const auto& fractal2 = FastNoise::New<FastNoise::FractalFBm>();
-  const auto& fade = FastNoise::New<FastNoise::Fade>();
-  const auto& max_smooth = FastNoise::New<FastNoise::MaxSmooth>();
-
-  seed_offset->SetSource(simplex2);
-  seed_offset->SetOffset(7);
-  fractal2->SetSource(seed_offset);
-  fractal2->SetOctaveCount(4);
-  fractal2->SetLacunarity(1.42f);
-  fractal2->SetGain(1.1f);
-  fractal2->SetWeightedStrength(0.42);
-
-  fade->SetA(subtract);
-  fade->SetB(fractal2);
-  fade->SetFade(0.62f);
-
-  max_smooth->SetLHS(fade);
-  max_smooth->SetRHS(-0.68f);
-  max_smooth->SetSmoothness(1.76f);
-
-  const auto& min = FastNoise::New<FastNoise::Min>();
-
-  min->SetLHS(remap);
-  min->SetRHS(max_smooth);
-
-  const auto& remap2 = FastNoise::New<FastNoise::Remap>();
-  remap2->SetSource(min);
-  remap2->SetRemap(-1.0f, 1.0f, 0.0f, 1.00f);
-
-  remap2->GenUniformGrid2D(raw_height_map.data(),
-                           offset.x - m_generation_padding,
-                           offset.y + m_generation_padding,
-                           // offset.x - m_generation_padding - 256 / 2 * map_to_tiles,
-                           // offset.y + m_generation_padding - 256 / 2 * map_to_tiles,
-                           width + m_generation_padding * 2,
-                           height + m_generation_padding * 2,
-                           frequency,
-                           seed);
+  generator->GenUniformGrid2D(raw_height_map.data(),
+                              offset.x - m_generation_padding,
+                              offset.y + m_generation_padding,
+                              // offset.x - m_generation_padding - 256 / 2 * map_to_tiles,
+                              // offset.y + m_generation_padding - 256 / 2 * map_to_tiles,
+                              size.x + m_generation_padding * 2,
+                              size.y + m_generation_padding * 2,
+                              island_params.frequency,
+                              seed);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise =
       FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
-  vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, width, height, 0.05f, seed + 30);
+  vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 30);
 
   // Vegetation density lookup
   FastNoise::SmartNode<> vegetation_density_noise =
       FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
   vegetation_density_noise->GenUniformGrid2D(
-      vegetation_density.data(), offset.x, offset.y, width, height, 0.05f, seed + 50);
-}
-
-float GameChunkGenerator::m_get_rectangle_gradient_value(const int x, const int y)
-{
-  auto distance_to_edge = std::min(abs(x - width), x);
-  distance_to_edge = std::min(distance_to_edge, abs(y - height));
-  distance_to_edge = std::min(distance_to_edge, y) * 2;
-  return 1.f - static_cast<float>(distance_to_edge) / (width / 2.0f);
+      vegetation_density.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 50);
 }
 
 void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
 {
-  const int padded_width = width + m_generation_padding * 2;
-  const int padded_height = height + m_generation_padding * 2;
   const int transposed_x = x + m_generation_padding;
   const int transposed_y = y + m_generation_padding;
 
-  const auto terrain_id = terrain[z * padded_width * padded_height + transposed_y * padded_width + transposed_x];
+  const auto terrain_id =
+      terrain[z * m_padded_size.x * m_padded_size.y + transposed_y * m_padded_size.x + transposed_x];
 
   if (terrain_id == 0)
   {
@@ -234,7 +183,7 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
   // TODO: Set non walkable block tile if not visible
   if (!chunk->tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
   {
-    chunk->tiles.values[z * width * height + y * width + x].terrain = 1;
+    chunk->tiles.values[z * size.x * size.y + y * size.x + x].terrain = 1;
     return;
   }
 
@@ -458,7 +407,7 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
 
   } while (old_values.terrain != new_values.terrain);
 
-  chunk->tiles.values[z * width * height + y * width + x].terrain = new_values.terrain;
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].terrain = new_values.terrain;
 
   // Select vegetation
   if (new_values.decoration == 0)
@@ -466,7 +415,7 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
     new_values.decoration = m_select_decoration(terrain_id, x, y, z);
   }
 
-  chunk->tiles.values[z * width * height + y * width + x].decoration = new_values.decoration;
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].decoration = new_values.decoration;
 }
 
 int GameChunkGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
@@ -482,7 +431,7 @@ int GameChunkGenerator::m_select_decoration(const int terrain_id, const int x, c
   }
 
   // Place bigger plants on the center and smaller ones on the edges
-  const auto density = vegetation_density[y * width + x];
+  const auto density = vegetation_density[y * size.x + x];
 
   if (density < 0.3f)
   {
@@ -499,7 +448,7 @@ int GameChunkGenerator::m_select_decoration(const int terrain_id, const int x, c
   int plant_small = 0;
   int plant_big = 0;
 
-  const auto type_threshold = vegetation_type[y * width + x];
+  const auto type_threshold = vegetation_type[y * size.x + x];
 
   if (type_threshold < 0.0f)
   {
@@ -527,27 +476,27 @@ int GameChunkGenerator::m_select_decoration(const int terrain_id, const int x, c
 uint32_t GameChunkGenerator::m_get_bitmask_4_sided(
     const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
 {
-  const int padded_width = width + m_generation_padding * 2;
-  const int padded_height = height + m_generation_padding * 2;
   uint32_t bitmask = 0;
 
   // Top
-  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == neighbor)
+  if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == neighbor)
   {
     bitmask |= DL_EDGE_TOP;
   }
   // Right
-  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
-  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == neighbor)
+  if (y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
   {
     bitmask |= DL_EDGE_BOTTOM;
   }
   // Left
-  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == neighbor)
+  if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == neighbor)
   {
     bitmask |= DL_EDGE_LEFT;
   }
@@ -564,50 +513,49 @@ uint32_t GameChunkGenerator::m_get_bitmask_8_sided(
            DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
   }
 
-  const int padded_width = width + m_generation_padding * 2;
-  const int padded_height = height + m_generation_padding * 2;
   uint32_t bitmask = 0;
 
   // Top
-  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == source)
+  if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == source)
   {
     bitmask |= DL_EDGE_TOP;
   }
   // Right
-  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == source)
+  if (x < m_padded_size.x - 1 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == source)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
-  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == source)
+  if (y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == source)
   {
     bitmask |= DL_EDGE_BOTTOM;
   }
   // Left
-  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == source)
+  if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == source)
   {
     bitmask |= DL_EDGE_LEFT;
   }
   // Top Left
-  if (x > 0 && y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x - 1] == source)
+  if (x > 0 && y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x - 1] == source)
   {
     bitmask |= DL_EDGE_TOP_LEFT;
   }
   // Top Right
-  if (x < padded_width - 1 && y > 0 &&
-      terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == source)
+  if (x < m_padded_size.x - 1 && y > 0 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == source)
   {
     bitmask |= DL_EDGE_TOP_RIGHT;
   }
   // Bottom Right
-  if (x < padded_width - 1 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == source)
+  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_RIGHT;
   }
   // Bottom Left
-  if (x > 0 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == source)
+  if (x > 0 && y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_LEFT;
   }
@@ -635,49 +583,48 @@ uint32_t GameChunkGenerator::m_get_bitmask_8_sided(
 bool GameChunkGenerator::m_has_neighbor(
     const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
 {
-  const int padded_width = width + m_generation_padding * 2;
-  const int padded_height = height + m_generation_padding * 2;
-
   // Top
-  if (y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x] == neighbor)
+  if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == neighbor)
   {
     return true;
   }
   // Right
-  if (x < padded_width - 1 && terrain[z * padded_width * padded_height + y * padded_width + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom
-  if (y < padded_height - 1 && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x] == neighbor)
+  if (y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
   {
     return true;
   }
   // Left
-  if (x > 0 && terrain[z * padded_width * padded_height + y * padded_width + x - 1] == neighbor)
+  if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == neighbor)
   {
     return true;
   }
   // Top Left
-  if (x > 0 && y > 0 && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x - 1] == neighbor)
+  if (x > 0 && y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x - 1] == neighbor)
   {
     return true;
   }
   // Top Right
-  if (x < padded_width - 1 && y > 0 &&
-      terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1 && y > 0 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom Right
-  if (x < padded_width - 1 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom Left
-  if (x > 0 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == neighbor)
+  if (x > 0 && y < m_padded_size.y - 1 &&
+      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == neighbor)
   {
     return true;
   }

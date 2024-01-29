@@ -1,6 +1,7 @@
 #include "./scene.hpp"
 
 #include <SDL.h>
+#include <fmt/format.h>
 
 #include <entt/core/hashed_string.hpp>
 
@@ -10,12 +11,14 @@
 namespace dl
 {
 Scene::Scene(const std::string& scene_key, GameContext& game_context)
-    : m_scene_key(entt::hashed_string{scene_key.c_str()}), m_scene_key_string(scene_key), m_game_context(game_context)
+    : m_scene_key(entt::hashed_string{scene_key.c_str()}),
+      m_scene_path(fmt::format("data/scenes/{}/data.json", scene_key)),
+      m_game_context(game_context)
 {
   resize();
 }
 
-void Scene::load() { m_json.load("./data/scenes/" + m_scene_key_string + "/data.json"); }
+void Scene::load() { m_json.load(m_scene_path); }
 
 void Scene::resize()
 {

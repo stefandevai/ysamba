@@ -28,7 +28,7 @@ class Scene
 
  protected:
   const uint32_t m_scene_key{};
-  const std::string m_scene_key_string{};
+  const std::string m_scene_path{};
   GameContext& m_game_context;
   JSON m_json{};
   Renderer m_renderer{*m_game_context.asset_manager};

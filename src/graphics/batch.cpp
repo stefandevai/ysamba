@@ -453,4 +453,6 @@ void Batch::add_scissor(const Vector4i& scissor)
   has_scissor = true;
 }
 
+void Batch::clear_textures() { m_textures.clear(); }
+
 }  // namespace dl

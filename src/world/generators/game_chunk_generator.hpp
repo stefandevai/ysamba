@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "./island_data.hpp"
 #include "core/json.hpp"
 #include "core/maths/vector.hpp"
 #include "world/tilemap.hpp"
@@ -13,16 +14,17 @@ struct Chunk;
 class GameChunkGenerator
 {
  public:
-  int width = 1;
-  int height = 1;
-  int depth = 1;
+  Vector3i size{1, 1, 1};
   std::vector<float> raw_height_map;
   std::vector<float> vegetation_type;
   std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;
 
-  GameChunkGenerator() = default;
-  GameChunkGenerator(const int width, const int height, const int depth) : width(width), height(height), depth(depth) {}
+  // Quantity of tiles per map texture pixel
+  float map_to_tiles = 1.0f;
+
+  GameChunkGenerator();
+  GameChunkGenerator(const Vector3i& size);
 
   void generate(const int seed, const Vector3i& offset = Vector3i{});
   void set_size(const Vector3i& size);
@@ -42,9 +44,10 @@ class GameChunkGenerator
   };
 
   JSON m_json{"./data/world/tile_rules.json"};
+  IslandNoiseParams island_params{};
   int m_generation_padding = 1;
+  Vector3i m_padded_size{size.x + m_generation_padding * 2, size.y + m_generation_padding * 2, 1};
   void m_get_height_map(const int seed, const Vector3i& offset);
-  float m_get_rectangle_gradient_value(const int x, const int y);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
   int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
   uint32_t m_get_bitmask_4_sided(
