@@ -73,13 +73,9 @@ void Gameplay::update()
     return;
   }
 
-  const auto& current_context = m_input_manager.get_current_context();
-
-  if (current_context != nullptr && current_context->key == "gameplay"_hs)
+  if (m_input_manager.is_context("gameplay"_hs))
   {
-    const auto will_quit = m_update_input(m_game_context);
-
-    if (will_quit)
+    if (m_update_input())
     {
       return;
     }
@@ -145,7 +141,7 @@ void Gameplay::load_game()
   m_has_loaded = true;
 }
 
-bool Gameplay::m_update_input(GameContext& m_game_context)
+bool Gameplay::m_update_input()
 {
   using namespace entt::literals;
 

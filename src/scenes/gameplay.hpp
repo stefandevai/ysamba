@@ -66,6 +66,6 @@ class Gameplay : public Scene
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager};
 
-  bool m_update_input(GameContext& game_context);
+  bool m_update_input();
 };
 }  // namespace dl

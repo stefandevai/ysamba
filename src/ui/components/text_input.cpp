@@ -19,7 +19,17 @@ TextInput::TextInput(UIContext& context) : UIComponent(context)
   m_label->y_alignment = YAlignement::Center;
 }
 
-void TextInput::init() { m_label->set_text(text); }
+void TextInput::init()
+{
+  if (text.empty())
+  {
+    m_label->set_text(placeholder);
+  }
+  else
+  {
+    m_label->set_text(text);
+  }
+}
 
 void TextInput::update()
 {
@@ -42,6 +52,13 @@ void TextInput::update()
     if (m_state == State::Display)
     {
       m_state = State::Focus;
+
+      // Replace placeholder with actual text value
+      if (text != m_label->value)
+      {
+        m_label->set_text(text);
+      }
+
       m_input_manager.push_context("text_input"_hs);
       m_input_manager.set_text_input(text);
       m_input_manager.text_input_start();

@@ -14,6 +14,7 @@
 #include "graphics/color.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/texture.hpp"
+#include "ui/compositions/world_creation_panel.hpp"
 #include "world/generators/island_generator.hpp"
 #include "world/metadata.hpp"
 
@@ -32,6 +33,8 @@ void WorldCreation::load()
   world_size.y = m_json.object["world_height"].get<int>();
   world_size.z = m_json.object["world_depth"].get<int>();
 
+  m_panel = m_ui_manager.emplace<ui::WorldCreationPanel>();
+
   m_generate_map();
   m_create_map_representation();
   m_has_loaded = true;
@@ -46,13 +49,42 @@ void WorldCreation::update()
     return;
   }
 
-  const auto delta = m_game_context.clock->delta;
+  if (m_input_manager.is_context("world_creation"_hs))
+  {
+    if (m_update_input())
+    {
+      return;
+    }
+  }
 
-  m_camera.update(delta);
+  m_camera.update(m_game_context.clock->delta);
+  m_ui_manager.update();
+}
+
+void WorldCreation::render()
+{
+  if (!has_loaded())
+  {
+    return;
+  }
+
+  m_batch.push_matrix(m_camera.view_matrix);
+  m_batch.emplace(&m_world_sprite, 0, 0, 0);
+  m_ui_manager.render();
+  m_renderer.render(m_camera);
+  m_batch.pop_matrix();
+}
+
+bool WorldCreation::m_update_input()
+{
+  using namespace entt::literals;
+
+  bool will_quit = false;
 
   if (m_input_manager.poll_action("quit"_hs))
   {
     m_game_context.scene_manager->pop_scene();
+    will_quit = true;
   }
   else if (m_input_manager.poll_action("generate_world"_hs))
   {
@@ -67,26 +99,23 @@ void WorldCreation::update()
   {
     spdlog::info("SEED: {}", m_seed);
   }
-}
 
-void WorldCreation::render()
-{
-  if (!has_loaded())
-  {
-    return;
-  }
-
-  m_batch.push_matrix(m_camera.view_matrix);
-  m_batch.emplace(&m_world_sprite, 0, 0, 0);
-  m_renderer.render(m_camera);
-  m_batch.pop_matrix();
+  return will_quit;
 }
 
 void WorldCreation::save_world()
 {
+  bool is_valid = m_panel->validate();
+
+  if (!is_valid)
+  {
+    spdlog::debug("World parameters are invalid");
+    return;
+  }
+
   WorldMetadata metadata{};
   metadata.id = utils::generate_id();
-  metadata.name = "Agua Blanca";
+  metadata.name = m_panel->get_name();
   metadata.seed = m_seed;
 
   serialization::save_world_metadata(metadata);
