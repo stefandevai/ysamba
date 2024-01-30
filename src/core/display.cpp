@@ -4,7 +4,6 @@
 #include <spdlog/spdlog.h>
 
 #include <sstream>
-#include <stdexcept>
 
 #if DISABLE_VSYNC == 1
 #ifdef __APPLE__
@@ -41,7 +40,8 @@ void Display::load(const int width, const int height, const std::string& title)
 
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
-    throw std::runtime_error("It was not possible to initialize SDL2");
+    spdlog::critical("It was not possible to initialize SDL2");
+    return;
   }
 
   /* const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL); */

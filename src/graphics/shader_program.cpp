@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
-#include "core/fileutils.hpp"
+#include "core/utils.hpp"
 
 namespace dl
 {
@@ -62,8 +62,8 @@ void ShaderProgram::load()
     return;
   }
 
-  const auto vertex_source_string = FileUtils::read_file(m_vertex_path);
-  const auto fragment_source_string = FileUtils::read_file(m_fragment_path);
+  const auto vertex_source_string = utils::read_file(m_vertex_path);
+  const auto fragment_source_string = utils::read_file(m_fragment_path);
   const auto& vertex_source = vertex_source_string.c_str();
   const auto& fragment_source = fragment_source_string.c_str();
 

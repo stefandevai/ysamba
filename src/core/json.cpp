@@ -1,8 +1,8 @@
 #include "./json.hpp"
 
-#include <stdexcept>
+#include <spdlog/spdlog.h>
 
-#include "./fileutils.hpp"
+#include "./utils.hpp"
 
 namespace dl
 {
@@ -13,10 +13,11 @@ void JSON::load(const std::string& filepath)
 {
   if (filepath.empty())
   {
-    throw std::invalid_argument("Filepath is empty.");
+    spdlog::critical("Filepath is empty.");
+    return;
   }
 
-  auto json_string = FileUtils::read_file(filepath.c_str());
+  auto json_string = utils::read_file(filepath.c_str());
   object = nlohmann::json::parse(json_string);
   m_filepath = filepath;
   m_has_loaded = true;
@@ -26,7 +27,8 @@ void JSON::save(const std::string& filepath)
 {
   if (filepath.empty())
   {
-    throw std::invalid_argument("Filepath is empty.");
+    spdlog::critical("Filepath is empty.");
+    return;
   }
 
   std::string json_string;
@@ -39,7 +41,7 @@ void JSON::save(const std::string& filepath)
     json_string = object.dump();
   }
 
-  FileUtils::write_file(json_string, filepath);
+  utils::write_file(filepath, json_string);
   m_filepath = filepath;
 }
 }  // namespace dl
