@@ -77,10 +77,14 @@ void HomeMenu::update()
         const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
         const auto updated_at_time_t = std::chrono::system_clock::to_time_t(world_metadata.updated_at);
         const auto label =
-            fmt::format("{} ({:%d/%m/%Y %H:%M})", world_metadata.name, fmt::localtime(updated_at_time_t));
+            fmt::format("{}\n({:%d/%m/%Y %H:%M})", world_metadata.name, fmt::localtime(updated_at_time_t));
         worlds_metadata.push_back({world_metadata, label});
       }
     }
+
+    std::sort(worlds_metadata.begin(), worlds_metadata.end(), [](const auto& lhs, const auto& rhs) {
+      return lhs.first.updated_at > rhs.first.updated_at;
+    });
 
     m_world_list->set_actions(worlds_metadata);
     m_world_list->show();
