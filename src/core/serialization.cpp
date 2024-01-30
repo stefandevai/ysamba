@@ -1,6 +1,7 @@
 #include "./serialization.hpp"
 
-#include <fmt/format.h>
+#include <date/date.h>
+#include <fmt/chrono.h>
 #include <spdlog/spdlog.h>
 
 #include <cereal/archives/binary.hpp>
@@ -14,6 +15,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 #include <fstream>
+#include <sstream>
 
 #include "config.hpp"
 #include "ecs/components/action_pickup.hpp"
@@ -79,7 +81,12 @@ void save_world_metadata(const WorldMetadata& metadata)
 
   std::ofstream output{world_directory / ".metadata"};
   cereal::JSONOutputArchive archive{output};
-  archive(metadata);
+
+  WorldMetadata data = metadata;
+  data.created_at_label = fmt::format("{:%Y-%m-%d %H:%M:%S}", data.created_at);
+  data.updated_at_label = fmt::format("{:%Y-%m-%d %H:%M:%S}", data.updated_at);
+
+  archive(data);
 }
 
 WorldMetadata load_world_metadata(const std::string& id)
@@ -96,6 +103,12 @@ WorldMetadata load_world_metadata(const std::string& id)
 
   WorldMetadata metadata{};
   archive(metadata);
+
+  std::istringstream created_ss{metadata.created_at_label.c_str()};
+  created_ss >> date::parse("%Y-%m-%d %H:%M:%S", metadata.created_at);
+
+  std::istringstream updated_ss{metadata.updated_at_label.c_str()};
+  updated_ss >> date::parse("%Y-%m-%d %H:%M:%S", metadata.updated_at);
 
   return metadata;
 }

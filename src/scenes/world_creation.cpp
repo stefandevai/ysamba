@@ -1,7 +1,9 @@
 #include "./world_creation.hpp"
 
+#include <fmt/chrono.h>
 #include <spdlog/spdlog.h>
 
+#include <chrono>
 #include <climits>
 #include <entt/core/hashed_string.hpp>
 
@@ -34,6 +36,7 @@ void WorldCreation::load()
   world_size.z = m_json.object["world_depth"].get<int>();
 
   m_panel = m_ui_manager.emplace<ui::WorldCreationPanel>();
+  m_panel->on_save([this]() { save_world(); });
 
   m_generate_map();
   m_create_map_representation();
@@ -51,14 +54,16 @@ void WorldCreation::update()
 
   if (m_input_manager.is_context("world_creation"_hs))
   {
-    if (m_update_input())
-    {
-      return;
-    }
+    m_update_input();
   }
 
   m_camera.update(m_game_context.clock->delta);
   m_ui_manager.update();
+
+  if (m_scene_state == SceneState::Pop)
+  {
+    m_game_context.scene_manager->pop_scene();
+  }
 }
 
 void WorldCreation::render()
@@ -83,8 +88,7 @@ bool WorldCreation::m_update_input()
 
   if (m_input_manager.poll_action("quit"_hs))
   {
-    m_game_context.scene_manager->pop_scene();
-    will_quit = true;
+    m_scene_state = SceneState::Pop;
   }
   else if (m_input_manager.poll_action("generate_world"_hs))
   {
@@ -113,16 +117,24 @@ void WorldCreation::save_world()
     return;
   }
 
+  const auto now = std::chrono::system_clock::now();
+  const auto now_time_t = std::chrono::time_point_cast<std::chrono::seconds>(now);
+
   WorldMetadata metadata{};
   metadata.id = utils::generate_id();
   metadata.name = m_panel->get_name();
   metadata.seed = m_seed;
+  metadata.world_size = world_size;
+  metadata.created_at = now_time_t;
+  metadata.updated_at = now_time_t;
 
   serialization::save_world_metadata(metadata);
 
   spdlog::debug("World saved: {}", metadata.name);
   spdlog::debug("Seed: {}", metadata.seed);
   spdlog::debug("Id: {}", metadata.id);
+
+  m_scene_state = SceneState::Pop;
 }
 
 void WorldCreation::m_generate_map()

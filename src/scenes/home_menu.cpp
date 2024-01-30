@@ -1,7 +1,9 @@
 #include "./home_menu.hpp"
 
+#include <fmt/chrono.h>
 #include <spdlog/spdlog.h>
 
+#include <chrono>
 #include <entt/core/hashed_string.hpp>
 
 #include "config.hpp"
@@ -73,7 +75,10 @@ void HomeMenu::update()
       if (candidate.is_directory())
       {
         const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
-        worlds_metadata.push_back({world_metadata, world_metadata.name});
+        const auto updated_at_time_t = std::chrono::system_clock::to_time_t(world_metadata.updated_at);
+        const auto label =
+            fmt::format("{} ({:%d/%m/%Y %H:%M})", world_metadata.name, fmt::localtime(updated_at_time_t));
+        worlds_metadata.push_back({world_metadata, label});
       }
     }
 

@@ -6,6 +6,7 @@ namespace dl::ui
 {
 class Label;
 class TextInput;
+class Button;
 
 class WorldCreationPanel : public UIComponent
 {
@@ -14,12 +15,15 @@ class WorldCreationPanel : public UIComponent
   size_t max_world_name_length = 24;
 
   WorldCreationPanel(UIContext& context);
+
+  void on_save(const std::function<void()>& on_save_fn);
   std::string& get_name();
   bool validate();
 
  private:
   Label* m_label = nullptr;
   TextInput* m_text_input = nullptr;
+  Button* m_save_button = nullptr;
 };
 
 }  // namespace dl::ui

@@ -21,6 +21,8 @@ TextInput::TextInput(UIContext& context) : UIComponent(context)
 
 void TextInput::init()
 {
+  m_container->set_size(size);
+
   if (text.empty())
   {
     m_label->set_text(placeholder);

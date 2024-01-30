@@ -11,6 +11,7 @@ namespace dl::ui
 {
 Button::Button(UIContext& context) : UIComponent(context)
 {
+  size = {160, 32};
   m_container = emplace<Container>();
   m_label = m_container->emplace<Label>();
 }

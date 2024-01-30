@@ -33,6 +33,13 @@ class WorldCreation : public Scene
   void save_world();
 
  private:
+  enum class SceneState
+  {
+    Normal,
+    Pop,
+  };
+  SceneState m_scene_state = SceneState::Normal;
+
   Batch m_batch{"default"};
   Sprite m_world_sprite{};
   int m_seed = 0;

@@ -208,7 +208,7 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
   }
 
   m_size.x = char_pos_x;
-  m_size.y = char_pos_y;
+  m_size.y = char_pos_y + max_character_top * scale;
 }
 
 void Text::m_process_command(UTF8Iterator& it, Color& character_color)
