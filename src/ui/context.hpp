@@ -4,7 +4,7 @@ namespace dl
 {
 class Batch;
 class Renderer;
-class AssetManager2;
+class AssetManager;
 class Batch;
 struct Clock;
 }  // namespace dl
@@ -18,7 +18,7 @@ namespace dl::ui
 {
 struct UIContext
 {
-  AssetManager2* asset_manager;
+  AssetManager* asset_manager;
   Renderer* renderer;
   Batch* batch;
   Clock* clock;

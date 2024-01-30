@@ -14,7 +14,7 @@ namespace dl
 {
 class Batch;
 class Renderer;
-class AssetManager2;
+class AssetManager;
 }  // namespace dl
 
 namespace dl::ui
@@ -24,7 +24,7 @@ using namespace entt::literals;
 class UIManager
 {
  public:
-  UIManager(AssetManager2* asset_manager, Renderer* renderer);
+  UIManager(AssetManager* asset_manager, Renderer* renderer);
   ~UIManager();
 
   template <typename T, typename... Args>
@@ -48,7 +48,7 @@ class UIManager
   void force_hide_all();
 
  private:
-  AssetManager2* m_asset_manager = nullptr;
+  AssetManager* m_asset_manager = nullptr;
   Renderer* m_renderer = nullptr;
   std::vector<std::unique_ptr<UIComponent>> m_components;
   std::vector<glm::mat4> m_matrix_stack;

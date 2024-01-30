@@ -4,7 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
-#include "core/asset_manager2.hpp"
+#include "core/asset_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "graphics/renderer.hpp"
 

@@ -3,13 +3,12 @@
 #include <glad/glad.h>
 
 #include <glm/glm.hpp>
+#include <string>
 #include <unordered_map>
-
-#include "core/asset.hpp"
 
 namespace dl
 {
-class ShaderProgram : public Asset
+class ShaderProgram
 {
  public:
   bool has_loaded = false;

@@ -2,116 +2,88 @@
 
 #include <spdlog/spdlog.h>
 
-#include <nlohmann/json.hpp>
-
-#include "graphics/font_loader.hpp"
-#include "graphics/shader_loader.hpp"
-#include "graphics/texture_loader.hpp"
+#include <entt/core/hashed_string.hpp>
 
 namespace dl
 {
-AssetMap AssetManager::m_assets = {};
+std::unordered_map<uint32_t, Asset> AssetManager::m_assets{};
 
-AssetManager::AssetManager(const std::filesystem::path& filepath) : m_filepath(filepath)
+const std::unordered_map<std::string, AssetType> AssetManager::m_asset_types = {
+    {"texture", AssetType::Texture},
+    {"texture_atlas", AssetType::TextureAtlas},
+    {"shader", AssetType::Shader},
+    {"font", AssetType::Font},
+};
+
+void AssetManager::load_assets(const std::filesystem::path& filepath)
 {
-  // Get base dir from the config filepath
-  m_base_dir = filepath.string();
-  m_base_dir.remove_filename();
+  m_json.load(filepath.string());
 
-  // Load config file
-  m_json.load(m_filepath.string());
-  m_init_assets();
-}
-
-template <typename T, typename... Args>
-void AssetManager::add(const std::string& id, const std::string& filepath, Args... args)
-{
-  // TODO: Better handling of existing textures
-  // If the key already exists just return
-  if (m_assets.find(id) != m_assets.end())
+  for (const auto& asset_info : m_json.object["assets"])
   {
-    return;
-  }
+    const auto& id = asset_info["id"].get<std::string>();
+    const uint32_t hashed_id = entt::hashed_string::value(id.c_str());
+    const auto& type_tag = asset_info["type"].get<std::string>();
 
-  auto asset_loader = std::make_unique<T>(m_base_dir / filepath, args...);
-  std::shared_ptr<Asset> asset_ptr = nullptr;
-  /* assert (asset_loader != nullptr); */
-  /* assert (asset_ptr != nullptr); */
-  m_assets.emplace(id, std::make_pair(std::move(asset_ptr), std::move(asset_loader)));
-}
+    spdlog::debug("Loaded asset with ID: {} and HASH: {}", id, hashed_id);
 
-void AssetManager::m_init_assets()
-{
-  if (m_json.object[ASSET_OBJECT_ASSETS] == nullptr)
-  {
-    spdlog::warn("Project has no assets.");
-    return;
-  }
-
-  auto assets = m_json.object[ASSET_OBJECT_ASSETS].get<std::vector<nlohmann::json>>();
-
-  for (auto& asset_info : assets)
-  {
-    const auto id = asset_info[ASSET_PARAMETER_ID].get<std::string>();
-    const auto type_tag = asset_info[ASSET_PARAMETER_TYPE].get<std::string>();
-    AssetType type = AssetType::NONE;
-
-    try
+    if (!m_asset_types.contains(type_tag))
     {
-      type = m_asset_types.at(type_tag);
-    }
-    catch (std::out_of_range& e)
-    {
-      spdlog::warn("Unknown asset type {}.\n{}", type_tag, e.what());
+      spdlog::warn("Asset type {} not supported", type_tag);
       continue;
     }
 
+    const auto type = m_asset_types.at(type_tag);
+
     switch (type)
     {
-    case AssetType::TEXTURE:
+    case AssetType::Shader:
     {
-      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      add<TextureLoader>(id, filepath);
+      const auto& vertex_path = asset_info["vertex_path"].get<std::string>();
+      const auto& fragment_path = asset_info["fragment_path"].get<std::string>();
+      add<ShaderProgram>(hashed_id, vertex_path, fragment_path);
     }
     break;
 
-    case AssetType::SHADER:
+    case AssetType::Texture:
     {
-      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      add<ShaderLoader>(id, filepath);
+      const auto& filepath = asset_info["path"].get<std::string>();
+      add<Texture>(hashed_id, filepath);
     }
     break;
 
-    case AssetType::TEXTURE_ATLAS:
+    case AssetType::TextureAtlas:
     {
-      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      const auto horizontal_frames = asset_info[ASSET_PARAMETER_HORIZONTAL_FRAMES].get<int>();
-      const auto vertical_frames = asset_info[ASSET_PARAMETER_VERTICAL_FRAMES].get<int>();
+      const auto& filepath = asset_info["path"].get<std::string>();
+      const auto horizontal_frames = asset_info["horizontal_frames"].get<int>();
+      const auto vertical_frames = asset_info["vertical_frames"].get<int>();
 
-      if (asset_info.contains(ASSET_PARAMETER_DATA_FILEPATH))
+      if (asset_info.contains("data_path"))
       {
-        const auto data_filepath = asset_info[ASSET_PARAMETER_DATA_FILEPATH].get<std::string>();
-        add<TextureLoader>(id, filepath, horizontal_frames, vertical_frames, data_filepath);
+        const auto data_filepath = asset_info["data_path"].get<std::string>();
+        add<Texture>(hashed_id, filepath, horizontal_frames, vertical_frames, data_filepath);
         break;
       }
 
-      add<TextureLoader>(id, filepath, horizontal_frames, vertical_frames);
+      add<Texture>(hashed_id, filepath, horizontal_frames, vertical_frames);
     }
     break;
 
-    case AssetType::FONT:
+    case AssetType::Font:
     {
-      const auto filepath = asset_info[ASSET_PARAMETER_PATH].get<std::string>();
-      const auto size = asset_info[ASSET_PARAMETER_SIZE].get<std::size_t>();
-
-      add<FontLoader>(id, filepath, size);
+      const auto filepath = asset_info["path"].get<std::string>();
+      const auto size = asset_info["size"].get<std::size_t>();
+      add<Font>(hashed_id, filepath, size);
     }
     break;
 
     default:
-      spdlog::warn("Unknown asset type {}", type_tag);
-      break;
+    {
+      spdlog::warn("Asset type {} not supported", static_cast<int>(type));
+    }
+    break;
     }
   }
 }
+
 }  // namespace dl

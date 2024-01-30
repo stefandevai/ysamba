@@ -2,69 +2,65 @@
 
 #include <spdlog/spdlog.h>
 
-#include <filesystem>
-#include <string>
+#include <memory>
 #include <unordered_map>
+#include <variant>
 
-#include "./asset.hpp"
-#include "./asset_parameters.hpp"
 #include "./json.hpp"
+#include "graphics/font.hpp"
+#include "graphics/shader_program.hpp"
+#include "graphics/texture.hpp"
 
 namespace dl
 {
-using AssetPair = std::pair<std::shared_ptr<Asset>, std::unique_ptr<AssetLoader>>;
-using AssetMap = std::unordered_map<std::string, AssetPair>;
+using Asset = std::variant<std::unique_ptr<ShaderProgram>, std::unique_ptr<Texture>, std::unique_ptr<Font>>;
+
+enum class AssetType
+{
+  None,
+  Texture,
+  Shader,
+  TextureAtlas,
+  Font,
+};
 
 class AssetManager
 {
  public:
-  AssetManager(const std::filesystem::path& filepath);
+  AssetManager() = default;
 
-  // Add resource data to the internal map
-  template <class T, typename... Args>
-  void add(const std::string& name, const std::string& filepath, Args... args);
+  void load_assets(const std::filesystem::path& filepath);
 
-  // Gets a loaded asset by its name
+  template <typename T, typename... Args>
+  void add(uint32_t id, Args&&... args)
+  {
+    std::unique_ptr<T> asset = std::make_unique<T>(std::forward<Args>(args)...);
+    m_assets.emplace(id, std::move(asset));
+  }
+
   template <typename T>
-  static std::shared_ptr<T> get(const std::string& id)
+  static T* get(uint32_t id)
   {
     if (!m_assets.contains(id))
     {
-      spdlog::warn("There's no asset with ID {}.\n", id);
+      printf("Could not find asset with id %d\n", id);
       return nullptr;
     }
 
-    auto& asset_pair = m_assets.at(id);
-    auto& asset_ptr = asset_pair.first;
+    auto& asset = m_assets.at(id);
+    auto& value = std::get<std::unique_ptr<T>>(asset);
 
-    if (asset_ptr != nullptr)
+    if (!value->has_loaded)
     {
-      return std::dynamic_pointer_cast<T>(asset_ptr);
+      value->load();
     }
 
-    std::shared_ptr<T> asset_value = std::dynamic_pointer_cast<T>(asset_pair.second->construct());
-
-    assert(asset_value != nullptr && "Asset construction failed");
-
-    asset_ptr = asset_value;
-
-    return asset_value;
+    return value.get();
   }
 
  private:
-  const std::filesystem::path m_filepath;
-  std::filesystem::path m_base_dir;
-  JSON m_json;
-  static AssetMap m_assets;
-
-  const std::unordered_map<std::string, AssetType> m_asset_types = {
-      {ASSET_TYPE_TEXTURE, AssetType::TEXTURE},
-      {ASSET_TYPE_TEXTURE_ATLAS, AssetType::TEXTURE_ATLAS},
-      {ASSET_TYPE_SHADER, AssetType::SHADER},
-      {ASSET_TYPE_FONT, AssetType::FONT},
-  };
-
- private:
-  void m_init_assets();
+  JSON m_json{};
+  static std::unordered_map<uint32_t, Asset> m_assets;
+  static const std::unordered_map<std::string, AssetType> m_asset_types;
 };
 }  // namespace dl

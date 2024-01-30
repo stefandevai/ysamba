@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "./font.hpp"
-#include "core/asset_manager2.hpp"
+#include "core/asset_manager.hpp"
 #include "core/utf8.hpp"
 
 namespace dl
@@ -25,7 +25,7 @@ void Text::initialize()
 {
   assert(typeface != 0 && "Failed to initialize text, typeface is 0");
 
-  m_font = AssetManager2::get<Font>(typeface);
+  m_font = AssetManager::get<Font>(typeface);
   m_has_initialized = true;
   update();
 

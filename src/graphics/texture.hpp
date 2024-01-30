@@ -5,7 +5,6 @@
 #include <map>
 #include <string>
 
-#include "core/asset.hpp"
 #include "core/json.hpp"
 
 namespace dl
@@ -37,7 +36,7 @@ struct FrameData
   std::vector<uint32_t> pattern{};
 };
 
-class Texture : public Asset
+class Texture
 {
  public:
   bool has_loaded = false;

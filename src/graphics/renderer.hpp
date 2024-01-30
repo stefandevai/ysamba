@@ -12,7 +12,7 @@
 namespace dl
 {
 class ShaderProgram;
-class AssetManager2;
+class AssetManager;
 class Sprite;
 class MultiSprite;
 class Text;
@@ -22,7 +22,7 @@ class Camera;
 class Renderer
 {
  public:
-  Renderer(AssetManager2& asset_manager);
+  Renderer(AssetManager& asset_manager);
 
   void batch(const uint32_t batch_id, Sprite* sprite, const double x, const double y, const double z);
   void batch(const uint32_t batch_id, MultiSprite* multi_sprite, const double x, const double y, const double z);
@@ -42,7 +42,7 @@ class Renderer
  private:
   using LayerMap = std::map<uint32_t, std::unique_ptr<Batch>>;
 
-  AssetManager2& m_asset_manager;
+  AssetManager& m_asset_manager;
   LayerMap m_batches;
   std::vector<Batch*> m_ordered_batches;
 };

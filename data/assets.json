@@ -4,7 +4,6 @@
         {
             "id": "default",
             "type": "shader",
-            "path": "shaders/default",
             "vertex_path": "data/shaders/default.vs",
             "fragment_path": "data/shaders/default.fs"
         },
@@ -20,7 +19,7 @@
             "uniform": true,
             "horizontal_frames": 32,
             "vertical_frames": 32,
-            "data_filepath": "./data/textures/tileset.json"
+            "data_path": "data/textures/tileset.json"
         },
 
         {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./asset_manager2.hpp"
+#include "./asset_manager.hpp"
 #include "./clock.hpp"
 #include "world/metadata.hpp"
 
@@ -14,7 +14,7 @@ struct Clock;
 struct GameContext
 {
   Display* display;
-  AssetManager2* asset_manager;
+  AssetManager* asset_manager;
   Camera* camera;
   SceneManager* scene_manager;
   Clock* clock;

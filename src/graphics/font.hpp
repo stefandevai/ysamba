@@ -8,7 +8,6 @@
 #include <glad/glad.h>
 
 #include "./texture.hpp"
-#include "core/asset.hpp"
 
 namespace dl
 {
@@ -23,7 +22,7 @@ struct CharacterData
   float tx;  // x offset of glyph in texture coordinates
 };
 
-class Font : public Asset
+class Font
 {
  public:
   bool has_loaded = false;
