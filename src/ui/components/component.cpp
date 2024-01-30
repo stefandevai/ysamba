@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "graphics/renderer.hpp"
 

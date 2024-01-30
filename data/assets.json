@@ -5,18 +5,18 @@
             "id": "default",
             "type": "shader",
             "path": "shaders/default",
-            "vertex_path": "shaders/default.vs",
-            "fragment_path": "shaders/default.fs"
+            "vertex_path": "data/shaders/default.vs",
+            "fragment_path": "data/shaders/default.fs"
         },
         {
             "id": "ui",
             "type": "texture",
-            "path": "textures/ui.png"
+            "path": "data/textures/ui.png"
         },
         {
             "id": "spritesheet-tileset",
-            "type": "texture-atlas",
-            "path": "textures/tileset.png",
+            "type": "texture_atlas",
+            "path": "data/textures/tileset.png",
             "uniform": true,
             "horizontal_frames": 32,
             "vertical_frames": 32,
@@ -25,8 +25,8 @@
 
         {
             "id": "spritesheet-characters",
-            "type": "texture-atlas",
-            "path": "textures/characters.png",
+            "type": "texture_atlas",
+            "path": "data/textures/characters.png",
             "uniform": true,
             "horizontal_frames": 32,
             "vertical_frames": 32
@@ -35,7 +35,7 @@
         {
             "id": "font-1980",
             "type": "font",
-            "path": "fonts/unscii.ttf",
+            "path": "data/fonts/unscii.ttf",
             "size": 16
         }
     ]

@@ -11,7 +11,7 @@ namespace dl
 struct NinePatch
 {
   // Id of the loaded resource
-  std::string resource_id{};
+  uint32_t resource_id{};
 
   // Top, left, bottom and right coordinates in the texture given in pixels
   uint32_t top{};
@@ -30,7 +30,7 @@ struct NinePatch
   Sprite center_patch{};
 
   // Actual sprite texture
-  std::shared_ptr<Texture> texture = nullptr;
+  const Texture* texture = nullptr;
 
   // Flag to trigger patche (re)generation
   bool dirty = true;
@@ -39,8 +39,8 @@ struct NinePatch
   Color color{0xFFFFFFFF};
 
   NinePatch() = default;
-  NinePatch(const std::string& resource_id) : resource_id(resource_id) {}
-  NinePatch(const std::string& resource_id,
+  NinePatch(const uint32_t resource_id) : resource_id(resource_id) {}
+  NinePatch(const uint32_t resource_id,
             const uint32_t top,
             const uint32_t left,
             const uint32_t bottom,

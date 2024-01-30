@@ -62,8 +62,10 @@ void ShaderProgram::load()
     return;
   }
 
-  const auto vertex_source = FileUtils::read_file(m_vertex_path).c_str();
-  const auto fragment_source = FileUtils::read_file(m_fragment_path).c_str();
+  const auto vertex_source_string = FileUtils::read_file(m_vertex_path);
+  const auto fragment_source_string = FileUtils::read_file(m_fragment_path);
+  const auto& vertex_source = vertex_source_string.c_str();
+  const auto& fragment_source = fragment_source_string.c_str();
 
   int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &vertex_source, NULL);

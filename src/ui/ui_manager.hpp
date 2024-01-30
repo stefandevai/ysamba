@@ -1,5 +1,6 @@
 #pragma once
 
+#include <entt/core/hashed_string.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <map>
 
@@ -13,15 +14,17 @@ namespace dl
 {
 class Batch;
 class Renderer;
-class AssetManager;
+class AssetManager2;
 }  // namespace dl
 
 namespace dl::ui
 {
+using namespace entt::literals;
+
 class UIManager
 {
  public:
-  UIManager(AssetManager* asset_manager, Renderer* renderer);
+  UIManager(AssetManager2* asset_manager, Renderer* renderer);
   ~UIManager();
 
   template <typename T, typename... Args>
@@ -45,11 +48,11 @@ class UIManager
   void force_hide_all();
 
  private:
-  AssetManager* m_asset_manager = nullptr;
+  AssetManager2* m_asset_manager = nullptr;
   Renderer* m_renderer = nullptr;
   std::vector<std::unique_ptr<UIComponent>> m_components;
   std::vector<glm::mat4> m_matrix_stack;
-  Batch m_batch{"default", 10};
+  Batch m_batch{"default"_hs, 10};
   AnimationManager m_animation_manager{};
   Clock m_clock{};
 

@@ -26,8 +26,8 @@ struct TileRenderData;
 class Batch
 {
  public:
-  std::shared_ptr<ShaderProgram> shader = nullptr;
-  std::string shader_id{};
+  ShaderProgram* shader = nullptr;
+  uint32_t shader_id{};
   uint32_t index_count = 0;
   int priority = 0;
   bool has_scissor = false;
@@ -36,7 +36,7 @@ class Batch
   Vector4i scissor{0, 0, -1, -1};
 
   Batch(const int priority = 0);
-  Batch(const std::string& shader_id, const int priority = 0);
+  Batch(const uint32_t shader_id, const int priority = 0);
   ~Batch();
 
   void load();
@@ -83,6 +83,6 @@ class Batch
   uint32_t m_vbo;
   uint32_t m_ebo;
   uint32_t m_vertices_index = 0;
-  std::vector<Texture*> m_textures;
+  std::vector<const Texture*> m_textures;
 };
 }  // namespace dl

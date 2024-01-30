@@ -11,15 +11,15 @@ namespace dl
 class Sprite
 {
  public:
-  std::string resource_id;
-  std::shared_ptr<Texture> texture = nullptr;
+  uint32_t resource_id{};
+  const Texture* texture = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
   Color color{0xFFFFFFFF};
   int frame = 0;
   FrameAngle frame_angle = FrameAngle::Parallel;
 
   Sprite() {}
-  Sprite(const std::string& resource_id, const int frame = 0, const FrameAngle frame_angle = FrameAngle::Parallel)
+  Sprite(const uint32_t resource_id, const int frame = 0, const FrameAngle frame_angle = FrameAngle::Parallel)
       : resource_id(resource_id), frame(frame), frame_angle(frame_angle)
   {
   }

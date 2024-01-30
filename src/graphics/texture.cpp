@@ -14,13 +14,18 @@ extern "C"
 namespace dl
 {
 // Load single texture
-Texture::Texture(const std::string& filepath) : m_horizontal_frames(1), m_vertical_frames(1) { load(filepath); }
+Texture::Texture(const std::string& filepath) : m_filepath(filepath), m_horizontal_frames(1), m_vertical_frames(1) {}
 
 // Load uniform texture atlas
-Texture::Texture(const std::string& filepath, const int horizontal_frames, const int vertical_frames)
-    : m_horizontal_frames(horizontal_frames), m_vertical_frames(vertical_frames)
+Texture::Texture(const std::string& filepath,
+                 const int horizontal_frames,
+                 const int vertical_frames,
+                 const std::string& data_filepath)
+    : m_filepath(filepath),
+      m_data_filepath(data_filepath),
+      m_horizontal_frames(horizontal_frames),
+      m_vertical_frames(vertical_frames)
 {
-  load(filepath);
 }
 
 // Load with raw data
@@ -38,20 +43,23 @@ Texture::Texture(const int width, const int height)
 
 Texture::~Texture() { glDeleteTextures(1, &m_id); }
 
-void Texture::load() { has_loaded = true; }
-
-void Texture::load(const std::string& filepath)
+void Texture::load()
 {
+  if (m_data_filepath != "")
+  {
+    load_data(m_data_filepath);
+  }
+
   int width = 0;
   int height = 0;
   int channels = 0;
   unsigned char* image_data;
 
   // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-  image_data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
+  image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
   if (image_data == nullptr)
   {
-    throw std::runtime_error("It wasn't possible to load " + filepath);
+    throw std::runtime_error("It wasn't possible to load " + m_filepath);
   }
 
   GLenum format;
@@ -77,6 +85,8 @@ void Texture::load(const std::string& filepath)
   load(image_data, width, height, format);
 
   stbi_image_free(image_data);
+
+  has_loaded = true;
 }
 
 void Texture::load(const unsigned char* data, const int width, const int height, unsigned int format)
@@ -97,9 +107,9 @@ void Texture::load(const unsigned char* data, const int width, const int height,
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::bind() { glBindTexture(GL_TEXTURE_2D, m_id); }
+void Texture::bind() const { glBindTexture(GL_TEXTURE_2D, m_id); }
 
-void Texture::unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
+void Texture::unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
 // TODO: Implement irregular frame calculations
 float Texture::get_frame_width() const { return (m_width / static_cast<float>(m_horizontal_frames)); }
@@ -154,7 +164,7 @@ void Texture::m_load_empty()
   }
 }
 
-const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type)
+const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type) const
 {
   return m_frame_data.at(std::make_pair(id, type));
 }

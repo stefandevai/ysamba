@@ -8,7 +8,6 @@
 #include "./label.hpp"
 #include "./scrollable.hpp"
 #include "./window_frame.hpp"
-#include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
 #include "world/metadata.hpp"

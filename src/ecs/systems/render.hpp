@@ -28,13 +28,10 @@ class RenderSystem
   Batch* m_batch = nullptr;
   World& m_world;
   std::unordered_map<uint32_t, TileRenderData> m_tiles{};
-  const std::string& m_world_texture_id;
-  const std::shared_ptr<Texture> m_world_texture = nullptr;
+  const uint32_t m_world_texture_id;
+  const Texture* m_world_texture = nullptr;
   static constexpr int m_frustum_tile_padding = 1;
   static constexpr double m_z_index_increment = 0.02;
-
-  /* template <typename T> */
-  /* void m_batch(const Position& position, T* renderable, const Vector2i& size, const int z_index = 0); */
 
   void m_render_tiles(const Camera& camera);
   void m_render_tile(const Chunk& chunk,

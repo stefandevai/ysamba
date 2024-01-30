@@ -8,7 +8,7 @@ namespace dl::ui
 class Label : public UIComponent
 {
  public:
-  Text text;
+  Text text{};
   std::string value;
   bool wrap = true;
 

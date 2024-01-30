@@ -17,6 +17,8 @@ void Game::load()
 {
   spdlog::set_level(spdlog::level::debug);
 
+  m_asset_manager.load_assets("./data/assets.json");
+
   try
   {
     serialization::initialize_directories();

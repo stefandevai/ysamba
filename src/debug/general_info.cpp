@@ -5,6 +5,7 @@
 #include <sys/sysctl.h>
 #include <unistd.h>
 #endif
+#include <spdlog/spdlog.h>
 #include <stdlib.h>
 #include <sys/types.h>
 

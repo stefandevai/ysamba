@@ -32,7 +32,7 @@ void Gameplay::load()
 
   Scene::load();
 
-  m_renderer.add_batch("world"_hs, "default");
+  m_renderer.add_batch("world"_hs, "default"_hs);
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 

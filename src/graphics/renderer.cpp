@@ -9,13 +9,13 @@
 #include "./sprite.hpp"
 #include "./text.hpp"
 #include "./texture.hpp"
-#include "core/asset_manager.hpp"
+#include "core/asset_manager2.hpp"
 
 namespace dl
 {
-Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager) { glClearColor(0.f, 0.f, 0.f, 1.0f); }
+Renderer::Renderer(AssetManager2& asset_manager) : m_asset_manager(asset_manager) { glClearColor(0.f, 0.f, 0.f, 1.0f); }
 
-void Renderer::add_batch(const uint32_t batch_id, const std::string& shader_id, const int priority)
+void Renderer::add_batch(const uint32_t batch_id, const uint32_t shader_id, const int priority)
 {
   auto batch = std::make_unique<Batch>(shader_id, priority);
 
@@ -36,10 +36,7 @@ void Renderer::add_batch(Batch* batch)
   });
 }
 
-std::shared_ptr<Texture> Renderer::get_texture(const std::string& resource_id)
-{
-  return m_asset_manager.get<Texture>(resource_id);
-}
+const Texture* Renderer::get_texture(const uint32_t resource_id) { return m_asset_manager.get<Texture>(resource_id); }
 
 void Renderer::batch(const uint32_t batch_id, Sprite* sprite, const double x, const double y, const double z)
 {

@@ -10,9 +10,9 @@ struct FrameData;
 
 struct TileRenderData
 {
-  Texture* texture;
-  const FrameData* frame_data;
-  const glm::vec2 size;
-  const std::array<glm::vec2, 4> uv_coordinates;
+  const Texture* texture = nullptr;
+  const FrameData* frame_data = nullptr;
+  const glm::vec2 size{};
+  const std::array<glm::vec2, 4> uv_coordinates{};
 };
 }  // namespace dl

@@ -8,21 +8,26 @@
 
 namespace dl
 {
-Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_size(size) {}
+Font::Font(const std::string& path, std::size_t size) : m_path(path), m_size(size) {}
 
 void Font::load()
 {
   if (FT_Init_FreeType(&m_ft))
   {
     spdlog::critical("Could not init FreeType Library");
+    return;
   }
-  if (FT_New_Face(m_ft, m_path, 0, &m_face))
+  if (FT_New_Face(m_ft, m_path.c_str(), 0, &m_face))
   {
     spdlog::critical("Failed to load font {}", m_path);
+    return;
   }
   if (FT_Select_Charmap(m_face, FT_ENCODING_UNICODE))
   {
     spdlog::critical("Failed to load unicode charmap");
+    FT_Done_Face(m_face);
+    FT_Done_FreeType(m_ft);
+    return;
   }
   FT_Set_Pixel_Sizes(m_face, 0, m_size);
 
@@ -46,7 +51,7 @@ void Font::load()
   m_atlas_width = atlas_width;
   m_atlas_height = atlas_height;
 
-  m_texture_atlas = std::make_shared<Texture>(atlas_width, atlas_height);
+  m_texture_atlas = std::make_unique<Texture>(atlas_width, atlas_height);
 
   int x_offset = 0;
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -94,5 +99,7 @@ void Font::load()
 
   FT_Done_Face(m_face);
   FT_Done_FreeType(m_ft);
+
+  has_loaded = true;
 }
 }  // namespace dl

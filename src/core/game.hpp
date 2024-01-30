@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "./asset_manager.hpp"
+#include "./asset_manager2.hpp"
 #include "./clock.hpp"
 #include "./display.hpp"
 #include "./game_context.hpp"
@@ -25,7 +25,7 @@ class Game
  private:
   JSON m_json{"./data/game.json"};
   Display m_display{};
-  AssetManager m_asset_manager{"./data/assets.json"};
+  AssetManager2 m_asset_manager{};
   SceneManager m_scene_manager{m_display};
   Camera m_camera{};
   Clock m_clock{};

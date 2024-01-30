@@ -4,7 +4,6 @@
 
 #include "./container.hpp"
 #include "./label.hpp"
-#include "core/asset_manager.hpp"
 #include "graphics/batch.hpp"
 
 namespace dl::ui

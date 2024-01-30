@@ -19,7 +19,7 @@ namespace dl
 {
 Batch::Batch(const int priority) : priority(priority) {}
 
-Batch::Batch(const std::string& shader_id, const int priority) : shader_id(shader_id), priority(priority) { load(); }
+Batch::Batch(const uint32_t shader_id, const int priority) : shader_id(shader_id), priority(priority) { load(); }
 
 Batch::~Batch()
 {
@@ -204,8 +204,6 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
   const auto& texture_coordinates = sprite->get_texture_coordinates();
   unsigned int color = sprite->color.int_color;
 
-  const std::shared_ptr<Texture>& texture = sprite->texture;
-
   assert(sprite->texture != nullptr);
   assert(size.x != 0);
   assert(size.y != 0);
@@ -223,12 +221,11 @@ void Batch::emplace(Sprite* sprite, const double x, const double y, const double
   // texture_index is the index in m_textures that will
   // be translated to a index in the shader.
   float texture_index = 0.00f;
-  auto texture_ptr = texture.get();
-  const auto it = std::find(m_textures.begin(), m_textures.end(), texture_ptr);
+  const auto it = std::find(m_textures.begin(), m_textures.end(), sprite->texture);
   if (it == m_textures.end())
   {
     texture_index = m_textures.size();
-    m_textures.push_back(texture_ptr);
+    m_textures.push_back(sprite->texture);
   }
   else
   {
@@ -276,8 +273,6 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
 
   unsigned int color = sprite->color.int_color;
 
-  const std::shared_ptr<Texture>& texture = sprite->texture;
-
   assert(sprite->texture != nullptr);
 
   if (sprite->color.opacity_factor < 1.0)
@@ -293,12 +288,11 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
   // texture_index is the index in m_textures that will
   // be translated to a index in the shader.
   float texture_index = 0.00f;
-  auto texture_ptr = texture.get();
-  const auto it = std::find(m_textures.begin(), m_textures.end(), texture_ptr);
+  const auto it = std::find(m_textures.begin(), m_textures.end(), sprite->texture);
   if (it == m_textures.end())
   {
     texture_index = m_textures.size();
-    m_textures.push_back(texture_ptr);
+    m_textures.push_back(sprite->texture);
   }
   else
   {
@@ -307,8 +301,8 @@ void Batch::emplace(const MultiSprite* sprite, const double x, const double y, c
 
   const auto& size = sprite->get_size();
   const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
-  const int frame_width = texture->get_frame_width() * (size.x);
-  const int frame_height = texture->get_frame_height() * (size.y);
+  const int frame_width = sprite->texture->get_frame_width() * (size.x);
+  const int frame_height = sprite->texture->get_frame_height() * (size.y);
 
   // Top left vertex
   // Change according to the angle that the quad will be rendered

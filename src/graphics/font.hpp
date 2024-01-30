@@ -34,17 +34,17 @@ class Font : public Asset
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
   };
-  inline std::shared_ptr<Texture> get_atlas() const { return m_texture_atlas; };
+  inline const Texture* get_atlas() const { return m_texture_atlas.get(); };
   inline size_t get_size() const { return m_size; };
   inline int get_max_character_top() const { return m_max_character_top; };
 
  private:
-  const char* m_path;
+  std::string m_path{};
   std::size_t m_size;
   FT_Library m_ft;
   FT_Face m_face;
   std::map<char32_t, CharacterData> m_chars;
-  std::shared_ptr<Texture> m_texture_atlas;
+  std::unique_ptr<Texture> m_texture_atlas = nullptr;
   unsigned int m_atlas_width, m_atlas_height;
   int m_max_character_top = 0;
 

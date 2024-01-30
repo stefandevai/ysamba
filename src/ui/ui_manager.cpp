@@ -4,13 +4,13 @@
 
 #include "./components/container.hpp"
 #include "./components/label.hpp"
-#include "core/asset_manager.hpp"
+#include "core/asset_manager2.hpp"
 #include "graphics/batch.hpp"
 #include "graphics/renderer.hpp"
 
 namespace dl::ui
 {
-UIManager::UIManager(AssetManager* asset_manager, Renderer* renderer)
+UIManager::UIManager(AssetManager2* asset_manager, Renderer* renderer)
     : m_asset_manager(asset_manager), m_renderer(renderer)
 {
   m_batch.has_depth = false;

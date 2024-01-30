@@ -6,7 +6,6 @@
 
 #include "./button.hpp"
 #include "./container.hpp"
-#include "core/asset_manager.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
 #include "world/metadata.hpp"

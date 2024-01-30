@@ -188,8 +188,8 @@ void WorldCreation::m_create_map_representation()
     }
   }
 
-  const auto texture = std::make_shared<Texture>(pixel_data, world_size.x, world_size.y);
-  m_world_sprite.texture = texture;
+  m_texture = std::make_unique<Texture>(pixel_data, world_size.x, world_size.y);
+  m_world_sprite.texture = m_texture.get();
   m_batch.clear_textures();
 }
 

@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "./font.hpp"
-#include "core/asset_manager.hpp"
+#include "core/asset_manager2.hpp"
 #include "core/utf8.hpp"
 
 namespace dl
@@ -16,20 +16,20 @@ constexpr uint32_t unicode_bracket_right = 0x5D;
 constexpr uint32_t unicode_slash = 0x2F;
 constexpr uint32_t unicode_hash = 0x23;
 
-Text::Text(const std::string_view text,
-           const std::string_view typeface,
-           const unsigned int font_size,
-           const bool is_static)
+Text::Text(const std::string_view text, const uint32_t typeface, const unsigned int font_size, const bool is_static)
     : value(text), typeface(typeface), m_font_size(font_size), m_is_static(is_static)
 {
-  initialize();
 }
 
 void Text::initialize()
 {
-  m_font = AssetManager::get<Font>(typeface);
+  assert(typeface != 0 && "Failed to initialize text, typeface is 0");
+
+  m_font = AssetManager2::get<Font>(typeface);
   m_has_initialized = true;
   update();
+
+  assert(m_font != nullptr && "Failed to initialize text, font is nullptr");
 }
 
 void Text::update()
@@ -40,8 +40,10 @@ void Text::update()
   }
 
   characters.clear();
+
   assert(m_font != nullptr);
   assert(m_has_initialized);
+
   const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
 
@@ -68,6 +70,9 @@ void Text::update()
     character.sprite->set_custom_uv(ch.bh, ch.tx, ch.bw, ch.bh);
     character.sprite->color = color;
 
+    assert(typeface != 0);
+    assert(character.sprite->texture != nullptr);
+
     if (m_font_size != m_font->get_size())
     {
       character.sprite->transform = std::make_unique<Transform>();
@@ -89,7 +94,7 @@ void Text::update()
   m_size.y = m_font->get_max_character_top() * scale;
 }
 
-void Text::set_typeface(const std::string_view typeface)
+void Text::set_typeface(const uint32_t typeface)
 {
   this->typeface = typeface;
   initialize();
@@ -189,6 +194,9 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
     character.sprite->texture = m_font->get_atlas();
     character.sprite->set_custom_uv(ch.bh, ch.tx, ch.bw, ch.bh);
     character.sprite->color = character_color;
+
+    assert(typeface != 0);
+    assert(character.sprite->texture != nullptr);
 
     if (m_font_size != m_font->get_size())
     {

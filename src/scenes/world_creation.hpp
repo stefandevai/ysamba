@@ -17,6 +17,8 @@ namespace dl
 {
 struct Quad;
 struct GameContext;
+class Texture;
+using namespace entt::literals;
 
 class WorldCreation : public Scene
 {
@@ -40,8 +42,9 @@ class WorldCreation : public Scene
   };
   SceneState m_scene_state = SceneState::Normal;
 
-  Batch m_batch{"default"};
+  Batch m_batch{"default"_hs};
   Sprite m_world_sprite{};
+  std::unique_ptr<Texture> m_texture = nullptr;
   int m_seed = 0;
   std::vector<float> m_height_map{};
   InputManager& m_input_manager = InputManager::get_instance();

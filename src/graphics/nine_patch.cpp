@@ -2,7 +2,7 @@
 
 namespace dl
 {
-NinePatch::NinePatch(const std::string& resource_id,
+NinePatch::NinePatch(const uint32_t resource_id,
                      const uint32_t top,
                      const uint32_t left,
                      const uint32_t bottom,

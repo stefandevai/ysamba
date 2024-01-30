@@ -1,6 +1,10 @@
 #include "./window_frame.hpp"
 
-#include "core/asset_manager.hpp"
+#include <spdlog/spdlog.h>
+
+#include <entt/core/hashed_string.hpp>
+
+#include "core/asset_manager2.hpp"
 #include "core/maths/vector.hpp"
 #include "graphics/renderer.hpp"
 
@@ -10,8 +14,10 @@ WindowFrame::WindowFrame(UIContext& context) : UIComponent(context) {}
 
 void WindowFrame::init()
 {
-  nine_patch.resource_id = "ui";
-  nine_patch.texture = m_context.asset_manager->get<Texture>("ui");
+  using namespace entt::literals;
+
+  nine_patch.resource_id = "ui"_hs;
+  nine_patch.texture = m_context.asset_manager->get<Texture>("ui"_hs);
   nine_patch.top = 0;
   nine_patch.left = 0;
   nine_patch.bottom = 33;

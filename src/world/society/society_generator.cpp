@@ -147,6 +147,8 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
 SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(const SocietyBlueprint& society,
                                                                              const MemberParameters& parameters)
 {
+  using namespace entt::literals;
+
   const auto& member = society.get_member(parameters.member_id);
   const auto agent = SocietyAgent{parameters.member_id, society.id, parameters.name, SocialClass::None, Metier::None};
   const auto carried_items = CarriedItems{};
@@ -161,7 +163,7 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   return SocietyGenerator::MemberComponents{
       agent,
       biology,
-      Visibility{"spritesheet-characters", parameters.texture_frame, 0, FrameAngle::Orthogonal},
+      Visibility{"spritesheet-characters"_hs, parameters.texture_frame, 0, FrameAngle::Orthogonal},
       carried_items,
       weared_items,
       wielded_items};

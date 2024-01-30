@@ -11,15 +11,15 @@ namespace dl
 class MultiSprite
 {
  public:
-  std::string resource_id;
-  std::shared_ptr<Texture> texture = nullptr;
+  uint32_t resource_id{};
+  const Texture* texture = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
   Color color{0xFFFFFFFF};
   uint32_t frame = 0;
   FrameAngle frame_angle = FrameAngle::Parallel;
 
   MultiSprite() {}
-  MultiSprite(const std::string& resource_id, const uint32_t frame, const uint32_t width, const uint32_t height)
+  MultiSprite(const uint32_t resource_id, const uint32_t frame, const uint32_t width, const uint32_t height)
       : resource_id(resource_id), frame(frame), m_width(width), m_height(height)
   {
   }

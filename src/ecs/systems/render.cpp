@@ -27,8 +27,6 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
       m_world_texture_id(m_world.get_texture_id()),
       m_world_texture(m_renderer.get_texture(m_world.get_texture_id()))
 {
-  Texture* world_texture_ptr = m_world_texture.get();
-
   for (const auto& tile_data : m_world.tile_data)
   {
     const auto& frame_data = m_world_texture->id_to_frame(tile_data.first, frame_data_type::tile);
@@ -38,7 +36,7 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
     size.y = m_world_texture->get_frame_height();
     auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame);
     m_tiles.insert(
-        {tile_data.first, TileRenderData{world_texture_ptr, &frame_data, std::move(size), std::move(uv_coordinates)}});
+        {tile_data.first, TileRenderData{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
 }
 

@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 #include <fstream>
 #include <libtcod.hpp>
@@ -29,7 +30,8 @@ namespace dl
 {
 World::World(GameContext& game_context) : m_game_context(game_context)
 {
-  m_texture_id = m_json.object["texture_id"];
+  const auto texture_id = m_json.object["texture_id"].get<std::string>();
+  m_texture_id = entt::hashed_string::value(std::move(texture_id.c_str()));
   const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
   spatial_hash.load(config::chunk_size.x, config::chunk_size.y, spatial_hash_cell_size);
 

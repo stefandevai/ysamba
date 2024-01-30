@@ -45,7 +45,10 @@ class Texture : public Asset
   // Create single texture
   Texture(const std::string& filepath);
   // Create uniform texture atlas
-  Texture(const std::string& filepath, const int horizontal_frames, const int vertical_frames);
+  Texture(const std::string& filepath,
+          const int horizontal_frames,
+          const int vertical_frames,
+          const std::string& data_filepath = "");
   // Create empty texture in order to load it later
   Texture(const int width, const int height);
   // Create texture providing raw data
@@ -53,10 +56,9 @@ class Texture : public Asset
   ~Texture();
 
   void load();
-  void load(const std::string& filepath);
   void load(const unsigned char* data, const int width, const int height, unsigned int format);
-  void bind();
-  void unbind();
+  void bind() const;
+  void unbind() const;
   inline unsigned int get_id() const { return m_id; }
   inline int get_width() const { return m_width; }
   inline int get_height() const { return m_height; }
@@ -73,7 +75,7 @@ class Texture : public Asset
   void load_data(const std::string& filepath);
 
   // Convert a game id to a texture frame known from a metadata file
-  const FrameData& id_to_frame(const uint32_t id, const std::string& type);
+  const FrameData& id_to_frame(const uint32_t id, const std::string& type) const;
 
  private:
   struct PairHash
@@ -88,15 +90,13 @@ class Texture : public Asset
 
   JSON m_json{};
   FrameDataMap m_frame_data;
+  std::string m_filepath{};
+  std::string m_data_filepath{};
   const int m_horizontal_frames;
   const int m_vertical_frames;
   unsigned int m_id = 0;
   int m_width = 0;
   int m_height = 0;
-  /* bool m_has_custom_uv = false; */
-  /* glm::vec2 m_custom_uv{}; */
-  /* float m_frame_width = 0.0f; */
-  /* float m_frame_height = 0.0f; */
 
   void m_load_empty();
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
+
 #include <memory>
 #include <unordered_map>
 #include <variant>
@@ -37,8 +39,14 @@ class AssetManager2
   }
 
   template <typename T>
-  static const T& get(uint32_t id)
+  static T* get(uint32_t id)
   {
+    if (!m_assets.contains(id))
+    {
+      printf("Could not find asset with id %d\n", id);
+      return nullptr;
+    }
+
     auto& asset = m_assets.at(id);
     auto& value = std::get<std::unique_ptr<T>>(asset);
 
@@ -47,7 +55,7 @@ class AssetManager2
       value->load();
     }
 
-    return *value;
+    return value.get();
   }
 
  private:
