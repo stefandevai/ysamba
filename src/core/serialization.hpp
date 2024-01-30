@@ -20,10 +20,10 @@ void initialize_directories();
 
 void save_world_metadata(const WorldMetadata& metadata);
 WorldMetadata load_world_metadata(const std::string& id);
-void save_world(const World& world);
-void load_world(World& world);
-void save_game(World& world, entt::registry& registry);
-void load_game(World& world, entt::registry& registry);
+void save_world(const World& world, const WorldMetadata& world_metadata);
+void load_world(World& world, WorldMetadata& world_metadata);
+void save_game(World& world, const WorldMetadata& world_metadata, entt::registry& registry);
+void load_game(World& world, const WorldMetadata& world_metadata, entt::registry& registry);
 
 bool chunk_exists(const Vector3i& position, const std::string& world_id);
 void save_game_chunk(const Chunk& chunk, const std::string& world_id);

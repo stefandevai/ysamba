@@ -79,7 +79,7 @@ void save_world_metadata(const WorldMetadata& metadata)
     std::filesystem::create_directory(world_directory);
   }
 
-  std::ofstream output{world_directory / ".metadata"};
+  std::ofstream output{world_directory / filename::metadata};
   cereal::JSONOutputArchive archive{output};
 
   WorldMetadata data = metadata;
@@ -98,7 +98,7 @@ WorldMetadata load_world_metadata(const std::string& id)
     std::filesystem::create_directory(world_directory);
   }
 
-  std::ifstream input{world_directory / ".metadata"};
+  std::ifstream input{world_directory / filename::metadata};
   cereal::JSONInputArchive archive{input};
 
   WorldMetadata metadata{};
@@ -113,26 +113,29 @@ WorldMetadata load_world_metadata(const std::string& id)
   return metadata;
 }
 
-void save_world(const World& world)
+void save_world(const World& world, const WorldMetadata& world_metadata)
 {
-  std::ofstream output{"world.dl"};
+  const auto full_path = directory::worlds / world_metadata.id / filename::game;
+  std::ofstream output{full_path.c_str()};
   cereal::BinaryOutputArchive archive{output};
   archive(world);
 }
 
-void load_world(World& world)
+void load_world(World& world, WorldMetadata& world_metadata)
 {
-  std::ifstream input{"world.dl"};
+  const auto full_path = directory::worlds / world_metadata.id / filename::game;
+  std::ifstream input{full_path.c_str()};
   cereal::BinaryInputArchive archive{input};
   archive(world);
 }
 
-void save_game(World& world, entt::registry& registry)
+void save_game(World& world, const WorldMetadata& world_metadata, entt::registry& registry)
 {
-  save_world(world);
-
-  std::ofstream output{"game.dl"};
+  const auto full_path = directory::worlds / world_metadata.id / filename::game;
+  std::ofstream output{full_path.c_str()};
   cereal::BinaryOutputArchive archive{output};
+
+  archive(world);
 
   entt::snapshot{registry}
       .get<entt::entity>(archive)
@@ -150,12 +153,18 @@ void save_game(World& world, entt::registry& registry)
       .get<JobProgress>(archive);
 }
 
-void load_game(World& world, entt::registry& registry)
+void load_game(World& world, const WorldMetadata& world_metadata, entt::registry& registry)
 {
-  load_world(world);
-
-  std::ifstream input{"game.dl"};
+  const auto full_path = directory::worlds / world_metadata.id / filename::game;
+  std::ifstream input{full_path.c_str()};
   cereal::BinaryInputArchive archive{input};
+
+  archive(world);
+
+  if (!world.has_initialized)
+  {
+    return;
+  }
 
   entt::snapshot_loader{registry}
       .get<entt::entity>(archive)

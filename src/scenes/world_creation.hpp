@@ -7,6 +7,7 @@
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "graphics/sprite.hpp"
+#include "world/world.hpp"
 
 namespace dl::ui
 {
@@ -32,7 +33,7 @@ class WorldCreation : public Scene
 
   bool will_quit = false;
 
-  void save_world();
+  void save();
 
  private:
   enum class SceneState
@@ -41,9 +42,9 @@ class WorldCreation : public Scene
     Pop,
   };
   SceneState m_scene_state = SceneState::Normal;
-
-  Batch m_batch{"default"_hs};
+  World m_world{m_game_context};
   Sprite m_world_sprite{};
+  Batch m_batch{"default"_hs};
   std::unique_ptr<Texture> m_texture = nullptr;
   int m_seed = 0;
   std::vector<float> m_height_map{};
@@ -51,6 +52,7 @@ class WorldCreation : public Scene
   ui::WorldCreationPanel* m_panel = nullptr;
 
   void m_generate_map();
+  void m_generate_world();
   void m_create_map_representation();
   bool m_update_input();
 };

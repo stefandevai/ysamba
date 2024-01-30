@@ -17,6 +17,12 @@ const std::filesystem::path worlds{data / "worlds"};
 const std::filesystem::path chunks{"chunks"};
 }  // namespace dl::directory
 
+namespace dl::filename
+{
+const std::filesystem::path game{"game.dl"};
+const std::filesystem::path metadata{".metadata"};
+}  // namespace dl::filename
+
 namespace dl::world
 {
 const Vector3i chunk_size{128, 128, 10};

@@ -36,9 +36,10 @@ void WorldCreation::load()
   world_size.z = m_json.object["world_depth"].get<int>();
 
   m_panel = m_ui_manager.emplace<ui::WorldCreationPanel>();
-  m_panel->on_save([this]() { save_world(); });
+  m_panel->on_save([this]() { save(); });
 
   m_generate_map();
+  m_generate_world();
   m_create_map_representation();
   m_has_loaded = true;
 }
@@ -95,9 +96,9 @@ bool WorldCreation::m_update_input()
     m_generate_map();
     m_create_map_representation();
   }
-  else if (m_input_manager.poll_action("save_world"_hs))
+  else if (m_input_manager.poll_action("save"_hs))
   {
-    save_world();
+    save();
   }
   else if (m_input_manager.poll_action("display_seed"_hs))
   {
@@ -107,7 +108,7 @@ bool WorldCreation::m_update_input()
   return will_quit;
 }
 
-void WorldCreation::save_world()
+void WorldCreation::save()
 {
   bool is_valid = m_panel->validate();
 
@@ -129,6 +130,7 @@ void WorldCreation::save_world()
   metadata.updated_at = now_seconds;
 
   serialization::save_world_metadata(metadata);
+  serialization::save_world(m_world, metadata);
 
   spdlog::debug("World saved: {}", metadata.name);
   spdlog::debug("Seed: {}", metadata.seed);
@@ -165,6 +167,8 @@ void WorldCreation::m_generate_map()
   generator.generate(m_seed);
   m_height_map = std::move(generator.raw_height_map);
 }
+
+void WorldCreation::m_generate_world() { m_world.generate_societies(); }
 
 void WorldCreation::m_create_map_representation()
 {

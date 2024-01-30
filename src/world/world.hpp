@@ -62,9 +62,13 @@ class World
   ChunkManager chunk_manager{m_game_context};
   std::unordered_map<uint32_t, TileData> tile_data;
   std::unordered_map<uint32_t, ItemData> item_data;
+  bool has_initialized = false;
 
   // Constructor
   World(GameContext& game_context);
+
+  // Generate elements for a new world
+  void initialize(entt::registry& registry, const Camera& camera);
 
   // Generate all societies for the world
   void generate_societies();
@@ -151,7 +155,7 @@ class World
   template <class Archive>
   void serialize(Archive& archive)
   {
-    archive(m_seed, m_societies);
+    archive(m_societies, has_initialized);
   }
 
  private:
