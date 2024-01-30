@@ -40,6 +40,8 @@ struct FrameData
 class Texture : public Asset
 {
  public:
+  bool has_loaded = false;
+
   // Create single texture
   Texture(const std::string& filepath);
   // Create uniform texture atlas
@@ -50,6 +52,7 @@ class Texture : public Asset
   Texture(const std::vector<unsigned char>& data, const int width, const int height);
   ~Texture();
 
+  void load();
   void load(const std::string& filepath);
   void load(const unsigned char* data, const int width, const int height, unsigned int format);
   void bind();

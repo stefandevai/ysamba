@@ -38,6 +38,8 @@ Texture::Texture(const int width, const int height)
 
 Texture::~Texture() { glDeleteTextures(1, &m_id); }
 
+void Texture::load() { has_loaded = true; }
+
 void Texture::load(const std::string& filepath)
 {
   int width = 0;

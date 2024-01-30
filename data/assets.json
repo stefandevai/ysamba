@@ -4,7 +4,9 @@
         {
             "id": "default",
             "type": "shader",
-            "path": "shaders/default"
+            "path": "shaders/default",
+            "vertex_path": "shaders/default.vs",
+            "fragment_path": "shaders/default.fs"
         },
         {
             "id": "ui",

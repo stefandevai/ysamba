@@ -8,7 +8,9 @@
 
 namespace dl
 {
-Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_size(size)
+Font::Font(const std::string& path, std::size_t size) : m_path(path.c_str()), m_size(size) {}
+
+void Font::load()
 {
   if (FT_Init_FreeType(&m_ft))
   {
