@@ -17,7 +17,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "config.hpp"
+#include "constants.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/biology.hpp"
@@ -51,28 +51,28 @@ constexpr size_t cell_size = sizeof(uint32_t) * 3;
 
 void initialize_directories()
 {
-  if (!std::filesystem::exists(config::data_directory))
+  if (!std::filesystem::exists(directory::data))
   {
-    std::filesystem::create_directory(config::data_directory);
+    std::filesystem::create_directory(directory::data);
   }
-  else if (!std::filesystem::is_directory(config::data_directory))
+  else if (!std::filesystem::is_directory(directory::data))
   {
-    spdlog::critical("{} is not a directory", config::data_directory.c_str());
+    spdlog::critical("{} is not a directory", directory::data.c_str());
   }
 
-  if (!std::filesystem::exists(config::worlds_directory))
+  if (!std::filesystem::exists(directory::worlds))
   {
-    std::filesystem::create_directory(config::worlds_directory);
+    std::filesystem::create_directory(directory::worlds);
   }
-  else if (!std::filesystem::is_directory(config::worlds_directory))
+  else if (!std::filesystem::is_directory(directory::worlds))
   {
-    spdlog::critical("{} is not a directory", config::worlds_directory.c_str());
+    spdlog::critical("{} is not a directory", directory::worlds.c_str());
   }
 }
 
 void save_world_metadata(const WorldMetadata& metadata)
 {
-  const auto world_directory = config::worlds_directory / metadata.id;
+  const auto world_directory = directory::worlds / metadata.id;
 
   if (!std::filesystem::exists(world_directory))
   {
@@ -91,7 +91,7 @@ void save_world_metadata(const WorldMetadata& metadata)
 
 WorldMetadata load_world_metadata(const std::string& id)
 {
-  const auto world_directory = config::worlds_directory / id;
+  const auto world_directory = directory::worlds / id;
 
   if (!std::filesystem::exists(world_directory))
   {
@@ -175,17 +175,17 @@ void load_game(World& world, entt::registry& registry)
 
 bool chunk_exists(const Vector3i& position, const std::string& world_id)
 {
-  assert(position.x % config::chunk_size.x == 0 && position.y % config::chunk_size.y == 0 &&
-         position.z % config::chunk_size.z == 0 && "Position is not a chunk position.");
+  assert(position.x % world::chunk_size.x == 0 && position.y % world::chunk_size.y == 0 &&
+         position.z % world::chunk_size.z == 0 && "Position is not a chunk position.");
 
   const auto filename = fmt::format("{}_{}_{}.chunk", position.x, position.y, position.z);
-  const auto full_path = config::worlds_directory / world_id / config::chunks_directory / filename;
+  const auto full_path = directory::worlds / world_id / directory::chunks / filename;
   return std::filesystem::exists(full_path);
 }
 
 void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 {
-  const auto chunks_directory = config::worlds_directory / world_id / config::chunks_directory;
+  const auto chunks_directory = directory::worlds / world_id / directory::chunks;
 
   if (!std::filesystem::exists(chunks_directory))
   {
@@ -241,7 +241,7 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 void load_game_chunk(Chunk& chunk, const std::string& world_id)
 {
   const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = config::worlds_directory / world_id / config::chunks_directory / filename;
+  const auto full_path = directory::worlds / world_id / directory::chunks / filename;
 
   if (!std::filesystem::exists(full_path))
   {

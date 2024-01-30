@@ -9,18 +9,18 @@
 
 #include "./tile_rules.hpp"
 #include "./utils.hpp"
-#include "config.hpp"
+#include "constants.hpp"
 #include "core/random.hpp"
 #include "core/timer.hpp"
 #include "world/chunk.hpp"
 
 namespace dl
 {
-GameChunkGenerator::GameChunkGenerator() : GameChunkGenerator(config::chunk_size) {}
+GameChunkGenerator::GameChunkGenerator() : GameChunkGenerator(world::chunk_size) {}
 
 GameChunkGenerator::GameChunkGenerator(const Vector3i& size) : size(size)
 {
-  // map_to_tiles = static_cast<float>(config::chunk_size.x);
+  // map_to_tiles = static_cast<float>(world::chunk_size.x);
   const float frequency = 0.016f / map_to_tiles;
 
   island_params.layer_1_octaves = 4;

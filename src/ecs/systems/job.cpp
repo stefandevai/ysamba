@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "constants.hpp"
 #include "ecs/components/action_drop.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
@@ -11,7 +12,6 @@
 #include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "graphics/constants.hpp"
 #include "graphics/frame_data_types.hpp"
 
 namespace

@@ -6,11 +6,10 @@
 #include <entt/entity/registry.hpp>
 
 #include "./name_generator.hpp"
-#include "config.hpp"
+#include "constants.hpp"
 #include "core/random.hpp"
 #include "ecs/components/selectable.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/constants.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -125,9 +124,9 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = static_cast<double>(random::get_integer(0, config::chunk_size.x));
-    const auto y = static_cast<double>(random::get_integer(0, config::chunk_size.y));
-    const auto height = chunk.tiles.height_map[x + y * config::chunk_size.x];
+    const auto x = static_cast<double>(random::get_integer(0, world::chunk_size.x));
+    const auto y = static_cast<double>(random::get_integer(0, world::chunk_size.y));
+    const auto height = chunk.tiles.height_map[x + y * world::chunk_size.x];
 
     if (world.is_walkable(x, y, height))
     {

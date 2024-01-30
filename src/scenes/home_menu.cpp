@@ -6,7 +6,7 @@
 #include <chrono>
 #include <entt/core/hashed_string.hpp>
 
-#include "config.hpp"
+#include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
@@ -112,7 +112,7 @@ void HomeMenu::m_load_worlds_metadata()
 {
   m_worlds_metadata.clear();
 
-  for (const auto& candidate : std::filesystem::directory_iterator(config::worlds_directory))
+  for (const auto& candidate : std::filesystem::directory_iterator(directory::worlds))
   {
     if (candidate.is_directory())
     {

@@ -1,6 +1,6 @@
 #include "./chunk_debugger.hpp"
 
-#include "config.hpp"
+#include "constants.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "imgui.h"
 #include "scenes/gameplay.hpp"
@@ -54,7 +54,7 @@ void ChunkDebugger::update()
       auto color = chunk->active ? 0xCC8844FF : 0x4477AAFF;
       auto entity = m_gameplay.m_registry.create();
       m_gameplay.m_registry.emplace<Rectangle>(
-          entity, config::chunk_size.x * grid_size.x, config::chunk_size.y * grid_size.y, color);
+          entity, world::chunk_size.x * grid_size.x, world::chunk_size.y * grid_size.y, color);
       m_gameplay.m_registry.emplace<Position>(entity,
                                               static_cast<double>(chunk->position.x),
                                               static_cast<double>(chunk->position.y),

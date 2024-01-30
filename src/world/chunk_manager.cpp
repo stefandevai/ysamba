@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "./generators/game_chunk_generator.hpp"
-#include "config.hpp"
+#include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "core/random.hpp"
@@ -46,7 +46,7 @@ void ChunkManager::load_or_generate(const Vector3i& position)
   }
   else
   {
-    generate_sync(position, config::chunk_size);
+    generate_sync(position, world::chunk_size);
     return;
   }
 }
@@ -55,9 +55,9 @@ void ChunkManager::load_initial_chunks(const Vector3i& target)
 {
   const auto top_left_position = world_to_chunk(target.x - frustum.x / 2, target.y - frustum.y / 2, target.z);
 
-  for (int j = top_left_position.y; j < target.y + frustum.y / 2; j += config::chunk_size.y)
+  for (int j = top_left_position.y; j < target.y + frustum.y / 2; j += world::chunk_size.y)
   {
-    for (int i = top_left_position.x; i < target.x + frustum.x / 2; i += config::chunk_size.y)
+    for (int i = top_left_position.x; i < target.x + frustum.x / 2; i += world::chunk_size.y)
     {
       const auto& candidate = world_to_chunk(i, j, target.z);
 
@@ -77,18 +77,18 @@ void ChunkManager::update(const Vector3i& target)
   {
     // Load visible chunks
     // const auto top_left_position = world_to_chunk(
-    //     target.x - frustum.x / 2 - padding * config::chunk_size.x, target.y - frustum.y / 2 - padding *
-    //     config::chunk_size.y, target.z);
+    //     target.x - frustum.x / 2 - padding * world::chunk_size.x, target.y - frustum.y / 2 - padding *
+    //     world::chunk_size.y, target.z);
     const auto top_left_position =
-        world_to_chunk(target.x - padding * config::chunk_size.x, target.y - padding * config::chunk_size.y, target.z);
+        world_to_chunk(target.x - padding * world::chunk_size.x, target.y - padding * world::chunk_size.y, target.z);
 
-    const auto bottom_right_position = world_to_chunk(target.x + frustum.x + padding * config::chunk_size.x,
-                                                      target.y + frustum.y + padding * config::chunk_size.y,
+    const auto bottom_right_position = world_to_chunk(target.x + frustum.x + padding * world::chunk_size.x,
+                                                      target.y + frustum.y + padding * world::chunk_size.y,
                                                       target.z);
 
-    for (int j = top_left_position.y; j <= bottom_right_position.y; j += config::chunk_size.y)
+    for (int j = top_left_position.y; j <= bottom_right_position.y; j += world::chunk_size.y)
     {
-      for (int i = top_left_position.x; i <= bottom_right_position.x; i += config::chunk_size.y)
+      for (int i = top_left_position.x; i <= bottom_right_position.x; i += world::chunk_size.y)
       {
         const auto& candidate = world_to_chunk(i, j, target.z);
 
@@ -115,7 +115,7 @@ void ChunkManager::update(const Vector3i& target)
       return !is_within_tile_distance(
           chunk->position,
           target_chunk_position,
-          Vector2i{frustum.x + 2 * config::chunk_size.x, frustum.y + 2 * config::chunk_size.y});
+          Vector2i{frustum.x + 2 * world::chunk_size.x, frustum.y + 2 * world::chunk_size.y});
     });
   }
 
@@ -158,7 +158,7 @@ void ChunkManager::load_async(const Vector3i& position)
 
   if (found == m_chunks_loading.end())
   {
-    m_thread_pool.queue_job([this, position, size = config::chunk_size] {
+    m_thread_pool.queue_job([this, position, size = world::chunk_size] {
       generate_async(std::ref(position), std::ref(size), std::ref(m_chunks_to_add_mutex));
     });
     m_chunks_loading.push_back(position);
@@ -188,14 +188,14 @@ void ChunkManager::load_sync(const Vector3i& position)
   // timer.start();
 
   auto chunk = std::make_unique<Chunk>(position, true);
-  chunk->tiles.set_size(config::chunk_size);
+  chunk->tiles.set_size(world::chunk_size);
   serialization::load_game_chunk(*chunk, m_game_context.world_metadata.id);
 
   // spdlog::debug("Chunk size: {} {} {}", chunk->tiles.size.x, chunk->tiles.size.y, chunk->tiles.size.z);
   // timer.stop();
   // timer.print(fmt::format("Chunk ({}, {}, {})", position.x, position.y, position.z));
 
-  if (chunk->tiles.height_map.size() != static_cast<uint32_t>(config::chunk_size.x * config::chunk_size.y))
+  if (chunk->tiles.height_map.size() != static_cast<uint32_t>(world::chunk_size.x * world::chunk_size.y))
   {
     spdlog::critical("Could not load chunk: invalid height map size");
     return;
@@ -257,9 +257,9 @@ Chunk& ChunkManager::in(const Vector3i& position) const { return in(position.x, 
 
 Vector3i ChunkManager::world_to_chunk(const int x, const int y, const int z) const
 {
-  return Vector3i{std::floor(x / static_cast<float>(config::chunk_size.x)) * config::chunk_size.x,
-                  std::floor(y / static_cast<float>(config::chunk_size.y)) * config::chunk_size.y,
-                  std::floor(z / static_cast<float>(config::chunk_size.z)) * config::chunk_size.z};
+  return Vector3i{std::floor(x / static_cast<float>(world::chunk_size.x)) * world::chunk_size.x,
+                  std::floor(y / static_cast<float>(world::chunk_size.y)) * world::chunk_size.y,
+                  std::floor(z / static_cast<float>(world::chunk_size.z)) * world::chunk_size.z};
 }
 
 Vector3i ChunkManager::world_to_chunk(const Vector3i& position) const
@@ -282,9 +282,9 @@ bool ChunkManager::is_within_tile_distance(const Vector3i& origin,
 
 bool ChunkManager::is_within_chunk_radius(const Vector3i& origin, const Vector3i& target, const int radius) const
 {
-  return std::abs(origin.x - target.x) <= radius * config::chunk_size.x &&
-         std::abs(origin.y - target.y) <= radius * config::chunk_size.y &&
-         std::abs(origin.z - target.z) <= radius * config::chunk_size.z;
+  return std::abs(origin.x - target.x) <= radius * world::chunk_size.x &&
+         std::abs(origin.y - target.y) <= radius * world::chunk_size.y &&
+         std::abs(origin.z - target.z) <= radius * world::chunk_size.z;
 }
 
 void ChunkManager::activate_if(const std::function<bool(const std::unique_ptr<Chunk>&)>& condition)
