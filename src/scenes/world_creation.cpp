@@ -118,15 +118,15 @@ void WorldCreation::save_world()
   }
 
   const auto now = std::chrono::system_clock::now();
-  const auto now_time_t = std::chrono::time_point_cast<std::chrono::seconds>(now);
+  const auto now_seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
 
   WorldMetadata metadata{};
   metadata.id = utils::generate_id();
   metadata.name = m_panel->get_name();
   metadata.seed = m_seed;
   metadata.world_size = world_size;
-  metadata.created_at = now_time_t;
-  metadata.updated_at = now_time_t;
+  metadata.created_at = now_seconds;
+  metadata.updated_at = now_seconds;
 
   serialization::save_world_metadata(metadata);
 

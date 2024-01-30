@@ -3,6 +3,7 @@
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
 #include "graphics/text.hpp"
+#include "ui/types.hpp"
 
 namespace dl::ui
 {
@@ -24,8 +25,11 @@ class HomeMenu : public Scene
 
  private:
   InputManager& m_input_manager = InputManager::get_instance();
+  ui::ItemList<WorldMetadata> m_worlds_metadata{};
   ui::WorldList* m_world_list = nullptr;
   Text m_game_title;
   Text m_instructions;
+
+  void m_load_worlds_metadata();
 };
 }  // namespace dl

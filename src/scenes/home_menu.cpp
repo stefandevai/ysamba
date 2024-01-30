@@ -38,13 +38,17 @@ void HomeMenu::load()
   m_instructions.set_typeface("font-1980");
   m_instructions.set_text(instructions);
 
-  m_world_list = m_ui_manager.emplace<ui::WorldList>();
+  m_load_worlds_metadata();
+
   const auto on_select_world = [this](const WorldMetadata& world_metadata) {
     m_ui_manager.force_hide_all();
     m_game_context.world_metadata = world_metadata;
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   };
+
+  m_world_list = m_ui_manager.emplace<ui::WorldList>();
   m_world_list->set_on_select(on_select_world);
+  m_world_list->set_actions(m_worlds_metadata);
 
   m_has_loaded = true;
 }
@@ -68,25 +72,15 @@ void HomeMenu::update()
   }
   else if (m_input_manager.poll_action("play"_hs))
   {
-    ui::ItemList<WorldMetadata> worlds_metadata{};
+    m_load_worlds_metadata();
 
-    for (const auto& candidate : std::filesystem::directory_iterator(config::worlds_directory))
+    if (m_worlds_metadata.empty())
     {
-      if (candidate.is_directory())
-      {
-        const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
-        const auto updated_at_time_t = std::chrono::system_clock::to_time_t(world_metadata.updated_at);
-        const auto label =
-            fmt::format("{}\n({:%d/%m/%Y %H:%M})", world_metadata.name, fmt::localtime(updated_at_time_t));
-        worlds_metadata.push_back({world_metadata, label});
-      }
+      spdlog::warn("No worlds found");
+      return;
     }
 
-    std::sort(worlds_metadata.begin(), worlds_metadata.end(), [](const auto& lhs, const auto& rhs) {
-      return lhs.first.updated_at > rhs.first.updated_at;
-    });
-
-    m_world_list->set_actions(worlds_metadata);
+    m_world_list->set_actions(m_worlds_metadata);
     m_world_list->show();
   }
   else if (m_input_manager.poll_action("create_world"_hs))
@@ -112,5 +106,25 @@ void HomeMenu::render()
   m_ui_manager.render();
   m_renderer.render(m_camera);
   m_renderer.pop_matrix("text"_hs);
+}
+
+void HomeMenu::m_load_worlds_metadata()
+{
+  m_worlds_metadata.clear();
+
+  for (const auto& candidate : std::filesystem::directory_iterator(config::worlds_directory))
+  {
+    if (candidate.is_directory())
+    {
+      const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
+      const auto updated_at_time_t = std::chrono::system_clock::to_time_t(world_metadata.updated_at);
+      const auto label = fmt::format("{}\n({:%d/%m/%Y %H:%M})", world_metadata.name, fmt::localtime(updated_at_time_t));
+      m_worlds_metadata.push_back({world_metadata, label});
+    }
+  }
+
+  std::sort(m_worlds_metadata.begin(), m_worlds_metadata.end(), [](const auto& lhs, const auto& rhs) {
+    return lhs.first.updated_at > rhs.first.updated_at;
+  });
 }
 }  // namespace dl
