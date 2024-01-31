@@ -28,6 +28,7 @@ GameChunkGenerator::GameChunkGenerator(const Vector3i& size) : size(size)
   island_params.layer_1_lacunarity = 3.2f;
   island_params.layer_1_gain = 0.32f;
   island_params.layer_1_weighted_strength = 0.25f;
+  island_params.layer_1_terrace_multiplier = 0.14f;
 
   island_params.layer_2_seed_offset = 7;
   island_params.layer_2_octave_count = 4;

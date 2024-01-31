@@ -6,6 +6,7 @@
 #include "./chunk_debugger.hpp"
 #include "./general_info.hpp"
 #include "./render_editor.hpp"
+#include "./world_generation.hpp"
 
 union SDL_Event;
 struct SDL_Window;
@@ -35,6 +36,7 @@ class DebugTools
   void init_camera_inspector(Camera& camera);
   void init_render_editor(RenderSystem& render);
   void init_chunk_debugger(Gameplay& gameplay);
+  void init_world_generation(ChunkManager& chunk_manager);
 
  private:
   static std::unique_ptr<DebugTools> m_instance;
@@ -44,6 +46,7 @@ class DebugTools
   std::unique_ptr<CameraInspector> m_camera_inspector = nullptr;
   std::unique_ptr<RenderEditor> m_render_editor = nullptr;
   std::unique_ptr<ChunkDebugger> m_chunk_debugger = nullptr;
+  std::unique_ptr<WorldGeneration> m_world_generation = nullptr;
 
   void m_update_menu_bar();
 };

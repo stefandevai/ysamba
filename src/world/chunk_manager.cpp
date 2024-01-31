@@ -23,6 +23,11 @@ std::mutex ChunkManager::m_chunks_to_add_mutex = std::mutex{};
 
 ChunkManager::ChunkManager(GameContext& game_context) : m_game_context(game_context)
 {
+#ifdef DL_BUILD_DEBUG_TOOLS
+  GameChunkGenerator generator{};
+  island_params = generator.island_params;
+#endif
+
   m_seed = m_game_context.world_metadata.seed;
   m_thread_pool.initialize();
 }
@@ -96,7 +101,6 @@ void ChunkManager::load_initial_chunks(const Vector3i& target)
 
       if (!is_loaded(candidate))
       {
-        // load_sync(candidate);
         load_or_generate(candidate);
       }
     }
@@ -127,8 +131,6 @@ void ChunkManager::update(const Vector3i& target)
 
         if (!is_loaded(candidate))
         {
-          // load_async(candidate);
-          // load_sync(candidate);
           load_or_generate(candidate);
         }
       }
@@ -240,6 +242,11 @@ void ChunkManager::load_sync(const Vector3i& position)
 void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
 {
   GameChunkGenerator generator{};
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+  generator.island_params = island_params;
+#endif
+
   generator.set_size(size);
   generator.generate(m_seed, position);
   serialization::save_game_chunk(*generator.chunk, m_game_context.world_metadata.id);

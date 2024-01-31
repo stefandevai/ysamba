@@ -35,7 +35,7 @@ struct IslandNoiseParams
   // General
   float frequency = 0.005f;
   float tier_land = 0.002f;
-  float display_mask = true;
+  bool display_mask = true;
 
   // First layer
   int layer_1_octaves = 4;

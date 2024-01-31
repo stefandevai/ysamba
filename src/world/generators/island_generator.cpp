@@ -67,12 +67,13 @@ void IslandGenerator::m_load_params(const std::string& filepath)
   const auto& mask_params = json.object["mask"];
 
   island_params.frequency = mask_params["frequency"].get<float>();
+  island_params.tier_land = mask_params["tier_land"].get<float>();
   island_params.display_mask = mask_params["display_mask"].get<bool>();
   island_params.layer_1_octaves = mask_params["octaves"].get<int>();
   island_params.layer_1_lacunarity = mask_params["lacunarity"].get<float>();
   island_params.layer_1_gain = mask_params["gain"].get<float>();
   island_params.layer_1_weighted_strength = mask_params["weighted_strength"].get<float>();
-  island_params.tier_land = mask_params["tier_land"].get<float>();
+  island_params.layer_1_terrace_multiplier = mask_params["terrace_multiplier"].get<float>();
 }
 
 void IslandGenerator::m_get_height_map(const int seed)

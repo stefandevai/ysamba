@@ -9,7 +9,8 @@
         "tier_land": 0.1,
         "distance_k": 1.0,
         "distance_influence": 4.0,
-        "display_mask": true
+        "display_mask": true,
+        "terrace_multiplier": 0.14
     }
 }
 

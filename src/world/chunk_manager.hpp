@@ -9,6 +9,10 @@
 #include "core/thread_pool.hpp"
 #include "definitions.hpp"
 
+#ifdef DL_BUILD_DEBUG_TOOLS
+#include "world/generators/island_data.hpp"
+#endif
+
 namespace dl
 {
 struct GameContext;
@@ -25,6 +29,7 @@ class ChunkManager
     NoLoadingOrSaving,
   };
   Mode mode = Mode::Default;
+  IslandNoiseParams island_params{};
 
   void regenerate_chunks();
 #endif

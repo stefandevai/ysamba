@@ -94,6 +94,10 @@ void DebugTools::update()
   {
     m_chunk_debugger->update();
   }
+  if (m_world_generation != nullptr)
+  {
+    m_world_generation->update();
+  }
 }
 
 void DebugTools::render()
@@ -147,6 +151,11 @@ void DebugTools::init_render_editor(RenderSystem& render) { m_render_editor = st
 void DebugTools::init_chunk_debugger(Gameplay& gameplay)
 {
   m_chunk_debugger = std::make_unique<ChunkDebugger>(gameplay);
+}
+
+void DebugTools::init_world_generation(ChunkManager& chunk_manager)
+{
+  m_world_generation = std::make_unique<WorldGeneration>(chunk_manager);
 }
 
 }  // namespace dl
