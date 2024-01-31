@@ -36,6 +36,7 @@ class Gameplay : public Scene
 
   void save_game();
   void load_game();
+  void load_default_game();
 
  private:
   friend class ChunkDebugger;

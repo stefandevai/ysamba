@@ -36,23 +36,12 @@ void Gameplay::load()
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();
 
-  // const auto seed = random::get_integer(0, 100000);
-  // const auto seed = 1334;
-  // m_world.generate(32, 32, 2, seed);
-  /* m_world.load("./data/world/test_map.json"); */
-
   m_camera.set_tile_size(m_world.get_tile_size());
   m_camera.set_zoom(default_zoom);
   m_camera.update_dirty();
 
-  m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
-
-  load_game();
-
-  // m_world.generate_societies();
-  // auto society_blueprint = m_world.get_society("otomi"_hs);
-  // auto components = SocietyGenerator::generate_members(society_blueprint);
-  // SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  // load_game();
+  load_default_game();
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();
@@ -137,6 +126,8 @@ void Gameplay::save_game() { serialization::save_game(m_world, m_game_context.wo
 
 void Gameplay::load_game()
 {
+  m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
+
   m_registry.clear();
   serialization::load_game(m_world, m_game_context.world_metadata, m_registry);
 
@@ -146,6 +137,22 @@ void Gameplay::load_game()
     serialization::save_game(m_world, m_game_context.world_metadata, m_registry);
   }
 
+  m_has_loaded = true;
+}
+
+void Gameplay::load_default_game()
+{
+  m_game_context.world_metadata.id = "test";
+  m_game_context.world_metadata.seed = 100;
+  m_game_context.world_metadata.world_size = {256, 256, 10};
+
+  m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
+
+  m_world.generate_societies();
+  auto society_blueprint = m_world.get_society("otomi"_hs);
+  auto components = SocietyGenerator::generate_members(society_blueprint);
+  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  m_world.has_initialized = true;
   m_has_loaded = true;
 }
 

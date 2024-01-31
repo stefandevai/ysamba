@@ -47,9 +47,6 @@ World::World(GameContext& game_context) : m_game_context(game_context)
 void World::initialize(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
-
-  spdlog::debug("SOC {}", m_societies.size());
-
   auto society_blueprint = get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
   SocietyGenerator::place_members(components, *this, camera, registry);

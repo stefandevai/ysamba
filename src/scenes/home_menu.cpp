@@ -117,6 +117,12 @@ void HomeMenu::m_load_worlds_metadata()
     if (candidate.is_directory())
     {
       const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
+
+      if (world_metadata.id.empty())
+      {
+        continue;
+      }
+
       const auto updated_at_time_t = std::chrono::system_clock::to_time_t(world_metadata.updated_at);
       const auto label = fmt::format("{}\n({:%d/%m/%Y %H:%M})", world_metadata.name, fmt::localtime(updated_at_time_t));
       m_worlds_metadata.push_back({world_metadata, label});

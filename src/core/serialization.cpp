@@ -98,7 +98,14 @@ WorldMetadata load_world_metadata(const std::string& id)
     std::filesystem::create_directory(world_directory);
   }
 
-  std::ifstream input{world_directory / filename::metadata};
+  const auto metadata_path = world_directory / filename::metadata;
+
+  if (!std::filesystem::exists(metadata_path))
+  {
+    return {};
+  }
+
+  std::ifstream input{metadata_path};
   cereal::JSONInputArchive archive{input};
 
   WorldMetadata metadata{};
