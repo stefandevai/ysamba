@@ -7,6 +7,7 @@
 #include "./chunk.hpp"
 #include "core/maths/vector.hpp"
 #include "core/thread_pool.hpp"
+#include "definitions.hpp"
 
 namespace dl
 {
@@ -15,6 +16,19 @@ struct GameContext;
 class ChunkManager
 {
  public:
+#ifdef DL_BUILD_DEBUG_TOOLS
+  enum class Mode
+  {
+    // Save, load and generate chunks
+    Default,
+    // Only generates chunks
+    NoLoadingOrSaving,
+  };
+  Mode mode = Mode::Default;
+
+  void regenerate_chunks();
+#endif
+
   std::vector<std::unique_ptr<Chunk>> chunks{};
   // Frustum in tiles
   Vector2i frustum{80, 48};

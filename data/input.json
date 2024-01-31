@@ -26,7 +26,8 @@
         "drop_item": ["k_d"],
         "add_item": ["k_z"],
         "zoom_in": ["k_equals"],
-        "zoom_out": ["k_minus"]
+        "zoom_out": ["k_minus"],
+        "regenerate": ["k_r"]
     },
     "action_menu": {
         "close_menu": ["k_escape"],

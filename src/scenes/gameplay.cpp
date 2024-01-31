@@ -40,10 +40,18 @@ void Gameplay::load()
   m_camera.set_zoom(default_zoom);
   m_camera.update_dirty();
 
-  // load_game();
-  load_default_game();
+#ifndef DL_BUILD_DEBUG_TOOLS
+  load_game();
+#else
+  if (m_game_context.world_metadata.id.empty())
+  {
+    load_default_game();
+  }
+  else
+  {
+    load_game();
+  }
 
-#ifdef DL_BUILD_DEBUG_TOOLS
   auto& debug_tools = DebugTools::get_instance();
   debug_tools.init_general_info(m_game_context);
   debug_tools.init_camera_inspector(m_camera);
@@ -146,6 +154,7 @@ void Gameplay::load_default_game()
   m_game_context.world_metadata.seed = 100;
   m_game_context.world_metadata.world_size = {256, 256, 10};
 
+  m_world.chunk_manager.mode = ChunkManager::Mode::NoLoadingOrSaving;
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
   m_world.generate_societies();
@@ -227,6 +236,12 @@ bool Gameplay::m_update_input()
   {
     m_camera.zoom_out();
   }
+#ifdef DL_BUILD_DEBUG_TOOLS
+  else if (m_input_manager.poll_action("regenerate"_hs))
+  {
+    m_world.chunk_manager.regenerate_chunks();
+  }
+#endif
 
   return will_quit;
 }

@@ -37,6 +37,28 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::load_or_generate(const Vector3i& position)
 {
+#ifdef DL_BUILD_DEBUG_TOOLS
+  if (mode == Mode::NoLoadingOrSaving)
+  {
+    generate_sync(position, world::chunk_size);
+    return;
+  }
+  else
+  {
+    assert(m_game_context.world_metadata.id != "" && "World metadata id should be set before loading chunks");
+
+    if (serialization::chunk_exists(position, m_game_context.world_metadata.id))
+    {
+      load_sync(position);
+      return;
+    }
+    else
+    {
+      generate_sync(position, world::chunk_size);
+      return;
+    }
+  }
+#else
   assert(m_game_context.world_metadata.id != "" && "World metadata id should be set before loading chunks");
 
   if (serialization::chunk_exists(position, m_game_context.world_metadata.id))
@@ -49,7 +71,18 @@ void ChunkManager::load_or_generate(const Vector3i& position)
     generate_sync(position, world::chunk_size);
     return;
   }
+#endif
 }
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+void ChunkManager::regenerate_chunks()
+{
+  spdlog::debug("Regenerating chunks");
+  chunks.clear();
+  m_chunks_loading.clear();
+  m_chunks_to_add.clear();
+}
+#endif
 
 void ChunkManager::load_initial_chunks(const Vector3i& target)
 {
