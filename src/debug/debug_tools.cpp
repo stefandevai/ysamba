@@ -71,7 +71,7 @@ void DebugTools::update()
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
-  m_update_menu_bar();
+  // m_update_menu_bar();
 
   if (show_demo_window)
   {
