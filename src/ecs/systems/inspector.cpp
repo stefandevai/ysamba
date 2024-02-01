@@ -43,11 +43,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     return;
   }
 
-  const auto& grid_size = camera.get_grid_size();
-  const auto tile_x = (mouse_position.x + camera_position.x) / grid_size.x;
-  const auto tile_y = (mouse_position.y + camera_position.y) / grid_size.y;
-  const int floor_x = std::floor(tile_x);
-  const int floor_y = std::floor(tile_y);
+  const auto mouse_tile = m_world.mouse_to_world(camera);
 
   if (!registry.valid(m_target_quad))
   {
@@ -58,32 +54,18 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   }
 
   auto& quad_position = registry.get<Position>(m_target_quad);
-  quad_position.x = floor_x;
-  int elevation = 0;
+  quad_position.x = mouse_tile.x;
+  quad_position.y = mouse_tile.y;
+  quad_position.z = mouse_tile.z;
 
-  // Check elevation in the current mouse position
-  for (int z = world::chunk_size.z - 1; z >= 0; --z)
-  {
-    int queried_elevation = m_world.get_elevation(floor_x, floor_y + z);
-
-    if (queried_elevation == z)
-    {
-      elevation = queried_elevation;
-      break;
-    }
-  }
-
-  quad_position.y = floor_y + elevation;
-  quad_position.z = elevation;
-
-  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(tile_x, tile_y + elevation, registry);
+  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(mouse_tile.x, mouse_tile.y, registry);
   bool updated_inspector_content = false;
 
   if (registry.valid(entity))
   {
     const auto& position = registry.get<Position>(entity);
 
-    if (position.z >= elevation)
+    if (position.z >= mouse_tile.z)
     {
       m_update_inspector_content(entity, registry);
       updated_inspector_content = true;
@@ -92,7 +74,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
   if (!updated_inspector_content)
   {
-    const auto& tile_data = m_world.get(tile_x, tile_y + elevation, elevation);
+    const auto& tile_data = m_world.get(mouse_tile.x, mouse_tile.y, mouse_tile.z);
 
     if (tile_data.id > 0)
     {
