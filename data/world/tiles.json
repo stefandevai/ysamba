@@ -1122,17 +1122,17 @@
     {
       "id": 136,
       "name": "grass",
-      "flags": []
+      "flags": ["WALKABLE"]
     },
     {
       "id": 137,
       "name": "grass",
-      "flags": []
+      "flags": ["WALKABLE"]
     },
     {
       "id": 138,
       "name": "grass",
-      "flags": []
+      "flags": ["WALKABLE"]
     }
   ]
 }

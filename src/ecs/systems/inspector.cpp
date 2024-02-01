@@ -58,7 +58,8 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   quad_position.y = mouse_tile.y;
   quad_position.z = mouse_tile.z;
 
-  const auto entity = m_world.spatial_hash.get_by_component<Visibility>(mouse_tile.x, mouse_tile.y, registry);
+  const auto entity =
+      m_world.spatial_hash.get_by_component<Visibility>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
   bool updated_inspector_content = false;
 
   if (registry.valid(entity))

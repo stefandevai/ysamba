@@ -37,7 +37,7 @@ void PickupSystem::update(entt::registry& registry)
     }
 
     // Check if target tile is still there
-    if (!m_world.spatial_hash.has(item, target.position.x, target.position.y))
+    if (!m_world.spatial_hash.has(item, target.position.x, target.position.y, target.position.z))
     {
       stop_pickup(registry, entity, job);
       continue;

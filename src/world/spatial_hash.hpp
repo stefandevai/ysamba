@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <entt/entity/registry.hpp>
 #include <unordered_map>
 #include <vector>
@@ -15,23 +16,23 @@ class SpatialHash
   using TestFunction = std::function<bool(const entt::entity)>;
 
   SpatialHash();
-  SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension);
+  SpatialHash(const uint32_t cell_dimension);
 
-  void load(const uint32_t width, const uint32_t height, const uint32_t cell_dimension);
-  uint32_t add(const entt::entity object, const int x, const int y);
-  void remove(const entt::entity object, const uint32_t key);
-  uint32_t update(const entt::entity object, const int x, const int y, const uint32_t key);
-  [[nodiscard]] std::vector<entt::entity> get(const int x, const int y);
-  [[nodiscard]] bool has(entt::entity entity, const int x, const int y);
-  [[nodiscard]] std::vector<entt::entity> get_if(const Vector2i& position, TestFunction test_function);
+  void load(const uint32_t cell_dimension);
+  int add(const entt::entity object, const int x, const int y, const int z);
+  void remove(const entt::entity object, const int key);
+  int update(const entt::entity object, const int x, const int y, const int z, const int key);
+  [[nodiscard]] std::vector<entt::entity> get(const int x, const int y, const int z);
+  [[nodiscard]] bool has(entt::entity entity, const int x, const int y, const int z);
+  [[nodiscard]] std::vector<entt::entity> get_if(const Vector3i& position, TestFunction test_function);
 
   /* [[nodiscard]] std::vector<entt::entity> get_if(const uint32_t x, const uint32_t y, const entt::registry& registry)
    */
 
   template <typename... T>
-  [[nodiscard]] entt::entity get_by_component(const uint32_t x, const uint32_t y, const entt::registry& registry)
+  [[nodiscard]] entt::entity get_by_component(const int x, const int y, const int z, const entt::registry& registry)
   {
-    const auto& entities = get(x, y);
+    const auto& entities = get(x, y, z);
 
     entt::entity candidate = entt::null;
     size_t candidate_z = 0;
@@ -59,16 +60,11 @@ class SpatialHash
   }
 
  private:
-  using HashMap = std::unordered_multimap<uint32_t, entt::entity>;
+  using HashMap = std::unordered_multimap<int, entt::entity>;
   HashMap m_hash;
-  uint32_t m_width;
-  uint32_t m_height;
   uint32_t m_cell_dimension;
-  uint32_t m_number_of_cells;
-  uint32_t m_horizontal_cells;
-  uint32_t m_vertical_cells;
 
-  uint32_t m_get_key(const int x, const int y);
-  std::vector<uint32_t> m_get_search_keys(const int x, const int y);
+  int m_get_key(const int x, const int y, const int z);
+  std::array<int, 27> m_get_search_keys(const int x, const int y, const int z);
 };
 }  // namespace dl

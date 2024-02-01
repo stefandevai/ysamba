@@ -148,7 +148,7 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
     return true;
   }
 
-  const auto& entities = m_world.spatial_hash.get(x, y);
+  const auto& entities = m_world.spatial_hash.get(x, y, z);
 
   for (const auto e : entities)
   {

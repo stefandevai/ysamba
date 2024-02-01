@@ -33,7 +33,7 @@ World::World(GameContext& game_context) : m_game_context(game_context)
   const auto texture_id = m_json.object["texture_id"].get<std::string>();
   m_texture_id = entt::hashed_string::value(std::move(texture_id.c_str()));
   const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
-  spatial_hash.load(world::chunk_size.x, world::chunk_size.y, spatial_hash_cell_size);
+  spatial_hash.load(spatial_hash_cell_size);
 
   spdlog::debug("Loading world \"{}\"", m_game_context.world_metadata.name);
   spdlog::debug("Seed: {}", m_game_context.world_metadata.seed);

@@ -109,7 +109,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     const auto mouse_tile = m_world.mouse_to_world(camera);
 
     const auto selected_entity =
-        m_world.spatial_hash.get_by_component<Selectable>(mouse_tile.x, mouse_tile.y, registry);
+        m_world.spatial_hash.get_by_component<Selectable>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
 
     // If a selectable entity was clicked, toggle its selected state
     if (registry.valid(selected_entity))
@@ -153,7 +153,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     }
 
     const auto mouse_tile = m_world.mouse_to_world(camera);
-    const auto selected_entity = m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, registry);
+    const auto selected_entity =
+        m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
 
     if (registry.valid(selected_entity))
     {

@@ -179,8 +179,8 @@ void JobSystem::m_update_tile_job(const Job& job,
 void JobSystem::m_create_or_assign_job_progress(const Job& job, entt::registry& registry)
 {
   const auto& target_position = job.target.position;
-  const auto existing_entity =
-      m_world.spatial_hash.get_by_component<JobProgress>(target_position.x, target_position.y, registry);
+  const auto existing_entity = m_world.spatial_hash.get_by_component<JobProgress>(
+      target_position.x, target_position.y, target_position.z, registry);
 
   if (registry.valid(existing_entity))
   {

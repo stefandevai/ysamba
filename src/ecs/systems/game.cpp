@@ -21,15 +21,16 @@ void GameSystem::update() {}
 void GameSystem::m_add_to_spatial_hash(entt::registry& registry, entt::entity entity)
 {
   auto& position = registry.get<Position>(entity);
-  const auto index = m_world.spatial_hash.add(entity, std::round(position.x), std::round(position.y));
+  const auto index =
+      m_world.spatial_hash.add(entity, std::round(position.x), std::round(position.y), std::round(position.z));
   position.spatial_hash_index = index;
 }
 
 void GameSystem::m_update_spatial_hash(entt::registry& registry, entt::entity entity)
 {
   auto& position = registry.get<Position>(entity);
-  const auto index =
-      m_world.spatial_hash.update(entity, std::round(position.x), std::round(position.y), position.spatial_hash_index);
+  const auto index = m_world.spatial_hash.update(
+      entity, std::round(position.x), std::round(position.y), std::round(position.z), position.spatial_hash_index);
   position.spatial_hash_index = index;
 }
 

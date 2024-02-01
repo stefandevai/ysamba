@@ -8,33 +8,24 @@
 
 namespace dl
 {
-SpatialHash::SpatialHash() : m_width(0), m_height(0), m_cell_dimension(0) {}
+SpatialHash::SpatialHash() : m_cell_dimension(0) {}
 
-SpatialHash::SpatialHash(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
-{
-  load(width, height, cell_dimension);
-}
+SpatialHash::SpatialHash(const uint32_t cell_dimension) { load(cell_dimension); }
 
-void SpatialHash::load(const uint32_t width, const uint32_t height, const uint32_t cell_dimension)
+void SpatialHash::load(const uint32_t cell_dimension)
 {
   assert(cell_dimension >= 1);
-
-  m_width = width;
-  m_height = height;
   m_cell_dimension = cell_dimension;
-  m_horizontal_cells = m_width / cell_dimension;
-  m_vertical_cells = m_height / cell_dimension;
-  m_number_of_cells = m_horizontal_cells * m_vertical_cells;
 }
 
-uint32_t SpatialHash::add(const entt::entity object, const int x, const int y)
+int SpatialHash::add(const entt::entity object, const int x, const int y, const int z)
 {
-  const auto key = m_get_key(x, y);
+  const auto key = m_get_key(x, y, z);
   m_hash.emplace(key, object);
   return key;
 }
 
-void SpatialHash::remove(const entt::entity object, const uint32_t key)
+void SpatialHash::remove(const entt::entity object, const int key)
 {
   auto range = m_hash.equal_range(key);
   for (auto i = range.first; i != range.second; ++i)
@@ -47,9 +38,9 @@ void SpatialHash::remove(const entt::entity object, const uint32_t key)
   }
 }
 
-uint32_t SpatialHash::update(const entt::entity object, const int x, const int y, const uint32_t key)
+int SpatialHash::update(const entt::entity object, const int x, const int y, const int z, const int key)
 {
-  const auto new_key = m_get_key(x, y);
+  const auto new_key = m_get_key(x, y, z);
 
   if (new_key == key)
   {
@@ -58,15 +49,16 @@ uint32_t SpatialHash::update(const entt::entity object, const int x, const int y
 
   remove(object, key);
   m_hash.emplace(new_key, object);
-  return key;
+
+  return new_key;
 }
 
-std::vector<entt::entity> SpatialHash::get(const int x, const int y)
+std::vector<entt::entity> SpatialHash::get(const int x, const int y, const int z)
 {
   std::vector<entt::entity> objects;
-  const auto search_keys = m_get_search_keys(x, y);
+  const auto search_keys = m_get_search_keys(x, y, z);
 
-  for (const auto& key : search_keys)
+  for (const auto key : search_keys)
   {
     auto range = m_hash.equal_range(key);
     for (auto i = range.first; i != range.second; ++i)
@@ -78,11 +70,11 @@ std::vector<entt::entity> SpatialHash::get(const int x, const int y)
   return objects;
 }
 
-bool SpatialHash::has(entt::entity entity, const int x, const int y)
+bool SpatialHash::has(entt::entity entity, const int x, const int y, const int z)
 {
-  const auto search_keys = m_get_search_keys(x, y);
+  const auto search_keys = m_get_search_keys(x, y, z);
 
-  for (const auto& key : search_keys)
+  for (const auto key : search_keys)
   {
     auto range = m_hash.equal_range(key);
     for (auto i = range.first; i != range.second; ++i)
@@ -97,12 +89,12 @@ bool SpatialHash::has(entt::entity entity, const int x, const int y)
   return false;
 }
 
-std::vector<entt::entity> SpatialHash::get_if(const Vector2i& position, TestFunction test_function)
+std::vector<entt::entity> SpatialHash::get_if(const Vector3i& position, TestFunction test_function)
 {
   std::vector<entt::entity> objects;
-  const auto search_keys = m_get_search_keys(position.x, position.y);
+  const auto search_keys = m_get_search_keys(position.x, position.y, position.z);
 
-  for (const auto& key : search_keys)
+  for (const auto key : search_keys)
   {
     auto range = m_hash.equal_range(key);
     for (auto i = range.first; i != range.second; ++i)
@@ -117,55 +109,38 @@ std::vector<entt::entity> SpatialHash::get_if(const Vector2i& position, TestFunc
   return objects;
 }
 
-uint32_t SpatialHash::m_get_key(const int x, const int y)
+int SpatialHash::m_get_key(const int x, const int y, const int z)
 {
   const auto grid_x = x / m_cell_dimension;
   const auto grid_y = y / m_cell_dimension;
-  return grid_y * m_horizontal_cells + grid_x;
+  const auto grid_z = z / m_cell_dimension;
+
+  const auto hash_x = std::hash<int>()(grid_x);
+  const auto hash_y = std::hash<int>()(grid_y);
+  const auto hash_z = std::hash<int>()(grid_z);
+
+  return hash_x ^ hash_y ^ hash_z;
 }
 
-std::vector<uint32_t> SpatialHash::m_get_search_keys(const int x, const int y)
+const std::array<int, 3> lookup_index{-1, 0, 1};
+
+std::array<int, 27> SpatialHash::m_get_search_keys(const int x, const int y, const int z)
 {
-  std::vector<uint32_t> keys;
+  std::array<int, 27> keys{};
 
-  const auto grid_x = x / m_cell_dimension;
-  const auto grid_y = y / m_cell_dimension;
+  int i = 0;
 
-  keys.push_back(grid_y * m_horizontal_cells + grid_x);
-
-  // Add adjacent cells if they exist
-  if (grid_x > 0)
+  for (const auto x_index : lookup_index)
   {
-    keys.push_back(grid_y * m_horizontal_cells + grid_x - 1);
-    if (grid_y > 0)
+    for (const auto y_index : lookup_index)
     {
-      keys.push_back((grid_y - 1) * m_horizontal_cells + grid_x - 1);
+      for (const auto z_index : lookup_index)
+      {
+        keys[i] =
+            m_get_key(x + x_index * m_cell_dimension, y + y_index * m_cell_dimension, z + z_index * m_cell_dimension);
+        ++i;
+      }
     }
-    if (grid_y < m_vertical_cells)
-    {
-      keys.push_back((grid_y + 1) * m_horizontal_cells + grid_x - 1);
-    }
-  }
-  if (grid_x < m_horizontal_cells)
-  {
-    keys.push_back(grid_y * m_horizontal_cells + grid_x + 1);
-
-    if (grid_y > 0)
-    {
-      keys.push_back((grid_y - 1) * m_horizontal_cells + grid_x + 1);
-    }
-    if (grid_y < m_vertical_cells)
-    {
-      keys.push_back((grid_y + 1) * m_horizontal_cells + grid_x + 1);
-    }
-  }
-  if (grid_y > 0)
-  {
-    keys.push_back((grid_y - 1) * m_horizontal_cells + grid_x);
-  }
-  if (grid_y < m_vertical_cells)
-  {
-    keys.push_back((grid_y + 1) * m_horizontal_cells + grid_x);
   }
 
   return keys;
