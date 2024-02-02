@@ -13,6 +13,7 @@ constexpr float DEFAULT_ZOOM = 1.0f;
 namespace dl
 {
 class Display;
+struct EventEmitter;
 
 enum class CameraState
 {
@@ -51,11 +52,12 @@ class Camera
   const Vector2i& get_grid_size() const { return m_grid_size; }
   void set_position(const Vector3& position);
   void set_size(const Vector2& size);
-  void set_frustrum(const float left, const float right, const float bottom, const float top);
+  void set_frustum(const float left, const float right, const float bottom, const float top);
   void set_tile_size(const Vector2i& size);
   void set_yaw(const float yaw);
   void set_pitch(const float pitch);
   void set_zoom(const float zoom);
+  void set_event_emitter(EventEmitter* emitter);
   void zoom_in();
   void zoom_out();
   void reset_zoom();
@@ -63,10 +65,12 @@ class Camera
  private:
   friend class CameraInspector;
 
-  float m_frustrum_left = 0.0f;
-  float m_frustrum_right = 0.0f;
-  float m_frustrum_bottom = 0.0f;
-  float m_frustrum_top = 0.0f;
+  EventEmitter* m_event_emitter = nullptr;
+
+  float m_frustum_left = 0.0f;
+  float m_frustum_right = 0.0f;
+  float m_frustum_bottom = 0.0f;
+  float m_frustum_top = 0.0f;
   float m_near = 1.0f;
   float m_far = 3000.0f;
   double m_camera_z = 2000.0;

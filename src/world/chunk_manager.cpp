@@ -113,9 +113,6 @@ void ChunkManager::update(const Vector3i& target)
 
   {
     // Load visible chunks
-    // const auto top_left_position = world_to_chunk(
-    //     target.x - frustum.x / 2 - padding * world::chunk_size.x, target.y - frustum.y / 2 - padding *
-    //     world::chunk_size.y, target.z);
     const auto top_left_position =
         world_to_chunk(target.x - padding * world::chunk_size.x, target.y - padding * world::chunk_size.y, target.z);
 
