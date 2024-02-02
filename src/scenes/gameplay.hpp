@@ -13,6 +13,7 @@
 #include "ecs/systems/job.hpp"
 #include "ecs/systems/physics.hpp"
 #include "ecs/systems/pickup.hpp"
+#include "ecs/systems/player_controls.hpp"
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/society.hpp"
 #include "ecs/systems/walk.hpp"
@@ -66,6 +67,7 @@ class Gameplay : public Scene
   WearSystem m_wear_system{m_world};
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager};
+  PlayerControlsSystem m_player_controls_system{};
 
   bool m_update_input();
 };

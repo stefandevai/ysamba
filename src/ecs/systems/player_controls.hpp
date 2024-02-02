@@ -8,15 +8,14 @@ namespace dl
 {
 class World;
 
-class WalkSystem
+class PlayerControlsSystem
 {
  public:
-  WalkSystem(World& world);
+  PlayerControlsSystem();
 
   void update(entt::registry& registry);
 
  private:
-  World& m_world;
   InputManager& m_input_manager = InputManager::get_instance();
 };
 }  // namespace dl

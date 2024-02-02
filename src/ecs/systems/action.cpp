@@ -132,6 +132,24 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
         }
         m_selected_entities.erase(std::find(m_selected_entities.begin(), m_selected_entities.end(), selected_entity));
       }
+
+      // Add or remove player controls
+      if (m_selected_entities.size() == 1 && selectable.selected)
+      {
+        spdlog::debug("ADDING!");
+        registry.emplace<entt::tag<"player_controls"_hs>>(selected_entity);
+      }
+      else
+      {
+        spdlog::debug("REMOVING!");
+        for (const auto entity : m_selected_entities)
+        {
+          if (registry.all_of<entt::tag<"player_controls"_hs>>(entity))
+          {
+            registry.remove<entt::tag<"player_controls"_hs>>(entity);
+          }
+        }
+      }
     }
     // If we are not selecting an entity, walk to the target
     else if (!m_selected_entities.empty())

@@ -87,6 +87,8 @@ void Gameplay::update()
   const auto& camera_position = m_camera.get_position_in_tiles();
   m_world.chunk_manager.update({camera_position.x, camera_position.y, 0});
 
+  m_player_controls_system.update(m_registry);
+
   if (m_current_state == State::PLAYING)
   {
     if (m_turn_delay > 0.0)
