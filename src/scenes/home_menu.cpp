@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <entt/core/hashed_string.hpp>
+#include <i18n/i18n.hpp>
 
 #include "constants.hpp"
 #include "core/game_context.hpp"
@@ -22,21 +23,22 @@ HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context)
 void HomeMenu::load()
 {
   using namespace entt::literals;
+  using namespace i18n::literals;
 
   Scene::load();
 
   m_renderer.add_batch("text"_hs, "default"_hs, 2);
 
-  const auto game_title = m_json.object["game_title"].get<std::string>();
-  const auto instructions = m_json.object["instructions"].get<std::string>();
+  // const auto game_title = m_json.object["game_title"].get<std::string>();
+  // const auto instructions = m_json.object["instructions"].get<std::string>();
 
   m_game_title.set_font_size(16);
   m_game_title.set_typeface("font-1980"_hs);
-  m_game_title.set_text(game_title);
+  m_game_title.set_text("title"_t);
 
   m_instructions.set_font_size(16);
   m_instructions.set_typeface("font-1980"_hs);
-  m_instructions.set_text(instructions);
+  m_instructions.set_text("instructions"_t);
 
   m_load_worlds_metadata();
 

@@ -17,7 +17,7 @@ void JSON::load(const std::string& filepath)
     return;
   }
 
-  auto json_string = utils::read_file(filepath.c_str());
+  auto json_string = utils::read_file(filepath);
   object = nlohmann::json::parse(json_string);
   m_filepath = filepath;
   m_has_loaded = true;

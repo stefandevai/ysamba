@@ -53,6 +53,7 @@ endif()
 
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build Noise Tool" FORCE)
 add_subdirectory("lib/FastNoise2")
+add_subdirectory("lib/i18n")
 
 # Force an optimized build of FastNoise2
 if (MSVC)
@@ -96,4 +97,5 @@ target_link_libraries(
         imgui::imgui
         implot::implot
         FastNoise
+        i18n::i18n
 )

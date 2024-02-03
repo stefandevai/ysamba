@@ -2,6 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include <i18n/i18n.hpp>
+#include <i18n/translators/nlohmann_json.hpp>
+
 #include "core/serialization.hpp"
 #include "graphics/texture.hpp"
 #include "scenes/gameplay.hpp"
@@ -15,6 +18,9 @@ Game::Game() {}
 void Game::load()
 {
   spdlog::set_level(spdlog::level::debug);
+
+  i18n::set_locale("es");
+  i18n::initialize_translator<i18n::translators::nlohmann_json>("./data/translations");
 
   m_asset_manager.load_assets("./data/assets.json");
 
