@@ -4,6 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "core/events/camera.hpp"
 #include "core/game_context.hpp"
 #include "core/json.hpp"
 #include "core/random.hpp"
@@ -38,7 +39,16 @@ void Gameplay::load()
 
   m_camera.set_tile_size(m_world.get_tile_size());
   m_camera.set_zoom(default_zoom);
-  m_camera.update_dirty();
+
+  m_camera.set_event_emitter(&m_event_emitter);
+  m_event_emitter.on<CameraMovedEvent>([this](const CameraMovedEvent& event, EventEmitter& emitter) {
+    (void)emitter;
+    m_world.chunk_manager.update({event.position_in_tiles.x, event.position_in_tiles.y, 0});
+  });
+  m_event_emitter.on<CameraZoomedEvent>([this](const CameraZoomedEvent& event, EventEmitter& emitter) {
+    (void)emitter;
+    m_world.chunk_manager.set_frustum(event.frustum);
+  });
 
 #ifndef DL_BUILD_DEBUG_TOOLS
   load_game();
@@ -82,10 +92,7 @@ void Gameplay::update()
 
   const auto delta = m_game_context.clock->delta;
 
-  // TODO: Add event emmiter on camera class to notify when it is dirty and update the chunk manager only when needed
   m_camera.update(delta);
-  const auto& camera_position = m_camera.get_position_in_tiles();
-  m_world.chunk_manager.update({camera_position.x, camera_position.y, 0});
 
   m_player_controls_system.update(m_registry);
 
@@ -153,11 +160,14 @@ void Gameplay::load_game()
 
 void Gameplay::load_default_game()
 {
+  m_world.chunk_manager.mode = ChunkManager::Mode::NoLoadingOrSaving;
+
+  m_camera.update_dirty();
+
   m_game_context.world_metadata.id = "test";
   m_game_context.world_metadata.seed = 100;
   m_game_context.world_metadata.world_size = {256, 256, 10};
 
-  m_world.chunk_manager.mode = ChunkManager::Mode::NoLoadingOrSaving;
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
   m_world.generate_societies();

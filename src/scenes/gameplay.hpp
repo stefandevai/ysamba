@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "./scene.hpp"
+#include "core/events/emitter.hpp"
 #include "core/input_manager.hpp"
 #include "ecs/systems/action.hpp"
 #include "ecs/systems/drop.hpp"
@@ -48,7 +49,8 @@ class Gameplay : public Scene
     PAUSED,
   };
 
-  entt::registry m_registry;
+  entt::registry m_registry{};
+  EventEmitter m_event_emitter{};
   World m_world{m_game_context};
   InputManager& m_input_manager = InputManager::get_instance();
   State m_current_state = State::PAUSED;

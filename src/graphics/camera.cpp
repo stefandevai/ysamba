@@ -5,6 +5,8 @@
 #include <cmath>
 
 #include "core/display.hpp"
+#include "core/events/camera.hpp"
+#include "core/events/emitter.hpp"
 
 namespace
 {
@@ -39,6 +41,12 @@ void Camera::update_dirty()
   m_calculate_center_position();
 
   view_projection_matrix = projection_matrix * view_matrix;
+
+  if (m_event_emitter != nullptr)
+  {
+    m_event_emitter->publish(CameraMovedEvent{view_position, position_in_tiles});
+  }
+
   dirty = false;
 }
 
@@ -75,16 +83,16 @@ void Camera::set_position(const Vector3& position)
 void Camera::set_size(const Vector2& size)
 {
   m_size = size;
-  set_frustrum(0.f, size.x, size.y, 0.f);
+  set_frustum(0.f, size.x, size.y, 0.f);
   dirty = true;
 }
 
-void Camera::set_frustrum(const float left, const float right, const float bottom, const float top)
+void Camera::set_frustum(const float left, const float right, const float bottom, const float top)
 {
-  m_frustrum_left = left;
-  m_frustrum_right = right;
-  m_frustrum_bottom = bottom;
-  m_frustrum_top = top;
+  m_frustum_left = left;
+  m_frustum_right = right;
+  m_frustum_bottom = bottom;
+  m_frustum_top = top;
 
   m_size.x = std::abs(right - left);
   m_size.y = std::abs(top - bottom);
@@ -95,7 +103,7 @@ void Camera::set_frustrum(const float left, const float right, const float botto
     m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
   }
 
-  projection_matrix = glm::ortho(m_frustrum_left, m_frustrum_right, m_frustrum_bottom, m_frustrum_top, m_near, m_far);
+  projection_matrix = glm::ortho(m_frustum_left, m_frustum_right, m_frustum_bottom, m_frustum_top, m_near, m_far);
 }
 
 void Camera::set_tile_size(const Vector2i& size)
@@ -163,6 +171,8 @@ void Camera::reset_zoom()
   zoom = DEFAULT_ZOOM;
   dirty = true;
 }
+
+void Camera::set_event_emitter(EventEmitter* emitter) { m_event_emitter = emitter; }
 
 void Camera::m_calculate_center_position()
 {

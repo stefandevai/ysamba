@@ -57,10 +57,10 @@ void CameraInspector::update()
     }
 
     ImGui::SeparatorText("Other");
-    ImGui::DragFloat("Frustrum left", &m_camera.m_frustrum_left, 1.0f);
-    ImGui::DragFloat("Frustrum right", &m_camera.m_frustrum_right, 1.0f);
-    ImGui::DragFloat("Frustrum bottom", &m_camera.m_frustrum_bottom, 1.0f);
-    ImGui::DragFloat("Frustrum top", &m_camera.m_frustrum_top, 1.0f);
+    ImGui::DragFloat("Frustrum left", &m_camera.m_frustum_left, 1.0f);
+    ImGui::DragFloat("Frustrum right", &m_camera.m_frustum_right, 1.0f);
+    ImGui::DragFloat("Frustrum bottom", &m_camera.m_frustum_bottom, 1.0f);
+    ImGui::DragFloat("Frustrum top", &m_camera.m_frustum_top, 1.0f);
     ImGui::DragFloat("Near", &m_camera.m_near, 1.0f);
     ImGui::DragFloat("Far", &m_camera.m_far, 1.0f);
     ImGui::Checkbox("Resize View Matrix", &m_camera.m_resize_view_matrix);
