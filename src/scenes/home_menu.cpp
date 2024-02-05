@@ -29,9 +29,6 @@ void HomeMenu::load()
 
   m_renderer.add_batch("text"_hs, "default"_hs, 2);
 
-  // const auto game_title = m_json.object["game_title"].get<std::string>();
-  // const auto instructions = m_json.object["instructions"].get<std::string>();
-
   m_game_title.set_font_size(16);
   m_game_title.set_typeface("font-1980"_hs);
   m_game_title.set_text("title"_t);
