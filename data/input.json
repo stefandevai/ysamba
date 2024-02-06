@@ -27,7 +27,15 @@
         "add_item": ["k_z"],
         "zoom_in": ["k_equals"],
         "zoom_out": ["k_minus"],
-        "regenerate": ["k_r"]
+        "regenerate": ["k_r"],
+        "move_left": ["k_h"],
+        "move_top": ["k_k"],
+        "move_right": ["k_l"],
+        "move_bottom": ["k_j"],
+        "move_top_left": ["k_y"],
+        "move_top_right": ["k_u"],
+        "move_bottom_right": ["k_n"],
+        "move_bottom_left": ["k_b"]
     },
     "player_controls": {
         "move_left": ["k_h"],

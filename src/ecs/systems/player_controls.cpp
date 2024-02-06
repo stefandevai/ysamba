@@ -4,6 +4,8 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "core/events/emitter.hpp"
+#include "core/events/game.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -12,72 +14,62 @@
 
 namespace dl
 {
-PlayerControlsSystem::PlayerControlsSystem() {}
+PlayerControlsSystem::PlayerControlsSystem(EventEmitter& event_emitter) : m_event_emitter(event_emitter) {}
 
-void PlayerControlsSystem::update(entt::registry& registry)
+void PlayerControlsSystem::update(entt::registry& registry, const entt::entity player)
 {
   using namespace entt::literals;
 
-  auto view = registry.view<entt::tag<"player_controls"_hs>>();
-  for (const auto entity : view)
+  if (!m_input_manager.is_context("gameplay"_hs))
   {
-    if (!m_input_manager.is_context("player_controls"_hs))
-    {
-      m_input_manager.push_context("player_controls"_hs);
-    }
+    return;
+  }
 
-    // if (registry.all_of<ActionWalk>(entity))
-    // {
-    //   continue;
-    // }
+  if (registry.all_of<ActionWalk>(player))
+  {
+    return;
+  }
 
-    // auto& agent = registry.get<SocietyAgent>(entity);
-    auto& position = registry.get<Position>(entity);
+  auto& agent = registry.get<SocietyAgent>(player);
+  auto& position = registry.get<Position>(player);
 
-    if (m_input_manager.poll_action("move_left"_hs))
-    {
-      position.x -= 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x - 1, position.y, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_top"_hs))
-    {
-      position.y -= 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x, position.y - 1, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_right"_hs))
-    {
-      position.x += 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x + 1, position.y, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_bottom"_hs))
-    {
-      position.y += 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x, position.y + 1, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_top_left"_hs))
-    {
-      position.y -= 1;
-      position.x -= 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x - 1, position.y - 1, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_top_right"_hs))
-    {
-      position.y -= 1;
-      position.x += 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x + 1, position.y - 1, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_bottom_right"_hs))
-    {
-      position.y += 1;
-      position.x += 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x + 1, position.y + 1, position.z}, 0, 0}});
-    }
-    else if (m_input_manager.poll_action("move_bottom_left"_hs))
-    {
-      position.y += 1;
-      position.x -= 1;
-      // agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x - 1, position.y + 1, position.z}, 0, 0}});
-    }
+  if (m_input_manager.poll_action("move_left"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x - 1, position.y, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_top"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x, position.y - 1, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_right"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x + 1, position.y, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_bottom"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x, position.y + 1, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_top_left"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x - 1, position.y - 1, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_top_right"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x + 1, position.y - 1, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_bottom_right"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x + 1, position.y + 1, position.z}, 0, 0}});
+  }
+  else if (m_input_manager.poll_action("move_bottom_left"_hs))
+  {
+    agent.jobs.push(Job{JobType::Walk, 0, Target{{position.x - 1, position.y + 1, position.z}, 0, 0}});
+  }
+
+  // Update game until all jobs are done
+  while (!agent.jobs.empty())
+  {
+    m_event_emitter.publish(UpdateGameEvent{});
   }
 }
 

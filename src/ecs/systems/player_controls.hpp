@@ -7,15 +7,17 @@
 namespace dl
 {
 class World;
+struct EventEmitter;
 
 class PlayerControlsSystem
 {
  public:
-  PlayerControlsSystem();
+  PlayerControlsSystem(EventEmitter& event_emitter);
 
-  void update(entt::registry& registry);
+  void update(entt::registry& registry, const entt::entity player);
 
  private:
   InputManager& m_input_manager = InputManager::get_instance();
+  EventEmitter& m_event_emitter;
 };
 }  // namespace dl

@@ -18,11 +18,12 @@ namespace dl
 class World;
 class Camera;
 struct Vector2i;
+struct EventEmitter;
 
 class ActionSystem
 {
  public:
-  ActionSystem(World& world, ui::UIManager& ui_manager);
+  ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter);
   void update(entt::registry& registry, const Camera& camera);
 
  private:
@@ -42,6 +43,7 @@ class ActionSystem
   ui::ItemList<uint32_t> m_actions{};
   ui::ActionMenu* m_action_menu = nullptr;
   ui::Label* m_select_target_label = nullptr;
+  EventEmitter& m_event_emitter;
 
   std::vector<entt::entity> m_selected_entities{};
   ActionMenuState m_state = ActionMenuState::Closed;

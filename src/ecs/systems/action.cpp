@@ -4,6 +4,8 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "core/events/emitter.hpp"
+#include "core/events/game.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
@@ -28,7 +30,8 @@ const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
     {2, "Dig"},
 };
 
-ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
+ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
+    : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
 {
   m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
 
@@ -133,22 +136,14 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
         m_selected_entities.erase(std::find(m_selected_entities.begin(), m_selected_entities.end(), selected_entity));
       }
 
-      // Add or remove player controls
-      if (m_selected_entities.size() == 1 && selectable.selected)
+      // Enter turn based mode if only one entity is selected
+      if (m_selected_entities.size() == 1)
       {
-        spdlog::debug("ADDING!");
-        registry.emplace<entt::tag<"player_controls"_hs>>(selected_entity);
+        m_event_emitter.publish(EnterTurnBasedEvent{m_selected_entities[0]});
       }
       else
       {
-        spdlog::debug("REMOVING!");
-        for (const auto entity : m_selected_entities)
-        {
-          if (registry.all_of<entt::tag<"player_controls"_hs>>(entity))
-          {
-            registry.remove<entt::tag<"player_controls"_hs>>(entity);
-          }
-        }
+        m_event_emitter.publish(LeaveTurnBasedEvent{});
       }
     }
     // If we are not selecting an entity, walk to the target
