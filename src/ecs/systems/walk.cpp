@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "ecs/components/action_walk.hpp"
+#include "ecs/components/biology.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/velocity.hpp"
 #include "ecs/components/walk_path.hpp"
@@ -13,6 +14,7 @@ namespace dl
 const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const Job* job) {
   registry.remove<ActionWalk>(entity);
   registry.remove<WalkPath>(entity);
+  registry.remove<Velocity>(entity);
   job->status = JobStatus::Finished;
 };
 
@@ -20,13 +22,21 @@ WalkSystem::WalkSystem(World& world) : m_world(world) {}
 
 void WalkSystem::update(entt::registry& registry)
 {
-  auto view = registry.view<ActionWalk, const Position>();
+  auto view = registry.view<ActionWalk, const Position, Biology>();
   for (const auto entity : view)
   {
     auto& action_walk = registry.get<ActionWalk>(entity);
     const auto& job = action_walk.job;
     const auto& target = job->target;
     const auto& position = registry.get<Position>(entity);
+    auto& biology = registry.get<Biology>(entity);
+
+    if (biology.collided)
+    {
+      stop_walk(registry, entity, job);
+      biology.collided = false;
+      continue;
+    }
 
     if (!registry.all_of<WalkPath>(entity))
     {

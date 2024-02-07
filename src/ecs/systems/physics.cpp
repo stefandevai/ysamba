@@ -30,6 +30,7 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       return;
     }
 
+    biology.collided = false;
     biology.turn_threshold = 200.0;
 
     const auto speed_divide_factor = 100.0;
@@ -132,6 +133,10 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     if (target_position.x != position.x || target_position.y != position.y || target_position.z != position.z)
     {
       registry.patch<Position>(entity, [&target_position](auto& position) { position = target_position; });
+    }
+    else
+    {
+      biology.collided = true;
     }
 
     velocity.x = 0.;

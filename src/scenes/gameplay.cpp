@@ -390,7 +390,6 @@ bool Gameplay::m_update_input_turn_based()
 
 void Gameplay::m_enter_turn_based(entt::entity entity)
 {
-  spdlog::debug("ENTER TURN BASED");
   m_current_state = State::PLAYING_TURN_BASED;
   m_player = entity;
 }
@@ -402,7 +401,6 @@ void Gameplay::m_leave_turn_based()
     return;
   }
 
-  spdlog::debug("LEAVE TURN BASED");
   m_current_state = State::PAUSED;
   m_player = entt::null;
 }
