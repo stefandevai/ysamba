@@ -59,7 +59,6 @@ class InputManager
   const std::string& get_text_input() const;
 
   void set_text_input(const std::string& text);
-  void set_window_size_changed(const bool value);
   [[nodiscard]] bool should_quit();
   void quit();
 

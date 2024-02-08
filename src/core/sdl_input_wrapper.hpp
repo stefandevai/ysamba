@@ -32,7 +32,6 @@ class SDLInputWrapper
   void text_input_stop();
   const std::string& get_text_input() const;
 
-  void set_window_size_changed(bool value) { m_window_size_changed = value; }
   void set_text_input(const std::string& text);
 
  private:

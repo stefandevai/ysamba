@@ -277,6 +277,8 @@ void SDLInputWrapper::update()
     it.second = false;
   }
 
+  m_window_size_changed = false;
+
   m_any_key_down = false;
 
   m_scroll.x = 0;

@@ -53,7 +53,6 @@ void SceneManager::render()
 
   m_check_window_size();
   current_scene->render();
-  /* current_scene->render_call(); */
 }
 
 void SceneManager::m_check_window_size()
@@ -68,8 +67,6 @@ void SceneManager::m_check_window_size()
     {
       scene->resize();
     }
-
-    input_manager.set_window_size_changed(false);
   }
 }
 
