@@ -28,6 +28,7 @@ class Renderer
   void batch(const uint32_t batch_id, MultiSprite* multi_sprite, const double x, const double y, const double z);
   void batch(const uint32_t batch_id, Text& text, const double x, const double y, const double z);
   void batch(const uint32_t batch_id, const Quad* quad, const double x, const double y, const double z);
+  void clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a = 1.0f);
   void render(const Camera& camera);
   const Texture* get_texture(const uint32_t resource_id);
   void add_batch(const uint32_t batch_id, const uint32_t shader_id, const int priority = 0);

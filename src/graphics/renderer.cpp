@@ -130,6 +130,11 @@ void Renderer::render(const Camera& camera)
   glDisable(GL_SCISSOR_TEST);
 }
 
+void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a)
+{
+  glClearColor(r / 255.f, g / 255.f, b / 255.f, a);
+}
+
 void Renderer::push_matrix(const uint32_t batch_id, const glm::mat4& matrix)
 {
   m_batches.at(batch_id)->push_matrix(matrix);

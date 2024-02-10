@@ -8,6 +8,11 @@
             "fragment_path": "data/shaders/default.fs"
         },
         {
+            "id": "ysamba-typography",
+            "type": "texture",
+            "path": "data/textures/ysamba.png"
+        },
+        {
             "id": "ui",
             "type": "texture",
             "path": "data/textures/ui.png"

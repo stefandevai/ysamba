@@ -5,12 +5,14 @@
 
 #include <chrono>
 #include <entt/core/hashed_string.hpp>
+#include <glm/glm.hpp>
 #include <i18n/i18n.hpp>
 
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
+#include "graphics/sprite.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
 #include "ui/compositions/world_list.hpp"
@@ -29,13 +31,12 @@ void HomeMenu::load()
 
   m_renderer.add_batch("text"_hs, "default"_hs, 2);
 
-  m_game_title.set_font_size(16);
-  m_game_title.set_typeface("font-1980"_hs);
-  m_game_title.set_text("title"_t);
+  m_typography = std::make_shared<Sprite>("ysamba-typography"_hs);
 
+  m_instructions.color.set(0xCCC1AFFF);
   m_instructions.set_font_size(16);
   m_instructions.set_typeface("font-1980"_hs);
-  m_instructions.set_text("instructions"_t);
+  m_instructions.set_text_wrapped("instructions"_t, 200);
 
   m_load_worlds_metadata();
 
@@ -99,9 +100,13 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.push_matrix("text"_hs, m_camera.view_matrix);
-  m_renderer.batch("text"_hs, m_game_title, 60, 60, 0);
-  m_renderer.batch("text"_hs, m_instructions, 60, 108, 0);
+  m_renderer.clear_color(49, 147, 129);
+
+  const auto transform = glm::scale(m_camera.view_matrix, glm::vec3(2.0f, 2.0f, 1.0f));
+  m_renderer.push_matrix("text"_hs, transform);
+
+  m_renderer.batch("text"_hs, m_typography.get(), 30, 50, 0);
+  m_renderer.batch("text"_hs, m_instructions, 40, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
   m_renderer.pop_matrix("text"_hs);
