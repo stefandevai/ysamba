@@ -26,6 +26,15 @@ class AStar
     FAILED,
   };
 
+  struct Node
+  {
+    Vector3i position;
+    Node* parent = nullptr;
+    int f = 0;
+    int g = 0;
+    int h = 0;
+  };
+
   State state = State::NONE;
   Vector3i origin;
   Vector3i destination;
@@ -37,18 +46,9 @@ class AStar
   void step();
 
  private:
-  struct Node
-  {
-    Vector3i position;
-    Node* parent = nullptr;
-    int f = 0;
-    int g = 0;
-    int h = 0;
-  };
-
   std::vector<Node> m_open_set{};
   std::vector<std::shared_ptr<Node>> m_closed_set{};
 
-  int m_get_cost(const Vector3i& current, NeighborIterator<Vector3i>& neighbor) const;
+  int m_get_cost(const Vector3i& current, const Vector3i& neighbor, const bool is_diagonal) const;
 };
 }  // namespace dl

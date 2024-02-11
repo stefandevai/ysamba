@@ -37,7 +37,7 @@ class NeighborIterator
     return *this;
   }
 
-  T operator*()
+  const T& operator*()
   {
     if (!m_dirty)
     {

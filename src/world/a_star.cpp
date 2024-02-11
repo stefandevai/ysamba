@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include "constants.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "world/world.hpp"
 
@@ -11,8 +12,11 @@ namespace
 {
 int distance_squared(const dl::Vector3i& a, const dl::Vector3i& b)
 {
-  return std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2);
+  return std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2);
 }
+
+bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b) { return a.f > b.f || (a.f == b.f && a.h > b.h); }
+
 }  // namespace
 
 namespace dl
@@ -74,31 +78,31 @@ void AStar::step()
   // Found the path
   if (current_node.position == destination)
   {
-    spdlog::debug("Success! Found a path to the destination!");
+    spdlog::warn("Success! Found a path to the destination! Steps: {}", steps);
     state = State::SUCCEEDED;
     path = std::make_shared<std::vector<Vector3i>>();
     path->push_back(current_node.position);
-    spdlog::debug("Adding to path... {} {} {} {}",
-                  current_node.position.x,
-                  current_node.position.y,
-                  current_node.position.z,
-                  current_node.parent != nullptr);
+    // spdlog::debug("Adding to path... {} {} {} {}",
+    //               current_node.position.x,
+    //               current_node.position.y,
+    //               current_node.position.z,
+    //               current_node.parent != nullptr);
 
     while (current_node.parent != nullptr)
     {
       path->push_back(current_node.parent->position);
       current_node = *current_node.parent;
-      spdlog::debug("Adding to path... {} {} {} {}",
-                    current_node.position.x,
-                    current_node.position.y,
-                    current_node.position.z,
-                    current_node.parent != nullptr);
+      // spdlog::debug("Adding to path... {} {} {} {}",
+      //               current_node.position.x,
+      //               current_node.position.y,
+      //               current_node.position.z,
+      //               current_node.parent != nullptr);
     }
     std::reverse(path->begin(), path->end());
     return;
   }
 
-  std::pop_heap(m_open_set.begin(), m_open_set.end(), [](const auto& a, const auto& b) { return a.f > b.f; });
+  std::pop_heap(m_open_set.begin(), m_open_set.end(), node_compare);
   m_open_set.pop_back();
 
   if (current_node.parent == nullptr)
@@ -127,13 +131,37 @@ void AStar::step()
       "Searching center at {} {} {}", current_node.position.x, current_node.position.y, current_node.position.z);
   for (; it.neighbor != 8; ++it)
   {
-    const auto neighbor = *it;
+    auto neighbor = *it;
+    const int h = distance_squared(neighbor, destination);
+    const bool walkable = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z);
+
     // spdlog::debug("Checking neighbor {} at {} {} {}", it.neighbor, neighbor.x, neighbor.y, neighbor.z);
 
-    if (!m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z))
+    // If neighbor is not walkable and it's further away from the destination than the current node, skip it
+    if (!walkable && h > current_node.h)
     {
       // spdlog::debug("Not walkable...");
       continue;
+    }
+    // If neighbor is not walkable but it's closer to the destination than the current node, check if we can climb
+    // up or down
+    else if (!walkable && h < current_node.h)
+    {
+      const bool can_climb_up = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z + 1);
+      const bool can_climb_down = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z - 1);
+
+      if (can_climb_up)
+      {
+        neighbor = {neighbor.x, neighbor.y, neighbor.z + 1};
+      }
+      else if (can_climb_down)
+      {
+        neighbor = {neighbor.x, neighbor.y, neighbor.z - 1};
+      }
+      else
+      {
+        continue;
+      }
     }
 
     if (std::find_if(m_closed_set.begin(), m_closed_set.end(), [&neighbor](const auto& node) {
@@ -144,8 +172,7 @@ void AStar::step()
       continue;
     }
 
-    const int g = current_node.g + m_get_cost(current_node.position, it);
-    const int h = distance_squared(neighbor, destination);
+    const int g = current_node.g + m_get_cost(current_node.position, neighbor, it.is_diagonal);
     const int f = g + h;
 
     auto open_it = std::find_if(
@@ -158,7 +185,7 @@ void AStar::step()
       // spdlog::debug("Adding to open set {} {} {} parent: {} {} {}", neighbor.x, neighbor.y, neighbor.z,
       // closed_node.position.x, closed_node.position.y, closed_node.position.z);
       m_open_set.push_back(Node{neighbor, closed_node.get(), f, g, h});
-      std::push_heap(m_open_set.begin(), m_open_set.end(), [](const auto& a, const auto& b) { return a.f > b.f; });
+      std::push_heap(m_open_set.begin(), m_open_set.end(), node_compare);
     }
     else if (g < open_it->g)
     {
@@ -170,21 +197,28 @@ void AStar::step()
   }
 }
 
-int AStar::m_get_cost(const Vector3i& current, NeighborIterator<Vector3i>& neighbor) const
+int AStar::m_get_cost(const Vector3i& current, const Vector3i& neighbor, const bool is_diagonal) const
 {
-  // Base cost
+  // TODO: Get base cost from tile data
   int cost = 100;
 
   // Increase cost for diagonal movement
-  if (neighbor.is_diagonal)
+  if (is_diagonal)
   {
-    cost += 41;
+    cost += pathfinding::diagonal_cost_penalty;
   }
 
-  // Increase cost for climbing
-  if ((*neighbor).z > current.z)
+  if (current.z != neighbor.z)
   {
-    cost += 30;
+    // Increase cost for climbing
+    if (neighbor.z > current.z)
+    {
+      cost += pathfinding::climb_up_cost_penalty;
+    }
+    else if (neighbor.z < current.z)
+    {
+      cost += pathfinding::climb_down_cost_penalty;
+    }
   }
 
   return cost;

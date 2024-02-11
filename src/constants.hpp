@@ -27,3 +27,10 @@ namespace dl::world
 {
 const Vector3i chunk_size{128, 128, 10};
 }  // namespace dl::world
+
+namespace dl::pathfinding
+{
+constexpr int diagonal_cost_penalty = 41;
+constexpr int climb_up_cost_penalty = 200;
+constexpr int climb_down_cost_penalty = 50;
+}  // namespace dl::pathfinding
