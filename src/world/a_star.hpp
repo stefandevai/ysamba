@@ -8,6 +8,8 @@
 namespace dl
 {
 class World;
+template <typename T>
+class NeighborIterator;
 
 class AStar
 {
@@ -46,5 +48,7 @@ class AStar
 
   std::vector<Node> m_open_set{};
   std::vector<std::shared_ptr<Node>> m_closed_set{};
+
+  int m_get_cost(const Vector3i& current, NeighborIterator<Vector3i>& neighbor) const;
 };
 }  // namespace dl

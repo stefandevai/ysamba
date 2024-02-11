@@ -17,6 +17,7 @@ class NeighborIterator
   using reference = const T&;
 
   uint32_t neighbor = 0;
+  bool is_diagonal = true;
   reference center;
 
   NeighborIterator(reference center) : center(center) {}
@@ -38,10 +39,15 @@ class NeighborIterator
 
   T operator*()
   {
-    T value{center};
-    value.x = center.x + m_x_offsets[neighbor];
-    value.y = center.y + m_y_offsets[neighbor];
-    return value;
+    if (!m_dirty)
+    {
+      return m_cached_value;
+    }
+
+    m_cached_value.x = center.x + m_x_offsets[neighbor];
+    m_cached_value.y = center.y + m_y_offsets[neighbor];
+    is_diagonal = neighbor % 2 == 0;
+    return m_cached_value;
   }
 
   NeighborIterator& operator++()
@@ -52,6 +58,7 @@ class NeighborIterator
     }
 
     ++neighbor;
+    m_dirty = true;
     return *this;
   }
 
@@ -70,6 +77,7 @@ class NeighborIterator
     }
 
     --neighbor;
+    m_dirty = true;
     return *this;
   }
 
@@ -87,6 +95,8 @@ class NeighborIterator
  private:
   static constexpr std::array<int, 8> m_x_offsets{-1, 0, 1, 1, 1, 0, -1, -1};
   static constexpr std::array<int, 8> m_y_offsets{-1, -1, -1, 0, 1, 1, 1, 0};
+  bool m_dirty{true};
+  T m_cached_value{center};
 };
 
 }  // namespace dl

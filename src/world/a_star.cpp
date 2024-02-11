@@ -7,6 +7,14 @@
 #include "core/maths/neighbor_iterator.hpp"
 #include "world/world.hpp"
 
+namespace
+{
+int distance_squared(const dl::Vector3i& a, const dl::Vector3i& b)
+{
+  return std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2);
+}
+}  // namespace
+
 namespace dl
 {
 AStar::AStar(World& world, const Vector3i& origin, const Vector3i& destination)
@@ -136,8 +144,8 @@ void AStar::step()
       continue;
     }
 
-    const int g = current_node.g + 1;
-    const int h = std::pow(destination.x - neighbor.x, 2) + std::pow(destination.y - neighbor.y, 2);
+    const int g = current_node.g + m_get_cost(current_node.position, it);
+    const int h = distance_squared(neighbor, destination);
     const int f = g + h;
 
     auto open_it = std::find_if(
@@ -159,10 +167,26 @@ void AStar::step()
       open_it->f = f;
       open_it->parent = m_closed_set.back().get();
     }
-    else
-    {
-      // spdlog::debug("Not updating open set... g: {} f: {}", g, f);
-    }
   }
+}
+
+int AStar::m_get_cost(const Vector3i& current, NeighborIterator<Vector3i>& neighbor) const
+{
+  // Base cost
+  int cost = 100;
+
+  // Increase cost for diagonal movement
+  if (neighbor.is_diagonal)
+  {
+    cost += 41;
+  }
+
+  // Increase cost for climbing
+  if ((*neighbor).z > current.z)
+  {
+    cost += 30;
+  }
+
+  return cost;
 }
 }  // namespace dl
