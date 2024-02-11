@@ -151,11 +151,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     {
       for (const auto entity : m_selected_entities)
       {
-        // auto& agent = registry.get<SocietyAgent>(entity);
-        // agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
-
-        const auto& position = registry.get<Position>(entity);
-        auto path = m_world.find_path(Vector3i{position.x, position.y, position.z}, mouse_tile);
+        auto& agent = registry.get<SocietyAgent>(entity);
+        agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
       }
     }
   }

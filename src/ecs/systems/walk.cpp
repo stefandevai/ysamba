@@ -15,7 +15,11 @@ const auto stop_walk = [](entt::registry& registry, const entt::entity entity, c
   registry.remove<ActionWalk>(entity);
   registry.remove<WalkPath>(entity);
   registry.remove<Velocity>(entity);
-  job->status = JobStatus::Finished;
+
+  if (job != nullptr)
+  {
+    job->status = JobStatus::Finished;
+  }
 };
 
 WalkSystem::WalkSystem(World& world) : m_world(world) {}
@@ -26,7 +30,9 @@ void WalkSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_walk = registry.get<ActionWalk>(entity);
-    const auto& job = action_walk.job;
+    const auto job = action_walk.job;
+    assert(job != nullptr);
+
     const auto& target = job->target;
     const auto& position = registry.get<Position>(entity);
     auto& biology = registry.get<Biology>(entity);
@@ -41,7 +47,8 @@ void WalkSystem::update(entt::registry& registry)
     if (!registry.all_of<WalkPath>(entity))
     {
       auto& walk_path = registry.emplace<WalkPath>(entity);
-      walk_path.steps = m_world.get_path_between(Vector3i{position.x, position.y, position.z}, target.position);
+      // walk_path.steps = m_world.get_path_between(Vector3i{position.x, position.y, position.z}, target.position);
+      walk_path.steps = m_world.find_path(Vector3i{position.x, position.y, position.z}, target.position);
     }
 
     auto& walk_path = registry.get<WalkPath>(entity);
@@ -57,17 +64,16 @@ void WalkSystem::update(entt::registry& registry)
         continue;
       }
 
-      auto& current_target_position = walk_path.steps.top();
+      auto& current_target_position = walk_path.steps.back();
 
-      if (std::round(position.x) == current_target_position.first &&
-          std::round(position.y) == current_target_position.second)
+      if (std::round(position.x) == current_target_position.x && std::round(position.y) == current_target_position.y)
       {
-        walk_path.steps.pop();
-        current_target_position = walk_path.steps.top();
+        walk_path.steps.pop_back();
+        current_target_position = walk_path.steps.back();
       }
 
-      const auto x_dir = current_target_position.first - std::round(position.x);
-      const auto y_dir = current_target_position.second - std::round(position.y);
+      const auto x_dir = current_target_position.x - std::round(position.x);
+      const auto y_dir = current_target_position.y - std::round(position.y);
 
       if (registry.all_of<Velocity>(entity))
       {

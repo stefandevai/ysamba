@@ -134,15 +134,14 @@ void AStar::step()
   if (current_node.position == destination)
   {
     state = State::SUCCEEDED;
-    path = std::make_shared<std::vector<Vector3i>>();
-    path->push_back(current_node.position);
+    path.push_back(current_node.position);
 
     while (current_node.parent != nullptr)
     {
-      path->push_back(current_node.parent->position);
+      path.push_back(current_node.parent->position);
       current_node = *current_node.parent;
     }
-    std::reverse(path->begin(), path->end());
+
     return;
   }
 
@@ -277,7 +276,7 @@ void AStar::debug(entt::registry& registry, const bool only_path, const bool cle
       registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
     }
   }
-  for (const auto& step : *path)
+  for (const auto& step : path)
   {
     auto rect = registry.create();
     auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0xcc441188);

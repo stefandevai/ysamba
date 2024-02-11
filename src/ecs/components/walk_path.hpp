@@ -1,12 +1,14 @@
 #pragma once
 
-#include <stack>
+#include <vector>
+
+#include "core/maths/vector.hpp"
 
 namespace dl
 {
 struct WalkPath
 {
-  std::stack<std::pair<int, int>> steps{};
+  std::vector<Vector3i> steps{};
 };
 
 template <typename Archive>

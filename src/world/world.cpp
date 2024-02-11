@@ -215,8 +215,14 @@ std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, co
   return path;
 }
 
-std::shared_ptr<std::vector<Vector3i>> World::find_path(const Vector3i& from, const Vector3i& to)
+std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
 {
+  // If tile is adjacent, just return a single step and avoid A* altogether
+  if (std::abs(from.x - to.x) <= 1 && std::abs(from.y - to.y) <= 1 && std::abs(from.z - to.z) <= 1)
+  {
+    return {to};
+  }
+
   AStar a_star(*this, from, to);
 
   do
@@ -224,14 +230,14 @@ std::shared_ptr<std::vector<Vector3i>> World::find_path(const Vector3i& from, co
     a_star.step();
   } while (a_star.state == AStar::State::SEARCHING);
 
-  a_star.debug(*m_game_context.registry, true, true);
+  // a_star.debug(*m_game_context.registry, true, true);
 
   if (a_star.state == AStar::State::SUCCEEDED)
   {
     return a_star.path;
   }
 
-  return std::make_shared<std::vector<Vector3i>>();
+  return {};
 }
 
 TileTarget World::search_by_flag(const std::string& flag, const int x, const int y, const int z) const

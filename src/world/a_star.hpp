@@ -44,7 +44,7 @@ class AStar
   Vector3i origin;
   Vector3i destination;
   std::size_t steps = 0;
-  std::shared_ptr<std::vector<Vector3i>> path{};
+  std::vector<Vector3i> path{};
 
   AStar(World& world, const Vector3i& origin, const Vector3i& destination);
 
