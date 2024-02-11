@@ -10,27 +10,61 @@
 
 namespace
 {
-int distance_squared(const dl::Vector3i& a, const dl::Vector3i& b)
+int distance(const dl::Vector3i& a, const dl::Vector3i& b)
 {
-  // const int distance_x = std::abs(a.x - b.x);
-  // const int distance_y = std::abs(a.y - b.y);
-  // const int distance_z = std::abs(a.z - b.z);
-  //
-  // if (distance_x > distance_y)
-  // {
-  //   return 141 * distance_y + 100 * (distance_x - distance_y) + 200 * distance_z;
-  // }
-  //
-  // return 141 * distance_x + 100 * (distance_y - distance_x) + 200 * distance_z;
+  constexpr float scale = 1.2f;
+  constexpr int normal_cost = 100 * scale;
+  constexpr int diagonal_cost = 141 * scale;
+  // constexpr int diagonal_up_cost = 300 * scale;
+  // constexpr int diagonal_down_cost = 200 * scale;
 
   // Euclidean squared
-  // return (std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * 100;
+  // return (std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * normal_cost;
 
   // Euclidean
-  return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * 100;
+  // return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * normal_cost;
 
   // Manhattan
-  // return (std::abs(a.x - b.x) + std::abs(a.y - b.y) + std::abs(a.z - b.z)) * 100;
+  // return (std::abs(a.x - b.x) + std::abs(a.y - b.y) + std::abs(a.z - b.z)) * normal_cost;
+
+  // Manhattan with diagonal movement
+  // const int dx = std::abs(a.x - b.x);
+  // const int dy = std::abs(a.y - b.y);
+  // const int dz = std::abs(a.z - b.z);
+  // return normal_cost * (dx + dy + dz) + (diagonal_cost - 2 * normal_cost) * std::min(dx, dy);
+
+  // Octile 2D
+  const int dx = std::abs(a.x - b.x);
+  const int dy = std::abs(a.y - b.y);
+  return normal_cost * (dx + dy) + (diagonal_cost - 2 * normal_cost) * std::min(dx, dy);
+
+  // Octile 3D
+  // const int dx = std::abs(a.x - b.x);
+  // const int dy = std::abs(a.y - b.y);
+  // const int dz = std::abs(a.z - b.z);
+  // const int dmin = std::min(std::min(dx, dy), dz);
+  // const int dmax = std::max(std::max(dx, dy), dz);
+  // const int dmid = dx + dy + dz - dmin - dmax;
+  //
+  // int result = 0;
+  //
+  // // Going up
+  // if (b.z > a.z)
+  // {
+  //   result = (diagonal_up_cost - diagonal_cost) * dmin + (diagonal_cost - normal_cost) * dmid + normal_cost * dmax;
+  // }
+  // // Going down
+  // else if (b.z < a.z)
+  // {
+  //   result = (diagonal_down_cost - diagonal_cost) * dmin + (diagonal_cost - normal_cost) * dmid + normal_cost * dmax;
+  // }
+  // // Same z level
+  // else
+  // {
+  //   result = normal_cost * (dx + dy) + (diagonal_cost - 2 * normal_cost) * std::min(dx, dy);
+  // }
+  //
+  // return result;
 }
 
 bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b) { return a.f > b.f || (a.f == b.f && a.h > b.h); }
@@ -133,39 +167,34 @@ void AStar::step()
   for (; it.neighbor != 8; ++it)
   {
     auto neighbor = *it;
-    const int h = distance_squared(neighbor, destination);
+    const int h = distance(neighbor, destination);
     const bool walkable = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z);
 
-    if (!walkable)
+    // If neighbor is not walkable and it's further away from the destination than the current node, skip it
+    if (!walkable && h > current_node.h)
     {
       continue;
     }
+    // If neighbor is not walkable but it's closer to the destination than the current node, check if we can climb
+    // up or down. If we can, set the neighbor to the new position, otherwise skip to the next neighbor
+    else if (!walkable && h < current_node.h)
+    {
+      const bool can_climb_up = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z + 1);
+      const bool can_climb_down = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z - 1);
 
-    // // If neighbor is not walkable and it's further away from the destination than the current node, skip it
-    // if (!walkable && h > current_node.h)
-    // {
-    //   continue;
-    // }
-    // // If neighbor is not walkable but it's closer to the destination than the current node, check if we can climb
-    // // up or down. If we can, set the neighbor to the new position, otherwise skip to the next neighbor
-    // else if (!walkable && h < current_node.h)
-    // {
-    //   const bool can_climb_up = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z + 1);
-    //   const bool can_climb_down = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z - 1);
-    //
-    //   if (can_climb_up)
-    //   {
-    //     neighbor = {neighbor.x, neighbor.y, neighbor.z + 1};
-    //   }
-    //   else if (can_climb_down)
-    //   {
-    //     neighbor = {neighbor.x, neighbor.y, neighbor.z - 1};
-    //   }
-    //   else
-    //   {
-    //     continue;
-    //   }
-    // }
+      if (can_climb_up)
+      {
+        neighbor = {neighbor.x, neighbor.y, neighbor.z + 1};
+      }
+      else if (can_climb_down)
+      {
+        neighbor = {neighbor.x, neighbor.y, neighbor.z - 1};
+      }
+      else
+      {
+        continue;
+      }
+    }
 
     // Skip if node is in the closed set
     const auto closed_it = std::find_if(
@@ -206,24 +235,24 @@ int AStar::m_get_cost(const Vector3i& current, const Vector3i& neighbor, const b
   // Increase cost for diagonal movement
   if (is_diagonal)
   {
-    // cost += pathfinding::diagonal_cost_penalty;
-    cost += 41;
+    cost += pathfinding::diagonal_cost_penalty;
   }
 
-  // if (current.z != neighbor.z)
-  // {
-  //   // Increase cost for climbing
-  //   if (neighbor.z > current.z)
-  //   {
-  //     // cost += pathfinding::climb_up_cost_penalty;
-  //     cost += pathfinding::climb_up_cost_penalty;
-  //   }
-  //   else if (neighbor.z < current.z)
-  //   {
-  //     // cost += pathfinding::climb_down_cost_penalty;
-  //     cost += pathfinding::climb_down_cost_penalty;
-  //   }
-  // }
+  if (current.z != neighbor.z)
+  {
+    // Increase cost for climbing
+    if (neighbor.z > current.z)
+    {
+      // cost += pathfinding::climb_up_cost_penalty;
+      // cost += pathfinding::climb_up_cost_penalty;
+      cost += 200;
+    }
+    else if (neighbor.z < current.z)
+    {
+      // cost += pathfinding::climb_down_cost_penalty;
+      cost += 100;
+    }
+  }
 
   return cost;
 }
