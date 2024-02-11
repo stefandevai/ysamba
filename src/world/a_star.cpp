@@ -8,6 +8,13 @@
 #include "core/maths/neighbor_iterator.hpp"
 #include "world/world.hpp"
 
+#ifdef DL_BUILD_DEBUG_TOOLS
+#include <entt/core/hashed_string.hpp>
+#include <entt/entity/registry.hpp>
+
+#include "ecs/components/rectangle.hpp"
+#endif
+
 namespace
 {
 int distance(const dl::Vector3i& a, const dl::Vector3i& b)
@@ -68,7 +75,6 @@ int distance(const dl::Vector3i& a, const dl::Vector3i& b)
 }
 
 bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b) { return a.f > b.f || (a.f == b.f && a.h > b.h); }
-
 }  // namespace
 
 namespace dl
@@ -103,13 +109,6 @@ void AStar::step()
   // If it was initialized, set the state to searching
   if (state == State::INITIALIZED)
   {
-    spdlog::info("Astar initialized. FROM: {} {} {} TO: {} {} {}",
-                 origin.x,
-                 origin.y,
-                 origin.z,
-                 destination.x,
-                 destination.y,
-                 destination.z);
     state = State::SEARCHING;
   }
 
@@ -122,7 +121,7 @@ void AStar::step()
   // Failed to find a path
   if (m_open_set.empty())
   {
-    spdlog::debug("AStar failed to find a path");
+    spdlog::warn("AStar failed to find a path");
     state = State::FAILED;
     return;
   }
@@ -131,18 +130,9 @@ void AStar::step()
 
   auto current_node = m_open_set.front();
 
-  spdlog::info("Searching ({}, {}, {}) f: {} g: {} h: {}",
-               current_node.position.x,
-               current_node.position.y,
-               current_node.position.z,
-               current_node.f,
-               current_node.g,
-               current_node.h);
-
   // Found the path
   if (current_node.position == destination)
   {
-    spdlog::warn("Success! Found a path to the destination! Steps: {}", steps);
     state = State::SUCCEEDED;
     path = std::make_shared<std::vector<Vector3i>>();
     path->push_back(current_node.position);
@@ -243,17 +233,58 @@ int AStar::m_get_cost(const Vector3i& current, const Vector3i& neighbor, const b
     // Increase cost for climbing
     if (neighbor.z > current.z)
     {
-      // cost += pathfinding::climb_up_cost_penalty;
-      // cost += pathfinding::climb_up_cost_penalty;
-      cost += 200;
+      cost += cost * 2;
     }
     else if (neighbor.z < current.z)
     {
-      // cost += pathfinding::climb_down_cost_penalty;
-      cost += 100;
+      cost += cost;
     }
   }
 
   return cost;
 }
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+// Draws rectangles for the open set, closed set and path
+void AStar::debug(entt::registry& registry, const bool only_path, const bool clear_previous)
+{
+  using namespace entt::literals;
+
+  if (clear_previous)
+  {
+    for (const auto entity : registry.view<entt::tag<"a_star_rectangle"_hs>>())
+    {
+      registry.destroy(entity);
+    }
+  }
+
+  if (!only_path)
+  {
+    for (const auto& step : m_open_set)
+    {
+      auto rect = registry.create();
+      auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0x1144cc88);
+      r.z_index = 4;
+      registry.emplace<Position>(rect, step.position.x, step.position.y, step.position.z);
+      registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
+    }
+    for (const auto& step : m_closed_set)
+    {
+      auto rect = registry.create();
+      auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0x11cc4488);
+      r.z_index = 4;
+      registry.emplace<Position>(rect, step->position.x, step->position.y, step->position.z);
+      registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
+    }
+  }
+  for (const auto& step : *path)
+  {
+    auto rect = registry.create();
+    auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0xcc441188);
+    r.z_index = 4;
+    registry.emplace<Position>(rect, step.x, step.y, step.z);
+    registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
+  }
+}
+#endif
 }  // namespace dl

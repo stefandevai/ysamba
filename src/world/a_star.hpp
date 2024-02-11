@@ -4,6 +4,11 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
+#include "definitions.hpp"
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+#include <entt/fwd.hpp>
+#endif
 
 namespace dl
 {
@@ -44,6 +49,11 @@ class AStar
   AStar(World& world, const Vector3i& origin, const Vector3i& destination);
 
   void step();
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+  // Draws rectangles for the open set, closed set and path
+  void debug(entt::registry& registry, const bool only_path = true, const bool clear_previous = true);
+#endif
 
   std::vector<Node> m_open_set{};
   std::vector<std::shared_ptr<Node>> m_closed_set{};

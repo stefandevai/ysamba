@@ -22,10 +22,6 @@
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
-// DEBUG
-#include "world/a_star.hpp"
-// DEBUG
-
 namespace dl
 {
 const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
@@ -153,55 +149,13 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     // If we are not selecting an entity, walk to the target
     else if (!m_selected_entities.empty())
     {
-      static std::vector<entt::entity> rects{};
-      const auto& tile_size = m_world.get_tile_size();
-
-      for (auto rect : rects)
-      {
-        registry.destroy(rect);
-      }
-
-      rects.clear();
-
       for (const auto entity : m_selected_entities)
       {
         // auto& agent = registry.get<SocietyAgent>(entity);
         // agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
 
         const auto& position = registry.get<Position>(entity);
-        // auto path = m_world.find_path(Vector3i{position.x, position.y, position.z}, mouse_tile);
-
-        AStar a_star{m_world, Vector3i{position.x, position.y, position.z}, mouse_tile};
-
-        do
-        {
-          a_star.step();
-        } while (a_star.state == AStar::State::SEARCHING);
-
-        for (const auto& step : a_star.m_open_set)
-        {
-          auto rect = registry.create();
-          auto& r = registry.emplace<Rectangle>(rect, tile_size.x, tile_size.y, 0x1144cc88);
-          r.z_index = 4;
-          registry.emplace<Position>(rect, step.position.x, step.position.y, step.position.z);
-          rects.push_back(rect);
-        }
-        for (const auto& step : a_star.m_closed_set)
-        {
-          auto rect = registry.create();
-          auto& r = registry.emplace<Rectangle>(rect, tile_size.x, tile_size.y, 0x11cc4488);
-          r.z_index = 4;
-          registry.emplace<Position>(rect, step->position.x, step->position.y, step->position.z);
-          rects.push_back(rect);
-        }
-        for (const auto& step : *a_star.path)
-        {
-          auto rect = registry.create();
-          auto& r = registry.emplace<Rectangle>(rect, tile_size.x, tile_size.y, 0xcc441188);
-          r.z_index = 4;
-          registry.emplace<Position>(rect, step.x, step.y, step.z);
-          rects.push_back(rect);
-        }
+        auto path = m_world.find_path(Vector3i{position.x, position.y, position.z}, mouse_tile);
       }
     }
   }
