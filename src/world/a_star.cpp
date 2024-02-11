@@ -23,7 +23,14 @@ int distance_squared(const dl::Vector3i& a, const dl::Vector3i& b)
   //
   // return 141 * distance_x + 100 * (distance_y - distance_x) + 200 * distance_z;
 
-  return (std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * 100;
+  // Euclidean squared
+  // return (std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * 100;
+
+  // Euclidean
+  return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * 100;
+
+  // Manhattan
+  // return (std::abs(a.x - b.x) + std::abs(a.y - b.y) + std::abs(a.z - b.z)) * 100;
 }
 
 bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b) { return a.f > b.f || (a.f == b.f && a.h > b.h); }
@@ -129,31 +136,36 @@ void AStar::step()
     const int h = distance_squared(neighbor, destination);
     const bool walkable = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z);
 
-    // If neighbor is not walkable and it's further away from the destination than the current node, skip it
-    if (!walkable && h > current_node.h)
+    if (!walkable)
     {
       continue;
     }
-    // If neighbor is not walkable but it's closer to the destination than the current node, check if we can climb
-    // up or down. If we can, set the neighbor to the new position, otherwise skip to the next neighbor
-    else if (!walkable && h < current_node.h)
-    {
-      const bool can_climb_up = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z + 1);
-      const bool can_climb_down = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z - 1);
 
-      if (can_climb_up)
-      {
-        neighbor = {neighbor.x, neighbor.y, neighbor.z + 1};
-      }
-      else if (can_climb_down)
-      {
-        neighbor = {neighbor.x, neighbor.y, neighbor.z - 1};
-      }
-      else
-      {
-        continue;
-      }
-    }
+    // // If neighbor is not walkable and it's further away from the destination than the current node, skip it
+    // if (!walkable && h > current_node.h)
+    // {
+    //   continue;
+    // }
+    // // If neighbor is not walkable but it's closer to the destination than the current node, check if we can climb
+    // // up or down. If we can, set the neighbor to the new position, otherwise skip to the next neighbor
+    // else if (!walkable && h < current_node.h)
+    // {
+    //   const bool can_climb_up = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z + 1);
+    //   const bool can_climb_down = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z - 1);
+    //
+    //   if (can_climb_up)
+    //   {
+    //     neighbor = {neighbor.x, neighbor.y, neighbor.z + 1};
+    //   }
+    //   else if (can_climb_down)
+    //   {
+    //     neighbor = {neighbor.x, neighbor.y, neighbor.z - 1};
+    //   }
+    //   else
+    //   {
+    //     continue;
+    //   }
+    // }
 
     // Skip if node is in the closed set
     const auto closed_it = std::find_if(
@@ -194,23 +206,24 @@ int AStar::m_get_cost(const Vector3i& current, const Vector3i& neighbor, const b
   // Increase cost for diagonal movement
   if (is_diagonal)
   {
-    cost += pathfinding::diagonal_cost_penalty;
+    // cost += pathfinding::diagonal_cost_penalty;
+    cost += 41;
   }
 
-  if (current.z != neighbor.z)
-  {
-    // Increase cost for climbing
-    if (neighbor.z > current.z)
-    {
-      // cost += pathfinding::climb_up_cost_penalty;
-      cost += pathfinding::climb_up_cost_penalty;
-    }
-    else if (neighbor.z < current.z)
-    {
-      // cost += pathfinding::climb_down_cost_penalty;
-      cost += pathfinding::climb_down_cost_penalty;
-    }
-  }
+  // if (current.z != neighbor.z)
+  // {
+  //   // Increase cost for climbing
+  //   if (neighbor.z > current.z)
+  //   {
+  //     // cost += pathfinding::climb_up_cost_penalty;
+  //     cost += pathfinding::climb_up_cost_penalty;
+  //   }
+  //   else if (neighbor.z < current.z)
+  //   {
+  //     // cost += pathfinding::climb_down_cost_penalty;
+  //     cost += pathfinding::climb_down_cost_penalty;
+  //   }
+  // }
 
   return cost;
 }

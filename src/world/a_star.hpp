@@ -45,10 +45,10 @@ class AStar
 
   void step();
 
- private:
   std::vector<Node> m_open_set{};
   std::vector<std::shared_ptr<Node>> m_closed_set{};
 
+ private:
   int m_get_cost(const Vector3i& current, const Vector3i& neighbor, const bool is_diagonal) const;
 };
 }  // namespace dl
