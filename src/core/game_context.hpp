@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entt/fwd.hpp>
+
 #include "./asset_manager.hpp"
 #include "./clock.hpp"
 #include "world/metadata.hpp"
@@ -19,5 +21,6 @@ struct GameContext
   SceneManager* scene_manager;
   Clock* clock;
   WorldMetadata world_metadata;
+  entt::registry* registry;
 };
 }  // namespace dl

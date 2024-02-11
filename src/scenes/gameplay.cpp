@@ -34,6 +34,8 @@ void Gameplay::load()
 
   Scene::load();
 
+  m_game_context.registry = &m_registry;
+
   m_renderer.add_batch("world"_hs, "default"_hs);
 
   const auto default_zoom = m_json.object["default_zoom"].get<float>();

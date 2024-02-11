@@ -12,7 +12,18 @@ namespace
 {
 int distance_squared(const dl::Vector3i& a, const dl::Vector3i& b)
 {
-  return std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2);
+  // const int distance_x = std::abs(a.x - b.x);
+  // const int distance_y = std::abs(a.y - b.y);
+  // const int distance_z = std::abs(a.z - b.z);
+  //
+  // if (distance_x > distance_y)
+  // {
+  //   return 141 * distance_y + 100 * (distance_x - distance_y) + 200 * distance_z;
+  // }
+  //
+  // return 141 * distance_x + 100 * (distance_y - distance_x) + 200 * distance_z;
+
+  return (std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2) + std::pow(a.z - b.z, 2)) * 100;
 }
 
 bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b) { return a.f > b.f || (a.f == b.f && a.h > b.h); }
@@ -30,6 +41,12 @@ AStar::AStar(World& world, const Vector3i& origin, const Vector3i& destination)
     return;
   }
 
+  if (!m_world.is_walkable(destination.x, destination.y, destination.z))
+  {
+    state = State::FAILED;
+    return;
+  }
+
   m_open_set.push_back(Node{origin, nullptr, 0, 0, 0});
   state = State::INITIALIZED;
 }
@@ -39,7 +56,6 @@ void AStar::step()
   // AStar has not yet been initialized
   if (state == State::NONE)
   {
-    spdlog::debug("Astar has not been initialized");
     return;
   }
 
@@ -59,7 +75,6 @@ void AStar::step()
   // Allow stepping even after the search has finished
   if (state != State::SEARCHING)
   {
-    spdlog::debug("Search has already finished");
     return;
   }
 
@@ -75,6 +90,14 @@ void AStar::step()
 
   auto current_node = m_open_set.front();
 
+  spdlog::info("Searching ({}, {}, {}) f: {} g: {} h: {}",
+               current_node.position.x,
+               current_node.position.y,
+               current_node.position.z,
+               current_node.f,
+               current_node.g,
+               current_node.h);
+
   // Found the path
   if (current_node.position == destination)
   {
@@ -82,21 +105,11 @@ void AStar::step()
     state = State::SUCCEEDED;
     path = std::make_shared<std::vector<Vector3i>>();
     path->push_back(current_node.position);
-    // spdlog::debug("Adding to path... {} {} {} {}",
-    //               current_node.position.x,
-    //               current_node.position.y,
-    //               current_node.position.z,
-    //               current_node.parent != nullptr);
 
     while (current_node.parent != nullptr)
     {
       path->push_back(current_node.parent->position);
       current_node = *current_node.parent;
-      // spdlog::debug("Adding to path... {} {} {} {}",
-      //               current_node.position.x,
-      //               current_node.position.y,
-      //               current_node.position.z,
-      //               current_node.parent != nullptr);
     }
     std::reverse(path->begin(), path->end());
     return;
@@ -105,46 +118,24 @@ void AStar::step()
   std::pop_heap(m_open_set.begin(), m_open_set.end(), node_compare);
   m_open_set.pop_back();
 
-  if (current_node.parent == nullptr)
-  {
-    spdlog::debug("Adding to close set {} {} {} parent: nullptr",
-                  current_node.position.x,
-                  current_node.position.y,
-                  current_node.position.z);
-  }
-  else
-  {
-    spdlog::debug("Adding to close set {} {} {} parent: {} {} {} {}",
-                  current_node.position.x,
-                  current_node.position.y,
-                  current_node.position.z,
-                  current_node.parent->position.x,
-                  current_node.parent->position.y,
-                  current_node.parent->position.z,
-                  current_node.parent->parent == nullptr);
-  }
   m_closed_set.push_back(std::make_shared<Node>(current_node));
 
+  // Iterate through the 8 2D neighbors of the current node clockwise starting from the top left
   NeighborIterator<Vector3i> it{current_node.position};
 
-  spdlog::info(
-      "Searching center at {} {} {}", current_node.position.x, current_node.position.y, current_node.position.z);
   for (; it.neighbor != 8; ++it)
   {
     auto neighbor = *it;
     const int h = distance_squared(neighbor, destination);
     const bool walkable = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z);
 
-    // spdlog::debug("Checking neighbor {} at {} {} {}", it.neighbor, neighbor.x, neighbor.y, neighbor.z);
-
     // If neighbor is not walkable and it's further away from the destination than the current node, skip it
     if (!walkable && h > current_node.h)
     {
-      // spdlog::debug("Not walkable...");
       continue;
     }
     // If neighbor is not walkable but it's closer to the destination than the current node, check if we can climb
-    // up or down
+    // up or down. If we can, set the neighbor to the new position, otherwise skip to the next neighbor
     else if (!walkable && h < current_node.h)
     {
       const bool can_climb_up = m_world.is_walkable(neighbor.x, neighbor.y, neighbor.z + 1);
@@ -164,11 +155,12 @@ void AStar::step()
       }
     }
 
-    if (std::find_if(m_closed_set.begin(), m_closed_set.end(), [&neighbor](const auto& node) {
-          return node->position == neighbor;
-        }) != m_closed_set.end())
+    // Skip if node is in the closed set
+    const auto closed_it = std::find_if(
+        m_closed_set.begin(), m_closed_set.end(), [&neighbor](const auto& node) { return node->position == neighbor; });
+
+    if (closed_it != m_closed_set.end())
     {
-      // spdlog::debug("Found in closed...");
       continue;
     }
 
@@ -182,14 +174,11 @@ void AStar::step()
     {
       auto& closed_node = m_closed_set[m_closed_set.size() - 1];
 
-      // spdlog::debug("Adding to open set {} {} {} parent: {} {} {}", neighbor.x, neighbor.y, neighbor.z,
-      // closed_node.position.x, closed_node.position.y, closed_node.position.z);
       m_open_set.push_back(Node{neighbor, closed_node.get(), f, g, h});
       std::push_heap(m_open_set.begin(), m_open_set.end(), node_compare);
     }
     else if (g < open_it->g)
     {
-      // spdlog::warn("Updating open set... g: {} f: {}", g, f);
       open_it->g = g;
       open_it->f = f;
       open_it->parent = m_closed_set.back().get();
@@ -213,10 +202,12 @@ int AStar::m_get_cost(const Vector3i& current, const Vector3i& neighbor, const b
     // Increase cost for climbing
     if (neighbor.z > current.z)
     {
+      // cost += pathfinding::climb_up_cost_penalty;
       cost += pathfinding::climb_up_cost_penalty;
     }
     else if (neighbor.z < current.z)
     {
+      // cost += pathfinding::climb_down_cost_penalty;
       cost += pathfinding::climb_down_cost_penalty;
     }
   }

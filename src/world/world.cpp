@@ -336,8 +336,22 @@ bool World::adjacent(const uint32_t tile_id, const int x, const int y, const int
 
 bool World::is_walkable(const int x, const int y, const int z) const
 {
+  using namespace entt::literals;
+
   const auto& tile = get(x, y, z);
-  return tile.flags.contains(tile_flag::walkable);
+  bool walkable = tile.flags.contains(tile_flag::walkable);
+
+  if (walkable)
+  {
+    assert(m_game_context.registry != nullptr);
+    auto entity = spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, *m_game_context.registry);
+    if (m_game_context.registry->valid(entity))
+    {
+      walkable = false;
+    }
+  }
+
+  return walkable;
 }
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const

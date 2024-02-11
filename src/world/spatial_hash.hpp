@@ -22,20 +22,19 @@ class SpatialHash
   int add(const entt::entity object, const int x, const int y, const int z);
   void remove(const entt::entity object, const int key);
   int update(const entt::entity object, const int x, const int y, const int z, const int key);
-  [[nodiscard]] std::vector<entt::entity> get(const int x, const int y, const int z);
-  [[nodiscard]] bool has(entt::entity entity, const int x, const int y, const int z);
-  [[nodiscard]] std::vector<entt::entity> get_if(const Vector3i& position, TestFunction test_function);
-
-  /* [[nodiscard]] std::vector<entt::entity> get_if(const uint32_t x, const uint32_t y, const entt::registry& registry)
-   */
+  [[nodiscard]] std::vector<entt::entity> get(const int x, const int y, const int z) const;
+  [[nodiscard]] bool has(entt::entity entity, const int x, const int y, const int z) const;
+  [[nodiscard]] std::vector<entt::entity> get_if(const Vector3i& position, TestFunction test_function) const;
 
   template <typename... T>
-  [[nodiscard]] entt::entity get_by_component(const int x, const int y, const int z, const entt::registry& registry)
+  [[nodiscard]] entt::entity get_by_component(const int x,
+                                              const int y,
+                                              const int z,
+                                              const entt::registry& registry) const
   {
     const auto& entities = get(x, y, z);
 
     entt::entity candidate = entt::null;
-    size_t candidate_z = 0;
 
     for (const auto entity : entities)
     {
@@ -45,14 +44,13 @@ class SpatialHash
       }
 
       const auto& position = registry.get<Position>(entity);
-      const auto& visibility = registry.get<Visibility>(entity);
       const auto rounded_x = std::round(position.x);
       const auto rounded_y = std::round(position.y);
+      const auto rounded_z = std::round(position.z);
 
-      if (visibility.layer_z >= candidate_z && x == rounded_x && y == rounded_y)
+      if (z == rounded_z && x == rounded_x && y == rounded_y)
       {
         candidate = entity;
-        candidate_z = visibility.layer_z;
       }
     }
 
@@ -64,7 +62,7 @@ class SpatialHash
   HashMap m_hash;
   uint32_t m_cell_dimension;
 
-  int m_get_key(const int x, const int y, const int z);
-  std::array<int, 27> m_get_search_keys(const int x, const int y, const int z);
+  int m_get_key(const int x, const int y, const int z) const;
+  std::array<int, 27> m_get_search_keys(const int x, const int y, const int z) const;
 };
 }  // namespace dl

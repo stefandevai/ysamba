@@ -94,11 +94,14 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
                                      const Camera& camera,
                                      entt::registry& registry)
 {
+  using namespace entt::literals;
+
   for (auto& member : components)
   {
     auto entity = registry.create();
     registry.emplace<SocietyAgent>(entity, member.agent);
     registry.emplace<Biology>(entity, member.biology);
+    registry.emplace<entt::tag<"collidable"_hs>>(entity, member.biology);
 
     const auto position = m_get_member_position(world, camera);
     registry.emplace<Position>(entity, position);
