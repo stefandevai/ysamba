@@ -10,6 +10,7 @@
 #include <queue>
 #include <set>
 
+#include "./a_star.hpp"
 #include "./cell.hpp"
 #include "./generators/game_chunk_generator.hpp"
 #include "./generators/tile_rules.hpp"
@@ -212,6 +213,23 @@ std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, co
   } while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
 
   return path;
+}
+
+std::shared_ptr<std::vector<Vector3i>> World::find_path(const Vector3i& from, const Vector3i& to)
+{
+  AStar a_star(*this, from, to);
+
+  do
+  {
+    a_star.step();
+  } while (a_star.state == AStar::State::SEARCHING);
+
+  if (a_star.state == AStar::State::SUCCEEDED)
+  {
+    return a_star.path;
+  }
+
+  return std::make_shared<std::vector<Vector3i>>();
 }
 
 TileTarget World::search_by_flag(const std::string& flag, const int x, const int y, const int z) const

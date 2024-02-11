@@ -38,7 +38,7 @@ class NeighborIterator
 
   T operator*()
   {
-    T value{};
+    T value{center};
     value.x = center.x + m_x_offsets[neighbor];
     value.y = center.y + m_y_offsets[neighbor];
     return value;

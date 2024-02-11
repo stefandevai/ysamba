@@ -149,10 +149,32 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     // If we are not selecting an entity, walk to the target
     else if (!m_selected_entities.empty())
     {
+      static std::vector<entt::entity> rects{};
+      const auto& tile_size = m_world.get_tile_size();
+
+      for (auto rect : rects)
+      {
+        registry.destroy(rect);
+      }
+
+      rects.clear();
+
       for (const auto entity : m_selected_entities)
       {
-        auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
+        // auto& agent = registry.get<SocietyAgent>(entity);
+        // agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
+
+        const auto& position = registry.get<Position>(entity);
+        auto path = m_world.find_path(Vector3i{position.x, position.y, position.z}, mouse_tile);
+
+        for (const auto& step : *path)
+        {
+          auto rect = registry.create();
+          auto& r = registry.emplace<Rectangle>(rect, tile_size.x, tile_size.y, 0xcc441188);
+          r.z_index = 4;
+          registry.emplace<Position>(rect, step.x, step.y, step.z);
+          rects.push_back(rect);
+        }
       }
     }
   }

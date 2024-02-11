@@ -129,6 +129,9 @@ class World
   // Get a path between two points
   [[nodiscard]] std::stack<std::pair<int, int>> get_path_between(const Vector3i& from, const Vector3i& to);
 
+  // Find path between two points
+  [[nodiscard]] std::shared_ptr<std::vector<Vector3i>> find_path(const Vector3i& from, const Vector3i& to);
+
   // Get a nearby tile containing a flag
   [[nodiscard]] TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;
 
