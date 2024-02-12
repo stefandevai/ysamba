@@ -47,6 +47,15 @@ uint32_t world_height = 256;
 uint32_t world_depth = 30;
 }  // namespace world_creation
 
+template <typename T>
+void assign_if_contains(const nlohmann::json& json, const std::string& key, T& value)
+{
+  if (json.contains(key))
+  {
+    value = json.at(key).get<T>();
+  }
+}
+
 void load(const std::filesystem::path& filepath)
 {
   if (!std::filesystem::exists(filepath))
@@ -65,108 +74,53 @@ void load(const std::filesystem::path& filepath)
   {
     auto& path = json.object.at("path");
 
-    if (path.contains("assets"))
-    {
-      path::assets = path.at("assets").get<std::string>();
-    }
-    if (path.contains("translations"))
-    {
-      path::translations = path.at("translations").get<std::string>();
-    }
-    if (path.contains("tile_data"))
-    {
-      path::tile_data = path.at("tile_data").get<std::string>();
-    }
-    if (path.contains("tile_rules"))
-    {
-      path::tile_rules = path.at("tile_rules").get<std::string>();
-    }
-    if (path.contains("item_data"))
-    {
-      path::item_data = path.at("item_data").get<std::string>();
-    }
-    if (path.contains("input"))
-    {
-      path::input = path.at("input").get<std::string>();
-    }
+    assign_if_contains<std::string>(path, "assets", path::assets);
+    assign_if_contains<std::string>(path, "translations", path::translations);
+    assign_if_contains<std::string>(path, "tile_data", path::tile_data);
+    assign_if_contains<std::string>(path, "tile_rules", path::tile_rules);
+    assign_if_contains<std::string>(path, "item_data", path::item_data);
+    assign_if_contains<std::string>(path, "input", path::input);
   }
 
   if (json.object.contains("world"))
   {
     auto& world = json.object.at("world");
 
-    if (world.contains("texture_id"))
-    {
-      world::texture_id = world.at("texture_id").get<std::string>();
-    }
-
-    if (world.contains("spatial_hash_cell_size"))
-    {
-      world::spatial_hash_cell_size = world.at("spatial_hash_cell_size").get<uint32_t>();
-    }
+    assign_if_contains<std::string>(world, "texture_id", world::texture_id);
+    assign_if_contains<uint32_t>(world, "spatial_hash_cell_size", world::spatial_hash_cell_size);
   }
 
   if (json.object.contains("display"))
   {
     auto& display = json.object.at("display");
 
-    if (display.contains("default_width"))
-    {
-      display::default_width = display.at("default_width").get<int>();
-    }
-
-    if (display.contains("default_height"))
-    {
-      display::default_height = display.at("default_height").get<int>();
-    }
-
-    if (display.contains("title"))
-    {
-      display::title = display.at("title").get<std::string>();
-    }
+    assign_if_contains<int>(display, "default_width", display::default_width);
+    assign_if_contains<int>(display, "default_height", display::default_height);
+    assign_if_contains<std::string>(display, "title", display::title);
   }
 
   if (json.object.contains("pathfinding"))
   {
     auto& pathfinding = json.object.at("pathfinding");
 
-    if (pathfinding.contains("max_search_radius"))
-    {
-      pathfinding::search_radius = pathfinding.at("max_search_radius").get<uint32_t>();
-    }
-
-    if (pathfinding.contains("max_tries_after_collision"))
-    {
-      pathfinding::tries_after_collision = pathfinding.at("max_tries_after_collision").get<uint32_t>();
-    }
+    assign_if_contains<uint32_t>(pathfinding, "search_radius", pathfinding::search_radius);
+    assign_if_contains<uint32_t>(pathfinding, "tries_after_collision", pathfinding::tries_after_collision);
   }
 
   if (json.object.contains("gameplay"))
   {
     auto& gameplay = json.object.at("gameplay");
 
-    if (gameplay.contains("default_zoom"))
-    {
-      gameplay::default_zoom = gameplay.at("default_zoom").get<double>();
-    }
+    assign_if_contains<double>(gameplay, "default_zoom", gameplay::default_zoom);
   }
 
   if (json.object.contains("world_creation"))
   {
     auto& world_creation = json.object.at("world_creation");
 
-    if (world_creation.contains("world_width"))
-    {
-      world_creation::world_width = world_creation.at("world_width").get<uint32_t>();
-    }
-    if (world_creation.contains("world_height"))
-    {
-      world_creation::world_height = world_creation.at("world_height").get<uint32_t>();
-    }
-    if (world_creation.contains("world_depth"))
-    {
-      world_creation::world_depth = world_creation.at("world_depth").get<uint32_t>();
-    }
+    assign_if_contains<uint32_t>(world_creation, "world_width", world_creation::world_width);
+    assign_if_contains<uint32_t>(world_creation, "world_height", world_creation::world_height);
+    assign_if_contains<uint32_t>(world_creation, "world_depth", world_creation::world_depth);
   }
 }
 }  // namespace dl::config
