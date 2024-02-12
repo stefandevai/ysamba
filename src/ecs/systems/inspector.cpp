@@ -27,6 +27,8 @@ InspectorSystem::InspectorSystem(World& world, ui::UIManager& ui_manager) : m_wo
 
 void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 {
+  using namespace entt::literals;
+
   m_update_input(registry);
 
   if (m_state != State::Active)
@@ -47,9 +49,9 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
   if (!registry.valid(m_target_quad))
   {
-    const auto& tile_size = m_world.get_tile_size();
     m_target_quad = registry.create();
-    registry.emplace<Rectangle>(m_target_quad, tile_size.x, tile_size.y, 0xe3c16488, 4);
+    registry.emplace<entt::tag<"ui"_hs>>(m_target_quad);
+    registry.emplace<Visibility>(m_target_quad, "spritesheet-tileset"_hs, 1, 4);
     registry.emplace<Position>(m_target_quad, 0, 0, 0);
   }
 
