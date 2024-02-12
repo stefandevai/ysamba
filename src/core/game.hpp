@@ -23,7 +23,6 @@ class Game
   void run();
 
  private:
-  JSON m_json{"./data/game.json"};
   Display m_display{};
   AssetManager m_asset_manager{};
   SceneManager m_scene_manager{m_display};

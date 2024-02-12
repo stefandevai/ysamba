@@ -1,0 +1,24 @@
+{
+  "initial_scene": "home_menu",
+
+  "path": {
+    "tile_data": "data/world/tiles.json",
+    "item_data": "data/items/items.json"
+  },
+
+  "world": {
+    "texture_id": "spritesheet-tileset",
+    "spatial_hash_cell_size": 2
+  },
+
+  "display": {
+    "width": 1024,
+    "height": 576,
+    "title": "Colonization of Ysamba"
+  },
+
+  "pathfinding": {
+    "search_radius": 100,
+    "tries_after_collision": 3
+  }
+}

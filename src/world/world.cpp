@@ -18,9 +18,11 @@
 #include "./society/job_type.hpp"
 #include "./society/society_generator.hpp"
 #include "./tile_flag.hpp"
+#include "config.hpp"
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/input_manager.hpp"
+#include "core/json.hpp"
 #include "core/serialization.hpp"
 #include "ecs/components/position.hpp"
 #include "graphics/camera.hpp"
@@ -31,10 +33,8 @@ namespace dl
 {
 World::World(GameContext& game_context) : m_game_context(game_context)
 {
-  const auto texture_id = m_json.object["texture_id"].get<std::string>();
-  m_texture_id = entt::hashed_string::value(std::move(texture_id.c_str()));
-  const auto spatial_hash_cell_size = m_json.object["spatial_hash_cell_size"];
-  spatial_hash.load(spatial_hash_cell_size);
+  m_texture_id = entt::hashed_string::value(config::world::texture_id.c_str());
+  spatial_hash.load(config::world::spatial_hash_cell_size);
 
   spdlog::debug("Loading world \"{}\"", m_game_context.world_metadata.name);
   spdlog::debug("Seed: {}", m_game_context.world_metadata.seed);
@@ -410,7 +410,7 @@ entt::entity World::create_item(
 
 void World::m_load_tile_data()
 {
-  m_json.load("./data/world/tiles.json");
+  JSON json{config::path::tile_data};
 
   const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
 
@@ -419,7 +419,7 @@ void World::m_load_tile_data()
   m_tile_size.x = texture->get_frame_width();
   m_tile_size.y = texture->get_frame_height();
 
-  const auto tiles = m_json.object["tiles"].get<std::vector<nlohmann::json>>();
+  const auto tiles = json.object["tiles"].get<std::vector<nlohmann::json>>();
 
   for (const auto& tile : tiles)
   {
@@ -480,9 +480,9 @@ void World::m_load_tile_data()
 
 void World::m_load_item_data()
 {
-  m_json.load("./data/items/items.json");
+  JSON json{config::path::item_data};
 
-  const auto items = m_json.object.get<std::vector<nlohmann::json>>();
+  const auto items = json.object.get<std::vector<nlohmann::json>>();
 
   for (const auto& item : items)
   {

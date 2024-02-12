@@ -11,7 +11,6 @@
 #include "./society/society_blueprint.hpp"
 #include "./spatial_hash.hpp"
 #include "./tile_data.hpp"
-#include "core/json.hpp"
 #include "core/maths/vector.hpp"
 
 namespace dl
@@ -162,7 +161,6 @@ class World
   }
 
  private:
-  JSON m_json{"./data/world.json"};
   uint32_t m_texture_id{};
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};

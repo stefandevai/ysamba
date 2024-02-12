@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "config.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/movement.hpp"
@@ -64,7 +65,7 @@ void WalkSystem::update(entt::registry& registry)
     }
 
     // If the entity collided a certain number of times in a row, stop walking
-    if (movement.retries > 3)
+    if (movement.retries > config::pathfinding::tries_after_collision)
     {
       stop_walk(registry, entity, job);
       continue;

@@ -32,7 +32,6 @@ class SceneManager
 
  private:
   Display& m_display;
-  JSON m_json{"./data/game.json"};
   std::vector<std::unique_ptr<Scene>> m_scenes;
 
   void m_load();

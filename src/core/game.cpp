@@ -5,6 +5,7 @@
 #include <i18n/i18n.hpp>
 #include <i18n/translators/nlohmann_json.hpp>
 
+#include "config.hpp"
 #include "core/serialization.hpp"
 #include "graphics/texture.hpp"
 #include "scenes/gameplay.hpp"
@@ -19,38 +20,34 @@ void Game::load()
 {
   spdlog::set_level(spdlog::level::debug);
 
-  i18n::set_locale("es");
-  i18n::initialize_translator<i18n::translators::nlohmann_json>("./data/translations");
+  config::load();
 
-  m_asset_manager.load_assets("./data/assets.json");
+  i18n::set_locale("es");
+  i18n::initialize_translator<i18n::translators::nlohmann_json>(config::path::translations);
+
+  m_asset_manager.load_assets(config::path::assets);
 
   serialization::initialize_directories();
 
-  const auto width = m_json.object["width"];
-  const auto height = m_json.object["height"];
-  const auto title = m_json.object["title"];
+  m_display.load(config::display::width, config::display::height, config::display::title);
 
-  m_display.load(width, height, title);
-
-  const auto& inital_scene_key = m_json.object["initial_scene"].get<std::string>();
-
-  if (inital_scene_key == "home_menu")
+  if (config::initial_scene == "home_menu")
   {
     m_scene_manager.push_scene<HomeMenu>(m_context);
   }
-  else if (inital_scene_key == "world_creation")
+  else if (config::initial_scene == "world_creation")
   {
     m_scene_manager.push_scene<HomeMenu>(m_context);
     m_scene_manager.push_scene<WorldCreation>(m_context);
   }
-  else if (inital_scene_key == "gameplay")
+  else if (config::initial_scene == "gameplay")
   {
     m_scene_manager.push_scene<HomeMenu>(m_context);
     m_scene_manager.push_scene<Gameplay>(m_context);
   }
   else
   {
-    spdlog::critical("Could not find scene: {}", inital_scene_key);
+    spdlog::critical("Could not find scene: {}", config::initial_scene);
   }
 }
 
