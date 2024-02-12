@@ -4,12 +4,13 @@
 
 #include <entt/entity/registry.hpp>
 
+#include "core/maths/vector.hpp"
 #include "core/random.hpp"
 #include "ecs/components/biology.hpp"
+#include "ecs/components/movement.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
 #include "world/world.hpp"
 
@@ -64,37 +65,37 @@ void SocietySystem::update(entt::registry& registry, const double delta)
       const auto x_dir = random::get_real();
       const auto y_dir = random::get_real();
 
-      auto velocity_x = 0.;
-      auto velocity_y = 0.;
+      auto movement_x = 0.;
+      auto movement_y = 0.;
 
       if (x_dir < .33f)
       {
-        velocity_x = -1.0;
+        movement_x = -1.0;
       }
       else if (x_dir < .66f)
       {
-        velocity_x = 1.0;
+        movement_x = 1.0;
       }
 
       if (y_dir < .33f)
       {
-        velocity_y = -1.0;
+        movement_y = -1.0;
       }
       else if (y_dir < .66f)
       {
-        velocity_y = 1.0;
+        movement_y = 1.0;
       }
 
-      if (registry.all_of<Velocity>(entity))
+      if (registry.all_of<Movement>(entity))
       {
-        registry.patch<Velocity>(entity, [velocity_x, velocity_y](auto& velocity) {
-          velocity.x = velocity_x;
-          velocity.y = velocity_y;
+        registry.patch<Movement>(entity, [movement_x, movement_y](auto& movement) {
+          movement.direction.x = movement_x;
+          movement.direction.y = movement_y;
         });
       }
       else
       {
-        registry.emplace<Velocity>(entity, velocity_x, velocity_y, 0.);
+        registry.emplace<Movement>(entity, Vector3{movement_x, movement_y, 0.});
       }
     }
   });

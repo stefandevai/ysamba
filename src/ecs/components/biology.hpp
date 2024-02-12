@@ -22,7 +22,6 @@ struct Biology
   int speed{};
   std::vector<uint32_t> body_parts{};
   double turn_threshold = 100.0;
-  bool collided = false;
 };
 
 template <typename Archive>

@@ -25,10 +25,10 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/job_progress.hpp"
+#include "ecs/components/movement.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/velocity.hpp"
 #include "ecs/components/visibility.hpp"
 #include "ecs/components/walk_path.hpp"
 #include "ecs/components/weared_items.hpp"
@@ -150,7 +150,7 @@ void save_game(World& world, const WorldMetadata& world_metadata, entt::registry
   entt::snapshot{registry}
       .get<entt::entity>(archive)
       .get<Position>(archive)
-      .get<Velocity>(archive)
+      .get<Movement>(archive)
       .get<Biology>(archive)
       .get<entt::tag<"collidable"_hs>>(archive)
       .get<CarriedItems>(archive)
@@ -182,7 +182,7 @@ void load_game(World& world, const WorldMetadata& world_metadata, entt::registry
   entt::snapshot_loader{registry}
       .get<entt::entity>(archive)
       .get<Position>(archive)
-      .get<Velocity>(archive)
+      .get<Movement>(archive)
       .get<Biology>(archive)
       .get<entt::tag<"collidable"_hs>>(archive)
       .get<CarriedItems>(archive)

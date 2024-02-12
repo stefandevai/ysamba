@@ -8,7 +8,7 @@
 
 #include "core/maths/vector.hpp"
 #include "ecs/components/biology.hpp"
-#include "ecs/components/velocity.hpp"
+#include "ecs/components/movement.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -17,9 +17,9 @@ PhysicsSystem::PhysicsSystem(World& world) : m_world(world) {}
 
 void PhysicsSystem::update(entt::registry& registry, const double delta)
 {
-  auto view = registry.view<Biology, Position, Velocity>();
-  view.each([this, &registry, delta](auto entity, auto& biology, auto& position, auto& velocity) {
-    if (velocity.x == 0 && velocity.y == 0)
+  auto view = registry.view<Biology, Position, Movement>();
+  view.each([this, &registry, delta](auto entity, auto& biology, auto& position, auto& movement) {
+    if (movement.direction.x == 0 && movement.direction.y == 0)
     {
       return;
     }
@@ -31,15 +31,15 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       return;
     }
 
-    biology.collided = false;
+    movement.collided = false;
     biology.turn_threshold = 200.0;
 
     const auto speed_divide_factor = 100.0;
     const auto position_variation = (biology.speed / speed_divide_factor);
 
     Position candidate_position{
-        position.x + velocity.x * position_variation,
-        position.y + velocity.y * position_variation,
+        position.x + movement.direction.x * position_variation,
+        position.y + movement.direction.y * position_variation,
         position.z,
     };
 
@@ -63,14 +63,14 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
       TCOD_line_init_mt(x_round,
                         y_round,
-                        x_round + absolute_advance.x * velocity.x,
-                        y_round + absolute_advance.y * velocity.y,
+                        x_round + absolute_advance.x * movement.direction.x,
+                        y_round + absolute_advance.y * movement.direction.y,
                         &bresenham_data);
 
       // While loop instead of do while to avoid checking the current position
       while (!TCOD_line_step_mt(&x_round, &y_round, &bresenham_data))
       {
-        distant_collide = m_collides(registry, entity, x_round, y_round, candidate_position.z);
+        distant_collide = m_collides(x_round, y_round, candidate_position.z, registry);
 
         if (distant_collide)
         {
@@ -96,8 +96,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         // Entity can move to a position that is closer than the target
         if (walkable_advance_x > 0 || walkable_advance_y > 0)
         {
-          target_position.x = position.x + walkable_advance_x * velocity.x;
-          target_position.y = position.y + walkable_advance_y * velocity.y;
+          target_position.x = position.x + walkable_advance_x * movement.direction.x;
+          target_position.y = position.y + walkable_advance_y * movement.direction.y;
         }
         // Entity collided and can't advance
         else
@@ -137,15 +137,15 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     }
     else
     {
-      biology.collided = true;
+      movement.collided = true;
     }
 
-    velocity.x = 0.;
-    velocity.y = 0.;
+    movement.direction.x = 0.;
+    movement.direction.y = 0.;
   });
 }
 
-bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, const int x, const int y, const int z)
+bool PhysicsSystem::m_collides(const int x, const int y, const int z, entt::registry& registry)
 {
   using namespace entt::literals;
 
@@ -156,9 +156,9 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
     return true;
   }
 
-  const auto collidable_entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
+  const auto entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
 
-  if (registry.valid(collidable_entity))
+  if (registry.valid(entity))
   {
     return true;
   }

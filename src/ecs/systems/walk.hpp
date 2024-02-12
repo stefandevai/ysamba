@@ -11,7 +11,7 @@ class World;
 class WalkSystem
 {
  public:
-  WalkSystem(World& world);
+  WalkSystem(World& world, entt::registry& registry);
 
   void update(entt::registry& registry);
 
