@@ -27,8 +27,6 @@ void HomeMenu::load()
   using namespace entt::literals;
   using namespace i18n::literals;
 
-  Scene::load();
-
   m_renderer.add_batch("text"_hs, "default"_hs, 2);
 
   m_typography = std::make_shared<Sprite>("ysamba-typography"_hs);

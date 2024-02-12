@@ -6,6 +6,8 @@
 #include <entt/core/hashed_string.hpp>
 #include <vector>
 
+#include "config.hpp"
+#include "core/json.hpp"
 #include "graphics/camera.hpp"
 #include "world/world.hpp"
 
@@ -176,7 +178,9 @@ void InputManager::set_text_input(const std::string& text) { m_sdl_input_wrapper
 
 void InputManager::m_parse_input()
 {
-  for (const auto& item : m_json.object.items())
+  JSON json{config::path::input};
+
+  for (const auto& item : json.object.items())
   {
     const auto& key = entt::hashed_string{item.key().c_str()};
     const auto input_context = std::make_shared<InputContext>(key);

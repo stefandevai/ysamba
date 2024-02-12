@@ -2,66 +2,16 @@
 
 #include <spdlog/spdlog.h>
 
+#include "config.hpp"
+#include "core/json.hpp"
+
 namespace dl
 {
-JSON TileRules::m_json = JSON{"./data/world/tile_rules.json"};
 std::unordered_map<int, Rule> TileRules::rules{};
 Rule TileRules::identity = IdentityRule{0, "identity"};
 bool TileRules::has_loaded = false;
 
-void TileRules::load()
-{
-  if (has_loaded)
-  {
-    return;
-  }
-
-  const auto& raw_rules = m_json.object["rules"];
-
-  for (const auto& rule : raw_rules)
-  {
-    RuleType type = RuleType::None;
-
-    if (rule["type"] == "autotile_4_sides")
-    {
-      type = RuleType::Autotile4Sides;
-    }
-    else if (rule["type"] == "autotile_8_sides")
-    {
-      type = RuleType::Autotile8Sides;
-    }
-    else if (rule["type"] == "uniform_distribution")
-    {
-      type = RuleType::UniformDistribution;
-    }
-    else
-    {
-      spdlog::warn("Invalid rule type: {}", rule["type"].get<std::string>());
-      continue;
-    }
-
-    const auto input = rule["input"].get<int>();
-    const auto rule_object = m_create_rule(rule, type);
-
-    rules.insert({input, rule_object});
-  }
-
-  has_loaded = true;
-}
-
-const Rule& TileRules::get(const int input)
-{
-  const auto& rule = rules.find(input);
-
-  if (rule == rules.end())
-  {
-    return identity;
-  }
-
-  return rule->second;
-}
-
-Rule TileRules::m_create_rule(const nlohmann::json& rule, const RuleType type)
+Rule create_rule(const nlohmann::json& rule, const RuleType type)
 {
   switch (type)
   {
@@ -282,4 +232,59 @@ Rule TileRules::m_create_rule(const nlohmann::json& rule, const RuleType type)
   }
   }
 }
+
+void TileRules::load()
+{
+  if (has_loaded)
+  {
+    return;
+  }
+
+  JSON json{config::path::tile_rules};
+
+  const auto& raw_rules = json.object["rules"];
+
+  for (const auto& rule : raw_rules)
+  {
+    RuleType type = RuleType::None;
+
+    if (rule["type"] == "autotile_4_sides")
+    {
+      type = RuleType::Autotile4Sides;
+    }
+    else if (rule["type"] == "autotile_8_sides")
+    {
+      type = RuleType::Autotile8Sides;
+    }
+    else if (rule["type"] == "uniform_distribution")
+    {
+      type = RuleType::UniformDistribution;
+    }
+    else
+    {
+      spdlog::warn("Invalid rule type: {}", rule["type"].get<std::string>());
+      continue;
+    }
+
+    const auto input = rule["input"].get<int>();
+    const auto rule_object = create_rule(rule, type);
+
+    rules.insert({input, rule_object});
+  }
+
+  has_loaded = true;
+}
+
+const Rule& TileRules::get(const int input)
+{
+  const auto& rule = rules.find(input);
+
+  if (rule == rules.end())
+  {
+    return identity;
+  }
+
+  return rule->second;
+}
+
 }  // namespace dl

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
+#include <map>
 
 #include "core/input_manager.hpp"
 #include "ui/types.hpp"

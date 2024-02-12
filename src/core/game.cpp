@@ -29,7 +29,7 @@ void Game::load()
 
   serialization::initialize_directories();
 
-  m_display.load(config::display::width, config::display::height, config::display::title);
+  m_display.load(config::display::default_width, config::display::default_height, config::display::title);
 
   if (config::initial_scene == "home_menu")
   {

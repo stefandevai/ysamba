@@ -4,6 +4,8 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "core/json.hpp"
+
 namespace dl
 {
 std::unordered_map<uint32_t, Asset> AssetManager::m_assets{};
@@ -17,9 +19,9 @@ const std::unordered_map<std::string, AssetType> AssetManager::m_asset_types = {
 
 void AssetManager::load_assets(const std::filesystem::path& filepath)
 {
-  m_json.load(filepath.string());
+  JSON json{filepath.string()};
 
-  for (const auto& asset_info : m_json.object["assets"])
+  for (const auto& asset_info : json.object["assets"])
   {
     const auto& id = asset_info["id"].get<std::string>();
     const uint32_t hashed_id = entt::hashed_string::value(id.c_str());

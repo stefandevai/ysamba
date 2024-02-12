@@ -2,8 +2,12 @@
   "initial_scene": "home_menu",
 
   "path": {
+    "assets": "data/assets.json",
+    "translations": "data/translations",
     "tile_data": "data/world/tiles.json",
-    "item_data": "data/items/items.json"
+    "tile_rules": "data/world/tile_rules.json",
+    "item_data": "data/items/items.json",
+    "input": "data/input.json"
   },
 
   "world": {
@@ -12,13 +16,23 @@
   },
 
   "display": {
-    "width": 1024,
-    "height": 576,
+    "default_width": 1024,
+    "default_height": 576,
     "title": "Colonization of Ysamba"
   },
 
   "pathfinding": {
     "search_radius": 100,
     "tries_after_collision": 3
+  },
+
+  "gameplay": {
+    "default_zoom": 1
+  },
+
+  "world_creation": {
+    "world_width": 256,
+    "world_height": 256,
+    "world_depth": 30
   }
 }

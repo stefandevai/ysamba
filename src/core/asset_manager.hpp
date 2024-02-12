@@ -2,11 +2,11 @@
 
 #include <spdlog/spdlog.h>
 
+#include <filesystem>
 #include <memory>
 #include <unordered_map>
 #include <variant>
 
-#include "./json.hpp"
 #include "graphics/font.hpp"
 #include "graphics/shader_program.hpp"
 #include "graphics/texture.hpp"
@@ -59,7 +59,6 @@ class AssetManager
   }
 
  private:
-  JSON m_json{};
   static std::unordered_map<uint32_t, Asset> m_assets;
   static const std::unordered_map<std::string, AssetType> m_asset_types;
 };

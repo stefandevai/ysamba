@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
+#include "core/json.hpp"
+
 extern "C"
 {
 #define STBI_ONLY_PNG
@@ -171,15 +173,15 @@ const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type
 
 void Texture::load_data(const std::string& filepath)
 {
-  m_json.load(filepath);
+  JSON json{filepath};
 
-  if (!m_json.object.contains("frames"))
+  if (!json.object.contains("frames"))
   {
     spdlog::warn("Trying to load tileset data without frames: {}", filepath);
     return;
   }
 
-  const auto items = m_json.object["frames"].get<std::vector<nlohmann::json>>();
+  const auto items = json.object["frames"].get<std::vector<nlohmann::json>>();
 
   for (const auto& item : items)
   {

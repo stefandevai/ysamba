@@ -2,10 +2,9 @@
 
 #include <array>
 #include <glm/vec2.hpp>
-#include <map>
 #include <string>
-
-#include "core/json.hpp"
+#include <unordered_map>
+#include <vector>
 
 namespace dl
 {
@@ -87,7 +86,6 @@ class Texture
 
   using FrameDataMap = std::unordered_map<std::pair<uint32_t, std::string>, FrameData, PairHash>;
 
-  JSON m_json{};
   FrameDataMap m_frame_data;
   std::string m_filepath{};
   std::string m_data_filepath{};

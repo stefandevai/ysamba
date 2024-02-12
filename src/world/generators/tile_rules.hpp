@@ -2,10 +2,9 @@
 
 #include <array>
 #include <string>
+#include <unordered_map>
 #include <variant>
 #include <vector>
-
-#include "core/json.hpp"
 
 namespace dl
 {
@@ -85,9 +84,7 @@ class TileRules
   static void load();
   static const Rule& get(const int input);
 
- private:
-  static JSON m_json;
-
-  static Rule m_create_rule(const nlohmann::json& rule, const RuleType type);
+  // private:
+  // static Rule m_create_rule(const nlohmann::json& rule, const RuleType type);
 };
 }  // namespace dl

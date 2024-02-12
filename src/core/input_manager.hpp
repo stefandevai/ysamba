@@ -3,7 +3,6 @@
 #include <memory>
 #include <unordered_map>
 
-#include "./json.hpp"
 #include "./maths/vector.hpp"
 #include "./sdl_input_wrapper.hpp"
 
@@ -63,7 +62,6 @@ class InputManager
   void quit();
 
  private:
-  JSON m_json{"./data/input.json"};
   static std::unique_ptr<InputManager> m_instance;
   static SDLInputWrapper m_sdl_input_wrapper;
   static std::unordered_map<uint32_t, std::shared_ptr<InputContext>> m_available_contexts;

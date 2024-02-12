@@ -7,7 +7,9 @@
 #include <climits>
 #include <entt/core/hashed_string.hpp>
 
+#include "config.hpp"
 #include "core/game_context.hpp"
+#include "core/json.hpp"
 #include "core/maths/vector.hpp"
 #include "core/random.hpp"
 #include "core/scene_manager.hpp"
@@ -29,11 +31,9 @@ WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation"
 
 void WorldCreation::load()
 {
-  Scene::load();
-
-  world_size.x = m_json.object["world_width"].get<int>();
-  world_size.y = m_json.object["world_height"].get<int>();
-  world_size.z = m_json.object["world_depth"].get<int>();
+  world_size.x = config::world_creation::world_width;
+  world_size.y = config::world_creation::world_height;
+  world_size.z = config::world_creation::world_depth;
 
   m_panel = m_ui_manager.emplace<ui::WorldCreationPanel>();
   m_panel->on_save([this]() { save(); });
@@ -142,19 +142,18 @@ void WorldCreation::save()
 void WorldCreation::m_generate_map()
 {
   // Reload scene file
-  m_json.load(m_scene_path);
+  JSON json{m_scene_path};
 
-  const auto& json = m_json.object;
   bool use_random_seed = true;
 
-  if (json.contains("random_seed"))
+  if (json.object.contains("random_seed"))
   {
-    use_random_seed = json["random_seed"].get<bool>();
+    use_random_seed = json.object["random_seed"].get<bool>();
   }
 
-  if (!use_random_seed && json.contains("seed"))
+  if (!use_random_seed && json.object.contains("seed"))
   {
-    m_seed = json["seed"].get<int>();
+    m_seed = json.object["seed"].get<int>();
   }
   else
   {

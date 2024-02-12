@@ -3,7 +3,6 @@
 #include <string>
 
 #include "core/game_context.hpp"
-#include "core/json.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/renderer.hpp"
 #include "ui/ui_manager.hpp"
@@ -19,7 +18,7 @@ class Scene
   Scene(const std::string& scene_key, GameContext& game_context);
   virtual ~Scene(){};
 
-  virtual void load();
+  virtual void load() = 0;
   virtual void update() = 0;
   virtual void render() = 0;
   void resize();
@@ -31,7 +30,6 @@ class Scene
   const uint32_t m_scene_key{};
   const std::string m_scene_path{};
   GameContext& m_game_context;
-  JSON m_json{};
   Renderer m_renderer{*m_game_context.asset_manager};
   Camera m_camera{*m_game_context.display};
   ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer};

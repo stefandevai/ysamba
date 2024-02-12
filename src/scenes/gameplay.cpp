@@ -4,6 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "config.hpp"
 #include "core/events/camera.hpp"
 #include "core/events/game.hpp"
 #include "core/game_context.hpp"
@@ -32,16 +33,12 @@ void Gameplay::load()
 {
   using namespace entt::literals;
 
-  Scene::load();
-
   m_game_context.registry = &m_registry;
 
   m_renderer.add_batch("world"_hs, "default"_hs);
 
-  const auto default_zoom = m_json.object["default_zoom"].get<float>();
-
   m_camera.set_tile_size(m_world.get_tile_size());
-  m_camera.set_zoom(default_zoom);
+  m_camera.set_zoom(config::gameplay::default_zoom);
   m_camera.set_event_emitter(&m_event_emitter);
 
   m_event_emitter.on<CameraMovedEvent>([this](const CameraMovedEvent& event, EventEmitter& emitter) {
