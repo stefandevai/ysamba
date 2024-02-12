@@ -52,6 +52,11 @@ struct Visibility
 template <typename Archive>
 void serialize(Archive& archive, Visibility& visibility)
 {
-  archive(visibility.resource_id, visibility.frame, visibility.frame_id, visibility.frame_type, visibility.layer_z);
+  archive(visibility.resource_id,
+          visibility.frame,
+          visibility.frame_id,
+          visibility.frame_type,
+          visibility.layer_z,
+          visibility.frame_angle);
 }
 }  // namespace dl

@@ -100,13 +100,11 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.clear_color(49, 147, 129);
+  m_renderer.clear_color(27, 36, 32);
 
-  const auto transform = glm::scale(m_camera.view_matrix, glm::vec3(2.0f, 2.0f, 1.0f));
-  m_renderer.push_matrix("text"_hs, transform);
-
-  m_renderer.batch("text"_hs, m_typography.get(), 30, 50, 0);
-  m_renderer.batch("text"_hs, m_instructions, 40, 193, 0);
+  m_renderer.push_matrix("text"_hs, m_camera.view_matrix);
+  m_renderer.batch("text"_hs, m_typography.get(), 60, 60, 0);
+  m_renderer.batch("text"_hs, m_instructions, 75, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
   m_renderer.pop_matrix("text"_hs);
