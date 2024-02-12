@@ -53,11 +53,13 @@ void Gameplay::load()
   m_event_emitter.on<EnterTurnBasedEvent>([this](const EnterTurnBasedEvent& event, EventEmitter& emitter) {
     (void)emitter;
     m_enter_turn_based(event.entity);
+    m_camera.set_target(event.entity);
   });
   m_event_emitter.on<LeaveTurnBasedEvent>([this](const LeaveTurnBasedEvent& event, EventEmitter& emitter) {
     (void)event;
     (void)emitter;
     m_leave_turn_based();
+    m_camera.set_target(entt::null);
   });
   m_event_emitter.on<UpdateGameEvent>([this](const UpdateGameEvent& event, EventEmitter& emitter) {
     (void)event;
@@ -97,6 +99,7 @@ void Gameplay::update()
     return;
   }
 
+  m_camera.update_target(m_registry);
   m_camera.update(m_game_context.clock->delta);
 
   switch (m_current_state)

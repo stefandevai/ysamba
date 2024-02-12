@@ -1,9 +1,11 @@
 #pragma once
 
+#include <entt/entity/entity.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/maths/vector.hpp"
+#include "ecs/components/position.hpp"
 
 namespace
 {
@@ -34,12 +36,16 @@ class Camera
   glm::mat4 projection_matrix = glm::mat4{1.f};
   glm::mat4 view_matrix = glm::mat4{1.f};
   glm::mat4 view_projection_matrix = glm::mat4{1.f};
+  entt::entity target = entt::null;
   bool dirty = true;
 
   Camera() = default;
   Camera(const Display& display);
 
   void update(const float dt);
+  // TODO: Implement different cameras so that other scenes can have a simpler update
+  // then merge this method to the main update method
+  void update_target(const entt::registry& registry);
   void update_dirty();
   void move(const Vector3& quantity);
   void move_in_grid(const Vector3i& quantity);
@@ -57,6 +63,7 @@ class Camera
   void set_yaw(const float yaw);
   void set_pitch(const float pitch);
   void set_zoom(const float zoom);
+  void set_target(const entt::entity target);
   void set_event_emitter(EventEmitter* emitter);
   void zoom_in();
   void zoom_out();
@@ -87,6 +94,7 @@ class Camera
   Vector2i m_grid_size{0, 0};
   Vector2i m_size_in_tiles{0, 0};
   bool m_resize_view_matrix = true;
+  Position m_last_target_position{};
 
   void m_calculate_center_position();
   void m_calculate_center_vector();

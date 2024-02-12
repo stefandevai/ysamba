@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include <cmath>
+#include <entt/entity/registry.hpp>
 
 #include "core/display.hpp"
 #include "core/events/camera.hpp"
@@ -30,6 +31,30 @@ void Camera::update(const float dt)
   {
     update_dirty();
   }
+}
+
+// TODO: Implement different cameras so that other scenes can have a simpler update
+// then merge this method to the main update method
+void Camera::update_target(const entt::registry& registry)
+{
+  if (!registry.valid(target))
+  {
+    return;
+  }
+
+  const auto& position = registry.get<Position>(target);
+
+  if (position.x == m_last_target_position.x && position.y == m_last_target_position.y &&
+      position.z == m_last_target_position.z)
+  {
+    return;
+  }
+
+  m_last_target_position = position;
+  const auto display_size = Display::get_window_size();
+  set_position({position.x * m_grid_size.x - display_size.x / 2.0 * zoom,
+                position.y * m_grid_size.y - display_size.y / 2.0 * zoom,
+                position.z * m_grid_size.y});
 }
 
 void Camera::update_dirty()
@@ -75,9 +100,14 @@ void Camera::move_in_grid(const Vector3i& quantity)
 
 void Camera::set_position(const Vector3& position)
 {
-  (void)position;
+  movement_offset.x = position.x * (1.0 / zoom);
+  movement_offset.y = position.y * (1.0 / zoom);
+  movement_offset.z = position.z * (1.0 / zoom);
+  m_position.x = position.x * (1.0 / zoom);
+  m_position.y = position.y * m_scaling_factor * (1.0 / zoom) + m_camera_z;
+  m_position.z = position.z * (1.0 / zoom) + m_camera_z;
 
-  // TODO
+  dirty = true;
 }
 
 void Camera::set_size(const Vector2& size)
@@ -139,6 +169,8 @@ void Camera::set_zoom(const float zoom)
 
   dirty = true;
 }
+
+void Camera::set_target(const entt::entity target) { this->target = target; }
 
 void Camera::zoom_in()
 {
