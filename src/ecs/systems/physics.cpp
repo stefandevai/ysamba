@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 #include <libtcod.hpp>
 
@@ -146,6 +147,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
 bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, const int x, const int y, const int z)
 {
+  using namespace entt::literals;
+
   auto& target_tile = m_world.get(x, y, z);
 
   if (!target_tile.flags.contains("WALKABLE"))
@@ -153,24 +156,11 @@ bool PhysicsSystem::m_collides(entt::registry& registry, entt::entity entity, co
     return true;
   }
 
-  const auto& entities = m_world.spatial_hash.get(x, y, z);
+  const auto collidable_entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
 
-  for (const auto e : entities)
+  if (registry.valid(collidable_entity))
   {
-    if (e == entity)
-    {
-      continue;
-    }
-
-    if (registry.all_of<Position, Biology>(e))
-    {
-      auto& position = registry.get<Position>(e);
-
-      if (std::round(position.x) == x && std::round(position.y) == y)
-      {
-        return true;
-      }
-    }
+    return true;
   }
 
   return false;

@@ -12,6 +12,7 @@
 #include <cereal/types/stack.hpp>
 #include <cereal/types/utility.hpp>
 #include <cereal/types/vector.hpp>
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 #include <fstream>
@@ -138,6 +139,8 @@ void load_world(World& world, WorldMetadata& world_metadata)
 
 void save_game(World& world, const WorldMetadata& world_metadata, entt::registry& registry)
 {
+  using namespace entt::literals;
+
   const auto full_path = directory::worlds / world_metadata.id / filename::game;
   std::ofstream output{full_path.c_str()};
   cereal::BinaryOutputArchive archive{output};
@@ -149,6 +152,7 @@ void save_game(World& world, const WorldMetadata& world_metadata, entt::registry
       .get<Position>(archive)
       .get<Velocity>(archive)
       .get<Biology>(archive)
+      .get<entt::tag<"collidable"_hs>>(archive)
       .get<CarriedItems>(archive)
       .get<WearedItems>(archive)
       .get<WieldedItems>(archive)
@@ -162,6 +166,8 @@ void save_game(World& world, const WorldMetadata& world_metadata, entt::registry
 
 void load_game(World& world, const WorldMetadata& world_metadata, entt::registry& registry)
 {
+  using namespace entt::literals;
+
   const auto full_path = directory::worlds / world_metadata.id / filename::game;
   std::ifstream input{full_path.c_str()};
   cereal::BinaryInputArchive archive{input};
@@ -178,6 +184,7 @@ void load_game(World& world, const WorldMetadata& world_metadata, entt::registry
       .get<Position>(archive)
       .get<Velocity>(archive)
       .get<Biology>(archive)
+      .get<entt::tag<"collidable"_hs>>(archive)
       .get<CarriedItems>(archive)
       .get<WearedItems>(archive)
       .get<WieldedItems>(archive)
