@@ -4,6 +4,3 @@
 [submodule "lib/FastNoise2"]
 	path = lib/FastNoise2
 	url = https://github.com/Auburn/FastNoise2
-[submodule "lib/i18n"]
-	path = lib/i18n
-	url = https://github.com/stefandevai/i18n

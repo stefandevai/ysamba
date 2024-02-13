@@ -53,7 +53,7 @@ endif()
 
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build Noise Tool" FORCE)
 add_subdirectory("lib/FastNoise2")
-add_subdirectory("lib/i18n")
+add_subdirectory("lib/i18n_keyval")
 
 # Force an optimized build of FastNoise2
 if (MSVC)
@@ -85,7 +85,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-	$<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+	      $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
         glad::glad
         libtcod::libtcod
         cereal::cereal
@@ -97,5 +97,5 @@ target_link_libraries(
         imgui::imgui
         implot::implot
         FastNoise
-        i18n::i18n
+        i18n_keyval::i18n_keyval
 )
