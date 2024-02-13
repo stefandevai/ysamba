@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "./maths/vector.hpp"
 #include "./sdl_input_wrapper.hpp"

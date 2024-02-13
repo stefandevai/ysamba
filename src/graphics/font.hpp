@@ -2,9 +2,9 @@
 #include <ft2build.h>
 
 #include <map>
+#include <memory>
 #include <utility>
 #include <vector>
-#include <memory>
 #include FT_FREETYPE_H
 #include <glad/glad.h>
 
