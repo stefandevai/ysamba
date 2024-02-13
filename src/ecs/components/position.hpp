@@ -11,7 +11,7 @@ struct Position
   double x;
   double y;
   double z;
-  int spatial_hash_index = INFINITY;
+  int spatial_hash_index = 9999;
 };
 
 template <typename Archive>
