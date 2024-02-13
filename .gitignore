@@ -119,7 +119,6 @@ Temporary Items
 
 build
 vcpkg_installed
-vcpkg
 ./lib
 .cache
 imgui.ini
