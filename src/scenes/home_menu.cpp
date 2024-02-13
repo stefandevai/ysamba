@@ -6,7 +6,7 @@
 #include <chrono>
 #include <entt/core/hashed_string.hpp>
 #include <glm/glm.hpp>
-#include <i18n/i18n.hpp>
+#include <i18n_keyval/i18n.hpp>
 
 #include "constants.hpp"
 #include "core/game_context.hpp"

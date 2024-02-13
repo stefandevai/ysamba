@@ -4,3 +4,6 @@
 [submodule "lib/FastNoise2"]
 	path = lib/FastNoise2
 	url = https://github.com/Auburn/FastNoise2
+[submodule "lib/i18n_keyval"]
+	path = lib/i18n_keyval
+	url = https://github.com/stefandevai/i18n_keyval.git

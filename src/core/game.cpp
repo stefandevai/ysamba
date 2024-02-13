@@ -2,8 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include <i18n/i18n.hpp>
-#include <i18n/translators/nlohmann_json.hpp>
+#include <i18n_keyval/i18n.hpp>
+#include <i18n_keyval/translators/nlohmann_json.hpp>
 
 #include "config.hpp"
 #include "core/serialization.hpp"
