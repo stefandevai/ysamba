@@ -165,7 +165,7 @@ void IslandGenerator::m_flood_fill(const int value, const int x, const int y, st
     const auto top_coord = yt * size.x + x0;
     if (m_valid_coord(x0, yt) && tiles[top_coord] == original_value && mask[top_coord] == value)
     {
-      mask[top_coord] = INFINITY;
+      mask[top_coord] = 9999;
       tiles[top_coord] = value;
       coord_queue.push(Point<int>(x0, yt));
     }
@@ -175,7 +175,7 @@ void IslandGenerator::m_flood_fill(const int value, const int x, const int y, st
     const auto bottom_coord = yb * size.x + x0;
     if (m_valid_coord(x0, yb) && tiles[bottom_coord] == original_value && mask[bottom_coord] == value)
     {
-      mask[bottom_coord] = INFINITY;
+      mask[bottom_coord] = 9999;
       tiles[bottom_coord] = value;
       coord_queue.push(Point<int>(x0, yb));
     }
@@ -185,7 +185,7 @@ void IslandGenerator::m_flood_fill(const int value, const int x, const int y, st
     const auto left_coord = y0 * size.x + xl;
     if (m_valid_coord(xl, y0) && tiles[left_coord] == original_value && mask[left_coord] == value)
     {
-      mask[left_coord] = INFINITY;
+      mask[left_coord] = 9999;
       tiles[left_coord] = value;
       coord_queue.push(Point<int>(xl, y0));
     }
@@ -195,7 +195,7 @@ void IslandGenerator::m_flood_fill(const int value, const int x, const int y, st
     const auto right_coord = y0 * size.x + xr;
     if (m_valid_coord(xr, y0) && tiles[right_coord] == original_value && mask[right_coord] == value)
     {
-      mask[right_coord] = INFINITY;
+      mask[right_coord] = 9999;
       tiles[right_coord] = value;
       coord_queue.push(Point<int>(xr, y0));
     }

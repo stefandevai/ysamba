@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "world/point.hpp"
 
 namespace dl

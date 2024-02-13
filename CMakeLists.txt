@@ -84,8 +84,8 @@ target_include_directories(
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
-        SDL2::SDL2
-        SDL2::SDL2main
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+	$<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
         glad::glad
         libtcod::libtcod
         cereal::cereal

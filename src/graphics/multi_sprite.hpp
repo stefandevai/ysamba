@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/vec2.hpp>
+#include <memory>
 
 #include "./color.hpp"
 #include "./texture.hpp"
