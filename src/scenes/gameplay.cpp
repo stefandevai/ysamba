@@ -99,9 +99,6 @@ void Gameplay::update()
     return;
   }
 
-  m_camera.update_target(m_registry);
-  m_camera.update(m_game_context.clock->delta);
-
   switch (m_current_state)
   {
   case State::PAUSED:
@@ -124,6 +121,8 @@ void Gameplay::update()
     break;
   }
 
+  m_camera.update_target(m_registry);
+  m_camera.update(m_game_context.clock->delta);
   m_ui_manager.update();
 }
 
