@@ -410,7 +410,9 @@ entt::entity World::create_item(
 
 void World::m_load_tile_data()
 {
-  JSON json{config::path::tile_data};
+  JSON json_tile_data{config::path::tile_data};
+
+  const auto actions = m_load_actions();
 
   const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
 
@@ -419,7 +421,7 @@ void World::m_load_tile_data()
   m_tile_size.x = texture->get_frame_width();
   m_tile_size.y = texture->get_frame_height();
 
-  const auto tiles = json.object["tiles"].get<std::vector<nlohmann::json>>();
+  const auto tiles = json_tile_data.object["tiles"].get<std::vector<nlohmann::json>>();
 
   for (const auto& tile : tiles)
   {
@@ -438,39 +440,16 @@ void World::m_load_tile_data()
     }
     if (tile.contains("actions"))
     {
-      const auto actions = tile["actions"].get<std::vector<nlohmann::json>>();
+      const auto actions_data = tile["actions"].get<std::vector<nlohmann::json>>();
 
-      for (const auto& action : actions)
+      for (const auto& action_data : actions_data)
       {
-        const auto& type = action["type"].get<JobType>();
-        const auto& action_name = action["name"].get<std::string>();
-        tile_data.actions[type].name = action_name;
-        tile_data.actions[type].turns_into = action["turns_into"].get<uint32_t>();
+        const auto id = action_data["id"].get<uint32_t>();
 
-        if (action.contains("qualities_required"))
-        {
-          tile_data.actions[type].qualities_required = action["qualities_required"].get<std::vector<std::string>>();
-        }
+        assert(actions.contains(id) && "Action not found in the action data");
 
-        if (action.contains("consumes"))
-        {
-          for (const auto& item : action["consumes"])
-          {
-            tile_data.actions[type].consumes[item["id"].get<uint32_t>()] = item["quantity"].get<uint32_t>();
-          }
-        }
-
-        if (action.contains("gives"))
-        {
-          for (const auto& item : action["gives"])
-          {
-            const auto item_id = item["item_id"].get<uint32_t>();
-            const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
-            tile_data.actions[type].gives[item_id] = quantity;
-          }
-
-          tile_data.actions[type].gives_in_place = action["gives_in_place"].get<bool>();
-        }
+        auto action = actions.at(id);
+        tile_data.actions[action.type] = std::move(action);
       }
     }
 
@@ -478,11 +457,57 @@ void World::m_load_tile_data()
   }
 }
 
+std::unordered_map<uint32_t, Action> World::m_load_actions()
+{
+  JSON json_actions{config::path::action_data};
+  std::unordered_map<uint32_t, Action> actions{};
+
+  for (const auto& json_action : json_actions.object)
+  {
+    Action action{};
+
+    action.id = json_action["id"].get<uint32_t>();
+    action.type = json_action["type"].get<JobType>();
+    action.name = json_action["label"].get<std::string>();
+    action.turns_into = json_action["turns_into"].get<uint32_t>();
+
+    if (json_action.contains("qualities_required"))
+    {
+      action.qualities_required = json_action["qualities_required"].get<std::vector<std::string>>();
+    }
+
+    if (json_action.contains("consumes"))
+    {
+      for (const auto& item : json_action["consumes"])
+      {
+        const auto item_id = item["id"].get<uint32_t>();
+        action.consumes[item_id] = item["quantity"].get<uint32_t>();
+      }
+    }
+
+    if (json_action.contains("gives"))
+    {
+      for (const auto& item : json_action["gives"])
+      {
+        const auto item_id = item["item_id"].get<uint32_t>();
+        const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
+        action.gives[item_id] = quantity;
+      }
+
+      action.gives_in_place = json_action["gives_in_place"].get<bool>();
+    }
+
+    actions[action.id] = std::move(action);
+  }
+
+  return actions;
+}
+
 void World::m_load_item_data()
 {
-  JSON json{config::path::item_data};
+  JSON item_data_json{config::path::item_data};
 
-  const auto items = json.object.get<std::vector<nlohmann::json>>();
+  const auto items = item_data_json.object.get<std::vector<nlohmann::json>>();
 
   for (const auto& item : items)
   {

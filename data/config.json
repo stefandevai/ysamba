@@ -5,6 +5,7 @@
     "assets": "data/assets.json",
     "translations": "data/translations",
     "tile_data": "data/world/tiles.json",
+    "action_data": "data/world/actions.json",
     "tile_rules": "data/world/tile_rules.json",
     "item_data": "data/items/items.json",
     "input": "data/input.json"

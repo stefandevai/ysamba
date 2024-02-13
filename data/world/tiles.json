@@ -16,40 +16,14 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
     {
       "id": 3,
       "name": "sand",
-      "flags": ["WALKABLE"],
-      "drop_ids": [6],
-      "actions": [
-        {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
-        }
-      ]
+      "flags": ["WALKABLE"]
     },
     {
       "id": 4,
@@ -62,16 +36,7 @@
       "flags": [],
       "actions": [
         {
-          "type": 1,
-          "name": "harvest",
-          "gives_in_place": true,
-          "gives": [
-            {
-              "item_id": 1,
-              "quantity": [3, 10]
-            }
-          ],
-          "turns_into": 2
+          "id": 1
         }
       ]
     },
@@ -86,16 +51,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 1,
-          "name": "harvest",
-          "gives_in_place": true,
-          "gives": [
-            {
-              "item_id": 4,
-              "quantity": [1, 6]
-            }
-          ],
-          "turns_into": 2
+          "id": 2
         }
       ]
     },
@@ -105,17 +61,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 2,
-          "name": "break",
-          "gives_in_place": true,
-          "qualities_required": ["hammer"],
-          "gives": [
-            {
-              "item_id": 5,
-              "quantity": [1, 10]
-            }
-          ],
-          "turns_into": 2
+          "id": 3
         }
       ]
     },
@@ -125,17 +71,7 @@
       "flags": [],
       "actions": [
         {
-          "type": 2,
-          "name": "break",
-          "gives_in_place": true,
-          "qualities_required": ["hammer"],
-          "gives": [
-            {
-              "item_id": 5,
-              "quantity": [1, 10]
-            }
-          ],
-          "turns_into": 2
+          "id": 3
         }
       ]
     },
@@ -155,15 +91,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 5,
-          "name": "prepare firecamp",
-          "turns_into": 13,
-          "consumes": [
-            {
-              "id": 9,
-              "quantity": 1
-            }
-          ]
+          "id": 4
         }
       ]
     },
@@ -173,10 +101,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 6,
-          "name": "start fire",
-          "turns_into": 14,
-          "qualities_required": ["fire_starter"]
+          "id": 5
         }
       ]
     },
@@ -245,17 +170,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -265,17 +180,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -285,17 +190,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -305,17 +200,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -325,17 +210,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -345,17 +220,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -365,17 +230,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -385,17 +240,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -405,17 +250,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -425,17 +260,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -445,17 +270,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -465,17 +280,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -485,17 +290,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -505,17 +300,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -525,17 +310,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -545,17 +320,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -585,17 +350,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -605,17 +360,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -625,17 +370,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -645,17 +380,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -665,17 +390,7 @@
       "flags": ["WALKABLE"],
       "actions": [
         {
-          "type": 3,
-          "name": "dig",
-          "qualities_required": ["dig"],
-          "gives_in_place": false,
-          "gives": [
-            {
-              "item_id": 6,
-              "quantity": [1, 1]
-            }
-          ],
-          "turns_into": 12
+          "id": 0
         }
       ]
     },
@@ -1122,17 +837,32 @@
     {
       "id": 136,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 0
+        }
+      ]
     },
     {
       "id": 137,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 0
+        }
+      ]
     },
     {
       "id": 138,
       "name": "grass",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 0
+        }
+      ]
     }
   ]
 }

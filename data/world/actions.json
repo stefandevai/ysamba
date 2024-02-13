@@ -1,0 +1,75 @@
+[
+  {
+    "id": 0,
+    "type": 3,
+    "label": "dig grass",
+    "qualities_required": ["dig"],
+    "gives_in_place": false,
+    "gives": [
+      {
+        "item_id": 6,
+        "quantity": [1, 1]
+      }
+    ],
+    "turns_into": 12
+  },
+  {
+    "id": 1,
+    "type": 1,
+    "label": "harvest yuca",
+    "gives_in_place": true,
+    "gives": [
+      {
+        "item_id": 1,
+        "quantity": [3, 10]
+      }
+    ],
+    "turns_into": 2
+  },
+  {
+    "id": 2,
+    "type": 1,
+    "label": "harvest mushrooms",
+    "gives_in_place": true,
+    "gives": [
+      {
+        "item_id": 4,
+        "quantity": [1, 6]
+      }
+    ],
+    "turns_into": 2
+  },
+  {
+    "id": 3,
+    "type": 2,
+    "label": "break rocks",
+    "gives_in_place": true,
+    "qualities_required": ["hammer"],
+    "gives": [
+      {
+        "item_id": 5,
+        "quantity": [1, 10]
+      }
+    ],
+    "turns_into": 2
+  },
+  {
+    "id": 4,
+    "type": 5,
+    "label": "prepare firecamp",
+    "turns_into": 13,
+    "consumes": [
+      {
+        "id": 9,
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "type": 6,
+    "label": "start fire",
+    "turns_into": 14,
+    "qualities_required": ["fire_starter"]
+  }
+]

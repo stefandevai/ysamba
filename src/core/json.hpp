@@ -7,7 +7,7 @@ namespace dl
 class JSON
 {
  public:
-  nlohmann::json object;
+  nlohmann::json object{};
 
  public:
   JSON();

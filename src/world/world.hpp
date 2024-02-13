@@ -168,6 +168,7 @@ class World
 
   // Load information about tiles
   void m_load_tile_data();
+  std::unordered_map<uint32_t, Action> m_load_actions();
 
   // Load information about items
   void m_load_item_data();

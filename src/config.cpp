@@ -11,6 +11,7 @@ namespace path
 std::string assets = "data/assets.json";
 std::string translations = "data/translations";
 std::string tile_data = "data/world/tiles.json";
+std::string action_data = "data/world/actions.json";
 std::string tile_rules = "data/world/tile_rules.json";
 std::string item_data = "data/items/items.json";
 std::string input = "data/input.json";
@@ -77,6 +78,7 @@ void load(const std::filesystem::path& filepath)
     assign_if_contains<std::string>(path, "assets", path::assets);
     assign_if_contains<std::string>(path, "translations", path::translations);
     assign_if_contains<std::string>(path, "tile_data", path::tile_data);
+    assign_if_contains<std::string>(path, "action_data", path::action_data);
     assign_if_contains<std::string>(path, "tile_rules", path::tile_rules);
     assign_if_contains<std::string>(path, "item_data", path::item_data);
     assign_if_contains<std::string>(path, "input", path::input);

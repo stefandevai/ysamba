@@ -13,6 +13,7 @@ namespace path
 extern std::string assets;
 extern std::string translations;
 extern std::string tile_data;
+extern std::string action_data;
 extern std::string tile_rules;
 extern std::string item_data;
 extern std::string input;

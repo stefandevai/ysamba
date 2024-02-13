@@ -12,6 +12,8 @@ enum class Direction;
 
 struct Action
 {
+  uint32_t id{};
+  JobType type{};
   std::string name{};
   uint32_t turns_into{};
   bool gives_in_place = true;
