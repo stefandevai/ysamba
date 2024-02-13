@@ -468,7 +468,7 @@ std::unordered_map<uint32_t, Action> World::m_load_actions()
 
     action.id = json_action["id"].get<uint32_t>();
     action.type = json_action["type"].get<JobType>();
-    action.name = json_action["label"].get<std::string>();
+    action.label = json_action["label"].get<std::string>();
     action.turns_into = json_action["turns_into"].get<uint32_t>();
 
     if (json_action.contains("qualities_required"))

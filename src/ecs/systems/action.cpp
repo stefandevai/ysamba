@@ -209,7 +209,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       for (const auto& action : tile_data.actions)
       {
-        m_actions.push_back({static_cast<uint32_t>(action.first), action.second.name});
+        m_actions.push_back({static_cast<uint32_t>(action.first), action.second.label});
       }
 
       m_action_menu->set_actions(m_actions);
