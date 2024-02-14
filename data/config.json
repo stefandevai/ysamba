@@ -28,7 +28,7 @@
   },
 
   "gameplay": {
-    "default_zoom": 2.0
+    "default_zoom": 1.0
   },
 
   "world_creation": {

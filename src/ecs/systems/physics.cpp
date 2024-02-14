@@ -31,17 +31,26 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       return;
     }
 
+    // spdlog::debug("TUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUURN");
+    // spdlog::debug("Position: ({}, {}, {})", position.x, position.y, position.z);
+
     movement.collided = false;
     biology.turn_threshold = 200.0;
 
     const auto speed_divide_factor = 100.0;
     const auto position_variation = (biology.speed / speed_divide_factor);
 
+    // spdlog::debug("Direction: ({}, {})", movement.direction.x, movement.direction.y);
+    // spdlog::debug("Position variation: {}", position_variation);
+
     Position candidate_position{
         position.x + movement.direction.x * position_variation,
         position.y + movement.direction.y * position_variation,
         position.z,
     };
+
+    // spdlog::debug("Candidate position: ({}, {}, {})", candidate_position.x, candidate_position.y,
+    // candidate_position.z);
 
     Position target_position = Position{position};
 

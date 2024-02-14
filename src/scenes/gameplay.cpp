@@ -25,6 +25,12 @@
 #include "debug/debug_tools.hpp"
 #endif
 
+// DEBUG
+#include <chrono>
+
+#include "core/timer.hpp"
+// DEBUG
+
 namespace dl
 {
 Gameplay::Gameplay(GameContext& game_context) : Scene("gameplay", game_context) {}
@@ -157,9 +163,10 @@ bool Gameplay::m_update_real_time()
   }
   else
   {
-    m_update_turn_systems();
     m_turn_delay = 0.5;
   }
+
+  m_update_turn_systems();
 
   m_update_action_systems();
 
@@ -181,13 +188,35 @@ bool Gameplay::m_update_turn_based()
   return false;
 }
 
+Timer a_star_timer{};
+int a_star_counter = 0;
+
 void Gameplay::m_update_turn_systems()
 {
+  using namespace entt::literals;
+
   const auto delta = m_game_context.clock->delta;
 
   m_game_system.update();
+  m_society_system.update(m_registry, delta);
   m_physics_system.update(m_registry, delta);
+
+  a_star_timer.start();
   m_walk_system.update(m_registry);
+  a_star_timer.stop();
+  ++a_star_counter;
+
+  // a_star_timer.print<std::chrono::milliseconds>("A*", 0.0);
+  // a_star_timer.print<std::chrono::microseconds>("A*", 1.0);
+
+  if (a_star_counter % 60 == 0)
+  {
+    for (const auto entity : m_registry.view<entt::tag<"a_star_rectangle"_hs>>())
+    {
+      m_registry.destroy(entity);
+    }
+  }
+
   m_job_system.update(m_registry, delta);
 }
 
@@ -228,16 +257,18 @@ void Gameplay::save_game() { serialization::save_game(m_world, m_game_context.wo
 
 void Gameplay::load_game()
 {
+  m_camera.update_dirty();
+
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
   m_registry.clear();
   serialization::load_game(m_world, m_game_context.world_metadata, m_registry);
 
-  if (!m_world.has_initialized)
-  {
-    m_world.initialize(m_registry, m_camera);
-    serialization::save_game(m_world, m_game_context.world_metadata, m_registry);
-  }
+  // if (!m_world.has_initialized)
+  // {
+  m_world.initialize(m_registry, m_camera);
+  //   serialization::save_game(m_world, m_game_context.world_metadata, m_registry);
+  // }
 
   m_has_loaded = true;
 }

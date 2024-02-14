@@ -36,7 +36,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
 {
   name_generator.load("guarani");
   std::vector<MemberComponents> members;
-  const auto first_generation_members = 1;
+  const auto first_generation_members = 4;
 
   for (auto i = 0; i < first_generation_members; ++i)
   {
@@ -54,7 +54,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     mother_parameters.texture_frame = 1;
     mother_parameters.speed = 100;
     mother_parameters.name = name_generator.generate();
-    spdlog::info("Mothers's name: {}", mother_parameters.name);
+    // spdlog::info("Mothers's name: {}", mother_parameters.name);
     members.push_back(m_get_member_components(society, mother_parameters));
 
     const auto number_of_sons = 3;
@@ -65,9 +65,10 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       auto son_parameters = MemberParameters();
       son_parameters.member_id = son_id;
       son_parameters.texture_frame = 4;
-      son_parameters.speed = 80;
+      // son_parameters.speed = 80;
+      son_parameters.speed = 100;
       son_parameters.name = name_generator.generate();
-      spdlog::info("Sons's name: {}", son_parameters.name);
+      // spdlog::info("Sons's name: {}", son_parameters.name);
       members.push_back(m_get_member_components(society, son_parameters));
     }
 
@@ -79,12 +80,15 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       auto daughter_parameters = MemberParameters();
       daughter_parameters.member_id = daughter_id;
       daughter_parameters.texture_frame = 5;
-      daughter_parameters.speed = 80;
+      // daughter_parameters.speed = 80;
+      daughter_parameters.speed = 100;
       daughter_parameters.name = name_generator.generate();
-      spdlog::info("Daughters's name: {}", daughter_parameters.name);
+      // spdlog::info("Daughters's name: {}", daughter_parameters.name);
       members.push_back(m_get_member_components(society, daughter_parameters));
     }
   }
+
+  spdlog::info("TOTAL MEMBERS: {}", members.size());
 
   return members;
 }
@@ -127,8 +131,8 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Camer
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = static_cast<double>(random::get_integer(0, world::chunk_size.x));
-    const auto y = static_cast<double>(random::get_integer(0, world::chunk_size.y));
+    const auto x = static_cast<double>(random::get_integer(0, world::chunk_size.x - 50));
+    const auto y = static_cast<double>(random::get_integer(0, world::chunk_size.y - 50));
     const auto height = chunk.tiles.height_map[x + y * world::chunk_size.x];
 
     if (world.is_walkable(x, y, height))

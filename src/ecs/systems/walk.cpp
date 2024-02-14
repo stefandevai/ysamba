@@ -73,9 +73,12 @@ void WalkSystem::update(entt::registry& registry)
 
     if (!registry.all_of<WalkPath>(entity))
     {
+      static int n_a_star = 0;
       auto& walk_path = registry.emplace<WalkPath>(entity);
-      // walk_path.steps = m_world.get_path_between(Vector3i{position.x, position.y, position.z}, target.position);
       walk_path.steps = m_world.find_path(Vector3i{position.x, position.y, position.z}, target.position);
+      ++n_a_star;
+
+      // spdlog::debug("A* calls: {}", n_a_star);
     }
 
     auto& walk_path = registry.get<WalkPath>(entity);
