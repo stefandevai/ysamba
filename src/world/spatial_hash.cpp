@@ -56,33 +56,30 @@ int SpatialHash::update(const entt::entity object, const int x, const int y, con
 std::vector<entt::entity> SpatialHash::get(const int x, const int y, const int z) const
 {
   std::vector<entt::entity> objects{};
-  const auto search_keys = m_get_search_keys(x, y, z);
+  const auto key = m_get_key(x, y, z);
 
-  for (const auto key : search_keys)
+  // for (const auto key : search_keys)
+  // {
+  auto range = m_hash.equal_range(key);
+  for (auto i = range.first; i != range.second; ++i)
   {
-    auto range = m_hash.equal_range(key);
-    for (auto i = range.first; i != range.second; ++i)
-    {
-      objects.push_back(i->second);
-    }
+    objects.push_back(i->second);
   }
+  // }
 
   return objects;
 }
 
 bool SpatialHash::has(entt::entity entity, const int x, const int y, const int z) const
 {
-  const auto search_keys = m_get_search_keys(x, y, z);
+  const auto key = m_get_key(x, y, z);
 
-  for (const auto key : search_keys)
+  auto range = m_hash.equal_range(key);
+  for (auto i = range.first; i != range.second; ++i)
   {
-    auto range = m_hash.equal_range(key);
-    for (auto i = range.first; i != range.second; ++i)
+    if (i->second == entity)
     {
-      if (i->second == entity)
-      {
-        return true;
-      }
+      return true;
     }
   }
 
@@ -92,17 +89,14 @@ bool SpatialHash::has(entt::entity entity, const int x, const int y, const int z
 std::vector<entt::entity> SpatialHash::get_if(const Vector3i& position, TestFunction test_function) const
 {
   std::vector<entt::entity> objects{};
-  const auto search_keys = m_get_search_keys(position.x, position.y, position.z);
+  const auto key = m_get_key(position.x, position.y, position.z);
 
-  for (const auto key : search_keys)
+  auto range = m_hash.equal_range(key);
+  for (auto i = range.first; i != range.second; ++i)
   {
-    auto range = m_hash.equal_range(key);
-    for (auto i = range.first; i != range.second; ++i)
+    if (test_function(i->second))
     {
-      if (test_function(i->second))
-      {
-        objects.push_back(i->second);
-      }
+      objects.push_back(i->second);
     }
   }
 
@@ -122,7 +116,7 @@ int SpatialHash::m_get_key(const int x, const int y, const int z) const
   return hash_x ^ hash_y ^ hash_z;
 }
 
-const std::array<int, 3> lookup_index{-1, 0, 1};
+constexpr std::array<int, 3> lookup_index{-1, 0, 1};
 
 std::array<int, 27> SpatialHash::m_get_search_keys(const int x, const int y, const int z) const
 {

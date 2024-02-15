@@ -353,15 +353,15 @@ bool World::is_walkable(const int x, const int y, const int z) const
   const auto& tile = get(x, y, z);
   bool walkable = tile.flags.contains(tile_flag::walkable);
 
-  // if (walkable)
-  // {
-  //   assert(m_game_context.registry != nullptr);
-  //   auto entity = spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, *m_game_context.registry);
-  //   if (m_game_context.registry->valid(entity))
-  //   {
-  //     walkable = false;
-  //   }
-  // }
+  if (walkable)
+  {
+    assert(m_game_context.registry != nullptr);
+    auto entity = spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, *m_game_context.registry);
+    if (m_game_context.registry->valid(entity))
+    {
+      walkable = false;
+    }
+  }
 
   return walkable;
 }
