@@ -41,8 +41,8 @@ void SocietySystem::update(entt::registry& registry, const double delta)
       return;
     }
 
-    const auto x = random::get_integer(0, 128);
-    const auto y = random::get_integer(0, 128);
+    const auto x = random::get_integer(-128, 256);
+    const auto y = random::get_integer(-128, 256);
     const auto elevation = m_world.get_elevation(x, y);
 
     if (m_world.is_walkable(x, y, elevation))

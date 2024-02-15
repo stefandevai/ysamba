@@ -32,7 +32,7 @@ uint32_t spatial_hash_cell_size = 2;
 
 namespace pathfinding
 {
-uint32_t search_radius = 100;
+uint32_t max_steps = 700;
 uint32_t tries_after_collision = 3;
 }  // namespace pathfinding
 
@@ -105,7 +105,7 @@ void load(const std::filesystem::path& filepath)
   {
     auto& pathfinding = json.object.at("pathfinding");
 
-    assign_if_contains<uint32_t>(pathfinding, "search_radius", pathfinding::search_radius);
+    assign_if_contains<uint32_t>(pathfinding, "max_steps", pathfinding::max_steps);
     assign_if_contains<uint32_t>(pathfinding, "tries_after_collision", pathfinding::tries_after_collision);
   }
 

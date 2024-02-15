@@ -1,5 +1,6 @@
 #include "./inspector.hpp"
 
+#include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
 #include <entt/core/hashed_string.hpp>
@@ -70,7 +71,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
     if (position.z >= mouse_tile.z)
     {
-      m_update_inspector_content(entity, registry);
+      m_update_inspector_content(mouse_tile, entity, registry);
       updated_inspector_content = true;
     }
   }
@@ -81,7 +82,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
 
     if (tile_data.id > 0)
     {
-      m_update_inspector_content(tile_data);
+      m_update_inspector_content(mouse_tile, tile_data);
       updated_inspector_content = true;
     }
   }
@@ -95,7 +96,9 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   m_last_camera_position = camera_position;
 }
 
-void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt::registry& registry)
+void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
+                                                 const entt::entity entity,
+                                                 entt::registry& registry)
 {
   if (m_inspector->state == ui::UIComponent::State::Hidden)
   {
@@ -105,7 +108,9 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
   if (registry.all_of<SocietyAgent>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
-    m_inspector->set_content(agent.name);
+    // m_inspector->set_content(agent.name);
+    m_inspector->set_content(
+        fmt::format("({}, {}, {})\n{}", mouse_position.x, mouse_position.y, mouse_position.z, agent.name));
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
@@ -118,19 +123,27 @@ void InspectorSystem::m_update_inspector_content(const entt::entity entity, entt
     }
 
     const auto& item_data = m_world.get_item_data(item.id);
-    m_inspector->set_content(item_data.name + "\nWeight: " + item_data.weight_string +
-                             "\nVolume: " + item_data.volume_string);
+    // m_inspector->set_content(item_data.name + "\nWeight: " + item_data.weight_string +
+    //                          "\nVolume: " + item_data.volume_string);
+    m_inspector->set_content(fmt::format("({}, {}, {})\n{}\nWeight: {}\nVolume: {}",
+                                         mouse_position.x,
+                                         mouse_position.y,
+                                         mouse_position.z,
+                                         item_data.name,
+                                         item_data.weight_string,
+                                         item_data.volume_string));
   }
 }
 
-void InspectorSystem::m_update_inspector_content(const TileData& tile_data)
+void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, const TileData& tile_data)
 {
   if (m_inspector->state == ui::UIComponent::State::Hidden)
   {
     m_inspector->show();
   }
 
-  m_inspector->set_content(tile_data.name);
+  m_inspector->set_content(
+      fmt::format("({}, {}, {})\n{}", mouse_position.x, mouse_position.y, mouse_position.z, tile_data.name));
 }
 
 void InspectorSystem::m_destroy_inspector() { m_inspector->hide(); }

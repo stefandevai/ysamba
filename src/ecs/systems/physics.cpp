@@ -142,6 +142,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     // Update the position if it's different from the last position
     if (target_position.x != position.x || target_position.y != position.y || target_position.z != position.z)
     {
+      // Update spatial hash index so it can be correctly removed on the spatial hash
+      target_position.spatial_hash_index = position.spatial_hash_index;
       registry.patch<Position>(entity, [&target_position](auto& position) { position = target_position; });
     }
     else

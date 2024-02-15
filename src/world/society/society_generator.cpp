@@ -36,7 +36,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
 {
   name_generator.load("guarani");
   std::vector<MemberComponents> members;
-  const auto first_generation_members = 50;
+  const auto first_generation_members = 300;
 
   for (auto i = 0; i < first_generation_members; ++i)
   {
@@ -124,22 +124,23 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
 
 Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
 {
-  const auto& chunk = world.chunk_manager.in(camera.center_in_tiles);
+  // const auto& chunk = world.chunk_manager.in(camera.center_in_tiles);
 
   auto position = Position{0., 0., 0.};
-  const uint32_t max_tries = 30;
+  const uint32_t max_tries = 50;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = static_cast<double>(random::get_integer(0, world::chunk_size.x - 50));
-    const auto y = static_cast<double>(random::get_integer(0, world::chunk_size.y - 50));
-    const auto height = chunk.tiles.height_map[x + y * world::chunk_size.x];
+    const auto x = random::get_integer(-128, 256);
+    const auto y = random::get_integer(-128, 256);
+    const auto elevation = world.get_elevation(x, y);
+    // const auto height = chunk.tiles.height_map[x + y * world::chunk_size.x];
 
-    if (world.is_walkable(x, y, height))
+    if (world.is_walkable(x, y, elevation))
     {
-      position.x = chunk.position.x + x;
-      position.y = chunk.position.y + y;
-      position.z = height;
+      position.x = x;
+      position.y = y;
+      position.z = elevation;
 
       return position;
     }

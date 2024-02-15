@@ -41,8 +41,8 @@ class InspectorSystem
   entt::entity m_target_quad = entt::null;
 
   void m_update_input(entt::registry& registry);
-  void m_update_inspector_content(const entt::entity entity, entt::registry& registry);
-  void m_update_inspector_content(const TileData& tile_data);
+  void m_update_inspector_content(const Vector3i mouse_position, const entt::entity entity, entt::registry& registry);
+  void m_update_inspector_content(const Vector3i mouse_position, const TileData& tile_data);
   void m_destroy_inspector();
 };
 }  // namespace dl

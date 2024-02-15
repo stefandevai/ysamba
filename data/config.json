@@ -23,8 +23,8 @@
   },
 
   "pathfinding": {
-    "search_radius": 100,
-    "tries_after_collision": 3
+    "max_steps": 2000,
+    "tries_after_collision": 8
   },
 
   "gameplay": {

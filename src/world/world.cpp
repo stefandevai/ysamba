@@ -239,6 +239,8 @@ std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
     return a_star.path;
   }
 
+  // a_star.debug(*m_game_context.registry, false, false);
+
   return {};
 }
 

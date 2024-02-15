@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include "config.hpp"
 #include "constants.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "world/world.hpp"
@@ -121,12 +122,24 @@ void AStar::step()
   // Failed to find a path
   if (m_open_set.empty())
   {
-    spdlog::warn("AStar failed to find a path");
+    // spdlog::warn("AStar failed to find a path");
+    // spdlog::debug("AStar step: {}", steps);
+    // spdlog::debug("Origin: {} {} {}", origin.x, origin.y, origin.z);
+    // spdlog::debug("Destination: {} {} {}", destination.x, destination.y, destination.z);
     state = State::FAILED;
     return;
   }
 
   ++steps;
+
+  if (steps > config::pathfinding::max_steps)
+  {
+    // spdlog::debug("AStar step: {}", steps);
+    // spdlog::debug("Origin: {} {} {}", origin.x, origin.y, origin.z);
+    // spdlog::debug("Destination: {} {} {}", destination.x, destination.y, destination.z);
+    state = State::FAILED;
+    return;
+  }
 
   auto current_node = m_open_set.front();
 

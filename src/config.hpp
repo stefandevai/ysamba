@@ -34,7 +34,7 @@ extern uint32_t spatial_hash_cell_size;
 
 namespace pathfinding
 {
-extern uint32_t search_radius;
+extern uint32_t max_steps;
 extern uint32_t tries_after_collision;
 }  // namespace pathfinding
 
