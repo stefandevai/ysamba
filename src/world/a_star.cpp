@@ -122,10 +122,7 @@ void AStar::step()
   // Failed to find a path
   if (m_open_set.empty())
   {
-    // spdlog::warn("AStar failed to find a path");
-    // spdlog::debug("AStar step: {}", steps);
-    // spdlog::debug("Origin: {} {} {}", origin.x, origin.y, origin.z);
-    // spdlog::debug("Destination: {} {} {}", destination.x, destination.y, destination.z);
+    spdlog::warn("A* failed to find a path");
     state = State::FAILED;
     return;
   }
@@ -134,9 +131,7 @@ void AStar::step()
 
   if (steps > config::pathfinding::max_steps)
   {
-    // spdlog::debug("AStar step: {}", steps);
-    // spdlog::debug("Origin: {} {} {}", origin.x, origin.y, origin.z);
-    // spdlog::debug("Destination: {} {} {}", destination.x, destination.y, destination.z);
+    spdlog::warn("Maximum steps for A* reached, aborting search");
     state = State::FAILED;
     return;
   }

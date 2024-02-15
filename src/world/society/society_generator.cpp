@@ -36,8 +36,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
 {
   name_generator.load("guarani");
   std::vector<MemberComponents> members;
-  // const auto first_generation_members = 300;
-  const auto first_generation_members = 100;
+  const auto first_generation_members = 1;
 
   for (auto i = 0; i < first_generation_members; ++i)
   {
@@ -55,7 +54,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     mother_parameters.texture_frame = 1;
     mother_parameters.speed = 100;
     mother_parameters.name = name_generator.generate();
-    // spdlog::info("Mothers's name: {}", mother_parameters.name);
+    spdlog::info("Mothers's name: {}", mother_parameters.name);
     members.push_back(m_get_member_components(society, mother_parameters));
 
     const auto number_of_sons = 3;
@@ -69,7 +68,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       // son_parameters.speed = 80;
       son_parameters.speed = 100;
       son_parameters.name = name_generator.generate();
-      // spdlog::info("Sons's name: {}", son_parameters.name);
+      spdlog::info("Sons's name: {}", son_parameters.name);
       members.push_back(m_get_member_components(society, son_parameters));
     }
 
@@ -84,12 +83,10 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       // daughter_parameters.speed = 80;
       daughter_parameters.speed = 100;
       daughter_parameters.name = name_generator.generate();
-      // spdlog::info("Daughters's name: {}", daughter_parameters.name);
+      spdlog::info("Daughters's name: {}", daughter_parameters.name);
       members.push_back(m_get_member_components(society, daughter_parameters));
     }
   }
-
-  spdlog::info("TOTAL MEMBERS: {}", members.size());
 
   return members;
 }
@@ -125,17 +122,15 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
 
 Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
 {
-  // const auto& chunk = world.chunk_manager.in(camera.center_in_tiles);
-
   auto position = Position{0., 0., 0.};
   const uint32_t max_tries = 50;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = random::get_integer(-128, 256);
-    const auto y = random::get_integer(-128, 256);
+    const auto x = camera.center_in_tiles.x + random::get_integer(-10, 10);
+    const auto y = 35 + camera.center_in_tiles.y + random::get_integer(-10, 10);
+
     const auto elevation = world.get_elevation(x, y);
-    // const auto height = chunk.tiles.height_map[x + y * world::chunk_size.x];
 
     if (world.is_walkable(x, y, elevation))
     {

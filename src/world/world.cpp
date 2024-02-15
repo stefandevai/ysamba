@@ -230,16 +230,12 @@ std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
     a_star.step();
   } while (a_star.state == AStar::State::SEARCHING);
 
-  // spdlog::debug("A* steps: {}", a_star.steps);
-
   // a_star.debug(*m_game_context.registry, true, false);
 
   if (a_star.state == AStar::State::SUCCEEDED)
   {
     return a_star.path;
   }
-
-  // a_star.debug(*m_game_context.registry, false, false);
 
   return {};
 }

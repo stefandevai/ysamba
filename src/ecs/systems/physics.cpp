@@ -31,7 +31,6 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
       return;
     }
 
-    // spdlog::debug("TUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUURN");
     // spdlog::debug("Position: ({}, {}, {})", position.x, position.y, position.z);
 
     movement.collided = false;
