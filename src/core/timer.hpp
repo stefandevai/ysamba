@@ -19,6 +19,12 @@ class Timer
   void stop();
 
   template <typename Unit = std::chrono::microseconds>
+  std::size_t count()
+  {
+    return std::chrono::duration_cast<Unit>(second - first).count();
+  }
+
+  template <typename Unit = std::chrono::microseconds>
   void print(const std::string& what)
   {
     const auto duration = std::chrono::duration_cast<Unit>(second - first).count();

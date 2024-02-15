@@ -36,7 +36,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
 {
   name_generator.load("guarani");
   std::vector<MemberComponents> members;
-  const auto first_generation_members = 4;
+  const auto first_generation_members = 50;
 
   for (auto i = 0; i < first_generation_members; ++i)
   {

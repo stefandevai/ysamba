@@ -165,12 +165,12 @@ bool PhysicsSystem::m_collides(const int x, const int y, const int z, entt::regi
     return true;
   }
 
-  const auto entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
-
-  if (registry.valid(entity))
-  {
-    return true;
-  }
+  // const auto entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
+  //
+  // if (registry.valid(entity))
+  // {
+  //   return true;
+  // }
 
   return false;
 }

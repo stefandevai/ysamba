@@ -26,14 +26,23 @@ SocietySystem::SocietySystem(const World& world) : m_world(world) {}
 void SocietySystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<SocietyAgent, Position>();
+  // for (const auto entity : view)
+  // {
+  //   const auto& agent = registry.get<SocietyAgent>(entity);
+  //   if (registry.all_of<ActionWalk>(entity) || agent.jobs.size() > 0)
+  //   {
+  //     return;
+  //   }
+  // }
+
   view.each([&registry, delta, this](auto entity, auto& agent, const auto& position) {
     if (registry.all_of<ActionWalk>(entity) || agent.jobs.size() > 0)
     {
       return;
     }
 
-    const auto x = random::get_integer(10, 60);
-    const auto y = random::get_integer(10, 30);
+    const auto x = random::get_integer(0, 128);
+    const auto y = random::get_integer(0, 128);
     const auto elevation = m_world.get_elevation(x, y);
 
     if (m_world.is_walkable(x, y, elevation))

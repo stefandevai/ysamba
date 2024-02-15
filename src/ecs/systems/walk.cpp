@@ -10,6 +10,10 @@
 #include "ecs/components/walk_path.hpp"
 #include "world/world.hpp"
 
+// DEBUG
+#include "core/timer.hpp"
+// DEBUG
+
 namespace
 {
 void add_movement_component(entt::registry& registry, entt::entity entity)
@@ -40,8 +44,12 @@ WalkSystem::WalkSystem(World& world, entt::registry& registry) : m_world(world)
   registry.on_construct<ActionWalk>().connect<&add_movement_component>();
 }
 
+Timer find_path_timer{};
+
 void WalkSystem::update(entt::registry& registry)
 {
+  // int called_times = 0;
+
   auto view = registry.view<ActionWalk, Movement, const Position>();
   for (const auto entity : view)
   {
@@ -73,10 +81,15 @@ void WalkSystem::update(entt::registry& registry)
 
     if (!registry.all_of<WalkPath>(entity))
     {
-      static int n_a_star = 0;
+      // static int n_a_star = 0;
       auto& walk_path = registry.emplace<WalkPath>(entity);
+
+      // find_path_timer.start();
       walk_path.steps = m_world.find_path(Vector3i{position.x, position.y, position.z}, target.position);
-      ++n_a_star;
+      // find_path_timer.stop();
+      // find_path_timer.print("FIND PATH");
+      // ++n_a_star;
+      // ++called_times;
 
       // spdlog::debug("A* calls: {}", n_a_star);
     }
@@ -115,6 +128,11 @@ void WalkSystem::update(entt::registry& registry)
 
     stop_walk(registry, entity, job);
   }
+
+  // if (called_times > 0)
+  // {
+  //   spdlog::debug("WalkSystem called {} times", called_times);
+  // }
 }
 
 }  // namespace dl

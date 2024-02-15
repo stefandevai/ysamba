@@ -201,21 +201,28 @@ void Gameplay::m_update_turn_systems()
   m_society_system.update(m_registry, delta);
   m_physics_system.update(m_registry, delta);
 
-  a_star_timer.start();
+  // a_star_timer.start();
   m_walk_system.update(m_registry);
-  a_star_timer.stop();
+  // a_star_timer.stop();
   ++a_star_counter;
 
-  // a_star_timer.print<std::chrono::milliseconds>("A*", 0.0);
+  // const auto count = a_star_timer.count<std::chrono::milliseconds>();
+
+  // if (count > 0)
+  // {
+  //   a_star_timer.print<std::chrono::milliseconds>("A*");
+  // }
+
+  // a_star_timer.print<std::chrono::milliseconds>("A*", 0.1);
   // a_star_timer.print<std::chrono::microseconds>("A*", 1.0);
 
-  if (a_star_counter % 60 == 0)
-  {
-    for (const auto entity : m_registry.view<entt::tag<"a_star_rectangle"_hs>>())
-    {
-      m_registry.destroy(entity);
-    }
-  }
+  // if (a_star_counter % 30 == 0)
+  // {
+  //   for (const auto entity : m_registry.view<entt::tag<"a_star_rectangle"_hs>>())
+  //   {
+  //     m_registry.destroy(entity);
+  //   }
+  // }
 
   m_job_system.update(m_registry, delta);
 }
