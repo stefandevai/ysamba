@@ -9,7 +9,10 @@
       "features": [
       ]
     },
-    "sdl2",
+    {
+      "name": "sdl2",
+      "platform": "!linux"
+    },
     "entt",
     "glad",
     "cereal",

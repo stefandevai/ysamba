@@ -159,7 +159,10 @@ void JobSystem::m_update_tile_job(const Job& job,
 
       if (action.gives_in_place)
       {
-        registry.emplace<Position>(drop, static_cast<double>(target_position.x), static_cast<double>(target_position.y), static_cast<double>(target_position.z));
+        registry.emplace<Position>(drop,
+                                   static_cast<double>(target_position.x),
+                                   static_cast<double>(target_position.y),
+                                   static_cast<double>(target_position.z));
       }
       else
       {

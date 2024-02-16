@@ -272,7 +272,10 @@ void AStar::debug(entt::registry& registry, const bool only_path, const bool cle
       auto rect = registry.create();
       auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0x1144cc88);
       r.z_index = 4;
-      registry.emplace<Position>(rect, static_cast<double>(step.position.x), static_cast<double>(step.position.y), static_cast<double>(step.position.z));
+      registry.emplace<Position>(rect,
+                                 static_cast<double>(step.position.x),
+                                 static_cast<double>(step.position.y),
+                                 static_cast<double>(step.position.z));
       registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
     }
     for (const auto& step : m_closed_set)
@@ -293,10 +296,8 @@ void AStar::debug(entt::registry& registry, const bool only_path, const bool cle
     auto rect = registry.create();
     auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0xcc441188);
     r.z_index = 4;
-    registry.emplace<Position>(rect,
-                               static_cast<double>(step.x),
-                               static_cast<double>(step.y),
-                               static_cast<double>(step.z));
+    registry.emplace<Position>(
+        rect, static_cast<double>(step.x), static_cast<double>(step.y), static_cast<double>(step.z));
     registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
   }
 }

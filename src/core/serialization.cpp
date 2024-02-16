@@ -117,11 +117,11 @@ WorldMetadata load_world_metadata(const std::string& id)
   archive(metadata);
 
   std::istringstream created_ss{metadata.created_at_label.c_str()};
- #ifdef _WIN32
+#ifdef _WIN32
   created_ss >> std::chrono::parse("%Y-%m-%d %H:%M:%S", metadata.created_at);
- #else
+#else
   created_ss >> date::parse("%Y-%m-%d %H:%M:%S", metadata.created_at);
- #endif
+#endif
 
   std::istringstream updated_ss{metadata.updated_at_label.c_str()};
 #ifdef _WIN32
@@ -289,11 +289,11 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
   // Timer timer3{};
   // timer1.start();
 
- #ifdef _WIN32
+#ifdef _WIN32
   FILE* file = _wfopen(full_path.c_str(), L"r");
- #else
+#else
   FILE* file = fopen(full_path.c_str(), "r");
- #endif
+#endif
 
   auto& tiles = chunk.tiles;
 

@@ -61,7 +61,7 @@ std::string read_file(const std::string& filepath)
 
   std::string result(data);
   delete[] data;
- #endif
+#endif
   return result;
 }
 
