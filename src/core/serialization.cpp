@@ -1,6 +1,10 @@
 #include "./serialization.hpp"
 
+#ifdef _WIN32
+#include <chrono>
+#else
 #include <date/date.h>
+#endif
 #include <fmt/chrono.h>
 #include <spdlog/spdlog.h>
 
@@ -58,7 +62,7 @@ void initialize_directories()
   }
   else if (!std::filesystem::is_directory(directory::data))
   {
-    spdlog::critical("{} is not a directory", directory::data.c_str());
+    spdlog::critical("{} is not a directory", directory::data.string());
   }
 
   if (!std::filesystem::exists(directory::worlds))
@@ -67,7 +71,7 @@ void initialize_directories()
   }
   else if (!std::filesystem::is_directory(directory::worlds))
   {
-    spdlog::critical("{} is not a directory", directory::worlds.c_str());
+    spdlog::critical("{} is not a directory", directory::worlds.string());
   }
 }
 
@@ -113,10 +117,18 @@ WorldMetadata load_world_metadata(const std::string& id)
   archive(metadata);
 
   std::istringstream created_ss{metadata.created_at_label.c_str()};
+ #ifdef _WIN32
+  created_ss >> std::chrono::parse("%Y-%m-%d %H:%M:%S", metadata.created_at);
+ #else
   created_ss >> date::parse("%Y-%m-%d %H:%M:%S", metadata.created_at);
+ #endif
 
   std::istringstream updated_ss{metadata.updated_at_label.c_str()};
+#ifdef _WIN32
+  created_ss >> std::chrono::parse("%Y-%m-%d %H:%M:%S", metadata.created_at);
+#else
   updated_ss >> date::parse("%Y-%m-%d %H:%M:%S", metadata.updated_at);
+#endif
 
   return metadata;
 }
@@ -216,7 +228,7 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
   }
   else if (!std::filesystem::is_directory(chunks_directory))
   {
-    spdlog::critical("{} is not a directory", chunks_directory.c_str());
+    spdlog::critical("{} is not a directory", chunks_directory.string());
     return;
   }
 
@@ -228,7 +240,7 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 
   if (!outfile.is_open())
   {
-    spdlog::critical("Could not open file to save chunk: {}", full_path.c_str());
+    spdlog::critical("Could not open file to save chunk: {}", full_path.string());
     return;
   }
 
@@ -277,7 +289,11 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
   // Timer timer3{};
   // timer1.start();
 
+ #ifdef _WIN32
+  FILE* file = _wfopen(full_path.c_str(), L"r");
+ #else
   FILE* file = fopen(full_path.c_str(), "r");
+ #endif
 
   auto& tiles = chunk.tiles;
 

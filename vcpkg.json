@@ -9,6 +9,7 @@
       "features": [
       ]
     },
+    "sdl2",
     "entt",
     "glad",
     "cereal",

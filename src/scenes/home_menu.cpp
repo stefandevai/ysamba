@@ -116,7 +116,7 @@ void HomeMenu::m_load_worlds_metadata()
   {
     if (candidate.is_directory())
     {
-      const auto world_metadata = serialization::load_world_metadata(candidate.path().filename());
+      const auto world_metadata = serialization::load_world_metadata(candidate.path().filename().string());
 
       if (world_metadata.id.empty())
       {

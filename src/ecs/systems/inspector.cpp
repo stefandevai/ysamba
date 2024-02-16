@@ -53,7 +53,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     m_target_quad = registry.create();
     registry.emplace<entt::tag<"ui"_hs>>(m_target_quad);
     registry.emplace<Visibility>(m_target_quad, "spritesheet-tileset"_hs, 1, 4);
-    registry.emplace<Position>(m_target_quad, 0, 0, 0);
+    registry.emplace<Position>(m_target_quad, 0.0, 0.0, 0.0);
   }
 
   auto& quad_position = registry.get<Position>(m_target_quad);

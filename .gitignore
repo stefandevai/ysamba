@@ -122,6 +122,7 @@ vcpkg_installed
 ./lib
 .cache
 imgui.ini
+.vs
 
 # World save files
 *.world

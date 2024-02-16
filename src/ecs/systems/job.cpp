@@ -159,7 +159,7 @@ void JobSystem::m_update_tile_job(const Job& job,
 
       if (action.gives_in_place)
       {
-        registry.emplace<Position>(drop, target_position.x, target_position.y, target_position.z);
+        registry.emplace<Position>(drop, static_cast<double>(target_position.x), static_cast<double>(target_position.y), static_cast<double>(target_position.z));
       }
       else
       {
@@ -194,7 +194,11 @@ void JobSystem::m_create_or_assign_job_progress(const Job& job, entt::registry& 
   {
     const auto entity = registry.create();
     registry.emplace<JobProgress>(entity, job.type, 0.1);
-    registry.emplace<Position>(entity, target_position.x, target_position.y, target_position.z);
+    registry.emplace<Position>(entity,
+                               static_cast<double>(target_position.x),
+                               static_cast<double>(target_position.y),
+                               static_cast<double>(target_position.z));
+
     job.progress_entity = entity;
   }
 }
