@@ -39,6 +39,10 @@ std::string generate_id()
 
 std::string read_file(const std::string& filepath)
 {
+#ifdef _WIN32
+  std::ifstream ifs(filepath);
+  std::string result((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+#else
   FILE* file = fopen(filepath.c_str(), "rt");
 
   if (file == nullptr)
@@ -57,6 +61,7 @@ std::string read_file(const std::string& filepath)
 
   std::string result(data);
   delete[] data;
+#endif
   return result;
 }
 

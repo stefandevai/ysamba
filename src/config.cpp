@@ -64,7 +64,7 @@ void load(const std::filesystem::path& filepath)
     return;
   }
 
-  JSON json{filepath};
+  JSON json(filepath.string());
 
   if (json.object.contains("initial_scene"))
   {

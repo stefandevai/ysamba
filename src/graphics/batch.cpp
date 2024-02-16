@@ -30,7 +30,7 @@ Batch::~Batch()
 
 void Batch::load()
 {
-  m_vertices.reserve(m_indices_size);
+  m_vertices.resize(m_indices_size);
 
   // Push a default view matrix for an orthographic projection
   // as a fallback

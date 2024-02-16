@@ -57,7 +57,6 @@ add_subdirectory("lib/i18n_keyval")
 
 # Force an optimized build of FastNoise2
 if (MSVC)
-    target_compile_options(FastNoise PRIVATE /Ox)
 else()
     target_compile_options(FastNoise PRIVATE -O3)
 endif()
