@@ -7,6 +7,3 @@
 [submodule "lib/vcpkg"]
 	path = lib/vcpkg
 	url = https://github.com/microsoft/vcpkg.git
-[submodule "lib/--force"]
-	path = lib/--force
-	url = https://github.com/stefandevai/i18n_keyval.git
