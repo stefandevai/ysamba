@@ -48,15 +48,6 @@ uint32_t world_height = 256;
 uint32_t world_depth = 30;
 }  // namespace world_creation
 
-template <typename T>
-void assign_if_contains(const nlohmann::json& json, const std::string& key, T& value)
-{
-  if (json.contains(key))
-  {
-    value = json.at(key).get<T>();
-  }
-}
-
 void load(const std::filesystem::path& filepath)
 {
   if (!std::filesystem::exists(filepath))
@@ -75,54 +66,54 @@ void load(const std::filesystem::path& filepath)
   {
     auto& path = json.object.at("path");
 
-    assign_if_contains<std::string>(path, "assets", path::assets);
-    assign_if_contains<std::string>(path, "translations", path::translations);
-    assign_if_contains<std::string>(path, "tile_data", path::tile_data);
-    assign_if_contains<std::string>(path, "action_data", path::action_data);
-    assign_if_contains<std::string>(path, "tile_rules", path::tile_rules);
-    assign_if_contains<std::string>(path, "item_data", path::item_data);
-    assign_if_contains<std::string>(path, "input", path::input);
+    json::assign_if_contains<std::string>(path, "assets", path::assets);
+    json::assign_if_contains<std::string>(path, "translations", path::translations);
+    json::assign_if_contains<std::string>(path, "tile_data", path::tile_data);
+    json::assign_if_contains<std::string>(path, "action_data", path::action_data);
+    json::assign_if_contains<std::string>(path, "tile_rules", path::tile_rules);
+    json::assign_if_contains<std::string>(path, "item_data", path::item_data);
+    json::assign_if_contains<std::string>(path, "input", path::input);
   }
 
   if (json.object.contains("world"))
   {
     auto& world = json.object.at("world");
 
-    assign_if_contains<std::string>(world, "texture_id", world::texture_id);
-    assign_if_contains<uint32_t>(world, "spatial_hash_cell_size", world::spatial_hash_cell_size);
+    json::assign_if_contains<std::string>(world, "texture_id", world::texture_id);
+    json::assign_if_contains<uint32_t>(world, "spatial_hash_cell_size", world::spatial_hash_cell_size);
   }
 
   if (json.object.contains("display"))
   {
     auto& display = json.object.at("display");
 
-    assign_if_contains<int>(display, "default_width", display::default_width);
-    assign_if_contains<int>(display, "default_height", display::default_height);
-    assign_if_contains<std::string>(display, "title", display::title);
+    json::assign_if_contains<int>(display, "default_width", display::default_width);
+    json::assign_if_contains<int>(display, "default_height", display::default_height);
+    json::assign_if_contains<std::string>(display, "title", display::title);
   }
 
   if (json.object.contains("pathfinding"))
   {
     auto& pathfinding = json.object.at("pathfinding");
 
-    assign_if_contains<uint32_t>(pathfinding, "max_steps", pathfinding::max_steps);
-    assign_if_contains<uint32_t>(pathfinding, "tries_after_collision", pathfinding::tries_after_collision);
+    json::assign_if_contains<uint32_t>(pathfinding, "max_steps", pathfinding::max_steps);
+    json::assign_if_contains<uint32_t>(pathfinding, "tries_after_collision", pathfinding::tries_after_collision);
   }
 
   if (json.object.contains("gameplay"))
   {
     auto& gameplay = json.object.at("gameplay");
 
-    assign_if_contains<double>(gameplay, "default_zoom", gameplay::default_zoom);
+    json::assign_if_contains<double>(gameplay, "default_zoom", gameplay::default_zoom);
   }
 
   if (json.object.contains("world_creation"))
   {
     auto& world_creation = json.object.at("world_creation");
 
-    assign_if_contains<uint32_t>(world_creation, "world_width", world_creation::world_width);
-    assign_if_contains<uint32_t>(world_creation, "world_height", world_creation::world_height);
-    assign_if_contains<uint32_t>(world_creation, "world_depth", world_creation::world_depth);
+    json::assign_if_contains<uint32_t>(world_creation, "world_width", world_creation::world_width);
+    json::assign_if_contains<uint32_t>(world_creation, "world_height", world_creation::world_height);
+    json::assign_if_contains<uint32_t>(world_creation, "world_depth", world_creation::world_depth);
   }
 }
 }  // namespace dl::config

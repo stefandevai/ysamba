@@ -4,6 +4,19 @@
 
 namespace dl
 {
+namespace json
+{
+// Assign variable if it exists in the json object
+template <typename T>
+void assign_if_contains(const nlohmann::json& json, const std::string& key, T& value)
+{
+  if (json.contains(key))
+  {
+    value = json.at(key).get<T>();
+  }
+}
+}  // namespace json
+
 class JSON
 {
  public:
