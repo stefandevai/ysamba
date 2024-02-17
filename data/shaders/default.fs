@@ -26,31 +26,31 @@ void main()
     {
       case 0:
         texture_color = texture(textures[0], f_in.uv);
-	break;
+	      break;
       case 1:
         texture_color = texture(textures[1], f_in.uv);
-	break;
+	      break;
       case 2:
         texture_color = texture(textures[2], f_in.uv);
-	break;
+	      break;
       case 3:
         texture_color = texture(textures[3], f_in.uv);
-	break;
+	      break;
       case 4:
         texture_color = texture(textures[4], f_in.uv);
-	break;
+	      break;
       case 5:
         texture_color = texture(textures[5], f_in.uv);
-	break;
+	      break;
       case 6:
         texture_color = texture(textures[6], f_in.uv);
-	break;
+	      break;
       case 7:
         texture_color = texture(textures[7], f_in.uv);
-	break;
+	      break;
       default:
         texture_color = texture(textures[0], f_in.uv);
-	break;
+	      break;
     }
     final_color = texture_color * f_in.color;
   }

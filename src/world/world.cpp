@@ -421,23 +421,23 @@ void World::m_load_tile_data()
   m_tile_size.x = texture->get_frame_width();
   m_tile_size.y = texture->get_frame_height();
 
+  assert(json_tile_data.object.contains("tiles") && "Tile data must contain a tiles array");
+
   const auto tiles = json_tile_data.object["tiles"].get<std::vector<nlohmann::json>>();
 
   for (const auto& tile : tiles)
   {
     auto tile_data = TileData();
 
+    assert(tile.contains("id") && "Tile must have an id");
+    assert(tile.contains("name") && "Tile must have a name");
+
     tile_data.id = tile["id"].get<uint32_t>();
     tile_data.name = tile["name"].get<std::string>();
 
-    if (tile.contains("flags"))
-    {
-      tile_data.flags = tile["flags"].get<std::unordered_set<std::string>>();
-    }
-    if (tile.contains("climbs_to"))
-    {
-      tile_data.climbs_to = tile["climbs_to"].get<Direction>();
-    }
+    json::assign_if_contains<std::unordered_set<std::string>>(tile, "flags", tile_data.flags);
+    json::assign_if_contains<Direction>(tile, "climbs_to", tile_data.climbs_to);
+
     if (tile.contains("actions"))
     {
       const auto actions_data = tile["actions"].get<std::vector<nlohmann::json>>();
@@ -466,20 +466,23 @@ std::unordered_map<uint32_t, Action> World::m_load_actions()
   {
     Action action{};
 
+    assert(json_action.contains("id") && "Action must have an id");
+    assert(json_action.contains("type") && "Action must have a type");
+
     action.id = json_action["id"].get<uint32_t>();
     action.type = json_action["type"].get<JobType>();
-    action.label = json_action["label"].get<std::string>();
-    action.turns_into = json_action["turns_into"].get<uint32_t>();
 
-    if (json_action.contains("qualities_required"))
-    {
-      action.qualities_required = json_action["qualities_required"].get<std::vector<std::string>>();
-    }
+    json::assign_if_contains<std::string>(json_action, "label", action.label);
+    json::assign_if_contains<uint32_t>(json_action, "turns_into", action.turns_into);
+    json::assign_if_contains<std::vector<std::string>>(json_action, "qualities_required", action.qualities_required);
 
     if (json_action.contains("consumes"))
     {
       for (const auto& item : json_action["consumes"])
       {
+        assert(item.contains("id") && "Consumed item must have an id");
+        assert(item.contains("quantity") && "Consumed item must have a quantity");
+
         const auto item_id = item["id"].get<uint32_t>();
         action.consumes[item_id] = item["quantity"].get<uint32_t>();
       }
@@ -489,12 +492,15 @@ std::unordered_map<uint32_t, Action> World::m_load_actions()
     {
       for (const auto& item : json_action["gives"])
       {
+        assert(item.contains("item_id") && "Consumed item must have an item_id");
+        assert(item.contains("quantity") && "Consumed item must have a quantity");
+
         const auto item_id = item["item_id"].get<uint32_t>();
         const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
         action.gives[item_id] = quantity;
       }
 
-      action.gives_in_place = json_action["gives_in_place"].get<bool>();
+      json::assign_if_contains<bool>(json_action, "gives_in_place", action.gives_in_place);
     }
 
     actions[action.id] = std::move(action);
@@ -513,41 +519,61 @@ void World::m_load_item_data()
   {
     auto item_data = ItemData();
 
+    assert(item.contains("id") && "Item must have an id");
+    assert(item.contains("name") && "Item must have a name");
+
     item_data.id = item["id"].get<uint32_t>();
     item_data.name = item["name"].get<std::string>();
 
-    const std::string& weight_string = item["weight"].get<std::string>();
-    const double weight = item_factory::parse_weight(weight_string);
-    item_data.weight = weight;
-    item_data.weight_string = std::move(weight_string);
-
-    const std::string& volume_string = item["volume"].get<std::string>();
-    const double volume = item_factory::parse_volume(volume_string);
-    item_data.volume = volume;
-    item_data.volume_string = std::move(volume_string);
+    if (item.contains("weight"))
+    {
+      const std::string& weight_string = item["weight"].get<std::string>();
+      const double weight = item_factory::parse_weight(weight_string);
+      item_data.weight = weight;
+      item_data.weight_string = std::move(weight_string);
+    }
+    if (item.contains("volume"))
+    {
+      const std::string& volume_string = item["volume"].get<std::string>();
+      const double volume = item_factory::parse_volume(volume_string);
+      item_data.volume = volume;
+      item_data.volume_string = std::move(volume_string);
+    }
 
     if (item.contains("qualities"))
     {
       for (const auto& quality : item["qualities"])
       {
+        assert(quality.contains("name") && "Quality must have a name");
+        assert(quality.contains("level") && "Quality must have a level");
+
         item_data.qualities[quality["name"].get<std::string>()] = quality["level"].get<int>();
       }
     }
-    if (item.contains("flags"))
-    {
-      item_data.flags = item["flags"].get<std::unordered_set<std::string>>();
-    }
-    if (item.contains("weared_on"))
-    {
-      item_data.weared_on = item["weared_on"].get<std::vector<uint32_t>>();
-    }
+    json::assign_if_contains<std::unordered_set<std::string>>(item, "flags", item_data.flags);
+    json::assign_if_contains<std::vector<uint32_t>>(item, "weared_on", item_data.weared_on);
+
     if (item.contains("container"))
     {
-      item_data.container.materials = item["container"]["materials"].get<std::vector<uint32_t>>();
-      item_data.container.weight_capacity =
-          item_factory::parse_weight(item["container"]["weight_capacity"].get<std::string>());
-      item_data.container.volume_capacity =
-          item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
+      const auto& container = item["container"];
+
+      assert(container.contains("materials") && "Container must have materials");
+      assert(container.contains("weight_capacity") && "Container must have weight capacity");
+      assert(container.contains("volume_capacity") && "Container must have volume capacity");
+
+      json::assign_if_contains<std::vector<uint32_t>>(container, "materials", item_data.container.materials);
+
+      if (container.contains("weight_capacity"))
+      {
+        item_data.container.weight_capacity =
+            item_factory::parse_weight(item["container"]["weight_capacity"].get<std::string>());
+      }
+
+      if (container.contains("volume_capacity"))
+      {
+        item_data.container.volume_capacity =
+            item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
+      }
     }
 
     this->item_data[item_data.id] = item_data;
