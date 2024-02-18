@@ -49,7 +49,7 @@ class SocietyGenerator
   struct MemberParameters
   {
     uint32_t member_id;
-    uint32_t texture_frame;
+    uint32_t character_id;
     int speed;
     std::string name;
   };

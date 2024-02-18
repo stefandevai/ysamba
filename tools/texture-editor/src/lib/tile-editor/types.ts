@@ -12,7 +12,7 @@ export type Size = {
 };
 
 export const FrameTypes = ['tile', 'item'] as const;
-export const TileTypes = ['single', 'multiple'] as const;
+export const SpriteTypes = ['single', 'multiple'] as const;
 export const AngleTypes = ['orthogonal', 'parallel'] as const;
 
 type AnyFrame = {
@@ -20,17 +20,17 @@ type AnyFrame = {
   frame: number;
   id: number;
   type: typeof FrameTypes[number];
-  tile_type: typeof TileTypes[number];
+  sprite_type: typeof SpriteTypes[number];
   angle: typeof AngleTypes[number];
   front_face_id?: number;
 };
 
 type SingleFrame = AnyFrame & {
-  tile_type: 'single';
+  sprite_type: 'single';
 };
 
 type MultipleFrame = AnyFrame & {
-  tile_type: 'multiple';
+  sprite_type: 'multiple';
   width: number;
   height: number;
   pattern: number[];

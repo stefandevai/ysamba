@@ -14,7 +14,7 @@ enum class FrameAngle
   Orthogonal,
 };
 
-enum class TileType
+enum class SpriteType
 {
   Single,
   Multiple,
@@ -31,7 +31,7 @@ struct FrameData
   int anchor_y = 0;
   uint32_t front_face_id = 0;
   FrameAngle angle = FrameAngle::Parallel;
-  TileType tile_type = TileType::Single;
+  SpriteType sprite_type = SpriteType::Single;
   std::vector<uint32_t> pattern{};
 };
 

@@ -3,7 +3,7 @@
   import SidebarBase from '../../common/sidebar-base.svelte';
   import { selectedTiles, textureFrames } from './store';
   import type { Position, Frame } from './types';
-  import { FrameTypes, TileTypes, AngleTypes } from './types';
+  import { FrameTypes, SpriteTypes, AngleTypes } from './types';
   import { defaultFrame } from './frame';
 
   let currentFrame: Frame[] | null = [structuredClone(defaultFrame)];
@@ -49,7 +49,7 @@
     textureFrames.set(newFrames);
   }
 
-  const handleTileTypeChange = (event: Event, key: number) => {
+  const handleSpriteTypeChange = (event: Event, key: number) => {
     const item = currentFrame.find((frame) => frame.key == key);
 
     if (!item) {
@@ -59,7 +59,7 @@
     const target = (event.target as HTMLSelectElement)
 
     if (target.value == 'multiple') {
-      item.tile_type = target.value;
+      item.sprite_type = target.value;
       item.width = 1;
       item.height = 1;
       item.pattern = [];
@@ -71,7 +71,7 @@
       currentFrame.push(item);
     }
     else if (target.value == 'single') {
-      item.tile_type = target.value;
+      item.sprite_type = target.value;
       delete item.width;
       delete item.height;
       delete item.pattern;
@@ -114,9 +114,9 @@
 
           <p>Tile Type:</p>
           <div class="select input-group">
-            <select bind:value={item.tile_type} on:change={(event) => handleTileTypeChange(event, item.key)}>
+            <select bind:value={item.sprite_type} on:change={(event) => handleSpriteTypeChange(event, item.key)}>
               <option value="" disabled selected>- Select -</option>
-              {#each TileTypes as option}
+              {#each SpriteTypes as option}
                 <option value={option}>
                   {option}
                 </option>
@@ -139,7 +139,7 @@
           <p>Front Face ID:</p>
           <input class="input" id="front_face_id" type="number" placeholder="Game ID" bind:value={item.front_face_id} />
           
-          {#if item.tile_type == 'multiple'}
+          {#if item.sprite_type == 'multiple'}
             <p>Size:</p>
             <div class="input-group">
               <input class="input" type="number" bind:value={item.width} />

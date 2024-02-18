@@ -286,7 +286,7 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
 
   const auto& tile = m_tiles.at(tile_id);
 
-  if (tile.frame_data->tile_type == TileType::Single)
+  if (tile.frame_data->sprite_type == SpriteType::Single)
   {
     m_batch->tile(tile,
                   world_x * tile_size.x,
@@ -300,7 +300,7 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
       m_batch->tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
     }
   }
-  else if (tile.frame_data->tile_type == TileType::Multiple)
+  else if (tile.frame_data->sprite_type == SpriteType::Multiple)
   {
     // TODO: Check pattern directly on chunk to avoid another lookup
     if (!m_world.has_pattern(tile.frame_data->pattern,

@@ -43,7 +43,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     const auto father_id = society.add_first_member(Sex::Male);
     auto father_parameters = MemberParameters();
     father_parameters.member_id = father_id;
-    father_parameters.texture_frame = 0;
+    father_parameters.character_id = 0;
     father_parameters.speed = 100;
     father_parameters.name = name_generator.generate();
     members.push_back(m_get_member_components(society, father_parameters));
@@ -51,7 +51,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     const auto mother_id = society.add_spouse(father_id);
     auto mother_parameters = MemberParameters();
     mother_parameters.member_id = mother_id;
-    mother_parameters.texture_frame = 1;
+    mother_parameters.character_id = 1;
     mother_parameters.speed = 100;
     mother_parameters.name = name_generator.generate();
     spdlog::info("Mothers's name: {}", mother_parameters.name);
@@ -64,7 +64,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       const auto son_id = society.add_son(father_id);
       auto son_parameters = MemberParameters();
       son_parameters.member_id = son_id;
-      son_parameters.texture_frame = 4;
+      son_parameters.character_id = 4;
       // son_parameters.speed = 80;
       son_parameters.speed = 100;
       son_parameters.name = name_generator.generate();
@@ -79,7 +79,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       const auto daughter_id = society.add_daughter(father_id);
       auto daughter_parameters = MemberParameters();
       daughter_parameters.member_id = daughter_id;
-      daughter_parameters.texture_frame = 5;
+      daughter_parameters.character_id = 5;
       // daughter_parameters.speed = 80;
       daughter_parameters.speed = 100;
       daughter_parameters.name = name_generator.generate();
@@ -166,7 +166,7 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   return SocietyGenerator::MemberComponents{
       agent,
       biology,
-      Visibility{"spritesheet-characters"_hs, parameters.texture_frame, 0, FrameAngle::Orthogonal},
+      Visibility{"spritesheet-characters"_hs, parameters.character_id, 0, FrameAngle::Orthogonal},
       carried_items,
       weared_items,
       wielded_items};

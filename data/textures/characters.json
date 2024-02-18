@@ -7,135 +7,62 @@
     "tile_height": 16,
     "frames": [
         {
-            "type": "tile",
-            "tile_type": "multiple",
+            "game_id": 0,
+            "type": "character",
+            "sprite_type": "multiple",
             "angle": "orthogonal",
-            "frame": 45,
-            "width": 2,
-            "height": 4,
-            "pattern": [
-                9,
-                9,
-                9,
-                9
-            ],
-            "pattern_width": 2,
-            "pattern_height": 2,
-            "anchor_x": 0,
-            "anchor_y": 2,
-            "id": 9
-        },
-        {
-            "type": "tile",
-            "tile_type": "multiple",
-            "angle": "orthogonal",
-            "frame": 53,
+            "frame": 0,
             "width": 1,
             "height": 2,
-            "pattern": [
-                10
-            ],
-            "pattern_width": 1,
-            "pattern_height": 1,
-            "anchor_x": 0,
-            "anchor_y": 1,
-            "id": 10
-        },
-        {
-            "type": "tile",
-            "tile_type": "multiple",
-            "angle": "orthogonal",
-            "frame": 54,
-            "width": 1,
-            "height": 2,
-            "pattern": [
-                11
-            ],
-            "pattern_width": 1,
-            "pattern_height": 1,
-            "anchor_x": 0,
-            "anchor_y": 1,
-            "id": 11
-        },
-        {
-            "type": "tile",
-            "tile_type": "multiple",
-            "angle": "orthogonal",
-            "frame": 55,
-            "id": 48,
-            "width": 1,
-            "height": 2,
-            "pattern": [
-                48
-            ],
-            "pattern_width": 1,
-            "pattern_height": 1,
             "anchor_x": 0,
             "anchor_y": 1
         },
         {
-            "type": "tile",
-            "tile_type": "multiple",
+            "game_id": 1,
+            "type": "character",
+            "sprite_type": "multiple",
             "angle": "orthogonal",
-            "frame": 59,
-            "id": 51,
+            "frame": 1,
             "width": 1,
             "height": 2,
-            "pattern": [
-                51
-            ],
-            "pattern_width": 1,
-            "pattern_height": 1,
             "anchor_x": 0,
             "anchor_y": 1
         },
         {
-            "type": "tile",
-            "tile_type": "multiple",
+            "game_id": 2,
+            "type": "character",
+            "sprite_type": "multiple",
             "angle": "orthogonal",
-            "frame": 60,
-            "id": 52,
+            "frame": 2,
             "width": 1,
             "height": 2,
-            "pattern": [
-                52
-            ],
-            "pattern_width": 1,
-            "pattern_height": 2,
             "anchor_x": 0,
             "anchor_y": 1
         },
         {
-            "type": "tile",
-            "tile_type": "multiple",
+            "game_id": 3,
+            "type": "character",
+            "sprite_type": "multiple",
             "angle": "orthogonal",
-            "frame": 61,
-            "id": 53,
+            "frame": 3,
             "width": 1,
             "height": 2,
-            "pattern": [
-                53
-            ],
-            "pattern_width": 1,
-            "pattern_height": 1,
             "anchor_x": 0,
             "anchor_y": 1
         },
         {
-            "type": "tile",
-            "tile_type": "multiple",
+            "game_id": 4,
+            "type": "character",
+            "sprite_type": "single",
             "angle": "orthogonal",
-            "frame": 62,
-            "id": 54,
-            "width": 1,
-            "height": 2,
-            "pattern": [
-                54
-            ],
-            "pattern_width": 1,
-            "pattern_height": 1,
-            "anchor_x": 0,
-            "anchor_y": 1
+            "frame": 37
+        },
+        {
+            "game_id": 5,
+            "type": "character",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 38
         }
     ]
 }

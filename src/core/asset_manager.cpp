@@ -23,11 +23,12 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
   for (const auto& asset_info : json.object["assets"])
   {
+    assert(asset_info.contains("id") && "Asset id not specified");
+    assert(asset_info.contains("type") && "Asset type not specified");
+
     const auto& id = asset_info["id"].get<std::string>();
     const uint32_t hashed_id = entt::hashed_string::value(id.c_str());
     const auto& type_tag = asset_info["type"].get<std::string>();
-
-    spdlog::debug("Loaded asset with ID: {} and HASH: {}", id, hashed_id);
 
     if (!m_asset_types.contains(type_tag))
     {
@@ -41,6 +42,8 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
     {
     case AssetType::Shader:
     {
+      assert(asset_info.contains("vertex_path") && "Vertex path not specified");
+      assert(asset_info.contains("fragment_path") && "Fragment path not specified");
       const auto& vertex_path = asset_info["vertex_path"].get<std::string>();
       const auto& fragment_path = asset_info["fragment_path"].get<std::string>();
       add<ShaderProgram>(hashed_id, vertex_path, fragment_path);
@@ -49,6 +52,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
     case AssetType::Texture:
     {
+      assert(asset_info.contains("path") && "Texture path not specified");
       const auto& filepath = asset_info["path"].get<std::string>();
       add<Texture>(hashed_id, filepath);
     }
@@ -56,6 +60,10 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
     case AssetType::TextureAtlas:
     {
+      assert(asset_info.contains("path") && "Texture atlas path not specified");
+      assert(asset_info.contains("horizontal_frames") && "Texture atlas horizontal_frames not specified");
+      assert(asset_info.contains("vertical_frames") && "Texture atlas vertical_frames not specified");
+
       const auto& filepath = asset_info["path"].get<std::string>();
       const auto horizontal_frames = asset_info["horizontal_frames"].get<int>();
       const auto vertical_frames = asset_info["vertical_frames"].get<int>();
@@ -73,6 +81,9 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
     case AssetType::Font:
     {
+      assert(asset_info.contains("path") && "Font path not specified");
+      assert(asset_info.contains("size") && "Font size not specified");
+
       const auto filepath = asset_info["path"].get<std::string>();
       const auto size = asset_info["size"].get<std::size_t>();
       add<Font>(hashed_id, filepath, size);
