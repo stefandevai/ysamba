@@ -18,6 +18,12 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
   case RuleType::Autotile4Sides:
   {
     AutoTile4SidesRule rule_object;
+
+    assert(rule.contains("input") && "Input not specified");
+    assert(rule.contains("label") && "Label not specified");
+    assert(rule.contains("neighbor") && "Neighbor not specified");
+    assert(rule.contains("output") && "Output not specified");
+
     rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
     rule_object.neighbor = rule["neighbor"].get<int>();
@@ -25,6 +31,9 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
     const auto& output = rule["output"];
     for (const auto& transform : output)
     {
+      assert(transform.contains("value") && "Transform value not specified");
+      assert(transform.contains("bitmask") && "Transform bitmask not specified");
+
       const auto value = transform["value"].get<int>();
       const auto index = transform["bitmask"].get<int>();
 
@@ -35,6 +44,11 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
   }
   case RuleType::Autotile8Sides:
   {
+    assert(rule.contains("input") && "Input not specified");
+    assert(rule.contains("label") && "Label not specified");
+    assert(rule.contains("neighbor") && "Neighbor not specified");
+    assert(rule.contains("output") && "Output not specified");
+
     AutoTile8SidesRule rule_object;
     rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
@@ -43,6 +57,9 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
     const auto& output = rule["output"];
     for (const auto& transform : output)
     {
+      assert(transform.contains("value") && "Transform value not specified");
+      assert(transform.contains("bitmask") && "Transform bitmask not specified");
+
       const auto value = transform["value"].get<int>();
       const auto bitmask = transform["bitmask"].get<int>();
 
@@ -208,6 +225,10 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
   }
   case RuleType::UniformDistribution:
   {
+    assert(rule.contains("input") && "Input not specified");
+    assert(rule.contains("label") && "Label not specified");
+    assert(rule.contains("output") && "Output not specified");
+
     UniformDistributionRule rule_object;
     rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
@@ -215,6 +236,10 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
     const auto& output = rule["output"];
     for (const auto& transform : output)
     {
+      assert(transform.contains("value") && "Transform value not specified");
+      assert(transform.contains("probability") && "Transform probability not specified");
+      assert(transform.contains("placement") && "Transform placement not specified");
+
       UniformDistributionTransform transform_object;
       transform_object.value = transform["value"].get<int>();
       transform_object.probability = transform["probability"].get<double>();
