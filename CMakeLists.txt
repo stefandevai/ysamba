@@ -21,6 +21,8 @@ file(
     CONFIGURE_DEPENDS  # Automatically reconfigure if source files are added/removed.
     ${PROJECT_SOURCE_DIR}/src/*.cpp
     ${PROJECT_SOURCE_DIR}/src/*.hpp
+    ${PROJECT_SOURCE_DIR}/src/*.c
+    ${PROJECT_SOURCE_DIR}/src/*.h
 )
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
@@ -40,17 +42,18 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3)
 endif()
 
-if (EMSCRIPTEN)
-    # Attach data folder to Emscripten builds.
-    target_link_options(${PROJECT_NAME} PRIVATE --preload-file "${CMAKE_CURRENT_SOURCE_DIR}/data@data")
-    # Set output to html to generate preview pages, otherwise you'll have to make your own html.
-    set_target_properties(
-        ${PROJECT_NAME}
-        PROPERTIES
-            SUFFIX ".html"
-    )
-endif()
+# Set up WebGPU
+include(FetchContent)
 
+FetchContent_Declare(
+  webgpu
+  GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution
+  GIT_TAG        wgpu-static
+)
+
+FetchContent_MakeAvailable(webgpu)
+
+# Set up dependencies under lib directory
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build Noise Tool" FORCE)
 add_subdirectory("lib/FastNoise2")
 add_subdirectory("lib/i18n_keyval")
@@ -80,21 +83,40 @@ target_include_directories(
     "./src"
 )
 
-target_link_libraries(
+SET(
+    DL_LIBRARIES
+    webgpu
+    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    glad::glad
+    libtcod::libtcod
+    cereal::cereal
+    EnTT::EnTT
+    nlohmann_json::nlohmann_json
+    freetype
+    fmt::fmt
+    spdlog::spdlog
+    imgui::imgui
+    implot::implot
+    FastNoise
+    i18n_keyval::i18n_keyval
+)
+
+# Allow objective-c for SDL2 C file on Apple platforms
+if(APPLE)
+  set_source_files_properties("src/graphics/renderer/sdl2_webgpu.c" PROPERTIES COMPILE_FLAGS "-x objective-c" LANGUAGE C)
+  target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
-        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-	      $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-        glad::glad
-        libtcod::libtcod
-        cereal::cereal
-        EnTT::EnTT
-        nlohmann_json::nlohmann_json
-        freetype
-        fmt::fmt
-        spdlog::spdlog
-        imgui::imgui
-        implot::implot
-        FastNoise
-        i18n_keyval::i18n_keyval
-)
+    ${DL_LIBRARIES}
+    "-framework QuartzCore"
+    "-framework Cocoa"
+    "-framework Metal"
+  )
+else()
+    target_link_libraries(
+        ${PROJECT_NAME}
+        PRIVATE
+        ${DL_LIBRARIES}
+    )
+endif()

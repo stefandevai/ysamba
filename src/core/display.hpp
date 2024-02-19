@@ -1,5 +1,6 @@
 #pragma once
 
+#include <webgpu/webgpu.h>
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__APPLE__)
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
@@ -16,6 +17,8 @@ struct Vector2i;
 class Display
 {
  public:
+  WGPUSurface surface;
+
   Display();
   ~Display();
   void load(const int width, const int height, const std::string& title);

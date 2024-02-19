@@ -15,7 +15,9 @@ namespace dl
 {
 WorldGeneration::WorldGeneration(ChunkManager& chunk_manager) : m_chunk_manager(chunk_manager)
 {
+#ifdef DL_BUILD_DEBUG_TOOLS
   original_island_params = m_chunk_manager.island_params;
+#endif
 }
 
 void WorldGeneration::update()
@@ -25,6 +27,7 @@ void WorldGeneration::update()
     return;
   }
 
+#ifdef DL_BUILD_DEBUG_TOOLS
   if (ImGui::Begin("World Generation", &open, ImGuiWindowFlags_NoFocusOnAppearing))
   {
     ImGui::SeparatorText("General");
@@ -94,5 +97,6 @@ void WorldGeneration::update()
     }
   }
   ImGui::End();
+#endif
 }
 }  // namespace dl

@@ -247,6 +247,7 @@ void Gameplay::load_game()
   m_has_loaded = true;
 }
 
+#ifdef DL_BUILD_DEBUG_TOOLS
 void Gameplay::load_default_game()
 {
   m_world.chunk_manager.mode = ChunkManager::Mode::NoLoadingOrSaving;
@@ -266,6 +267,7 @@ void Gameplay::load_default_game()
   m_world.has_initialized = true;
   m_has_loaded = true;
 }
+#endif
 
 bool Gameplay::m_update_input_real_time()
 {

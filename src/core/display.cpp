@@ -5,6 +5,8 @@
 
 #include <sstream>
 
+#include "graphics/renderer/sdl2_webgpu.h"
+
 #if DISABLE_VSYNC == 1
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -44,32 +46,43 @@ void Display::load(const int width, const int height, const std::string& title)
     return;
   }
 
-  // const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE |
-  // SDL_WINDOW_OPENGL);
-  const SDL_WindowFlags window_flags =
-      (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_OPENGL);
+  // const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+  const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
   m_window = SDL_CreateWindow(
       m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, window_flags);
   SDL_SetWindowMinimumSize(m_window, width, height);
 
-#if __APPLE__
-  // Always required on Mac
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#else
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#endif
+  WGPUInstanceDescriptor desc = {};
+  desc.nextInChain = nullptr;
+  WGPUInstance instance = wgpuCreateInstance(&desc);
 
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  m_gl_context = SDL_GL_CreateContext(m_window);
-  SDL_GL_MakeCurrent(m_window, m_gl_context);
-  SDL_GL_SetSwapInterval(1);
+  if (instance == nullptr)
+  {
+    spdlog::critical("Failed to create WebGPU instance");
+    return;
+  }
 
+  surface = SDL_GetWGPUSurface(instance, m_window);
+  wgpuInstanceRelease(instance);
+
+  // #if __APPLE__
+  //   // Always required on Mac
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  // #else
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+  // #endif
+  //
+  //   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  //   m_gl_context = SDL_GL_CreateContext(m_window);
+  //   SDL_GL_MakeCurrent(m_window, m_gl_context);
+  //   SDL_GL_SetSwapInterval(1);
+  //
   if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
   {
     spdlog::critical("Failed to initialize GLAD");
@@ -82,7 +95,8 @@ void Display::load(const int width, const int height, const std::string& title)
 
 Display::~Display()
 {
-  SDL_GL_DeleteContext(m_gl_context);
+  wgpuSurfaceRelease(surface);
+  // SDL_GL_DeleteContext(m_gl_context);
   SDL_DestroyWindow(m_window);
   SDL_Quit();
 }
