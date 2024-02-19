@@ -1,18 +1,23 @@
 #pragma once
 
+#include <webgpu/webgpu.h>
+
 #include <cstdint>
 
 namespace dl
 {
 class AssetManager;
 class Camera;
+struct GameContext;
 
 namespace v2
 {
 class Renderer
 {
  public:
-  Renderer(AssetManager& asset_manager);
+  WGPUQueue queue;
+
+  Renderer(GameContext& game_context);
 
   void init();
 
@@ -20,7 +25,7 @@ class Renderer
   void render(const Camera& camera);
 
  private:
-  AssetManager& m_asset_manager;
+  GameContext& m_game_context;
 };
 
 }  // namespace v2

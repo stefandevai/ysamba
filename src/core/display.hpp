@@ -18,6 +18,7 @@ class Display
 {
  public:
   WGPUSurface surface;
+  WGPUDevice device;
 
   Display();
   ~Display();

@@ -26,6 +26,73 @@ auto& debug_tools = dl::DebugTools::get_instance();
 }
 #endif
 
+namespace
+{
+WGPUAdapter request_adapter(WGPUInstance instance, WGPURequestAdapterOptions const* options)
+{
+  struct UserData
+  {
+    WGPUAdapter adapter = nullptr;
+    bool request_ended = false;
+  };
+  UserData user_data;
+
+  auto on_adapter_request_ended =
+      [](WGPURequestAdapterStatus status, WGPUAdapter adapter, char const* message, void* user_data_) {
+        UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
+
+        if (status == WGPURequestAdapterStatus_Success && adapter)
+        {
+          user_data.adapter = adapter;
+        }
+        else
+        {
+          spdlog::critical("Failed to request WebGPU adapter: ", message);
+        }
+
+        user_data.request_ended = true;
+      };
+
+  wgpuInstanceRequestAdapter(instance, options, on_adapter_request_ended, (void*)&user_data);
+
+  assert(user_data.request_ended);
+
+  return user_data.adapter;
+}
+
+WGPUDevice request_device(WGPUAdapter adapter, WGPUDeviceDescriptor const* descriptor)
+{
+  struct UserData
+  {
+    WGPUDevice device = nullptr;
+    bool request_ended = false;
+  };
+  UserData user_data;
+
+  auto on_device_request_ended =
+      [](WGPURequestDeviceStatus status, WGPUDevice device, char const* message, void* user_data_) {
+        UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
+
+        if (status == WGPURequestDeviceStatus_Success && device)
+        {
+          user_data.device = device;
+        }
+        else
+        {
+          spdlog::critical("Failed to request WebGPU device: ", message);
+        }
+
+        user_data.request_ended = true;
+      };
+
+  wgpuAdapterRequestDevice(adapter, descriptor, on_device_request_ended, (void*)&user_data);
+
+  assert(user_data.request_ended);
+
+  return user_data.device;
+}
+}  // namespace
+
 namespace dl
 {
 SDL_Window* Display::m_window = nullptr;
@@ -63,6 +130,60 @@ void Display::load(const int width, const int height, const std::string& title)
   }
 
   surface = SDL_GetWGPUSurface(instance, m_window);
+
+  WGPURequestAdapterOptions options = {};
+  options.nextInChain = nullptr;
+  options.compatibleSurface = surface;
+  options.powerPreference = WGPUPowerPreference_HighPerformance;
+  options.forceFallbackAdapter = false;
+
+#if defined(__APPLE__)
+  options.backendType = WGPUBackendType_Metal;
+#elif defined(_WIN32)
+  options.backendType = WGPUBackendType_D3D12;
+#else
+  options.backendType = WGPUBackendType_Vulkan;
+#endif
+
+  WGPUAdapter adapter = request_adapter(instance, &options);
+
+  WGPUAdapterProperties properties = {};
+  properties.nextInChain = nullptr;
+  wgpuAdapterGetProperties(adapter, &properties);
+
+  spdlog::info("Using adapter: {}", properties.name);
+
+  WGPUDeviceDescriptor device_desc = {};
+  device_desc.label = "Device 1";
+  device_desc.requiredFeatureCount = 0;
+  device_desc.requiredLimits = nullptr;
+  device_desc.defaultQueue.label = "Default Queue";
+  device_desc.defaultQueue.nextInChain = nullptr;
+  device = request_device(adapter, &device_desc);
+
+  auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
+    spdlog::critical("Device error: {}, {}", (uint32_t)type, message);
+  };
+  wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
+
+  WGPUTextureFormat surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
+
+  WGPUSurfaceConfiguration surface_configuration;
+  surface_configuration.nextInChain = nullptr;
+  surface_configuration.device = device;
+  surface_configuration.format = surface_format;
+  surface_configuration.usage = WGPUTextureUsage_RenderAttachment;
+  surface_configuration.viewFormatCount = 1;
+  surface_configuration.viewFormats = &surface_format;
+  surface_configuration.alphaMode = WGPUCompositeAlphaMode_Auto;
+  surface_configuration.width = m_width;
+  surface_configuration.height = m_height;
+  surface_configuration.presentMode = WGPUPresentMode_Fifo;
+
+  wgpuSurfaceConfigure(surface, &surface_configuration);
+
+  // Adapter and Instance are only needed in initialization
+  wgpuAdapterRelease(adapter);
   wgpuInstanceRelease(instance);
 
   // #if __APPLE__
@@ -95,6 +216,7 @@ void Display::load(const int width, const int height, const std::string& title)
 
 Display::~Display()
 {
+  wgpuDeviceRelease(device);
   wgpuSurfaceRelease(surface);
   // SDL_GL_DeleteContext(m_gl_context);
   SDL_DestroyWindow(m_window);
@@ -110,7 +232,7 @@ void Display::render()
 #ifdef DL_BUILD_DEBUG_TOOLS
   debug_tools.render();
 #endif
-  SDL_GL_SwapWindow(m_window);
+  // SDL_GL_SwapWindow(m_window);
 }
 
 void Display::set_title(const std::string& title) { SDL_SetWindowTitle(m_window, title.c_str()); }
