@@ -9,44 +9,44 @@ namespace dl
 {
 ShaderProgram::ShaderProgram(const char* vertex_source, const char* fragment_source)
 {
-  int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_source, NULL);
-  glCompileShader(vertex_shader);
-
-  int success;
-  char info_log[512];
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-
-  if (!success)
-  {
-    glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-    spdlog::critical("Vertex Shader compilation failed: {}\n{}", vertex_source, info_log);
-  }
-
-  int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_source, NULL);
-  glCompileShader(fragment_shader);
-
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-    spdlog::critical("Fragment Shader compilation failed: {}\n{}", fragment_source, info_log);
-  }
-
-  m_program = glCreateProgram();
-  glAttachShader(m_program, vertex_shader);
-  glAttachShader(m_program, fragment_shader);
-  glLinkProgram(m_program);
-
-  glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-  if (!success)
-  {
-    glGetProgramInfoLog(m_program, 512, NULL, info_log);
-    spdlog::critical("Program linking failed: {} {}\n{}", vertex_source, fragment_source, info_log);
-  }
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
+  // int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  // glShaderSource(vertex_shader, 1, &vertex_source, NULL);
+  // glCompileShader(vertex_shader);
+  //
+  // int success;
+  // char info_log[512];
+  // glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+  //
+  // if (!success)
+  // {
+  //   glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
+  //   spdlog::critical("Vertex Shader compilation failed: {}\n{}", vertex_source, info_log);
+  // }
+  //
+  // int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  // glShaderSource(fragment_shader, 1, &fragment_source, NULL);
+  // glCompileShader(fragment_shader);
+  //
+  // glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+  // if (!success)
+  // {
+  //   glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
+  //   spdlog::critical("Fragment Shader compilation failed: {}\n{}", fragment_source, info_log);
+  // }
+  //
+  // m_program = glCreateProgram();
+  // glAttachShader(m_program, vertex_shader);
+  // glAttachShader(m_program, fragment_shader);
+  // glLinkProgram(m_program);
+  //
+  // glGetProgramiv(m_program, GL_LINK_STATUS, &success);
+  // if (!success)
+  // {
+  //   glGetProgramInfoLog(m_program, 512, NULL, info_log);
+  //   spdlog::critical("Program linking failed: {} {}\n{}", vertex_source, fragment_source, info_log);
+  // }
+  // glDeleteShader(vertex_shader);
+  // glDeleteShader(fragment_shader);
 }
 
 ShaderProgram::ShaderProgram(const std::string& vertex_path, const std::string& fragment_path)
@@ -56,60 +56,63 @@ ShaderProgram::ShaderProgram(const std::string& vertex_path, const std::string& 
 
 void ShaderProgram::load()
 {
-  if (m_vertex_path.empty() || m_fragment_path.empty())
-  {
-    spdlog::critical("Vertex or fragment path is empty");
-    return;
-  }
-
-  const auto vertex_source_string = utils::read_file(m_vertex_path);
-  const auto fragment_source_string = utils::read_file(m_fragment_path);
-  const auto& vertex_source = vertex_source_string.c_str();
-  const auto& fragment_source = fragment_source_string.c_str();
-
-  int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_source, NULL);
-  glCompileShader(vertex_shader);
-
-  int success;
-  char info_log[512];
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-
-  if (!success)
-  {
-    glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-    spdlog::critical("Vertex Shader compilation failed: {}\n{}", vertex_source, info_log);
-  }
-
-  int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_source, NULL);
-  glCompileShader(fragment_shader);
-
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-    spdlog::critical("Fragment Shader compilation failed: {}\n{}", fragment_source, info_log);
-  }
-
-  m_program = glCreateProgram();
-  glAttachShader(m_program, vertex_shader);
-  glAttachShader(m_program, fragment_shader);
-  glLinkProgram(m_program);
-
-  glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-  if (!success)
-  {
-    glGetProgramInfoLog(m_program, 512, NULL, info_log);
-    spdlog::critical("Program linking failed: {} {}\n{}", vertex_source, fragment_source, info_log);
-  }
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
-
-  has_loaded = true;
+  // if (m_vertex_path.empty() || m_fragment_path.empty())
+  // {
+  //   spdlog::critical("Vertex or fragment path is empty");
+  //   return;
+  // }
+  //
+  // const auto vertex_source_string = utils::read_file(m_vertex_path);
+  // const auto fragment_source_string = utils::read_file(m_fragment_path);
+  // const auto& vertex_source = vertex_source_string.c_str();
+  // const auto& fragment_source = fragment_source_string.c_str();
+  //
+  // int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  // glShaderSource(vertex_shader, 1, &vertex_source, NULL);
+  // glCompileShader(vertex_shader);
+  //
+  // int success;
+  // char info_log[512];
+  // glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+  //
+  // if (!success)
+  // {
+  //   glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
+  //   spdlog::critical("Vertex Shader compilation failed: {}\n{}", vertex_source, info_log);
+  // }
+  //
+  // int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  // glShaderSource(fragment_shader, 1, &fragment_source, NULL);
+  // glCompileShader(fragment_shader);
+  //
+  // glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+  // if (!success)
+  // {
+  //   glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
+  //   spdlog::critical("Fragment Shader compilation failed: {}\n{}", fragment_source, info_log);
+  // }
+  //
+  // m_program = glCreateProgram();
+  // glAttachShader(m_program, vertex_shader);
+  // glAttachShader(m_program, fragment_shader);
+  // glLinkProgram(m_program);
+  //
+  // glGetProgramiv(m_program, GL_LINK_STATUS, &success);
+  // if (!success)
+  // {
+  //   glGetProgramInfoLog(m_program, 512, NULL, info_log);
+  //   spdlog::critical("Program linking failed: {} {}\n{}", vertex_source, fragment_source, info_log);
+  // }
+  // glDeleteShader(vertex_shader);
+  // glDeleteShader(fragment_shader);
+  //
+  // has_loaded = true;
 }
 
-ShaderProgram::~ShaderProgram() { glDeleteProgram(m_program); }
+ShaderProgram::~ShaderProgram()
+{
+  // glDeleteProgram(m_program);
+}
 
 void ShaderProgram::use() { glUseProgram(m_program); }
 

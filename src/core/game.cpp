@@ -14,8 +14,6 @@
 
 namespace dl
 {
-Game::Game() {}
-
 void Game::load()
 {
   spdlog::set_level(spdlog::level::debug);

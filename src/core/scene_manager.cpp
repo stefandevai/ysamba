@@ -51,7 +51,7 @@ void SceneManager::render()
     return;
   }
 
-  m_check_window_size();
+  // m_check_window_size();
   current_scene->render();
 }
 

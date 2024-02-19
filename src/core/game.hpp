@@ -17,8 +17,6 @@ namespace dl
 class Game
 {
  public:
-  Game();
-
   void load();
   void run();
 

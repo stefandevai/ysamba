@@ -19,108 +19,111 @@ namespace dl
 {
 Batch::Batch(const int priority) : priority(priority) {}
 
-Batch::Batch(const uint32_t shader_id, const int priority) : shader_id(shader_id), priority(priority) { load(); }
+Batch::Batch(const uint32_t shader_id, const int priority) : shader_id(shader_id), priority(priority)
+{
+  // load();
+}
 
 Batch::~Batch()
 {
-  glDeleteBuffers(1, &m_ebo);
-  glDeleteBuffers(1, &m_vbo);
-  glDeleteVertexArrays(1, &m_vao);
+  // glDeleteBuffers(1, &m_ebo);
+  // glDeleteBuffers(1, &m_vbo);
+  // glDeleteVertexArrays(1, &m_vao);
 }
 
 void Batch::load()
 {
-  m_vertices.resize(m_indices_size);
-
-  // Push a default view matrix for an orthographic projection
-  // as a fallback
-  std::array<float, 16> values{
-      1.0f,
-      0.0f,
-      0.0f,
-      0.0f,
-      0.0f,
-      1.0f,
-      0.0f,
-      0.0f,
-      0.0f,
-      0.0f,
-      1.0f,
-      0.0f,
-      0.0f,
-      0.0f,
-      -1.0f,
-      1.0f,
-  };
-  glm::mat4 default_view_matrix = glm::make_mat4(values.data());
-  push_matrix(default_view_matrix);
-
-  glGenVertexArrays(1, &m_vao);
-  glGenBuffers(1, &m_vbo);
-  glGenBuffers(1, &m_ebo);
-
-  glBindVertexArray(m_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-  glBufferData(GL_ARRAY_BUFFER, m_buffer_size, nullptr, GL_DYNAMIC_DRAW);
-  glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)0);
-  glEnableVertexAttribArray(PositionIndex);
-
-  glVertexAttribPointer(
-      TextureCoordsIndex, 2, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)offsetof(VertexData, texture_coordinates));
-  glEnableVertexAttribArray(TextureCoordsIndex);
-
-  glVertexAttribPointer(
-      TextureIdIndex, 1, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)offsetof(VertexData, texture_id));
-  glEnableVertexAttribArray(TextureIdIndex);
-
-  glVertexAttribPointer(ColorIndex, 4, GL_UNSIGNED_BYTE, GL_TRUE, m_vertex_size, (GLvoid*)offsetof(VertexData, color));
-  glEnableVertexAttribArray(ColorIndex);
-
-  GLint offset = 0;
-  GLuint indices[m_indices_size];
-  for (GLuint i = 0; i < m_indices_size; i += 6)
-  {
-    indices[i] = offset;
-    indices[i + 1] = offset + 1;
-    indices[i + 2] = offset + 2;
-
-    indices[i + 3] = offset;
-    indices[i + 4] = offset + 2;
-    indices[i + 5] = offset + 3;
-
-    offset += 4;
-  }
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-  glBindVertexArray(0);
+  // m_vertices.resize(m_indices_size);
+  //
+  // // Push a default view matrix for an orthographic projection
+  // // as a fallback
+  // std::array<float, 16> values{
+  //     1.0f,
+  //     0.0f,
+  //     0.0f,
+  //     0.0f,
+  //     0.0f,
+  //     1.0f,
+  //     0.0f,
+  //     0.0f,
+  //     0.0f,
+  //     0.0f,
+  //     1.0f,
+  //     0.0f,
+  //     0.0f,
+  //     0.0f,
+  //     -1.0f,
+  //     1.0f,
+  // };
+  // glm::mat4 default_view_matrix = glm::make_mat4(values.data());
+  // push_matrix(default_view_matrix);
+  //
+  // glGenVertexArrays(1, &m_vao);
+  // glGenBuffers(1, &m_vbo);
+  // glGenBuffers(1, &m_ebo);
+  //
+  // glBindVertexArray(m_vao);
+  // glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+  //
+  // glBufferData(GL_ARRAY_BUFFER, m_buffer_size, nullptr, GL_DYNAMIC_DRAW);
+  // glVertexAttribPointer(PositionIndex, 3, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)0);
+  // glEnableVertexAttribArray(PositionIndex);
+  //
+  // glVertexAttribPointer(
+  //     TextureCoordsIndex, 2, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)offsetof(VertexData, texture_coordinates));
+  // glEnableVertexAttribArray(TextureCoordsIndex);
+  //
+  // glVertexAttribPointer(
+  //     TextureIdIndex, 1, GL_FLOAT, GL_FALSE, m_vertex_size, (GLvoid*)offsetof(VertexData, texture_id));
+  // glEnableVertexAttribArray(TextureIdIndex);
+  //
+  // glVertexAttribPointer(ColorIndex, 4, GL_UNSIGNED_BYTE, GL_TRUE, m_vertex_size, (GLvoid*)offsetof(VertexData,
+  // color)); glEnableVertexAttribArray(ColorIndex);
+  //
+  // GLint offset = 0;
+  // GLuint indices[m_indices_size];
+  // for (GLuint i = 0; i < m_indices_size; i += 6)
+  // {
+  //   indices[i] = offset;
+  //   indices[i + 1] = offset + 1;
+  //   indices[i + 2] = offset + 2;
+  //
+  //   indices[i + 3] = offset;
+  //   indices[i + 4] = offset + 2;
+  //   indices[i + 5] = offset + 3;
+  //
+  //   offset += 4;
+  // }
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  //
+  // glBindVertexArray(0);
 }
 
 void Batch::render()
 {
-  // Return early if no sprites were added to the batch
-  if (index_count == 0)
-  {
-    return;
-  }
-
-  // Copy vertex data to the GPU
-  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, (m_vertices_index + 1) * sizeof(VertexData), m_vertices.data());
-
-  for (unsigned int i = 0; i < m_textures.size(); ++i)
-  {
-    glActiveTexture(GL_TEXTURE0 + i);
-    m_textures[i]->bind();
-    shader->set_int("textures[" + std::to_string(i) + "]", i);
-  }
-  glActiveTexture(GL_TEXTURE0);
-
-  glBindVertexArray(m_vao);
-  glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
-  index_count = 0;
-  m_vertices_index = 0;
+  // // Return early if no sprites were added to the batch
+  // if (index_count == 0)
+  // {
+  //   return;
+  // }
+  //
+  // // Copy vertex data to the GPU
+  // glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+  // glBufferSubData(GL_ARRAY_BUFFER, 0, (m_vertices_index + 1) * sizeof(VertexData), m_vertices.data());
+  //
+  // for (unsigned int i = 0; i < m_textures.size(); ++i)
+  // {
+  //   glActiveTexture(GL_TEXTURE0 + i);
+  //   m_textures[i]->bind();
+  //   shader->set_int("textures[" + std::to_string(i) + "]", i);
+  // }
+  // glActiveTexture(GL_TEXTURE0);
+  //
+  // glBindVertexArray(m_vao);
+  // glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+  // index_count = 0;
+  // m_vertices_index = 0;
 }
 
 void Batch::push_matrix(const glm::mat4& matrix)

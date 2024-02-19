@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 
 #include <entt/core/hashed_string.hpp>
 
@@ -15,7 +16,8 @@ Scene::Scene(const std::string& scene_key, GameContext& game_context)
       m_scene_path(fmt::format("data/scenes/{}/data.json", scene_key)),
       m_game_context(game_context)
 {
-  resize();
+  m_renderer2.init();
+  // resize();
 }
 
 void Scene::resize()

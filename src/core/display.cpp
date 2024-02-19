@@ -204,14 +204,18 @@ void Display::load(const int width, const int height, const std::string& title)
   //   SDL_GL_MakeCurrent(m_window, m_gl_context);
   //   SDL_GL_SetSwapInterval(1);
   //
-  if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-  {
-    spdlog::critical("Failed to initialize GLAD");
-  }
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   debug_tools.init(m_window, m_gl_context);
 #endif
+}
+
+void temp()
+{
+  if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+  {
+    spdlog::critical("Failed to initialize GLAD");
+  }
 }
 
 Display::~Display()

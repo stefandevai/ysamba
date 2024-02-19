@@ -12,7 +12,7 @@
 
 namespace dl
 {
-Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager) { glClearColor(0.f, 0.f, 0.f, 1.0f); }
+Renderer::Renderer(AssetManager& asset_manager) : m_asset_manager(asset_manager) {}
 
 void Renderer::add_batch(const uint32_t batch_id, const uint32_t shader_id, const int priority)
 {

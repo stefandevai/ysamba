@@ -13,8 +13,8 @@ namespace dl::ui
 UIManager::UIManager(AssetManager* asset_manager, Renderer* renderer)
     : m_asset_manager(asset_manager), m_renderer(renderer)
 {
-  m_batch.has_depth = false;
-  m_renderer->add_batch(&m_batch);
+  // m_batch.has_depth = false;
+  // m_renderer->add_batch(&m_batch);
   m_matrix_stack.push_back(glm::mat4(1));
 }
 

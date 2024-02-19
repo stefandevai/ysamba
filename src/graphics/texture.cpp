@@ -43,70 +43,73 @@ Texture::Texture(const int width, const int height)
   m_load_empty();
 }
 
-Texture::~Texture() { glDeleteTextures(1, &m_id); }
+Texture::~Texture()
+{
+  // glDeleteTextures(1, &m_id);
+}
 
 void Texture::load()
 {
-  if (m_data_filepath != "")
-  {
-    load_data(m_data_filepath);
-  }
-
-  int width = 0;
-  int height = 0;
-  int channels = 0;
-  unsigned char* image_data;
-
-  // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-  image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
-  if (image_data == nullptr)
-  {
-    throw std::runtime_error("It wasn't possible to load " + m_filepath);
-  }
-
-  GLenum format;
-  switch (channels)
-  {
-  case 1:
-    format = GL_RED;
-    break;
-
-  case 3:
-    format = GL_RGB;
-    break;
-
-  case 4:
-    format = GL_RGBA;
-    break;
-
-  default:
-    format = GL_RGBA;
-    break;
-  }
-
-  load(image_data, width, height, format);
-
-  stbi_image_free(image_data);
-
-  has_loaded = true;
+  // if (m_data_filepath != "")
+  // {
+  //   load_data(m_data_filepath);
+  // }
+  //
+  // int width = 0;
+  // int height = 0;
+  // int channels = 0;
+  // unsigned char* image_data;
+  //
+  // // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+  // image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
+  // if (image_data == nullptr)
+  // {
+  //   throw std::runtime_error("It wasn't possible to load " + m_filepath);
+  // }
+  //
+  // GLenum format;
+  // switch (channels)
+  // {
+  // case 1:
+  //   format = GL_RED;
+  //   break;
+  //
+  // case 3:
+  //   format = GL_RGB;
+  //   break;
+  //
+  // case 4:
+  //   format = GL_RGBA;
+  //   break;
+  //
+  // default:
+  //   format = GL_RGBA;
+  //   break;
+  // }
+  //
+  // load(image_data, width, height, format);
+  //
+  // stbi_image_free(image_data);
+  //
+  // has_loaded = true;
 }
 
 void Texture::load(const unsigned char* data, const int width, const int height, unsigned int format)
 {
-  m_width = width;
-  m_height = height;
-
-  glGenTextures(1, &m_id);
-  glBindTexture(GL_TEXTURE_2D, m_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-  glBindTexture(GL_TEXTURE_2D, 0);
+  // m_width = width;
+  // m_height = height;
+  //
+  // glGenTextures(1, &m_id);
+  // glBindTexture(GL_TEXTURE_2D, m_id);
+  // glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
+  // glGenerateMipmap(GL_TEXTURE_2D);
+  //
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  //
+  // glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::bind() const { glBindTexture(GL_TEXTURE_2D, m_id); }
@@ -144,26 +147,26 @@ std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
 
 void Texture::m_load_empty()
 {
-  GLenum err;
-  while ((err = glGetError()) != GL_NO_ERROR)
-  {
-    spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
-  }
-
-  glGenTextures(1, &m_id);
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glBindTexture(GL_TEXTURE_2D, m_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_width, m_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0x0000);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  while ((err = glGetError()) != GL_NO_ERROR)
-  {
-    spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
-  }
+  // GLenum err;
+  // while ((err = glGetError()) != GL_NO_ERROR)
+  // {
+  //   spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
+  // }
+  //
+  // glGenTextures(1, &m_id);
+  // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  // glBindTexture(GL_TEXTURE_2D, m_id);
+  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_width, m_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0x0000);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  // glBindTexture(GL_TEXTURE_2D, 0);
+  //
+  // while ((err = glGetError()) != GL_NO_ERROR)
+  // {
+  //   spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
+  // }
 }
 
 const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type) const
