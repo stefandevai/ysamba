@@ -19,6 +19,7 @@ class Display
  public:
   WGPUSurface surface;
   WGPUDevice device;
+  WGPUTextureFormat surface_format;
 
   Display();
   ~Display();

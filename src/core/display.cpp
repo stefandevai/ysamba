@@ -166,7 +166,7 @@ void Display::load(const int width, const int height, const std::string& title)
   };
   wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
 
-  WGPUTextureFormat surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
+  surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
 
   WGPUSurfaceConfiguration surface_configuration;
   surface_configuration.nextInChain = nullptr;
