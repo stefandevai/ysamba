@@ -22,6 +22,14 @@ uint32_t vertex_count;
 WGPUBindGroupLayoutEntry binding_layout;
 WGPUBindGroup bindGroup;
 WGPUBuffer uniformBuffer;
+
+struct Uniforms
+{
+  std::array<float, 4> color;
+  float time;
+  float _padding[3];
+};
+Uniforms uniforms{};
 // TEMP
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
@@ -32,20 +40,22 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   mesh.load(device);
 
   // Uniforms
-  float currentTime = 1.0f;
+  uniforms.time = 1.0f;
+  uniforms.color = {1.0f, 1.0f, 1.0f, 1.0f};
+
   WGPUBufferDescriptor bufferDesc = {};
   bufferDesc.nextInChain = nullptr;
-  bufferDesc.size = sizeof(float);
+  bufferDesc.size = sizeof(Uniforms);
   bufferDesc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
   bufferDesc.mappedAtCreation = false;
   uniformBuffer = wgpuDeviceCreateBuffer(device, &bufferDesc);
-  wgpuQueueWriteBuffer(m_queue, uniformBuffer, 0, &currentTime, sizeof(float));
+  wgpuQueueWriteBuffer(m_queue, uniformBuffer, 0, &uniforms, sizeof(Uniforms));
 
   binding_layout = utils::default_binding_layout();
   binding_layout.binding = 0;
-  binding_layout.visibility = WGPUShaderStage_Vertex;
+  binding_layout.visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment;
   binding_layout.buffer.type = WGPUBufferBindingType_Uniform;
-  binding_layout.buffer.minBindingSize = sizeof(float);
+  binding_layout.buffer.minBindingSize = sizeof(Uniforms);
 
   WGPUBindGroupLayoutDescriptor bindGroupLayoutDesc{};
   bindGroupLayoutDesc.nextInChain = nullptr;
@@ -58,7 +68,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   binding.binding = 0;
   binding.buffer = uniformBuffer;
   binding.offset = 0;
-  binding.size = sizeof(float);
+  binding.size = sizeof(Uniforms);
 
   WGPUBindGroupDescriptor bindGroupDesc{};
   bindGroupDesc.nextInChain = nullptr;
@@ -141,7 +151,6 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   fragmentState.targets = &colorTarget;
   pipelineDesc.depthStencil = nullptr;
   pipelineDesc.multisample.count = 1;
-  pipelineDesc.layout = nullptr;
   pipeline = wgpuDeviceCreateRenderPipeline(device, &pipelineDesc);
 
   m_has_loaded = true;
@@ -151,8 +160,11 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass)
 {
   static int idx = 0;
   ++idx;
-  float t = static_cast<float>(idx) * 0.05f;
-  wgpuQueueWriteBuffer(m_queue, uniformBuffer, 0, &t, sizeof(float));
+  uniforms.time = static_cast<float>(idx) * 0.05f;
+  uniforms.color = {0.2f, 0.0f, 0.0f, 1.0f};
+
+  wgpuQueueWriteBuffer(m_queue, uniformBuffer, offsetof(Uniforms, time), &uniforms.time, sizeof(Uniforms::time));
+  wgpuQueueWriteBuffer(m_queue, uniformBuffer, offsetof(Uniforms, color), &uniforms.color, sizeof(Uniforms::color));
 
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
   wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, mesh.buffer, 0, mesh.size);

@@ -8,11 +8,16 @@ struct VertexOutput {
   @location(0) color: vec3f,
 }
 
-@group(0) @binding(0) var<uniform> u_time: f32;
+struct Uniforms {
+  color: vec4f,
+  time: f32,
+}
+
+@group(0) @binding(0) var<uniform> uniforms: Uniforms;
 
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
-  var offset = 0.3 * vec2f(cos(u_time), sin(u_time));
+  var offset = 0.3 * vec2f(cos(uniforms.time), sin(uniforms.time));
   var pos = in.position.xy + offset;
 
   var out: VertexOutput;
@@ -23,5 +28,5 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-    return vec4f(in.color, 1.0);
+    return vec4f(in.color, 1.0) * uniforms.color;
 }

@@ -17,6 +17,7 @@ Mesh::~Mesh()
   if (m_has_loaded)
   {
     wgpuBufferDestroy(buffer);
+    wgpuBufferRelease(buffer);
   }
 }
 
