@@ -101,13 +101,11 @@ int Display::m_height = 0;
 
 Display::Display() {}
 
-WGPUInstance instance;
-
 Display::~Display()
 {
   wgpuDeviceRelease(device);
   wgpuSurfaceRelease(surface);
-  wgpuInstanceRelease(instance);
+  wgpuInstanceRelease(m_webgpu_instance);
   // SDL_GL_DeleteContext(m_gl_context);
   SDL_DestroyWindow(m_window);
   SDL_Quit();
@@ -133,15 +131,15 @@ void Display::load(const int width, const int height, const std::string& title)
 
   WGPUInstanceDescriptor desc = {};
   desc.nextInChain = nullptr;
-  instance = wgpuCreateInstance(&desc);
+  m_webgpu_instance = wgpuCreateInstance(&desc);
 
-  if (instance == nullptr)
+  if (m_webgpu_instance == nullptr)
   {
     spdlog::critical("Failed to create WebGPU instance");
     return;
   }
 
-  surface = SDL_GetWGPUSurface(instance, m_window);
+  surface = SDL_GetWGPUSurface(m_webgpu_instance, m_window);
 
   WGPURequestAdapterOptions options = {};
   options.nextInChain = nullptr;
@@ -157,7 +155,7 @@ void Display::load(const int width, const int height, const std::string& title)
   options.backendType = WGPUBackendType_Vulkan;
 #endif
 
-  WGPUAdapter adapter = request_adapter(instance, &options);
+  WGPUAdapter adapter = request_adapter(m_webgpu_instance, &options);
 
   WGPUAdapterProperties properties = {};
   properties.nextInChain = nullptr;
@@ -258,7 +256,7 @@ void Display::update_viewport()
   m_height = height;
 
   wgpuSurfaceRelease(surface);
-  surface = SDL_GetWGPUSurface(instance, m_window);
+  surface = SDL_GetWGPUSurface(m_webgpu_instance, m_window);
   m_configure_surface();
   // glViewport(0, 0, width, height);
 }
