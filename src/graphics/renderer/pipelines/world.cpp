@@ -3,9 +3,10 @@
 #include <spdlog/spdlog.h>
 
 #include "graphics/camera.hpp"
+#include "graphics/renderer/texture.hpp"
 #include "graphics/renderer/utils.hpp"
 
-namespace dl
+namespace dl::v2
 {
 WorldPipeline::~WorldPipeline()
 {
@@ -16,13 +17,12 @@ WorldPipeline::~WorldPipeline()
     wgpuBindGroupRelease(bindGroup);
     wgpuBindGroupLayoutRelease(bindGroupLayout);
     wgpuSamplerRelease(sampler);
-    wgpuTextureViewRelease(textureView);
-    wgpuTextureDestroy(texture);
-    wgpuTextureRelease(texture);
     wgpuPipelineLayoutRelease(pipelineLayout);
     wgpuRenderPipelineRelease(pipeline);
   }
 }
+
+Texture texture{"data/textures/tileset.png"};
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
 {
@@ -31,64 +31,8 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   // Mesh
   mesh.load(device);
 
-  uint32_t texture_width = 0;
-  uint32_t texture_height = 0;
-
-  {
-    // Texture
-    WGPUTextureDescriptor textureDesc{};
-    textureDesc.label = "WorldPipeline Texture";
-    textureDesc.nextInChain = nullptr;
-    textureDesc.dimension = WGPUTextureDimension_2D;
-    textureDesc.size = {64, 64, 1};
-    textureDesc.mipLevelCount = 1;
-    textureDesc.sampleCount = 1;
-    textureDesc.format = WGPUTextureFormat_RGBA8Unorm;
-    textureDesc.usage = WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst;
-    textureDesc.viewFormatCount = 0;
-    textureDesc.viewFormats = nullptr;
-    texture = wgpuDeviceCreateTexture(device, &textureDesc);
-    texture_width = textureDesc.size.width;
-    texture_height = textureDesc.size.height;
-
-    std::vector<uint8_t> pixels(4 * texture_width * texture_height, 0u);
-    for (uint32_t i = 0; i < texture_width; ++i)
-    {
-      for (uint32_t j = 0; j < texture_height; ++j)
-      {
-        pixels[4 * (j * texture_width + i) + 0] = 100u + (uint8_t)(i);
-        pixels[4 * (j * texture_width + i) + 1] = 100u + (uint8_t)(j);
-        pixels[4 * (j * texture_width + i) + 2] = 0u;
-        pixels[4 * (j * texture_width + i) + 3] = 255u;
-      }
-    }
-
-    WGPUImageCopyTexture destination;
-    destination.texture = texture;
-    destination.mipLevel = 0;
-    destination.origin = {0, 0, 0};
-    destination.aspect = WGPUTextureAspect_All;
-
-    WGPUTextureDataLayout source;
-    source.offset = 0;
-    source.bytesPerRow = 4 * texture_width;
-    source.rowsPerImage = texture_height;
-
-    wgpuQueueWriteTexture(
-        m_queue, &destination, pixels.data(), pixels.size() * sizeof(uint8_t), &source, &textureDesc.size);
-
-    WGPUTextureViewDescriptor textureViewDesc{};
-    textureViewDesc.label = "WorldPipeline Texture View";
-    textureViewDesc.nextInChain = nullptr;
-    textureViewDesc.aspect = WGPUTextureAspect_All;
-    textureViewDesc.baseArrayLayer = 0;
-    textureViewDesc.arrayLayerCount = 1;
-    textureViewDesc.baseMipLevel = 0;
-    textureViewDesc.mipLevelCount = 1;
-    textureViewDesc.dimension = WGPUTextureViewDimension_2D;
-    textureViewDesc.format = textureDesc.format;
-    textureView = wgpuTextureCreateView(texture, &textureViewDesc);
-  }
+  // Texture
+  texture.load(device);
 
   // Sampler
   {
@@ -97,7 +41,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     samplerDesc.addressModeU = WGPUAddressMode_ClampToEdge;
     samplerDesc.addressModeV = WGPUAddressMode_ClampToEdge;
     samplerDesc.addressModeW = WGPUAddressMode_ClampToEdge;
-    samplerDesc.magFilter = WGPUFilterMode_Linear;
+    samplerDesc.magFilter = WGPUFilterMode_Nearest;
     samplerDesc.minFilter = WGPUFilterMode_Linear;
     samplerDesc.mipmapFilter = WGPUMipmapFilterMode_Linear;
     samplerDesc.lodMinClamp = 0.0f;
@@ -157,7 +101,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
     binding[1].nextInChain = nullptr;
     binding[1].binding = 1;
-    binding[1].textureView = textureView;
+    binding[1].textureView = texture.view;
 
     binding[2].nextInChain = nullptr;
     binding[2].binding = 2;
@@ -280,4 +224,4 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
   wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
   wgpuRenderPassEncoderDraw(render_pass, vertex_count, 1, 0, 0);
 }
-}  // namespace dl
+}  // namespace dl::v2

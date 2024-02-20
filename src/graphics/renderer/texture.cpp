@@ -1,25 +1,18 @@
 #include "./texture.hpp"
 
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 #include "core/json.hpp"
 
 extern "C"
 {
-// #ifndef STBI_ONLY_PNG
-// #define STBI_ONLY_PNG
-// #endif
-// #ifndef STBI_ONLY_JPEG
-// #define STBI_ONLY_JPEG
-// #endif
-// #ifndef STB_IMAGE_IMPLEMENTATION
-// #define STB_IMAGE_IMPLEMENTATION
-// #endif
+#define STBI_ONLY_PNG
+#define STBI_ONLY_JPEG
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 }
 
-namespace dl
+namespace dl::v2
 {
 // Load single texture
 Texture::Texture(const std::string& filepath) : m_filepath(filepath), m_horizontal_frames(1), m_vertical_frames(1) {}
@@ -40,71 +33,97 @@ Texture::Texture(const std::string& filepath,
 Texture::Texture(const std::vector<unsigned char>& data, const int width, const int height)
     : m_horizontal_frames(1), m_vertical_frames(1)
 {
-  load(data.data(), width, height, GL_RGBA);
+  // load(data.data(), width, height, GL_RGBA);
 }
 
 Texture::Texture(const int width, const int height)
     : m_horizontal_frames(1), m_vertical_frames(1), m_width(width), m_height(height)
 {
-  m_load_empty();
+  // m_load_empty();
 }
 
 Texture::~Texture()
 {
+  if (has_loaded)
+  {
+    wgpuTextureViewRelease(view);
+    wgpuTextureDestroy(texture);
+    wgpuTextureRelease(texture);
+  }
   // glDeleteTextures(1, &m_id);
 }
 
-void Texture::load()
+void Texture::load(const WGPUDevice device)
 {
-  // if (m_data_filepath != "")
-  // {
-  //   load_data(m_data_filepath);
-  // }
-  //
-  // int width = 0;
-  // int height = 0;
-  // int channels = 0;
-  // unsigned char* image_data;
-  //
-  // // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-  // image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
-  // if (image_data == nullptr)
-  // {
-  //   throw std::runtime_error("It wasn't possible to load " + m_filepath);
-  // }
-  //
-  // GLenum format;
-  // switch (channels)
-  // {
-  // case 1:
-  //   format = GL_RED;
-  //   break;
-  //
-  // case 3:
-  //   format = GL_RGB;
-  //   break;
-  //
-  // case 4:
-  //   format = GL_RGBA;
-  //   break;
-  //
-  // default:
-  //   format = GL_RGBA;
-  //   break;
-  // }
-  //
-  // load(image_data, width, height, format);
-  //
-  // stbi_image_free(image_data);
-  //
-  // has_loaded = true;
+  if (m_data_filepath != "")
+  {
+    load_data(m_data_filepath);
+  }
+
+  int width = 0;
+  int height = 0;
+  int channels = 0;
+  unsigned char* image_data;
+
+  // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+  image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
+  if (image_data == nullptr)
+  {
+    throw std::runtime_error("It wasn't possible to load " + m_filepath);
+  }
+
+  load(device, image_data, width, height, channels);
+
+  stbi_image_free(image_data);
 }
 
-void Texture::load(const unsigned char* data, const int width, const int height, unsigned int format)
+void Texture::load(
+    const WGPUDevice device, const unsigned char* data, const int width, const int height, const int channels)
 {
-  // m_width = width;
-  // m_height = height;
-  //
+  m_width = width;
+  m_height = height;
+
+  const auto queue = wgpuDeviceGetQueue(device);
+
+  WGPUTextureDescriptor textureDesc{};
+  textureDesc.label = "WorldPipeline Texture";
+  textureDesc.nextInChain = nullptr;
+  textureDesc.dimension = WGPUTextureDimension_2D;
+  textureDesc.size = {static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), 1};
+  textureDesc.mipLevelCount = 1;
+  textureDesc.sampleCount = 1;
+  textureDesc.format = WGPUTextureFormat_RGBA8Unorm;
+  textureDesc.usage = WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst;
+  textureDesc.viewFormatCount = 0;
+  textureDesc.viewFormats = nullptr;
+  texture = wgpuDeviceCreateTexture(device, &textureDesc);
+
+  WGPUImageCopyTexture destination;
+  destination.texture = texture;
+  destination.mipLevel = 0;
+  destination.origin = {0, 0, 0};
+  destination.aspect = WGPUTextureAspect_All;
+
+  WGPUTextureDataLayout source;
+  source.offset = 0;
+  source.bytesPerRow = 4 * textureDesc.size.width;
+  source.rowsPerImage = textureDesc.size.height;
+
+  wgpuQueueWriteTexture(
+      queue, &destination, data, width * height * channels * sizeof(uint8_t), &source, &textureDesc.size);
+
+  WGPUTextureViewDescriptor textureViewDesc{};
+  textureViewDesc.label = "WorldPipeline Texture View";
+  textureViewDesc.nextInChain = nullptr;
+  textureViewDesc.aspect = WGPUTextureAspect_All;
+  textureViewDesc.baseArrayLayer = 0;
+  textureViewDesc.arrayLayerCount = 1;
+  textureViewDesc.baseMipLevel = 0;
+  textureViewDesc.mipLevelCount = 1;
+  textureViewDesc.dimension = WGPUTextureViewDimension_2D;
+  textureViewDesc.format = textureDesc.format;
+  view = wgpuTextureCreateView(texture, &textureViewDesc);
+
   // glGenTextures(1, &m_id);
   // glBindTexture(GL_TEXTURE_2D, m_id);
   // glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -116,11 +135,18 @@ void Texture::load(const unsigned char* data, const int width, const int height,
   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   //
   // glBindTexture(GL_TEXTURE_2D, 0);
+  has_loaded = true;
 }
 
-void Texture::bind() const { glBindTexture(GL_TEXTURE_2D, m_id); }
+void Texture::bind() const
+{
+  // glBindTexture(GL_TEXTURE_2D, m_id);
+}
 
-void Texture::unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
+void Texture::unbind() const
+{
+  // glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 // TODO: Implement irregular frame calculations
 float Texture::get_frame_width() const { return (m_width / static_cast<float>(m_horizontal_frames)); }
@@ -252,4 +278,4 @@ void Texture::load_data(const std::string& filepath)
   }
 }
 
-}  // namespace dl
+}  // namespace dl::v2

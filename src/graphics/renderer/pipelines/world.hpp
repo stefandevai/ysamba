@@ -19,6 +19,8 @@ namespace dl
 {
 class Camera;
 
+namespace v2
+{
 class WorldPipeline
 {
  public:
@@ -31,7 +33,6 @@ class WorldPipeline
   WGPUBindGroup bindGroup;
   WGPUBuffer uniformBuffer;
   WGPUDepthStencilState stencil_state;
-  WGPUTextureView textureView;
   WGPUSampler sampler;
 
   struct UniformData
@@ -44,7 +45,6 @@ class WorldPipeline
     uint32_t view_matrix_size = sizeof(glm::mat4);
   };
   UniformData uniform_data;
-  WGPUTexture texture;
   WGPUBindGroupLayout bindGroupLayout = nullptr;
   WGPUPipelineLayout pipelineLayout;
   // TEMP
@@ -61,4 +61,5 @@ class WorldPipeline
   bool m_has_loaded = false;
   WGPUQueue m_queue;
 };
+}  // namespace v2
 }  // namespace dl

@@ -37,7 +37,7 @@ endif()
 
 # Enable warnings recommended for new projects.
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WD4244)
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3)
 endif()

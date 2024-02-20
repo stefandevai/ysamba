@@ -30,6 +30,6 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-  let color = textureSample(gradientTexture, textureSampler, in.uv).rgb;
-  return vec4f(color, 1.0);
+  let color = textureSample(gradientTexture, textureSampler, in.uv);
+  return color;
 }
