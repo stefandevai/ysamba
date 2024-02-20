@@ -6,6 +6,8 @@
 
 namespace dl
 {
+class Camera;
+
 class WorldPipeline
 {
  public:
@@ -15,7 +17,7 @@ class WorldPipeline
   ~WorldPipeline();
 
   void load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader);
-  void render(const WGPURenderPassEncoder render_pass);
+  void render(const WGPURenderPassEncoder render_pass, const Camera& camera);
 
  private:
   bool m_has_loaded = false;

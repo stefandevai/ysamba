@@ -9,24 +9,21 @@ struct VertexOutput {
 }
 
 struct Uniforms {
-  color: vec4f,
-  time: f32,
+  projection: mat4x4f,
+  view: mat4x4f,
 }
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
-  var offset = 0.3 * vec2f(cos(uniforms.time), sin(uniforms.time));
-  var pos = in.position.xy + offset;
-
   var out: VertexOutput;
-  out.position = vec4f(pos, in.position.z, 1.0);
+  out.position = uniforms.projection * uniforms.view * vec4f(in.position, 1.0);
   out.color = in.color;
   return out;
 }
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-    return vec4f(in.color, 1.0) * uniforms.color;
+    return vec4f(in.color, 1.0);
 }

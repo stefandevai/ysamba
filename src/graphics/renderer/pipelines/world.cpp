@@ -1,7 +1,17 @@
 #include "./world.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <array>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+
+#include "graphics/camera.hpp"
 #include "graphics/renderer/mesh.hpp"
 #include "graphics/renderer/utils.hpp"
 
@@ -22,15 +32,18 @@ uint32_t vertex_count;
 WGPUBindGroupLayoutEntry binding_layout;
 WGPUBindGroup bindGroup;
 WGPUBuffer uniformBuffer;
-
-struct Uniforms
-{
-  std::array<float, 4> color;
-  float time;
-  float _padding[3];
-};
-Uniforms uniforms{};
 WGPUDepthStencilState stencil_state;
+
+struct UniformData
+{
+  uint32_t size = sizeof(glm::mat4) * 2;
+
+  uint32_t projection_matrix_offset = 0;
+  uint32_t projection_matrix_size = sizeof(glm::mat4);
+  uint32_t view_matrix_offset = sizeof(glm::mat4);
+  uint32_t view_matrix_size = sizeof(glm::mat4);
+};
+UniformData uniform_data;
 // TEMP
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
@@ -41,22 +54,27 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   mesh.load(device);
 
   // Uniforms
-  uniforms.time = 1.0f;
-  uniforms.color = {1.0f, 1.0f, 1.0f, 1.0f};
-
   WGPUBufferDescriptor bufferDesc = {};
   bufferDesc.nextInChain = nullptr;
-  bufferDesc.size = sizeof(Uniforms);
+  bufferDesc.size = uniform_data.size;
   bufferDesc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
   bufferDesc.mappedAtCreation = false;
   uniformBuffer = wgpuDeviceCreateBuffer(device, &bufferDesc);
-  wgpuQueueWriteBuffer(m_queue, uniformBuffer, 0, &uniforms, sizeof(Uniforms));
+
+  const auto identity_matrix = glm::mat4(1.0f);
+  wgpuQueueWriteBuffer(m_queue,
+                       uniformBuffer,
+                       uniform_data.projection_matrix_offset,
+                       &identity_matrix,
+                       uniform_data.projection_matrix_size);
+  wgpuQueueWriteBuffer(
+      m_queue, uniformBuffer, uniform_data.view_matrix_offset, &identity_matrix, uniform_data.view_matrix_size);
 
   binding_layout = utils::default_binding_layout();
   binding_layout.binding = 0;
   binding_layout.visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment;
   binding_layout.buffer.type = WGPUBufferBindingType_Uniform;
-  binding_layout.buffer.minBindingSize = sizeof(Uniforms);
+  binding_layout.buffer.minBindingSize = uniform_data.size;
 
   WGPUBindGroupLayoutDescriptor bindGroupLayoutDesc{};
   bindGroupLayoutDesc.nextInChain = nullptr;
@@ -69,7 +87,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   binding.binding = 0;
   binding.buffer = uniformBuffer;
   binding.offset = 0;
-  binding.size = sizeof(Uniforms);
+  binding.size = uniform_data.size;
 
   WGPUBindGroupDescriptor bindGroupDesc{};
   bindGroupDesc.nextInChain = nullptr;
@@ -166,15 +184,15 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   m_has_loaded = true;
 }
 
-void WorldPipeline::render(const WGPURenderPassEncoder render_pass)
+void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
 {
-  static int idx = 0;
-  ++idx;
-  uniforms.time = static_cast<float>(idx) * 0.05f;
-  uniforms.color = {1.0f, 1.0f, 1.0f, 1.0f};
-
-  wgpuQueueWriteBuffer(m_queue, uniformBuffer, offsetof(Uniforms, time), &uniforms.time, sizeof(Uniforms::time));
-  wgpuQueueWriteBuffer(m_queue, uniformBuffer, offsetof(Uniforms, color), &uniforms.color, sizeof(Uniforms::color));
+  wgpuQueueWriteBuffer(m_queue,
+                       uniformBuffer,
+                       uniform_data.projection_matrix_offset,
+                       &camera.projection_matrix,
+                       uniform_data.projection_matrix_size);
+  wgpuQueueWriteBuffer(
+      m_queue, uniformBuffer, uniform_data.view_matrix_offset, &camera.view_matrix, uniform_data.view_matrix_size);
 
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
   wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, mesh.buffer, 0, mesh.size);

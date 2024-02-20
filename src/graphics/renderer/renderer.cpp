@@ -127,7 +127,7 @@ void Renderer::render(const Camera& camera)
   renderPassDesc.nextInChain = nullptr;
   WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
 
-  world_pipeline.render(renderPass);
+  world_pipeline.render(renderPass, camera);
 
   wgpuRenderPassEncoderEnd(renderPass);
   wgpuRenderPassEncoderRelease(renderPass);
