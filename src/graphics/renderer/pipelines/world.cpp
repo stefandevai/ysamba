@@ -2,17 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include <array>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include "graphics/camera.hpp"
-#include "graphics/renderer/mesh.hpp"
 #include "graphics/renderer/utils.hpp"
 
 namespace dl
@@ -21,30 +11,17 @@ WorldPipeline::~WorldPipeline()
 {
   if (m_has_loaded)
   {
+    wgpuBufferDestroy(uniformBuffer);
+    wgpuBufferRelease(uniformBuffer);
+    wgpuBindGroupRelease(bindGroup);
+    wgpuBindGroupLayoutRelease(bindGroupLayout);
+    wgpuTextureViewRelease(textureView);
+    wgpuTextureDestroy(texture);
+    wgpuTextureRelease(texture);
+    wgpuPipelineLayoutRelease(pipelineLayout);
     wgpuRenderPipelineRelease(pipeline);
   }
 }
-
-// TEMP
-Mesh mesh{};
-uint32_t vertex_size;
-uint32_t vertex_count;
-WGPUBindGroupLayoutEntry binding_layout;
-WGPUBindGroup bindGroup;
-WGPUBuffer uniformBuffer;
-WGPUDepthStencilState stencil_state;
-
-struct UniformData
-{
-  uint32_t size = sizeof(glm::mat4) * 2;
-
-  uint32_t projection_matrix_offset = 0;
-  uint32_t projection_matrix_size = sizeof(glm::mat4);
-  uint32_t view_matrix_offset = sizeof(glm::mat4);
-  uint32_t view_matrix_size = sizeof(glm::mat4);
-};
-UniformData uniform_data;
-// TEMP
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
 {
@@ -52,6 +29,59 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
   // Mesh
   mesh.load(device);
+
+  // Texture
+  WGPUTextureDescriptor textureDesc;
+  textureDesc.nextInChain = nullptr;
+  textureDesc.dimension = WGPUTextureDimension_2D;
+  textureDesc.size = {64, 64, 1};
+  textureDesc.mipLevelCount = 1;
+  textureDesc.sampleCount = 1;
+  textureDesc.format = WGPUTextureFormat_RGBA8Unorm;
+  textureDesc.usage = WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst;
+  textureDesc.viewFormatCount = 0;
+  textureDesc.viewFormats = nullptr;
+  texture = wgpuDeviceCreateTexture(device, &textureDesc);
+
+  {
+    auto size_temp = textureDesc.size.width * textureDesc.size.height * 4;
+    std::vector<uint8_t> pixels(size_temp);
+    for (uint32_t i = 0; i < textureDesc.size.width; ++i)
+    {
+      for (uint32_t j = 0; j < textureDesc.size.height; ++j)
+      {
+        pixels[4 * (j * textureDesc.size.width + i) + 0] = 100u + (uint8_t)(i);
+        pixels[4 * (j * textureDesc.size.width + i) + 1] = 100u + (uint8_t)(j);
+        pixels[4 * (j * textureDesc.size.width + i) + 2] = 0u;
+        pixels[4 * (j * textureDesc.size.width + i) + 3] = 255u;
+      }
+    }
+
+    WGPUImageCopyTexture destination;
+    destination.texture = texture;
+    destination.mipLevel = 0;
+    destination.origin = {0, 0, 0};
+    destination.aspect = WGPUTextureAspect_All;
+
+    WGPUTextureDataLayout source;
+    source.offset = 0;
+    source.bytesPerRow = 4 * textureDesc.size.width;
+    source.rowsPerImage = textureDesc.size.height;
+
+    wgpuQueueWriteTexture(
+        m_queue, &destination, pixels.data(), pixels.size() * sizeof(uint8_t), &source, &textureDesc.size);
+  }
+
+  WGPUTextureViewDescriptor textureViewDesc;
+  textureViewDesc.nextInChain = nullptr;
+  textureViewDesc.aspect = WGPUTextureAspect_All;
+  textureViewDesc.baseArrayLayer = 0;
+  textureViewDesc.arrayLayerCount = 1;
+  textureViewDesc.baseMipLevel = 0;
+  textureViewDesc.mipLevelCount = 1;
+  textureViewDesc.dimension = WGPUTextureViewDimension_2D;
+  textureViewDesc.format = textureDesc.format;
+  textureView = wgpuTextureCreateView(texture, &textureViewDesc);
 
   // Uniforms
   WGPUBufferDescriptor bufferDesc = {};
@@ -70,30 +100,40 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   wgpuQueueWriteBuffer(
       m_queue, uniformBuffer, uniform_data.view_matrix_offset, &identity_matrix, uniform_data.view_matrix_size);
 
-  binding_layout = utils::default_binding_layout();
-  binding_layout.binding = 0;
-  binding_layout.visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment;
-  binding_layout.buffer.type = WGPUBufferBindingType_Uniform;
-  binding_layout.buffer.minBindingSize = uniform_data.size;
+  binding_layout[0] = utils::default_binding_layout();
+  binding_layout[0].binding = 0;
+  binding_layout[0].visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment;
+  binding_layout[0].buffer.type = WGPUBufferBindingType_Uniform;
+  binding_layout[0].buffer.minBindingSize = uniform_data.size;
+
+  binding_layout[1] = utils::default_binding_layout();
+  binding_layout[1].binding = 1;
+  binding_layout[1].visibility = WGPUShaderStage_Fragment;
+  binding_layout[1].texture.sampleType = WGPUTextureSampleType_Float;
+  binding_layout[1].texture.viewDimension = WGPUTextureViewDimension_2D;
 
   WGPUBindGroupLayoutDescriptor bindGroupLayoutDesc{};
   bindGroupLayoutDesc.nextInChain = nullptr;
-  bindGroupLayoutDesc.entryCount = 1;
-  bindGroupLayoutDesc.entries = &binding_layout;
-  WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bindGroupLayoutDesc);
+  bindGroupLayoutDesc.entryCount = (uint32_t)binding_layout.size();
+  bindGroupLayoutDesc.entries = binding_layout.data();
+  bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bindGroupLayoutDesc);
 
-  WGPUBindGroupEntry binding{};
-  binding.nextInChain = nullptr;
-  binding.binding = 0;
-  binding.buffer = uniformBuffer;
-  binding.offset = 0;
-  binding.size = uniform_data.size;
+  std::array<WGPUBindGroupEntry, 2> binding{};
+  binding[0].nextInChain = nullptr;
+  binding[0].binding = 0;
+  binding[0].buffer = uniformBuffer;
+  binding[0].offset = 0;
+  binding[0].size = uniform_data.size;
+
+  binding[1].nextInChain = nullptr;
+  binding[1].binding = 1;
+  binding[1].textureView = textureView;
 
   WGPUBindGroupDescriptor bindGroupDesc{};
   bindGroupDesc.nextInChain = nullptr;
   bindGroupDesc.layout = bindGroupLayout;
-  bindGroupDesc.entryCount = bindGroupLayoutDesc.entryCount;
-  bindGroupDesc.entries = &binding;
+  bindGroupDesc.entryCount = (uint32_t)binding.size();
+  bindGroupDesc.entries = binding.data();
   bindGroup = wgpuDeviceCreateBindGroup(device, &bindGroupDesc);
 
   // Pipeline
@@ -105,20 +145,24 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
   pipelineLayoutDesc.nextInChain = nullptr;
   pipelineLayoutDesc.bindGroupLayoutCount = 1;
   pipelineLayoutDesc.bindGroupLayouts = &bindGroupLayout;
-  WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &pipelineLayoutDesc);
+  pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &pipelineLayoutDesc);
   pipelineDesc.layout = pipelineLayout;
 
   // Vertex fetch
-  vertex_size = 6;
+  vertex_size = 8;
   vertex_count = mesh.count / vertex_size;
-  std::array<WGPUVertexAttribute, 2> vertexAttribs{};
+  std::array<WGPUVertexAttribute, 3> vertexAttribs{};
   vertexAttribs[0].shaderLocation = 0;
   vertexAttribs[0].format = WGPUVertexFormat_Float32x3;
   vertexAttribs[0].offset = 0;
 
-  vertexAttribs[1].shaderLocation = 1;
-  vertexAttribs[1].format = WGPUVertexFormat_Float32x3;
+  vertexAttribs[1].shaderLocation = 2;
+  vertexAttribs[1].format = WGPUVertexFormat_Float32x2;
   vertexAttribs[1].offset = 3 * sizeof(float);
+
+  vertexAttribs[2].shaderLocation = 1;
+  vertexAttribs[2].format = WGPUVertexFormat_Float32x3;
+  vertexAttribs[2].offset = 5 * sizeof(float);
 
   WGPUVertexBufferLayout vertexBufferLayout = {};
   vertexBufferLayout.attributeCount = vertexAttribs.size();

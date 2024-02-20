@@ -4,6 +4,9 @@
 
 #include <cstdint>
 
+#include "graphics/renderer/pipelines/world.hpp"
+#include "graphics/renderer/shader.hpp"
+
 namespace dl
 {
 class AssetManager;
@@ -16,6 +19,8 @@ class Renderer
 {
  public:
   WGPUQueue queue;
+  WorldPipeline world_pipeline{};
+  Shader shader{};
 
   Renderer(GameContext& game_context);
   ~Renderer();

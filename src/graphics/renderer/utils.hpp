@@ -6,7 +6,7 @@ namespace dl::utils
 {
 WGPUBindGroupLayoutEntry default_binding_layout()
 {
-  WGPUBindGroupLayoutEntry binding_layout;
+  WGPUBindGroupLayoutEntry binding_layout{};
 
   binding_layout.buffer.nextInChain = nullptr;
   binding_layout.buffer.type = WGPUBufferBindingType_Undefined;

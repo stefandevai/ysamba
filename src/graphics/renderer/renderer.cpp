@@ -6,8 +6,6 @@
 #include "core/display.hpp"
 #include "core/game_context.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/renderer/pipelines/world.hpp"
-#include "graphics/renderer/shader.hpp"
 
 namespace dl::v2
 {
@@ -23,21 +21,18 @@ Renderer::~Renderer()
   }
 }
 
-Shader shader{};
-WorldPipeline world_pipeline{};
-
 void Renderer::load()
 {
   assert(m_game_context.display != nullptr);
 
   queue = wgpuDeviceGetQueue(m_game_context.display->device);
   m_load_depth_buffer();
-  //
-  // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
-  //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
-  // };
-  //
-  // wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
+
+  auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
+    spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
+  };
+
+  wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
 
   // TEMP
   shader.load(m_game_context.display->device, "data/shaders/default.wgsl");
@@ -152,6 +147,7 @@ void Renderer::render(const Camera& camera)
   auto commandBuffer = wgpuCommandEncoderFinish(encoder, &commandBufferDescriptor);
   wgpuQueueSubmit(queue, 1, &commandBuffer);
 
+  wgpuCommandBufferRelease(commandBuffer);
   wgpuCommandEncoderRelease(encoder);
   wgpuTextureViewRelease(targetView);
 
