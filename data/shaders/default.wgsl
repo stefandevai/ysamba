@@ -17,6 +17,7 @@ struct Uniforms {
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 @group(0) @binding(1) var gradientTexture: texture_2d<f32>;
+@group(0) @binding(2) var textureSampler: sampler;
 
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
@@ -29,7 +30,6 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-  let texelCoords = vec2i(in.uv * vec2f(textureDimensions(gradientTexture)));
-  let color = textureLoad(gradientTexture, texelCoords, 0).rgb;
+  let color = textureSample(gradientTexture, textureSampler, in.uv).rgb;
   return vec4f(color, 1.0);
 }

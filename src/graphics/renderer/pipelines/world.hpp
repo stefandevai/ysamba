@@ -26,11 +26,13 @@ class WorldPipeline
   Mesh mesh{};
   uint32_t vertex_size;
   uint32_t vertex_count;
-  std::array<WGPUBindGroupLayoutEntry, 2> binding_layout{};
+  std::array<WGPUBindGroupLayoutEntry, 3> binding_layout{};
+  std::array<WGPUBindGroupEntry, 3> binding{};
   WGPUBindGroup bindGroup;
   WGPUBuffer uniformBuffer;
   WGPUDepthStencilState stencil_state;
   WGPUTextureView textureView;
+  WGPUSampler sampler;
 
   struct UniformData
   {

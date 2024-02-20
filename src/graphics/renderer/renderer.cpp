@@ -28,11 +28,11 @@ void Renderer::load()
   queue = wgpuDeviceGetQueue(m_game_context.display->device);
   m_load_depth_buffer();
 
-  auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
-    spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
-  };
-
-  wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
+  // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
+  //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
+  // };
+  //
+  // wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
 
   // TEMP
   shader.load(m_game_context.display->device, "data/shaders/default.wgsl");
