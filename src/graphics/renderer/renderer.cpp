@@ -26,11 +26,12 @@ Renderer::~Renderer()
 Shader shader{};
 WorldPipeline world_pipeline{};
 
-void Renderer::init()
+void Renderer::load()
 {
   assert(m_game_context.display != nullptr);
 
   queue = wgpuDeviceGetQueue(m_game_context.display->device);
+  m_load_depth_buffer();
   //
   // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
   //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
@@ -38,14 +39,33 @@ void Renderer::init()
   //
   // wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
 
-  WGPUTextureFormat depth_texture_format = WGPUTextureFormat_Depth24Plus;
+  // TEMP
+  shader.load(m_game_context.display->device, "data/shaders/default.wgsl");
+  world_pipeline.load(m_game_context.display->device, m_game_context.display->surface_format, shader);
+  // TEMP
+  m_has_loaded = true;
+}
 
+void Renderer::resize() { m_load_depth_buffer(); }
+
+void Renderer::m_load_depth_buffer()
+{
+  if (m_has_loaded)
+  {
+    wgpuTextureViewRelease(depth_texture_view);
+    wgpuTextureDestroy(depth_texture);
+    wgpuTextureRelease(depth_texture);
+  }
+
+  const auto& display_size = Display::get_window_size();
+
+  WGPUTextureFormat depth_texture_format = WGPUTextureFormat_Depth24Plus;
   WGPUTextureDescriptor depthTextureDesc;
   depthTextureDesc.dimension = WGPUTextureDimension_2D;
   depthTextureDesc.format = depth_texture_format;
   depthTextureDesc.mipLevelCount = 1;
   depthTextureDesc.sampleCount = 1;
-  depthTextureDesc.size = {1024, 576, 1};
+  depthTextureDesc.size = {static_cast<uint32_t>(display_size.x), static_cast<uint32_t>(display_size.y), 1};
   depthTextureDesc.usage = WGPUTextureUsage_RenderAttachment;
   depthTextureDesc.viewFormatCount = 1;
   depthTextureDesc.viewFormats = &depth_texture_format;
@@ -60,12 +80,6 @@ void Renderer::init()
   depthTextureViewDesc.dimension = WGPUTextureViewDimension_2D;
   depthTextureViewDesc.format = depth_texture_format;
   depth_texture_view = wgpuTextureCreateView(depth_texture, &depthTextureViewDesc);
-
-  // TEMP
-  shader.load(m_game_context.display->device, "data/shaders/default.wgsl");
-  world_pipeline.load(m_game_context.display->device, m_game_context.display->surface_format, shader);
-  // TEMP
-  m_has_loaded = true;
 }
 
 void Renderer::render(const Camera& camera)

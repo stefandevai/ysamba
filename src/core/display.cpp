@@ -101,6 +101,18 @@ int Display::m_height = 0;
 
 Display::Display() {}
 
+WGPUInstance instance;
+
+Display::~Display()
+{
+  wgpuDeviceRelease(device);
+  wgpuSurfaceRelease(surface);
+  wgpuInstanceRelease(instance);
+  // SDL_GL_DeleteContext(m_gl_context);
+  SDL_DestroyWindow(m_window);
+  SDL_Quit();
+}
+
 void Display::load(const int width, const int height, const std::string& title)
 {
   m_width = width;
@@ -121,7 +133,7 @@ void Display::load(const int width, const int height, const std::string& title)
 
   WGPUInstanceDescriptor desc = {};
   desc.nextInChain = nullptr;
-  WGPUInstance instance = wgpuCreateInstance(&desc);
+  instance = wgpuCreateInstance(&desc);
 
   if (instance == nullptr)
   {
@@ -168,23 +180,9 @@ void Display::load(const int width, const int height, const std::string& title)
 
   surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
 
-  WGPUSurfaceConfiguration surface_configuration;
-  surface_configuration.nextInChain = nullptr;
-  surface_configuration.device = device;
-  surface_configuration.format = surface_format;
-  surface_configuration.usage = WGPUTextureUsage_RenderAttachment;
-  surface_configuration.viewFormatCount = 1;
-  surface_configuration.viewFormats = &surface_format;
-  surface_configuration.alphaMode = WGPUCompositeAlphaMode_Auto;
-  surface_configuration.width = m_width;
-  surface_configuration.height = m_height;
-  surface_configuration.presentMode = WGPUPresentMode_Fifo;
+  m_configure_surface();
 
-  wgpuSurfaceConfigure(surface, &surface_configuration);
-
-  // Adapter and Instance are only needed in initialization
   wgpuAdapterRelease(adapter);
-  wgpuInstanceRelease(instance);
 
   // #if __APPLE__
   //   // Always required on Mac
@@ -208,6 +206,8 @@ void Display::load(const int width, const int height, const std::string& title)
 #ifdef DL_BUILD_DEBUG_TOOLS
   debug_tools.init(m_window, m_gl_context);
 #endif
+
+  m_has_loaded = true;
 }
 
 void temp()
@@ -216,15 +216,6 @@ void temp()
   {
     spdlog::critical("Failed to initialize GLAD");
   }
-}
-
-Display::~Display()
-{
-  wgpuDeviceRelease(device);
-  wgpuSurfaceRelease(surface);
-  // SDL_GL_DeleteContext(m_gl_context);
-  SDL_DestroyWindow(m_window);
-  SDL_Quit();
 }
 
 const Vector2i Display::get_size() const { return {m_width, m_height}; }
@@ -266,6 +257,26 @@ void Display::update_viewport()
   m_width = width;
   m_height = height;
 
-  glViewport(0, 0, width, height);
+  wgpuSurfaceRelease(surface);
+  surface = SDL_GetWGPUSurface(instance, m_window);
+  m_configure_surface();
+  // glViewport(0, 0, width, height);
+}
+
+void Display::m_configure_surface()
+{
+  WGPUSurfaceConfiguration surface_configuration;
+  surface_configuration.nextInChain = nullptr;
+  surface_configuration.device = device;
+  surface_configuration.format = surface_format;
+  surface_configuration.usage = WGPUTextureUsage_RenderAttachment;
+  surface_configuration.viewFormatCount = 1;
+  surface_configuration.viewFormats = &surface_format;
+  surface_configuration.alphaMode = WGPUCompositeAlphaMode_Auto;
+  surface_configuration.width = m_width;
+  surface_configuration.height = m_height;
+  surface_configuration.presentMode = WGPUPresentMode_Fifo;
+
+  wgpuSurfaceConfigure(surface, &surface_configuration);
 }
 }  // namespace dl

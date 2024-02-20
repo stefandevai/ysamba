@@ -20,7 +20,8 @@ class Renderer
   Renderer(GameContext& game_context);
   ~Renderer();
 
-  void init();
+  void load();
+  void resize();
 
   void clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a = 1.0f);
   void render(const Camera& camera);
@@ -30,6 +31,8 @@ class Renderer
   GameContext& m_game_context;
   WGPUTextureView depth_texture_view;
   WGPUTexture depth_texture;
+
+  void m_load_depth_buffer();
 };
 
 }  // namespace v2

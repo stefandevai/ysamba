@@ -33,10 +33,14 @@ class Display
   void update_viewport();
 
  private:
+  bool m_has_loaded = false;
+
   static SDL_Window* m_window;
   static int m_width;
   static int m_height;
   std::string m_title;
   SDL_GLContext m_gl_context;
+
+  void m_configure_surface();
 };
 }  // namespace dl
