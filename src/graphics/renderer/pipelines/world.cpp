@@ -1,6 +1,9 @@
 #include "./world.hpp"
 
+#include <array>
+
 #include "graphics/renderer/mesh.hpp"
+#include "graphics/renderer/utils.hpp"
 
 namespace dl
 {
@@ -14,24 +17,84 @@ WorldPipeline::~WorldPipeline()
 
 // TEMP
 Mesh mesh{};
+uint32_t vertex_size;
+uint32_t vertex_count;
+WGPUBindGroupLayoutEntry binding_layout;
+WGPUBindGroup bindGroup;
+WGPUBuffer uniformBuffer;
 // TEMP
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
 {
+  m_queue = wgpuDeviceGetQueue(device);
+
+  // Mesh
   mesh.load(device);
+
+  // Uniforms
+  float currentTime = 1.0f;
+  WGPUBufferDescriptor bufferDesc = {};
+  bufferDesc.nextInChain = nullptr;
+  bufferDesc.size = sizeof(float);
+  bufferDesc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
+  bufferDesc.mappedAtCreation = false;
+  uniformBuffer = wgpuDeviceCreateBuffer(device, &bufferDesc);
+  wgpuQueueWriteBuffer(m_queue, uniformBuffer, 0, &currentTime, sizeof(float));
+
+  binding_layout = utils::default_binding_layout();
+  binding_layout.binding = 0;
+  binding_layout.visibility = WGPUShaderStage_Vertex;
+  binding_layout.buffer.type = WGPUBufferBindingType_Uniform;
+  binding_layout.buffer.minBindingSize = sizeof(float);
+
+  WGPUBindGroupLayoutDescriptor bindGroupLayoutDesc{};
+  bindGroupLayoutDesc.nextInChain = nullptr;
+  bindGroupLayoutDesc.entryCount = 1;
+  bindGroupLayoutDesc.entries = &binding_layout;
+  WGPUBindGroupLayout bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bindGroupLayoutDesc);
+
+  WGPUBindGroupEntry binding{};
+  binding.nextInChain = nullptr;
+  binding.binding = 0;
+  binding.buffer = uniformBuffer;
+  binding.offset = 0;
+  binding.size = sizeof(float);
+
+  WGPUBindGroupDescriptor bindGroupDesc{};
+  bindGroupDesc.nextInChain = nullptr;
+  bindGroupDesc.layout = bindGroupLayout;
+  bindGroupDesc.entryCount = bindGroupLayoutDesc.entryCount;
+  bindGroupDesc.entries = &binding;
+  bindGroup = wgpuDeviceCreateBindGroup(device, &bindGroupDesc);
+
+  // Pipeline
   WGPURenderPipelineDescriptor pipelineDesc = {};
   pipelineDesc.nextInChain = nullptr;
 
+  // Uniforms layout
+  WGPUPipelineLayoutDescriptor pipelineLayoutDesc = {};
+  pipelineLayoutDesc.nextInChain = nullptr;
+  pipelineLayoutDesc.bindGroupLayoutCount = 1;
+  pipelineLayoutDesc.bindGroupLayouts = &bindGroupLayout;
+  WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &pipelineLayoutDesc);
+  pipelineDesc.layout = pipelineLayout;
+
   // Vertex fetch
-  WGPUVertexAttribute vertexAttrib;
-  vertexAttrib.shaderLocation = 0;
-  vertexAttrib.format = WGPUVertexFormat_Float32x2;
-  vertexAttrib.offset = 0;
+  vertex_size = 6;
+  vertex_count = mesh.count / vertex_size;
+  std::array<WGPUVertexAttribute, 2> vertexAttribs{};
+  vertexAttribs[0].shaderLocation = 0;
+  vertexAttribs[0].format = WGPUVertexFormat_Float32x3;
+  vertexAttribs[0].offset = 0;
+
+  vertexAttribs[1].shaderLocation = 1;
+  vertexAttribs[1].format = WGPUVertexFormat_Float32x3;
+  vertexAttribs[1].offset = 3 * sizeof(float);
 
   WGPUVertexBufferLayout vertexBufferLayout = {};
-  vertexBufferLayout.attributeCount = 1;
-  vertexBufferLayout.attributes = &vertexAttrib;
-  vertexBufferLayout.arrayStride = 2 * sizeof(float);
+  vertexBufferLayout.attributeCount = vertexAttribs.size();
+  vertexBufferLayout.attributes = vertexAttribs.data();
+  vertexBufferLayout.arrayStride = vertex_size * sizeof(float);
   vertexBufferLayout.stepMode = WGPUVertexStepMode_Vertex;
 
   pipelineDesc.vertex.bufferCount = 1;
@@ -86,8 +149,14 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
 void WorldPipeline::render(const WGPURenderPassEncoder render_pass)
 {
+  static int idx = 0;
+  ++idx;
+  float t = static_cast<float>(idx) * 0.05f;
+  wgpuQueueWriteBuffer(m_queue, uniformBuffer, 0, &t, sizeof(float));
+
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
   wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, mesh.buffer, 0, mesh.size);
-  wgpuRenderPassEncoderDraw(render_pass, mesh.count, 1, 0, 0);
+  wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
+  wgpuRenderPassEncoderDraw(render_pass, vertex_count, 1, 0, 0);
 }
 }  // namespace dl

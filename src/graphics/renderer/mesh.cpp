@@ -7,12 +7,9 @@
 namespace dl
 {
 const std::vector<float> vertex_data{
-    0.0f,
-    0.5f,
-    -0.5f,
-    -0.5f,
-    0.5f,
-    -0.5f,
+    -0.5f, 0.5f, 0.0f, 0.9f, 0.6f, 0.3f, -0.5f, -0.5f, 0.0f, 0.3f, 0.6f, 0.9f, 0.5f, -0.5f, 0.0f, 0.6f, 0.9f, 0.3f,
+
+    -0.5f, 0.5f, 0.0f, 0.3f, 0.9f, 0.6f, 0.5f,  0.5f,  0.0f, 0.9f, 0.3f, 0.6f, 0.5f, -0.5f, 0.0f, 0.6f, 0.3f, 0.9f,
 };
 
 Mesh::~Mesh()
@@ -35,7 +32,7 @@ void Mesh::load(const WGPUDevice device)
   buffer = wgpuDeviceCreateBuffer(device, &buffer_descriptor);
 
   size = buffer_descriptor.size;
-  count = vertex_data.size() / 2;
+  count = vertex_data.size();
 
   wgpuQueueWriteBuffer(queue, buffer, 0, vertex_data.data(), size);
   m_has_loaded = true;

@@ -1,5 +1,7 @@
 #include "./shader.hpp"
 
+#include "core/utils.hpp"
+
 namespace dl
 {
 Shader::~Shader()
@@ -12,22 +14,12 @@ Shader::~Shader()
 
 void Shader::load(WGPUDevice device, const std::filesystem::path& filepath)
 {
-  const char* shaderSource = R"(
-@vertex
-fn vs_main(@location(0) in_vertex_position: vec2f) -> @builtin(position) vec4f {
-	return vec4f(in_vertex_position, 0.0, 1.0);
-}
+  const auto shader_source = utils::read_file(filepath.string());
 
-@fragment
-fn fs_main() -> @location(0) vec4f {
-    return vec4f(0.3, 0.6, 0.9, 1.0);
-}
-)";
-
-  WGPUShaderModuleDescriptor shaderDesc = {};
-  shaderDesc.nextInChain = nullptr;
-  shaderDesc.hintCount = 0;
-  shaderDesc.hints = nullptr;
+  WGPUShaderModuleDescriptor shader_descriptor = {};
+  shader_descriptor.nextInChain = nullptr;
+  shader_descriptor.hintCount = 0;
+  shader_descriptor.hints = nullptr;
 
   // Use the extension mechanism to load a WGSL shader source code
   WGPUShaderModuleWGSLDescriptor shaderCodeDesc = {};
@@ -35,12 +27,12 @@ fn fs_main() -> @location(0) vec4f {
   shaderCodeDesc.chain.next = nullptr;
   shaderCodeDesc.chain.sType = WGPUSType_ShaderModuleWGSLDescriptor;
   // Connect the chain
-  shaderDesc.nextInChain = &shaderCodeDesc.chain;
+  shader_descriptor.nextInChain = &shaderCodeDesc.chain;
 
   // Setup the actual payload of the shader code descriptor
-  shaderCodeDesc.code = shaderSource;
+  shaderCodeDesc.code = shader_source.c_str();
 
-  module = wgpuDeviceCreateShaderModule(device, &shaderDesc);
+  module = wgpuDeviceCreateShaderModule(device, &shader_descriptor);
 
   m_has_loaded = true;
 }

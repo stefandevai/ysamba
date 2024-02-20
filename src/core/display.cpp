@@ -161,10 +161,10 @@ void Display::load(const int width, const int height, const std::string& title)
   device_desc.defaultQueue.nextInChain = nullptr;
   device = request_device(adapter, &device_desc);
 
-  auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
-    spdlog::critical("Device error: {}, {}", (uint32_t)type, message);
-  };
-  wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
+  // auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
+  //   spdlog::critical("Device error: {}, {}", (uint32_t)type, message);
+  // };
+  // wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
 
   surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
 

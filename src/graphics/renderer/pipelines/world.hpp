@@ -19,5 +19,6 @@ class WorldPipeline
 
  private:
   bool m_has_loaded = false;
+  WGPUQueue m_queue;
 };
 }  // namespace dl
