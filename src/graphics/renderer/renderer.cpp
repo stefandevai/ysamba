@@ -13,6 +13,16 @@ namespace dl::v2
 {
 Renderer::Renderer(GameContext& game_context) : m_game_context(game_context) {}
 
+Renderer::~Renderer()
+{
+  if (m_has_loaded)
+  {
+    wgpuTextureViewRelease(depth_texture_view);
+    wgpuTextureDestroy(depth_texture);
+    wgpuTextureRelease(depth_texture);
+  }
+}
+
 Shader shader{};
 WorldPipeline world_pipeline{};
 
@@ -21,17 +31,41 @@ void Renderer::init()
   assert(m_game_context.display != nullptr);
 
   queue = wgpuDeviceGetQueue(m_game_context.display->device);
+  //
+  // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
+  //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
+  // };
+  //
+  // wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
 
-  auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
-    spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
-  };
+  WGPUTextureFormat depth_texture_format = WGPUTextureFormat_Depth24Plus;
 
-  wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
+  WGPUTextureDescriptor depthTextureDesc;
+  depthTextureDesc.dimension = WGPUTextureDimension_2D;
+  depthTextureDesc.format = depth_texture_format;
+  depthTextureDesc.mipLevelCount = 1;
+  depthTextureDesc.sampleCount = 1;
+  depthTextureDesc.size = {1024, 576, 1};
+  depthTextureDesc.usage = WGPUTextureUsage_RenderAttachment;
+  depthTextureDesc.viewFormatCount = 1;
+  depthTextureDesc.viewFormats = &depth_texture_format;
+  depth_texture = wgpuDeviceCreateTexture(m_game_context.display->device, &depthTextureDesc);
+
+  WGPUTextureViewDescriptor depthTextureViewDesc;
+  depthTextureViewDesc.aspect = WGPUTextureAspect_DepthOnly;
+  depthTextureViewDesc.baseArrayLayer = 0;
+  depthTextureViewDesc.arrayLayerCount = 1;
+  depthTextureViewDesc.baseMipLevel = 0;
+  depthTextureViewDesc.mipLevelCount = 1;
+  depthTextureViewDesc.dimension = WGPUTextureViewDimension_2D;
+  depthTextureViewDesc.format = depth_texture_format;
+  depth_texture_view = wgpuTextureCreateView(depth_texture, &depthTextureViewDesc);
 
   // TEMP
   shader.load(m_game_context.display->device, "data/shaders/default.wgsl");
   world_pipeline.load(m_game_context.display->device, m_game_context.display->surface_format, shader);
   // TEMP
+  m_has_loaded = true;
 }
 
 void Renderer::render(const Camera& camera)
@@ -76,7 +110,19 @@ void Renderer::render(const Camera& camera)
   renderPassColorAttachment.clearValue = WGPUColor{0.9, 0.1, 0.2, 1.0};
   renderPassDesc.colorAttachmentCount = 1;
   renderPassDesc.colorAttachments = &renderPassColorAttachment;
-  renderPassDesc.depthStencilAttachment = nullptr;
+
+  WGPURenderPassDepthStencilAttachment depthStencilAttachment;
+  depthStencilAttachment.view = depth_texture_view;
+  depthStencilAttachment.depthClearValue = 1.0f;
+  depthStencilAttachment.depthLoadOp = WGPULoadOp_Clear;
+  depthStencilAttachment.depthStoreOp = WGPUStoreOp_Store;
+  depthStencilAttachment.depthReadOnly = false;
+  depthStencilAttachment.stencilClearValue = 0;
+  depthStencilAttachment.stencilLoadOp = WGPULoadOp_Clear;
+  depthStencilAttachment.stencilStoreOp = WGPUStoreOp_Store;
+  depthStencilAttachment.stencilReadOnly = true;
+  renderPassDesc.depthStencilAttachment = &depthStencilAttachment;
+
   renderPassDesc.timestampWrites = nullptr;
   renderPassDesc.nextInChain = nullptr;
   WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);

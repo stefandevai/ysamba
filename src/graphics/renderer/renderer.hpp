@@ -18,6 +18,7 @@ class Renderer
   WGPUQueue queue;
 
   Renderer(GameContext& game_context);
+  ~Renderer();
 
   void init();
 
@@ -25,7 +26,10 @@ class Renderer
   void render(const Camera& camera);
 
  private:
+  bool m_has_loaded = false;
   GameContext& m_game_context;
+  WGPUTextureView depth_texture_view;
+  WGPUTexture depth_texture;
 };
 
 }  // namespace v2

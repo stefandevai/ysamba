@@ -30,6 +30,7 @@ struct Uniforms
   float _padding[3];
 };
 Uniforms uniforms{};
+WGPUDepthStencilState stencil_state;
 // TEMP
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
@@ -149,8 +150,17 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
   fragmentState.targetCount = 1;
   fragmentState.targets = &colorTarget;
-  pipelineDesc.depthStencil = nullptr;
+
+  stencil_state = utils::default_depth_stencil_state();
+  stencil_state.depthCompare = WGPUCompareFunction_Less;
+  stencil_state.depthWriteEnabled = true;
+  stencil_state.format = WGPUTextureFormat_Depth24Plus;
+  stencil_state.stencilReadMask = 0;
+  stencil_state.stencilWriteMask = 0;
+  pipelineDesc.depthStencil = &stencil_state;
+
   pipelineDesc.multisample.count = 1;
+
   pipeline = wgpuDeviceCreateRenderPipeline(device, &pipelineDesc);
 
   m_has_loaded = true;
@@ -161,7 +171,7 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass)
   static int idx = 0;
   ++idx;
   uniforms.time = static_cast<float>(idx) * 0.05f;
-  uniforms.color = {0.2f, 0.0f, 0.0f, 1.0f};
+  uniforms.color = {1.0f, 1.0f, 1.0f, 1.0f};
 
   wgpuQueueWriteBuffer(m_queue, uniformBuffer, offsetof(Uniforms, time), &uniforms.time, sizeof(Uniforms::time));
   wgpuQueueWriteBuffer(m_queue, uniformBuffer, offsetof(Uniforms, color), &uniforms.color, sizeof(Uniforms::color));
