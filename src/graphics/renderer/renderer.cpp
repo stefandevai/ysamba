@@ -117,7 +117,7 @@ void Renderer::render(const Camera& camera)
   renderPassColorAttachment.loadOp = WGPULoadOp_Clear;
   renderPassColorAttachment.storeOp = WGPUStoreOp_Store;
   // renderPassColorAttachment.clearValue = WGPUColor{0.28125, 0.44921875, 0.09375, 1.0};
-  renderPassColorAttachment.clearValue = WGPUColor{0.0, 0.0, 0.0, 1.0};
+  renderPassColorAttachment.clearValue = m_clear_color;
   renderPassDesc.colorAttachmentCount = 1;
   renderPassDesc.colorAttachments = &renderPassColorAttachment;
 
@@ -156,5 +156,11 @@ void Renderer::render(const Camera& camera)
   wgpuTextureRelease(surface_texture.texture);
 }
 
-void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a) {}
+void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a)
+{
+  m_clear_color.r = static_cast<double>(r) / 255.0;
+  m_clear_color.g = static_cast<double>(g) / 255.0;
+  m_clear_color.b = static_cast<double>(b) / 255.0;
+  m_clear_color.a = a;
+}
 }  // namespace dl::v2

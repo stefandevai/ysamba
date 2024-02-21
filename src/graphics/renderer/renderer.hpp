@@ -36,6 +36,7 @@ class Renderer
   GameContext& m_game_context;
   WGPUTextureView depth_texture_view;
   WGPUTexture depth_texture;
+  WGPUColor m_clear_color{0.0, 0.0, 0.0, 1.0};
 
   void m_load_depth_buffer();
 };
