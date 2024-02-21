@@ -43,7 +43,7 @@ void DebugInfo::update()
   const int tile_x = std::floor((mouse_position.x + camera_position.x) / grid_size.x);
   const int tile_y = std::floor((mouse_position.y + camera_position.y) / grid_size.y);
 
-  m_label->set_text(m_fps + "\nTile: (" + std::to_string(tile_x) + ", " + std::to_string(tile_y) + ")" + "\nMouse: (" +
-                    std::to_string(mouse_position.x) + ", " + std::to_string(mouse_position.y) + ")");
+  m_label->set_text(m_fps + "\nTile: (" + std::to_string(tile_x) + ", " + std::to_string(tile_y) + ")" + "\nMouse: ("
+                    + std::to_string(mouse_position.x) + ", " + std::to_string(mouse_position.y) + ")");
 }
 }  // namespace dl::ui

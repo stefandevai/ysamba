@@ -113,8 +113,8 @@ void ChunkManager::update(const Vector3i& target)
 
   {
     // Load visible chunks
-    const auto top_left_position =
-        world_to_chunk(target.x - padding * world::chunk_size.x, target.y - padding * world::chunk_size.y, target.z);
+    const auto top_left_position
+        = world_to_chunk(target.x - padding * world::chunk_size.x, target.y - padding * world::chunk_size.y, target.z);
 
     const auto bottom_right_position = world_to_chunk(target.x + frustum.x + padding * world::chunk_size.x,
                                                       target.y + frustum.y + padding * world::chunk_size.y,
@@ -173,18 +173,18 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
   const auto found = std::find_if(
       chunks.begin(), chunks.end(), [&position](const auto& chunk) { return chunk->position == position; });
 
-  const auto found_generating =
-      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const auto& chunk_position) {
-        return position == chunk_position;
-      });
+  const auto found_generating
+      = std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const auto& chunk_position) {
+          return position == chunk_position;
+        });
 
   return found != chunks.end() || found_generating != m_chunks_loading.end();
 }
 
 void ChunkManager::load_async(const Vector3i& position)
 {
-  const auto found =
-      std::find_if(m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const Vector3i& generating_position) {
+  const auto found = std::find_if(
+      m_chunks_loading.begin(), m_chunks_loading.end(), [&position](const Vector3i& generating_position) {
         return generating_position == position;
       });
 
@@ -306,8 +306,8 @@ Vector3i ChunkManager::world_to_chunk(const Vector3i& position) const
 
 bool ChunkManager::is_within_tile_radius(const Vector3i& origin, const Vector3i& target, const int radius) const
 {
-  return std::abs(origin.x - target.x) <= radius && std::abs(origin.y - target.y) <= radius &&
-         std::abs(origin.z - target.z) <= radius;
+  return std::abs(origin.x - target.x) <= radius && std::abs(origin.y - target.y) <= radius
+         && std::abs(origin.z - target.z) <= radius;
 }
 
 bool ChunkManager::is_within_tile_distance(const Vector3i& origin,
@@ -319,9 +319,9 @@ bool ChunkManager::is_within_tile_distance(const Vector3i& origin,
 
 bool ChunkManager::is_within_chunk_radius(const Vector3i& origin, const Vector3i& target, const int radius) const
 {
-  return std::abs(origin.x - target.x) <= radius * world::chunk_size.x &&
-         std::abs(origin.y - target.y) <= radius * world::chunk_size.y &&
-         std::abs(origin.z - target.z) <= radius * world::chunk_size.z;
+  return std::abs(origin.x - target.x) <= radius * world::chunk_size.x
+         && std::abs(origin.y - target.y) <= radius * world::chunk_size.y
+         && std::abs(origin.z - target.z) <= radius * world::chunk_size.z;
 }
 
 void ChunkManager::activate_if(const std::function<bool(const std::unique_ptr<Chunk>&)>& condition)

@@ -130,8 +130,8 @@ std::array<int, 27> SpatialHash::m_get_search_keys(const int x, const int y, con
     {
       for (const auto z_index : lookup_index)
       {
-        keys[i] =
-            m_get_key(x + x_index * m_cell_dimension, y + y_index * m_cell_dimension, z + z_index * m_cell_dimension);
+        keys[i]
+            = m_get_key(x + x_index * m_cell_dimension, y + y_index * m_cell_dimension, z + z_index * m_cell_dimension);
         ++i;
       }
     }

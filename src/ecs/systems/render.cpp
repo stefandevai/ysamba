@@ -129,8 +129,8 @@ void RenderSystem::m_render_tiles(const Camera& camera)
   const auto& camera_position = camera.get_position_in_tiles();
 
   {
-    const auto first_chunk_position =
-        m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y, 0});
+    const auto first_chunk_position
+        = m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y, 0});
 
     // Loop through chunks
     for (int j = first_chunk_position.y; j < camera_position.y + camera_size.y; j += world::chunk_size.y)
@@ -197,8 +197,8 @@ void RenderSystem::m_render_tiles(const Camera& camera)
     // camera_position.y + camera_size.y + world_size.z.
     // Loop through chunks below the camera bottom to render tiles in other chunks
     // that are high enough to be viewed from the current camera position.
-    const auto first_chunk_position =
-        m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y + camera_size.y, 0});
+    const auto first_chunk_position
+        = m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y + camera_size.y, 0});
     const auto last_chunk_position = m_world.chunk_manager.world_to_chunk(
         Vector3i{camera_position.x, camera_position.y + camera_size.y + world::chunk_size.z, 0});
     for (int j = first_chunk_position.y; j <= last_chunk_position.y; j += world::chunk_size.y)
@@ -311,8 +311,8 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     }
 
     // TODO: Add multi sprite pool
-    auto multi_sprite =
-        MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
+    auto multi_sprite
+        = MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
     multi_sprite.texture = m_world_texture;
     multi_sprite.frame_angle = tile.frame_data->angle;
 

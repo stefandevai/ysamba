@@ -210,8 +210,8 @@ void load_game(World& world, const WorldMetadata& world_metadata, entt::registry
 
 bool chunk_exists(const Vector3i& position, const std::string& world_id)
 {
-  assert(position.x % world::chunk_size.x == 0 && position.y % world::chunk_size.y == 0 &&
-         position.z % world::chunk_size.z == 0 && "Position is not a chunk position.");
+  assert(position.x % world::chunk_size.x == 0 && position.y % world::chunk_size.y == 0
+         && position.z % world::chunk_size.z == 0 && "Position is not a chunk position.");
 
   const auto filename = fmt::format("{}_{}_{}.chunk", position.x, position.y, position.z);
   const auto full_path = directory::worlds / world_id / directory::chunks / filename;
@@ -338,8 +338,8 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
 
   // spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
 
-  assert(world_size.x >= tiles.size.x && world_size.y >= tiles.size.y && world_size.z >= tiles.size.z &&
-         "Chunk size is bigger than world size.");
+  assert(world_size.x >= tiles.size.x && world_size.y >= tiles.size.y && world_size.z >= tiles.size.z
+         && "Chunk size is bigger than world size.");
 
   fread(&file_values_marker, terrain_ext::marker_size, 1, file);
 

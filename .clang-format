@@ -6,6 +6,7 @@ Language: Cpp
 DerivePointerAlignment: false
 PointerAlignment: Left
 BreakBeforeBraces: Allman
+BreakBeforeBinaryOperators: All
 AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: false
 AlignAfterOpenBracket: Align

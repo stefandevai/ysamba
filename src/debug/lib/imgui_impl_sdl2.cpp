@@ -104,8 +104,8 @@
 #include <TargetConditionals.h>
 #endif
 
-#if SDL_VERSION_ATLEAST(2, 0, 4) && !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && \
-    !(defined(__APPLE__) && TARGET_OS_IOS) && !defined(__amigaos4__)
+#if SDL_VERSION_ATLEAST(2, 0, 4) && !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) \
+    && !(defined(__APPLE__) && TARGET_OS_IOS) && !defined(__amigaos4__)
 #define SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE 1
 #else
 #define SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE 0
@@ -560,8 +560,8 @@ static bool ImGui_ImplSDL2_Init(SDL_Window* window, SDL_Renderer* renderer)
   io.BackendPlatformUserData = (void*)bd;
   io.BackendPlatformName = "imgui_impl_sdl2";
   io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;  // We can honor GetMouseCursor() values (optional)
-  io.BackendFlags |=
-      ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
+  io.BackendFlags
+      |= ImGuiBackendFlags_HasSetMousePos;  // We can honor io.WantSetMousePos requests (optional, rarely used)
 
   bd->Window = window;
   bd->Renderer = renderer;
@@ -667,8 +667,8 @@ void ImGui_ImplSDL2_Shutdown()
 
   io.BackendPlatformName = nullptr;
   io.BackendPlatformUserData = nullptr;
-  io.BackendFlags &=
-      ~(ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos | ImGuiBackendFlags_HasGamepad);
+  io.BackendFlags
+      &= ~(ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos | ImGuiBackendFlags_HasGamepad);
   IM_DELETE(bd);
 }
 
@@ -685,8 +685,8 @@ static void ImGui_ImplSDL2_UpdateMouseData()
   SDL_Window* focused_window = SDL_GetKeyboardFocus();
   const bool is_app_focused = (bd->Window == focused_window);
 #else
-  const bool is_app_focused = (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_INPUT_FOCUS) !=
-                              0;  // SDL 2.0.3 and non-windowed systems: single-viewport only
+  const bool is_app_focused = (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_INPUT_FOCUS)
+                              != 0;  // SDL 2.0.3 and non-windowed systems: single-viewport only
 #endif
   if (is_app_focused)
   {
@@ -723,8 +723,8 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
   else
   {
     // Show OS mouse cursor
-    SDL_Cursor* expected_cursor =
-        bd->MouseCursors[imgui_cursor] ? bd->MouseCursors[imgui_cursor] : bd->MouseCursors[ImGuiMouseCursor_Arrow];
+    SDL_Cursor* expected_cursor
+        = bd->MouseCursors[imgui_cursor] ? bd->MouseCursors[imgui_cursor] : bd->MouseCursors[ImGuiMouseCursor_Arrow];
     if (bd->LastMouseCursor != expected_cursor)
     {
       SDL_SetCursor(expected_cursor);  // SDL function doesn't have an early out (see #6113)
@@ -737,8 +737,8 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
 static void ImGui_ImplSDL2_UpdateGamepads()
 {
   ImGuiIO& io = ImGui::GetIO();
-  if ((io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad) ==
-      0)  // FIXME: Technically feeding gamepad shouldn't depend on this now that they are regular inputs.
+  if ((io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad)
+      == 0)  // FIXME: Technically feeding gamepad shouldn't depend on this now that they are regular inputs.
     return;
 
   // Get gamepad

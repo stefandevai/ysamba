@@ -111,8 +111,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
   {
     const auto mouse_tile = m_world.mouse_to_world(camera);
 
-    const auto selected_entity =
-        m_world.spatial_hash.get_by_component<Selectable>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+    const auto selected_entity
+        = m_world.spatial_hash.get_by_component<Selectable>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
 
     // If a selectable entity was clicked, toggle its selected state
     if (registry.valid(selected_entity))
@@ -166,8 +166,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     }
 
     const auto mouse_tile = m_world.mouse_to_world(camera);
-    const auto selected_entity =
-        m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+    const auto selected_entity
+        = m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
 
     if (registry.valid(selected_entity))
     {
@@ -176,8 +176,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       const auto& item_data = m_world.get_item_data(item.id);
       m_actions.clear();
 
-      if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1 &&
-          PickupSystem::can_pickup(registry, m_selected_entities[0], item_data))
+      if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1
+          && PickupSystem::can_pickup(registry, m_selected_entities[0], item_data))
       {
         m_actions.push_back({static_cast<uint32_t>(JobType::Pickup), "pickup"});
       }

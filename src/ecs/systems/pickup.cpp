@@ -129,8 +129,8 @@ entt::entity PickupSystem::iterate_containers(entt::registry& registry,
         const auto& container = registry.get<Container>(item);
 
         // TODO: Check materials that the container can carry
-        if (container.volume_occupied + item_data.volume <= container.volume_capacity &&
-            container.weight_occupied + item_data.weight <= container.weight_capacity)
+        if (container.volume_occupied + item_data.volume <= container.volume_capacity
+            && container.weight_occupied + item_data.weight <= container.weight_capacity)
         {
           return item;
         }
@@ -156,8 +156,8 @@ entt::entity PickupSystem::search_container(entt::registry& registry,
       const auto& container = registry.get<Container>(item);
 
       // TODO: Check materials that the container can carry
-      if (container.volume_occupied + item_data.volume <= container.volume_capacity &&
-          container.weight_occupied + item_data.weight <= container.weight_capacity)
+      if (container.volume_occupied + item_data.volume <= container.volume_capacity
+          && container.weight_occupied + item_data.weight <= container.weight_capacity)
       {
         return item;
       }

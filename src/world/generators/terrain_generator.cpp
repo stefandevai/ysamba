@@ -382,8 +382,8 @@ std::vector<Point<int>> TerrainGenerator::m_get_coastline(const std::vector<int>
     const auto top_point = current_point.top();
 
     auto manipulate_point = [this, mask_size, &mask, &point_queue, &tiles](const Point<int>& point) {
-      if (m_valid_point(point) && m_is_coast_point(point, tiles) &&
-          mask[point.y * m_width + point.x] == TerrainType::Water)
+      if (m_valid_point(point) && m_is_coast_point(point, tiles)
+          && mask[point.y * m_width + point.x] == TerrainType::Water)
       {
         int neighbours = 0;
 
@@ -453,10 +453,10 @@ bool TerrainGenerator::m_contains_island_area(const Point<int>& point,
 {
   const auto top_left_x = std::max(static_cast<int>(point.x - std::round(segment_m_width_h)), 0);
   const auto top_left_y = std::max(static_cast<int>(point.y - std::round(segment_m_width_v)), 0);
-  const auto bottom_right_x =
-      std::min(static_cast<int>(point.x + std::round(segment_m_width_h)), static_cast<int>(m_width));
-  const auto bottom_right_y =
-      std::min(static_cast<int>(point.y + std::round(segment_m_width_v)), static_cast<int>(m_height));
+  const auto bottom_right_x
+      = std::min(static_cast<int>(point.x + std::round(segment_m_width_h)), static_cast<int>(m_width));
+  const auto bottom_right_y
+      = std::min(static_cast<int>(point.y + std::round(segment_m_width_v)), static_cast<int>(m_height));
 
   for (auto i = top_left_x; i < bottom_right_x; ++i)
   {
@@ -728,8 +728,8 @@ std::vector<Point<int>> TerrainGenerator::m_get_bays(std::vector<Point<int>>& co
       }
       else if (found_candidate && coast_point_a != nullptr && coast_point_b != nullptr)
       {
-        const auto bay_data =
-            m_get_bay_data(*coast_point_a, *coast_point_b, island.mask, minimum_area, area_mask, TerrainType::Water);
+        const auto bay_data
+            = m_get_bay_data(*coast_point_a, *coast_point_b, island.mask, minimum_area, area_mask, TerrainType::Water);
 
         if (bay_data.area >= minimum_area)
         {
@@ -766,8 +766,8 @@ bool TerrainGenerator::m_has_land_intersection(const Point<int>& point_a,
 
   do
   {
-    if ((x == static_cast<int>(point_a.x) && y == static_cast<int>(point_a.y)) ||
-        (x == static_cast<int>(point_b.x) && y == static_cast<int>(point_b.y)))
+    if ((x == static_cast<int>(point_a.x) && y == static_cast<int>(point_a.y))
+        || (x == static_cast<int>(point_b.x) && y == static_cast<int>(point_b.y)))
     {
       continue;
     }
@@ -987,10 +987,10 @@ void TerrainGenerator::m_build_island_structure(IslandData& island)
 {
   assert(island.points.size() > 0 && "Main island size is empty");
 
-  std::array<float, 2> min_point = {static_cast<float>(island.top_left.x - 20),
-                                    static_cast<float>(island.top_left.y - 20)};
-  std::array<float, 2> max_point = {static_cast<float>(island.bottom_right.x + 20),
-                                    static_cast<float>(island.bottom_right.y + 20)};
+  std::array<float, 2> min_point
+      = {static_cast<float>(island.top_left.x - 20), static_cast<float>(island.top_left.y - 20)};
+  std::array<float, 2> max_point
+      = {static_cast<float>(island.bottom_right.x + 20), static_cast<float>(island.bottom_right.y + 20)};
 
   const auto poisson_disk_sampling_radius = m_json.object["poisson_disk_sampling_radius"].get<float>();
   const auto poisson_points = thinks::PoissonDiskSampling(poisson_disk_sampling_radius, min_point, max_point);
@@ -1050,8 +1050,8 @@ void TerrainGenerator::m_build_island_structure(IslandData& island)
         const auto destination = half_edge->destination->point.convert(m_width, m_height);
 
         // If any of the edges points lays on water annotate it as coast
-        if (island.mask[origin.y * m_width + origin.x] == TerrainType::Water ||
-            island.mask[destination.y * m_width + destination.y] == TerrainType::Water)
+        if (island.mask[origin.y * m_width + origin.x] == TerrainType::Water
+            || island.mask[destination.y * m_width + destination.y] == TerrainType::Water)
         {
           is_coast = true;
         }
@@ -1295,8 +1295,8 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
       const int distance_x = std::abs(static_cast<int>(bay.x - source_point.x));
       const int distance_y = std::abs(static_cast<int>(bay.y - source_point.y));
 
-      if (distance_x >= min_source_mouth_distance_x && distance_y >= min_source_mouth_distance_y &&
-          bay.y > source_point.y)
+      if (distance_x >= min_source_mouth_distance_x && distance_y >= min_source_mouth_distance_y
+          && bay.y > source_point.y)
       {
         if (intersects_water(source_point, bay))
         {
@@ -1307,8 +1307,8 @@ std::pair<Point<int>, Point<int>> TerrainGenerator::m_get_river_source_and_mouth
         found_river_points = true;
         break;
       }
-      else if (has_reached_first_limit && bay.y > source_point.y &&
-               (distance_x >= min_source_mouth_distance_x || distance_y >= min_source_mouth_distance_y))
+      else if (has_reached_first_limit && bay.y > source_point.y
+               && (distance_x >= min_source_mouth_distance_x || distance_y >= min_source_mouth_distance_y))
       {
         if (intersects_water(source_point, bay))
         {
@@ -1403,8 +1403,9 @@ RiverData TerrainGenerator::m_get_river_data(const Point<int>& source, const Poi
 
   for (std::size_t i = 1; i < points_x.size(); ++i)
   {
-    river.points_t[i] = river.points_t[i - 1] + sqrt((points_x[i] - points_x[i - 1]) * (points_x[i] - points_x[i - 1]) +
-                                                     (points_y[i] - points_y[i - 1]) * (points_y[i] - points_y[i - 1]));
+    river.points_t[i] = river.points_t[i - 1]
+                        + sqrt((points_x[i] - points_x[i - 1]) * (points_x[i] - points_x[i - 1])
+                               + (points_y[i] - points_y[i - 1]) * (points_y[i] - points_y[i - 1]));
   }
 
   river.spline_x.set_points(river.points_t, points_x, tk::spline::cspline_hermite);
@@ -1472,8 +1473,8 @@ void TerrainGenerator::m_create_meanders(RiverData& river,
       Point<double> current_point(current_x, current_y);
       Point<double> next_point(next_x, next_y);
 
-      const auto tangent =
-          Point<double>(river.spline_x.deriv(1, t) * tangent_scale, river.spline_y.deriv(1, t) * tangent_scale);
+      const auto tangent
+          = Point<double>(river.spline_x.deriv(1, t) * tangent_scale, river.spline_y.deriv(1, t) * tangent_scale);
       const auto normal = Point<double>(-tangent.y, tangent.x);
 
       auto curvature = m_menger_curvature(previous_point,
@@ -1495,10 +1496,10 @@ void TerrainGenerator::m_create_meanders(RiverData& river,
       }
 
       const double normal_length = curvature * normal_scale;
-      const double combined_x =
-          (normal.x * normal_length * bitangent_factor + tangent.x * (2.0 - bitangent_factor)) * -1.0;
-      const double combined_y =
-          (normal.y * normal_length * bitangent_factor + tangent.y * (2.0 - bitangent_factor)) * -1.0;
+      const double combined_x
+          = (normal.x * normal_length * bitangent_factor + tangent.x * (2.0 - bitangent_factor)) * -1.0;
+      const double combined_y
+          = (normal.y * normal_length * bitangent_factor + tangent.y * (2.0 - bitangent_factor)) * -1.0;
 
       /* spdlog::warn("TANGENT: {} {} {}", iteration, tangent.x, tangent.y); */
       /* spdlog::warn("NORMAL: {} {} {}", iteration, normal.x, normal.y); */
@@ -1551,8 +1552,8 @@ void TerrainGenerator::m_create_meanders(RiverData& river,
     river.points_t[0] = 0.0;
     for (int i = 1; i < n_points; ++i)
     {
-      const auto increment = sqrt((new_points_x[i] - new_points_x[i - 1]) * (new_points_x[i] - new_points_x[i - 1]) +
-                                  (new_points_y[i] - new_points_y[i - 1]) * (new_points_y[i] - new_points_y[i - 1]));
+      const auto increment = sqrt((new_points_x[i] - new_points_x[i - 1]) * (new_points_x[i] - new_points_x[i - 1])
+                                  + (new_points_y[i] - new_points_y[i - 1]) * (new_points_y[i] - new_points_y[i - 1]));
       river.points_t[i] = river.points_t[i - 1] + std::max(increment, 0.0001);
     }
 
@@ -1587,8 +1588,8 @@ double TerrainGenerator::m_menger_curvature(const Point<double>& point_a,
   assert(length_2 > 0 && "Length must be greater than 0");
   assert(length_3 > 0 && "Length must be greater than 0");
 
-  return 2.0 * ((point_b.x - point_a.x) * (point_c.y - point_a.y) - (point_b.y - point_a.y) * (point_c.x - point_a.x)) /
-         (length_1 * length_2 * length_3);
+  return 2.0 * ((point_b.x - point_a.x) * (point_c.y - point_a.y) - (point_b.y - point_a.y) * (point_c.x - point_a.x))
+         / (length_1 * length_2 * length_3);
 }
 
 void TerrainGenerator::m_draw_point(const Point<int>& point, const int value, std::vector<int>& tiles)

@@ -243,8 +243,8 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
       UniformDistributionTransform transform_object;
       transform_object.value = transform["value"].get<int>();
       transform_object.probability = transform["probability"].get<double>();
-      transform_object.placement =
-          transform["placement"].get<std::string>() == "terrain" ? PlacementType::Terrain : PlacementType::Decoration;
+      transform_object.placement
+          = transform["placement"].get<std::string>() == "terrain" ? PlacementType::Terrain : PlacementType::Decoration;
 
       rule_object.output.push_back(transform_object);
     }

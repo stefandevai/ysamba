@@ -139,8 +139,8 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
   {
     const auto& mouse_position = get_mouse_position();
 
-    if (mouse_position.x > position.x && mouse_position.x < position.x + size.x && mouse_position.y > position.y &&
-        mouse_position.y < position.y + size.y)
+    if (mouse_position.x > position.x && mouse_position.x < position.x + size.x && mouse_position.y > position.y
+        && mouse_position.y < position.y + size.y)
     {
       return true;
     }

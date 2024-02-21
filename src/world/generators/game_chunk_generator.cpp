@@ -72,8 +72,8 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
       const int k = static_cast<int>(map_value * (size.z - 1));
       bool inside_chunk = false;
 
-      if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding &&
-          i < m_padded_size.y - m_generation_padding)
+      if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
+          && i < m_padded_size.y - m_generation_padding)
       {
         inside_chunk = true;
       }
@@ -157,13 +157,13 @@ void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset
                               seed);
 
   // Vegetation type lookup
-  FastNoise::SmartNode<> vegetation_type_noise =
-      FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
+  FastNoise::SmartNode<> vegetation_type_noise
+      = FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
   vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 30);
 
   // Vegetation density lookup
-  FastNoise::SmartNode<> vegetation_density_noise =
-      FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
+  FastNoise::SmartNode<> vegetation_density_noise
+      = FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
   vegetation_density_noise->GenUniformGrid2D(
       vegetation_density.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 50);
 }
@@ -173,8 +173,8 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
   const int transposed_x = x + m_generation_padding;
   const int transposed_y = y + m_generation_padding;
 
-  const auto terrain_id =
-      terrain[z * m_padded_size.x * m_padded_size.y + transposed_y * m_padded_size.x + transposed_x];
+  const auto terrain_id
+      = terrain[z * m_padded_size.x * m_padded_size.y + transposed_y * m_padded_size.x + transposed_x];
 
   if (terrain_id == 0)
   {
@@ -258,8 +258,8 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
       case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[3].value;
         break;
-      case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM |
-          DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
+          | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
         new_terrain_id = rule.output[4].value;
         break;
       case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
@@ -310,12 +310,12 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
       case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
         new_terrain_id = rule.output[20].value;
         break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP |
-          DL_EDGE_TOP_LEFT:
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+          | DL_EDGE_TOP_LEFT:
         new_terrain_id = rule.output[21].value;
         break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP |
-          DL_EDGE_TOP_LEFT:
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+          | DL_EDGE_TOP_LEFT:
         new_terrain_id = rule.output[22].value;
         break;
       case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
@@ -324,12 +324,12 @@ void GameChunkGenerator::m_select_tile(const std::vector<int>& terrain, const in
       case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[24].value;
         break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT |
-          DL_EDGE_TOP_LEFT:
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
+          | DL_EDGE_TOP_LEFT:
         new_terrain_id = rule.output[25].value;
         break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM |
-          DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
+          | DL_EDGE_LEFT:
         new_terrain_id = rule.output[26].value;
         break;
       case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
@@ -485,14 +485,14 @@ uint32_t GameChunkGenerator::m_get_bitmask_4_sided(
     bitmask |= DL_EDGE_TOP;
   }
   // Right
-  if (x < m_padded_size.x - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
-  if (y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
+  if (y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
   {
     bitmask |= DL_EDGE_BOTTOM;
   }
@@ -510,8 +510,8 @@ uint32_t GameChunkGenerator::m_get_bitmask_8_sided(
 {
   if (!m_has_neighbor(terrain, x, y, z, neighbor))
   {
-    return DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT |
-           DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
+    return DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT
+           | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
   }
 
   uint32_t bitmask = 0;
@@ -527,8 +527,8 @@ uint32_t GameChunkGenerator::m_get_bitmask_8_sided(
     bitmask |= DL_EDGE_RIGHT;
   }
   // Bottom
-  if (y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == source)
+  if (y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == source)
   {
     bitmask |= DL_EDGE_BOTTOM;
   }
@@ -543,20 +543,20 @@ uint32_t GameChunkGenerator::m_get_bitmask_8_sided(
     bitmask |= DL_EDGE_TOP_LEFT;
   }
   // Top Right
-  if (x < m_padded_size.x - 1 && y > 0 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == source)
+  if (x < m_padded_size.x - 1 && y > 0
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == source)
   {
     bitmask |= DL_EDGE_TOP_RIGHT;
   }
   // Bottom Right
-  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == source)
+  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_RIGHT;
   }
   // Bottom Left
-  if (x > 0 && y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == source)
+  if (x > 0 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_LEFT;
   }
@@ -590,14 +590,14 @@ bool GameChunkGenerator::m_has_neighbor(
     return true;
   }
   // Right
-  if (x < m_padded_size.x - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom
-  if (y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
+  if (y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
   {
     return true;
   }
@@ -612,20 +612,20 @@ bool GameChunkGenerator::m_has_neighbor(
     return true;
   }
   // Top Right
-  if (x < m_padded_size.x - 1 && y > 0 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1 && y > 0
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom Right
-  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == neighbor)
+  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom Left
-  if (x > 0 && y < m_padded_size.y - 1 &&
-      terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == neighbor)
+  if (x > 0 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == neighbor)
   {
     return true;
   }

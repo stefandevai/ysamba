@@ -565,14 +565,14 @@ void World::m_load_item_data()
 
       if (container.contains("weight_capacity"))
       {
-        item_data.container.weight_capacity =
-            item_factory::parse_weight(item["container"]["weight_capacity"].get<std::string>());
+        item_data.container.weight_capacity
+            = item_factory::parse_weight(item["container"]["weight_capacity"].get<std::string>());
       }
 
       if (container.contains("volume_capacity"))
       {
-        item_data.container.volume_capacity =
-            item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
+        item_data.container.volume_capacity
+            = item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
       }
     }
 

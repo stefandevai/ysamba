@@ -55,8 +55,8 @@ void MapGenerator::generate(const int seed, const Vector3i& offset)
       const int k = static_cast<int>(map_value * (depth - 1));
       bool inside_chunk = false;
 
-      if (j >= m_generation_padding && j < padded_width - m_generation_padding && i >= m_generation_padding &&
-          i < padded_height - m_generation_padding)
+      if (j >= m_generation_padding && j < padded_width - m_generation_padding && i >= m_generation_padding
+          && i < padded_height - m_generation_padding)
       {
         inside_chunk = true;
       }
@@ -195,13 +195,13 @@ void MapGenerator::m_get_height_map(const int seed, const Vector3i& offset)
                           seed);
 
   // Vegetation type lookup
-  FastNoise::SmartNode<> vegetation_type_noise =
-      FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
+  FastNoise::SmartNode<> vegetation_type_noise
+      = FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
   vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, width, height, 0.05f, seed + 30);
 
   // Vegetation density lookup
-  FastNoise::SmartNode<> vegetation_density_noise =
-      FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
+  FastNoise::SmartNode<> vegetation_density_noise
+      = FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
   vegetation_density_noise->GenUniformGrid2D(
       vegetation_density.data(), offset.x, offset.y, width, height, 0.05f, seed + 50);
 }
@@ -305,8 +305,8 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[3].value;
         break;
-      case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM |
-          DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
+          | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
         new_terrain_id = rule.output[4].value;
         break;
       case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
@@ -357,12 +357,12 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
         new_terrain_id = rule.output[20].value;
         break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP |
-          DL_EDGE_TOP_LEFT:
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+          | DL_EDGE_TOP_LEFT:
         new_terrain_id = rule.output[21].value;
         break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP |
-          DL_EDGE_TOP_LEFT:
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+          | DL_EDGE_TOP_LEFT:
         new_terrain_id = rule.output[22].value;
         break;
       case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
@@ -371,12 +371,12 @@ void MapGenerator::m_select_tile(const std::vector<int>& terrain, const int x, c
       case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
         new_terrain_id = rule.output[24].value;
         break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT |
-          DL_EDGE_TOP_LEFT:
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
+          | DL_EDGE_TOP_LEFT:
         new_terrain_id = rule.output[25].value;
         break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM |
-          DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
+          | DL_EDGE_LEFT:
         new_terrain_id = rule.output[26].value;
         break;
       case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
@@ -557,8 +557,8 @@ uint32_t MapGenerator::m_get_bitmask_8_sided(
 {
   if (!m_has_neighbor(terrain, x, y, z, neighbor))
   {
-    return DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT |
-           DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
+    return DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT
+           | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
   }
 
   const int padded_width = width + m_generation_padding * 2;
@@ -591,20 +591,20 @@ uint32_t MapGenerator::m_get_bitmask_8_sided(
     bitmask |= DL_EDGE_TOP_LEFT;
   }
   // Top Right
-  if (x < padded_width - 1 && y > 0 &&
-      terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == source)
+  if (x < padded_width - 1 && y > 0
+      && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == source)
   {
     bitmask |= DL_EDGE_TOP_RIGHT;
   }
   // Bottom Right
-  if (x < padded_width - 1 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == source)
+  if (x < padded_width - 1 && y < padded_height - 1
+      && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_RIGHT;
   }
   // Bottom Left
-  if (x > 0 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == source)
+  if (x > 0 && y < padded_height - 1
+      && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == source)
   {
     bitmask |= DL_EDGE_BOTTOM_LEFT;
   }
@@ -661,20 +661,20 @@ bool MapGenerator::m_has_neighbor(
     return true;
   }
   // Top Right
-  if (x < padded_width - 1 && y > 0 &&
-      terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == neighbor)
+  if (x < padded_width - 1 && y > 0
+      && terrain[z * padded_width * padded_height + (y - 1) * padded_width + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom Right
-  if (x < padded_width - 1 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == neighbor)
+  if (x < padded_width - 1 && y < padded_height - 1
+      && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x + 1] == neighbor)
   {
     return true;
   }
   // Bottom Left
-  if (x > 0 && y < padded_height - 1 &&
-      terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == neighbor)
+  if (x > 0 && y < padded_height - 1
+      && terrain[z * padded_width * padded_height + (y + 1) * padded_width + x - 1] == neighbor)
   {
     return true;
   }

@@ -464,8 +464,8 @@ void ImGui_ImplWGPU_RenderDrawData(ImDrawData* draw_data, WGPURenderPassEncoder 
         }
         else
         {
-          WGPUBindGroup image_bind_group =
-              ImGui_ImplWGPU_CreateImageBindGroup(bd->renderResources.ImageBindGroupLayout, (WGPUTextureView)tex_id);
+          WGPUBindGroup image_bind_group
+              = ImGui_ImplWGPU_CreateImageBindGroup(bd->renderResources.ImageBindGroupLayout, (WGPUTextureView)tex_id);
           bd->renderResources.ImageBindGroups.SetVoidPtr(tex_id_hash, image_bind_group);
           wgpuRenderPassEncoderSetBindGroup(pass_encoder, 1, image_bind_group, 0, nullptr);
         }
@@ -703,8 +703,8 @@ bool ImGui_ImplWGPU_CreateDeviceObjects()
   depth_stencil_state.stencilBack.passOp = WGPUStencilOperation_Keep;
 
   // Configure disabled depth-stencil state
-  graphics_pipeline_desc.depthStencil =
-      (bd->depthStencilFormat == WGPUTextureFormat_Undefined) ? nullptr : &depth_stencil_state;
+  graphics_pipeline_desc.depthStencil
+      = (bd->depthStencilFormat == WGPUTextureFormat_Undefined) ? nullptr : &depth_stencil_state;
 
   bd->pipelineState = wgpuDeviceCreateRenderPipeline(bd->wgpuDevice, &graphics_pipeline_desc);
 
@@ -723,8 +723,8 @@ bool ImGui_ImplWGPU_CreateDeviceObjects()
   common_bg_descriptor.entries = common_bg_entries;
   bd->renderResources.CommonBindGroup = wgpuDeviceCreateBindGroup(bd->wgpuDevice, &common_bg_descriptor);
 
-  WGPUBindGroup image_bind_group =
-      ImGui_ImplWGPU_CreateImageBindGroup(bg_layouts[1], bd->renderResources.FontTextureView);
+  WGPUBindGroup image_bind_group
+      = ImGui_ImplWGPU_CreateImageBindGroup(bg_layouts[1], bd->renderResources.FontTextureView);
   bd->renderResources.ImageBindGroup = image_bind_group;
   bd->renderResources.ImageBindGroupLayout = bg_layouts[1];
   bd->renderResources.ImageBindGroups.SetVoidPtr(ImHashData(&bd->renderResources.FontTextureView, sizeof(ImTextureID)),

@@ -44,8 +44,8 @@ void Camera::update_target(const entt::registry& registry)
 
   const auto& position = registry.get<Position>(target);
 
-  if (position.x == m_last_target_position.x && position.y == m_last_target_position.y &&
-      position.z == m_last_target_position.z)
+  if (position.x == m_last_target_position.x && position.y == m_last_target_position.y
+      && position.z == m_last_target_position.z)
   {
     return;
   }

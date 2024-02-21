@@ -81,42 +81,38 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
         m_queue, uniformBuffer, uniform_data.view_matrix_offset, &identity_matrix, uniform_data.view_matrix_size);
 
     binding_layout[0] = {
-        .binding = 0,
-        .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
-        .buffer =
-            {
-                .type = WGPUBufferBindingType_Uniform,
-                .minBindingSize = uniform_data.size,
-            },
+      .binding = 0,
+      .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
+      .buffer = {
+        .type = WGPUBufferBindingType_Uniform,
+        .minBindingSize = uniform_data.size,
+      },
     };
 
     texture_view_layout_entry = {
-        .chain =
-            {
-                .sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras,
-                .next = nullptr,
-            },
-        .count = 2,
+      .chain = {
+        .sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras,
+        .next = nullptr,
+      },
+      .count = 2,
     };
 
     binding_layout[1] = {
-        .nextInChain = &texture_view_layout_entry.chain,
-        .binding = 1,
-        .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
-        .texture =
-            {
-                .sampleType = WGPUTextureSampleType_Float,
-                .viewDimension = WGPUTextureViewDimension_2D,
-            },
+      .nextInChain = &texture_view_layout_entry.chain,
+      .binding = 1,
+      .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
+      .texture = {
+        .sampleType = WGPUTextureSampleType_Float,
+        .viewDimension = WGPUTextureViewDimension_2D,
+      },
     };
 
     binding_layout[2] = {
-        .binding = 2,
-        .visibility = WGPUShaderStage_Fragment,
-        .sampler =
-            {
-                .type = WGPUSamplerBindingType_Filtering,
-            },
+      .binding = 2,
+      .visibility = WGPUShaderStage_Fragment,
+      .sampler = {
+        .type = WGPUSamplerBindingType_Filtering,
+      },
     };
 
     WGPUBindGroupLayoutDescriptor bindGroupLayoutDesc = {
@@ -140,13 +136,12 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     };
 
     texture_view_entry = {
-        .chain =
-            {
-                .sType = (WGPUSType)WGPUSType_BindGroupEntryExtras,
-                .next = nullptr,
-            },
-        .textureViews = texture_views.data(),
-        .textureViewCount = 2,
+      .chain = {
+        .sType = (WGPUSType)WGPUSType_BindGroupEntryExtras,
+        .next = nullptr,
+      },
+      .textureViews = texture_views.data(),
+      .textureViewCount = 2,
     };
 
     binding[1] = {
@@ -207,18 +202,16 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
     // Blend state
     WGPUBlendState blendState = {
-        .color =
-            {
-                .srcFactor = WGPUBlendFactor_SrcAlpha,
-                .dstFactor = WGPUBlendFactor_OneMinusSrcAlpha,
-                .operation = WGPUBlendOperation_Add,
-            },
-        .alpha =
-            {
-                .srcFactor = WGPUBlendFactor_Zero,
-                .dstFactor = WGPUBlendFactor_One,
-                .operation = WGPUBlendOperation_Add,
-            },
+      .color = {
+        .srcFactor = WGPUBlendFactor_SrcAlpha,
+        .dstFactor = WGPUBlendFactor_OneMinusSrcAlpha,
+        .operation = WGPUBlendOperation_Add,
+      },
+      .alpha = {
+        .srcFactor = WGPUBlendFactor_Zero,
+        .dstFactor = WGPUBlendFactor_One,
+        .operation = WGPUBlendOperation_Add,
+      },
     };
 
     WGPUColorTargetState colorTarget = {
@@ -243,26 +236,24 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     stencil_state.stencilWriteMask = 0;
 
     WGPURenderPipelineDescriptor pipelineDesc = {
-        .layout = pipelineLayout,
+      .layout = pipelineLayout,
 
-        .vertex =
-            {
-                .bufferCount = 1,
-                .buffers = &vertexBufferLayout,
-                .module = shader.module,
-                .entryPoint = "vs_main",
-            },
+      .vertex = {
+        .bufferCount = 1,
+        .buffers = &vertexBufferLayout,
+        .module = shader.module,
+        .entryPoint = "vs_main",
+      },
 
-        .primitive =
-            {
-                .topology = WGPUPrimitiveTopology_TriangleList,
-                .frontFace = WGPUFrontFace_CCW,
-                .cullMode = WGPUCullMode_None,
-            },
+      .primitive = {
+        .topology = WGPUPrimitiveTopology_TriangleList,
+        .frontFace = WGPUFrontFace_CCW,
+        .cullMode = WGPUCullMode_None,
+      },
 
-        .fragment = &fragmentState,
-        .depthStencil = &stencil_state,
-        .multisample.count = 1,
+      .fragment = &fragmentState,
+      .depthStencil = &stencil_state,
+      .multisample.count = 1,
     };
 
     pipeline = wgpuDeviceCreateRenderPipeline(device, &pipelineDesc);

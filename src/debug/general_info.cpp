@@ -168,9 +168,9 @@ void GeneralInfo::update()
     return;
   }
 
-  ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
-                                  ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
-                                  ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+  ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize
+                                  | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing
+                                  | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   const float padding = 15.0f;
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -230,16 +230,16 @@ void GeneralInfo::m_render_usage_info()
     sdata2.add_point(t, cpu_usage);
 
     static float history = 10.0f;
-    static ImPlotAxisFlags flags = ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoTickMarks |
-                                   ImPlotAxisFlags_NoTickLabels;
+    static ImPlotAxisFlags flags = ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoTickMarks
+                                   | ImPlotAxisFlags_NoTickLabels;
 
     ImPlot::PushStyleVar(ImPlotStyleVar_MinorAlpha, 1.00f);
     ImPlot::PushStyleVar(ImPlotStyleVar_PlotPadding, ImVec2(0, 0));
     ImPlot::PushStyleVar(ImPlotStyleVar_LegendPadding, ImVec2(0, 0));
     if (ImPlot::BeginPlot("##CPU",
                           ImVec2(161, 100),
-                          ImPlotFlags_NoTitle | ImPlotFlags_NoMouseText | ImPlotFlags_NoInputs | ImPlotFlags_NoMenus |
-                              ImPlotFlags_NoBoxSelect))
+                          ImPlotFlags_NoTitle | ImPlotFlags_NoMouseText | ImPlotFlags_NoInputs | ImPlotFlags_NoMenus
+                              | ImPlotFlags_NoBoxSelect))
     {
       ImPlot::SetupLegend(ImPlotLocation_South | ImPlotLocation_West, 0);
       ImPlot::SetupAxes(nullptr, nullptr, flags, flags);

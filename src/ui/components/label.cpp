@@ -16,8 +16,8 @@ void Label::init()
   if (wrap)
   {
     const auto& window_size = Display::get_window_size();
-    const auto wrap_width =
-        (parent == nullptr || parent->size.x == 0) ? window_size.x - 2 * margin.x : parent->size.x - 2 * margin.x;
+    const auto wrap_width
+        = (parent == nullptr || parent->size.x == 0) ? window_size.x - 2 * margin.x : parent->size.x - 2 * margin.x;
     text.set_text_wrapped(value, wrap_width);
   }
   else

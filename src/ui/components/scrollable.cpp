@@ -28,8 +28,8 @@ void Scrollable::update()
   {
     const auto& mouse_position = m_input_manager.get_mouse_position();
 
-    if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x &&
-        mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
+    if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x
+        && mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
     {
       assert(children.size() == 1 && "Updating scroll with a number of children different than 1");
       const auto& child = children[0];

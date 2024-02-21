@@ -84,10 +84,11 @@ class Camera
   float m_far = 3000.0f;
   double m_camera_z = 2000.0;
   glm::vec3 m_position{0.0, m_camera_z, m_camera_z};
-  glm::vec3 m_center =
-      m_position + glm::vec3{glm::normalize(glm::vec3{std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch)),
-                                                      std::sin(glm::radians(pitch)),
-                                                      std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch))})};
+  glm::vec3 m_center
+      = m_position
+        + glm::vec3{glm::normalize(glm::vec3{std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch)),
+                                             std::sin(glm::radians(pitch)),
+                                             std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch))})};
   const glm::vec3 m_up{0.0f, 1.0f, 0.0f};
   double m_scaling_factor = 1.0 / std::sin(glm::radians(-pitch));
   Vector3 m_saved_position{0., 0., 0.};

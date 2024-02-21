@@ -62,8 +62,8 @@ void UIComponent::m_update_geometry()
       const int anchor_h = (parent == nullptr || parent->size.y == 0) ? window_size.y : parent->size.y;
       transformed_position.y = anchor_h / 2 - size.y / 2 + position.y + margin.y;
     }
-    m_transform_matrix =
-        glm::translate(matrix, glm::vec3(transformed_position.x, transformed_position.y, transformed_position.z));
+    m_transform_matrix
+        = glm::translate(matrix, glm::vec3(transformed_position.x, transformed_position.y, transformed_position.z));
     const auto top_left = m_transform_matrix * glm::vec4(0.f, 0.f, 1.f, 1.f);
     absolute_position.x = top_left.x;
     absolute_position.y = top_left.y;
