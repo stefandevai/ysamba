@@ -37,6 +37,7 @@ void Renderer::load()
   m_load_depth_buffer(context.device);
 
   // TEMP
+  Shader shader{};
   shader.load(context.device, "data/shaders/default.wgsl");
   world_pipeline.load(shader);
   // TEMP

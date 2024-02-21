@@ -17,8 +17,11 @@
 
 namespace dl
 {
-class Camera;
 struct WGPUContext;
+class Camera;
+class Sprite;
+struct Quad;
+class Text;
 
 namespace v2
 {
@@ -57,6 +60,10 @@ class WorldPipeline
 
   void load(const Shader& shader);
   void render(const WGPURenderPassEncoder render_pass, const Camera& camera);
+
+  void sprite(Sprite* sprite, const double x, const double y, const double z);
+  void quad(const Quad* quad, const double x, const double y, const double z);
+  void text(Text& text, const double x, const double y, const double z);
 
  private:
   WGPUContext& m_context;

@@ -3,9 +3,12 @@
 #include <spdlog/spdlog.h>
 
 #include "graphics/camera.hpp"
+#include "graphics/quad.hpp"
 #include "graphics/renderer/texture.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
+#include "graphics/sprite.hpp"
+#include "graphics/text.hpp"
 
 namespace dl::v2
 {
@@ -177,30 +180,34 @@ void WorldPipeline::load(const Shader& shader)
     pipelineLayout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipelineLayoutDesc);
 
     // Vertex fetch
-    vertex_size = 8;
-    vertex_count = mesh.count / vertex_size;
-    std::array<WGPUVertexAttribute, 3> vertexAttribs = {
+    vertex_size = 6 * sizeof(float) + sizeof(uint32_t);
+    std::array<WGPUVertexAttribute, 4> vertexAttribs = {
         WGPUVertexAttribute{
             .shaderLocation = 0,
             .format = WGPUVertexFormat_Float32x3,
             .offset = 0,
         },
         WGPUVertexAttribute{
-            .shaderLocation = 2,
+            .shaderLocation = 1,
             .format = WGPUVertexFormat_Float32x2,
             .offset = 3 * sizeof(float),
         },
         WGPUVertexAttribute{
-            .shaderLocation = 1,
-            .format = WGPUVertexFormat_Float32x3,
+            .shaderLocation = 2,
+            .format = WGPUVertexFormat_Float32,
             .offset = 5 * sizeof(float),
+        },
+        WGPUVertexAttribute{
+            .shaderLocation = 3,
+            .format = WGPUVertexFormat_Unorm8x4,
+            .offset = 6 * sizeof(float),
         },
     };
 
     WGPUVertexBufferLayout vertexBufferLayout = {
         .attributeCount = vertexAttribs.size(),
         .attributes = vertexAttribs.data(),
-        .arrayStride = vertex_size * sizeof(float),
+        .arrayStride = vertex_size,
         .stepMode = WGPUVertexStepMode_Vertex,
     };
 
@@ -283,6 +290,12 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
   wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, mesh.buffer, 0, mesh.size);
   wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
-  wgpuRenderPassEncoderDraw(render_pass, vertex_count, 1, 0, 0);
+  wgpuRenderPassEncoderDraw(render_pass, mesh.count, 1, 0, 0);
 }
+
+void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const double z) {}
+
+void WorldPipeline::quad(const Quad* quad, const double x, const double y, const double z) {}
+
+void WorldPipeline::text(Text& text, const double x, const double y, const double z) {}
 }  // namespace dl::v2

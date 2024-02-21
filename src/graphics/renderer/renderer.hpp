@@ -21,7 +21,6 @@ class Renderer
  public:
   WGPUContext& context;
   WorldPipeline world_pipeline{context};
-  Shader shader{};
 
   Renderer(GameContext& game_context);
   ~Renderer();
