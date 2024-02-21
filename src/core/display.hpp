@@ -1,6 +1,9 @@
 #pragma once
 
 #include <webgpu/wgpu.h>
+
+#include "graphics/renderer/wgpu_context.hpp"
+
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__APPLE__)
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
@@ -17,11 +20,9 @@ struct Vector2i;
 class Display
 {
  public:
-  WGPUSurface surface;
-  WGPUDevice device;
-  WGPUTextureFormat surface_format;
+  WGPUContext wgpu_context{};
 
-  Display();
+  Display() = default;
   ~Display();
   void load(const int width, const int height, const std::string& title);
   void set_title(const std::string& title);
@@ -39,7 +40,6 @@ class Display
   static int m_height;
   std::string m_title;
   SDL_GLContext m_gl_context;
-  WGPUInstance m_webgpu_instance;
 
   void m_configure_surface();
 };

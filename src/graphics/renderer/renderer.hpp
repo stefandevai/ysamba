@@ -12,13 +12,14 @@ namespace dl
 class AssetManager;
 class Camera;
 struct GameContext;
+struct WGPUContext;
 
 namespace v2
 {
 class Renderer
 {
  public:
-  WGPUQueue queue;
+  WGPUContext& context;
   WorldPipeline world_pipeline{};
   Shader shader{};
 
@@ -38,7 +39,7 @@ class Renderer
   WGPUTexture depth_texture;
   WGPUColor m_clear_color{0.0, 0.0, 0.0, 1.0};
 
-  void m_load_depth_buffer();
+  void m_load_depth_buffer(WGPUDevice device);
 };
 
 }  // namespace v2

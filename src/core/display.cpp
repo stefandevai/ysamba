@@ -95,14 +95,17 @@ SDL_Window* Display::m_window = nullptr;
 int Display::m_width = 0;
 int Display::m_height = 0;
 
-Display::Display() {}
-
 Display::~Display()
 {
-  wgpuDeviceRelease(device);
-  wgpuSurfaceRelease(surface);
-  wgpuInstanceRelease(m_webgpu_instance);
-  // SDL_GL_DeleteContext(m_gl_context);
+  if (!m_has_loaded)
+  {
+    return;
+  }
+
+  wgpuAdapterRelease(wgpu_context.adapter);
+  wgpuDeviceRelease(wgpu_context.device);
+  wgpuSurfaceRelease(wgpu_context.surface);
+  wgpuInstanceRelease(wgpu_context.instance);
   SDL_DestroyWindow(m_window);
   SDL_Quit();
 }
@@ -125,37 +128,35 @@ void Display::load(const int width, const int height, const std::string& title)
       m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, window_flags);
   SDL_SetWindowMinimumSize(m_window, width, height);
 
-  WGPUInstanceDescriptor desc = {};
-  desc.nextInChain = nullptr;
-  m_webgpu_instance = wgpuCreateInstance(&desc);
+  WGPUInstanceDescriptor desc = {
+      .nextInChain = nullptr,
+  };
+  wgpu_context.instance = wgpuCreateInstance(&desc);
+  assert(wgpu_context.instance != nullptr);
 
-  if (m_webgpu_instance == nullptr)
-  {
-    spdlog::critical("Failed to create WebGPU instance");
-    return;
-  }
+  // surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
+  wgpu_context.surface_format = WGPUTextureFormat_BGRA8Unorm;
+  wgpu_context.surface = SDL_GetWGPUSurface(wgpu_context.instance, m_window);
+  assert(wgpu_context.surface != nullptr);
 
-  surface = SDL_GetWGPUSurface(m_webgpu_instance, m_window);
-
-  WGPURequestAdapterOptions options = {};
-  options.nextInChain = nullptr;
-  options.compatibleSurface = surface;
-  options.powerPreference = WGPUPowerPreference_HighPerformance;
-  options.forceFallbackAdapter = false;
-
+  WGPURequestAdapterOptions options
+      = {.compatibleSurface = wgpu_context.surface,
+         .powerPreference = WGPUPowerPreference_HighPerformance,
+         .forceFallbackAdapter = false,
 #if defined(__APPLE__)
-  options.backendType = WGPUBackendType_Metal;
+         .backendType = WGPUBackendType_Metal,
 #elif defined(_WIN32)
-  options.backendType = WGPUBackendType_D3D12;
+         .backendType = WGPUBackendType_D3D12,
 #else
-  options.backendType = WGPUBackendType_Vulkan;
+         .backendType = WGPUBackendType_Vulkan,
 #endif
+        };
 
-  WGPUAdapter adapter = request_adapter(m_webgpu_instance, &options);
+  wgpu_context.adapter = request_adapter(wgpu_context.instance, &options);
 
   // WGPUAdapterProperties properties = {};
   // properties.nextInChain = nullptr;
-  // wgpuAdapterGetProperties(adapter, &properties);
+  // wgpuAdapterGetProperties(wgpu_instance.adapter, &properties);
   //
   // spdlog::info("Using adapter: {}", properties.name);
 
@@ -173,52 +174,25 @@ void Display::load(const int width, const int height, const std::string& title)
     .requiredFeatures = required_features.data(),
     .requiredFeatureCount = required_features.size(),
   };
-  device = request_device(adapter, &device_desc);
+  wgpu_context.device = request_device(wgpu_context.adapter, &device_desc);
 
   // auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
   //   spdlog::critical("Device error: {}, {}", (uint32_t)type, message);
   // };
-  // wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
+  // wgpuDeviceSetUncapturedErrorCallback(wgpu_context.device, on_device_error, nullptr);
 
-  // surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
-  surface_format = WGPUTextureFormat_BGRA8Unorm;
+  wgpu_context.queue = wgpuDeviceGetQueue(wgpu_context.device);
 
-  // spdlog::debug("Surface format: 0x{0:x}", (uint32_t)surface_format);
+  // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
+  //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
+  // };
+  //
+  // wgpuQueueOnSubmittedWorkDone(wgpu_context.queue, on_queue_work_done, nullptr);
 
   m_configure_surface();
 
-  // std::vector<WGPUFeatureName> features;
-  // size_t featureCount = wgpuAdapterEnumerateFeatures(adapter, nullptr);
-  // features.resize(featureCount);
-  // wgpuAdapterEnumerateFeatures(adapter, features.data());
-  // for (auto feature : features)
-  // {
-  //   spdlog::info("Feature: 0x{0:x}", (uint64_t)feature);
-  // }
-
-  wgpuAdapterRelease(adapter);
-
-  // #if __APPLE__
-  //   // Always required on Mac
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-  // #else
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  //   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-  // #endif
-  //
-  //   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  //   m_gl_context = SDL_GL_CreateContext(m_window);
-  //   SDL_GL_MakeCurrent(m_window, m_gl_context);
-  //   SDL_GL_SetSwapInterval(1);
-  //
-
 #ifdef DL_BUILD_DEBUG_TOOLS
-  DebugTools::get_instance().init(m_window, device);
+  DebugTools::get_instance().init(m_window, wgpu_context.device);
 #endif
 
   m_has_loaded = true;
@@ -263,8 +237,8 @@ void Display::update_viewport()
   m_width = width;
   m_height = height;
 
-  wgpuSurfaceRelease(surface);
-  surface = SDL_GetWGPUSurface(m_webgpu_instance, m_window);
+  wgpuSurfaceRelease(wgpu_context.surface);
+  wgpu_context.surface = SDL_GetWGPUSurface(wgpu_context.instance, m_window);
   m_configure_surface();
   // glViewport(0, 0, width, height);
 }
@@ -273,16 +247,16 @@ void Display::m_configure_surface()
 {
   WGPUSurfaceConfiguration surface_configuration;
   surface_configuration.nextInChain = nullptr;
-  surface_configuration.device = device;
-  surface_configuration.format = surface_format;
+  surface_configuration.device = wgpu_context.device;
+  surface_configuration.format = wgpu_context.surface_format;
   surface_configuration.usage = WGPUTextureUsage_RenderAttachment;
   surface_configuration.viewFormatCount = 1;
-  surface_configuration.viewFormats = &surface_format;
+  surface_configuration.viewFormats = &wgpu_context.surface_format;
   surface_configuration.alphaMode = WGPUCompositeAlphaMode_Auto;
   surface_configuration.width = m_width;
   surface_configuration.height = m_height;
   surface_configuration.presentMode = WGPUPresentMode_Fifo;
 
-  wgpuSurfaceConfigure(surface, &surface_configuration);
+  wgpuSurfaceConfigure(wgpu_context.surface, &surface_configuration);
 }
 }  // namespace dl

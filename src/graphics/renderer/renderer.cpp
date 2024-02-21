@@ -7,6 +7,7 @@
 #include "core/game_context.hpp"
 #include "definitions.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/renderer/wgpu_context.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
 #include "debug/debug_tools.hpp"
@@ -14,7 +15,10 @@
 
 namespace dl::v2
 {
-Renderer::Renderer(GameContext& game_context) : m_game_context(game_context) {}
+Renderer::Renderer(GameContext& game_context)
+    : context(game_context.display->wgpu_context), m_game_context(game_context)
+{
+}
 
 Renderer::~Renderer()
 {
@@ -30,25 +34,18 @@ void Renderer::load()
 {
   assert(m_game_context.display != nullptr);
 
-  queue = wgpuDeviceGetQueue(m_game_context.display->device);
-  m_load_depth_buffer();
-
-  // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
-  //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
-  // };
-  //
-  // wgpuQueueOnSubmittedWorkDone(queue, on_queue_work_done, nullptr);
+  m_load_depth_buffer(context.device);
 
   // TEMP
-  shader.load(m_game_context.display->device, "data/shaders/default.wgsl");
-  world_pipeline.load(m_game_context.display->device, m_game_context.display->surface_format, shader);
+  shader.load(context.device, "data/shaders/default.wgsl");
+  world_pipeline.load(context.device, context.surface_format, shader);
   // TEMP
   m_has_loaded = true;
 }
 
-void Renderer::resize() { m_load_depth_buffer(); }
+void Renderer::resize() { m_load_depth_buffer(context.device); }
 
-void Renderer::m_load_depth_buffer()
+void Renderer::m_load_depth_buffer(WGPUDevice device)
 {
   if (m_has_loaded)
   {
@@ -72,7 +69,7 @@ void Renderer::m_load_depth_buffer()
       .viewFormats = &depth_texture_format,
   };
 
-  depth_texture = wgpuDeviceCreateTexture(m_game_context.display->device, &depthTextureDesc);
+  depth_texture = wgpuDeviceCreateTexture(device, &depthTextureDesc);
   assert(depth_texture != nullptr);
 
   WGPUTextureViewDescriptor depthTextureViewDesc = {
@@ -92,7 +89,7 @@ void Renderer::m_load_depth_buffer()
 void Renderer::render(const Camera& camera)
 {
   WGPUSurfaceTexture surface_texture;
-  wgpuSurfaceGetCurrentTexture(m_game_context.display->surface, &surface_texture);
+  wgpuSurfaceGetCurrentTexture(context.surface, &surface_texture);
 
   if (surface_texture.status == WGPUSurfaceGetCurrentTextureStatus_Timeout)
   {
@@ -120,7 +117,7 @@ void Renderer::render(const Camera& camera)
   WGPUCommandEncoderDescriptor commandEncoderDesc = {
       .label = "Command Encoder",
   };
-  WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(m_game_context.display->device, &commandEncoderDesc);
+  WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(context.device, &commandEncoderDesc);
 
   WGPURenderPassColorAttachment renderPassColorAttachment = {
       .view = targetView,
@@ -165,13 +162,13 @@ void Renderer::render(const Camera& camera)
       .label = "Command Buffer",
   };
   auto commandBuffer = wgpuCommandEncoderFinish(encoder, &commandBufferDescriptor);
-  wgpuQueueSubmit(queue, 1, &commandBuffer);
+  wgpuQueueSubmit(context.queue, 1, &commandBuffer);
 
   wgpuCommandBufferRelease(commandBuffer);
   wgpuCommandEncoderRelease(encoder);
   wgpuTextureViewRelease(targetView);
 
-  wgpuSurfacePresent(m_game_context.display->surface);
+  wgpuSurfacePresent(context.surface);
   wgpuTextureRelease(surface_texture.texture);
 }
 
