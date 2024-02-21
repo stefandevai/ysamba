@@ -406,7 +406,7 @@ void SDLInputWrapper::update()
   }
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  debug_tools.update();
+  // debug_tools.update();
 #endif
 }
 

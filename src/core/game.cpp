@@ -57,7 +57,6 @@ void Game::run()
     m_input_manager.update();
     m_scene_manager.update();
     m_scene_manager.render();
-    m_display.render();
   }
 }
 }  // namespace dl

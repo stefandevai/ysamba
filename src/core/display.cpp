@@ -20,11 +20,6 @@
 
 #ifdef DL_BUILD_DEBUG_TOOLS
 #include "debug/debug_tools.hpp"
-
-namespace
-{
-auto& debug_tools = dl::DebugTools::get_instance();
-}
 #endif
 
 namespace
@@ -222,7 +217,7 @@ void Display::load(const int width, const int height, const std::string& title)
   //
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  debug_tools.init(m_window, m_gl_context);
+  DebugTools::get_instance().init(m_window, device);
 #endif
 
   m_has_loaded = true;
@@ -239,14 +234,6 @@ void temp()
 const Vector2i Display::get_size() const { return {m_width, m_height}; }
 
 const Vector2i Display::get_window_size() { return {m_width, m_height}; }
-
-void Display::render()
-{
-#ifdef DL_BUILD_DEBUG_TOOLS
-  debug_tools.render();
-#endif
-  // SDL_GL_SwapWindow(m_window);
-}
 
 void Display::set_title(const std::string& title) { SDL_SetWindowTitle(m_window, title.c_str()); }
 

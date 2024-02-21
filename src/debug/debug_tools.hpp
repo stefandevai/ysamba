@@ -10,7 +10,8 @@
 
 union SDL_Event;
 struct SDL_Window;
-typedef void* SDL_GLContext;
+struct WGPUDeviceImpl;
+struct WGPURenderPassEncoderImpl;
 
 namespace dl
 {
@@ -26,10 +27,10 @@ class DebugTools
   void operator=(DebugTools const&) = delete;
 
   static DebugTools& get_instance();
-  void init(SDL_Window* window, SDL_GLContext& context);
+  void init(SDL_Window* window, WGPUDeviceImpl* device);
   void process_event(SDL_Event* event);
   void update();
-  void render();
+  void render(WGPURenderPassEncoderImpl* render_pass);
 
   // Custom widgets
   void init_general_info(GameContext& context);

@@ -5,7 +5,12 @@
 
 #include "core/display.hpp"
 #include "core/game_context.hpp"
+#include "definitions.hpp"
 #include "graphics/camera.hpp"
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+#include "debug/debug_tools.hpp"
+#endif
 
 namespace dl::v2
 {
@@ -138,6 +143,11 @@ void Renderer::render(const Camera& camera)
   WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
 
   world_pipeline.render(renderPass, camera);
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+  DebugTools::get_instance().update();
+  DebugTools::get_instance().render(renderPass);
+#endif
 
   wgpuRenderPassEncoderEnd(renderPass);
   wgpuRenderPassEncoderRelease(renderPass);

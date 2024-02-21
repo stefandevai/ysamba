@@ -24,7 +24,6 @@ class Display
   Display();
   ~Display();
   void load(const int width, const int height, const std::string& title);
-  void render();
   void set_title(const std::string& title);
   void set_size(const int width, const int height);
   const Vector2i get_size() const;
