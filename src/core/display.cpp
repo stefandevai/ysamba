@@ -166,7 +166,6 @@ void Display::load(const int width, const int height, const std::string& title)
 
   WGPUDeviceDescriptor device_desc = {
     .label = "Default Device",
-    .requiredFeatureCount = 0,
     .requiredLimits = nullptr,
     .defaultQueue = {
       .label = "Default Queue",
