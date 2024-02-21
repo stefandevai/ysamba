@@ -18,6 +18,7 @@
 namespace dl
 {
 class Camera;
+struct WGPUContext;
 
 namespace v2
 {
@@ -51,15 +52,15 @@ class WorldPipeline
 
   WGPURenderPipeline pipeline;
 
-  WorldPipeline() = default;
+  WorldPipeline(WGPUContext& context);
   ~WorldPipeline();
 
-  void load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader);
+  void load(const Shader& shader);
   void render(const WGPURenderPassEncoder render_pass, const Camera& camera);
 
  private:
+  WGPUContext& m_context;
   bool m_has_loaded = false;
-  WGPUQueue m_queue;
 };
 }  // namespace v2
 }  // namespace dl

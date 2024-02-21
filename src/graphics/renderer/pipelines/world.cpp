@@ -5,9 +5,12 @@
 #include "graphics/camera.hpp"
 #include "graphics/renderer/texture.hpp"
 #include "graphics/renderer/utils.hpp"
+#include "graphics/renderer/wgpu_context.hpp"
 
 namespace dl::v2
 {
+WorldPipeline::WorldPipeline(WGPUContext& context) : m_context(context) {}
+
 WorldPipeline::~WorldPipeline()
 {
   if (m_has_loaded)
@@ -27,16 +30,14 @@ Texture texture2{"data/textures/characters.png"};
 WGPUBindGroupEntryExtras texture_view_entry{};
 WGPUBindGroupLayoutEntryExtras texture_view_layout_entry{};
 
-void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
+void WorldPipeline::load(const Shader& shader)
 {
-  m_queue = wgpuDeviceGetQueue(device);
-
   // Mesh
-  mesh.load(device);
+  mesh.load(m_context.device);
 
   // Texture
-  texture.load(device);
-  texture2.load(device);
+  texture.load(m_context.device);
+  texture2.load(m_context.device);
 
   // Sampler
   {
@@ -54,7 +55,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
         .maxAnisotropy = 1,
     };
 
-    sampler = wgpuDeviceCreateSampler(device, &samplerDesc);
+    sampler = wgpuDeviceCreateSampler(m_context.device, &samplerDesc);
     assert(sampler != nullptr);
   }
 
@@ -67,18 +68,21 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
         .mappedAtCreation = false,
     };
 
-    uniformBuffer = wgpuDeviceCreateBuffer(device, &bufferDesc);
+    uniformBuffer = wgpuDeviceCreateBuffer(m_context.device, &bufferDesc);
     assert(uniformBuffer != nullptr);
 
     const auto identity_matrix = glm::mat4(1.0f);
 
-    wgpuQueueWriteBuffer(m_queue,
+    wgpuQueueWriteBuffer(m_context.queue,
                          uniformBuffer,
                          uniform_data.projection_matrix_offset,
                          &identity_matrix,
                          uniform_data.projection_matrix_size);
-    wgpuQueueWriteBuffer(
-        m_queue, uniformBuffer, uniform_data.view_matrix_offset, &identity_matrix, uniform_data.view_matrix_size);
+    wgpuQueueWriteBuffer(m_context.queue,
+                         uniformBuffer,
+                         uniform_data.view_matrix_offset,
+                         &identity_matrix,
+                         uniform_data.view_matrix_size);
 
     binding_layout[0] = {
       .binding = 0,
@@ -120,7 +124,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
         .entries = binding_layout.data(),
     };
 
-    bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bindGroupLayoutDesc);
+    bindGroupLayout = wgpuDeviceCreateBindGroupLayout(m_context.device, &bindGroupLayoutDesc);
     assert(bindGroupLayout != nullptr);
 
     std::array<WGPUTextureView, 2> texture_views = {
@@ -160,7 +164,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
         .entries = binding.data(),
     };
 
-    bindGroup = wgpuDeviceCreateBindGroup(device, &bindGroupDesc);
+    bindGroup = wgpuDeviceCreateBindGroup(m_context.device, &bindGroupDesc);
     assert(bindGroup != nullptr);
   }
 
@@ -170,7 +174,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     WGPUPipelineLayoutDescriptor pipelineLayoutDesc{};
     pipelineLayoutDesc.bindGroupLayoutCount = 1;
     pipelineLayoutDesc.bindGroupLayouts = &bindGroupLayout;
-    pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &pipelineLayoutDesc);
+    pipelineLayout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipelineLayoutDesc);
 
     // Vertex fetch
     vertex_size = 8;
@@ -215,7 +219,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     };
 
     WGPUColorTargetState colorTarget = {
-        .format = texture_format,
+        .format = m_context.surface_format,
         .blend = &blendState,
         .writeMask = WGPUColorWriteMask_All,
     };
@@ -256,7 +260,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
       .multisample.count = 1,
     };
 
-    pipeline = wgpuDeviceCreateRenderPipeline(device, &pipelineDesc);
+    pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipelineDesc);
     assert(pipeline != nullptr);
   }
 
@@ -265,13 +269,16 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
 void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
 {
-  wgpuQueueWriteBuffer(m_queue,
+  wgpuQueueWriteBuffer(m_context.queue,
                        uniformBuffer,
                        uniform_data.projection_matrix_offset,
                        &camera.projection_matrix,
                        uniform_data.projection_matrix_size);
-  wgpuQueueWriteBuffer(
-      m_queue, uniformBuffer, uniform_data.view_matrix_offset, &camera.view_matrix, uniform_data.view_matrix_size);
+  wgpuQueueWriteBuffer(m_context.queue,
+                       uniformBuffer,
+                       uniform_data.view_matrix_offset,
+                       &camera.view_matrix,
+                       uniform_data.view_matrix_size);
 
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
   wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, mesh.buffer, 0, mesh.size);

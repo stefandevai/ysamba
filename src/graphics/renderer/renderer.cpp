@@ -38,7 +38,7 @@ void Renderer::load()
 
   // TEMP
   shader.load(context.device, "data/shaders/default.wgsl");
-  world_pipeline.load(context.device, context.surface_format, shader);
+  world_pipeline.load(shader);
   // TEMP
   m_has_loaded = true;
 }
