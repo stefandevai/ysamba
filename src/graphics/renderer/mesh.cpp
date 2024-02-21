@@ -31,7 +31,6 @@ void Mesh::load(const WGPUDevice device)
   WGPUQueue queue = wgpuDeviceGetQueue(device);
 
   WGPUBufferDescriptor buffer_descriptor = {};
-  buffer_descriptor.nextInChain = nullptr;
   buffer_descriptor.size = vertex_data.size() * sizeof(float);
   buffer_descriptor.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex;
   buffer_descriptor.mappedAtCreation = false;

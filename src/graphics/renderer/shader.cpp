@@ -17,7 +17,6 @@ void Shader::load(WGPUDevice device, const std::filesystem::path& filepath)
   const auto shader_source = utils::read_file(filepath.string());
 
   WGPUShaderModuleDescriptor shader_descriptor = {};
-  shader_descriptor.nextInChain = nullptr;
   shader_descriptor.hintCount = 0;
   shader_descriptor.hints = nullptr;
 

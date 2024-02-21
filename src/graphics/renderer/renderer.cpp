@@ -59,27 +59,34 @@ void Renderer::m_load_depth_buffer()
 
   const auto& display_size = Display::get_window_size();
 
-  WGPUTextureFormat depth_texture_format = WGPUTextureFormat_Depth24Plus;
-  WGPUTextureDescriptor depthTextureDesc;
-  depthTextureDesc.dimension = WGPUTextureDimension_2D;
-  depthTextureDesc.format = depth_texture_format;
-  depthTextureDesc.mipLevelCount = 1;
-  depthTextureDesc.sampleCount = 1;
-  depthTextureDesc.size = {static_cast<uint32_t>(display_size.x), static_cast<uint32_t>(display_size.y), 1};
-  depthTextureDesc.usage = WGPUTextureUsage_RenderAttachment;
-  depthTextureDesc.viewFormatCount = 1;
-  depthTextureDesc.viewFormats = &depth_texture_format;
-  depth_texture = wgpuDeviceCreateTexture(m_game_context.display->device, &depthTextureDesc);
+  const auto depth_texture_format = WGPUTextureFormat_Depth24Plus;
 
-  WGPUTextureViewDescriptor depthTextureViewDesc;
-  depthTextureViewDesc.aspect = WGPUTextureAspect_DepthOnly;
-  depthTextureViewDesc.baseArrayLayer = 0;
-  depthTextureViewDesc.arrayLayerCount = 1;
-  depthTextureViewDesc.baseMipLevel = 0;
-  depthTextureViewDesc.mipLevelCount = 1;
-  depthTextureViewDesc.dimension = WGPUTextureViewDimension_2D;
-  depthTextureViewDesc.format = depth_texture_format;
+  WGPUTextureDescriptor depthTextureDesc = {
+      .dimension = WGPUTextureDimension_2D,
+      .format = depth_texture_format,
+      .mipLevelCount = 1,
+      .sampleCount = 1,
+      .size = {static_cast<uint32_t>(display_size.x), static_cast<uint32_t>(display_size.y), 1},
+      .usage = WGPUTextureUsage_RenderAttachment,
+      .viewFormatCount = 1,
+      .viewFormats = &depth_texture_format,
+  };
+
+  depth_texture = wgpuDeviceCreateTexture(m_game_context.display->device, &depthTextureDesc);
+  assert(depth_texture != nullptr);
+
+  WGPUTextureViewDescriptor depthTextureViewDesc = {
+      .aspect = WGPUTextureAspect_DepthOnly,
+      .baseArrayLayer = 0,
+      .arrayLayerCount = 1,
+      .baseMipLevel = 0,
+      .mipLevelCount = 1,
+      .dimension = WGPUTextureViewDimension_2D,
+      .format = depth_texture_format,
+  };
+
   depth_texture_view = wgpuTextureCreateView(depth_texture, &depthTextureViewDesc);
+  assert(depth_texture_view != nullptr);
 }
 
 void Renderer::render(const Camera& camera)
@@ -98,79 +105,81 @@ void Renderer::render(const Camera& camera)
     return;
   }
 
-  WGPUTextureViewDescriptor descriptor{};
-  descriptor.nextInChain = nullptr;
-  descriptor.label = "Target View";
-  descriptor.format = wgpuTextureGetFormat(surface_texture.texture);
-  descriptor.dimension = WGPUTextureViewDimension_2D;
-  descriptor.baseMipLevel = 0;
-  descriptor.mipLevelCount = 1;
-  descriptor.baseArrayLayer = 0;
-  descriptor.arrayLayerCount = 1;
-  descriptor.aspect = WGPUTextureAspect_All;
+  WGPUTextureViewDescriptor descriptor = {
+      .label = "Target View",
+      .format = wgpuTextureGetFormat(surface_texture.texture),
+      .dimension = WGPUTextureViewDimension_2D,
+      .baseMipLevel = 0,
+      .mipLevelCount = 1,
+      .baseArrayLayer = 0,
+      .arrayLayerCount = 1,
+      .aspect = WGPUTextureAspect_All,
+  };
   WGPUTextureView targetView = wgpuTextureCreateView(surface_texture.texture, &descriptor);
 
-  WGPUCommandEncoderDescriptor commandEncoderDesc{};
-  commandEncoderDesc.nextInChain = nullptr;
-  commandEncoderDesc.label = "Command Encoder";
-  WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(m_game_context.display->device, &commandEncoderDesc);
+  WGPUCommandEncoderDescriptor commandEncoderDesc = {.label = "Command Encoder";
+};
+WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(m_game_context.display->device, &commandEncoderDesc);
 
-  WGPURenderPassDescriptor renderPassDesc{};
-  WGPURenderPassColorAttachment renderPassColorAttachment{};
-  renderPassColorAttachment.view = targetView;
-  renderPassColorAttachment.resolveTarget = nullptr;
-  renderPassColorAttachment.loadOp = WGPULoadOp_Clear;
-  renderPassColorAttachment.storeOp = WGPUStoreOp_Store;
-  // renderPassColorAttachment.clearValue = WGPUColor{0.28125, 0.44921875, 0.09375, 1.0};
-  renderPassColorAttachment.clearValue = m_clear_color;
-  renderPassDesc.colorAttachmentCount = 1;
-  renderPassDesc.colorAttachments = &renderPassColorAttachment;
+WGPURenderPassColorAttachment renderPassColorAttachment = {.view = targetView;
+.resolveTarget = nullptr;
+.loadOp = WGPULoadOp_Clear;
+.storeOp = WGPUStoreOp_Store;
+.clearValue = m_clear_color;
+};  // namespace dl::v2
 
-  WGPURenderPassDepthStencilAttachment depthStencilAttachment;
-  depthStencilAttachment.view = depth_texture_view;
-  depthStencilAttachment.depthClearValue = 1.0f;
-  depthStencilAttachment.depthLoadOp = WGPULoadOp_Clear;
-  depthStencilAttachment.depthStoreOp = WGPUStoreOp_Store;
-  depthStencilAttachment.depthReadOnly = false;
-  depthStencilAttachment.stencilClearValue = 0;
-  depthStencilAttachment.stencilLoadOp = WGPULoadOp_Clear;
-  depthStencilAttachment.stencilStoreOp = WGPUStoreOp_Store;
-  depthStencilAttachment.stencilReadOnly = true;
-  renderPassDesc.depthStencilAttachment = &depthStencilAttachment;
+WGPURenderPassDepthStencilAttachment depthStencilAttachment = {.view = depth_texture_view;
+.depthClearValue = 1.0f;
+.depthLoadOp = WGPULoadOp_Clear;
+.depthStoreOp = WGPUStoreOp_Store;
+.depthReadOnly = false;
+.stencilClearValue = 0;
+.stencilLoadOp = WGPULoadOp_Clear;
+.stencilStoreOp = WGPUStoreOp_Store;
+.stencilReadOnly = true;
+}
+;
 
-  renderPassDesc.timestampWrites = nullptr;
-  renderPassDesc.nextInChain = nullptr;
-  WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
+WGPURenderPassDescriptor renderPassDesc = {.colorAttachmentCount = 1;
+.colorAttachments = &renderPassColorAttachment;
+.depthStencilAttachment = &depthStencilAttachment;
+.timestampWrites = nullptr;
+}
+;
 
-  world_pipeline.render(renderPass, camera);
+WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
+
+world_pipeline.render(renderPass, camera);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  DebugTools::get_instance().update();
-  DebugTools::get_instance().render(renderPass);
+DebugTools::get_instance().update();
+DebugTools::get_instance().render(renderPass);
 #endif
 
-  wgpuRenderPassEncoderEnd(renderPass);
-  wgpuRenderPassEncoderRelease(renderPass);
+wgpuRenderPassEncoderEnd(renderPass);
+wgpuRenderPassEncoderRelease(renderPass);
 
-  WGPUCommandBufferDescriptor commandBufferDescriptor = {};
-  commandBufferDescriptor.nextInChain = nullptr;
-  commandBufferDescriptor.label = "Command Buffer";
-  auto commandBuffer = wgpuCommandEncoderFinish(encoder, &commandBufferDescriptor);
-  wgpuQueueSubmit(queue, 1, &commandBuffer);
+WGPUCommandBufferDescriptor commandBufferDescriptor = {.label = "Command Buffer";
+}
+;
+auto commandBuffer = wgpuCommandEncoderFinish(encoder, &commandBufferDescriptor);
+wgpuQueueSubmit(queue, 1, &commandBuffer);
 
-  wgpuCommandBufferRelease(commandBuffer);
-  wgpuCommandEncoderRelease(encoder);
-  wgpuTextureViewRelease(targetView);
+wgpuCommandBufferRelease(commandBuffer);
+wgpuCommandEncoderRelease(encoder);
+wgpuTextureViewRelease(targetView);
 
-  wgpuSurfacePresent(m_game_context.display->surface);
-  wgpuTextureRelease(surface_texture.texture);
+wgpuSurfacePresent(m_game_context.display->surface);
+wgpuTextureRelease(surface_texture.texture);
 }
 
 void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a)
 {
-  m_clear_color.r = static_cast<double>(r) / 255.0;
-  m_clear_color.g = static_cast<double>(g) / 255.0;
-  m_clear_color.b = static_cast<double>(b) / 255.0;
-  m_clear_color.a = a;
+  m_clear_color = {
+      .r = static_cast<double>(r) / 255.0,
+      .g = static_cast<double>(g) / 255.0,
+      .b = static_cast<double>(b) / 255.0,
+      .a = a,
+  };
 }
 }  // namespace dl::v2

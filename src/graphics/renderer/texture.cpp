@@ -87,7 +87,6 @@ void Texture::load(
 
   WGPUTextureDescriptor textureDesc{};
   textureDesc.label = "WorldPipeline Texture";
-  textureDesc.nextInChain = nullptr;
   textureDesc.dimension = WGPUTextureDimension_2D;
   textureDesc.size = {static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), 1};
   textureDesc.mipLevelCount = 1;
@@ -114,7 +113,6 @@ void Texture::load(
 
   WGPUTextureViewDescriptor textureViewDesc{};
   textureViewDesc.label = "WorldPipeline Texture View";
-  textureViewDesc.nextInChain = nullptr;
   textureViewDesc.aspect = WGPUTextureAspect_All;
   textureViewDesc.baseArrayLayer = 0;
   textureViewDesc.arrayLayerCount = 1;

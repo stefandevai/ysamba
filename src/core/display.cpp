@@ -164,14 +164,17 @@ void Display::load(const int width, const int height, const std::string& title)
       static_cast<WGPUFeatureName>(WGPUNativeFeature_SampledTextureAndStorageBufferArrayNonUniformIndexing),
   };
 
-  WGPUDeviceDescriptor device_desc = {};
-  device_desc.label = "Default Device";
-  device_desc.requiredFeatureCount = 0;
-  device_desc.requiredLimits = nullptr;
-  device_desc.defaultQueue.label = "Default Queue";
-  device_desc.defaultQueue.nextInChain = nullptr;
-  device_desc.requiredFeatures = required_features.data();
-  device_desc.requiredFeatureCount = required_features.size();
+  WGPUDeviceDescriptor device_desc = {
+      .label = "Default Device",
+      .requiredFeatureCount = 0,
+      .requiredLimits = nullptr,
+      .defaultQueue =
+          {
+              .label = "Default Queue",
+          },
+      .requiredFeatures = required_features.data(),
+      .requiredFeatureCount = required_features.size(),
+  };
   device = request_device(adapter, &device_desc);
 
   // auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
