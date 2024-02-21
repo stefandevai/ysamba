@@ -16,7 +16,7 @@ struct Uniforms {
 }
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
-@group(0) @binding(1) var gradientTexture: texture_2d<f32>;
+@group(0) @binding(1) var gradientTexture: binding_array<texture_2d<f32>, 2>;
 @group(0) @binding(2) var textureSampler: sampler;
 
 @vertex
@@ -30,6 +30,17 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4f {
-  let color = textureSample(gradientTexture, textureSampler, in.uv);
+  var idx = 0;
+
+  if (in.uv.x < 0.5) {
+    idx = 1;
+  }
+
+  let color = textureSample(gradientTexture[idx], textureSampler, in.uv);
+
+  if (color.a < 0.0001) {
+    discard;
+  }
+
   return color;
 }

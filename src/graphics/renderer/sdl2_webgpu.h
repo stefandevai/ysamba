@@ -5,7 +5,7 @@
 #else
 #include <SDL2/SDL_video.h>
 #endif
-#include <webgpu/webgpu.h>
+#include <webgpu/wgpu.h>
 
 #ifdef __cplusplus
 extern "C" {

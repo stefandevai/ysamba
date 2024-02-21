@@ -1,7 +1,5 @@
 #include "sdl2_webgpu.h"
 
-#include <webgpu/webgpu.h>
-
 #ifdef __APPLE__
 #include <SDL_syswm.h>
 #else

@@ -7,6 +7,7 @@
 namespace dl
 {
 const std::vector<float> vertex_data{
+    // position           // uv       // color
     0.0f,    0.0f,    0.2f, 0.0f, 0.0f, 0.9f, 0.6f, 0.3f, 100.0f,  100.0f,  0.2f, 1.0f, 1.0f, 0.9f, 0.6f, 0.3f,
     0.0f,    100.0f,  0.2f, 0.0f, 1.0f, 0.9f, 0.6f, 0.3f, 0.0f,    0.0f,    0.2f, 0.0f, 0.0f, 0.9f, 0.6f, 0.3f,
     100.0f,  0.0f,    0.2f, 1.0f, 0.0f, 0.9f, 0.6f, 0.3f, 100.0f,  100.0f,  0.2f, 1.0f, 1.0f, 0.9f, 0.6f, 0.3f,

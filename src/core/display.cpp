@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
+#include <array>
 #include <sstream>
 
 #include "graphics/renderer/sdl2_webgpu.h"
@@ -157,18 +158,25 @@ void Display::load(const int width, const int height, const std::string& title)
 
   WGPUAdapter adapter = request_adapter(m_webgpu_instance, &options);
 
-  WGPUAdapterProperties properties = {};
-  properties.nextInChain = nullptr;
-  wgpuAdapterGetProperties(adapter, &properties);
+  // WGPUAdapterProperties properties = {};
+  // properties.nextInChain = nullptr;
+  // wgpuAdapterGetProperties(adapter, &properties);
+  //
+  // spdlog::info("Using adapter: {}", properties.name);
 
-  spdlog::info("Using adapter: {}", properties.name);
+  std::array<WGPUFeatureName, 2> required_features = {
+      static_cast<WGPUFeatureName>(WGPUNativeFeature_TextureBindingArray),
+      static_cast<WGPUFeatureName>(WGPUNativeFeature_SampledTextureAndStorageBufferArrayNonUniformIndexing),
+  };
 
   WGPUDeviceDescriptor device_desc = {};
-  device_desc.label = "Device 1";
+  device_desc.label = "Default Device";
   device_desc.requiredFeatureCount = 0;
   device_desc.requiredLimits = nullptr;
   device_desc.defaultQueue.label = "Default Queue";
   device_desc.defaultQueue.nextInChain = nullptr;
+  device_desc.requiredFeatures = required_features.data();
+  device_desc.requiredFeatureCount = required_features.size();
   device = request_device(adapter, &device_desc);
 
   // auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
@@ -176,9 +184,21 @@ void Display::load(const int width, const int height, const std::string& title)
   // };
   // wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
 
-  surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
+  // surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
+  surface_format = WGPUTextureFormat_BGRA8Unorm;
+
+  // spdlog::debug("Surface format: 0x{0:x}", (uint32_t)surface_format);
 
   m_configure_surface();
+
+  // std::vector<WGPUFeatureName> features;
+  // size_t featureCount = wgpuAdapterEnumerateFeatures(adapter, nullptr);
+  // features.resize(featureCount);
+  // wgpuAdapterEnumerateFeatures(adapter, features.data());
+  // for (auto feature : features)
+  // {
+  //   spdlog::info("Feature: 0x{0:x}", (uint64_t)feature);
+  // }
 
   wgpuAdapterRelease(adapter);
 

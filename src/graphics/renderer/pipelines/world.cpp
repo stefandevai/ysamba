@@ -23,6 +23,9 @@ WorldPipeline::~WorldPipeline()
 }
 
 Texture texture{"data/textures/tileset.png"};
+Texture texture2{"data/textures/characters.png"};
+WGPUBindGroupEntryExtras texture_view_entry{};
+WGPUBindGroupLayoutEntryExtras texture_view_layout_entry{};
 
 void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat texture_format, const Shader& shader)
 {
@@ -33,6 +36,7 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
 
   // Texture
   texture.load(device);
+  texture2.load(device);
 
   // Sampler
   {
@@ -76,7 +80,12 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     binding_layout[0].buffer.type = WGPUBufferBindingType_Uniform;
     binding_layout[0].buffer.minBindingSize = uniform_data.size;
 
+    texture_view_layout_entry.chain.next = nullptr;
+    texture_view_layout_entry.chain.sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras;
+    texture_view_layout_entry.count = 2;
+
     binding_layout[1] = utils::default_binding_layout();
+    binding_layout[1].nextInChain = &texture_view_layout_entry.chain;
     binding_layout[1].binding = 1;
     binding_layout[1].visibility = WGPUShaderStage_Fragment;
     binding_layout[1].texture.sampleType = WGPUTextureSampleType_Float;
@@ -93,15 +102,26 @@ void WorldPipeline::load(const WGPUDevice device, const WGPUTextureFormat textur
     bindGroupLayoutDesc.entries = binding_layout.data();
     bindGroupLayout = wgpuDeviceCreateBindGroupLayout(device, &bindGroupLayoutDesc);
 
+    std::array<WGPUTextureView, 2> texture_views{
+        texture.view,
+        texture2.view,
+    };
+
     binding[0].nextInChain = nullptr;
     binding[0].binding = 0;
     binding[0].buffer = uniformBuffer;
     binding[0].offset = 0;
     binding[0].size = uniform_data.size;
 
-    binding[1].nextInChain = nullptr;
+    texture_view_entry.chain.next = nullptr;
+    texture_view_entry.chain.sType = (WGPUSType)WGPUSType_BindGroupEntryExtras;
+    texture_view_entry.textureViews = texture_views.data();
+    texture_view_entry.textureViewCount = 2;
+
+    binding[1].nextInChain = &texture_view_entry.chain;
     binding[1].binding = 1;
-    binding[1].textureView = texture.view;
+    // binding[1].size = 2;
+    // binding[1].textureViews = texture_views[0];
 
     binding[2].nextInChain = nullptr;
     binding[2].binding = 2;

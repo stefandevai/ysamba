@@ -1,7 +1,7 @@
 #include "./renderer.hpp"
 
 #include <spdlog/spdlog.h>
-#include <webgpu/webgpu.h>
+#include <webgpu/wgpu.h>
 
 #include "core/display.hpp"
 #include "core/game_context.hpp"
@@ -93,7 +93,7 @@ void Renderer::render(const Camera& camera)
     return;
   }
 
-  WGPUTextureViewDescriptor descriptor = {};
+  WGPUTextureViewDescriptor descriptor{};
   descriptor.nextInChain = nullptr;
   descriptor.label = "Target View";
   descriptor.format = wgpuTextureGetFormat(surface_texture.texture);
@@ -105,18 +105,19 @@ void Renderer::render(const Camera& camera)
   descriptor.aspect = WGPUTextureAspect_All;
   WGPUTextureView targetView = wgpuTextureCreateView(surface_texture.texture, &descriptor);
 
-  WGPUCommandEncoderDescriptor commandEncoderDesc = {};
+  WGPUCommandEncoderDescriptor commandEncoderDesc{};
   commandEncoderDesc.nextInChain = nullptr;
   commandEncoderDesc.label = "Command Encoder";
   WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(m_game_context.display->device, &commandEncoderDesc);
 
-  WGPURenderPassDescriptor renderPassDesc = {};
-  WGPURenderPassColorAttachment renderPassColorAttachment = {};
+  WGPURenderPassDescriptor renderPassDesc{};
+  WGPURenderPassColorAttachment renderPassColorAttachment{};
   renderPassColorAttachment.view = targetView;
   renderPassColorAttachment.resolveTarget = nullptr;
   renderPassColorAttachment.loadOp = WGPULoadOp_Clear;
   renderPassColorAttachment.storeOp = WGPUStoreOp_Store;
-  renderPassColorAttachment.clearValue = WGPUColor{0.28125, 0.44921875, 0.09375, 1.0};
+  // renderPassColorAttachment.clearValue = WGPUColor{0.28125, 0.44921875, 0.09375, 1.0};
+  renderPassColorAttachment.clearValue = WGPUColor{0.0, 0.0, 0.0, 1.0};
   renderPassDesc.colorAttachmentCount = 1;
   renderPassDesc.colorAttachments = &renderPassColorAttachment;
 
