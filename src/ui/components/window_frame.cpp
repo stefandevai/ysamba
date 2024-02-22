@@ -17,7 +17,7 @@ void WindowFrame::init()
   using namespace entt::literals;
 
   nine_patch.resource_id = "ui"_hs;
-  nine_patch.texture = m_context.asset_manager->get<Texture>("ui"_hs);
+  // nine_patch.texture = m_context.asset_manager->get<v2::Texture>("ui"_hs);
   nine_patch.top = 0;
   nine_patch.left = 0;
   nine_patch.bottom = 33;

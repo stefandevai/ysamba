@@ -16,7 +16,7 @@
 namespace dl::v2
 {
 Renderer::Renderer(GameContext& game_context)
-    : context(game_context.display->wgpu_context), m_game_context(game_context)
+    : m_game_context(game_context), context(game_context.display->wgpu_context)
 {
 }
 

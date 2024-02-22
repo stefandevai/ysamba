@@ -6,14 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "./frame_angle.hpp"
+
 namespace dl
 {
-enum class FrameAngle
-{
-  Parallel,
-  Orthogonal,
-};
-
 enum class SpriteType
 {
   Single,

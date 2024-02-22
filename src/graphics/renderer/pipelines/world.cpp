@@ -2,9 +2,12 @@
 
 #include <spdlog/spdlog.h>
 
+#include "core/display.hpp"
+#include "core/game_context.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/color.hpp"
+#include "graphics/frame_angle.hpp"
 #include "graphics/quad.hpp"
-#include "graphics/renderer/texture.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 #include "graphics/sprite.hpp"
@@ -12,7 +15,12 @@
 
 namespace dl::v2
 {
-WorldPipeline::WorldPipeline(WGPUContext& context) : m_context(context) {}
+WorldPipeline::WorldPipeline(GameContext& game_context)
+    : m_game_context(game_context),
+      m_context(game_context.display->wgpu_context),
+      m_dummy_texture(Texture::dummy(m_context.device))
+{
+}
 
 WorldPipeline::~WorldPipeline()
 {
@@ -21,26 +29,31 @@ WorldPipeline::~WorldPipeline()
     wgpuBufferDestroy(uniformBuffer);
     wgpuBufferRelease(uniformBuffer);
     wgpuBindGroupRelease(bindGroup);
-    wgpuBindGroupLayoutRelease(bindGroupLayout);
+    wgpuBindGroupLayoutRelease(bindGroupLayouts[0]);
+    wgpuBindGroupRelease(texture_bind_group);
+    wgpuBindGroupLayoutRelease(bindGroupLayouts[1]);
     wgpuSamplerRelease(sampler);
     wgpuPipelineLayoutRelease(pipelineLayout);
     wgpuRenderPipelineRelease(pipeline);
   }
 }
 
-Texture texture{"data/textures/tileset.png"};
-Texture texture2{"data/textures/characters.png"};
-WGPUBindGroupEntryExtras texture_view_entry{};
-WGPUBindGroupLayoutEntryExtras texture_view_layout_entry{};
-
 void WorldPipeline::load(const Shader& shader)
 {
+  m_vertices.resize(m_indices_size);
+
   // Mesh
   mesh.load(m_context.device);
 
-  // Texture
-  texture.load(m_context.device);
-  texture2.load(m_context.device);
+  // Textures
+  // TODO: Replace dummy textures with a more robust and flexible system
+  // when https://github.com/gfx-rs/wgpu/issues/3692 is available
+  for (uint32_t i = 0; i < TEXTURE_SLOTS; ++i)
+  {
+    m_texture_views[i] = m_dummy_texture.view;
+  }
+
+  m_texture_slot_index = 0;
 
   // Sampler
   {
@@ -96,26 +109,8 @@ void WorldPipeline::load(const Shader& shader)
       },
     };
 
-    texture_view_layout_entry = {
-      .chain = {
-        .sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras,
-        .next = nullptr,
-      },
-      .count = 2,
-    };
-
     binding_layout[1] = {
-      .nextInChain = &texture_view_layout_entry.chain,
       .binding = 1,
-      .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
-      .texture = {
-        .sampleType = WGPUTextureSampleType_Float,
-        .viewDimension = WGPUTextureViewDimension_2D,
-      },
-    };
-
-    binding_layout[2] = {
-      .binding = 2,
       .visibility = WGPUShaderStage_Fragment,
       .sampler = {
         .type = WGPUSamplerBindingType_Filtering,
@@ -127,13 +122,8 @@ void WorldPipeline::load(const Shader& shader)
         .entries = binding_layout.data(),
     };
 
-    bindGroupLayout = wgpuDeviceCreateBindGroupLayout(m_context.device, &bindGroupLayoutDesc);
-    assert(bindGroupLayout != nullptr);
-
-    std::array<WGPUTextureView, 2> texture_views = {
-        texture.view,
-        texture2.view,
-    };
+    bindGroupLayouts[0] = wgpuDeviceCreateBindGroupLayout(m_context.device, &bindGroupLayoutDesc);
+    assert(bindGroupLayouts[0] != nullptr);
 
     binding[0] = {
         .binding = 0,
@@ -142,41 +132,29 @@ void WorldPipeline::load(const Shader& shader)
         .size = uniform_data.size,
     };
 
-    texture_view_entry = {
-      .chain = {
-        .sType = (WGPUSType)WGPUSType_BindGroupEntryExtras,
-        .next = nullptr,
-      },
-      .textureViews = texture_views.data(),
-      .textureViewCount = 2,
-    };
-
     binding[1] = {
-        .nextInChain = &texture_view_entry.chain,
         .binding = 1,
-    };
-
-    binding[2] = {
-        .binding = 2,
         .sampler = sampler,
     };
 
     WGPUBindGroupDescriptor bindGroupDesc = {
-        .layout = bindGroupLayout,
+        .layout = bindGroupLayouts[0],
         .entryCount = (uint32_t)binding.size(),
         .entries = binding.data(),
     };
 
     bindGroup = wgpuDeviceCreateBindGroup(m_context.device, &bindGroupDesc);
     assert(bindGroup != nullptr);
+
+    m_update_texture_bind_group();
   }
 
   // Pipeline
   {
     // Uniforms layout
     WGPUPipelineLayoutDescriptor pipelineLayoutDesc{};
-    pipelineLayoutDesc.bindGroupLayoutCount = 1;
-    pipelineLayoutDesc.bindGroupLayouts = &bindGroupLayout;
+    pipelineLayoutDesc.bindGroupLayoutCount = bindGroupLayouts.size();
+    pipelineLayoutDesc.bindGroupLayouts = bindGroupLayouts.data();
     pipelineLayout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipelineLayoutDesc);
 
     // Vertex fetch
@@ -271,11 +249,27 @@ void WorldPipeline::load(const Shader& shader)
     assert(pipeline != nullptr);
   }
 
+  // Initialize vertex buffer
+  {
+    WGPUBufferDescriptor buffer_descriptor = {
+        .size = m_buffer_size,
+        .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
+        .mappedAtCreation = false,
+    };
+    m_vertex_buffer = wgpuDeviceCreateBuffer(m_context.device, &buffer_descriptor);
+  }
+
   m_has_loaded = true;
 }
 
 void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
 {
+  if (m_should_update_texture_bind_group)
+  {
+    m_update_texture_bind_group();
+  }
+
+  // Set up uniforms
   wgpuQueueWriteBuffer(m_context.queue,
                        uniformBuffer,
                        uniform_data.projection_matrix_offset,
@@ -287,15 +281,170 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
                        &camera.view_matrix,
                        uniform_data.view_matrix_size);
 
+  // Write vertice data to buffer
+  const auto size = m_vertices_index * sizeof(VertexData);
+  const auto count = m_vertices_index;
+  wgpuQueueWriteBuffer(m_context.queue, m_vertex_buffer, 0, m_vertices.data(), size);
+
+  // Draw
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
-  wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, mesh.buffer, 0, mesh.size);
+  wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, m_vertex_buffer, 0, size);
   wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
-  wgpuRenderPassEncoderDraw(render_pass, mesh.count, 1, 0, 0);
+  wgpuRenderPassEncoderSetBindGroup(render_pass, 1, texture_bind_group, 0, nullptr);
+  wgpuRenderPassEncoderDraw(render_pass, count, 1, 0, 0);
+
+  // Reset vertex index for next frame
+  index_count = 0;
+  m_vertices_index = 0;
 }
 
-void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const double z) {}
+void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const double z)
+{
+  assert(index_count <= m_indices_size);
+  if (sprite->texture == nullptr)
+  {
+    sprite->texture = m_game_context.asset_manager->get<v2::Texture>("ysamba-typography"_hs, m_context.device);
+  }
+
+  const glm::vec2& size = sprite->get_size();
+  const auto& texture_coordinates = sprite->get_texture_coordinates();
+  unsigned int color = sprite->color.int_color;
+
+  assert(size.x != 0);
+  assert(size.y != 0);
+
+  if (sprite->color.opacity_factor < 1.0)
+  {
+    const auto& sprite_color = sprite->color.rgba_color;
+    color = Color::rgba_to_int(sprite_color.r,
+                               sprite_color.g,
+                               sprite_color.b,
+                               static_cast<uint8_t>(sprite_color.a * sprite->color.opacity_factor));
+  }
+
+  // Build vector of textures to bind when rendering
+  // texture_index is the index in m_texture_views that will
+  // be translated to a index in the shader.
+  float texture_index = 0.00f;
+  const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(m_texture_views.begin(), upper_bound, sprite->texture->view);
+  if (it >= upper_bound)
+  {
+    texture_index = static_cast<float>(m_texture_slot_index);
+    m_texture_views[m_texture_slot_index] = sprite->texture->view;
+    ++m_texture_slot_index;
+    m_should_update_texture_bind_group = true;
+  }
+  else
+  {
+    texture_index = it - m_texture_views.begin();
+  }
+
+  // Top left vertex
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color};
+  }
+  else
+  {
+    m_vertices[m_vertices_index++]
+        = VertexData{glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color};
+  }
+
+  // Top right vertex
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    m_vertices[m_vertices_index++]
+        = VertexData{glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color};
+  }
+  else
+  {
+    m_vertices[m_vertices_index++]
+        = VertexData{glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color};
+  }
+
+  // Bottom left vertex
+  m_vertices[m_vertices_index++]
+      = VertexData{glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color};
+
+  // Top right vertex
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    m_vertices[m_vertices_index++]
+        = VertexData{glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color};
+  }
+  else
+  {
+    m_vertices[m_vertices_index++]
+        = VertexData{glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color};
+  }
+
+  // Bottom left vertex
+  m_vertices[m_vertices_index++]
+      = VertexData{glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color};
+
+  // Bottom right vertex
+  m_vertices[m_vertices_index++]
+      = VertexData{glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color};
+
+  // Each quad has 6 vertices, we have therefore to increment by 6 each time
+  index_count += 6;
+}
 
 void WorldPipeline::quad(const Quad* quad, const double x, const double y, const double z) {}
 
 void WorldPipeline::text(Text& text, const double x, const double y, const double z) {}
+
+void WorldPipeline::m_update_texture_bind_group()
+{
+  WGPUBindGroupLayoutEntryExtras texture_view_layout_entry = {
+    .chain = {
+      .sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras,
+      .next = nullptr,
+    },
+    .count = (uint32_t)m_texture_views.size(),
+  };
+
+  texture_binding_layout = {
+    .nextInChain = &texture_view_layout_entry.chain,
+    .binding = 0,
+    .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
+    .texture = {
+      .sampleType = WGPUTextureSampleType_Float,
+      .viewDimension = WGPUTextureViewDimension_2D,
+    },
+  };
+
+  WGPUBindGroupLayoutDescriptor texture_bind_group_layout_descriptor = {
+      .entryCount = 1,
+      .entries = &texture_binding_layout,
+  };
+
+  bindGroupLayouts[1] = wgpuDeviceCreateBindGroupLayout(m_context.device, &texture_bind_group_layout_descriptor);
+  assert(bindGroupLayouts[1] != nullptr);
+
+  WGPUBindGroupEntryExtras texture_view_entry = {
+    .chain = {
+      .sType = (WGPUSType)WGPUSType_BindGroupEntryExtras,
+      .next = nullptr,
+    },
+    .textureViews = m_texture_views.data(),
+    .textureViewCount = (uint32_t)m_texture_views.size(),
+  };
+
+  texture_binding = {
+      .nextInChain = &texture_view_entry.chain,
+      .binding = 0,
+  };
+
+  WGPUBindGroupDescriptor texture_bind_group_descriptor = {
+      .layout = bindGroupLayouts[1],
+      .entryCount = 1,
+      .entries = &texture_binding,
+  };
+  texture_bind_group = wgpuDeviceCreateBindGroup(m_context.device, &texture_bind_group_descriptor);
+  assert(texture_bind_group != nullptr);
+
+  m_should_update_texture_bind_group = false;
+}
 }  // namespace dl::v2

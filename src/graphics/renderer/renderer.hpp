@@ -18,9 +18,12 @@ namespace v2
 {
 class Renderer
 {
+ private:
+  GameContext& m_game_context;
+
  public:
   WGPUContext& context;
-  WorldPipeline world_pipeline{context};
+  WorldPipeline world_pipeline{m_game_context};
 
   Renderer(GameContext& game_context);
   ~Renderer();
@@ -33,7 +36,6 @@ class Renderer
 
  private:
   bool m_has_loaded = false;
-  GameContext& m_game_context;
   WGPUTextureView depth_texture_view;
   WGPUTexture depth_texture;
   WGPUColor m_clear_color{0.0, 0.0, 0.0, 1.0};

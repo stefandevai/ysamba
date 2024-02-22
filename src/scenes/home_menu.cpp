@@ -18,6 +18,11 @@
 #include "ui/compositions/world_list.hpp"
 #include "world/society/name_generator.hpp"
 
+// TEMP
+#include "core/asset_manager.hpp"
+#include "graphics/renderer/texture.hpp"
+// TEMP
+
 namespace dl
 {
 HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context) {}
@@ -28,16 +33,16 @@ void HomeMenu::load()
   using namespace i18n::literals;
 
   // m_renderer.add_batch("text"_hs, "default"_hs, 2);
-  //
-  // m_typography = std::make_shared<Sprite>("ysamba-typography"_hs);
-  //
+
+  m_typography = std::make_shared<Sprite>("ysamba-typography"_hs);
+
   // m_instructions.color.set(0xCCC1AFFF);
   // m_instructions.set_font_size(16);
   // m_instructions.set_typeface("font-1980"_hs);
   // m_instructions.set_text_wrapped("instructions"_t, 200);
-  //
-  // m_load_worlds_metadata();
-  //
+
+  m_load_worlds_metadata();
+
   // const auto on_select_world = [this](const WorldMetadata& world_metadata) {
   //   m_ui_manager.force_hide_all();
   //   m_game_context.world_metadata = world_metadata;
@@ -99,6 +104,7 @@ void HomeMenu::render()
     return;
   }
 
+  m_renderer2.world_pipeline.sprite(m_typography.get(), 60, 60, 0);
   m_renderer2.render(m_camera);
 
   // m_renderer.push_matrix("text"_hs, m_camera.view_matrix);

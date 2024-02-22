@@ -4,8 +4,9 @@
 #include <memory>
 
 #include "./color.hpp"
-#include "./texture.hpp"
+#include "./frame_angle.hpp"
 #include "./transform.hpp"
+#include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
@@ -13,7 +14,7 @@ class Sprite
 {
  public:
   uint32_t resource_id{};
-  const Texture* texture = nullptr;
+  const v2::Texture* texture = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
   Color color{0xFFFFFFFF};
   int frame = 0;

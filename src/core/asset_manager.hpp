@@ -8,12 +8,12 @@
 #include <variant>
 
 #include "graphics/font.hpp"
+#include "graphics/renderer/texture.hpp"
 #include "graphics/shader_program.hpp"
-#include "graphics/texture.hpp"
 
 namespace dl
 {
-using Asset = std::variant<std::unique_ptr<ShaderProgram>, std::unique_ptr<Texture>, std::unique_ptr<Font>>;
+using Asset = std::variant<std::unique_ptr<ShaderProgram>, std::unique_ptr<v2::Texture>, std::unique_ptr<Font>>;
 
 enum class AssetType
 {
@@ -38,8 +38,8 @@ class AssetManager
     m_assets.emplace(id, std::move(asset));
   }
 
-  template <typename T>
-  static T* get(uint32_t id)
+  template <typename T, typename... Args>
+  static T* get(uint32_t id, Args&&... args)
   {
     if (!m_assets.contains(id))
     {
@@ -52,7 +52,7 @@ class AssetManager
 
     if (!value->has_loaded)
     {
-      value->load();
+      value->load(std::forward<Args>(args)...);
     }
 
     return value.get();

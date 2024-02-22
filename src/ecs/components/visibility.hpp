@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "graphics/frame_angle.hpp"
 #include "graphics/sprite.hpp"
 
 namespace dl

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "./color.hpp"
+#include "./frame_angle.hpp"
 #include "./texture.hpp"
 #include "./transform.hpp"
 

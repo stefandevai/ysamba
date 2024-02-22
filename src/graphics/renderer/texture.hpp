@@ -8,14 +8,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "graphics/frame_angle.hpp"
+
 namespace dl::v2
 {
-enum class FrameAngle
-{
-  Parallel,
-  Orthogonal,
-};
-
 enum class SpriteType
 {
   Single,
@@ -57,6 +53,8 @@ class Texture
   // Create texture providing raw data
   Texture(const std::vector<unsigned char>& data, const int width, const int height);
   ~Texture();
+
+  static Texture dummy(const WGPUDevice device);
 
   void load(const WGPUDevice device);
   void load(const WGPUDevice device, const unsigned char* data, const int width, const int height, const int channels);

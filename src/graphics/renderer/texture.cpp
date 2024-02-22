@@ -33,7 +33,7 @@ Texture::Texture(const std::string& filepath,
 Texture::Texture(const std::vector<unsigned char>& data, const int width, const int height)
     : m_horizontal_frames(1), m_vertical_frames(1)
 {
-  // load(data.data(), width, height, GL_RGBA);
+  // load(data.data(), width, height, 4);
 }
 
 Texture::Texture(const int width, const int height)
@@ -50,7 +50,16 @@ Texture::~Texture()
     wgpuTextureDestroy(texture);
     wgpuTextureRelease(texture);
   }
-  // glDeleteTextures(1, &m_id);
+}
+
+Texture Texture::dummy(const WGPUDevice device)
+{
+  const std::vector<unsigned char> dummy_data = {0, 0, 0, 0};
+
+  Texture dummy_texture{dummy_data, 1, 1};
+  dummy_texture.load(device, dummy_data.data(), 1, 1, 4);
+
+  return dummy_texture;
 }
 
 void Texture::load(const WGPUDevice device)
@@ -122,17 +131,6 @@ void Texture::load(
   textureViewDesc.format = textureDesc.format;
   view = wgpuTextureCreateView(texture, &textureViewDesc);
 
-  // glGenTextures(1, &m_id);
-  // glBindTexture(GL_TEXTURE_2D, m_id);
-  // glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
-  // glGenerateMipmap(GL_TEXTURE_2D);
-  //
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  //
-  // glBindTexture(GL_TEXTURE_2D, 0);
   has_loaded = true;
 }
 

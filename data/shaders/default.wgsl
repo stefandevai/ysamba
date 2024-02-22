@@ -18,8 +18,9 @@ struct Uniforms {
 }
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
-@group(0) @binding(1) var gradientTexture: binding_array<texture_2d<f32>, 2>;
-@group(0) @binding(2) var textureSampler: sampler;
+@group(0) @binding(1) var textureSampler: sampler;
+
+@group(1) @binding(0) var gradientTexture: binding_array<texture_2d<f32>>;
 
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {

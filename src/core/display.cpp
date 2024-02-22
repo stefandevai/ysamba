@@ -160,6 +160,15 @@ void Display::load(const int width, const int height, const std::string& title)
   //
   // spdlog::info("Using adapter: {}", properties.name);
 
+  // size_t featureCount = wgpuAdapterEnumerateFeatures(wgpu_context.adapter, nullptr);
+  // std::vector<WGPUFeatureName> features(featureCount);
+  // wgpuAdapterEnumerateFeatures(wgpu_context.adapter, features.data());
+  //
+  // for (auto f : features)
+  // {
+  //   spdlog::debug("Feature: 0x{0:x}", (uint64_t)f);
+  // }
+
   std::array<WGPUFeatureName, 2> required_features = {
       static_cast<WGPUFeatureName>(WGPUNativeFeature_TextureBindingArray),
       static_cast<WGPUFeatureName>(WGPUNativeFeature_SampledTextureAndStorageBufferArrayNonUniformIndexing),

@@ -65,7 +65,8 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       }
       if (visibility.sprite->texture == nullptr)
       {
-        visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
+        // TODO: READ ON REFACTOR
+        // visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
         visibility.sprite->frame_angle = visibility.frame_angle;
 
         // Set specific frame according to the texture data loaded in a separated json file.
