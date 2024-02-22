@@ -7,8 +7,9 @@
 #include <vector>
 #include FT_FREETYPE_H
 #include <glad/glad.h>
+#include <webgpu/wgpu.h>
 
-#include "./texture.hpp"
+#include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
@@ -29,12 +30,12 @@ class Font
   bool has_loaded = false;
 
   Font(const std::string& path, std::size_t size = 16);
-  void load();
+  void load(WGPUDevice device);
   const CharacterData& get_char_data(char32_t c) const
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
   };
-  inline const Texture* get_atlas() const { return m_texture_atlas.get(); };
+  inline const v2::Texture* get_atlas() const { return m_texture_atlas.get(); };
   inline size_t get_size() const { return m_size; };
   inline int get_max_character_top() const { return m_max_character_top; };
 
@@ -44,7 +45,7 @@ class Font
   FT_Library m_ft;
   FT_Face m_face;
   std::map<char32_t, CharacterData> m_chars;
-  std::unique_ptr<Texture> m_texture_atlas = nullptr;
+  std::unique_ptr<v2::Texture> m_texture_atlas = nullptr;
   unsigned int m_atlas_width, m_atlas_height;
   int m_max_character_top = 0;
 

@@ -94,42 +94,65 @@ void Texture::load(
 
   const auto queue = wgpuDeviceGetQueue(device);
 
-  WGPUTextureDescriptor textureDesc{};
-  textureDesc.label = "WorldPipeline Texture";
-  textureDesc.dimension = WGPUTextureDimension_2D;
-  textureDesc.size = {static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), 1};
-  textureDesc.mipLevelCount = 1;
-  textureDesc.sampleCount = 1;
-  textureDesc.format = WGPUTextureFormat_RGBA8Unorm;
-  textureDesc.usage = WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst;
-  textureDesc.viewFormatCount = 0;
-  textureDesc.viewFormats = nullptr;
+  WGPUTextureFormat format;
+  switch (channels)
+  {
+  case 1:
+    format = WGPUTextureFormat_R8Unorm;
+    break;
+
+  case 4:
+    format = WGPUTextureFormat_RGBA8Unorm;
+    break;
+
+  default:
+    format = WGPUTextureFormat_RGBA8Unorm;
+    break;
+  }
+
+  WGPUTextureDescriptor textureDesc{
+      .label = "WorldPipeline Texture",
+      .dimension = WGPUTextureDimension_2D,
+      .size = {static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), 1},
+      .mipLevelCount = 1,
+      .sampleCount = 1,
+      .format = format,
+      .usage = WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst,
+      .viewFormatCount = 0,
+      .viewFormats = nullptr,
+  };
+
   texture = wgpuDeviceCreateTexture(device, &textureDesc);
+  assert(texture != nullptr);
 
-  WGPUImageCopyTexture destination;
-  destination.texture = texture;
-  destination.mipLevel = 0;
-  destination.origin = {0, 0, 0};
-  destination.aspect = WGPUTextureAspect_All;
+  WGPUImageCopyTexture destination = {
+      .texture = texture,
+      .mipLevel = 0,
+      .origin = {0, 0, 0},
+      .aspect = WGPUTextureAspect_All,
+  };
 
-  WGPUTextureDataLayout source;
-  source.offset = 0;
-  source.bytesPerRow = 4 * textureDesc.size.width;
-  source.rowsPerImage = textureDesc.size.height;
+  WGPUTextureDataLayout source = {
+      .offset = 0,
+      .bytesPerRow = channels * textureDesc.size.width,
+      .rowsPerImage = textureDesc.size.height,
+  };
 
   wgpuQueueWriteTexture(
       queue, &destination, data, width * height * channels * sizeof(uint8_t), &source, &textureDesc.size);
 
-  WGPUTextureViewDescriptor textureViewDesc{};
-  textureViewDesc.label = "WorldPipeline Texture View";
-  textureViewDesc.aspect = WGPUTextureAspect_All;
-  textureViewDesc.baseArrayLayer = 0;
-  textureViewDesc.arrayLayerCount = 1;
-  textureViewDesc.baseMipLevel = 0;
-  textureViewDesc.mipLevelCount = 1;
-  textureViewDesc.dimension = WGPUTextureViewDimension_2D;
-  textureViewDesc.format = textureDesc.format;
+  WGPUTextureViewDescriptor textureViewDesc{
+      .label = "WorldPipeline Texture View",
+      .aspect = WGPUTextureAspect_All,
+      .baseArrayLayer = 0,
+      .arrayLayerCount = 1,
+      .baseMipLevel = 0,
+      .mipLevelCount = 1,
+      .dimension = WGPUTextureViewDimension_2D,
+      .format = textureDesc.format,
+  };
   view = wgpuTextureCreateView(texture, &textureViewDesc);
+  assert(view != nullptr);
 
   has_loaded = true;
 }

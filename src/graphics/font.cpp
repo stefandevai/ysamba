@@ -10,7 +10,7 @@ namespace dl
 {
 Font::Font(const std::string& path, std::size_t size) : m_path(path), m_size(size) {}
 
-void Font::load()
+void Font::load(WGPUDevice device)
 {
   if (FT_Init_FreeType(&m_ft))
   {
@@ -51,11 +51,13 @@ void Font::load()
   m_atlas_width = atlas_width;
   m_atlas_height = atlas_height;
 
-  m_texture_atlas = std::make_unique<Texture>(atlas_width, atlas_height);
+  m_texture_atlas = std::make_unique<v2::Texture>(atlas_width, atlas_height);
 
   int x_offset = 0;
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  m_texture_atlas->bind();
+  // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  // m_texture_atlas->bind();
+
+  std::vector<unsigned char> data(atlas_width * atlas_height * 4, 0);
 
   for (const auto& char_range : m_char_ranges)
   {
@@ -66,36 +68,52 @@ void Font::load()
         spdlog::critical("Failed to load Glyph");
         continue;
       }
-      glTexSubImage2D(GL_TEXTURE_2D,
-                      0,
-                      x_offset,
-                      0,
-                      m_face->glyph->bitmap.width,
-                      m_face->glyph->bitmap.rows,
-                      GL_RED,
-                      GL_UNSIGNED_BYTE,
-                      m_face->glyph->bitmap.buffer);
+
+      const auto& glyph = *m_face->glyph;
+
+      // glTexSubImage2D(GL_TEXTURE_2D,
+      //                 0,
+      //                 x_offset,
+      //                 0,
+      //                 m_face->glyph->bitmap.width,
+      //                 m_face->glyph->bitmap.rows,
+      //                 GL_RED,
+      //                 GL_UNSIGNED_BYTE,
+      //                 m_face->glyph->bitmap.buffer);
+
+      for (uint32_t j = 0; j < glyph.bitmap.rows; ++j)
+      {
+        for (uint32_t i = 0; i < glyph.bitmap.width; ++i)
+        {
+          data[x_offset * 4 + i * 4 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          data[x_offset * 4 + i * 4 + 1 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          data[x_offset * 4 + i * 4 + 2 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          data[x_offset * 4 + i * 4 + 3 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+        }
+      }
 
       m_max_character_top = std::max(m_max_character_top, m_face->glyph->bitmap_top);
 
-      CharacterData ch_data = {m_face->glyph->advance.x,
-                               m_face->glyph->advance.y,
-                               m_face->glyph->bitmap.width,
-                               m_face->glyph->bitmap.rows,
-                               m_face->glyph->bitmap_left,
-                               m_face->glyph->bitmap_top,
+      CharacterData ch_data = {glyph.advance.x,
+                               glyph.advance.y,
+                               glyph.bitmap.width,
+                               glyph.bitmap.rows,
+                               glyph.bitmap_left,
+                               glyph.bitmap_top,
                                (float)x_offset / m_atlas_width};
       m_chars.insert(std::pair<char32_t, CharacterData>(c, ch_data));
-      x_offset += m_face->glyph->bitmap.width;
+      x_offset += glyph.bitmap.width;
     }
   }
 
-  // Use the red value in the GBA channels to facilitate the work in the shader
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
+  m_texture_atlas->load(device, data.data(), m_atlas_width, m_atlas_height, 4);
 
-  m_texture_atlas->unbind();
+  // Use the red value in the GBA channels to facilitate the work in the shader
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
+
+  // m_texture_atlas->unbind();
 
   FT_Done_Face(m_face);
   FT_Done_FreeType(m_ft);

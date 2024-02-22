@@ -26,7 +26,7 @@ struct Uniforms {
 fn vs_main(in: VertexInput) -> VertexOutput {
   var out: VertexOutput;
   out.position = uniforms.projection * uniforms.view * vec4f(in.position, 1.0);
-  out.color = in.color;
+  out.color = in.color.abgr;
   out.uv = in.uv;
   out.texture_id = in.texture_id;
   return out;
@@ -45,5 +45,5 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4f {
     discard;
   }
 
-  return color * in.color;
+  return vec4(color.r, color.g, color.b, color.a) * in.color;
 }

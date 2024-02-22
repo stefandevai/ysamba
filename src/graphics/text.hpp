@@ -33,6 +33,9 @@ class Text
   std::vector<Character> characters{};
   Color color{0xFFFFFFFF};
   double line_height = 1.2;
+  const Font* m_font = nullptr;
+  bool m_has_initialized = false;
+  uint32_t wrap_width = 0;
 
   Text(const std::string_view text,
        const uint32_t typeface,
@@ -46,6 +49,8 @@ class Text
 
   void initialize();
   void update();
+  void update_wrapped();
+  void update_non_wrapped();
 
   const std::string& get_text() const { return value; }
   uint32_t get_typeface() const { return typeface; }
@@ -63,9 +68,7 @@ class Text
  private:
   size_t m_font_size = 16;
   bool m_is_static = true;
-  bool m_has_initialized = false;
   Vector2i m_size{0, 0};
-  const Font* m_font = nullptr;
 
   void m_process_command(UTF8Iterator& it, Color& character_color);
 };

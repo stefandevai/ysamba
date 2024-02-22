@@ -393,7 +393,38 @@ void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const
 
 void WorldPipeline::quad(const Quad* quad, const double x, const double y, const double z) {}
 
-void WorldPipeline::text(Text& text, const double x, const double y, const double z) {}
+void WorldPipeline::text(Text& text, const double x, const double y, const double z)
+{
+  if (!text.m_has_initialized)
+  {
+    text.m_font = m_game_context.asset_manager->get<Font>(text.typeface, m_context.device);
+    assert(text.m_font != nullptr);
+    text.initialize();
+  }
+  else if (!text.get_is_static())
+  {
+    text.update();
+  }
+
+  for (auto& character : text.characters)
+  {
+    // Character is a space
+    if (character.sprite == nullptr)
+    {
+      continue;
+    }
+    /* if (character.sprite->color.int_color != text.color.int_color) */
+    /* { */
+    /*   character.sprite->color.set(text.color.int_color); */
+    /* } */
+    if (character.sprite->color.opacity_factor != text.color.opacity_factor)
+    {
+      character.sprite->color.opacity_factor = text.color.opacity_factor;
+    }
+
+    sprite(character.sprite.get(), character.x + x, character.y + y, z);
+  }
+}
 
 void WorldPipeline::m_update_texture_bind_group()
 {
