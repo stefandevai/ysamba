@@ -40,20 +40,11 @@ WorldPipeline::~WorldPipeline()
   }
 }
 
-uint64_t original_ptr = 0;
-
 void WorldPipeline::load(const Shader& shader)
 {
   // Add main vertex buffer
-  m_vertex_buffers.emplace_back(m_context.device, m_indices_size);
+  m_vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT);
   m_current_vb = &m_vertex_buffers[0];
-  original_ptr = (uint64_t)m_current_vb;
-  spdlog::debug("Original ptr: {}", original_ptr);
-
-  // m_vertices.resize(m_indices_size);
-
-  // Mesh
-  mesh.load(m_context.device);
 
   // Textures
   // TODO: Replace dummy textures with a more robust and flexible system
@@ -168,7 +159,6 @@ void WorldPipeline::load(const Shader& shader)
     pipelineLayout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipelineLayoutDesc);
 
     // Vertex fetch
-    vertex_size = 6 * sizeof(float) + sizeof(uint32_t);
     std::array<WGPUVertexAttribute, 4> vertexAttribs = {
         WGPUVertexAttribute{
             .shaderLocation = 0,
@@ -195,7 +185,7 @@ void WorldPipeline::load(const Shader& shader)
     WGPUVertexBufferLayout vertexBufferLayout = {
         .attributeCount = vertexAttribs.size(),
         .attributes = vertexAttribs.data(),
-        .arrayStride = vertex_size,
+        .arrayStride = sizeof(VertexData),
         .stepMode = WGPUVertexStepMode_Vertex,
     };
 
@@ -259,21 +249,13 @@ void WorldPipeline::load(const Shader& shader)
     assert(pipeline != nullptr);
   }
 
-  // Initialize vertex buffer
-  {
-    // WGPUBufferDescriptor buffer_descriptor = {
-    //     .size = m_buffer_size,
-    //     .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
-    //     .mappedAtCreation = false,
-    // };
-    // m_vertex_buffer = wgpuDeviceCreateBuffer(m_context.device, &buffer_descriptor);
-  }
-
   m_has_loaded = true;
 }
 
 void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
 {
+  assert(m_current_vb != nullptr);
+
   if (m_should_update_texture_bind_group)
   {
     m_update_texture_bind_group();
@@ -285,6 +267,7 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
                        uniform_data.projection_matrix_offset,
                        &camera.projection_matrix,
                        uniform_data.projection_matrix_size);
+
   wgpuQueueWriteBuffer(m_context.queue,
                        uniformBuffer,
                        uniform_data.view_matrix_offset,
@@ -298,13 +281,6 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
   wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
   wgpuRenderPassEncoderSetBindGroup(render_pass, 1, texture_bind_group, 0, nullptr);
 
-  // Write vertice data to buffer
-  // const auto size = m_vertices_index * sizeof(VertexData);
-  // const auto count = m_vertices_index;
-  // const auto size = m_current_vb->size();
-  // wgpuQueueWriteBuffer(m_context.queue, m_current_vb->buffer, 0, m_current_vb->vertices.data(), size);
-
-  // spdlog::debug("Rendering {} vertex buffers", m_vertex_buffers.size());
   for (auto& vertex_buffer : m_vertex_buffers)
   {
     if (vertex_buffer.index == 0)
@@ -312,46 +288,31 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
       continue;
     }
 
+    // Write vertex data to buffer
     vertex_buffer.update(m_context.queue);
     wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.size);
 
+    // Set scissor if exists
     if (vertex_buffer.has_scissor())
     {
       const auto& scissor = vertex_buffer.scissor;
       wgpuRenderPassEncoderSetScissorRect(render_pass, scissor.x, scissor.y, scissor.z, scissor.w);
     }
 
+    // Draw
     wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.index, 1, 0, 0);
+
+    // Reset buffer for next frame
     vertex_buffer.reset();
   }
-
-  // spdlog::debug("Original ptr: {}", original_ptr);
-  // spdlog::debug("Current ptr: {}\n", (uint64_t)&m_vertex_buffers[0]);
-
-  // m_vertex_buffers[0].update(m_context.queue);
-  // wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, m_vertex_buffers[0].buffer, 0, m_vertex_buffers[0].size);
-  // wgpuRenderPassEncoderDraw(render_pass, m_vertex_buffers[0].index, 1, 0, 0);
-  // m_vertex_buffers[0].reset();
-
-  // m_current_vb->update(m_context.queue);
-  // wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, m_current_vb->buffer, 0, m_current_vb->size);
-
-  // wgpuRenderPassEncoderSetScissorRect(render_pass, 150, 150, 100, 100);
-
-  // Draw
-  // wgpuRenderPassEncoderDraw(render_pass, m_current_vb->index, 1, 0, 0);
-
-  // Reset vertex index for next frame
-  // m_current_vb->reset();
-  // index_count = 0;
-  // m_vertices_index = 0;
 }
 
 void WorldPipeline::clear_textures() { m_texture_slot_index = 0; }
 
 void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const double z)
 {
-  // assert(index_count <= m_indices_size);
+  assert(m_current_vb != nullptr);
+
   if (sprite->texture == nullptr)
   {
     sprite->texture = m_game_context.asset_manager->get<v2::Texture>("ysamba-typography"_hs, m_context.device);
@@ -429,20 +390,17 @@ void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
-
-  // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  // index_count += 6;
 }
 
 void WorldPipeline::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
 {
+  assert(m_current_vb != nullptr);
+
   // Load texture if it has not been loaded
   if (sprite->texture == nullptr)
   {
     sprite->texture = m_game_context.asset_manager->get<v2::Texture>(sprite->resource_id, m_context.device);
   }
-
-  assert(index_count <= m_indices_size);
 
   unsigned int color = sprite->color.int_color;
 
@@ -522,13 +480,12 @@ void WorldPipeline::multi_sprite(MultiSprite* sprite, const double x, const doub
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color);
-
-  // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  // index_count += 6;
 }
 
 void WorldPipeline::tile(const TileRenderData& tile, const double x, const double y, const double z)
 {
+  assert(m_current_vb != nullptr);
+
   const auto& size = tile.size;
   const auto& uv_coordinates = tile.uv_coordinates;
   const uint32_t color = 0xFFFFFFFF;
@@ -590,14 +547,11 @@ void WorldPipeline::tile(const TileRenderData& tile, const double x, const doubl
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color);
-
-  // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  // index_count += 6;
 }
 
 void WorldPipeline::quad(const Quad* quad, const double x, const double y, const double z)
 {
-  // assert(index_count <= m_indices_size);
+  assert(m_current_vb != nullptr);
 
   uint32_t color = quad->color.int_color;
 
@@ -609,36 +563,27 @@ void WorldPipeline::quad(const Quad* quad, const double x, const double y, const
   }
 
   // Top left vertex
-  // m_vertices[m_vertices_index++] = VertexData{};
   m_current_vb->emplace(glm::vec3{x, y, z}, glm::vec2{0}, -1.0f, color);
 
   // Top right vertex
-  // m_vertices[m_vertices_index++] = VertexData{};
   m_current_vb->emplace(glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1.0f, color);
 
   // Bottom left vertex
-  // m_vertices[m_vertices_index++] = VertexData{};
   m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 
   // Top right vertex
-  // m_vertices[m_vertices_index++] = VertexData{};
   m_current_vb->emplace(glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1.0f, color);
 
   // Bottom left vertex
-  // m_vertices[m_vertices_index++] = VertexData{};
   m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 
   // Bottom right vertex
-  // m_vertices[m_vertices_index++] = VertexData{};
   m_current_vb->emplace(glm::vec3{x + quad->w, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
-
-  // Each quad has 6 vertices, we have therefore to increment by 6 each time
-  // index_count += 6;
 }
 
 void WorldPipeline::text(Text& text, const double x, const double y, const double z)
 {
-  // assert(index_count <= m_indices_size);
+  assert(m_current_vb != nullptr);
 
   if (!text.m_has_initialized)
   {
@@ -673,6 +618,8 @@ void WorldPipeline::text(Text& text, const double x, const double y, const doubl
 
 void WorldPipeline::m_update_texture_bind_group()
 {
+  assert(m_current_vb != nullptr);
+
   WGPUBindGroupLayoutEntryExtras texture_view_layout_entry = {
     .chain = {
       .sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras,
@@ -726,6 +673,8 @@ void WorldPipeline::m_update_texture_bind_group()
 
 void WorldPipeline::nine_patch(NinePatch& nine_patch, const double x, const double y, const double z)
 {
+  assert(m_current_vb != nullptr);
+
   if (nine_patch.texture == nullptr)
   {
     nine_patch.texture = m_game_context.asset_manager->get<v2::Texture>(nine_patch.resource_id, m_context.device);
@@ -787,12 +736,11 @@ void WorldPipeline::push_scissor(Vector4i scissor)
 
   // Create a new buffer
   spdlog::debug("CREATING BUFFER!");
-  VertexBuffer<VertexData> vertex_buffer{m_context.device, 2000};
+  VertexBuffer<VertexData> vertex_buffer{m_context.device, SECONDARY_BATCH_VERTEX_COUNT};
   vertex_buffer.scissor = std::move(scissor);
   m_vertex_buffers.push_back(std::move(vertex_buffer));
   m_current_vb = &m_vertex_buffers.back();
 }
 
 void WorldPipeline::pop_scissor() { m_current_vb = &m_vertex_buffers[0]; }
-
 }  // namespace dl::v2

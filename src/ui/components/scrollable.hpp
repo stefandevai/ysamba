@@ -3,7 +3,6 @@
 #include <entt/core/hashed_string.hpp>
 
 #include "./component.hpp"
-#include "graphics/batch.hpp"
 
 namespace dl::ui
 {

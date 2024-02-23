@@ -38,11 +38,9 @@ class Texture;
 class WorldPipeline
 {
  public:
-  // TEMP
-  Mesh mesh{};
-  uint32_t index_count = 0;
-  uint32_t vertex_size;
-  uint32_t vertex_count;
+  static constexpr uint32_t MAIN_BATCH_VERTEX_COUNT = 80000;
+  static constexpr uint32_t SECONDARY_BATCH_VERTEX_COUNT = 2000;
+  static constexpr uint32_t TEXTURE_SLOTS = 8;
 
   std::array<WGPUBindGroupLayoutEntry, 2> binding_layout{};
   std::array<WGPUBindGroupEntry, 2> binding{};
@@ -60,7 +58,6 @@ class WorldPipeline
   struct UniformData
   {
     uint32_t size = sizeof(glm::mat4) * 2;
-
     uint32_t projection_matrix_offset = 0;
     uint32_t projection_matrix_size = sizeof(glm::mat4);
     uint32_t view_matrix_offset = sizeof(glm::mat4);
@@ -68,8 +65,6 @@ class WorldPipeline
   };
   UniformData uniform_data;
   WGPUPipelineLayout pipelineLayout;
-  // TEMP
-
   WGPURenderPipeline pipeline;
 
   WorldPipeline(GameContext& game_context);
@@ -103,19 +98,6 @@ class WorldPipeline
     uint32_t color;
   };
 
-  static constexpr uint32_t m_max_quads = 80000;
-  static constexpr uint32_t m_vertex_size = sizeof(VertexData);
-  static constexpr uint32_t m_quad_size = 4 * m_vertex_size;
-  static constexpr uint32_t m_buffer_size = m_max_quads * m_quad_size;
-  static constexpr uint32_t m_indices_size = 6 * m_max_quads;
-  static constexpr uint32_t TEXTURE_SLOTS = 8;
-
-  std::vector<VertexData> m_vertices{};
-  uint32_t m_vertices_index = 0;
-  WGPUBuffer m_vertex_buffer{};
-
-  // VertexBuffer<VertexData> m_main_vb;
-  // std::vector<VertexBuffer<VertexData>> m_secondary_vbs{};
   std::vector<VertexBuffer<VertexData>> m_vertex_buffers{};
   VertexBuffer<VertexData>* m_current_vb = nullptr;
 

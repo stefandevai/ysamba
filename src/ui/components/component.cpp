@@ -6,7 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/display.hpp"
-#include "graphics/renderer.hpp"
 
 namespace dl::ui
 {

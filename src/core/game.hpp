@@ -10,7 +10,6 @@
 #include "./json.hpp"
 #include "./scene_manager.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/renderer.hpp"
 
 namespace dl
 {

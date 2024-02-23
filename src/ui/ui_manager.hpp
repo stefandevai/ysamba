@@ -8,7 +8,6 @@
 #include "./components/component.hpp"
 #include "./context.hpp"
 #include "core/clock.hpp"
-#include "graphics/batch.hpp"
 
 namespace dl
 {
@@ -56,7 +55,6 @@ class UIManager
   v2::Renderer* m_renderer = nullptr;
   std::vector<std::unique_ptr<UIComponent>> m_components;
   std::vector<glm::mat4> m_matrix_stack;
-  // Batch m_batch{"default"_hs, 10};
   AnimationManager m_animation_manager{};
   Clock m_clock{};
 

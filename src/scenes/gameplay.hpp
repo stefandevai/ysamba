@@ -20,7 +20,6 @@
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
 #include "ecs/systems/wield.hpp"
-#include "graphics/batch.hpp"
 #include "world/world.hpp"
 
 namespace dl

@@ -11,7 +11,6 @@
 #include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/visibility.hpp"
-#include "graphics/batch.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"
 #include "graphics/multi_sprite.hpp"
