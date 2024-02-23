@@ -55,6 +55,7 @@ void Renderer::load()
   m_load_depth_buffer(context.device);
 
   main_pass.load(shader, depth_texture_view);
+  ui_pass.load(shader);
 
   m_has_loaded = true;
 }
@@ -123,6 +124,7 @@ void Renderer::render(const Camera& camera)
   WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(context.device, &command_encoder_descriptor);
 
   main_pass.render(targetView, encoder, camera);
+  ui_pass.render(targetView, encoder, camera);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   // Debug tools render pass for ImGui

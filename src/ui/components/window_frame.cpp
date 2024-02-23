@@ -38,7 +38,7 @@ void WindowFrame::render()
     nine_patch.color.opacity_factor = opacity;
   }
 
-  m_context.renderer->main_pass.batch.nine_patch(
+  m_context.renderer->ui_pass.batch.nine_patch(
       nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)

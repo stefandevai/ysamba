@@ -59,7 +59,7 @@ void Scrollable::render()
   }
 
   const auto& window_size = Display::get_window_size();
-  m_context.renderer->main_pass.batch.push_scissor(
+  m_context.renderer->ui_pass.batch.push_scissor(
       {absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
 
   for (auto& child : children)
@@ -67,7 +67,7 @@ void Scrollable::render()
     child->render();
   }
 
-  m_context.renderer->main_pass.batch.pop_scissor();
+  m_context.renderer->ui_pass.batch.pop_scissor();
 }
 
 void Scrollable::reset_scroll()

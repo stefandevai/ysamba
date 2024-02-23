@@ -40,7 +40,7 @@ void Label::render()
     text.color.opacity_factor = opacity;
   }
 
-  m_context.renderer->main_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z + 0.2f);
+  m_context.renderer->ui_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z + 0.2f);
 }
 
 void Label::set_text(const std::string_view value)
