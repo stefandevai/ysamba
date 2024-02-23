@@ -1,22 +1,13 @@
 #include "./display.hpp"
 
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 #include <array>
 #include <sstream>
 
-#include "graphics/renderer/sdl2_webgpu.h"
-
-#if DISABLE_VSYNC == 1
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#include <OpenGL/OpenGL.h>
-#endif
-#endif
-
 #include "core/maths/vector.hpp"
 #include "definitions.hpp"
+#include "graphics/renderer/sdl2_webgpu.h"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
 #include "debug/debug_tools.hpp"
@@ -207,13 +198,13 @@ void Display::load(const int width, const int height, const std::string& title)
   m_has_loaded = true;
 }
 
-void temp()
-{
-  if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-  {
-    spdlog::critical("Failed to initialize GLAD");
-  }
-}
+// void temp()
+// {
+//   if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+//   {
+//     spdlog::critical("Failed to initialize GLAD");
+//   }
+// }
 
 const Vector2i Display::get_size() const { return {m_width, m_height}; }
 
@@ -237,7 +228,10 @@ void Display::set_size(const int width, const int height)
   SDL_SetWindowSize(m_window, width, height);
 }
 
-void Display::reset_viewport() { glViewport(0, 0, m_width, m_height); }
+void Display::reset_viewport()
+{
+  // glViewport(0, 0, m_width, m_height);
+}
 
 void Display::update_viewport()
 {

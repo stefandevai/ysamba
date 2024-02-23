@@ -6,7 +6,6 @@
 #include <utility>
 #include <vector>
 #include FT_FREETYPE_H
-#include <glad/glad.h>
 #include <webgpu/wgpu.h>
 
 #include "graphics/renderer/texture.hpp"

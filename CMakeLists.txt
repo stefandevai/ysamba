@@ -39,7 +39,7 @@ endif()
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WD4244)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3)
 endif()
 
 # Set up WebGPU
@@ -65,7 +65,6 @@ else()
 endif()
 
 find_package(SDL2 CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
@@ -88,7 +87,6 @@ SET(
     webgpu
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-    glad::glad
     libtcod::libtcod
     cereal::cereal
     EnTT::EnTT

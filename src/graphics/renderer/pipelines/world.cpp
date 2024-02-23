@@ -490,9 +490,9 @@ void WorldPipeline::tile(const TileRenderData& tile, const double x, const doubl
   const auto& uv_coordinates = tile.uv_coordinates;
   const uint32_t color = 0xFFFFFFFF;
 
-  /* assert(tile.texture != nullptr); */
-  /* assert(size.x != 0); */
-  /* assert(size.y != 0); */
+  assert(tile.texture != nullptr);
+  assert(size.x != 0);
+  assert(size.y != 0);
 
   float texture_index = 0.00f;
   const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
@@ -603,10 +603,7 @@ void WorldPipeline::text(Text& text, const double x, const double y, const doubl
     {
       continue;
     }
-    /* if (character.sprite->color.int_color != text.color.int_color) */
-    /* { */
-    /*   character.sprite->color.set(text.color.int_color); */
-    /* } */
+
     if (character.sprite->color.opacity_factor != text.color.opacity_factor)
     {
       character.sprite->color.opacity_factor = text.color.opacity_factor;
@@ -735,7 +732,6 @@ void WorldPipeline::push_scissor(Vector4i scissor)
   }
 
   // Create a new buffer
-  spdlog::debug("CREATING BUFFER!");
   VertexBuffer<VertexData> vertex_buffer{m_context.device, SECONDARY_BATCH_VERTEX_COUNT};
   vertex_buffer.scissor = std::move(scissor);
   m_vertex_buffers.push_back(std::move(vertex_buffer));

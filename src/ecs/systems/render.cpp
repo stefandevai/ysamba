@@ -39,18 +39,11 @@ RenderSystem::RenderSystem(v2::Renderer& renderer, World& world)
     m_tiles.insert(
         {tile_data.first, TileRenderData{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
-
-  spdlog::debug("RenderSystem loaded");
 }
 
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
-
-  // if (m_batch == nullptr)
-  // {
-  //   m_batch = m_renderer.get_batch("world"_hs);
-  // }
 
   m_render_tiles(camera);
 

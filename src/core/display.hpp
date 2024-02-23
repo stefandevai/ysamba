@@ -39,7 +39,6 @@ class Display
   static int m_width;
   static int m_height;
   std::string m_title;
-  SDL_GLContext m_gl_context;
 
   void m_configure_surface();
 };
