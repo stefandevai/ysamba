@@ -1,7 +1,7 @@
 #include "./container.hpp"
 
 #include "core/maths/vector.hpp"
-#include "graphics/renderer.hpp"
+#include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
@@ -15,7 +15,7 @@ Container::Container(UIContext& context, const Vector2i& size, const uint32_t co
   this->size = size;
 }
 
-void Container::render(Batch& batch)
+void Container::render()
 {
   if (state == State::Hidden)
   {
@@ -27,11 +27,11 @@ void Container::render(Batch& batch)
     quad->color.opacity_factor = opacity;
   }
 
-  batch.quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
+  m_context.renderer->world_pipeline.quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {
-    child->render(batch);
+    child->render();
   }
 }
 

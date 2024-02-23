@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "core/display.hpp"
-#include "graphics/renderer.hpp"
+#include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
@@ -28,7 +28,7 @@ void Label::init()
   size = text.get_size();
 }
 
-void Label::render(Batch& batch)
+void Label::render()
 {
   if (state == State::Hidden)
   {
@@ -40,7 +40,7 @@ void Label::render(Batch& batch)
     text.color.opacity_factor = opacity;
   }
 
-  batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z);
+  m_context.renderer->world_pipeline.text(text, absolute_position.x, absolute_position.y, absolute_position.z + 0.2f);
 }
 
 void Label::set_text(const std::string_view value)

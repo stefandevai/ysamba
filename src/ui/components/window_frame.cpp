@@ -6,7 +6,7 @@
 
 #include "core/asset_manager.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/renderer.hpp"
+#include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
@@ -17,7 +17,6 @@ void WindowFrame::init()
   using namespace entt::literals;
 
   nine_patch.resource_id = "ui"_hs;
-  // nine_patch.texture = m_context.asset_manager->get<v2::Texture>("ui"_hs);
   nine_patch.top = 0;
   nine_patch.left = 0;
   nine_patch.bottom = 33;
@@ -25,11 +24,9 @@ void WindowFrame::init()
   nine_patch.border = 16;
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;
-
-  assert(nine_patch.texture != nullptr && "Nine patch texture is null");
 }
 
-void WindowFrame::render(Batch& batch)
+void WindowFrame::render()
 {
   if (state == State::Hidden)
   {
@@ -41,11 +38,12 @@ void WindowFrame::render(Batch& batch)
     nine_patch.color.opacity_factor = opacity;
   }
 
-  batch.nine_patch(nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
+  m_context.renderer->world_pipeline.nine_patch(
+      nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {
-    child->render(batch);
+    child->render();
   }
 }
 }  // namespace dl::ui

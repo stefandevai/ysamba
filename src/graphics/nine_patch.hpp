@@ -4,7 +4,7 @@
 
 #include "./color.hpp"
 #include "./sprite.hpp"
-#include "./texture.hpp"
+#include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
@@ -30,7 +30,7 @@ struct NinePatch
   Sprite center_patch{};
 
   // Actual sprite texture
-  const Texture* texture = nullptr;
+  const v2::Texture* texture = nullptr;
 
   // Flag to trigger patche (re)generation
   bool dirty = true;

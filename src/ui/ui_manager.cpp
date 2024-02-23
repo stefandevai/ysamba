@@ -5,12 +5,12 @@
 #include "./components/container.hpp"
 #include "./components/label.hpp"
 #include "core/asset_manager.hpp"
-#include "graphics/batch.hpp"
-#include "graphics/renderer.hpp"
+// #include "graphics/batch.hpp"
+#include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
-UIManager::UIManager(AssetManager* asset_manager, Renderer* renderer)
+UIManager::UIManager(AssetManager* asset_manager, v2::Renderer* renderer)
     : m_asset_manager(asset_manager), m_renderer(renderer)
 {
   // m_batch.has_depth = false;
@@ -45,7 +45,7 @@ void UIManager::render()
       continue;
     }
 
-    component->render(m_batch);
+    component->render();
   }
 }
 

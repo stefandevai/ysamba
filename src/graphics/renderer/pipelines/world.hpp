@@ -5,8 +5,10 @@
 #include <array>
 #include <vector>
 
+#include "core/maths/vector.hpp"
 #include "graphics/renderer/shader.hpp"
 #include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/wgpu_context.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -16,15 +18,16 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "graphics/renderer/mesh.hpp"
+#include "graphics/renderer/vertex_buffer.hpp"
 
 namespace dl
 {
 struct GameContext;
-struct WGPUContext;
 class Camera;
 class Sprite;
 struct Quad;
 class Text;
+struct NinePatch;
 
 namespace v2
 {
@@ -76,6 +79,10 @@ class WorldPipeline
   void sprite(Sprite* sprite, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
+  void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
+
+  void push_scissor(Vector4i scissor);
+  void pop_scissor();
 
  private:
   GameContext& m_game_context;
@@ -101,6 +108,11 @@ class WorldPipeline
   std::vector<VertexData> m_vertices{};
   uint32_t m_vertices_index = 0;
   WGPUBuffer m_vertex_buffer{};
+
+  // VertexBuffer<VertexData> m_main_vb;
+  // std::vector<VertexBuffer<VertexData>> m_secondary_vbs{};
+  std::vector<VertexBuffer<VertexData>> m_vertex_buffers{};
+  VertexBuffer<VertexData>* m_current_vb = nullptr;
 
   Texture m_dummy_texture;
   std::array<WGPUTextureView, TEXTURE_SLOTS> m_texture_views{};

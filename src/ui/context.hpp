@@ -2,11 +2,14 @@
 
 namespace dl
 {
-class Batch;
-class Renderer;
 class AssetManager;
-class Batch;
+// class Batch;
 struct Clock;
+
+namespace v2
+{
+class Renderer;
+}
 }  // namespace dl
 
 namespace dl::ui
@@ -19,8 +22,8 @@ namespace dl::ui
 struct UIContext
 {
   AssetManager* asset_manager;
-  Renderer* renderer;
-  Batch* batch;
+  v2::Renderer* renderer;
+  // Batch* batch;
   Clock* clock;
   entt::registry* animator;
   std::vector<glm::mat4>* matrix_stack;

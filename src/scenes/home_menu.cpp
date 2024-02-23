@@ -43,15 +43,15 @@ void HomeMenu::load()
 
   m_load_worlds_metadata();
 
-  // const auto on_select_world = [this](const WorldMetadata& world_metadata) {
-  //   m_ui_manager.force_hide_all();
-  //   m_game_context.world_metadata = world_metadata;
-  //   m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
-  // };
-  //
-  // m_world_list = m_ui_manager.emplace<ui::WorldList>();
-  // m_world_list->set_on_select(on_select_world);
-  // m_world_list->set_actions(m_worlds_metadata);
+  const auto on_select_world = [this](const WorldMetadata& world_metadata) {
+    m_ui_manager.force_hide_all();
+    m_game_context.world_metadata = world_metadata;
+    m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
+  };
+
+  m_world_list = m_ui_manager.emplace<ui::WorldList>();
+  m_world_list->set_on_select(on_select_world);
+  m_world_list->set_actions(m_worlds_metadata);
 
   m_has_loaded = true;
 }
@@ -92,7 +92,7 @@ void HomeMenu::update()
   }
 
   m_renderer2.clear_color(27, 36, 32);
-  // m_ui_manager.update();
+  m_ui_manager.update();
 }
 
 void HomeMenu::render()
@@ -111,7 +111,7 @@ void HomeMenu::render()
   // m_renderer.push_matrix("text"_hs, m_camera.view_matrix);
   // m_renderer.batch("text"_hs, m_typography.get(), 60, 60, 0);
   // m_renderer.batch("text"_hs, m_instructions, 75, 193, 0);
-  // m_ui_manager.render();
+  m_ui_manager.render();
   // m_renderer.render(m_camera);
   // m_renderer.pop_matrix("text"_hs);
 }

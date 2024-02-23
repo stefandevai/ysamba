@@ -6,15 +6,15 @@
 #include "./label.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/renderer.hpp"
+#include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
 Scrollable::Scrollable(UIContext& context) : UIComponent(context)
 {
-  m_batch.has_depth = false;
-  m_batch.has_scissor = true;
-  m_context.renderer->add_batch(&m_batch);
+  // m_batch.has_depth = false;
+  // m_batch.has_scissor = true;
+  // m_context.renderer->add_batch(&m_batch);
 }
 
 void Scrollable::update()
@@ -56,7 +56,7 @@ void Scrollable::update()
   }
 }
 
-void Scrollable::render([[maybe_unused]] Batch& batch)
+void Scrollable::render()
 {
   if (state == UIComponent::State::Hidden)
   {
@@ -64,12 +64,15 @@ void Scrollable::render([[maybe_unused]] Batch& batch)
   }
 
   const auto& window_size = Display::get_window_size();
-  m_batch.add_scissor({absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
+  m_context.renderer->world_pipeline.push_scissor(
+      {absolute_position.x, window_size.y - absolute_position.y - size.y, size.x, size.y});
 
   for (auto& child : children)
   {
-    child->render(m_batch);
+    child->render();
   }
+
+  m_context.renderer->world_pipeline.pop_scissor();
 }
 
 void Scrollable::reset_scroll()

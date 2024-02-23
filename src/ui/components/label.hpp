@@ -16,7 +16,7 @@ class Label : public UIComponent
   Label(UIContext& context, const std::string_view value);
 
   void init();
-  void render(Batch& batch);
+  void render();
 
   void set_text(const std::string_view value);
 

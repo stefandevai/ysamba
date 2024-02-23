@@ -15,11 +15,11 @@ class Scrollable : public UIComponent
   Scrollable(UIContext& context);
 
   void update();
-  void render(Batch& batch);
+  void render();
   void reset_scroll();
 
  private:
-  Batch m_batch{"default"_hs, 99999};
+  // Batch m_batch{"default"_hs, 99999};
   int m_scroll_y = 0;
 };
 

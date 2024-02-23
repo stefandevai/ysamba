@@ -34,7 +34,7 @@ class Scene
   Renderer m_renderer{*m_game_context.asset_manager};
   v2::Renderer m_renderer2{m_game_context};
   Camera m_camera{*m_game_context.display};
-  ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer};
+  ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer2};
   bool m_has_loaded = false;
 };
 }  // namespace dl

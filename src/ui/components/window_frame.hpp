@@ -18,7 +18,7 @@ class WindowFrame : public UIComponent
   WindowFrame(UIContext& context);
 
   void init();
-  void render(Batch& batch);
+  void render();
 };
 
 }  // namespace dl::ui

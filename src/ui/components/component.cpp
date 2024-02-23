@@ -106,7 +106,7 @@ void UIComponent::m_update()
   dirty = false;
 }
 
-void UIComponent::render(Batch& batch)
+void UIComponent::render()
 {
   if (state == State::Hidden)
   {
@@ -115,7 +115,7 @@ void UIComponent::render(Batch& batch)
 
   for (const auto& child : children)
   {
-    child->render(batch);
+    child->render();
   }
 }
 

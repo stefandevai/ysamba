@@ -18,7 +18,7 @@ class Container : public UIComponent
   Container(UIContext& context);
   Container(UIContext& context, const Vector2i& size, const uint32_t color);
 
-  void render(Batch& batch);
+  void render();
 
   void set_size(const Vector2i& size);
   void set_color(const uint32_t color);

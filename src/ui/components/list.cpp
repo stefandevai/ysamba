@@ -6,7 +6,6 @@
 #include "./label.hpp"
 #include "core/display.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/renderer.hpp"
 
 namespace dl::ui
 {

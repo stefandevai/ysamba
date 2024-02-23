@@ -12,7 +12,6 @@
 
 namespace dl
 {
-class Batch;
 class Renderer;
 class AssetManager;
 }  // namespace dl
@@ -73,7 +72,7 @@ class UIComponent
   virtual void init() {}
   virtual void update_geometry() {}
   virtual void update() {}
-  virtual void render(Batch& batch);
+  virtual void render();
   virtual void show();
   virtual void hide();
 
