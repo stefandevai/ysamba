@@ -91,7 +91,7 @@ void HomeMenu::update()
     m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
   }
 
-  m_renderer2.clear_color(27, 36, 32);
+  m_renderer.clear_color(27, 36, 32);
   m_ui_manager.update();
 }
 
@@ -104,10 +104,10 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer2.world_pipeline.sprite(m_typography.get(), 60, 60, 0);
-  m_renderer2.world_pipeline.text(m_instructions, 75, 193, 0);
+  m_renderer.batch.sprite(m_typography.get(), 60, 60, 0);
+  m_renderer.batch.text(m_instructions, 75, 193, 0);
   m_ui_manager.render();
-  m_renderer2.render(m_camera);
+  m_renderer.render(m_camera);
 
   // m_renderer.push_matrix("text"_hs, m_camera.view_matrix);
   // m_renderer.batch("text"_hs, m_typography.get(), 60, 60, 0);

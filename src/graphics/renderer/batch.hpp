@@ -30,7 +30,7 @@ struct TileRenderData;
 class MultiSprite;
 class Texture;
 
-class WorldPipeline
+class Batch
 {
  public:
   static constexpr uint32_t MAIN_BATCH_VERTEX_COUNT = 80000;
@@ -62,8 +62,8 @@ class WorldPipeline
   WGPUPipelineLayout pipelineLayout;
   WGPURenderPipeline pipeline;
 
-  WorldPipeline(GameContext& game_context);
-  ~WorldPipeline();
+  Batch(GameContext& game_context);
+  ~Batch();
 
   void load(const Shader& shader);
   void render(const WGPURenderPassEncoder render_pass, const Camera& camera);

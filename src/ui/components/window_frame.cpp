@@ -38,8 +38,7 @@ void WindowFrame::render()
     nine_patch.color.opacity_factor = opacity;
   }
 
-  m_context.renderer->world_pipeline.nine_patch(
-      nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
+  m_context.renderer->batch.nine_patch(nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {

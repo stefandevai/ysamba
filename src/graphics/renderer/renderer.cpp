@@ -39,7 +39,7 @@ void Renderer::load()
   // TEMP
   Shader shader{};
   shader.load(context.device, "data/shaders/default.wgsl");
-  world_pipeline.load(shader);
+  batch.load(shader);
   // TEMP
   m_has_loaded = true;
 }
@@ -149,7 +149,7 @@ void Renderer::render(const Camera& camera)
 
   WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
 
-  world_pipeline.render(renderPass, camera);
+  batch.render(renderPass, camera);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   DebugTools::get_instance().update();

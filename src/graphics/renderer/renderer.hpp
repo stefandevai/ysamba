@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "graphics/renderer/pipelines/world.hpp"
+#include "graphics/renderer/batch.hpp"
 #include "graphics/renderer/shader.hpp"
 
 namespace dl
@@ -21,7 +21,7 @@ class Renderer
 
  public:
   WGPUContext& context;
-  WorldPipeline world_pipeline{m_game_context};
+  Batch batch{m_game_context};
 
   Renderer(GameContext& game_context);
   ~Renderer();

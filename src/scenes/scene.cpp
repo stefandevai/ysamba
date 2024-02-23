@@ -16,13 +16,13 @@ Scene::Scene(const std::string& scene_key, GameContext& game_context)
       m_scene_path(fmt::format("data/scenes/{}/data.json", scene_key)),
       m_game_context(game_context)
 {
-  m_renderer2.load();
+  m_renderer.load();
 }
 
 void Scene::resize()
 {
   const auto& display_size = Display::get_window_size();
   m_camera.set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
-  m_renderer2.resize();
+  m_renderer.resize();
 }
 }  // namespace dl

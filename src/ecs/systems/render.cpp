@@ -80,10 +80,10 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto position_y = std::round(position.y) * tile_size.y;
       const auto position_z = std::round(position.z) * tile_size.y;
 
-      m_renderer.world_pipeline.sprite(visibility.sprite.get(),
-                                       position_x,
-                                       position_y + visibility.layer_z * m_z_index_increment,
-                                       position_z + visibility.layer_z * m_z_index_increment);
+      m_renderer.batch.sprite(visibility.sprite.get(),
+                              position_x,
+                              position_y + visibility.layer_z * m_z_index_increment,
+                              position_z + visibility.layer_z * m_z_index_increment);
     }
   }
 
@@ -100,10 +100,10 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto position_x = std::round(position.x) * tile_size.x;
       const auto position_y = std::round(position.y) * tile_size.y;
 
-      m_renderer.world_pipeline.quad(&rectangle.quad,
-                                     position_x,
-                                     position_y + rectangle.z_index * m_z_index_increment,
-                                     position_z + rectangle.z_index * m_z_index_increment);
+      m_renderer.batch.quad(&rectangle.quad,
+                            position_x,
+                            position_y + rectangle.z_index * m_z_index_increment,
+                            position_z + rectangle.z_index * m_z_index_increment);
     }
 
     auto text_view = registry.view<const Text, const Position>();
@@ -113,7 +113,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto& position = registry.get<Position>(entity);
       auto& text = registry.get<Text>(entity);
 
-      m_renderer.world_pipeline.text(text, position.x, position.y, position.z + 3);
+      m_renderer.batch.text(text, position.x, position.y, position.z + 3);
     }
   }
 }
@@ -284,17 +284,16 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
 
   if (tile.frame_data->sprite_type == SpriteType::Single)
   {
-    m_renderer.world_pipeline.tile(tile,
-                                   world_x * tile_size.x,
-                                   world_y * tile_size.y + z_index * m_z_index_increment,
-                                   world_z * tile_size.y + z_index * m_z_index_increment);
+    m_renderer.batch.tile(tile,
+                          world_x * tile_size.x,
+                          world_y * tile_size.y + z_index * m_z_index_increment,
+                          world_z * tile_size.y + z_index * m_z_index_increment);
 
     // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
     if (chunk.tiles.is_bottom_empty(x, y, z))
     {
       const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
-      m_renderer.world_pipeline.tile(
-          bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
+      m_renderer.batch.tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
     }
   }
   else if (tile.frame_data->sprite_type == SpriteType::Multiple)
@@ -313,10 +312,10 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     multi_sprite.texture = m_world_texture;
     multi_sprite.frame_angle = tile.frame_data->angle;
 
-    m_renderer.world_pipeline.multi_sprite(&multi_sprite,
-                                           (world_x - tile.frame_data->anchor_x) * tile_size.x,
-                                           (world_y - tile.frame_data->anchor_y) * tile_size.y,
-                                           world_z * tile_size.y + z_index);
+    m_renderer.batch.multi_sprite(&multi_sprite,
+                                  (world_x - tile.frame_data->anchor_x) * tile_size.x,
+                                  (world_y - tile.frame_data->anchor_y) * tile_size.y,
+                                  world_z * tile_size.y + z_index);
   }
 }
 

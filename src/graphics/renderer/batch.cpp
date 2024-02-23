@@ -1,4 +1,4 @@
-#include "./world.hpp"
+#include "./batch.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -17,14 +17,14 @@
 
 namespace dl
 {
-WorldPipeline::WorldPipeline(GameContext& game_context)
+Batch::Batch(GameContext& game_context)
     : m_game_context(game_context),
       m_context(game_context.display->wgpu_context),
       m_dummy_texture(Texture::dummy(m_context.device))
 {
 }
 
-WorldPipeline::~WorldPipeline()
+Batch::~Batch()
 {
   if (m_has_loaded)
   {
@@ -40,7 +40,7 @@ WorldPipeline::~WorldPipeline()
   }
 }
 
-void WorldPipeline::load(const Shader& shader)
+void Batch::load(const Shader& shader)
 {
   // Add main vertex buffer
   m_vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT);
@@ -59,7 +59,7 @@ void WorldPipeline::load(const Shader& shader)
   // Sampler
   {
     WGPUSamplerDescriptor samplerDesc = {
-        .label = "WorldPipeline Sampler",
+        .label = "Batch Sampler",
         .addressModeU = WGPUAddressMode_ClampToEdge,
         .addressModeV = WGPUAddressMode_ClampToEdge,
         .addressModeW = WGPUAddressMode_ClampToEdge,
@@ -79,7 +79,7 @@ void WorldPipeline::load(const Shader& shader)
   // Uniforms
   {
     WGPUBufferDescriptor bufferDesc = {
-        .label = "WorldPipeline Uniform Buffer",
+        .label = "Batch Uniform Buffer",
         .size = uniform_data.size,
         .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform,
         .mappedAtCreation = false,
@@ -252,7 +252,7 @@ void WorldPipeline::load(const Shader& shader)
   m_has_loaded = true;
 }
 
-void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
+void Batch::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
 {
   assert(m_current_vb != nullptr);
 
@@ -307,9 +307,9 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
   }
 }
 
-void WorldPipeline::clear_textures() { m_texture_slot_index = 0; }
+void Batch::clear_textures() { m_texture_slot_index = 0; }
 
-void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const double z)
+void Batch::sprite(Sprite* sprite, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
@@ -392,7 +392,7 @@ void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
 }
 
-void WorldPipeline::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
+void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
@@ -482,7 +482,7 @@ void WorldPipeline::multi_sprite(MultiSprite* sprite, const double x, const doub
   m_current_vb->emplace(glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color);
 }
 
-void WorldPipeline::tile(const TileRenderData& tile, const double x, const double y, const double z)
+void Batch::tile(const TileRenderData& tile, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
@@ -549,7 +549,7 @@ void WorldPipeline::tile(const TileRenderData& tile, const double x, const doubl
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color);
 }
 
-void WorldPipeline::quad(const Quad* quad, const double x, const double y, const double z)
+void Batch::quad(const Quad* quad, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
@@ -581,7 +581,7 @@ void WorldPipeline::quad(const Quad* quad, const double x, const double y, const
   m_current_vb->emplace(glm::vec3{x + quad->w, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 }
 
-void WorldPipeline::text(Text& text, const double x, const double y, const double z)
+void Batch::text(Text& text, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
@@ -613,7 +613,7 @@ void WorldPipeline::text(Text& text, const double x, const double y, const doubl
   }
 }
 
-void WorldPipeline::m_update_texture_bind_group()
+void Batch::m_update_texture_bind_group()
 {
   assert(m_current_vb != nullptr);
 
@@ -668,7 +668,7 @@ void WorldPipeline::m_update_texture_bind_group()
   m_should_update_texture_bind_group = false;
 }
 
-void WorldPipeline::nine_patch(NinePatch& nine_patch, const double x, const double y, const double z)
+void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
@@ -715,7 +715,7 @@ void WorldPipeline::nine_patch(NinePatch& nine_patch, const double x, const doub
   sprite(&nine_patch.center_patch, x + nine_patch.border, y + nine_patch.border, z);
 }
 
-void WorldPipeline::push_scissor(Vector4i scissor)
+void Batch::push_scissor(Vector4i scissor)
 {
   // Try to reuse a vertex buffer
   if (m_vertex_buffers.size() > 1)
@@ -738,5 +738,5 @@ void WorldPipeline::push_scissor(Vector4i scissor)
   m_current_vb = &m_vertex_buffers.back();
 }
 
-void WorldPipeline::pop_scissor() { m_current_vb = &m_vertex_buffers[0]; }
+void Batch::pop_scissor() { m_current_vb = &m_vertex_buffers[0]; }
 }  // namespace dl

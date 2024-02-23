@@ -22,10 +22,7 @@
 
 namespace dl
 {
-WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
-{
-  // m_renderer.add_batch(&m_batch);
-}
+WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context) {}
 
 void WorldCreation::load()
 {
@@ -74,9 +71,9 @@ void WorldCreation::render()
 
   // m_batch.push_matrix(m_camera.view_matrix);
   // m_batch.emplace(&m_world_sprite, 0, 0, 0);
-  m_renderer2.world_pipeline.sprite(&m_world_sprite, 0, 0, 0);
+  m_renderer.batch.sprite(&m_world_sprite, 0, 0, 0);
   m_ui_manager.render();
-  m_renderer2.render(m_camera);
+  m_renderer.render(m_camera);
   // m_renderer.render(m_camera);
   // m_batch.pop_matrix();
 }
@@ -194,7 +191,7 @@ void WorldCreation::m_create_map_representation()
   m_texture = std::make_unique<Texture>(world_size.x, world_size.y);
   m_texture->load(m_game_context.display->wgpu_context.device, pixel_data.data(), world_size.x, world_size.y, 4);
   m_world_sprite.texture = m_texture.get();
-  m_renderer2.world_pipeline.clear_textures();
+  m_renderer.batch.clear_textures();
 }
 
 }  // namespace dl
