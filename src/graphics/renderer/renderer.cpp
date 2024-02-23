@@ -22,7 +22,7 @@ Renderer::Renderer(GameContext& game_context)
 
 Renderer::~Renderer()
 {
-  if (m_has_loaded)
+  if (m_has_loaded && m_has_depth_test)
   {
     wgpuTextureViewRelease(depth_texture_view);
     wgpuTextureDestroy(depth_texture);
@@ -30,17 +30,63 @@ Renderer::~Renderer()
   }
 }
 
-void Renderer::load()
+void Renderer::load(const bool has_depth_test)
 {
   assert(m_game_context.display != nullptr);
+  m_has_depth_test = has_depth_test;
 
-  m_load_depth_buffer(context.device);
-
-  // TEMP
   Shader shader{};
   shader.load(context.device, "data/shaders/default.wgsl");
-  batch.load(shader);
-  // TEMP
+
+  batch.load(shader, m_has_depth_test);
+
+  // Load descriptors used during rendering
+  target_view_descriptor = {
+      .label = "Target View",
+      .dimension = WGPUTextureViewDimension_2D,
+      .baseMipLevel = 0,
+      .mipLevelCount = 1,
+      .baseArrayLayer = 0,
+      .arrayLayerCount = 1,
+      .aspect = WGPUTextureAspect_All,
+  };
+
+  command_encoder_descriptor = {
+      .label = "Command Encoder",
+  };
+
+  render_pass_color_attachment = {
+      .resolveTarget = nullptr,
+      .loadOp = WGPULoadOp_Clear,
+      .storeOp = WGPUStoreOp_Store,
+      .clearValue = m_clear_color,
+  };
+
+  render_pass_descriptor = {
+      .timestampWrites = nullptr,
+      .depthStencilAttachment = nullptr,
+      .colorAttachmentCount = 1,
+  };
+
+  if (m_has_depth_test)
+  {
+    m_load_depth_buffer(context.device);
+
+    depth_stencil_attachment = {
+        .view = depth_texture_view,
+        .depthClearValue = 1.0f,
+        .depthLoadOp = WGPULoadOp_Clear,
+        .depthStoreOp = WGPUStoreOp_Store,
+        .depthReadOnly = false,
+        .stencilClearValue = 0,
+        .stencilLoadOp = WGPULoadOp_Clear,
+        .stencilStoreOp = WGPUStoreOp_Store,
+        .stencilReadOnly = true,
+    };
+
+    render_pass_descriptor.depthStencilAttachment = &depth_stencil_attachment;
+  }
+
   m_has_loaded = true;
 }
 
@@ -103,51 +149,14 @@ void Renderer::render(const Camera& camera)
     return;
   }
 
-  WGPUTextureViewDescriptor descriptor = {
-      .label = "Target View",
-      .format = wgpuTextureGetFormat(surface_texture.texture),
-      .dimension = WGPUTextureViewDimension_2D,
-      .baseMipLevel = 0,
-      .mipLevelCount = 1,
-      .baseArrayLayer = 0,
-      .arrayLayerCount = 1,
-      .aspect = WGPUTextureAspect_All,
-  };
-  WGPUTextureView targetView = wgpuTextureCreateView(surface_texture.texture, &descriptor);
+  target_view_descriptor.format = wgpuTextureGetFormat(surface_texture.texture);
+  WGPUTextureView targetView = wgpuTextureCreateView(surface_texture.texture, &target_view_descriptor);
+  WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(context.device, &command_encoder_descriptor);
 
-  WGPUCommandEncoderDescriptor commandEncoderDesc = {
-      .label = "Command Encoder",
-  };
-  WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(context.device, &commandEncoderDesc);
-
-  WGPURenderPassColorAttachment renderPassColorAttachment = {
-      .view = targetView,
-      .resolveTarget = nullptr,
-      .loadOp = WGPULoadOp_Clear,
-      .storeOp = WGPUStoreOp_Store,
-      .clearValue = m_clear_color,
-  };
-
-  WGPURenderPassDepthStencilAttachment depthStencilAttachment = {
-      .view = depth_texture_view,
-      .depthClearValue = 1.0f,
-      .depthLoadOp = WGPULoadOp_Clear,
-      .depthStoreOp = WGPUStoreOp_Store,
-      .depthReadOnly = false,
-      .stencilClearValue = 0,
-      .stencilLoadOp = WGPULoadOp_Clear,
-      .stencilStoreOp = WGPUStoreOp_Store,
-      .stencilReadOnly = true,
-  };
-
-  WGPURenderPassDescriptor renderPassDesc = {
-      .colorAttachmentCount = 1,
-      .colorAttachments = &renderPassColorAttachment,
-      .depthStencilAttachment = &depthStencilAttachment,
-      .timestampWrites = nullptr,
-  };
-
-  WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &renderPassDesc);
+  render_pass_color_attachment.clearValue = m_clear_color;
+  render_pass_color_attachment.view = targetView;
+  render_pass_descriptor.colorAttachments = &render_pass_color_attachment;
+  WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_descriptor);
 
   batch.render(renderPass, camera);
 

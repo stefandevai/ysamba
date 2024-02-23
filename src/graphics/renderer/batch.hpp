@@ -37,17 +37,16 @@ class Batch
   static constexpr uint32_t SECONDARY_BATCH_VERTEX_COUNT = 2000;
   static constexpr uint32_t TEXTURE_SLOTS = 8;
 
-  std::array<WGPUBindGroupLayoutEntry, 2> binding_layout{};
-  std::array<WGPUBindGroupEntry, 2> binding{};
-  std::array<WGPUBindGroupLayout, 2> bind_group_layouts{};
-  WGPUBindGroup bind_group{};
+  enum BindGroupType
+  {
+    BIND_GROUP_UNIFORMS,
+    BIND_GROUP_TEXTURES,
+  };
 
-  WGPUBindGroupLayoutEntry texture_binding_layout{};
-  WGPUBindGroupEntry texture_binding{};
-  WGPUBindGroup texture_bind_group{};
+  std::array<WGPUBindGroupLayout, 2> bind_group_layouts{};
+  std::array<WGPUBindGroup, 2> bind_groups{};
 
   WGPUBuffer uniform_buffer;
-  WGPUDepthStencilState stencil_state;
   WGPUSampler sampler;
 
   struct UniformData
@@ -65,7 +64,7 @@ class Batch
   Batch(GameContext& game_context);
   ~Batch();
 
-  void load(const Shader& shader);
+  void load(const Shader& shader, const bool has_depth_test);
   void render(const WGPURenderPassEncoder render_pass, const Camera& camera);
   void clear_textures();
 
@@ -100,6 +99,10 @@ class Batch
   std::array<WGPUTextureView, TEXTURE_SLOTS> m_texture_views{};
   uint32_t m_texture_slot_index = 0;
 
+  void m_load_vertex_buffers();
+  void m_load_textures();
+  void m_load_uniforms();
+  void m_load_pipeline(const Shader& shader, const bool has_depth_test);
   void m_update_texture_bind_group();
 };
 }  // namespace dl

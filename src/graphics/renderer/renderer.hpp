@@ -26,7 +26,7 @@ class Renderer
   Renderer(GameContext& game_context);
   ~Renderer();
 
-  void load();
+  void load(const bool has_depth_test = true);
   void resize();
 
   void clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a = 1.0f);
@@ -35,9 +35,17 @@ class Renderer
 
  private:
   bool m_has_loaded = false;
+  bool m_has_depth_test = true;
   WGPUTextureView depth_texture_view;
   WGPUTexture depth_texture;
   WGPUColor m_clear_color{0.0, 0.0, 0.0, 1.0};
+
+  // Descriptors used during rendering
+  WGPURenderPassDepthStencilAttachment depth_stencil_attachment;
+  WGPUTextureViewDescriptor target_view_descriptor;
+  WGPUCommandEncoderDescriptor command_encoder_descriptor;
+  WGPURenderPassColorAttachment render_pass_color_attachment;
+  WGPURenderPassDescriptor render_pass_descriptor;
 
   void m_load_depth_buffer(WGPUDevice device);
 };
