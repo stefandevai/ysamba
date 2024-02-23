@@ -75,6 +75,7 @@ class WorldPipeline
 
   void load(const Shader& shader);
   void render(const WGPURenderPassEncoder render_pass, const Camera& camera);
+  void clear_textures();
 
   void sprite(Sprite* sprite, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);

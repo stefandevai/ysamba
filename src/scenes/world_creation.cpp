@@ -26,7 +26,7 @@ namespace dl
 {
 WorldCreation::WorldCreation(GameContext& game_context) : Scene("world_creation", game_context)
 {
-  m_renderer.add_batch(&m_batch);
+  // m_renderer.add_batch(&m_batch);
 }
 
 void WorldCreation::load()
@@ -74,11 +74,13 @@ void WorldCreation::render()
     return;
   }
 
-  m_batch.push_matrix(m_camera.view_matrix);
-  m_batch.emplace(&m_world_sprite, 0, 0, 0);
+  // m_batch.push_matrix(m_camera.view_matrix);
+  // m_batch.emplace(&m_world_sprite, 0, 0, 0);
+  m_renderer2.world_pipeline.sprite(&m_world_sprite, 0, 0, 0);
   m_ui_manager.render();
-  m_renderer.render(m_camera);
-  m_batch.pop_matrix();
+  m_renderer2.render(m_camera);
+  // m_renderer.render(m_camera);
+  // m_batch.pop_matrix();
 }
 
 bool WorldCreation::m_update_input()
@@ -171,29 +173,30 @@ void WorldCreation::m_generate_world() { m_world.generate_societies(); }
 
 void WorldCreation::m_create_map_representation()
 {
-  // std::vector<unsigned char> pixel_data((world_size.x * world_size.y) * 4);
-  // const int z_levels = world_size.z;
-  //
-  // for (auto i = 0; i < world_size.x; ++i)
-  // {
-  //   for (auto j = 0; j < world_size.y; ++j)
-  //   {
-  //     // const auto map_value = m_height_map[j * world_size.x + i] * 0.5f + 0.5f;
-  //     const auto map_value = m_height_map[j * world_size.x + i];
-  //     const int z = static_cast<int>(map_value * z_levels);
-  //     const uint8_t value = z * 255 / z_levels;
-  //     // const uint8_t value = map_value * 255;
-  //
-  //     pixel_data[j * world_size.x * 4 + i * 4] = 0;
-  //     pixel_data[j * world_size.x * 4 + i * 4 + 1] = value;
-  //     pixel_data[j * world_size.x * 4 + i * 4 + 2] = 50;
-  //     pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
-  //   }
-  // }
-  //
-  // m_texture = std::make_unique<Texture>(pixel_data, world_size.x, world_size.y);
-  // m_world_sprite.texture = m_texture.get();
-  // m_batch.clear_textures();
+  std::vector<unsigned char> pixel_data((world_size.x * world_size.y) * 4);
+  const int z_levels = world_size.z;
+
+  for (auto i = 0; i < world_size.x; ++i)
+  {
+    for (auto j = 0; j < world_size.y; ++j)
+    {
+      // const auto map_value = m_height_map[j * world_size.x + i] * 0.5f + 0.5f;
+      const auto map_value = m_height_map[j * world_size.x + i];
+      const int z = static_cast<int>(map_value * z_levels);
+      const uint8_t value = z * 255 / z_levels;
+      // const uint8_t value = map_value * 255;
+
+      pixel_data[j * world_size.x * 4 + i * 4] = 0;
+      pixel_data[j * world_size.x * 4 + i * 4 + 1] = value;
+      pixel_data[j * world_size.x * 4 + i * 4 + 2] = 50;
+      pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
+    }
+  }
+
+  m_texture = std::make_unique<v2::Texture>(world_size.x, world_size.y);
+  m_texture->load(m_game_context.display->wgpu_context.device, pixel_data.data(), world_size.x, world_size.y, 4);
+  m_world_sprite.texture = m_texture.get();
+  m_renderer2.world_pipeline.clear_textures();
 }
 
 }  // namespace dl

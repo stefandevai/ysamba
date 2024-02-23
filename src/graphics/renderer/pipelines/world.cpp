@@ -345,6 +345,8 @@ void WorldPipeline::render(const WGPURenderPassEncoder render_pass, const Camera
   // m_vertices_index = 0;
 }
 
+void WorldPipeline::clear_textures() { m_texture_slot_index = 0; }
+
 void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const double z)
 {
   // assert(index_count <= m_indices_size);
