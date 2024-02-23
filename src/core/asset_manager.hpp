@@ -9,11 +9,10 @@
 
 #include "graphics/font.hpp"
 #include "graphics/renderer/texture.hpp"
-#include "graphics/shader_program.hpp"
 
 namespace dl
 {
-using Asset = std::variant<std::unique_ptr<ShaderProgram>, std::unique_ptr<v2::Texture>, std::unique_ptr<Font>>;
+using Asset = std::variant<std::unique_ptr<v2::Texture>, std::unique_ptr<Font>>;
 
 enum class AssetType
 {

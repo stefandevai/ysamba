@@ -7,7 +7,6 @@
 
 #include "config.hpp"
 #include "core/serialization.hpp"
-#include "graphics/texture.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/home_menu.hpp"
 #include "scenes/world_creation.hpp"

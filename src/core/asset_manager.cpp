@@ -42,11 +42,11 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
     {
     case AssetType::Shader:
     {
-      assert(asset_info.contains("vertex_path") && "Vertex path not specified");
-      assert(asset_info.contains("fragment_path") && "Fragment path not specified");
-      const auto& vertex_path = asset_info["vertex_path"].get<std::string>();
-      const auto& fragment_path = asset_info["fragment_path"].get<std::string>();
-      add<ShaderProgram>(hashed_id, vertex_path, fragment_path);
+      // assert(asset_info.contains("vertex_path") && "Vertex path not specified");
+      // assert(asset_info.contains("fragment_path") && "Fragment path not specified");
+      // const auto& vertex_path = asset_info["vertex_path"].get<std::string>();
+      // const auto& fragment_path = asset_info["fragment_path"].get<std::string>();
+      // add<ShaderProgram>(hashed_id, vertex_path, fragment_path);
     }
     break;
 

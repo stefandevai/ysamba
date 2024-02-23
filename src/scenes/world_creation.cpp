@@ -16,7 +16,6 @@
 #include "core/serialization.hpp"
 #include "core/utils.hpp"
 #include "graphics/color.hpp"
-#include "graphics/texture.hpp"
 #include "ui/compositions/world_creation_panel.hpp"
 #include "world/generators/island_generator.hpp"
 #include "world/metadata.hpp"
