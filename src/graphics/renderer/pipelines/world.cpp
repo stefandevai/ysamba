@@ -7,11 +7,13 @@
 #include "graphics/camera.hpp"
 #include "graphics/color.hpp"
 #include "graphics/frame_angle.hpp"
+#include "graphics/multi_sprite.hpp"
 #include "graphics/nine_patch.hpp"
 #include "graphics/quad.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/sprite.hpp"
 #include "graphics/text.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace dl::v2
 {
@@ -392,58 +394,202 @@ void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const
   // Top left vertex
   if (sprite->frame_angle == FrameAngle::Parallel)
   {
-    // m_vertices[m_vertices_index++] = VertexData{glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color};
     m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
   }
   else
   {
-    // m_vertices[m_vertices_index++]
-    //     = VertexData{};
     m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color);
   }
 
   // Top right vertex
   if (sprite->frame_angle == FrameAngle::Parallel)
   {
-    // m_vertices[m_vertices_index++]
-    //     = VertexData{};
     m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
   }
   else
   {
-    // m_vertices[m_vertices_index++]
-    //     = VertexData{};
     m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color);
   }
 
   // Bottom left vertex
-  // m_vertices[m_vertices_index++]
-  //     = VertexData{};
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
 
   // Top right vertex
   if (sprite->frame_angle == FrameAngle::Parallel)
   {
-    // m_vertices[m_vertices_index++]
-    //     = VertexData{};
     m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
   }
   else
   {
-    // m_vertices[m_vertices_index++]
-    //     = VertexData{};
     m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color);
   }
 
   // Bottom left vertex
-  // m_vertices[m_vertices_index++]
-  //     = VertexData{};
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
 
   // Bottom right vertex
-  // m_vertices[m_vertices_index++]
-  //     = VertexData{};
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
+
+  // Each quad has 6 vertices, we have therefore to increment by 6 each time
+  // index_count += 6;
+}
+
+void WorldPipeline::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
+{
+  // Load texture if it has not been loaded
+  if (sprite->texture == nullptr)
+  {
+    sprite->texture = m_game_context.asset_manager->get<v2::Texture>(sprite->resource_id, m_context.device);
+  }
+
+  assert(index_count <= m_indices_size);
+
+  unsigned int color = sprite->color.int_color;
+
+  assert(sprite->texture != nullptr);
+
+  if (sprite->color.opacity_factor < 1.0)
+  {
+    const auto& sprite_color = sprite->color.rgba_color;
+    color = Color::rgba_to_int(sprite_color.r,
+                               sprite_color.g,
+                               sprite_color.b,
+                               static_cast<uint8_t>(sprite_color.a * sprite->color.opacity_factor));
+  }
+
+  // Build vector of textures to bind when rendering
+  // texture_index is the index in m_texture_views that will
+  // be translated to a index in the shader.
+  float texture_index = 0.00f;
+  const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(m_texture_views.begin(), upper_bound, sprite->texture->view);
+  if (it >= upper_bound)
+  {
+    texture_index = static_cast<float>(m_texture_slot_index);
+    m_texture_views[m_texture_slot_index] = sprite->texture->view;
+    ++m_texture_slot_index;
+    m_should_update_texture_bind_group = true;
+  }
+  else
+  {
+    texture_index = it - m_texture_views.begin();
+  }
+
+  const auto& size = sprite->get_size();
+  const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
+  const int frame_width = sprite->texture->get_frame_width() * (size.x);
+  const int frame_height = sprite->texture->get_frame_height() * (size.y);
+
+  // Top left vertex
+  // Change according to the angle that the quad will be rendered
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(
+        glm::vec3{x, y + frame_height, z + frame_height}, texture_coordinates[0], texture_index, color);
+  }
+
+  // Top right vertex
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(
+        glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index, color);
+  }
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
+
+  // Top right vertex
+  if (sprite->frame_angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(
+        glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index, color);
+  }
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color);
+
+  // Each quad has 6 vertices, we have therefore to increment by 6 each time
+  // index_count += 6;
+}
+
+void WorldPipeline::tile(const TileRenderData& tile, const double x, const double y, const double z)
+{
+  const auto& size = tile.size;
+  const auto& uv_coordinates = tile.uv_coordinates;
+  const uint32_t color = 0xFFFFFFFF;
+
+  /* assert(tile.texture != nullptr); */
+  /* assert(size.x != 0); */
+  /* assert(size.y != 0); */
+
+  float texture_index = 0.00f;
+  const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(m_texture_views.begin(), upper_bound, tile.texture->view);
+  if (it >= upper_bound)
+  {
+    texture_index = static_cast<float>(m_texture_slot_index);
+    m_texture_views[m_texture_slot_index] = tile.texture->view;
+    ++m_texture_slot_index;
+    m_should_update_texture_bind_group = true;
+  }
+  else
+  {
+    texture_index = it - m_texture_views.begin();
+  }
+
+  // Top left vertex
+  if (tile.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x, y, z}, uv_coordinates[0], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, uv_coordinates[0], texture_index, color);
+  }
+
+  // Top right vertex
+  if (tile.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
+  }
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
+
+  // Top right vertex
+  if (tile.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
+  }
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color);
 
   // Each quad has 6 vertices, we have therefore to increment by 6 each time
   // index_count += 6;

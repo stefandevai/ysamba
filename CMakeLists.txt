@@ -39,7 +39,7 @@ endif()
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WD4244)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 endif()
 
 # Set up WebGPU

@@ -177,6 +177,8 @@ float Texture::get_frame_height() const { return (m_height / static_cast<float>(
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
 std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
 {
+  assert(m_width > 0 && m_height > 0);
+
   const auto frame_width = get_frame_width() / static_cast<float>(m_width);
   const auto frame_height = get_frame_height() / static_cast<float>(m_height);
   const int max_frames = m_horizontal_frames * m_vertical_frames;

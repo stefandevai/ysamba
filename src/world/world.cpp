@@ -20,14 +20,15 @@
 #include "./tile_flag.hpp"
 #include "config.hpp"
 #include "constants.hpp"
+#include "core/display.hpp"
 #include "core/game_context.hpp"
 #include "core/input_manager.hpp"
 #include "core/json.hpp"
 #include "core/serialization.hpp"
 #include "ecs/components/position.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/renderer/texture.hpp"
 #include "graphics/sprite.hpp"
-#include "graphics/texture.hpp"
 
 namespace dl
 {
@@ -410,51 +411,52 @@ entt::entity World::create_item(
 
 void World::m_load_tile_data()
 {
-  // JSON json_tile_data{config::path::tile_data};
-  //
-  // const auto actions = m_load_actions();
-  //
-  // const auto& texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
-  //
-  // assert(texture != nullptr && "World texture is not loaded in order to get tile size");
-  //
-  // m_tile_size.x = texture->get_frame_width();
-  // m_tile_size.y = texture->get_frame_height();
-  //
-  // assert(json_tile_data.object.contains("tiles") && "Tile data must contain a tiles array");
-  //
-  // const auto tiles = json_tile_data.object["tiles"].get<std::vector<nlohmann::json>>();
-  //
-  // for (const auto& tile : tiles)
-  // {
-  //   auto tile_data = TileData();
-  //
-  //   assert(tile.contains("id") && "Tile must have an id");
-  //   assert(tile.contains("name") && "Tile must have a name");
-  //
-  //   tile_data.id = tile["id"].get<uint32_t>();
-  //   tile_data.name = tile["name"].get<std::string>();
-  //
-  //   json::assign_if_contains<std::unordered_set<std::string>>(tile, "flags", tile_data.flags);
-  //   json::assign_if_contains<Direction>(tile, "climbs_to", tile_data.climbs_to);
-  //
-  //   if (tile.contains("actions"))
-  //   {
-  //     const auto actions_data = tile["actions"].get<std::vector<nlohmann::json>>();
-  //
-  //     for (const auto& action_data : actions_data)
-  //     {
-  //       const auto id = action_data["id"].get<uint32_t>();
-  //
-  //       assert(actions.contains(id) && "Action not found in the action data");
-  //
-  //       auto action = actions.at(id);
-  //       tile_data.actions[action.type] = std::move(action);
-  //     }
-  //   }
-  //
-  //   this->tile_data[tile_data.id] = tile_data;
-  // }
+  JSON json_tile_data{config::path::tile_data};
+
+  const auto actions = m_load_actions();
+
+  const auto texture
+      = m_game_context.asset_manager->get<v2::Texture>(m_texture_id, m_game_context.display->wgpu_context.device);
+
+  assert(texture != nullptr && "World texture is not loaded in order to get tile size");
+
+  m_tile_size.x = texture->get_frame_width();
+  m_tile_size.y = texture->get_frame_height();
+
+  assert(json_tile_data.object.contains("tiles") && "Tile data must contain a tiles array");
+
+  const auto tiles = json_tile_data.object["tiles"].get<std::vector<nlohmann::json>>();
+
+  for (const auto& tile : tiles)
+  {
+    auto tile_data = TileData();
+
+    assert(tile.contains("id") && "Tile must have an id");
+    assert(tile.contains("name") && "Tile must have a name");
+
+    tile_data.id = tile["id"].get<uint32_t>();
+    tile_data.name = tile["name"].get<std::string>();
+
+    json::assign_if_contains<std::unordered_set<std::string>>(tile, "flags", tile_data.flags);
+    json::assign_if_contains<Direction>(tile, "climbs_to", tile_data.climbs_to);
+
+    if (tile.contains("actions"))
+    {
+      const auto actions_data = tile["actions"].get<std::vector<nlohmann::json>>();
+
+      for (const auto& action_data : actions_data)
+      {
+        const auto id = action_data["id"].get<uint32_t>();
+
+        assert(actions.contains(id) && "Action not found in the action data");
+
+        auto action = actions.at(id);
+        tile_data.actions[action.type] = std::move(action);
+      }
+    }
+
+    this->tile_data[tile_data.id] = tile_data;
+  }
 }
 
 std::unordered_map<uint32_t, Action> World::m_load_actions()

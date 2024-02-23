@@ -28,6 +28,8 @@ class Sprite;
 struct Quad;
 class Text;
 struct NinePatch;
+struct TileRenderData;
+class MultiSprite;
 
 namespace v2
 {
@@ -78,6 +80,8 @@ class WorldPipeline
   void clear_textures();
 
   void sprite(Sprite* sprite, const double x, const double y, const double z);
+  void multi_sprite(MultiSprite* sprite, const double x, const double y, const double z);
+  void tile(const TileRenderData& tile, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
