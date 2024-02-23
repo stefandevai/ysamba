@@ -156,17 +156,25 @@ void Renderer::render(const Camera& camera)
   render_pass_color_attachment.clearValue = m_clear_color;
   render_pass_color_attachment.view = targetView;
   render_pass_descriptor.colorAttachments = &render_pass_color_attachment;
-  WGPURenderPassEncoder renderPass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_descriptor);
+  WGPURenderPassEncoder render_pass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_descriptor);
 
-  batch.render(renderPass, camera);
+  batch.render(render_pass, camera);
+
+  wgpuRenderPassEncoderEnd(render_pass);
+  wgpuRenderPassEncoderRelease(render_pass);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
+  WGPURenderPassDescriptor debug_render_pass_descriptor = render_pass_descriptor;
+  WGPURenderPassColorAttachment debug_render_pass_color_attachment = render_pass_color_attachment;
+  debug_render_pass_color_attachment.loadOp = WGPULoadOp_Load;
+  debug_render_pass_descriptor.colorAttachments = &debug_render_pass_color_attachment;
+  debug_render_pass_descriptor.depthStencilAttachment = nullptr;
+  WGPURenderPassEncoder debug_render_pass = wgpuCommandEncoderBeginRenderPass(encoder, &debug_render_pass_descriptor);
   DebugTools::get_instance().update();
-  DebugTools::get_instance().render(renderPass);
+  DebugTools::get_instance().render(debug_render_pass);
+  wgpuRenderPassEncoderEnd(debug_render_pass);
+  wgpuRenderPassEncoderRelease(debug_render_pass);
 #endif
-
-  wgpuRenderPassEncoderEnd(renderPass);
-  wgpuRenderPassEncoderRelease(renderPass);
 
   WGPUCommandBufferDescriptor commandBufferDescriptor = {
       .label = "Command Buffer",
