@@ -104,8 +104,8 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.batch.sprite(m_typography.get(), 60, 60, 0);
-  m_renderer.batch.text(m_instructions, 75, 193, 0);
+  m_renderer.main_pass.batch.sprite(m_typography.get(), 60, 60, 0);
+  m_renderer.main_pass.batch.text(m_instructions, 75, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 

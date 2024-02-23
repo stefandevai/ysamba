@@ -46,7 +46,6 @@ void DebugTools::init(SDL_Window* window, WGPUDeviceImpl* device)
   ImGui_ImplWGPU_InitInfo init_info{};
   init_info.Device = device;
   init_info.RenderTargetFormat = WGPUTextureFormat_BGRA8Unorm;
-  // init_info.DepthStencilFormat = WGPUTextureFormat_Depth24Plus;
 
   ImGui_ImplSDL2_InitForOther(window);
   ImGui_ImplWGPU_Init(&init_info);

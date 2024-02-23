@@ -7,6 +7,7 @@
 #include "definitions.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/display.hpp"
+#include "graphics/renderer/utils.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
@@ -22,7 +23,8 @@ Renderer::Renderer(GameContext& game_context)
 
 Renderer::~Renderer()
 {
-  if (m_has_loaded && m_has_depth_test)
+  // Release depth buffer
+  if (m_has_loaded)
   {
     wgpuTextureViewRelease(depth_texture_view);
     wgpuTextureDestroy(depth_texture);
@@ -30,15 +32,10 @@ Renderer::~Renderer()
   }
 }
 
-void Renderer::load(const bool has_depth_test)
+void Renderer::load()
 {
-  assert(m_game_context.display != nullptr);
-  m_has_depth_test = has_depth_test;
-
   Shader shader{};
   shader.load(context.device, "data/shaders/default.wgsl");
-
-  batch.load(shader, m_has_depth_test);
 
   // Load descriptors used during rendering
   target_view_descriptor = {
@@ -55,37 +52,9 @@ void Renderer::load(const bool has_depth_test)
       .label = "Command Encoder",
   };
 
-  render_pass_color_attachment = {
-      .resolveTarget = nullptr,
-      .loadOp = WGPULoadOp_Clear,
-      .storeOp = WGPUStoreOp_Store,
-      .clearValue = m_clear_color,
-  };
+  m_load_depth_buffer(context.device);
 
-  render_pass_descriptor = {
-      .timestampWrites = nullptr,
-      .depthStencilAttachment = nullptr,
-      .colorAttachmentCount = 1,
-  };
-
-  if (m_has_depth_test)
-  {
-    m_load_depth_buffer(context.device);
-
-    depth_stencil_attachment = {
-        .view = depth_texture_view,
-        .depthClearValue = 1.0f,
-        .depthLoadOp = WGPULoadOp_Clear,
-        .depthStoreOp = WGPUStoreOp_Store,
-        .depthReadOnly = false,
-        .stencilClearValue = 0,
-        .stencilLoadOp = WGPULoadOp_Clear,
-        .stencilStoreOp = WGPUStoreOp_Store,
-        .stencilReadOnly = true,
-    };
-
-    render_pass_descriptor.depthStencilAttachment = &depth_stencil_attachment;
-  }
+  main_pass.load(shader, depth_texture_view);
 
   m_has_loaded = true;
 }
@@ -153,22 +122,24 @@ void Renderer::render(const Camera& camera)
   WGPUTextureView targetView = wgpuTextureCreateView(surface_texture.texture, &target_view_descriptor);
   WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(context.device, &command_encoder_descriptor);
 
-  render_pass_color_attachment.clearValue = m_clear_color;
-  render_pass_color_attachment.view = targetView;
-  render_pass_descriptor.colorAttachments = &render_pass_color_attachment;
-  WGPURenderPassEncoder render_pass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_descriptor);
-
-  batch.render(render_pass, camera);
-
-  wgpuRenderPassEncoderEnd(render_pass);
-  wgpuRenderPassEncoderRelease(render_pass);
+  main_pass.render(targetView, encoder, camera);
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  WGPURenderPassDescriptor debug_render_pass_descriptor = render_pass_descriptor;
-  WGPURenderPassColorAttachment debug_render_pass_color_attachment = render_pass_color_attachment;
-  debug_render_pass_color_attachment.loadOp = WGPULoadOp_Load;
-  debug_render_pass_descriptor.colorAttachments = &debug_render_pass_color_attachment;
-  debug_render_pass_descriptor.depthStencilAttachment = nullptr;
+  // Debug tools render pass for ImGui
+  WGPURenderPassColorAttachment debug_render_pass_color_attachment = {
+      .view = targetView,
+      .resolveTarget = nullptr,
+      .loadOp = WGPULoadOp_Load,
+      .storeOp = WGPUStoreOp_Store,
+  };
+
+  WGPURenderPassDescriptor debug_render_pass_descriptor = {
+      .timestampWrites = nullptr,
+      .depthStencilAttachment = nullptr,
+      .colorAttachments = &debug_render_pass_color_attachment,
+      .colorAttachmentCount = 1,
+  };
+
   WGPURenderPassEncoder debug_render_pass = wgpuCommandEncoderBeginRenderPass(encoder, &debug_render_pass_descriptor);
   DebugTools::get_instance().update();
   DebugTools::get_instance().render(debug_render_pass);
@@ -192,7 +163,7 @@ void Renderer::render(const Camera& camera)
 
 void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a)
 {
-  m_clear_color = {
+  main_pass.clear_color = {
       .r = static_cast<double>(r) / 255.0,
       .g = static_cast<double>(g) / 255.0,
       .b = static_cast<double>(b) / 255.0,
@@ -204,4 +175,5 @@ const Texture* Renderer::get_texture(const uint32_t resource_id)
 {
   return m_game_context.asset_manager->get<Texture>(resource_id, context.device);
 }
+
 }  // namespace dl

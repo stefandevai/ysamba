@@ -17,6 +17,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "graphics/renderer/vertex_buffer.hpp"
+#include "graphics/renderer/vertex_data.hpp"
 
 namespace dl
 {
@@ -30,6 +31,27 @@ struct TileRenderData;
 class MultiSprite;
 class Texture;
 
+struct UniformData
+{
+  uint32_t size = sizeof(glm::mat4) * 2;
+  uint32_t projection_matrix_offset = 0;
+  uint32_t projection_matrix_size = sizeof(glm::mat4);
+  uint32_t view_matrix_offset = sizeof(glm::mat4);
+  uint32_t view_matrix_size = sizeof(glm::mat4);
+};
+
+struct Pipeline
+{
+  std::array<WGPUBindGroupLayout, 2> bind_group_layouts{};
+  std::array<WGPUBindGroup, 2> bind_groups{};
+  WGPUBuffer uniform_buffer{};
+  WGPUSampler sampler{};
+  UniformData uniform_data{};
+  WGPUPipelineLayout layout{};
+  WGPURenderPipeline pipeline{};
+  bool has_depth_test = true;
+};
+
 class Batch
 {
  public:
@@ -37,35 +59,14 @@ class Batch
   static constexpr uint32_t SECONDARY_BATCH_VERTEX_COUNT = 2000;
   static constexpr uint32_t TEXTURE_SLOTS = 8;
 
-  enum BindGroupType
-  {
-    BIND_GROUP_UNIFORMS,
-    BIND_GROUP_TEXTURES,
-  };
+  Pipeline pipeline{};
+  std::vector<VertexBuffer<VertexData>> vertex_buffers{};
+  std::array<WGPUTextureView, TEXTURE_SLOTS> texture_views{};
+  bool should_update_texture_bind_group = false;
 
-  std::array<WGPUBindGroupLayout, 2> bind_group_layouts{};
-  std::array<WGPUBindGroup, 2> bind_groups{};
+  Batch(WGPUContext& context);
 
-  WGPUBuffer uniform_buffer;
-  WGPUSampler sampler;
-
-  struct UniformData
-  {
-    uint32_t size = sizeof(glm::mat4) * 2;
-    uint32_t projection_matrix_offset = 0;
-    uint32_t projection_matrix_size = sizeof(glm::mat4);
-    uint32_t view_matrix_offset = sizeof(glm::mat4);
-    uint32_t view_matrix_size = sizeof(glm::mat4);
-  };
-  UniformData uniform_data;
-  WGPUPipelineLayout pipeline_layout;
-  WGPURenderPipeline pipeline;
-
-  Batch(GameContext& game_context);
-  ~Batch();
-
-  void load(const Shader& shader, const bool has_depth_test);
-  void render(const WGPURenderPassEncoder render_pass, const Camera& camera);
+  void load();
   void clear_textures();
 
   void sprite(Sprite* sprite, const double x, const double y, const double z);
@@ -79,30 +80,13 @@ class Batch
   void pop_scissor();
 
  private:
-  GameContext& m_game_context;
   WGPUContext& m_context;
-  bool m_should_update_texture_bind_group = false;
-  bool m_has_loaded = false;
-
-  struct VertexData
-  {
-    glm::vec3 position;
-    glm::vec2 texture_coordinates;
-    float texture_id;
-    uint32_t color;
-  };
-
-  std::vector<VertexBuffer<VertexData>> m_vertex_buffers{};
   VertexBuffer<VertexData>* m_current_vb = nullptr;
 
   Texture m_dummy_texture;
-  std::array<WGPUTextureView, TEXTURE_SLOTS> m_texture_views{};
   uint32_t m_texture_slot_index = 0;
 
   void m_load_vertex_buffers();
   void m_load_textures();
-  void m_load_uniforms();
-  void m_load_pipeline(const Shader& shader, const bool has_depth_test);
-  void m_update_texture_bind_group();
 };
 }  // namespace dl

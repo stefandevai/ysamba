@@ -16,7 +16,7 @@ Scene::Scene(const std::string& scene_key, GameContext& game_context)
       m_scene_path(fmt::format("data/scenes/{}/data.json", scene_key)),
       m_game_context(game_context)
 {
-  m_renderer.load(true);
+  m_renderer.load();
 }
 
 void Scene::resize()

@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "core/asset_manager.hpp"
 #include "core/game_context.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/color.hpp"
@@ -17,50 +18,19 @@
 
 namespace dl
 {
-Batch::Batch(GameContext& game_context)
-    : m_game_context(game_context),
-      m_context(game_context.display->wgpu_context),
-      m_dummy_texture(Texture::dummy(m_context.device))
-{
-}
+Batch::Batch(WGPUContext& context) : m_context(context), m_dummy_texture(Texture::dummy(m_context.device)) {}
 
-Batch::~Batch()
-{
-  if (m_has_loaded)
-  {
-    wgpuBufferDestroy(uniform_buffer);
-    wgpuBufferRelease(uniform_buffer);
-
-    for (auto bind_group : bind_groups)
-    {
-      wgpuBindGroupRelease(bind_group);
-    }
-    for (auto bind_group_layout : bind_group_layouts)
-    {
-      wgpuBindGroupLayoutRelease(bind_group_layout);
-    }
-
-    wgpuSamplerRelease(sampler);
-    wgpuPipelineLayoutRelease(pipeline_layout);
-    wgpuRenderPipelineRelease(pipeline);
-  }
-}
-
-void Batch::load(const Shader& shader, const bool has_depth_test)
+void Batch::load()
 {
   m_load_vertex_buffers();
   m_load_textures();
-  m_load_uniforms();
-  m_load_pipeline(shader, has_depth_test);
-
-  m_has_loaded = true;
 }
 
 void Batch::m_load_vertex_buffers()
 {
   // Add main vertex buffer
-  m_vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT);
-  m_current_vb = &m_vertex_buffers[0];
+  vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT);
+  m_current_vb = &vertex_buffers[0];
 }
 
 void Batch::m_load_textures()
@@ -70,324 +40,10 @@ void Batch::m_load_textures()
   // when https://github.com/gfx-rs/wgpu/issues/3692 is available
   for (uint32_t i = 0; i < TEXTURE_SLOTS; ++i)
   {
-    m_texture_views[i] = m_dummy_texture.view;
+    texture_views[i] = m_dummy_texture.view;
   }
 
   m_texture_slot_index = 0;
-
-  // Create sampler
-  WGPUSamplerDescriptor sampler_descriptor = {
-      .label = "Batch Sampler",
-      .addressModeU = WGPUAddressMode_ClampToEdge,
-      .addressModeV = WGPUAddressMode_ClampToEdge,
-      .addressModeW = WGPUAddressMode_ClampToEdge,
-      .magFilter = WGPUFilterMode_Nearest,
-      .minFilter = WGPUFilterMode_Linear,
-      .mipmapFilter = WGPUMipmapFilterMode_Linear,
-      .lodMinClamp = 0.0f,
-      .lodMaxClamp = 1.0f,
-      .compare = WGPUCompareFunction_Undefined,
-      .maxAnisotropy = 1,
-  };
-
-  sampler = wgpuDeviceCreateSampler(m_context.device, &sampler_descriptor);
-  assert(sampler != nullptr);
-}
-
-void Batch::m_load_uniforms()
-{
-  // Uniforms
-  WGPUBufferDescriptor uniform_buffer_descriptor = {
-      .label = "Batch Uniform Buffer",
-      .size = uniform_data.size,
-      .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform,
-      .mappedAtCreation = false,
-  };
-
-  uniform_buffer = wgpuDeviceCreateBuffer(m_context.device, &uniform_buffer_descriptor);
-  assert(uniform_buffer != nullptr);
-
-  const auto identity_matrix = glm::mat4(1.0f);
-
-  wgpuQueueWriteBuffer(m_context.queue,
-                       uniform_buffer,
-                       uniform_data.projection_matrix_offset,
-                       &identity_matrix,
-                       uniform_data.projection_matrix_size);
-  wgpuQueueWriteBuffer(m_context.queue,
-                       uniform_buffer,
-                       uniform_data.view_matrix_offset,
-                       &identity_matrix,
-                       uniform_data.view_matrix_size);
-
-  std::array<WGPUBindGroupLayoutEntry, 2> bind_group_layout_entries{};
-  bind_group_layout_entries[BIND_GROUP_UNIFORMS] = {
-    .binding = 0,
-    .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
-    .buffer = {
-      .type = WGPUBufferBindingType_Uniform,
-      .minBindingSize = uniform_data.size,
-    },
-  };
-
-  bind_group_layout_entries[BIND_GROUP_TEXTURES] = {
-    .binding = 1,
-    .visibility = WGPUShaderStage_Fragment,
-    .sampler = {
-      .type = WGPUSamplerBindingType_Filtering,
-    },
-  };
-
-  WGPUBindGroupLayoutDescriptor bind_group_layout_descriptor = {
-      .entryCount = static_cast<uint32_t>(bind_group_layout_entries.size()),
-      .entries = bind_group_layout_entries.data(),
-  };
-
-  bind_group_layouts[BIND_GROUP_UNIFORMS]
-      = wgpuDeviceCreateBindGroupLayout(m_context.device, &bind_group_layout_descriptor);
-  assert(bind_group_layouts[BIND_GROUP_UNIFORMS] != nullptr);
-
-  std::array<WGPUBindGroupEntry, 2> bind_group_entries{};
-  bind_group_entries[BIND_GROUP_UNIFORMS] = {
-      .binding = 0,
-      .buffer = uniform_buffer,
-      .offset = 0,
-      .size = uniform_data.size,
-  };
-
-  bind_group_entries[BIND_GROUP_TEXTURES] = {
-      .binding = 1,
-      .sampler = sampler,
-  };
-
-  WGPUBindGroupDescriptor bind_group_descriptor = {
-      .layout = bind_group_layouts[BIND_GROUP_UNIFORMS],
-      .entryCount = static_cast<uint32_t>(bind_group_entries.size()),
-      .entries = bind_group_entries.data(),
-  };
-
-  bind_groups[BIND_GROUP_UNIFORMS] = wgpuDeviceCreateBindGroup(m_context.device, &bind_group_descriptor);
-  assert(bind_groups[BIND_GROUP_UNIFORMS] != nullptr);
-
-  m_update_texture_bind_group();
-}
-
-void Batch::m_load_pipeline(const Shader& shader, const bool has_depth_test)
-{
-  // Create pipeline
-  // Uniforms layout
-  WGPUPipelineLayoutDescriptor pipeline_layout_descriptor{};
-  pipeline_layout_descriptor.bindGroupLayoutCount = bind_group_layouts.size();
-  pipeline_layout_descriptor.bindGroupLayouts = bind_group_layouts.data();
-  pipeline_layout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipeline_layout_descriptor);
-
-  // Vertex fetch
-  std::array<WGPUVertexAttribute, 4> vertex_attributes = {
-      WGPUVertexAttribute{
-          .shaderLocation = 0,
-          .format = WGPUVertexFormat_Float32x3,
-          .offset = 0,
-      },
-      WGPUVertexAttribute{
-          .shaderLocation = 1,
-          .format = WGPUVertexFormat_Float32x2,
-          .offset = 3 * sizeof(float),
-      },
-      WGPUVertexAttribute{
-          .shaderLocation = 2,
-          .format = WGPUVertexFormat_Float32,
-          .offset = 5 * sizeof(float),
-      },
-      WGPUVertexAttribute{
-          .shaderLocation = 3,
-          .format = WGPUVertexFormat_Unorm8x4,
-          .offset = 6 * sizeof(float),
-      },
-  };
-
-  WGPUVertexBufferLayout vertex_buffer_layout = {
-      .attributeCount = vertex_attributes.size(),
-      .attributes = vertex_attributes.data(),
-      .arrayStride = sizeof(VertexData),
-      .stepMode = WGPUVertexStepMode_Vertex,
-  };
-
-  // Blend state
-  WGPUBlendState blend_state = {
-    .color = {
-      .srcFactor = WGPUBlendFactor_SrcAlpha,
-      .dstFactor = WGPUBlendFactor_OneMinusSrcAlpha,
-      .operation = WGPUBlendOperation_Add,
-    },
-    .alpha = {
-      .srcFactor = WGPUBlendFactor_Zero,
-      .dstFactor = WGPUBlendFactor_One,
-      .operation = WGPUBlendOperation_Add,
-    },
-  };
-
-  WGPUColorTargetState color_target = {
-      .format = m_context.surface_format,
-      .blend = &blend_state,
-      .writeMask = WGPUColorWriteMask_All,
-  };
-
-  // Fragment state
-  WGPUFragmentState fragment_state = {
-      .module = shader.module,
-      .entryPoint = "fs_main",
-      .targetCount = 1,
-      .targets = &color_target,
-  };
-
-  WGPURenderPipelineDescriptor pipeline_descriptor = {
-    .layout = pipeline_layout,
-
-    .vertex = {
-      .bufferCount = 1,
-      .buffers = &vertex_buffer_layout,
-      .module = shader.module,
-      .entryPoint = "vs_main",
-    },
-
-    .primitive = {
-      .topology = WGPUPrimitiveTopology_TriangleList,
-      .frontFace = WGPUFrontFace_CCW,
-      .cullMode = WGPUCullMode_None,
-    },
-
-    .fragment = &fragment_state,
-    .depthStencil = nullptr,
-    .multisample.count = 1,
-  };
-
-  WGPUDepthStencilState stencil_state;
-
-  if (has_depth_test)
-  {
-    stencil_state = utils::default_depth_stencil_state();
-    stencil_state.depthCompare = WGPUCompareFunction_Less;
-    stencil_state.depthWriteEnabled = true;
-    stencil_state.format = WGPUTextureFormat_Depth24Plus;
-    stencil_state.stencilReadMask = 0;
-    stencil_state.stencilWriteMask = 0;
-
-    pipeline_descriptor.depthStencil = &stencil_state;
-  }
-
-  pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipeline_descriptor);
-  assert(pipeline != nullptr);
-}
-
-void Batch::m_update_texture_bind_group()
-{
-  assert(m_current_vb != nullptr);
-
-  WGPUBindGroupLayoutEntryExtras texture_view_layout_entry = {
-    .chain = {
-      .sType = (WGPUSType)WGPUSType_BindGroupLayoutEntryExtras,
-      .next = nullptr,
-    },
-    .count = static_cast<uint32_t>(m_texture_views.size()),
-  };
-
-  WGPUBindGroupLayoutEntry texture_binding_layout = {
-    .nextInChain = &texture_view_layout_entry.chain,
-    .binding = 0,
-    .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
-    .texture = {
-      .sampleType = WGPUTextureSampleType_Float,
-      .viewDimension = WGPUTextureViewDimension_2D,
-    },
-  };
-
-  WGPUBindGroupLayoutDescriptor texture_bind_group_layout_descriptor = {
-      .entryCount = 1,
-      .entries = &texture_binding_layout,
-  };
-
-  bind_group_layouts[BIND_GROUP_TEXTURES]
-      = wgpuDeviceCreateBindGroupLayout(m_context.device, &texture_bind_group_layout_descriptor);
-  assert(bind_group_layouts[BIND_GROUP_TEXTURES] != nullptr);
-
-  WGPUBindGroupEntryExtras texture_view_entry = {
-    .chain = {
-      .sType = (WGPUSType)WGPUSType_BindGroupEntryExtras,
-      .next = nullptr,
-    },
-    .textureViews = m_texture_views.data(),
-    .textureViewCount = static_cast<uint32_t>(m_texture_views.size()),
-  };
-
-  WGPUBindGroupEntry texture_binding = {
-      .nextInChain = &texture_view_entry.chain,
-      .binding = 0,
-  };
-
-  WGPUBindGroupDescriptor texture_bind_group_descriptor = {
-      .layout = bind_group_layouts[BIND_GROUP_TEXTURES],
-      .entryCount = 1,
-      .entries = &texture_binding,
-  };
-  bind_groups[BIND_GROUP_TEXTURES] = wgpuDeviceCreateBindGroup(m_context.device, &texture_bind_group_descriptor);
-  assert(bind_groups[BIND_GROUP_TEXTURES] != nullptr);
-
-  m_should_update_texture_bind_group = false;
-}
-
-void Batch::render(const WGPURenderPassEncoder render_pass, const Camera& camera)
-{
-  assert(m_current_vb != nullptr);
-
-  if (m_should_update_texture_bind_group)
-  {
-    m_update_texture_bind_group();
-  }
-
-  // Set up uniforms
-  wgpuQueueWriteBuffer(m_context.queue,
-                       uniform_buffer,
-                       uniform_data.projection_matrix_offset,
-                       &camera.projection_matrix,
-                       uniform_data.projection_matrix_size);
-
-  wgpuQueueWriteBuffer(m_context.queue,
-                       uniform_buffer,
-                       uniform_data.view_matrix_offset,
-                       &camera.view_matrix,
-                       uniform_data.view_matrix_size);
-
-  // Set up pipeline
-  wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
-
-  // Set up bind groups
-  wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bind_groups[BIND_GROUP_UNIFORMS], 0, nullptr);
-  wgpuRenderPassEncoderSetBindGroup(render_pass, 1, bind_groups[BIND_GROUP_TEXTURES], 0, nullptr);
-
-  for (auto& vertex_buffer : m_vertex_buffers)
-  {
-    if (vertex_buffer.index == 0)
-    {
-      continue;
-    }
-
-    // Write vertex data to buffer
-    vertex_buffer.update(m_context.queue);
-    wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.size);
-
-    // Set scissor if exists
-    if (vertex_buffer.has_scissor())
-    {
-      const auto& scissor = vertex_buffer.scissor;
-      wgpuRenderPassEncoderSetScissorRect(render_pass, scissor.x, scissor.y, scissor.z, scissor.w);
-    }
-
-    // Draw
-    wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.index, 1, 0, 0);
-
-    // Reset buffer for next frame
-    vertex_buffer.reset();
-  }
 }
 
 void Batch::clear_textures() { m_texture_slot_index = 0; }
@@ -398,7 +54,7 @@ void Batch::sprite(Sprite* sprite, const double x, const double y, const double 
 
   if (sprite->texture == nullptr)
   {
-    sprite->texture = m_game_context.asset_manager->get<Texture>("ysamba-typography"_hs, m_context.device);
+    sprite->texture = AssetManager::get<Texture>(sprite->resource_id, m_context.device);
   }
 
   const glm::vec2& size = sprite->get_size();
@@ -418,21 +74,21 @@ void Batch::sprite(Sprite* sprite, const double x, const double y, const double 
   }
 
   // Build vector of textures to bind when rendering
-  // texture_index is the index in m_texture_views that will
+  // texture_index is the index in texture_views that will
   // be translated to a index in the shader.
   float texture_index = 0.00f;
-  const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(m_texture_views.begin(), upper_bound, sprite->texture->view);
+  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite->texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    m_texture_views[m_texture_slot_index] = sprite->texture->view;
+    texture_views[m_texture_slot_index] = sprite->texture->view;
     ++m_texture_slot_index;
-    m_should_update_texture_bind_group = true;
+    should_update_texture_bind_group = true;
   }
   else
   {
-    texture_index = it - m_texture_views.begin();
+    texture_index = it - texture_views.begin();
   }
 
   // Top left vertex
@@ -482,7 +138,7 @@ void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, co
   // Load texture if it has not been loaded
   if (sprite->texture == nullptr)
   {
-    sprite->texture = m_game_context.asset_manager->get<Texture>(sprite->resource_id, m_context.device);
+    sprite->texture = AssetManager::get<Texture>(sprite->resource_id, m_context.device);
   }
 
   unsigned int color = sprite->color.int_color;
@@ -499,21 +155,21 @@ void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, co
   }
 
   // Build vector of textures to bind when rendering
-  // texture_index is the index in m_texture_views that will
+  // texture_index is the index in texture_views that will
   // be translated to a index in the shader.
   float texture_index = 0.00f;
-  const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(m_texture_views.begin(), upper_bound, sprite->texture->view);
+  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite->texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    m_texture_views[m_texture_slot_index] = sprite->texture->view;
+    texture_views[m_texture_slot_index] = sprite->texture->view;
     ++m_texture_slot_index;
-    m_should_update_texture_bind_group = true;
+    should_update_texture_bind_group = true;
   }
   else
   {
-    texture_index = it - m_texture_views.begin();
+    texture_index = it - texture_views.begin();
   }
 
   const auto& size = sprite->get_size();
@@ -578,18 +234,18 @@ void Batch::tile(const TileRenderData& tile, const double x, const double y, con
   assert(size.y != 0);
 
   float texture_index = 0.00f;
-  const auto upper_bound = m_texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(m_texture_views.begin(), upper_bound, tile.texture->view);
+  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(texture_views.begin(), upper_bound, tile.texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    m_texture_views[m_texture_slot_index] = tile.texture->view;
+    texture_views[m_texture_slot_index] = tile.texture->view;
     ++m_texture_slot_index;
-    m_should_update_texture_bind_group = true;
+    should_update_texture_bind_group = true;
   }
   else
   {
-    texture_index = it - m_texture_views.begin();
+    texture_index = it - texture_views.begin();
   }
 
   // Top left vertex
@@ -670,7 +326,7 @@ void Batch::text(Text& text, const double x, const double y, const double z)
 
   if (!text.m_has_initialized)
   {
-    text.m_font = m_game_context.asset_manager->get<Font>(text.typeface, m_context.device);
+    text.m_font = AssetManager::get<Font>(text.typeface, m_context.device);
     assert(text.m_font != nullptr);
     text.initialize();
   }
@@ -702,7 +358,7 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 
   if (nine_patch.texture == nullptr)
   {
-    nine_patch.texture = m_game_context.asset_manager->get<Texture>(nine_patch.resource_id, m_context.device);
+    nine_patch.texture = AssetManager::get<Texture>(nine_patch.resource_id, m_context.device);
   }
 
   if (nine_patch.dirty)
@@ -746,9 +402,9 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 void Batch::push_scissor(Vector4i scissor)
 {
   // Try to reuse a vertex buffer
-  if (m_vertex_buffers.size() > 1)
+  if (vertex_buffers.size() > 1)
   {
-    for (auto& vertex_buffer : m_vertex_buffers)
+    for (auto& vertex_buffer : vertex_buffers)
     {
       if (vertex_buffer.index == 0)
       {
@@ -762,9 +418,9 @@ void Batch::push_scissor(Vector4i scissor)
   // Create a new buffer
   VertexBuffer<VertexData> vertex_buffer{m_context.device, SECONDARY_BATCH_VERTEX_COUNT};
   vertex_buffer.scissor = std::move(scissor);
-  m_vertex_buffers.push_back(std::move(vertex_buffer));
-  m_current_vb = &m_vertex_buffers.back();
+  vertex_buffers.push_back(std::move(vertex_buffer));
+  m_current_vb = &vertex_buffers.back();
 }
 
-void Batch::pop_scissor() { m_current_vb = &m_vertex_buffers[0]; }
+void Batch::pop_scissor() { m_current_vb = &vertex_buffers[0]; }
 }  // namespace dl
