@@ -8,8 +8,8 @@
 #include "./label.hpp"
 #include "./scrollable.hpp"
 #include "./window_frame.hpp"
-#include "core/display.hpp"
 #include "core/maths/vector.hpp"
+#include "graphics/display.hpp"
 #include "world/metadata.hpp"
 
 namespace dl::ui

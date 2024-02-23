@@ -4,34 +4,20 @@
 
 namespace dl::utils
 {
-WGPUStencilFaceState default_stencil_face_state()
-{
-  WGPUStencilFaceState stencil_face_state = {
-      .compare = WGPUCompareFunction_Always,
-      .failOp = WGPUStencilOperation_Keep,
-      .depthFailOp = WGPUStencilOperation_Keep,
-      .passOp = WGPUStencilOperation_Keep,
-  };
+WGPUAdapter request_adapter(WGPUInstance instance, WGPURequestAdapterOptions const* options);
 
-  return stencil_face_state;
-}
+WGPUAdapterProperties adapter_properties(WGPUAdapter adapter);
 
-WGPUDepthStencilState default_depth_stencil_state()
-{
-  WGPUDepthStencilState depth_stencil_state = {
-      .format = WGPUTextureFormat_Undefined,
-      .depthWriteEnabled = false,
-      .depthCompare = WGPUCompareFunction_Always,
-      .stencilReadMask = 0xFFFFFFFF,
-      .stencilWriteMask = 0xFFFFFFFF,
-      .depthBias = 0,
-      .depthBiasSlopeScale = 0,
-      .depthBiasClamp = 0,
-      .stencilFront = default_stencil_face_state(),
-      .stencilBack = default_stencil_face_state(),
-  };
+WGPUDevice request_device(WGPUAdapter adapter, WGPUDeviceDescriptor const* descriptor);
 
-  return depth_stencil_state;
-}
+void list_features(WGPUAdapter adapter);
+
+void device_set_uncaptured_error_callback(WGPUDevice device);
+
+void queue_on_submitted_work_done(WGPUQueue queue);
+
+WGPUStencilFaceState default_stencil_face_state();
+
+WGPUDepthStencilState default_depth_stencil_state();
 
 }  // namespace dl::utils

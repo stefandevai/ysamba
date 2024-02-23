@@ -4,8 +4,8 @@
 #include <memory>
 
 #include "./json.hpp"
-#include "core/display.hpp"
 #include "core/input_manager.hpp"
+#include "graphics/display.hpp"
 #include "scenes/scene.hpp"
 
 namespace dl

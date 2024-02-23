@@ -3,10 +3,10 @@
 #include <spdlog/spdlog.h>
 #include <webgpu/wgpu.h>
 
-#include "core/display.hpp"
 #include "core/game_context.hpp"
 #include "definitions.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/display.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS

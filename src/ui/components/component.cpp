@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "core/display.hpp"
+#include "graphics/display.hpp"
 
 namespace dl::ui
 {

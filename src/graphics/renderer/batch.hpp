@@ -39,14 +39,14 @@ class Batch
 
   std::array<WGPUBindGroupLayoutEntry, 2> binding_layout{};
   std::array<WGPUBindGroupEntry, 2> binding{};
-  std::array<WGPUBindGroupLayout, 2> bindGroupLayouts{};
-  WGPUBindGroup bindGroup{};
+  std::array<WGPUBindGroupLayout, 2> bind_group_layouts{};
+  WGPUBindGroup bind_group{};
 
   WGPUBindGroupLayoutEntry texture_binding_layout{};
   WGPUBindGroupEntry texture_binding{};
   WGPUBindGroup texture_bind_group{};
 
-  WGPUBuffer uniformBuffer;
+  WGPUBuffer uniform_buffer;
   WGPUDepthStencilState stencil_state;
   WGPUSampler sampler;
 
@@ -59,7 +59,7 @@ class Batch
     uint32_t view_matrix_size = sizeof(glm::mat4);
   };
   UniformData uniform_data;
-  WGPUPipelineLayout pipelineLayout;
+  WGPUPipelineLayout pipeline_layout;
   WGPURenderPipeline pipeline;
 
   Batch(GameContext& game_context);

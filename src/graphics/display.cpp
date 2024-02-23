@@ -8,77 +8,11 @@
 #include "core/maths/vector.hpp"
 #include "definitions.hpp"
 #include "graphics/renderer/sdl2_webgpu.h"
+#include "graphics/renderer/utils.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
 #include "debug/debug_tools.hpp"
 #endif
-
-namespace
-{
-WGPUAdapter request_adapter(WGPUInstance instance, WGPURequestAdapterOptions const* options)
-{
-  struct UserData
-  {
-    WGPUAdapter adapter = nullptr;
-    bool request_ended = false;
-  };
-  UserData user_data;
-
-  auto on_adapter_request_ended
-      = [](WGPURequestAdapterStatus status, WGPUAdapter adapter, char const* message, void* user_data_) {
-          UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
-
-          if (status == WGPURequestAdapterStatus_Success && adapter)
-          {
-            user_data.adapter = adapter;
-          }
-          else
-          {
-            spdlog::critical("Failed to request WebGPU adapter: ", message);
-          }
-
-          user_data.request_ended = true;
-        };
-
-  wgpuInstanceRequestAdapter(instance, options, on_adapter_request_ended, (void*)&user_data);
-
-  assert(user_data.request_ended);
-
-  return user_data.adapter;
-}
-
-WGPUDevice request_device(WGPUAdapter adapter, WGPUDeviceDescriptor const* descriptor)
-{
-  struct UserData
-  {
-    WGPUDevice device = nullptr;
-    bool request_ended = false;
-  };
-  UserData user_data;
-
-  auto on_device_request_ended
-      = [](WGPURequestDeviceStatus status, WGPUDevice device, char const* message, void* user_data_) {
-          UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
-
-          if (status == WGPURequestDeviceStatus_Success && device)
-          {
-            user_data.device = device;
-          }
-          else
-          {
-            spdlog::critical("Failed to request WebGPU device: ", message);
-          }
-
-          user_data.request_ended = true;
-        };
-
-  wgpuAdapterRequestDevice(adapter, descriptor, on_device_request_ended, (void*)&user_data);
-
-  assert(user_data.request_ended);
-
-  return user_data.device;
-}
-}  // namespace
 
 namespace dl
 {
@@ -125,7 +59,6 @@ void Display::load(const int width, const int height, const std::string& title)
   wgpu_context.instance = wgpuCreateInstance(&desc);
   assert(wgpu_context.instance != nullptr);
 
-  // surface_format = wgpuSurfaceGetPreferredFormat(surface, adapter);
   wgpu_context.surface_format = WGPUTextureFormat_BGRA8Unorm;
   wgpu_context.surface = SDL_GetWGPUSurface(wgpu_context.instance, m_window);
   assert(wgpu_context.surface != nullptr);
@@ -143,29 +76,19 @@ void Display::load(const int width, const int height, const std::string& title)
 #endif
         };
 
-  wgpu_context.adapter = request_adapter(wgpu_context.instance, &options);
+  wgpu_context.adapter = utils::request_adapter(wgpu_context.instance, &options);
 
-  // WGPUAdapterProperties properties = {};
-  // properties.nextInChain = nullptr;
-  // wgpuAdapterGetProperties(wgpu_instance.adapter, &properties);
-  //
-  // spdlog::info("Using adapter: {}", properties.name);
+  const auto properties = utils::adapter_properties(wgpu_context.adapter);
+  spdlog::info("Using adapter for {}", properties.name);
 
-  // size_t featureCount = wgpuAdapterEnumerateFeatures(wgpu_context.adapter, nullptr);
-  // std::vector<WGPUFeatureName> features(featureCount);
-  // wgpuAdapterEnumerateFeatures(wgpu_context.adapter, features.data());
-  //
-  // for (auto f : features)
-  // {
-  //   spdlog::debug("Feature: 0x{0:x}", (uint64_t)f);
-  // }
+  // utils::list_features(wgpu_context.adapter);
 
   std::array<WGPUFeatureName, 2> required_features = {
       static_cast<WGPUFeatureName>(WGPUNativeFeature_TextureBindingArray),
       static_cast<WGPUFeatureName>(WGPUNativeFeature_SampledTextureAndStorageBufferArrayNonUniformIndexing),
   };
 
-  WGPUDeviceDescriptor device_desc = {
+  WGPUDeviceDescriptor device_descriptor = {
     .label = "Default Device",
     .requiredLimits = nullptr,
     .defaultQueue = {
@@ -174,20 +97,14 @@ void Display::load(const int width, const int height, const std::string& title)
     .requiredFeatures = required_features.data(),
     .requiredFeatureCount = required_features.size(),
   };
-  wgpu_context.device = request_device(wgpu_context.adapter, &device_desc);
 
-  // auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
-  //   spdlog::critical("Device error: {}, {}", (uint32_t)type, message);
-  // };
-  // wgpuDeviceSetUncapturedErrorCallback(wgpu_context.device, on_device_error, nullptr);
+  wgpu_context.device = utils::request_device(wgpu_context.adapter, &device_descriptor);
+
+  // utils::device_set_uncaptured_error_callback(wgpu_context.device);
 
   wgpu_context.queue = wgpuDeviceGetQueue(wgpu_context.device);
 
-  // auto on_queue_work_done = [](WGPUQueueWorkDoneStatus status, void*) {
-  //   spdlog::debug("Queue work done. Status: {}", (uint32_t)status);
-  // };
-  //
-  // wgpuQueueOnSubmittedWorkDone(wgpu_context.queue, on_queue_work_done, nullptr);
+  // utils::queue_on_submitted_work_done(wgpu_context.queue);
 
   m_configure_surface();
 
@@ -197,14 +114,6 @@ void Display::load(const int width, const int height, const std::string& title)
 
   m_has_loaded = true;
 }
-
-// void temp()
-// {
-//   if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-//   {
-//     spdlog::critical("Failed to initialize GLAD");
-//   }
-// }
 
 const Vector2i Display::get_size() const { return {m_width, m_height}; }
 

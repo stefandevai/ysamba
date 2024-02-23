@@ -157,16 +157,6 @@ void Texture::load(
   has_loaded = true;
 }
 
-void Texture::bind() const
-{
-  // glBindTexture(GL_TEXTURE_2D, m_id);
-}
-
-void Texture::unbind() const
-{
-  // glBindTexture(GL_TEXTURE_2D, 0);
-}
-
 // TODO: Implement irregular frame calculations
 float Texture::get_frame_width() const { return (m_width / static_cast<float>(m_horizontal_frames)); }
 

@@ -58,8 +58,6 @@ class Texture
 
   void load(const WGPUDevice device);
   void load(const WGPUDevice device, const unsigned char* data, const int width, const int height, const int channels);
-  void bind() const;
-  void unbind() const;
   inline unsigned int get_id() const { return m_id; }
   inline int get_width() const { return m_width; }
   inline int get_height() const { return m_height; }

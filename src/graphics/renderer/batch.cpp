@@ -2,10 +2,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include "core/display.hpp"
 #include "core/game_context.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/color.hpp"
+#include "graphics/display.hpp"
 #include "graphics/frame_angle.hpp"
 #include "graphics/multi_sprite.hpp"
 #include "graphics/nine_patch.hpp"
@@ -28,14 +28,14 @@ Batch::~Batch()
 {
   if (m_has_loaded)
   {
-    wgpuBufferDestroy(uniformBuffer);
-    wgpuBufferRelease(uniformBuffer);
-    wgpuBindGroupRelease(bindGroup);
-    wgpuBindGroupLayoutRelease(bindGroupLayouts[0]);
+    wgpuBufferDestroy(uniform_buffer);
+    wgpuBufferRelease(uniform_buffer);
+    wgpuBindGroupRelease(bind_group);
+    wgpuBindGroupLayoutRelease(bind_group_layouts[0]);
     wgpuBindGroupRelease(texture_bind_group);
-    wgpuBindGroupLayoutRelease(bindGroupLayouts[1]);
+    wgpuBindGroupLayoutRelease(bind_group_layouts[1]);
     wgpuSamplerRelease(sampler);
-    wgpuPipelineLayoutRelease(pipelineLayout);
+    wgpuPipelineLayoutRelease(pipeline_layout);
     wgpuRenderPipelineRelease(pipeline);
   }
 }
@@ -56,9 +56,9 @@ void Batch::load(const Shader& shader)
 
   m_texture_slot_index = 0;
 
-  // Sampler
+  // Create sampler
   {
-    WGPUSamplerDescriptor samplerDesc = {
+    WGPUSamplerDescriptor sampler_descriptor = {
         .label = "Batch Sampler",
         .addressModeU = WGPUAddressMode_ClampToEdge,
         .addressModeV = WGPUAddressMode_ClampToEdge,
@@ -72,31 +72,31 @@ void Batch::load(const Shader& shader)
         .maxAnisotropy = 1,
     };
 
-    sampler = wgpuDeviceCreateSampler(m_context.device, &samplerDesc);
+    sampler = wgpuDeviceCreateSampler(m_context.device, &sampler_descriptor);
     assert(sampler != nullptr);
   }
 
   // Uniforms
   {
-    WGPUBufferDescriptor bufferDesc = {
+    WGPUBufferDescriptor uniform_buffer_descriptor = {
         .label = "Batch Uniform Buffer",
         .size = uniform_data.size,
         .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform,
         .mappedAtCreation = false,
     };
 
-    uniformBuffer = wgpuDeviceCreateBuffer(m_context.device, &bufferDesc);
-    assert(uniformBuffer != nullptr);
+    uniform_buffer = wgpuDeviceCreateBuffer(m_context.device, &uniform_buffer_descriptor);
+    assert(uniform_buffer != nullptr);
 
     const auto identity_matrix = glm::mat4(1.0f);
 
     wgpuQueueWriteBuffer(m_context.queue,
-                         uniformBuffer,
+                         uniform_buffer,
                          uniform_data.projection_matrix_offset,
                          &identity_matrix,
                          uniform_data.projection_matrix_size);
     wgpuQueueWriteBuffer(m_context.queue,
-                         uniformBuffer,
+                         uniform_buffer,
                          uniform_data.view_matrix_offset,
                          &identity_matrix,
                          uniform_data.view_matrix_size);
@@ -118,17 +118,17 @@ void Batch::load(const Shader& shader)
       },
     };
 
-    WGPUBindGroupLayoutDescriptor bindGroupLayoutDesc = {
+    WGPUBindGroupLayoutDescriptor bind_group_layout_descriptor = {
         .entryCount = (uint32_t)binding_layout.size(),
         .entries = binding_layout.data(),
     };
 
-    bindGroupLayouts[0] = wgpuDeviceCreateBindGroupLayout(m_context.device, &bindGroupLayoutDesc);
-    assert(bindGroupLayouts[0] != nullptr);
+    bind_group_layouts[0] = wgpuDeviceCreateBindGroupLayout(m_context.device, &bind_group_layout_descriptor);
+    assert(bind_group_layouts[0] != nullptr);
 
     binding[0] = {
         .binding = 0,
-        .buffer = uniformBuffer,
+        .buffer = uniform_buffer,
         .offset = 0,
         .size = uniform_data.size,
     };
@@ -138,28 +138,28 @@ void Batch::load(const Shader& shader)
         .sampler = sampler,
     };
 
-    WGPUBindGroupDescriptor bindGroupDesc = {
-        .layout = bindGroupLayouts[0],
+    WGPUBindGroupDescriptor bind_group_descriptor = {
+        .layout = bind_group_layouts[0],
         .entryCount = (uint32_t)binding.size(),
         .entries = binding.data(),
     };
 
-    bindGroup = wgpuDeviceCreateBindGroup(m_context.device, &bindGroupDesc);
-    assert(bindGroup != nullptr);
+    bind_group = wgpuDeviceCreateBindGroup(m_context.device, &bind_group_descriptor);
+    assert(bind_group != nullptr);
 
     m_update_texture_bind_group();
   }
 
-  // Pipeline
+  // Create pipeline
   {
     // Uniforms layout
-    WGPUPipelineLayoutDescriptor pipelineLayoutDesc{};
-    pipelineLayoutDesc.bindGroupLayoutCount = bindGroupLayouts.size();
-    pipelineLayoutDesc.bindGroupLayouts = bindGroupLayouts.data();
-    pipelineLayout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipelineLayoutDesc);
+    WGPUPipelineLayoutDescriptor pipeline_layout_descriptor{};
+    pipeline_layout_descriptor.bindGroupLayoutCount = bind_group_layouts.size();
+    pipeline_layout_descriptor.bindGroupLayouts = bind_group_layouts.data();
+    pipeline_layout = wgpuDeviceCreatePipelineLayout(m_context.device, &pipeline_layout_descriptor);
 
     // Vertex fetch
-    std::array<WGPUVertexAttribute, 4> vertexAttribs = {
+    std::array<WGPUVertexAttribute, 4> vertex_attributes = {
         WGPUVertexAttribute{
             .shaderLocation = 0,
             .format = WGPUVertexFormat_Float32x3,
@@ -182,15 +182,15 @@ void Batch::load(const Shader& shader)
         },
     };
 
-    WGPUVertexBufferLayout vertexBufferLayout = {
-        .attributeCount = vertexAttribs.size(),
-        .attributes = vertexAttribs.data(),
+    WGPUVertexBufferLayout vertex_buffer_layout = {
+        .attributeCount = vertex_attributes.size(),
+        .attributes = vertex_attributes.data(),
         .arrayStride = sizeof(VertexData),
         .stepMode = WGPUVertexStepMode_Vertex,
     };
 
     // Blend state
-    WGPUBlendState blendState = {
+    WGPUBlendState blend_state = {
       .color = {
         .srcFactor = WGPUBlendFactor_SrcAlpha,
         .dstFactor = WGPUBlendFactor_OneMinusSrcAlpha,
@@ -203,18 +203,18 @@ void Batch::load(const Shader& shader)
       },
     };
 
-    WGPUColorTargetState colorTarget = {
+    WGPUColorTargetState color_target = {
         .format = m_context.surface_format,
-        .blend = &blendState,
+        .blend = &blend_state,
         .writeMask = WGPUColorWriteMask_All,
     };
 
     // Fragment state
-    WGPUFragmentState fragmentState = {
+    WGPUFragmentState fragment_state = {
         .module = shader.module,
         .entryPoint = "fs_main",
         .targetCount = 1,
-        .targets = &colorTarget,
+        .targets = &color_target,
     };
 
     stencil_state = utils::default_depth_stencil_state();
@@ -224,12 +224,12 @@ void Batch::load(const Shader& shader)
     stencil_state.stencilReadMask = 0;
     stencil_state.stencilWriteMask = 0;
 
-    WGPURenderPipelineDescriptor pipelineDesc = {
-      .layout = pipelineLayout,
+    WGPURenderPipelineDescriptor pipeline_descriptor = {
+      .layout = pipeline_layout,
 
       .vertex = {
         .bufferCount = 1,
-        .buffers = &vertexBufferLayout,
+        .buffers = &vertex_buffer_layout,
         .module = shader.module,
         .entryPoint = "vs_main",
       },
@@ -240,12 +240,12 @@ void Batch::load(const Shader& shader)
         .cullMode = WGPUCullMode_None,
       },
 
-      .fragment = &fragmentState,
+      .fragment = &fragment_state,
       .depthStencil = &stencil_state,
       .multisample.count = 1,
     };
 
-    pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipelineDesc);
+    pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipeline_descriptor);
     assert(pipeline != nullptr);
   }
 
@@ -263,13 +263,13 @@ void Batch::render(const WGPURenderPassEncoder render_pass, const Camera& camera
 
   // Set up uniforms
   wgpuQueueWriteBuffer(m_context.queue,
-                       uniformBuffer,
+                       uniform_buffer,
                        uniform_data.projection_matrix_offset,
                        &camera.projection_matrix,
                        uniform_data.projection_matrix_size);
 
   wgpuQueueWriteBuffer(m_context.queue,
-                       uniformBuffer,
+                       uniform_buffer,
                        uniform_data.view_matrix_offset,
                        &camera.view_matrix,
                        uniform_data.view_matrix_size);
@@ -278,7 +278,7 @@ void Batch::render(const WGPURenderPassEncoder render_pass, const Camera& camera
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline);
 
   // Set up bind groups
-  wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
+  wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bind_group, 0, nullptr);
   wgpuRenderPassEncoderSetBindGroup(render_pass, 1, texture_bind_group, 0, nullptr);
 
   for (auto& vertex_buffer : m_vertex_buffers)
@@ -640,8 +640,8 @@ void Batch::m_update_texture_bind_group()
       .entries = &texture_binding_layout,
   };
 
-  bindGroupLayouts[1] = wgpuDeviceCreateBindGroupLayout(m_context.device, &texture_bind_group_layout_descriptor);
-  assert(bindGroupLayouts[1] != nullptr);
+  bind_group_layouts[1] = wgpuDeviceCreateBindGroupLayout(m_context.device, &texture_bind_group_layout_descriptor);
+  assert(bind_group_layouts[1] != nullptr);
 
   WGPUBindGroupEntryExtras texture_view_entry = {
     .chain = {
@@ -658,7 +658,7 @@ void Batch::m_update_texture_bind_group()
   };
 
   WGPUBindGroupDescriptor texture_bind_group_descriptor = {
-      .layout = bindGroupLayouts[1],
+      .layout = bind_group_layouts[1],
       .entryCount = 1,
       .entries = &texture_binding,
   };

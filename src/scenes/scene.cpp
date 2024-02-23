@@ -6,8 +6,8 @@
 
 #include <entt/core/hashed_string.hpp>
 
-#include "core/display.hpp"
 #include "core/input_manager.hpp"
+#include "graphics/display.hpp"
 
 namespace dl
 {

@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "core/display.hpp"
+#include "graphics/display.hpp"
 #include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui

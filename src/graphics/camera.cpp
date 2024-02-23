@@ -5,9 +5,9 @@
 #include <cmath>
 #include <entt/entity/registry.hpp>
 
-#include "core/display.hpp"
 #include "core/events/camera.hpp"
 #include "core/events/emitter.hpp"
+#include "graphics/display.hpp"
 
 namespace
 {

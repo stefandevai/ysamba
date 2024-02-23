@@ -4,8 +4,8 @@
 
 #include "./container.hpp"
 #include "./label.hpp"
-#include "core/display.hpp"
 #include "core/maths/vector.hpp"
+#include "graphics/display.hpp"
 
 namespace dl::ui
 {

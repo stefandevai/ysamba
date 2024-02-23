@@ -4,12 +4,12 @@
 
 #include "./asset_manager.hpp"
 #include "./clock.hpp"
-#include "./display.hpp"
 #include "./game_context.hpp"
 #include "./input_manager.hpp"
 #include "./json.hpp"
 #include "./scene_manager.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/display.hpp"
 
 namespace dl
 {
