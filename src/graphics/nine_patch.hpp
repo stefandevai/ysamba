@@ -30,7 +30,7 @@ struct NinePatch
   Sprite center_patch{};
 
   // Actual sprite texture
-  const v2::Texture* texture = nullptr;
+  const Texture* texture = nullptr;
 
   // Flag to trigger patche (re)generation
   bool dirty = true;

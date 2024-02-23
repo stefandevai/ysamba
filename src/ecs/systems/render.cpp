@@ -20,7 +20,7 @@
 
 namespace dl
 {
-RenderSystem::RenderSystem(v2::Renderer& renderer, World& world)
+RenderSystem::RenderSystem(Renderer& renderer, World& world)
     : m_renderer(renderer),
       m_world(world),
       m_world_texture_id(m_world.get_texture_id()),
@@ -282,7 +282,7 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
 
   const auto& tile = m_tiles.at(tile_id);
 
-  if (tile.frame_data->sprite_type == v2::SpriteType::Single)
+  if (tile.frame_data->sprite_type == SpriteType::Single)
   {
     m_renderer.world_pipeline.tile(tile,
                                    world_x * tile_size.x,
@@ -297,7 +297,7 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
           bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
     }
   }
-  else if (tile.frame_data->sprite_type == v2::SpriteType::Multiple)
+  else if (tile.frame_data->sprite_type == SpriteType::Multiple)
   {
     // TODO: Check pattern directly on chunk to avoid another lookup
     if (!m_world.has_pattern(tile.frame_data->pattern,

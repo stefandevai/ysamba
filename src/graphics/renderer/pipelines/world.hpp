@@ -15,9 +15,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
 
-#include "graphics/renderer/mesh.hpp"
 #include "graphics/renderer/vertex_buffer.hpp"
 
 namespace dl
@@ -30,9 +28,6 @@ class Text;
 struct NinePatch;
 struct TileRenderData;
 class MultiSprite;
-
-namespace v2
-{
 class Texture;
 
 class WorldPipeline
@@ -107,5 +102,4 @@ class WorldPipeline
 
   void m_update_texture_bind_group();
 };
-}  // namespace v2
 }  // namespace dl

@@ -30,7 +30,7 @@ class Scene
   const uint32_t m_scene_key{};
   const std::string m_scene_path{};
   GameContext& m_game_context;
-  v2::Renderer m_renderer2{m_game_context};
+  Renderer m_renderer2{m_game_context};
   Camera m_camera{*m_game_context.display};
   ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer2};
   bool m_has_loaded = false;

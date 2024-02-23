@@ -51,7 +51,7 @@ void Font::load(WGPUDevice device)
   m_atlas_width = atlas_width;
   m_atlas_height = atlas_height;
 
-  m_texture_atlas = std::make_unique<v2::Texture>(atlas_width, atlas_height);
+  m_texture_atlas = std::make_unique<Texture>(atlas_width, atlas_height);
 
   int x_offset = 0;
   // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

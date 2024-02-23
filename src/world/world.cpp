@@ -416,7 +416,7 @@ void World::m_load_tile_data()
   const auto actions = m_load_actions();
 
   const auto texture
-      = m_game_context.asset_manager->get<v2::Texture>(m_texture_id, m_game_context.display->wgpu_context.device);
+      = m_game_context.asset_manager->get<Texture>(m_texture_id, m_game_context.display->wgpu_context.device);
 
   assert(texture != nullptr && "World texture is not loaded in order to get tile size");
 

@@ -14,7 +14,7 @@ class MultiSprite
 {
  public:
   uint32_t resource_id{};
-  const v2::Texture* texture = nullptr;
+  const Texture* texture = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
   Color color{0xFFFFFFFF};
   uint32_t frame = 0;

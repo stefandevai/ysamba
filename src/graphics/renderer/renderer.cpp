@@ -13,7 +13,7 @@
 #include "debug/debug_tools.hpp"
 #endif
 
-namespace dl::v2
+namespace dl
 {
 Renderer::Renderer(GameContext& game_context)
     : m_game_context(game_context), context(game_context.display->wgpu_context)
@@ -187,4 +187,4 @@ const Texture* Renderer::get_texture(const uint32_t resource_id)
 {
   return m_game_context.asset_manager->get<Texture>(resource_id, context.device);
 }
-}  // namespace dl::v2
+}  // namespace dl

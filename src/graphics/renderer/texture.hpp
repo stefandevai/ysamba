@@ -10,7 +10,7 @@
 
 #include "graphics/frame_angle.hpp"
 
-namespace dl::v2
+namespace dl
 {
 enum class SpriteType
 {
@@ -100,4 +100,4 @@ class Texture
 
   void m_load_empty();
 };
-}  // namespace dl::v2
+}  // namespace dl

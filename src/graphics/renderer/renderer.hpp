@@ -14,8 +14,6 @@ class Camera;
 struct GameContext;
 struct WGPUContext;
 
-namespace v2
-{
 class Renderer
 {
  private:
@@ -44,5 +42,4 @@ class Renderer
   void m_load_depth_buffer(WGPUDevice device);
 };
 
-}  // namespace v2
 }  // namespace dl

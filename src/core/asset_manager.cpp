@@ -54,7 +54,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
     {
       assert(asset_info.contains("path") && "Texture path not specified");
       const auto& filepath = asset_info["path"].get<std::string>();
-      add<v2::Texture>(hashed_id, filepath);
+      add<Texture>(hashed_id, filepath);
     }
     break;
 
@@ -71,11 +71,11 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       if (asset_info.contains("data_path"))
       {
         const auto data_filepath = asset_info["data_path"].get<std::string>();
-        add<v2::Texture>(hashed_id, filepath, horizontal_frames, vertical_frames, data_filepath);
+        add<Texture>(hashed_id, filepath, horizontal_frames, vertical_frames, data_filepath);
         break;
       }
 
-      add<v2::Texture>(hashed_id, filepath, horizontal_frames, vertical_frames);
+      add<Texture>(hashed_id, filepath, horizontal_frames, vertical_frames);
     }
     break;
 

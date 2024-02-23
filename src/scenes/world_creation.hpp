@@ -44,7 +44,7 @@ class WorldCreation : public Scene
   SceneState m_scene_state = SceneState::Normal;
   World m_world{m_game_context};
   Sprite m_world_sprite{};
-  std::unique_ptr<v2::Texture> m_texture = nullptr;
+  std::unique_ptr<Texture> m_texture = nullptr;
   int m_seed = 0;
   std::vector<float> m_height_map{};
   InputManager& m_input_manager = InputManager::get_instance();

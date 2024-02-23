@@ -15,7 +15,7 @@
 #include "graphics/text.hpp"
 #include "graphics/tile_render_data.hpp"
 
-namespace dl::v2
+namespace dl
 {
 WorldPipeline::WorldPipeline(GameContext& game_context)
     : m_game_context(game_context),
@@ -315,7 +315,7 @@ void WorldPipeline::sprite(Sprite* sprite, const double x, const double y, const
 
   if (sprite->texture == nullptr)
   {
-    sprite->texture = m_game_context.asset_manager->get<v2::Texture>("ysamba-typography"_hs, m_context.device);
+    sprite->texture = m_game_context.asset_manager->get<Texture>("ysamba-typography"_hs, m_context.device);
   }
 
   const glm::vec2& size = sprite->get_size();
@@ -399,7 +399,7 @@ void WorldPipeline::multi_sprite(MultiSprite* sprite, const double x, const doub
   // Load texture if it has not been loaded
   if (sprite->texture == nullptr)
   {
-    sprite->texture = m_game_context.asset_manager->get<v2::Texture>(sprite->resource_id, m_context.device);
+    sprite->texture = m_game_context.asset_manager->get<Texture>(sprite->resource_id, m_context.device);
   }
 
   unsigned int color = sprite->color.int_color;
@@ -674,7 +674,7 @@ void WorldPipeline::nine_patch(NinePatch& nine_patch, const double x, const doub
 
   if (nine_patch.texture == nullptr)
   {
-    nine_patch.texture = m_game_context.asset_manager->get<v2::Texture>(nine_patch.resource_id, m_context.device);
+    nine_patch.texture = m_game_context.asset_manager->get<Texture>(nine_patch.resource_id, m_context.device);
   }
 
   if (nine_patch.dirty)
@@ -739,4 +739,4 @@ void WorldPipeline::push_scissor(Vector4i scissor)
 }
 
 void WorldPipeline::pop_scissor() { m_current_vb = &m_vertex_buffers[0]; }
-}  // namespace dl::v2
+}  // namespace dl

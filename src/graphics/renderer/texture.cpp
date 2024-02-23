@@ -12,7 +12,7 @@ extern "C"
 #include "stb_image.h"
 }
 
-namespace dl::v2
+namespace dl
 {
 // Load single texture
 Texture::Texture(const std::string& filepath) : m_filepath(filepath), m_horizontal_frames(1), m_vertical_frames(1) {}
@@ -299,4 +299,4 @@ void Texture::load_data(const std::string& filepath)
   }
 }
 
-}  // namespace dl::v2
+}  // namespace dl
