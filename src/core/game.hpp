@@ -21,7 +21,7 @@ class Game
 
  private:
   Display m_display{};
-  AssetManager m_asset_manager{};
+  AssetManager m_asset_manager{m_display};
   SceneManager m_scene_manager{m_display};
   Camera m_camera{};
   Clock m_clock{};

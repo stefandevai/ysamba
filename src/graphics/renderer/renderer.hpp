@@ -13,6 +13,7 @@ namespace dl
 class Camera;
 struct GameContext;
 struct WGPUContext;
+class AssetManager;
 
 class Renderer
 {
@@ -21,8 +22,9 @@ class Renderer
 
  public:
   WGPUContext& context;
-  MainPass main_pass{context};
-  UIPass ui_pass{context};
+  AssetManager& asset_manager;
+  MainPass main_pass{m_game_context};
+  UIPass ui_pass{m_game_context};
 
   Renderer(GameContext& game_context);
   ~Renderer();

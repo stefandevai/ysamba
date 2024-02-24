@@ -64,7 +64,7 @@ class Batch
   std::array<WGPUTextureView, TEXTURE_SLOTS> texture_views{};
   bool should_update_texture_bind_group = false;
 
-  Batch(WGPUContext& context);
+  Batch(GameContext& game_context);
 
   void load();
   void clear_textures();
@@ -80,6 +80,7 @@ class Batch
   void pop_scissor();
 
  private:
+  GameContext& m_game_context;
   WGPUContext& m_context;
   VertexBuffer<VertexData>* m_current_vb = nullptr;
 

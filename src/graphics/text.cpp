@@ -21,15 +21,18 @@ Text::Text(const std::string_view text, const uint32_t typeface, const unsigned 
 {
 }
 
-void Text::initialize()
+void Text::initialize(AssetManager& asset_manager)
 {
   assert(typeface != 0 && "Failed to initialize text, typeface is 0");
 
-  // m_font = AssetManager::get<Font>(typeface, );
-  m_has_initialized = true;
-  update();
+  if (m_font == nullptr)
+  {
+    m_font = asset_manager.get<Font>(typeface);
+  }
 
   assert(m_font != nullptr && "Failed to initialize text, font is nullptr");
+  update();
+  m_has_initialized = true;
 }
 
 void Text::update()
@@ -48,7 +51,6 @@ void Text::update_wrapped()
 {
   characters.clear();
   assert(m_font != nullptr);
-  assert(m_has_initialized);
   const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
   float char_pos_y = 0.f;
@@ -152,10 +154,9 @@ void Text::update_wrapped()
 
 void Text::update_non_wrapped()
 {
-  characters.clear();
-
   assert(m_font != nullptr);
-  assert(m_has_initialized);
+
+  characters.clear();
 
   const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
@@ -211,15 +212,13 @@ void Text::set_typeface(const uint32_t typeface)
 {
   this->typeface = typeface;
   m_has_initialized = false;
-  // initialize();
 }
 
 void Text::set_text(const std::string_view text)
 {
   value = text;
-  this->wrap_width = 0;
+  wrap_width = 0;
   m_has_initialized = false;
-  // update();
 }
 
 void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
@@ -227,12 +226,6 @@ void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
   value = text;
   this->wrap_width = wrap_width;
   m_has_initialized = false;
-
-  // if (!m_has_initialized)
-  // {
-  //   initialize();
-  // }
-  //
 }
 
 void Text::m_process_command(UTF8Iterator& it, Color& character_color)

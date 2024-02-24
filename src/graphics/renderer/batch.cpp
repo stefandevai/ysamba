@@ -18,7 +18,12 @@
 
 namespace dl
 {
-Batch::Batch(WGPUContext& context) : m_context(context), m_dummy_texture(Texture::dummy(m_context.device)) {}
+Batch::Batch(GameContext& game_context)
+    : m_game_context(game_context),
+      m_context(m_game_context.display->wgpu_context),
+      m_dummy_texture(Texture::dummy(m_context.device))
+{
+}
 
 void Batch::load()
 {
@@ -54,7 +59,7 @@ void Batch::sprite(Sprite* sprite, const double x, const double y, const double 
 
   if (sprite->texture == nullptr)
   {
-    sprite->texture = AssetManager::get<Texture>(sprite->resource_id, m_context.device);
+    sprite->texture = m_game_context.asset_manager->get<Texture>(sprite->resource_id);
   }
 
   const glm::vec2& size = sprite->get_size();
@@ -138,7 +143,7 @@ void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, co
   // Load texture if it has not been loaded
   if (sprite->texture == nullptr)
   {
-    sprite->texture = AssetManager::get<Texture>(sprite->resource_id, m_context.device);
+    sprite->texture = m_game_context.asset_manager->get<Texture>(sprite->resource_id);
   }
 
   unsigned int color = sprite->color.int_color;
@@ -326,9 +331,8 @@ void Batch::text(Text& text, const double x, const double y, const double z)
 
   if (!text.m_has_initialized)
   {
-    text.m_font = AssetManager::get<Font>(text.typeface, m_context.device);
-    assert(text.m_font != nullptr);
-    text.initialize();
+    assert(m_game_context.asset_manager != nullptr);
+    text.initialize(*m_game_context.asset_manager);
   }
   else if (!text.get_is_static())
   {
@@ -358,7 +362,7 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 
   if (nine_patch.texture == nullptr)
   {
-    nine_patch.texture = AssetManager::get<Texture>(nine_patch.resource_id, m_context.device);
+    nine_patch.texture = m_game_context.asset_manager->get<Texture>(nine_patch.resource_id);
   }
 
   if (nine_patch.dirty)

@@ -6,22 +6,24 @@
 
 namespace dl
 {
+struct GameContext;
 struct WGPUContext;
 class Camera;
 
 class UIPass
 {
  private:
+  GameContext& m_game_context;
   WGPUContext& m_context;
 
  public:
-  Batch batch{m_context};
+  Batch batch{m_game_context};
   WGPUColor clear_color{0.0, 0.0, 0.0, 1.0};
   WGPURenderPassDepthStencilAttachment depth_stencil_attachment;
   WGPURenderPassColorAttachment render_pass_color_attachment;
   WGPURenderPassDescriptor render_pass_descriptor;
 
-  UIPass(WGPUContext& context);
+  UIPass(GameContext& game_context);
   ~UIPass();
 
   // Delete copy/move assignment operator and copy/move constructor

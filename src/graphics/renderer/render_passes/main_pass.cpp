@@ -2,13 +2,18 @@
 
 #include <spdlog/spdlog.h>
 
+#include "core/game_context.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/display.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 namespace dl
 {
-MainPass::MainPass(WGPUContext& context) : m_context(context) {}
+MainPass::MainPass(GameContext& game_context)
+    : m_game_context(game_context), m_context(m_game_context.display->wgpu_context)
+{
+}
 
 MainPass::~MainPass()
 {
@@ -261,6 +266,17 @@ void MainPass::load(const Shader& shader, const WGPUTextureView depth_texture_vi
   };
 
   m_has_loaded = true;
+}
+
+void MainPass::resize(const WGPUTextureView depth_texture_view)
+{
+  depth_stencil_attachment.view = depth_texture_view;
+
+  // render_pass_descriptor = {
+  //     .timestampWrites = nullptr,
+  //     .depthStencilAttachment = &depth_stencil_attachment,
+  //     .colorAttachmentCount = 1,
+  // };
 }
 
 void MainPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera)

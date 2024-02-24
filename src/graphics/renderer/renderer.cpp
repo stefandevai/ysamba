@@ -17,7 +17,9 @@
 namespace dl
 {
 Renderer::Renderer(GameContext& game_context)
-    : m_game_context(game_context), context(game_context.display->wgpu_context)
+    : m_game_context(game_context),
+      context(game_context.display->wgpu_context),
+      asset_manager(*m_game_context.asset_manager)
 {
 }
 
@@ -60,7 +62,11 @@ void Renderer::load()
   m_has_loaded = true;
 }
 
-void Renderer::resize() { m_load_depth_buffer(context.device); }
+void Renderer::resize()
+{
+  m_load_depth_buffer(context.device);
+  main_pass.resize(depth_texture_view);
+}
 
 void Renderer::m_load_depth_buffer(WGPUDevice device)
 {
@@ -175,7 +181,7 @@ void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, co
 
 const Texture* Renderer::get_texture(const uint32_t resource_id)
 {
-  return m_game_context.asset_manager->get<Texture>(resource_id, context.device);
+  return m_game_context.asset_manager->get<Texture>(resource_id);
 }
 
 }  // namespace dl

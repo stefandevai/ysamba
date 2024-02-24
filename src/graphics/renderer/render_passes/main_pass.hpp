@@ -6,22 +6,24 @@
 
 namespace dl
 {
+struct GameContext;
 struct WGPUContext;
 class Camera;
 
 class MainPass
 {
  private:
+  GameContext& m_game_context;
   WGPUContext& m_context;
 
  public:
-  Batch batch{m_context};
+  Batch batch{m_game_context};
   WGPUColor clear_color{0.0, 0.0, 0.0, 1.0};
   WGPURenderPassDepthStencilAttachment depth_stencil_attachment;
   WGPURenderPassColorAttachment render_pass_color_attachment;
   WGPURenderPassDescriptor render_pass_descriptor;
 
-  MainPass(WGPUContext& context);
+  MainPass(GameContext& game_context);
   ~MainPass();
 
   // Delete copy/move assignment operator and copy/move constructor
@@ -32,6 +34,7 @@ class MainPass
 
   void load(const Shader& shader, const WGPUTextureView depth_texture_view);
   void render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera);
+  void resize(const WGPUTextureView depth_texture_view);
 
  private:
   enum BindGroupType

@@ -1,18 +1,32 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
+#include <webgpu/wgpu.h>
 
 #include <filesystem>
 #include <memory>
 #include <unordered_map>
 #include <variant>
 
+#include "graphics/display.hpp"
 #include "graphics/font.hpp"
 #include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
 using Asset = std::variant<std::unique_ptr<Texture>, std::unique_ptr<Font>>;
+
+struct AssetLoader
+{
+  AssetLoader(const WGPUDevice& device) : m_device(device) {}
+
+  void operator()(const std::unique_ptr<Texture>& texture) { texture->load(m_device); }
+
+  void operator()(const std::unique_ptr<Font>& font) { font->load(m_device); }
+
+ private:
+  const WGPUDevice& m_device;
+};
 
 enum class AssetType
 {
@@ -26,7 +40,7 @@ enum class AssetType
 class AssetManager
 {
  public:
-  AssetManager() = default;
+  AssetManager(const Display& display) : m_display(display) {}
 
   void load_assets(const std::filesystem::path& filepath);
 
@@ -37,8 +51,8 @@ class AssetManager
     m_assets.emplace(id, std::move(asset));
   }
 
-  template <typename T, typename... Args>
-  static T* get(uint32_t id, Args&&... args)
+  template <typename T>
+  T* get(uint32_t id)
   {
     if (!m_assets.contains(id))
     {
@@ -51,14 +65,20 @@ class AssetManager
 
     if (!value->has_loaded)
     {
-      value->load(std::forward<Args>(args)...);
+      std::visit(AssetLoader{m_display.wgpu_context.device}, asset);
     }
 
     return value.get();
   }
 
  private:
-  static std::unordered_map<uint32_t, Asset> m_assets;
-  static const std::unordered_map<std::string, AssetType> m_asset_types;
+  std::unordered_map<uint32_t, Asset> m_assets{};
+  const std::unordered_map<std::string, AssetType> m_asset_types = {
+      {"texture", AssetType::Texture},
+      {"texture_atlas", AssetType::TextureAtlas},
+      {"shader", AssetType::Shader},
+      {"font", AssetType::Font},
+  };
+  const Display& m_display;
 };
 }  // namespace dl

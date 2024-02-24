@@ -14,6 +14,7 @@ using namespace entt::literals;
 class Font;
 class Sprite;
 class UTF8Iterator;
+class AssetManager;
 
 struct Character
 {
@@ -47,7 +48,7 @@ class Text
   Text& operator=(const Text&) = delete;
   Text& operator=(Text&&) = default;
 
-  void initialize();
+  void initialize(AssetManager& asset_manager);
   void update();
   void update_wrapped();
   void update_non_wrapped();

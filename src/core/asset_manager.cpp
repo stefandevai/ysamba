@@ -8,15 +8,6 @@
 
 namespace dl
 {
-std::unordered_map<uint32_t, Asset> AssetManager::m_assets{};
-
-const std::unordered_map<std::string, AssetType> AssetManager::m_asset_types = {
-    {"texture", AssetType::Texture},
-    {"texture_atlas", AssetType::TextureAtlas},
-    {"shader", AssetType::Shader},
-    {"font", AssetType::Font},
-};
-
 void AssetManager::load_assets(const std::filesystem::path& filepath)
 {
   JSON json{filepath.string()};

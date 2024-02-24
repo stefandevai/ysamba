@@ -10,7 +10,7 @@ namespace dl
 {
 Font::Font(const std::string& path, std::size_t size) : m_path(path), m_size(size) {}
 
-void Font::load(WGPUDevice device)
+void Font::load(const WGPUDevice device)
 {
   if (FT_Init_FreeType(&m_ft))
   {

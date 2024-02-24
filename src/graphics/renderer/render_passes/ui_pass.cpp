@@ -2,13 +2,43 @@
 
 #include <spdlog/spdlog.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "core/game_context.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/display.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 namespace dl
 {
-UIPass::UIPass(WGPUContext& context) : m_context(context) {}
+// Create a flat view matrix to use instead of the camera's
+constexpr std::array<float, 16> values{
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    -1.0f,
+    1.0f,
+};
+
+const glm::mat4 default_view_matrix = glm::make_mat4(values.data());
+
+UIPass::UIPass(GameContext& game_context)
+    : m_game_context(game_context), m_context(m_game_context.display->wgpu_context)
+{
+}
 
 UIPass::~UIPass()
 {
@@ -80,7 +110,7 @@ void UIPass::load(const Shader& shader)
   wgpuQueueWriteBuffer(m_context.queue,
                        pipeline.uniform_buffer,
                        pipeline.uniform_data.view_matrix_offset,
-                       &identity_matrix,
+                       &default_view_matrix,
                        pipeline.uniform_data.view_matrix_size);
 
   std::array<WGPUBindGroupLayoutEntry, 2> bind_group_layout_entries{};
@@ -260,12 +290,6 @@ void UIPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, con
                        pipeline.uniform_data.projection_matrix_offset,
                        &camera.projection_matrix,
                        pipeline.uniform_data.projection_matrix_size);
-
-  wgpuQueueWriteBuffer(m_context.queue,
-                       pipeline.uniform_buffer,
-                       pipeline.uniform_data.view_matrix_offset,
-                       &camera.view_matrix,
-                       pipeline.uniform_data.view_matrix_size);
 
   // Set up pipeline
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline.pipeline);

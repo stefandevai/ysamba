@@ -25,6 +25,7 @@ void Label::init()
     text.set_text(value);
   }
 
+  text.initialize(m_context.renderer->asset_manager);
   size = text.get_size();
 }
 
@@ -40,7 +41,7 @@ void Label::render()
     text.color.opacity_factor = opacity;
   }
 
-  m_context.renderer->ui_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z + 0.2f);
+  m_context.renderer->ui_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z);
 }
 
 void Label::set_text(const std::string_view value)

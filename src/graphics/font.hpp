@@ -29,7 +29,7 @@ class Font
   bool has_loaded = false;
 
   Font(const std::string& path, std::size_t size = 16);
-  void load(WGPUDevice device);
+  void load(const WGPUDevice device);
   const CharacterData& get_char_data(char32_t c) const
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
