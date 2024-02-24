@@ -51,7 +51,30 @@ void Batch::m_load_textures()
   m_texture_slot_index = 0;
 }
 
-void Batch::clear_textures() { m_texture_slot_index = 0; }
+bool Batch::empty()
+{
+  for (const auto& vertex_buffer : vertex_buffers)
+  {
+    if (vertex_buffer.index > 0)
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void Batch::clear_textures() { m_texture_slot_index = m_texture_slot_index_base; }
+
+uint32_t Batch::pin_texture(WGPUTextureView texture_view)
+{
+  const uint32_t slot_index = m_texture_slot_index_base;
+  texture_views[m_texture_slot_index_base] = texture_view;
+  ++m_texture_slot_index_base;
+  clear_textures();
+
+  return slot_index;
+}
 
 void Batch::sprite(Sprite* sprite, const double x, const double y, const double z)
 {

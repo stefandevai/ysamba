@@ -35,8 +35,6 @@ void Gameplay::load()
 
   m_game_context.registry = &m_registry;
 
-  // m_renderer.add_batch("world"_hs, "default"_hs);
-
   m_camera.set_tile_size(m_world.get_tile_size());
   m_camera.set_zoom(config::gameplay::default_zoom);
   m_camera.set_event_emitter(&m_event_emitter);
@@ -220,11 +218,9 @@ void Gameplay::render()
     return;
   }
 
-  // m_renderer.push_matrix("world"_hs, m_camera.view_matrix);
   m_render_system.render(m_registry, m_camera);
   m_ui_manager.render();
   m_renderer.render(m_camera);
-  // m_renderer.pop_matrix("world"_hs);
 }
 
 void Gameplay::save_game() { serialization::save_game(m_world, m_game_context.world_metadata, m_registry); }

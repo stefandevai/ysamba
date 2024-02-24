@@ -57,7 +57,7 @@ void Font::load(const WGPUDevice device)
   // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   // m_texture_atlas->bind();
 
-  std::vector<unsigned char> data(atlas_width * atlas_height * 4, 0);
+  std::vector<unsigned char> data(atlas_width * atlas_height, 0);
 
   for (const auto& char_range : m_char_ranges)
   {
@@ -85,10 +85,10 @@ void Font::load(const WGPUDevice device)
       {
         for (uint32_t i = 0; i < glyph.bitmap.width; ++i)
         {
-          data[x_offset * 4 + i * 4 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
-          data[x_offset * 4 + i * 4 + 1 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
-          data[x_offset * 4 + i * 4 + 2 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
-          data[x_offset * 4 + i * 4 + 3 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          data[x_offset + i + j * atlas_width] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          // data[x_offset * 4 + i * 4 + 1 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          // data[x_offset * 4 + i * 4 + 2 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          // data[x_offset * 4 + i * 4 + 3 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
         }
       }
 
@@ -106,7 +106,7 @@ void Font::load(const WGPUDevice device)
     }
   }
 
-  m_texture_atlas->load(device, data.data(), m_atlas_width, m_atlas_height, 4);
+  m_texture_atlas->load(device, data.data(), m_atlas_width, m_atlas_height, 1);
 
   // Use the red value in the GBA channels to facilitate the work in the shader
   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);

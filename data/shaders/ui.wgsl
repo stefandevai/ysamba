@@ -40,7 +40,8 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4f {
   switch(idx)
   {
     case 0: {
-      color = textureSample(textures[0], texture_sampler, in.uv);
+      // Typeface texture uses only red channel
+      color = textureSample(textures[0], texture_sampler, in.uv).rrrr;
     }
     case 1: {
       color = textureSample(textures[1], texture_sampler, in.uv);
@@ -64,10 +65,6 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4f {
       color = textureSample(textures[7], texture_sampler, in.uv);
     }
     default { }
-  }
-
-  if (color.a < 0.1) {
-    discard;
   }
 
   return color * in.color;

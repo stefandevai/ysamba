@@ -1,9 +1,6 @@
-#include "./ui_pass.hpp"
+#include "./main_render_pass.hpp"
 
 #include <spdlog/spdlog.h>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "core/game_context.hpp"
 #include "graphics/camera.hpp"
@@ -13,34 +10,12 @@
 
 namespace dl
 {
-// Create a flat view matrix to use instead of the camera's
-constexpr std::array<float, 16> values{
-    1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    -1.0f,
-    1.0f,
-};
-
-const glm::mat4 default_view_matrix = glm::make_mat4(values.data());
-
-UIPass::UIPass(GameContext& game_context)
+MainRenderPass::MainRenderPass(GameContext& game_context)
     : m_game_context(game_context), m_context(m_game_context.display->wgpu_context)
 {
 }
 
-UIPass::~UIPass()
+MainRenderPass::~MainRenderPass()
 {
   if (!m_has_loaded)
   {
@@ -65,7 +40,7 @@ UIPass::~UIPass()
   wgpuRenderPipelineRelease(batch.pipeline.pipeline);
 }
 
-void UIPass::load(const Shader& shader)
+void MainRenderPass::load(const Shader& shader, const WGPUTextureView depth_texture_view)
 {
   batch.load();
 
@@ -110,7 +85,7 @@ void UIPass::load(const Shader& shader)
   wgpuQueueWriteBuffer(m_context.queue,
                        pipeline.uniform_buffer,
                        pipeline.uniform_data.view_matrix_offset,
-                       &default_view_matrix,
+                       &identity_matrix,
                        pipeline.uniform_data.view_matrix_size);
 
   std::array<WGPUBindGroupLayoutEntry, 2> bind_group_layout_entries{};
@@ -251,83 +226,120 @@ void UIPass::load(const Shader& shader)
     .multisample.count = 1,
   };
 
+  WGPUDepthStencilState stencil_state;
+  stencil_state = utils::default_depth_stencil_state();
+  stencil_state.depthCompare = WGPUCompareFunction_Less;
+  stencil_state.depthWriteEnabled = true;
+  stencil_state.format = WGPUTextureFormat_Depth24Plus;
+  stencil_state.stencilReadMask = 0;
+  stencil_state.stencilWriteMask = 0;
+
+  pipeline_descriptor.depthStencil = &stencil_state;
+
   pipeline.pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipeline_descriptor);
   assert(pipeline.pipeline != nullptr);
 
   // Set up render pass
   render_pass_color_attachment = {
       .resolveTarget = nullptr,
-      .loadOp = WGPULoadOp_Load,
+      .loadOp = WGPULoadOp_Clear,
       .storeOp = WGPUStoreOp_Store,
+      .clearValue = clear_color,
+  };
+
+  depth_stencil_attachment = {
+      .view = depth_texture_view,
+      .depthClearValue = 1.0f,
+      .depthLoadOp = WGPULoadOp_Clear,
+      .depthStoreOp = WGPUStoreOp_Store,
+      .depthReadOnly = false,
+      .stencilClearValue = 0,
+      .stencilLoadOp = WGPULoadOp_Clear,
+      .stencilStoreOp = WGPUStoreOp_Store,
+      .stencilReadOnly = true,
   };
 
   render_pass_descriptor = {
       .timestampWrites = nullptr,
-      .depthStencilAttachment = nullptr,
+      .depthStencilAttachment = &depth_stencil_attachment,
       .colorAttachmentCount = 1,
   };
 
   m_has_loaded = true;
 }
 
-void UIPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera)
+void MainRenderPass::resize(const WGPUTextureView depth_texture_view)
+{
+  depth_stencil_attachment.view = depth_texture_view;
+}
+
+void MainRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera)
 {
   render_pass_color_attachment.clearValue = clear_color;
   render_pass_color_attachment.view = target_view;
   render_pass_descriptor.colorAttachments = &render_pass_color_attachment;
   WGPURenderPassEncoder render_pass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_descriptor);
 
-  auto& pipeline = batch.pipeline;
-
-  if (batch.should_update_texture_bind_group)
+  if (!batch.empty())
   {
-    m_update_texture_bind_group();
-  }
+    auto& pipeline = batch.pipeline;
 
-  // Set up uniforms
-  wgpuQueueWriteBuffer(m_context.queue,
-                       pipeline.uniform_buffer,
-                       pipeline.uniform_data.projection_matrix_offset,
-                       &camera.projection_matrix,
-                       pipeline.uniform_data.projection_matrix_size);
-
-  // Set up pipeline
-  wgpuRenderPassEncoderSetPipeline(render_pass, pipeline.pipeline);
-
-  // Set up bind groups
-  wgpuRenderPassEncoderSetBindGroup(render_pass, 0, pipeline.bind_groups[BIND_GROUP_UNIFORMS], 0, nullptr);
-  wgpuRenderPassEncoderSetBindGroup(render_pass, 1, pipeline.bind_groups[BIND_GROUP_TEXTURES], 0, nullptr);
-
-  for (auto& vertex_buffer : batch.vertex_buffers)
-  {
-    if (vertex_buffer.index == 0)
+    if (batch.should_update_texture_bind_group)
     {
-      continue;
+      m_update_texture_bind_group();
     }
 
-    // Write vertex data to buffer
-    vertex_buffer.update(m_context.queue);
-    wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.size);
+    // Set up uniforms
+    wgpuQueueWriteBuffer(m_context.queue,
+                         pipeline.uniform_buffer,
+                         pipeline.uniform_data.projection_matrix_offset,
+                         &camera.projection_matrix,
+                         pipeline.uniform_data.projection_matrix_size);
 
-    // Set scissor if exists
-    if (vertex_buffer.has_scissor())
+    wgpuQueueWriteBuffer(m_context.queue,
+                         pipeline.uniform_buffer,
+                         pipeline.uniform_data.view_matrix_offset,
+                         &camera.view_matrix,
+                         pipeline.uniform_data.view_matrix_size);
+
+    // Set up pipeline
+    wgpuRenderPassEncoderSetPipeline(render_pass, pipeline.pipeline);
+
+    // Set up bind groups
+    wgpuRenderPassEncoderSetBindGroup(render_pass, 0, pipeline.bind_groups[BIND_GROUP_UNIFORMS], 0, nullptr);
+    wgpuRenderPassEncoderSetBindGroup(render_pass, 1, pipeline.bind_groups[BIND_GROUP_TEXTURES], 0, nullptr);
+
+    for (auto& vertex_buffer : batch.vertex_buffers)
     {
-      const auto& scissor = vertex_buffer.scissor;
-      wgpuRenderPassEncoderSetScissorRect(render_pass, scissor.x, scissor.y, scissor.z, scissor.w);
+      if (vertex_buffer.index == 0)
+      {
+        continue;
+      }
+
+      // Write vertex data to buffer
+      vertex_buffer.update(m_context.queue);
+      wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.size);
+
+      // Set scissor if exists
+      if (vertex_buffer.has_scissor())
+      {
+        const auto& scissor = vertex_buffer.scissor;
+        wgpuRenderPassEncoderSetScissorRect(render_pass, scissor.x, scissor.y, scissor.z, scissor.w);
+      }
+
+      // Draw
+      wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.index, 1, 0, 0);
+
+      // Reset buffer for next frame
+      vertex_buffer.reset();
     }
-
-    // Draw
-    wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.index, 1, 0, 0);
-
-    // Reset buffer for next frame
-    vertex_buffer.reset();
   }
 
   wgpuRenderPassEncoderEnd(render_pass);
   wgpuRenderPassEncoderRelease(render_pass);
 }
 
-void UIPass::m_update_texture_bind_group()
+void MainRenderPass::m_update_texture_bind_group()
 {
   auto& pipeline = batch.pipeline;
   WGPUBindGroupLayoutEntryExtras texture_view_layout_entry = {

@@ -1,21 +1,49 @@
-#include "./main_pass.hpp"
+#include "./ui_render_pass.hpp"
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "core/asset_manager.hpp"
 #include "core/game_context.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/display.hpp"
+#include "graphics/font.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 namespace dl
 {
-MainPass::MainPass(GameContext& game_context)
+// Create a flat view matrix to use instead of the camera's
+constexpr std::array<float, 16> values{
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    -1.0f,
+    1.0f,
+};
+
+const glm::mat4 default_view_matrix = glm::make_mat4(values.data());
+
+UIRenderPass::UIRenderPass(GameContext& game_context)
     : m_game_context(game_context), m_context(m_game_context.display->wgpu_context)
 {
 }
 
-MainPass::~MainPass()
+UIRenderPass::~UIRenderPass()
 {
   if (!m_has_loaded)
   {
@@ -40,11 +68,19 @@ MainPass::~MainPass()
   wgpuRenderPipelineRelease(batch.pipeline.pipeline);
 }
 
-void MainPass::load(const Shader& shader, const WGPUTextureView depth_texture_view)
+void UIRenderPass::load(const Shader& shader)
 {
-  batch.load();
+  using namespace entt::literals;
 
   auto& pipeline = batch.pipeline;
+
+  // Load batch
+  batch.load();
+
+  // Pin font texture as the first texture (slot index 0)
+  const auto font_texture = m_game_context.asset_manager->get<Font>("font-1980"_hs)->get_atlas();
+  const auto slot_index = batch.pin_texture(font_texture->view);
+  assert(slot_index == 0);
 
   // Create sampler
   WGPUSamplerDescriptor sampler_descriptor = {
@@ -64,7 +100,7 @@ void MainPass::load(const Shader& shader, const WGPUTextureView depth_texture_vi
   pipeline.sampler = wgpuDeviceCreateSampler(m_context.device, &sampler_descriptor);
   assert(pipeline.sampler != nullptr);
 
-  // Uniforms
+  // Create uniform buffer
   WGPUBufferDescriptor uniform_buffer_descriptor = {
       .label = "Batch Uniform Buffer",
       .size = pipeline.uniform_data.size,
@@ -85,7 +121,7 @@ void MainPass::load(const Shader& shader, const WGPUTextureView depth_texture_vi
   wgpuQueueWriteBuffer(m_context.queue,
                        pipeline.uniform_buffer,
                        pipeline.uniform_data.view_matrix_offset,
-                       &identity_matrix,
+                       &default_view_matrix,
                        pipeline.uniform_data.view_matrix_size);
 
   std::array<WGPUBindGroupLayoutEntry, 2> bind_group_layout_entries{};
@@ -226,61 +262,32 @@ void MainPass::load(const Shader& shader, const WGPUTextureView depth_texture_vi
     .multisample.count = 1,
   };
 
-  WGPUDepthStencilState stencil_state;
-  stencil_state = utils::default_depth_stencil_state();
-  stencil_state.depthCompare = WGPUCompareFunction_Less;
-  stencil_state.depthWriteEnabled = true;
-  stencil_state.format = WGPUTextureFormat_Depth24Plus;
-  stencil_state.stencilReadMask = 0;
-  stencil_state.stencilWriteMask = 0;
-
-  pipeline_descriptor.depthStencil = &stencil_state;
-
   pipeline.pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipeline_descriptor);
   assert(pipeline.pipeline != nullptr);
 
   // Set up render pass
   render_pass_color_attachment = {
       .resolveTarget = nullptr,
-      .loadOp = WGPULoadOp_Clear,
+      .loadOp = WGPULoadOp_Load,
       .storeOp = WGPUStoreOp_Store,
-      .clearValue = clear_color,
-  };
-
-  depth_stencil_attachment = {
-      .view = depth_texture_view,
-      .depthClearValue = 1.0f,
-      .depthLoadOp = WGPULoadOp_Clear,
-      .depthStoreOp = WGPUStoreOp_Store,
-      .depthReadOnly = false,
-      .stencilClearValue = 0,
-      .stencilLoadOp = WGPULoadOp_Clear,
-      .stencilStoreOp = WGPUStoreOp_Store,
-      .stencilReadOnly = true,
   };
 
   render_pass_descriptor = {
       .timestampWrites = nullptr,
-      .depthStencilAttachment = &depth_stencil_attachment,
+      .depthStencilAttachment = nullptr,
       .colorAttachmentCount = 1,
   };
 
   m_has_loaded = true;
 }
 
-void MainPass::resize(const WGPUTextureView depth_texture_view)
+void UIRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera)
 {
-  depth_stencil_attachment.view = depth_texture_view;
+  if (batch.empty())
+  {
+    return;
+  }
 
-  // render_pass_descriptor = {
-  //     .timestampWrites = nullptr,
-  //     .depthStencilAttachment = &depth_stencil_attachment,
-  //     .colorAttachmentCount = 1,
-  // };
-}
-
-void MainPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera)
-{
   render_pass_color_attachment.clearValue = clear_color;
   render_pass_color_attachment.view = target_view;
   render_pass_descriptor.colorAttachments = &render_pass_color_attachment;
@@ -299,12 +306,6 @@ void MainPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, c
                        pipeline.uniform_data.projection_matrix_offset,
                        &camera.projection_matrix,
                        pipeline.uniform_data.projection_matrix_size);
-
-  wgpuQueueWriteBuffer(m_context.queue,
-                       pipeline.uniform_buffer,
-                       pipeline.uniform_data.view_matrix_offset,
-                       &camera.view_matrix,
-                       pipeline.uniform_data.view_matrix_size);
 
   // Set up pipeline
   wgpuRenderPassEncoderSetPipeline(render_pass, pipeline.pipeline);
@@ -342,7 +343,7 @@ void MainPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, c
   wgpuRenderPassEncoderRelease(render_pass);
 }
 
-void MainPass::m_update_texture_bind_group()
+void UIRenderPass::m_update_texture_bind_group()
 {
   auto& pipeline = batch.pipeline;
   WGPUBindGroupLayoutEntryExtras texture_view_layout_entry = {

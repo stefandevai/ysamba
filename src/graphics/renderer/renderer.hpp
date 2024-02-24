@@ -4,8 +4,8 @@
 
 #include <cstdint>
 
-#include "graphics/renderer/render_passes/main_pass.hpp"
-#include "graphics/renderer/render_passes/ui_pass.hpp"
+#include "graphics/renderer/passes/main_render_pass.hpp"
+#include "graphics/renderer/passes/ui_render_pass.hpp"
 #include "graphics/renderer/shader.hpp"
 
 namespace dl
@@ -23,8 +23,8 @@ class Renderer
  public:
   WGPUContext& context;
   AssetManager& asset_manager;
-  MainPass main_pass{m_game_context};
-  UIPass ui_pass{m_game_context};
+  MainRenderPass main_pass{m_game_context};
+  UIRenderPass ui_pass{m_game_context};
 
   Renderer(GameContext& game_context);
   ~Renderer();

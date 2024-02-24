@@ -67,7 +67,15 @@ class Batch
   Batch(GameContext& game_context);
 
   void load();
+
+  // Returns true if all the vertex buffers are empty
+  bool empty();
+
+  // Clear non pinned textures
   void clear_textures();
+
+  // Pin a texture so it can't be cleared and return its slot index
+  uint32_t pin_texture(WGPUTextureView texture_view);
 
   void sprite(Sprite* sprite, const double x, const double y, const double z);
   void multi_sprite(MultiSprite* sprite, const double x, const double y, const double z);
@@ -85,7 +93,8 @@ class Batch
   VertexBuffer<VertexData>* m_current_vb = nullptr;
 
   Texture m_dummy_texture;
-  uint32_t m_texture_slot_index = 0;
+  uint32_t m_texture_slot_index_base = 0;
+  uint32_t m_texture_slot_index = m_texture_slot_index_base;
 
   void m_load_vertex_buffers();
   void m_load_textures();

@@ -104,16 +104,10 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.main_pass.batch.sprite(m_typography.get(), 60, 60, 0);
-  m_renderer.main_pass.batch.text(m_instructions, 75, 193, 0);
+  m_renderer.ui_pass.batch.sprite(m_typography.get(), 60, 60, 0);
+  m_renderer.ui_pass.batch.text(m_instructions, 75, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
-
-  // m_renderer.push_matrix("text"_hs, m_camera.view_matrix);
-  // m_renderer.batch("text"_hs, m_typography.get(), 60, 60, 0);
-  // m_renderer.batch("text"_hs, m_instructions, 75, 193, 0);
-  // m_renderer.render(m_camera);
-  // m_renderer.pop_matrix("text"_hs);
 }
 
 void HomeMenu::m_load_worlds_metadata()

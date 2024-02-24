@@ -10,7 +10,7 @@ struct GameContext;
 struct WGPUContext;
 class Camera;
 
-class MainPass
+class UIRenderPass
 {
  private:
   GameContext& m_game_context;
@@ -23,18 +23,17 @@ class MainPass
   WGPURenderPassColorAttachment render_pass_color_attachment;
   WGPURenderPassDescriptor render_pass_descriptor;
 
-  MainPass(GameContext& game_context);
-  ~MainPass();
+  UIRenderPass(GameContext& game_context);
+  ~UIRenderPass();
 
   // Delete copy/move assignment operator and copy/move constructor
-  MainPass& operator=(const MainPass&) = delete;
-  MainPass(const MainPass&) = delete;
-  MainPass&& operator=(MainPass&& rhs) = delete;
-  MainPass(MainPass&& rhs) = delete;
+  UIRenderPass& operator=(const UIRenderPass&) = delete;
+  UIRenderPass(const UIRenderPass&) = delete;
+  UIRenderPass&& operator=(UIRenderPass&& rhs) = delete;
+  UIRenderPass(UIRenderPass&& rhs) = delete;
 
-  void load(const Shader& shader, const WGPUTextureView depth_texture_view);
+  void load(const Shader& shader);
   void render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera);
-  void resize(const WGPUTextureView depth_texture_view);
 
  private:
   enum BindGroupType

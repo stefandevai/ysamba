@@ -36,8 +36,11 @@ Renderer::~Renderer()
 
 void Renderer::load()
 {
-  Shader shader{};
-  shader.load(context.device, "data/shaders/default.wgsl");
+  Shader main_shader{};
+  main_shader.load(context.device, "data/shaders/default.wgsl");
+
+  Shader ui_shader{};
+  ui_shader.load(context.device, "data/shaders/ui.wgsl");
 
   // Load descriptors used during rendering
   target_view_descriptor = {
@@ -56,8 +59,8 @@ void Renderer::load()
 
   m_load_depth_buffer(context.device);
 
-  main_pass.load(shader, depth_texture_view);
-  ui_pass.load(shader);
+  main_pass.load(main_shader, depth_texture_view);
+  ui_pass.load(ui_shader);
 
   m_has_loaded = true;
 }
