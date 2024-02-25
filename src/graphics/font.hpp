@@ -1,12 +1,11 @@
 #pragma once
-#include <ft2build.h>
+
+#include <webgpu/wgpu.h>
 
 #include <map>
 #include <memory>
 #include <utility>
 #include <vector>
-#include FT_FREETYPE_H
-#include <webgpu/wgpu.h>
 
 #include "graphics/renderer/texture.hpp"
 
@@ -41,8 +40,6 @@ class Font
  private:
   std::string m_path{};
   std::size_t m_size;
-  FT_Library m_ft;
-  FT_Face m_face;
   std::map<char32_t, CharacterData> m_chars;
   std::unique_ptr<Texture> m_texture_atlas = nullptr;
   unsigned int m_atlas_width, m_atlas_height;

@@ -1,9 +1,12 @@
 #include "./font.hpp"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
-#include <glm/glm.hpp>  // IWYU pragma: export
+#include <glm/glm.hpp>
 #include <string>
 
 namespace dl
@@ -12,24 +15,27 @@ Font::Font(const std::string& path, std::size_t size) : m_path(path), m_size(siz
 
 void Font::load(const WGPUDevice device)
 {
-  if (FT_Init_FreeType(&m_ft))
+  FT_Library ft;
+  FT_Face face;
+
+  if (FT_Init_FreeType(&ft))
   {
     spdlog::critical("Could not init FreeType Library");
     return;
   }
-  if (FT_New_Face(m_ft, m_path.c_str(), 0, &m_face))
+  if (FT_New_Face(ft, m_path.c_str(), 0, &face))
   {
     spdlog::critical("Failed to load font {}", m_path);
     return;
   }
-  if (FT_Select_Charmap(m_face, FT_ENCODING_UNICODE))
+  if (FT_Select_Charmap(face, FT_ENCODING_UNICODE))
   {
     spdlog::critical("Failed to load unicode charmap");
-    FT_Done_Face(m_face);
-    FT_Done_FreeType(m_ft);
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
     return;
   }
-  FT_Set_Pixel_Sizes(m_face, 0, m_size);
+  FT_Set_Pixel_Sizes(face, 0, m_size);
 
   uint32_t atlas_width = 0;
   uint32_t atlas_height = 0;
@@ -38,24 +44,22 @@ void Font::load(const WGPUDevice device)
   {
     for (char32_t c = char_range.first; c < char_range.second; c++)
     {
-      if (FT_Load_Char(m_face, c, FT_LOAD_RENDER))
+      if (FT_Load_Char(face, c, FT_LOAD_RENDER))
       {
         spdlog::critical("Failed to load Glyph");
         continue;
       }
-      atlas_width += m_face->glyph->bitmap.width;
-      atlas_height = std::max(atlas_height, m_face->glyph->bitmap.rows);
+      atlas_width += face->glyph->bitmap.width;
+      atlas_height = std::max(atlas_height, face->glyph->bitmap.rows);
     }
   }
 
   m_atlas_width = atlas_width;
   m_atlas_height = atlas_height;
 
-  m_texture_atlas = std::make_unique<Texture>(atlas_width, atlas_height);
+  m_texture_atlas = std::make_unique<Texture>();
 
   int x_offset = 0;
-  // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  // m_texture_atlas->bind();
 
   std::vector<unsigned char> data(atlas_width * atlas_height, 0);
 
@@ -63,36 +67,23 @@ void Font::load(const WGPUDevice device)
   {
     for (char32_t c = char_range.first; c < char_range.second; c++)
     {
-      if (FT_Load_Char(m_face, c, FT_LOAD_RENDER))
+      if (FT_Load_Char(face, c, FT_LOAD_RENDER))
       {
         spdlog::critical("Failed to load Glyph");
         continue;
       }
 
-      const auto& glyph = *m_face->glyph;
-
-      // glTexSubImage2D(GL_TEXTURE_2D,
-      //                 0,
-      //                 x_offset,
-      //                 0,
-      //                 m_face->glyph->bitmap.width,
-      //                 m_face->glyph->bitmap.rows,
-      //                 GL_RED,
-      //                 GL_UNSIGNED_BYTE,
-      //                 m_face->glyph->bitmap.buffer);
+      const auto& glyph = *face->glyph;
 
       for (uint32_t j = 0; j < glyph.bitmap.rows; ++j)
       {
         for (uint32_t i = 0; i < glyph.bitmap.width; ++i)
         {
           data[x_offset + i + j * atlas_width] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
-          // data[x_offset * 4 + i * 4 + 1 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
-          // data[x_offset * 4 + i * 4 + 2 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
-          // data[x_offset * 4 + i * 4 + 3 + j * atlas_width * 4] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
         }
       }
 
-      m_max_character_top = std::max(m_max_character_top, m_face->glyph->bitmap_top);
+      m_max_character_top = std::max(m_max_character_top, face->glyph->bitmap_top);
 
       CharacterData ch_data = {glyph.advance.x,
                                glyph.advance.y,
@@ -108,15 +99,8 @@ void Font::load(const WGPUDevice device)
 
   m_texture_atlas->load(device, data.data(), m_atlas_width, m_atlas_height, 1);
 
-  // Use the red value in the GBA channels to facilitate the work in the shader
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
-
-  // m_texture_atlas->unbind();
-
-  FT_Done_Face(m_face);
-  FT_Done_FreeType(m_ft);
+  FT_Done_Face(face);
+  FT_Done_FreeType(ft);
 
   has_loaded = true;
 }

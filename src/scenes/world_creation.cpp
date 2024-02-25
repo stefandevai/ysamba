@@ -184,7 +184,7 @@ void WorldCreation::m_create_map_representation()
     }
   }
 
-  m_texture = std::make_unique<Texture>(world_size.x, world_size.y);
+  m_texture = std::make_unique<Texture>();
   m_texture->load(m_game_context.display->wgpu_context.device, pixel_data.data(), world_size.x, world_size.y, 4);
   m_world_sprite.texture = m_texture.get();
   m_renderer.ui_pass.batch.clear_textures();

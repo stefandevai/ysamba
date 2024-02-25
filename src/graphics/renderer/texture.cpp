@@ -14,10 +14,12 @@ extern "C"
 
 namespace dl
 {
-// Load single texture
-Texture::Texture(const std::string& filepath) : m_filepath(filepath), m_horizontal_frames(1), m_vertical_frames(1) {}
+Texture::Texture() {}
 
-// Load uniform texture atlas
+// Create full sized texture
+Texture::Texture(const std::string& filepath) : m_filepath(filepath) {}
+
+// Create texture atlas
 Texture::Texture(const std::string& filepath,
                  const int horizontal_frames,
                  const int vertical_frames,
@@ -27,19 +29,6 @@ Texture::Texture(const std::string& filepath,
       m_horizontal_frames(horizontal_frames),
       m_vertical_frames(vertical_frames)
 {
-}
-
-// Load with raw data
-Texture::Texture(const std::vector<unsigned char>& data, const int width, const int height)
-    : m_horizontal_frames(1), m_vertical_frames(1)
-{
-  // load(data.data(), width, height, 4);
-}
-
-Texture::Texture(const int width, const int height)
-    : m_horizontal_frames(1), m_vertical_frames(1), m_width(width), m_height(height)
-{
-  // m_load_empty();
 }
 
 Texture::~Texture()
@@ -54,21 +43,16 @@ Texture::~Texture()
 
 Texture Texture::dummy(const WGPUDevice device)
 {
-  const std::vector<unsigned char> dummy_data = {0, 0, 0, 0};
+  constexpr unsigned char dummy_data = 0;
 
-  Texture dummy_texture{dummy_data, 1, 1};
-  dummy_texture.load(device, dummy_data.data(), 1, 1, 4);
+  Texture dummy_texture{};
+  dummy_texture.load(device, &dummy_data, 1, 1, 1);
 
   return dummy_texture;
 }
 
 void Texture::load(const WGPUDevice device)
 {
-  if (m_data_filepath != "")
-  {
-    load_data(m_data_filepath);
-  }
-
   int width = 0;
   int height = 0;
   int channels = 0;
@@ -89,6 +73,11 @@ void Texture::load(const WGPUDevice device)
 void Texture::load(
     const WGPUDevice device, const unsigned char* data, const int width, const int height, const int channels)
 {
+  if (m_data_filepath != "")
+  {
+    load_data(m_data_filepath);
+  }
+
   m_width = width;
   m_height = height;
 
@@ -186,30 +175,6 @@ std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
       glm::vec2{top_left_x + frame_width, top_left_y + frame_height},
       glm::vec2{top_left_x, top_left_y + frame_height},
   };
-}
-
-void Texture::m_load_empty()
-{
-  // GLenum err;
-  // while ((err = glGetError()) != GL_NO_ERROR)
-  // {
-  //   spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
-  // }
-  //
-  // glGenTextures(1, &m_id);
-  // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  // glBindTexture(GL_TEXTURE_2D, m_id);
-  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_width, m_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0x0000);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  // glBindTexture(GL_TEXTURE_2D, 0);
-  //
-  // while ((err = glGetError()) != GL_NO_ERROR)
-  // {
-  //   spdlog::critical("Failed to create empty Texture. OpenGL error code: 0x{0:04x}", err);
-  // }
 }
 
 const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type) const

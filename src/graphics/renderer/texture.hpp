@@ -41,17 +41,14 @@ class Texture
   WGPUTexture texture;
   WGPUTextureView view;
 
-  // Create single texture
+  Texture();
+  // Create full sized texture
   Texture(const std::string& filepath);
-  // Create uniform texture atlas
+  // Create texture atlas
   Texture(const std::string& filepath,
           const int horizontal_frames,
           const int vertical_frames,
           const std::string& data_filepath = "");
-  // Create empty texture in order to load it later
-  Texture(const int width, const int height);
-  // Create texture providing raw data
-  Texture(const std::vector<unsigned char>& data, const int width, const int height);
   ~Texture();
 
   static Texture dummy(const WGPUDevice device);
@@ -90,8 +87,8 @@ class Texture
   FrameDataMap m_frame_data;
   std::string m_filepath{};
   std::string m_data_filepath{};
-  const int m_horizontal_frames;
-  const int m_vertical_frames;
+  const int m_horizontal_frames = 1;
+  const int m_vertical_frames = 1;
   unsigned int m_id = 0;
   int m_width = 0;
   int m_height = 0;
