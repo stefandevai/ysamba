@@ -6,9 +6,11 @@ const glm::vec2& Sprite::get_size()
 {
   if (m_dirty && !m_has_custom_uv)
   {
+    assert(texture != nullptr && "Texture has not been initialized for sprite");
+
     m_uv_coordinates = texture->get_frame_coords(frame);
-    m_size.x = texture->get_frame_width();
-    m_size.y = texture->get_frame_height();
+    const auto& frame_size = texture->get_frame_size();
+    m_size = glm::vec2{frame_size.x, frame_size.y};
     m_dirty = false;
   }
 
@@ -20,13 +22,13 @@ const glm::vec2& Sprite::get_size()
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
 const std::array<glm::vec2, 4>& Sprite::get_texture_coordinates()
 {
-  assert(texture != nullptr && "Texture has not been initialized for sprite");
-
   if (m_dirty && !m_has_custom_uv)
   {
+    assert(texture != nullptr && "Texture has not been initialized for sprite");
+
     m_uv_coordinates = texture->get_frame_coords(frame);
-    m_size.x = texture->get_frame_width();
-    m_size.y = texture->get_frame_height();
+    const auto& frame_size = texture->get_frame_size();
+    m_size = glm::vec2{frame_size.x, frame_size.y};
     m_dirty = false;
   }
 
@@ -61,12 +63,11 @@ void Sprite::set_custom_uv(const float top, const float left, const float width,
 {
   assert(texture != nullptr && "Texture has not been initialized for setting custom uv");
 
-  const auto texture_width = texture->get_width();
-  const auto texture_height = texture->get_height();
+  const auto& texture_size = texture->get_size();
 
-  const auto uv_top = height / texture_height;
-  const auto uv_bottom = top / texture_height;
-  const auto uv_right = width / texture_width;
+  const float uv_top = height / static_cast<float>(texture_size.y);
+  const float uv_bottom = top / static_cast<float>(texture_size.y);
+  const float uv_right = width / static_cast<float>(texture_size.x);
 
   m_uv_coordinates = std::array<glm::vec2, 4>{
       glm::vec2{left, uv_bottom - uv_top},

@@ -11,6 +11,13 @@
 
 namespace dl
 {
+const std::vector<std::pair<char32_t, char32_t>> Font::m_char_ranges = {
+    std::make_pair(0x20, 0x7E),  // Basic Latin
+    std::make_pair(0xA1, 0x1BF),  // Latin Supplement, Extended-A and part of Extended-B
+    std::make_pair(0x1C4, 0x1CC),  // Serbian Cyrillic
+    std::make_pair(0x200, 0x21B),  // Additions for Slovenian, Croatian and Romanian
+};
+
 Font::Font(const std::string& path, std::size_t size) : m_path(path), m_size(size) {}
 
 void Font::load(const WGPUDevice device)
@@ -54,14 +61,12 @@ void Font::load(const WGPUDevice device)
     }
   }
 
-  m_atlas_width = atlas_width;
-  m_atlas_height = atlas_height;
-
-  m_texture_atlas = std::make_unique<Texture>();
+  m_atlas_size.x = atlas_width;
+  m_atlas_size.y = atlas_height;
 
   int x_offset = 0;
 
-  std::vector<unsigned char> data(atlas_width * atlas_height, 0);
+  std::vector<unsigned char> data(m_atlas_size.x * m_atlas_size.y, 0);
 
   for (const auto& char_range : m_char_ranges)
   {
@@ -79,7 +84,7 @@ void Font::load(const WGPUDevice device)
       {
         for (uint32_t i = 0; i < glyph.bitmap.width; ++i)
         {
-          data[x_offset + i + j * atlas_width] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
+          data[x_offset + i + j * m_atlas_size.x] = glyph.bitmap.buffer[i + j * glyph.bitmap.width];
         }
       }
 
@@ -91,13 +96,15 @@ void Font::load(const WGPUDevice device)
                                glyph.bitmap.rows,
                                glyph.bitmap_left,
                                glyph.bitmap_top,
-                               (float)x_offset / m_atlas_width};
+                               (float)x_offset / m_atlas_size.x};
       m_chars.insert(std::pair<char32_t, CharacterData>(c, ch_data));
       x_offset += glyph.bitmap.width;
     }
   }
 
-  m_texture_atlas->load(device, data.data(), m_atlas_width, m_atlas_height, 1);
+  assert(m_atlas_size.x > 0 && m_atlas_size.y > 0 && "Atlas size is invalid");
+
+  m_texture_atlas = std::make_unique<Texture>(device, data.data(), m_atlas_size, 1);
 
   FT_Done_Face(face);
   FT_Done_FreeType(ft);

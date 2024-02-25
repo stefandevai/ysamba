@@ -202,8 +202,9 @@ void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, co
 
   const auto& size = sprite->get_size();
   const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
-  const int frame_width = sprite->texture->get_frame_width() * (size.x);
-  const int frame_height = sprite->texture->get_frame_height() * (size.y);
+  const auto& frame_size = sprite->texture->get_frame_size();
+  const int frame_width = frame_size.x * size.x;
+  const int frame_height = frame_size.y * size.y;
 
   // Top left vertex
   // Change according to the angle that the quad will be rendered

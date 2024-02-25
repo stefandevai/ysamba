@@ -419,8 +419,7 @@ void World::m_load_tile_data()
 
   assert(texture != nullptr && "World texture is not loaded in order to get tile size");
 
-  m_tile_size.x = texture->get_frame_width();
-  m_tile_size.y = texture->get_frame_height();
+  m_tile_size = texture->get_frame_size();
 
   assert(json_tile_data.object.contains("tiles") && "Tile data must contain a tiles array");
 

@@ -16,16 +16,15 @@ void NinePatch::generate_patches()
 {
   assert(texture != nullptr && "Texture is null while trying to generate 9 patches");
 
-  const float texture_width = static_cast<float>(texture->get_width());
-  const float texture_height = static_cast<float>(texture->get_height());
+  const auto& texture_size = texture->get_size();
 
-  const float uv_top = top / texture_height;
-  const float uv_left = left / texture_width;
-  const float uv_bottom = bottom / texture_height;
-  const float uv_right = right / texture_width;
+  const float uv_top = top / static_cast<float>(texture_size.y);
+  const float uv_left = left / static_cast<float>(texture_size.x);
+  const float uv_bottom = bottom / static_cast<float>(texture_size.y);
+  const float uv_right = right / static_cast<float>(texture_size.x);
 
-  const float uv_border_width = border / texture_width;
-  const float uv_border_height = border / texture_height;
+  const float uv_border_width = border / static_cast<float>(texture_size.x);
+  const float uv_border_height = border / static_cast<float>(texture_size.y);
 
   // Top left patch
   border_patches[0].resource_id = resource_id;
@@ -104,13 +103,12 @@ std::array<glm::vec2, 4> NinePatch::get_texture_coordinates() const
 {
   assert(texture != nullptr);
 
-  const float texture_width = static_cast<float>(texture->get_width());
-  const float texture_height = static_cast<float>(texture->get_height());
+  const auto& texture_size = texture->get_size();
 
-  const float top_uv = top / texture_height;
-  const float left_uv = left / texture_width;
-  const float bottom_uv = bottom / texture_height;
-  const float right_uv = right / texture_width;
+  const float top_uv = top / static_cast<float>(texture_size.y);
+  const float left_uv = left / static_cast<float>(texture_size.x);
+  const float bottom_uv = bottom / static_cast<float>(texture_size.y);
+  const float right_uv = right / static_cast<float>(texture_size.x);
 
   return std::array<glm::vec2, 4>{
       glm::vec2{left_uv, top_uv},

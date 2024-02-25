@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "core/maths/vector.hpp"
 #include "graphics/renderer/texture.hpp"
 
 namespace dl
@@ -42,22 +43,17 @@ class Font
   std::size_t m_size;
   std::map<char32_t, CharacterData> m_chars;
   std::unique_ptr<Texture> m_texture_atlas = nullptr;
-  unsigned int m_atlas_width, m_atlas_height;
+  Vector2i m_atlas_size{};
   int m_max_character_top = 0;
 
   // Limit codes for obtaining characters in the ttf font
-  static const int CHAR_BOTTOM_LIMIT = 32;
-  static const int CHAR_TOP_LIMIT = 253;
+  static constexpr int CHAR_BOTTOM_LIMIT = 32;
+  static constexpr int CHAR_TOP_LIMIT = 253;
 
   // Empty data used in case the input is not within the range of loaded chars
-  CharacterData m_empty_char_data = {0, 0, 0, 0, 0, 0, 0.f};
+  static constexpr CharacterData m_empty_char_data = {0, 0, 0, 0, 0, 0, 0.f};
 
   // Unicode char ranges to load data from the font file
-  std::vector<std::pair<char32_t, char32_t>> m_char_ranges = {
-      std::make_pair(0x20, 0x7E),  // Basic Latin
-      std::make_pair(0xA1, 0x1BF),  // Latin Supplement, Extended-A and part of Extended-B
-      std::make_pair(0x1C4, 0x1CC),  // Serbian Cyrillic
-      std::make_pair(0x200, 0x21B),  // Additions for Slovenian, Croatian and Romanian
-  };
+  static const std::vector<std::pair<char32_t, char32_t>> m_char_ranges;
 };
 }  // namespace dl

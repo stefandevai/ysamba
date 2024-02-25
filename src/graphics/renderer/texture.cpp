@@ -14,8 +14,6 @@ extern "C"
 
 namespace dl
 {
-Texture::Texture() {}
-
 // Create full sized texture
 Texture::Texture(const std::string& filepath) : m_filepath(filepath) {}
 
@@ -31,6 +29,12 @@ Texture::Texture(const std::string& filepath,
 {
 }
 
+// Load texture from data on constructor
+Texture::Texture(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
+{
+  load(device, data, size, channels);
+}
+
 Texture::~Texture()
 {
   if (has_loaded)
@@ -43,16 +47,15 @@ Texture::~Texture()
 
 Texture Texture::dummy(const WGPUDevice device)
 {
-  constexpr unsigned char dummy_data = 0;
-
-  Texture dummy_texture{};
-  dummy_texture.load(device, &dummy_data, 1, 1, 1);
-
+  static constexpr unsigned char dummy_data = 0;
+  Texture dummy_texture{device, &dummy_data, Vector2i{1, 1}, 1};
   return dummy_texture;
 }
 
 void Texture::load(const WGPUDevice device)
 {
+  assert(!m_filepath.empty() && "Texture filepath is empty");
+
   int width = 0;
   int height = 0;
   int channels = 0;
@@ -60,26 +63,32 @@ void Texture::load(const WGPUDevice device)
 
   // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
   image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
+
   if (image_data == nullptr)
   {
-    throw std::runtime_error("It wasn't possible to load " + m_filepath);
+    spdlog::critical("Failed to load texture: {}", m_filepath);
+    return;
   }
 
-  load(device, image_data, width, height, channels);
-
+  load(device, image_data, Vector2i{width, height}, channels);
   stbi_image_free(image_data);
 }
 
-void Texture::load(
-    const WGPUDevice device, const unsigned char* data, const int width, const int height, const int channels)
+void Texture::load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
 {
-  if (m_data_filepath != "")
+  m_size = size;
+
+  // If we have horizontal and vertical frames, calculate frame size
+  if (m_horizontal_frames > 0 && m_vertical_frames > 0)
   {
-    load_data(m_data_filepath);
+    m_frame_size = Vector2i{m_size.x / m_horizontal_frames, m_size.y / m_vertical_frames};
   }
 
-  m_width = width;
-  m_height = height;
+  // Load metadata
+  if (m_data_filepath != "")
+  {
+    load_metadata(m_data_filepath);
+  }
 
   const auto queue = wgpuDeviceGetQueue(device);
 
@@ -102,7 +111,7 @@ void Texture::load(
   WGPUTextureDescriptor textureDesc{
       .label = "WorldPipeline Texture",
       .dimension = WGPUTextureDimension_2D,
-      .size = {static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height), 1},
+      .size = {static_cast<uint32_t>(m_size.x), static_cast<uint32_t>(m_size.y), 1},
       .mipLevelCount = 1,
       .sampleCount = 1,
       .format = format,
@@ -128,7 +137,7 @@ void Texture::load(
   };
 
   wgpuQueueWriteTexture(
-      queue, &destination, data, width * height * channels * sizeof(uint8_t), &source, &textureDesc.size);
+      queue, &destination, data, m_size.x * m_size.y * channels * sizeof(unsigned char), &source, &textureDesc.size);
 
   WGPUTextureViewDescriptor textureViewDesc{
       .label = "WorldPipeline Texture View",
@@ -146,28 +155,23 @@ void Texture::load(
   has_loaded = true;
 }
 
-// TODO: Implement irregular frame calculations
-float Texture::get_frame_width() const { return (m_width / static_cast<float>(m_horizontal_frames)); }
-
-// TODO: Implement irregular frame calculations
-float Texture::get_frame_height() const { return (m_height / static_cast<float>(m_vertical_frames)); }
-
-// TODO: Implement irregular frame calculations
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
 std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
 {
-  assert(m_width > 0 && m_height > 0);
+  assert(m_size.x > 0 && m_size.y > 0);
 
-  const auto frame_width = get_frame_width() / static_cast<float>(m_width);
-  const auto frame_height = get_frame_height() / static_cast<float>(m_height);
+  // const auto frame_width = get_frame_width() / static_cast<float>(m_size.x);
+  // const auto frame_height = get_frame_height() / static_cast<float>(m_size.y);
+  const float frame_width = 1.0f / static_cast<float>(m_horizontal_frames);
+  const float frame_height = 1.0f / static_cast<float>(m_vertical_frames);
   const int max_frames = m_horizontal_frames * m_vertical_frames;
   const float frame_x = static_cast<float>(frame % m_horizontal_frames);
   const float frame_y = static_cast<float>((frame % max_frames) / m_horizontal_frames);
   // Multiply the x coord of the frame in the texture atlas by the normalized value of the width one frame.
-  const float top_left_x = frame_x * (m_width / static_cast<float>(m_horizontal_frames)) / m_width;
+  const float top_left_x = frame_x * (m_size.x / static_cast<float>(m_horizontal_frames)) / m_size.x;
   // Multiply the y coord of the frame in the tile map by the normalized value of the height one frame.
   // Invert the value as the y axis is upwards for OpenGL
-  const float top_left_y = frame_y * (m_height / static_cast<float>(m_vertical_frames)) / m_height;
+  const float top_left_y = frame_y * (m_size.y / static_cast<float>(m_vertical_frames)) / m_size.y;
 
   return std::array<glm::vec2, 4>{
       glm::vec2{top_left_x, top_left_y},
@@ -182,7 +186,7 @@ const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type
   return m_frame_data.at(std::make_pair(id, type));
 }
 
-void Texture::load_data(const std::string& filepath)
+void Texture::load_metadata(const std::string& filepath)
 {
   JSON json{filepath};
 
