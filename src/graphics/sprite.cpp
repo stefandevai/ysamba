@@ -2,6 +2,11 @@
 
 namespace dl
 {
+Sprite::Sprite(const uint32_t resource_id, const uint32_t frame, const FrameAngle frame_angle)
+    : resource_id(resource_id), frame(frame), frame_angle(frame_angle)
+{
+}
+
 const glm::vec2& Sprite::get_size()
 {
   if (m_dirty && !m_has_custom_uv)
@@ -35,21 +40,9 @@ const std::array<glm::vec2, 4>& Sprite::get_texture_coordinates()
   return m_uv_coordinates;
 }
 
-void Sprite::set_frame(const int frame)
+void Sprite::set_frame(const uint32_t frame)
 {
   this->frame = frame;
-  m_dirty = true;
-}
-
-void Sprite::increment_frame()
-{
-  ++frame;
-  m_dirty = true;
-}
-
-void Sprite::decrement_frame()
-{
-  --frame;
   m_dirty = true;
 }
 

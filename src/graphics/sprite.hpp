@@ -17,24 +17,19 @@ class Sprite
   const Texture* texture = nullptr;
   std::unique_ptr<Transform> transform = nullptr;
   Color color{0xFFFFFFFF};
-  int frame = 0;
+  uint32_t frame = 0;
   FrameAngle frame_angle = FrameAngle::Parallel;
 
-  Sprite() {}
-  Sprite(const uint32_t resource_id, const int frame = 0, const FrameAngle frame_angle = FrameAngle::Parallel)
-      : resource_id(resource_id), frame(frame), frame_angle(frame_angle)
-  {
-  }
+  Sprite() = default;
+  Sprite(const uint32_t resource_id, const uint32_t frame = 0, const FrameAngle frame_angle = FrameAngle::Parallel);
 
-  int get_frame() const { return frame; };
+  uint32_t get_frame() const { return frame; };
   const glm::vec2& get_size();
 
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
   const std::array<glm::vec2, 4>& get_texture_coordinates();
 
-  void set_frame(const int frame);
-  void increment_frame();
-  void decrement_frame();
+  void set_frame(const uint32_t frame);
   void set_size(const float width, const float height);
   void set_custom_uv(const float top, const float left, const float width, const float height);
   void set_litteral_uv(const float top, const float left, const float bottom, const float right);

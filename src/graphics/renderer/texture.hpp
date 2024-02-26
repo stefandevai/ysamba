@@ -64,19 +64,21 @@ class Texture
 
   static Texture dummy(const WGPUDevice device);
 
+  // Loads after setting filepath
   void load(const WGPUDevice device);
+
+  // Loads texture from data
   void load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels);
-  inline unsigned int get_id() const { return m_id; }
-  inline const Vector2i& get_size() const { return m_size; }
-  inline int get_horizontal_frames() const { return m_horizontal_frames; }
-  inline int get_vertical_frames() const { return m_vertical_frames; }
-  inline const Vector2i& get_frame_size() const { return m_frame_size; }
-  // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> get_frame_coords(const int frame) const;
-  /* void set_custom_uv (const glm::vec2& uv, const float width, const float height); */
 
   // Load texture metadata from a json file
   void load_metadata(const std::string& filepath);
+
+  inline const Vector2i& get_size() const { return m_size; }
+  inline const Vector2i& get_frame_size() const { return m_frame_size; }
+  inline int get_horizontal_frames() const { return m_horizontal_frames; }
+  inline int get_vertical_frames() const { return m_vertical_frames; }
+  // Get top-left, top-right, bottom-right and bottom-left uv coordinates
+  std::array<glm::vec2, 4> get_frame_coords(const int frame) const;
 
   // Convert a game id to a texture frame known from a metadata file
   const FrameData& id_to_frame(const uint32_t id, const std::string& type) const;
@@ -87,10 +89,7 @@ class Texture
   std::string m_data_filepath{};
   const int m_horizontal_frames = 1;
   const int m_vertical_frames = 1;
-  unsigned int m_id = 0;
   Vector2i m_size{};
   Vector2i m_frame_size{};
-
-  void m_load_empty();
 };
 }  // namespace dl
