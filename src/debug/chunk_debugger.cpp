@@ -1,7 +1,7 @@
 #include "./chunk_debugger.hpp"
 
 #include "constants.hpp"
-#include "ecs/components/rectangle.hpp"
+#include "graphics/quad.hpp"
 #include "imgui.h"
 #include "scenes/gameplay.hpp"
 
@@ -33,15 +33,15 @@ void ChunkDebugger::update()
 
       if (position.x == chunk->position.x && position.y == chunk->position.y && position.z == chunk->position.z)
       {
-        auto& rect = m_gameplay.m_registry.get<Rectangle>(entity);
+        auto& quad = m_gameplay.m_registry.get<Quad>(entity);
 
-        if (chunk->active && rect.quad.color.int_color != 0xCC8844FF)
+        if (chunk->active && quad.color.int_color != 0xCC8844FF)
         {
-          rect.quad.color.set(0xCC8844FF);
+          quad.color.set(0xCC8844FF);
         }
-        else if (!chunk->active && rect.quad.color.int_color != 0x4477AAFF)
+        else if (!chunk->active && quad.color.int_color != 0x4477AAFF)
         {
-          rect.quad.color.set(0x4477AAFF);
+          quad.color.set(0x4477AAFF);
         }
 
         found = true;
@@ -53,7 +53,7 @@ void ChunkDebugger::update()
     {
       auto color = chunk->active ? 0xCC8844FF : 0x4477AAFF;
       auto entity = m_gameplay.m_registry.create();
-      m_gameplay.m_registry.emplace<Rectangle>(
+      m_gameplay.m_registry.emplace<Quad>(
           entity, world::chunk_size.x * grid_size.x, world::chunk_size.y * grid_size.y, color);
       m_gameplay.m_registry.emplace<Position>(entity,
                                               static_cast<double>(chunk->position.x),

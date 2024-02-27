@@ -13,7 +13,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 
-#include "ecs/components/rectangle.hpp"
+#include "graphics/quad.hpp"
 #endif
 
 namespace
@@ -269,36 +269,36 @@ void AStar::debug(entt::registry& registry, const bool only_path, const bool cle
   {
     for (const auto& step : m_open_set)
     {
-      auto rect = registry.create();
-      auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0x1144cc88);
-      r.z_index = 4;
-      registry.emplace<Position>(rect,
+      auto quad = registry.create();
+      auto& q = registry.emplace<Quad>(quad, 16, 16, 0x1144cc88);
+      q.z_index = 4;
+      registry.emplace<Position>(quad,
                                  static_cast<double>(step.position.x),
                                  static_cast<double>(step.position.y),
                                  static_cast<double>(step.position.z));
-      registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
+      registry.emplace<entt::tag<"a_star_rectangle"_hs>>(quad);
     }
     for (const auto& step : m_closed_set)
     {
-      auto rect = registry.create();
-      auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0x11cc4488);
-      r.z_index = 4;
-      registry.emplace<Position>(rect,
+      auto quad = registry.create();
+      auto& q = registry.emplace<Quad>(quad, 16, 16, 0x11cc4488);
+      q.z_index = 4;
+      registry.emplace<Position>(quad,
                                  static_cast<double>(step->position.x),
                                  static_cast<double>(step->position.y),
                                  static_cast<double>(step->position.z));
 
-      registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
+      registry.emplace<entt::tag<"a_star_rectangle"_hs>>(quad);
     }
   }
   for (const auto& step : path)
   {
-    auto rect = registry.create();
-    auto& r = registry.emplace<Rectangle>(rect, 16, 16, 0xcc441188);
-    r.z_index = 4;
+    auto quad = registry.create();
+    auto& q = registry.emplace<Quad>(quad, 16, 16, 0xcc441188);
+    q.z_index = 4;
     registry.emplace<Position>(
-        rect, static_cast<double>(step.x), static_cast<double>(step.y), static_cast<double>(step.z));
-    registry.emplace<entt::tag<"a_star_rectangle"_hs>>(rect);
+        quad, static_cast<double>(step.x), static_cast<double>(step.y), static_cast<double>(step.z));
+    registry.emplace<entt::tag<"a_star_rectangle"_hs>>(quad);
   }
 }
 #endif

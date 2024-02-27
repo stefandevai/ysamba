@@ -8,7 +8,6 @@
 #include "constants.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/visibility.hpp"

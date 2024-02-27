@@ -10,13 +10,13 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
 #include "ecs/systems/pickup.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/quad.hpp"
 #include "ui/components/label.hpp"
 #include "ui/compositions/action_menu.hpp"
 #include "ui/ui_manager.hpp"
@@ -123,15 +123,15 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       if (selectable.selected)
       {
         const auto& tile_size = m_world.get_tile_size();
-        auto& rectangle = registry.emplace<Rectangle>(selected_entity, tile_size.x, tile_size.y, 0x5588cc88);
-        rectangle.z_index = 4;
+        auto& quad = registry.emplace<Quad>(selected_entity, tile_size.x, tile_size.y, 0x5588cc88);
+        quad.z_index = 4;
         m_selected_entities.push_back(selected_entity);
       }
       else
       {
-        if (registry.all_of<Rectangle>(selected_entity))
+        if (registry.all_of<Quad>(selected_entity))
         {
-          registry.remove<Rectangle>(selected_entity);
+          registry.remove<Quad>(selected_entity);
         }
         m_selected_entities.erase(std::find(m_selected_entities.begin(), m_selected_entities.end(), selected_entity));
       }

@@ -9,7 +9,6 @@
 #include "ecs/components/biology.hpp"
 #include "ecs/components/movement.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/rectangle.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/visibility.hpp"
 #include "world/world.hpp"

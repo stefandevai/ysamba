@@ -8,12 +8,12 @@
 
 #include "constants.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/rectangle.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"
 #include "graphics/multi_sprite.hpp"
+#include "graphics/quad.hpp"
 #include "graphics/renderer/batch.hpp"
 #include "graphics/renderer/renderer.hpp"
 #include "graphics/text.hpp"
@@ -90,21 +90,21 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
   {
     const auto& tile_size = m_world.get_tile_size();
-    auto quad_view = registry.view<const Position, const Rectangle>();
+    auto quad_view = registry.view<const Position, const Quad>();
 
     for (auto entity : quad_view)
     {
       const auto& position = registry.get<Position>(entity);
-      auto& rectangle = registry.get<Rectangle>(entity);
+      auto& quad = registry.get<Quad>(entity);
 
       const auto position_z = std::round(position.z) * tile_size.y;
       const auto position_x = std::round(position.x) * tile_size.x;
       const auto position_y = std::round(position.y) * tile_size.y;
 
-      m_batch.quad(&rectangle.quad,
+      m_batch.quad(&quad,
                    position_x,
-                   position_y + rectangle.z_index * m_z_index_increment,
-                   position_z + rectangle.z_index * m_z_index_increment);
+                   position_y + quad.z_index * m_z_index_increment,
+                   position_z + quad.z_index * m_z_index_increment);
     }
 
     auto text_view = registry.view<const Text, const Position>();
