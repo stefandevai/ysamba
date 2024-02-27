@@ -29,7 +29,6 @@ class Display
   void set_size(const int width, const int height);
   const Vector2i get_size() const;
   static const Vector2i get_window_size();
-  void reset_viewport();
   void update_viewport();
 
  private:

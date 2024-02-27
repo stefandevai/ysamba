@@ -137,11 +137,6 @@ void Display::set_size(const int width, const int height)
   SDL_SetWindowSize(m_window, width, height);
 }
 
-void Display::reset_viewport()
-{
-  // glViewport(0, 0, m_width, m_height);
-}
-
 void Display::update_viewport()
 {
   int width, height;
@@ -152,7 +147,6 @@ void Display::update_viewport()
   wgpuSurfaceRelease(wgpu_context.surface);
   wgpu_context.surface = SDL_GetWGPUSurface(wgpu_context.instance, m_window);
   m_configure_surface();
-  // glViewport(0, 0, width, height);
 }
 
 void Display::m_configure_surface()
