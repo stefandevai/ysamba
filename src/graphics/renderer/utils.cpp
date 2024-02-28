@@ -134,4 +134,35 @@ WGPUDepthStencilState default_depth_stencil_state()
   return depth_stencil_state;
 }
 
+void populate_quad_index_buffer(WGPUQueue queue, WGPUBuffer buffer, uint32_t index_count)
+{
+  uint32_t offset = 0;
+  uint32_t count = 0;
+  uint32_t indices[index_count];
+
+  for (uint32_t i = 0; i < index_count; i += 6)
+  {
+    // First triangle
+    // Top left
+    indices[i] = offset;
+    // Top right
+    indices[i + 1] = offset + 1;
+    // Bottom left
+    indices[i + 2] = offset + 2;
+
+    // Second triangle
+    // Bottom left
+    indices[i + 3] = offset + 2;
+    // Top right
+    indices[i + 4] = offset + 1;
+    // Bottom right
+    indices[i + 5] = offset + 3;
+
+    offset += 4;
+    count += 6;
+  }
+
+  wgpuQueueWriteBuffer(queue, buffer, 0, indices, count * sizeof(uint32_t));
+}
+
 }  // namespace dl::utils

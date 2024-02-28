@@ -316,14 +316,16 @@ void UIRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder encode
 
   for (auto& vertex_buffer : batch.vertex_buffers)
   {
-    if (vertex_buffer.index == 0)
+    if (vertex_buffer.index_buffer_idx == 0)
     {
       continue;
     }
 
     // Write vertex data to buffer
     vertex_buffer.update(m_context.queue);
-    wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.size);
+    wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.vertex_buffer_size);
+    wgpuRenderPassEncoderSetIndexBuffer(
+        render_pass, vertex_buffer.index_buffer, WGPUIndexFormat_Uint32, 0, vertex_buffer.index_buffer_size);
 
     // Set scissor if exists
     if (vertex_buffer.has_scissor())
@@ -333,7 +335,8 @@ void UIRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder encode
     }
 
     // Draw
-    wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.index, 1, 0, 0);
+    // wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.vertex_buffer_idx, 1, 0, 0);
+    wgpuRenderPassEncoderDrawIndexed(render_pass, vertex_buffer.index_buffer_idx, 1, 0, 0, 0);
 
     // Reset buffer for next frame
     vertex_buffer.reset();

@@ -20,4 +20,7 @@ WGPUStencilFaceState default_stencil_face_state();
 
 WGPUDepthStencilState default_depth_stencil_state();
 
+// Populate index buffer with quad indices
+void populate_quad_index_buffer(WGPUQueue queue, WGPUBuffer buffer, uint32_t index_count);
+
 }  // namespace dl::utils

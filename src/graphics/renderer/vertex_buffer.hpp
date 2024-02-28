@@ -11,10 +11,12 @@ struct VertexBuffer
 {
   WGPUBuffer buffer;
   WGPUBuffer index_buffer;
-  uint32_t index = 0;
+  uint32_t vertex_buffer_idx = 0;
+  uint32_t index_buffer_idx = 0;
   uint32_t max_vertex_size = 0;
   uint32_t max_index_size = 0;
-  uint32_t size = 0;
+  uint32_t vertex_buffer_size = 0;
+  uint32_t index_buffer_size = 0;
   std::vector<T> vertices{};
   std::vector<uint32_t> indices{};
   Vector4i scissor{0, 0, -1, -1};
@@ -67,52 +69,71 @@ struct VertexBuffer
   VertexBuffer&& operator=(VertexBuffer&& rhs) noexcept
   {
     buffer = rhs.buffer;
+    vertex_buffer_idx = rhs.vertex_buffer_idx;
+    vertex_buffer_size = rhs.vertex_buffer_size;
     index_buffer = rhs.index_buffer;
-    index = rhs.index;
-    size = rhs.size;
+    index_buffer_idx = rhs.index_buffer_idx;
+    index_buffer_size = rhs.index_buffer_size;
     max_vertex_size = rhs.max_vertex_size;
     max_index_size = rhs.max_index_size;
     vertices = std::move(rhs.vertices);
     scissor = std::move(rhs.scissor);
 
     rhs.buffer = nullptr;
-    rhs.index = 0;
-    rhs.size = 0;
+    rhs.index_buffer = nullptr;
+    rhs.vertex_buffer_idx = 0;
+    rhs.vertex_buffer_size = 0;
+    rhs.index_buffer_idx = 0;
+    rhs.index_buffer_size = 0;
   }
 
   VertexBuffer(VertexBuffer&& rhs) noexcept
   {
     buffer = rhs.buffer;
+    vertex_buffer_idx = rhs.vertex_buffer_idx;
+    vertex_buffer_size = rhs.vertex_buffer_size;
     index_buffer = rhs.index_buffer;
-    index = rhs.index;
-    size = rhs.size;
+    index_buffer_idx = rhs.index_buffer_idx;
+    index_buffer_size = rhs.index_buffer_size;
     max_vertex_size = rhs.max_vertex_size;
     max_index_size = rhs.max_index_size;
     vertices = std::move(rhs.vertices);
     scissor = std::move(rhs.scissor);
 
     rhs.buffer = nullptr;
-    rhs.index = 0;
-    rhs.size = 0;
+    rhs.index_buffer = nullptr;
+    rhs.vertex_buffer_idx = 0;
+    rhs.vertex_buffer_size = 0;
+    rhs.index_buffer_idx = 0;
+    rhs.index_buffer_size = 0;
   }
 
   template <typename... Args>
   void emplace(Args&&... args)
   {
-    assert(index < max_vertex_size);
-    vertices[index++] = T{std::forward<Args>(args)...};
+    assert(vertex_buffer_idx < max_vertex_size);
+    vertices[vertex_buffer_idx++] = T{std::forward<Args>(args)...};
   }
 
   void update(WGPUQueue queue)
   {
-    size = index * sizeof(T);
-    wgpuQueueWriteBuffer(queue, buffer, 0, vertices.data(), size);
+    vertex_buffer_size = vertex_buffer_idx * sizeof(T);
+    index_buffer_size = index_buffer_idx * sizeof(uint32_t);
+    wgpuQueueWriteBuffer(queue, buffer, 0, vertices.data(), vertex_buffer_size);
+  }
+
+  void update_index_buffer(WGPUQueue queue)
+  {
+    index_buffer_size = index_buffer_idx * sizeof(uint32_t);
+    wgpuQueueWriteBuffer(queue, index_buffer, 0, indices.data(), index_buffer_size);
   }
 
   void reset()
   {
-    index = 0;
-    size = 0;
+    vertex_buffer_idx = 0;
+    index_buffer_idx = 0;
+    vertex_buffer_size = 0;
+    index_buffer_size = 0;
     scissor = {0, 0, -1, -1};
   }
 

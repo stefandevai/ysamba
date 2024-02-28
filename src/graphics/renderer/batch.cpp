@@ -36,6 +36,7 @@ void Batch::m_load_vertex_buffers()
   // Add main vertex buffer
   vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT, MAIN_BATCH_INDEX_COUNT);
   m_current_vb = &vertex_buffers[0];
+  utils::populate_quad_index_buffer(m_context.queue, m_current_vb->index_buffer, MAIN_BATCH_INDEX_COUNT);
 }
 
 void Batch::m_load_textures()
@@ -55,7 +56,7 @@ bool Batch::empty()
 {
   for (const auto& vertex_buffer : vertex_buffers)
   {
-    if (vertex_buffer.index > 0)
+    if (vertex_buffer.index_buffer_idx > 0)
     {
       return false;
     }
@@ -142,21 +143,24 @@ void Batch::sprite(Sprite* sprite, const double x, const double y, const double 
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
 
-  // Top right vertex
-  if (sprite->frame_angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color);
-  }
+  // // Bottom left vertex
+  // m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
 
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
+  // // Top right vertex
+  // if (sprite->frame_angle == FrameAngle::Parallel)
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index,
+  //   color);
+  // }
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
+
+  m_current_vb->index_buffer_idx += 6;
 }
 
 void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
@@ -232,22 +236,25 @@ void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, co
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
 
-  // Top right vertex
-  if (sprite->frame_angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(
-        glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index, color);
-  }
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
+  // // Top right vertex
+  // if (sprite->frame_angle == FrameAngle::Parallel)
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(
+  //       glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index,
+  //       color);
+  // }
+  //
+  // // Bottom left vertex
+  // m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color);
+
+  m_current_vb->index_buffer_idx += 6;
 }
 
 void Batch::tile(const TileRenderData& tile, const double x, const double y, const double z)
@@ -300,21 +307,23 @@ void Batch::tile(const TileRenderData& tile, const double x, const double y, con
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
 
-  // Top right vertex
-  if (tile.frame_data->angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
-  }
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
+  // // Top right vertex
+  // if (tile.frame_data->angle == FrameAngle::Parallel)
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
+  // }
+  //
+  // // Bottom left vertex
+  // m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color);
+
+  m_current_vb->index_buffer_idx += 6;
 }
 
 void Batch::quad(const Quad* quad, const double x, const double y, const double z)
@@ -339,14 +348,16 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 
-  // Top right vertex
-  m_current_vb->emplace(glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1.0f, color);
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
+  // // Top right vertex
+  // m_current_vb->emplace(glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1.0f, color);
+  //
+  // // Bottom left vertex
+  // m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + quad->w, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
+
+  m_current_vb->index_buffer_idx += 6;
 }
 
 void Batch::text(Text& text, const double x, const double y, const double z)
@@ -434,7 +445,7 @@ void Batch::push_scissor(Vector4i scissor)
   {
     for (auto& vertex_buffer : vertex_buffers)
     {
-      if (vertex_buffer.index == 0)
+      if (vertex_buffer.index_buffer_idx == 0)
       {
         vertex_buffer.scissor = std::move(scissor);
         m_current_vb = &vertex_buffer;
@@ -448,6 +459,7 @@ void Batch::push_scissor(Vector4i scissor)
   vertex_buffer.scissor = std::move(scissor);
   vertex_buffers.push_back(std::move(vertex_buffer));
   m_current_vb = &vertex_buffers.back();
+  utils::populate_quad_index_buffer(m_context.queue, m_current_vb->index_buffer, SECONDARY_BATCH_INDEX_COUNT);
 }
 
 void Batch::pop_scissor() { m_current_vb = &vertex_buffers[0]; }
