@@ -34,7 +34,7 @@ void Batch::load()
 void Batch::m_load_vertex_buffers()
 {
   // Add main vertex buffer
-  vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT);
+  vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT, MAIN_BATCH_INDEX_COUNT);
   m_current_vb = &vertex_buffers[0];
 }
 
@@ -444,7 +444,7 @@ void Batch::push_scissor(Vector4i scissor)
   }
 
   // Create a new buffer
-  VertexBuffer<VertexData> vertex_buffer{m_context.device, SECONDARY_BATCH_VERTEX_COUNT};
+  VertexBuffer<VertexData> vertex_buffer{m_context.device, SECONDARY_BATCH_VERTEX_COUNT, SECONDARY_BATCH_INDEX_COUNT};
   vertex_buffer.scissor = std::move(scissor);
   vertex_buffers.push_back(std::move(vertex_buffer));
   m_current_vb = &vertex_buffers.back();

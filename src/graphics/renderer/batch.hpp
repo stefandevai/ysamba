@@ -55,8 +55,14 @@ struct Pipeline
 class Batch
 {
  public:
-  static constexpr uint32_t MAIN_BATCH_VERTEX_COUNT = 900000;
-  static constexpr uint32_t SECONDARY_BATCH_VERTEX_COUNT = 2000;
+  static constexpr uint32_t MAIN_BATCH_QUAD_COUNT = 80000;
+  static constexpr uint32_t MAIN_BATCH_INDEX_COUNT = MAIN_BATCH_QUAD_COUNT * 6;
+  static constexpr uint32_t MAIN_BATCH_VERTEX_COUNT = MAIN_BATCH_QUAD_COUNT * 4;
+
+  static constexpr uint32_t SECONDARY_BATCH_QUAD_COUNT = 500;
+  static constexpr uint32_t SECONDARY_BATCH_INDEX_COUNT = SECONDARY_BATCH_QUAD_COUNT * 6;
+  static constexpr uint32_t SECONDARY_BATCH_VERTEX_COUNT = SECONDARY_BATCH_QUAD_COUNT * 4;
+
   static constexpr uint32_t TEXTURE_SLOTS = 8;
 
   Pipeline pipeline{};
