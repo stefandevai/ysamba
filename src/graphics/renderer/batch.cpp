@@ -27,15 +27,15 @@ Batch::Batch(GameContext& game_context)
 
 void Batch::load()
 {
-  m_load_vertex_buffers();
+  m_load_batch_data();
   m_load_textures();
 }
 
-void Batch::m_load_vertex_buffers()
+void Batch::m_load_batch_data()
 {
   // Add main vertex buffer
-  vertex_buffers.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT, MAIN_BATCH_INDEX_COUNT);
-  m_current_vb = &vertex_buffers[0];
+  batch_data.emplace_back(m_context.device, MAIN_BATCH_VERTEX_COUNT, MAIN_BATCH_INDEX_COUNT);
+  m_current_vb = &batch_data[0];
   utils::populate_quad_index_buffer(m_context.queue, m_current_vb->index_buffer, MAIN_BATCH_INDEX_COUNT);
 }
 
@@ -54,9 +54,9 @@ void Batch::m_load_textures()
 
 bool Batch::empty()
 {
-  for (const auto& vertex_buffer : vertex_buffers)
+  for (const auto& batch_datum : batch_data)
   {
-    if (vertex_buffer.index_buffer_idx > 0)
+    if (batch_datum.index_buffer_count > 0)
     {
       return false;
     }
@@ -143,24 +143,10 @@ void Batch::sprite(Sprite* sprite, const double x, const double y, const double 
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
 
-  // // Bottom left vertex
-  // m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
-
-  // // Top right vertex
-  // if (sprite->frame_angle == FrameAngle::Parallel)
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index,
-  //   color);
-  // }
-
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
 
-  m_current_vb->index_buffer_idx += 6;
+  m_current_vb->index_buffer_count += 6;
 }
 
 void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
@@ -236,25 +222,10 @@ void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, co
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
 
-  // // Top right vertex
-  // if (sprite->frame_angle == FrameAngle::Parallel)
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(
-  //       glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index,
-  //       color);
-  // }
-  //
-  // // Bottom left vertex
-  // m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
-
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color);
 
-  m_current_vb->index_buffer_idx += 6;
+  m_current_vb->index_buffer_count += 6;
 }
 
 void Batch::tile(const TileRenderData& tile, const double x, const double y, const double z)
@@ -307,23 +278,10 @@ void Batch::tile(const TileRenderData& tile, const double x, const double y, con
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
 
-  // // Top right vertex
-  // if (tile.frame_data->angle == FrameAngle::Parallel)
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
-  // }
-  //
-  // // Bottom left vertex
-  // m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
-
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color);
 
-  m_current_vb->index_buffer_idx += 6;
+  m_current_vb->index_buffer_count += 6;
 }
 
 void Batch::quad(const Quad* quad, const double x, const double y, const double z)
@@ -348,16 +306,10 @@ void Batch::quad(const Quad* quad, const double x, const double y, const double 
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 
-  // // Top right vertex
-  // m_current_vb->emplace(glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1.0f, color);
-  //
-  // // Bottom left vertex
-  // m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
-
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + quad->w, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
 
-  m_current_vb->index_buffer_idx += 6;
+  m_current_vb->index_buffer_count += 6;
 }
 
 void Batch::text(Text& text, const double x, const double y, const double z)
@@ -441,26 +393,26 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 void Batch::push_scissor(Vector4i scissor)
 {
   // Try to reuse a vertex buffer
-  if (vertex_buffers.size() > 1)
+  if (batch_data.size() > 1)
   {
-    for (auto& vertex_buffer : vertex_buffers)
+    for (auto& batch_datum : batch_data)
     {
-      if (vertex_buffer.index_buffer_idx == 0)
+      if (batch_datum.index_buffer_count == 0)
       {
-        vertex_buffer.scissor = std::move(scissor);
-        m_current_vb = &vertex_buffer;
+        batch_datum.scissor = std::move(scissor);
+        m_current_vb = &batch_datum;
         return;
       }
     }
   }
 
   // Create a new buffer
-  VertexBuffer<VertexData> vertex_buffer{m_context.device, SECONDARY_BATCH_VERTEX_COUNT, SECONDARY_BATCH_INDEX_COUNT};
-  vertex_buffer.scissor = std::move(scissor);
-  vertex_buffers.push_back(std::move(vertex_buffer));
-  m_current_vb = &vertex_buffers.back();
+  BatchData<VertexData> batch_datum{m_context.device, SECONDARY_BATCH_VERTEX_COUNT, SECONDARY_BATCH_INDEX_COUNT};
+  batch_datum.scissor = std::move(scissor);
+  batch_data.push_back(std::move(batch_datum));
+  m_current_vb = &batch_data.back();
   utils::populate_quad_index_buffer(m_context.queue, m_current_vb->index_buffer, SECONDARY_BATCH_INDEX_COUNT);
 }
 
-void Batch::pop_scissor() { m_current_vb = &vertex_buffers[0]; }
+void Batch::pop_scissor() { m_current_vb = &batch_data[0]; }
 }  // namespace dl

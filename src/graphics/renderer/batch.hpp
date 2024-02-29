@@ -16,7 +16,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "graphics/renderer/vertex_buffer.hpp"
+#include "graphics/renderer/batch_data.hpp"
 #include "graphics/renderer/vertex_data.hpp"
 
 namespace dl
@@ -66,7 +66,7 @@ class Batch
   static constexpr uint32_t TEXTURE_SLOTS = 8;
 
   Pipeline pipeline{};
-  std::vector<VertexBuffer<VertexData>> vertex_buffers{};
+  std::vector<BatchData<VertexData>> batch_data{};
   std::array<WGPUTextureView, TEXTURE_SLOTS> texture_views{};
   bool should_update_texture_bind_group = false;
 
@@ -96,13 +96,13 @@ class Batch
  private:
   GameContext& m_game_context;
   WGPUContext& m_context;
-  VertexBuffer<VertexData>* m_current_vb = nullptr;
+  BatchData<VertexData>* m_current_vb = nullptr;
 
   Texture m_dummy_texture;
   uint32_t m_texture_slot_index_base = 0;
   uint32_t m_texture_slot_index = m_texture_slot_index_base;
 
-  void m_load_vertex_buffers();
+  void m_load_batch_data();
   void m_load_textures();
 };
 }  // namespace dl

@@ -170,7 +170,7 @@ void MainRenderPass::load(const Shader& shader, const WGPUTextureView depth_text
       },
   };
 
-  WGPUVertexBufferLayout vertex_buffer_layout = {
+  WGPUVertexBufferLayout batch_datum_layout = {
       .attributeCount = vertex_attributes.size(),
       .attributes = vertex_attributes.data(),
       .arrayStride = sizeof(VertexData),
@@ -210,7 +210,7 @@ void MainRenderPass::load(const Shader& shader, const WGPUTextureView depth_text
 
     .vertex = {
       .bufferCount = 1,
-      .buffers = &vertex_buffer_layout,
+      .buffers = &batch_datum_layout,
       .module = shader.module,
       .entryPoint = "vs_main",
     },
@@ -309,32 +309,33 @@ void MainRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder enco
     wgpuRenderPassEncoderSetBindGroup(render_pass, 0, pipeline.bind_groups[BIND_GROUP_UNIFORMS], 0, nullptr);
     wgpuRenderPassEncoderSetBindGroup(render_pass, 1, pipeline.bind_groups[BIND_GROUP_TEXTURES], 0, nullptr);
 
-    for (auto& vertex_buffer : batch.vertex_buffers)
+    for (auto& batch_datum : batch.batch_data)
     {
-      if (vertex_buffer.index_buffer_idx == 0)
+      if (batch_datum.index_buffer_count == 0)
       {
         continue;
       }
 
       // Write vertex data to buffer
-      vertex_buffer.update(m_context.queue);
-      wgpuRenderPassEncoderSetVertexBuffer(render_pass, 0, vertex_buffer.buffer, 0, vertex_buffer.vertex_buffer_size);
+      batch_datum.update(m_context.queue);
+      wgpuRenderPassEncoderSetVertexBuffer(
+          render_pass, 0, batch_datum.vertex_buffer, 0, batch_datum.vertex_buffer_size);
       wgpuRenderPassEncoderSetIndexBuffer(
-          render_pass, vertex_buffer.index_buffer, WGPUIndexFormat_Uint32, 0, vertex_buffer.index_buffer_size);
+          render_pass, batch_datum.index_buffer, WGPUIndexFormat_Uint32, 0, batch_datum.index_buffer_size);
 
       // Set scissor if exists
-      if (vertex_buffer.has_scissor())
+      if (batch_datum.has_scissor())
       {
-        const auto& scissor = vertex_buffer.scissor;
+        const auto& scissor = batch_datum.scissor;
         wgpuRenderPassEncoderSetScissorRect(render_pass, scissor.x, scissor.y, scissor.z, scissor.w);
       }
 
       // Draw
-      // wgpuRenderPassEncoderDraw(render_pass, vertex_buffer.vertex_buffer_idx, 1, 0, 0);
-      wgpuRenderPassEncoderDrawIndexed(render_pass, vertex_buffer.index_buffer_idx, 1, 0, 0, 0);
+      // wgpuRenderPassEncoderDraw(render_pass, batch_datum.vertex_buffer_count, 1, 0, 0);
+      wgpuRenderPassEncoderDrawIndexed(render_pass, batch_datum.index_buffer_count, 1, 0, 0, 0);
 
       // Reset buffer for next frame
-      vertex_buffer.reset();
+      batch_datum.reset();
     }
   }
 
