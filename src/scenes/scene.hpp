@@ -1,5 +1,6 @@
 #pragma once
 
+#include <entt/entity/registry.hpp>
 #include <string>
 
 #include "core/game_context.hpp"
@@ -33,6 +34,7 @@ class Scene
   Renderer m_renderer{m_game_context};
   Camera m_camera{*m_game_context.display};
   ui::UIManager m_ui_manager{m_game_context.asset_manager, &m_renderer};
+  entt::registry m_registry{};
   bool m_has_loaded = false;
 };
 }  // namespace dl

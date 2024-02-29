@@ -30,6 +30,7 @@ struct NinePatch;
 struct TileRenderData;
 class MultiSprite;
 class Texture;
+struct SpriteRenderData;
 
 struct UniformData
 {
@@ -84,6 +85,7 @@ class Batch
   uint32_t pin_texture(WGPUTextureView texture_view);
 
   void sprite(Sprite* sprite, const double x, const double y, const double z);
+  void sprite(SpriteRenderData& sprite, const double x, const double y, const double z);
   void multi_sprite(MultiSprite* sprite, const double x, const double y, const double z);
   void tile(const TileRenderData& tile, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);

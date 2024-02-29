@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entity/registry.hpp>
+#include <entt/entity/entity.hpp>
 #include <memory>
 
 #include "./scene.hpp"
@@ -51,7 +51,6 @@ class Gameplay : public Scene
     PLAYING_TURN_BASED,
   };
 
-  entt::registry m_registry{};
   EventEmitter m_event_emitter{};
   World m_world{m_game_context};
   InputManager& m_input_manager = InputManager::get_instance();
@@ -61,7 +60,7 @@ class Gameplay : public Scene
 
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
-  RenderSystem m_render_system{m_renderer, m_world};
+  RenderSystem m_render_system{m_game_context, m_world};
   // SocietySystem m_society_system{m_world};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter};

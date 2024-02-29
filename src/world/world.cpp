@@ -29,6 +29,7 @@
 #include "graphics/display.hpp"
 #include "graphics/renderer/texture.hpp"
 #include "graphics/sprite.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -404,7 +405,14 @@ entt::entity World::create_item(
 {
   const auto item = item_factory::create(get_item_data(id), registry);
 
-  registry.emplace<Visibility>(item, get_texture_id(), id, "item", 1);
+  const auto render_data = SpriteRenderData{
+      .id = id,
+      .resource_id = m_texture_id,
+      .category = "item",
+      .layer_z = 1,
+  };
+  registry.emplace<SpriteRenderData>(item, render_data);
+  registry.emplace<Visibility>(item, m_texture_id, id, "item", 1);
   registry.emplace<Position>(item, static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
   return item;
 }

@@ -335,7 +335,6 @@ void UIRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder encode
     }
 
     // Draw
-    // wgpuRenderPassEncoderDraw(render_pass, batch_datum.vertex_buffer_count, 1, 0, 0);
     wgpuRenderPassEncoderDrawIndexed(render_pass, batch_datum.index_buffer_count, 1, 0, 0, 0);
 
     // Reset buffer for next frame

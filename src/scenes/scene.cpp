@@ -16,6 +16,8 @@ Scene::Scene(const std::string& scene_key, GameContext& game_context)
       m_scene_path(fmt::format("data/scenes/{}/data.json", scene_key)),
       m_game_context(game_context)
 {
+  m_game_context.registry = &m_registry;
+  m_game_context.renderer = &m_renderer;
   m_renderer.load();
 }
 

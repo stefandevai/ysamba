@@ -156,28 +156,25 @@ void Texture::load(const WGPUDevice device, const unsigned char* data, const Vec
 }
 
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame) const
+std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame, const int width, const int height) const
 {
-  assert(m_size.x > 0 && m_size.y > 0);
-
-  // const auto frame_width = get_frame_width() / static_cast<float>(m_size.x);
-  // const auto frame_height = get_frame_height() / static_cast<float>(m_size.y);
   const float frame_width = 1.0f / static_cast<float>(m_horizontal_frames);
   const float frame_height = 1.0f / static_cast<float>(m_vertical_frames);
+
   const int max_frames = m_horizontal_frames * m_vertical_frames;
   const float frame_x = static_cast<float>(frame % m_horizontal_frames);
   const float frame_y = static_cast<float>((frame % max_frames) / m_horizontal_frames);
-  // Multiply the x coord of the frame in the texture atlas by the normalized value of the width one frame.
-  const float top_left_x = frame_x * (m_size.x / static_cast<float>(m_horizontal_frames)) / m_size.x;
-  // Multiply the y coord of the frame in the tile map by the normalized value of the height one frame.
-  // Invert the value as the y axis is upwards for OpenGL
-  const float top_left_y = frame_y * (m_size.y / static_cast<float>(m_vertical_frames)) / m_size.y;
+
+  const float top_left_x = frame_width * frame_x;
+  const float top_left_y = frame_height * frame_y;
+  const float bottom_right_x = frame_width * (frame_x + width);
+  const float bottom_right_y = frame_height * (frame_y + height);
 
   return std::array<glm::vec2, 4>{
       glm::vec2{top_left_x, top_left_y},
-      glm::vec2{top_left_x + frame_width, top_left_y},
-      glm::vec2{top_left_x + frame_width, top_left_y + frame_height},
-      glm::vec2{top_left_x, top_left_y + frame_height},
+      glm::vec2{bottom_right_x, top_left_y},
+      glm::vec2{bottom_right_x, bottom_right_y},
+      glm::vec2{top_left_x, bottom_right_y},
   };
 }
 
@@ -247,15 +244,21 @@ void Texture::load_metadata(const std::string& filepath)
     {
       frame_data.width = item["width"].get<uint32_t>();
       frame_data.height = item["height"].get<uint32_t>();
-      frame_data.pattern = item["pattern"].get<std::vector<uint32_t>>();
-      frame_data.pattern_width = item["pattern_width"].get<uint32_t>();
-      frame_data.pattern_height = item["pattern_height"].get<uint32_t>();
       frame_data.anchor_x = item["anchor_x"].get<int>();
       frame_data.anchor_y = item["anchor_y"].get<int>();
+
+      if (type == "tile")
+      {
+        frame_data.pattern = item["pattern"].get<std::vector<uint32_t>>();
+        frame_data.pattern_width = item["pattern_width"].get<uint32_t>();
+        frame_data.pattern_height = item["pattern_height"].get<uint32_t>();
+      }
     }
 
     m_frame_data[std::make_pair(game_id, type)] = frame_data;
   }
+
+  has_metadata = true;
 }
 
 }  // namespace dl

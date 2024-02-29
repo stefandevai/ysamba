@@ -7,6 +7,8 @@
 #include <entt/entity/registry.hpp>
 
 #include "constants.hpp"
+#include "core/asset_manager.hpp"
+#include "core/game_context.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/visibility.hpp"
@@ -21,9 +23,10 @@
 
 namespace dl
 {
-RenderSystem::RenderSystem(Renderer& renderer, World& world)
-    : m_renderer(renderer),
-      m_batch(renderer.main_pass.batch),
+RenderSystem::RenderSystem(GameContext& game_context, World& world)
+    : m_game_context(game_context),
+      m_renderer(*m_game_context.renderer),
+      m_batch(m_renderer.main_pass.batch),
       m_world(world),
       m_world_texture_id(m_world.get_texture_id()),
       m_world_texture(m_renderer.get_texture(m_world.get_texture_id()))
@@ -40,6 +43,10 @@ RenderSystem::RenderSystem(Renderer& renderer, World& world)
     m_tiles.insert(
         {tile_data.first, TileRenderData{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
+
+  assert(m_game_context.registry != nullptr);
+  m_game_context.registry->on_construct<SpriteRenderData>().connect<&RenderSystem::m_create_sprite>(this);
+  m_game_context.registry->on_update<SpriteRenderData>().connect<&RenderSystem::m_update_sprite>(this);
 }
 
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
@@ -48,43 +55,62 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
   m_render_tiles(camera);
 
+  // {
+  //   auto items_view = registry.view<const Position, const Visibility>();
+  //
+  //   for (auto entity : items_view)
+  //   {
+  //     const auto& position = registry.get<Position>(entity);
+  //     auto& visibility = registry.get<Visibility>(entity);
+  //
+  //     if (visibility.sprite == nullptr)
+  //     {
+  //       visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame,
+  //       visibility.frame_angle);
+  //     }
+  //     if (visibility.sprite->texture == nullptr)
+  //     {
+  //       visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
+  //       visibility.sprite->frame_angle = visibility.frame_angle;
+  //
+  //       // Set specific frame according to the texture data loaded in a separated json file.
+  //       // This allows flexibility by separating the texture frames from game ids.
+  //       if (visibility.frame_id > 0 && !visibility.frame_type.empty())
+  //       {
+  //         const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id,
+  //         visibility.frame_type); visibility.sprite->set_frame(frame_data.frame); visibility.sprite->frame_angle =
+  //         frame_data.angle;
+  //       }
+  //     }
+  //
+  //     const auto tile_size = m_world.get_tile_size();
+  //
+  //     const auto position_x = std::round(position.x) * tile_size.x;
+  //     const auto position_y = std::round(position.y) * tile_size.y;
+  //     const auto position_z = std::round(position.z) * tile_size.y;
+  //
+  //     m_batch.sprite(visibility.sprite.get(),
+  //                    position_x,
+  //                    position_y + visibility.layer_z * m_z_index_increment,
+  //                    position_z + visibility.layer_z * m_z_index_increment);
+  //   }
+  // }
+
   {
-    auto items_view = registry.view<const Position, const Visibility>();
+    auto items_view = registry.view<const Position, const Visibility, const SpriteRenderData>();
+    const auto& tile_size = m_world.get_tile_size();
 
     for (auto entity : items_view)
     {
       const auto& position = registry.get<Position>(entity);
-      auto& visibility = registry.get<Visibility>(entity);
+      auto& render_data = registry.get<SpriteRenderData>(entity);
 
-      if (visibility.sprite == nullptr)
-      {
-        visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame, visibility.frame_angle);
-      }
-      if (visibility.sprite->texture == nullptr)
-      {
-        visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
-        visibility.sprite->frame_angle = visibility.frame_angle;
+      const auto position_x = std::round(position.x) * tile_size.x - render_data.anchor.x;
+      const auto position_y
+          = std::round(position.y) * tile_size.y - render_data.anchor.y + render_data.layer_z * m_z_index_increment;
+      const auto position_z = std::round(position.z) * tile_size.y + render_data.layer_z * m_z_index_increment;
 
-        // Set specific frame according to the texture data loaded in a separated json file.
-        // This allows flexibility by separating the texture frames from game ids.
-        if (visibility.frame_id > 0 && !visibility.frame_type.empty())
-        {
-          const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id, visibility.frame_type);
-          visibility.sprite->set_frame(frame_data.frame);
-          visibility.sprite->frame_angle = frame_data.angle;
-        }
-      }
-
-      const auto tile_size = m_world.get_tile_size();
-
-      const auto position_x = std::round(position.x) * tile_size.x;
-      const auto position_y = std::round(position.y) * tile_size.y;
-      const auto position_z = std::round(position.z) * tile_size.y;
-
-      m_batch.sprite(visibility.sprite.get(),
-                     position_x,
-                     position_y + visibility.layer_z * m_z_index_increment,
-                     position_z + visibility.layer_z * m_z_index_increment);
+      m_batch.sprite(render_data, position_x, position_y, position_z);
     }
   }
 
@@ -319,5 +345,52 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
                          world_z * tile_size.y + z_index);
   }
 }
+
+void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity)
+{
+  auto& sprite_data = registry.get<SpriteRenderData>(entity);
+
+  // Load texture and render data
+  if (sprite_data.texture == nullptr)
+  {
+    sprite_data.texture = m_game_context.asset_manager->get<Texture>(sprite_data.resource_id);
+    assert(sprite_data.texture != nullptr && "Texture not found");
+
+    if (sprite_data.texture->has_metadata)
+    {
+      const auto& frame_data = sprite_data.texture->id_to_frame(sprite_data.id, sprite_data.category);
+      sprite_data.frame_data = &frame_data;
+
+      switch (frame_data.sprite_type)
+      {
+      case SpriteType::Single:
+      {
+        sprite_data.uv_coordinates = sprite_data.texture->get_frame_coords(frame_data.frame);
+        const auto& frame_size = sprite_data.texture->get_frame_size();
+        sprite_data.size = glm::vec2{frame_size.x, frame_size.y};
+        break;
+      }
+      case SpriteType::Multiple:
+      {
+        sprite_data.uv_coordinates
+            = sprite_data.texture->get_frame_coords(frame_data.frame, frame_data.width, frame_data.height);
+        const auto& frame_size = sprite_data.texture->get_frame_size();
+        sprite_data.size = glm::vec2{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
+        sprite_data.anchor = glm::vec2{frame_size.x * frame_data.anchor_x, frame_size.y * frame_data.anchor_y};
+        break;
+      }
+      default:
+        break;
+      }
+    }
+    else
+    {
+      sprite_data.frame_data = nullptr;
+      sprite_data.uv_coordinates = sprite_data.texture->get_frame_coords(0);
+    }
+  }
+}
+
+void RenderSystem::m_update_sprite(entt::registry& registry, entt::entity entity) {}
 
 }  // namespace dl

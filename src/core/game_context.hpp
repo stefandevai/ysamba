@@ -11,16 +11,18 @@ namespace dl
 class SceneManager;
 class Display;
 class Camera;
+class Renderer;
 struct Clock;
 
 struct GameContext
 {
-  Display* display;
-  AssetManager* asset_manager;
-  Camera* camera;
-  SceneManager* scene_manager;
-  Clock* clock;
+  Display* display = nullptr;
+  AssetManager* asset_manager = nullptr;
+  Camera* camera = nullptr;
+  SceneManager* scene_manager = nullptr;
+  Clock* clock = nullptr;
   WorldMetadata world_metadata;
-  entt::registry* registry;
+  entt::registry* registry = nullptr;
+  Renderer* renderer = nullptr;
 };
 }  // namespace dl

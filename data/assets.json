@@ -27,7 +27,8 @@
             "path": "data/textures/characters.png",
             "uniform": true,
             "horizontal_frames": 32,
-            "vertical_frames": 32
+            "vertical_frames": 32,
+            "data_path": "data/textures/characters.json"
         },
 
         {

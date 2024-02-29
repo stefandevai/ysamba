@@ -104,7 +104,7 @@ class World
   [[nodiscard]] int get_elevation(const int x, const int y) const;
 
   // Get size of the tiles in the current tileset
-  [[nodiscard]] Vector2i get_tile_size() { return m_tile_size; }
+  [[nodiscard]] const Vector2i& get_tile_size() { return m_tile_size; }
 
   // Get the seed used in this world generation
   [[nodiscard]] int get_seed() const { return m_seed; };

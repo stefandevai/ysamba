@@ -77,6 +77,72 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
   return slot_index;
 }
 
+void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, const double z)
+{
+  assert(sprite.frame_data != nullptr);
+  assert(sprite.texture != nullptr);
+  assert(sprite.size.x != 0 && sprite.size.y != 0);
+
+  const glm::vec2& size = sprite.size;
+  const auto& texture_coordinates = sprite.uv_coordinates;
+  unsigned int color = sprite.color.int_color;
+
+  if (sprite.color.opacity_factor < 1.0)
+  {
+    const auto& sprite_color = sprite.color.rgba_color;
+    color = Color::rgba_to_int(sprite_color.r,
+                               sprite_color.g,
+                               sprite_color.b,
+                               static_cast<uint8_t>(sprite_color.a * sprite.color.opacity_factor));
+  }
+
+  // Build vector of textures to bind when rendering
+  // texture_index is the index in texture_views that will
+  // be translated to a index in the shader.
+  float texture_index = 0.00f;
+  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->view);
+  if (it >= upper_bound)
+  {
+    texture_index = static_cast<float>(m_texture_slot_index);
+    texture_views[m_texture_slot_index] = sprite.texture->view;
+    ++m_texture_slot_index;
+    should_update_texture_bind_group = true;
+  }
+  else
+  {
+    texture_index = it - texture_views.begin();
+  }
+
+  // Top left vertex
+  if (sprite.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color);
+  }
+
+  // Top right vertex
+  if (sprite.frame_data->angle == FrameAngle::Parallel)
+  {
+    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
+  }
+  else
+  {
+    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color);
+  }
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
+
+  m_current_vb->index_buffer_count += 6;
+}
+
 void Batch::sprite(Sprite* sprite, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);

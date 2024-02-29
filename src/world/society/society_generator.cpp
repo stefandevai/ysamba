@@ -11,6 +11,7 @@
 #include "ecs/components/selectable.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_angle.hpp"
+#include "graphics/tile_render_data.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -114,6 +115,13 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
                                  member.visibility.frame,
                                  member.visibility.layer_z,
                                  member.visibility.frame_angle);
+    auto render_data = SpriteRenderData{
+        .id = member.visibility.frame,
+        .resource_id = member.visibility.resource_id,
+        .layer_z = member.visibility.layer_z,
+        .category = "character",
+    };
+    registry.emplace<SpriteRenderData>(entity, render_data);
     registry.emplace<CarriedItems>(entity, member.carried_items);
     registry.emplace<WearedItems>(entity, member.weared_items);
     registry.emplace<WieldedItems>(entity, member.wielded_items);

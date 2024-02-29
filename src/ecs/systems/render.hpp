@@ -16,14 +16,16 @@ struct Chunk;
 class Batch;
 class Texture;
 class Renderer;
+struct GameContext;
 
 class RenderSystem
 {
  public:
-  RenderSystem(Renderer& renderer, World& world);
+  RenderSystem(GameContext& game_context, World& world);
   void render(entt::registry& registry, const Camera& camera);
 
  private:
+  GameContext& m_game_context;
   Renderer& m_renderer;
   Batch& m_batch;
   World& m_world;
@@ -41,6 +43,9 @@ class RenderSystem
                      const int y,
                      const int z,
                      const int z_index = 0);
+
+  void m_create_sprite(entt::registry& registry, entt::entity entity);
+  void m_update_sprite(entt::registry& registry, entt::entity entity);
 
   friend class RenderEditor;
 };
