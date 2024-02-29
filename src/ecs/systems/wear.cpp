@@ -7,6 +7,7 @@
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/weared_items.hpp"
+#include "graphics/tile_render_data.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -60,7 +61,7 @@ void WearSystem::update(entt::registry& registry)
     if (has_all_body_parts)
     {
       registry.remove<Position>(item);
-      registry.remove<Visibility>(item);
+      registry.remove<SpriteRenderData>(item);
 
       auto& weared_items = registry.get<WearedItems>(entity);
       weared_items.items.push_back(item);

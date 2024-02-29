@@ -79,13 +79,13 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
 
 void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, const double z)
 {
-  assert(sprite.frame_data != nullptr);
   assert(sprite.texture != nullptr);
   assert(sprite.size.x != 0 && sprite.size.y != 0);
 
   const glm::vec2& size = sprite.size;
   const auto& texture_coordinates = sprite.uv_coordinates;
   unsigned int color = sprite.color.int_color;
+  const auto angle = sprite.frame_data != nullptr ? sprite.frame_data->angle : FrameAngle::Parallel;
 
   if (sprite.color.opacity_factor < 1.0)
   {
@@ -115,7 +115,7 @@ void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, con
   }
 
   // Top left vertex
-  if (sprite.frame_data->angle == FrameAngle::Parallel)
+  if (angle == FrameAngle::Parallel)
   {
     m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
   }
@@ -125,7 +125,7 @@ void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, con
   }
 
   // Top right vertex
-  if (sprite.frame_data->angle == FrameAngle::Parallel)
+  if (angle == FrameAngle::Parallel)
   {
     m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
   }
@@ -433,27 +433,27 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
   }
 
   // Top left patch
-  sprite(&nine_patch.border_patches[0], x, y, z);
+  sprite(nine_patch.border_patches[0], x, y, z);
   // Top center patch
-  sprite(&nine_patch.border_patches[1], x + nine_patch.border, y, z);
+  sprite(nine_patch.border_patches[1], x + nine_patch.border, y, z);
   // Top right patch
-  sprite(&nine_patch.border_patches[2], x + nine_patch.size.x - nine_patch.border, y, z);
+  sprite(nine_patch.border_patches[2], x + nine_patch.size.x - nine_patch.border, y, z);
   // Center right patch
-  sprite(&nine_patch.border_patches[3], x + nine_patch.size.x - nine_patch.border, y + nine_patch.border, z);
+  sprite(nine_patch.border_patches[3], x + nine_patch.size.x - nine_patch.border, y + nine_patch.border, z);
   // Bottom right patch
-  sprite(&nine_patch.border_patches[4],
+  sprite(nine_patch.border_patches[4],
          x + nine_patch.size.x - nine_patch.border,
          y + nine_patch.size.y - nine_patch.border,
          z);
   // Bottom center patch
-  sprite(&nine_patch.border_patches[5], x + nine_patch.border, y + nine_patch.size.y - nine_patch.border, z);
+  sprite(nine_patch.border_patches[5], x + nine_patch.border, y + nine_patch.size.y - nine_patch.border, z);
   // Bottom left patch
-  sprite(&nine_patch.border_patches[6], x, y + nine_patch.size.y - nine_patch.border, z);
+  sprite(nine_patch.border_patches[6], x, y + nine_patch.size.y - nine_patch.border, z);
   // Center left patch
-  sprite(&nine_patch.border_patches[7], x, y + nine_patch.border, z);
+  sprite(nine_patch.border_patches[7], x, y + nine_patch.border, z);
 
   // Center patch
-  sprite(&nine_patch.center_patch, x + nine_patch.border, y + nine_patch.border, z);
+  sprite(nine_patch.center_patch, x + nine_patch.border, y + nine_patch.border, z);
 }
 
 void Batch::push_scissor(Vector4i scissor)

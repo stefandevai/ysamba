@@ -412,7 +412,6 @@ entt::entity World::create_item(
       .layer_z = 1,
   };
   registry.emplace<SpriteRenderData>(item, render_data);
-  registry.emplace<Visibility>(item, m_texture_id, id, "item", 1);
   registry.emplace<Position>(item, static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
   return item;
 }

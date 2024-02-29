@@ -97,7 +97,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   // }
 
   {
-    auto items_view = registry.view<const Position, const Visibility, const SpriteRenderData>();
+    auto items_view = registry.view<const Position, const SpriteRenderData>();
     const auto& tile_size = m_world.get_tile_size();
 
     for (auto entity : items_view)

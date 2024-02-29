@@ -32,5 +32,15 @@ struct SpriteRenderData
   glm::vec2 anchor{};
   std::array<glm::vec2, 4> uv_coordinates{};
   std::string category{};
+
+  void set_uv(const float top, const float left, const float bottom, const float right)
+  {
+    uv_coordinates = std::array<glm::vec2, 4>{
+        glm::vec2{left, top},
+        glm::vec2{right, top},
+        glm::vec2{right, bottom},
+        glm::vec2{left, bottom},
+    };
+  }
 };
 }  // namespace dl

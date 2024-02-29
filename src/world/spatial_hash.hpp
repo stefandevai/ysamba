@@ -7,6 +7,7 @@
 
 #include "ecs/components/position.hpp"
 #include "ecs/components/visibility.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -38,7 +39,7 @@ class SpatialHash
 
     for (const auto entity : entities)
     {
-      if (!registry.all_of<Position, Visibility, T...>(entity))
+      if (!registry.all_of<Position, SpriteRenderData, T...>(entity))
       {
         continue;
       }

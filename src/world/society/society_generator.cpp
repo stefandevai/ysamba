@@ -109,16 +109,11 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
 
     const auto position = m_get_member_position(world, camera);
     registry.emplace<Position>(entity, position);
-    member.visibility.layer_z = position.z + renderer::layer_z_offset_characters;
-    registry.emplace<Visibility>(entity,
-                                 member.visibility.resource_id,
-                                 member.visibility.frame,
-                                 member.visibility.layer_z,
-                                 member.visibility.frame_angle);
-    auto render_data = SpriteRenderData{
+
+    const auto render_data = SpriteRenderData{
         .id = member.visibility.frame,
         .resource_id = member.visibility.resource_id,
-        .layer_z = member.visibility.layer_z,
+        .layer_z = renderer::layer_z_offset_characters,
         .category = "character",
     };
     registry.emplace<SpriteRenderData>(entity, render_data);
