@@ -5,16 +5,16 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
-#include "graphics/sprite.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
 using namespace entt::literals;
 
 class Font;
-class Sprite;
 class UTF8Iterator;
 class AssetManager;
+struct SpriteRenderData;
 
 struct Character
 {
@@ -23,7 +23,7 @@ struct Character
   int y;
   int w;
   int h;
-  std::unique_ptr<Sprite> sprite = nullptr;
+  std::unique_ptr<SpriteRenderData> sprite = nullptr;
 };
 
 class Text

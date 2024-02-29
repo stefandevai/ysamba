@@ -79,6 +79,21 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
 
 void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, const double z)
 {
+  // Set texture if it has not been set
+  if (sprite.texture == nullptr)
+  {
+    assert(sprite.resource_id != 0 && "Sprite resource id is empty");
+    sprite.texture = m_game_context.asset_manager->get<Texture>(sprite.resource_id);
+  }
+
+  // Set default size as texture size if size is not yet set
+  if (sprite.size.x == 0 && sprite.size.y == 0 && sprite.texture != nullptr)
+  {
+    const auto& size = sprite.texture->get_size();
+    sprite.size = glm::vec2{size.x, size.y};
+    sprite.uv_coordinates = sprite.texture->get_frame_coords();
+  }
+
   assert(sprite.texture != nullptr);
   assert(sprite.size.x != 0 && sprite.size.y != 0);
 
@@ -405,7 +420,7 @@ void Batch::text(Text& text, const double x, const double y, const double z)
       character.sprite->color.opacity_factor = text.color.opacity_factor;
     }
 
-    sprite(character.sprite.get(), character.x + x, character.y + y, z);
+    sprite(*character.sprite, character.x + x, character.y + y, z);
   }
 }
 

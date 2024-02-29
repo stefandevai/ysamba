@@ -69,7 +69,7 @@ void WorldCreation::render()
     return;
   }
 
-  m_renderer.ui_pass.batch.sprite(&m_world_sprite, 0, 0, 0);
+  m_renderer.ui_pass.batch.sprite(m_world_sprite, 0, 0, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }
@@ -186,7 +186,11 @@ void WorldCreation::m_create_map_representation()
 
   m_texture = std::make_unique<Texture>(
       m_game_context.display->wgpu_context.device, pixel_data.data(), Vector2i{world_size.x, world_size.y});
-  m_world_sprite.texture = m_texture.get();
+
+  m_world_sprite = {
+      .texture = m_texture.get(),
+  };
+
   m_renderer.ui_pass.batch.clear_textures();
 }
 

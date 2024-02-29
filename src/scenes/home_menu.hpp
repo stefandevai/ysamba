@@ -3,6 +3,7 @@
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
 #include "graphics/text.hpp"
+#include "graphics/tile_render_data.hpp"
 #include "ui/types.hpp"
 
 namespace dl::ui
@@ -13,7 +14,6 @@ class WorldList;
 namespace dl
 {
 struct GameContext;
-class Sprite;
 
 class HomeMenu : public Scene
 {
@@ -29,7 +29,7 @@ class HomeMenu : public Scene
   ui::ItemList<WorldMetadata> m_worlds_metadata{};
   ui::WorldList* m_world_list = nullptr;
   Text m_instructions;
-  std::shared_ptr<Sprite> m_typography = nullptr;
+  SpriteRenderData m_typography;
 
   void m_load_worlds_metadata();
 };

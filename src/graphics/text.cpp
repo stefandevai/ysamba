@@ -123,20 +123,20 @@ void Text::update_wrapped()
     Character character;
 
     character.code = *it;
-    character.sprite = std::make_unique<Sprite>(typeface);
+    character.sprite = std::make_unique<SpriteRenderData>();
     character.sprite->texture = m_font->get_atlas();
-    character.sprite->set_custom_uv(ch.bh, ch.tx, ch.bw, ch.bh);
     character.sprite->color = character_color;
+    character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
 
     assert(typeface != 0);
     assert(character.sprite->texture != nullptr);
 
-    if (m_font_size != m_font->get_size())
-    {
-      character.sprite->transform = std::make_unique<Transform>();
-      character.sprite->transform->scale.x = scale;
-      character.sprite->transform->scale.y = scale;
-    }
+    // if (m_font_size != m_font->get_size())
+    // {
+    //   character.sprite->transform = std::make_unique<Transform>();
+    //   character.sprite->transform->scale.x = scale;
+    //   character.sprite->transform->scale.y = scale;
+    // }
 
     character.x = x;
     character.y = y;
@@ -179,20 +179,20 @@ void Text::update_non_wrapped()
     Character character;
 
     character.code = *it;
-    character.sprite = std::make_unique<Sprite>(typeface);
+    character.sprite = std::make_unique<SpriteRenderData>();
     character.sprite->texture = m_font->get_atlas();
-    character.sprite->set_custom_uv(ch.bh, ch.tx, ch.bw, ch.bh);
     character.sprite->color = color;
+    character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
 
     assert(typeface != 0);
     assert(character.sprite->texture != nullptr);
 
-    if (m_font_size != m_font->get_size())
-    {
-      character.sprite->transform = std::make_unique<Transform>();
-      character.sprite->transform->scale.x = scale;
-      character.sprite->transform->scale.y = scale;
-    }
+    // if (m_font_size != m_font->get_size())
+    // {
+    //   character.sprite->transform = std::make_unique<Transform>();
+    //   character.sprite->transform->scale.x = scale;
+    //   character.sprite->transform->scale.y = scale;
+    // }
 
     character.x = x;
     character.y = y;

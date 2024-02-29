@@ -18,11 +18,6 @@
 #include "ui/compositions/world_list.hpp"
 #include "world/society/name_generator.hpp"
 
-// TEMP
-#include "core/asset_manager.hpp"
-#include "graphics/renderer/texture.hpp"
-// TEMP
-
 namespace dl
 {
 HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context) {}
@@ -32,9 +27,9 @@ void HomeMenu::load()
   using namespace entt::literals;
   using namespace i18n::literals;
 
-  // m_renderer.add_batch("text"_hs, "default"_hs, 2);
-
-  m_typography = std::make_shared<Sprite>("ysamba-typography"_hs);
+  m_typography = {
+      .resource_id = "ysamba-typography"_hs,
+  };
 
   m_instructions.color.set(0xCCC1AFFF);
   m_instructions.set_font_size(16);
@@ -104,7 +99,7 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.ui_pass.batch.sprite(m_typography.get(), 60, 60, 0);
+  m_renderer.ui_pass.batch.sprite(m_typography, 60, 60, 0);
   m_renderer.ui_pass.batch.text(m_instructions, 75, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);

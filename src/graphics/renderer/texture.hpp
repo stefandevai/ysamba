@@ -80,7 +80,7 @@ class Texture
   inline int get_horizontal_frames() const { return m_horizontal_frames; }
   inline int get_vertical_frames() const { return m_vertical_frames; }
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> get_frame_coords(const int frame, const int width = 1, const int height = 1) const;
+  std::array<glm::vec2, 4> get_frame_coords(const int frame = 0, const int width = 1, const int height = 1) const;
 
   // Convert a game id to a texture frame known from a metadata file
   const FrameData& id_to_frame(const uint32_t id, const std::string& type) const;
