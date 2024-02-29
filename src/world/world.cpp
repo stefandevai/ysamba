@@ -25,10 +25,10 @@
 #include "core/json.hpp"
 #include "core/serialization.hpp"
 #include "ecs/components/position.hpp"
+#include "ecs/components/sprite.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/display.hpp"
 #include "graphics/renderer/texture.hpp"
-#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -404,13 +404,13 @@ entt::entity World::create_item(
 {
   const auto item = item_factory::create(get_item_data(id), registry);
 
-  const auto render_data = SpriteRenderData{
+  const auto render_data = Sprite{
       .id = id,
       .resource_id = m_texture_id,
       .category = "item",
       .layer_z = 1,
   };
-  registry.emplace<SpriteRenderData>(item, render_data);
+  registry.emplace<Sprite>(item, render_data);
   registry.emplace<Position>(item, static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
   return item;
 }

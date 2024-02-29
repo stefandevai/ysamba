@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
-#include "graphics/tile_render_data.hpp"
+#include "ecs/components/sprite.hpp"
 
 namespace dl
 {
@@ -14,7 +14,7 @@ using namespace entt::literals;
 class Font;
 class UTF8Iterator;
 class AssetManager;
-struct SpriteRenderData;
+struct Sprite;
 
 struct Character
 {
@@ -23,7 +23,7 @@ struct Character
   int y;
   int w;
   int h;
-  std::unique_ptr<SpriteRenderData> sprite = nullptr;
+  std::unique_ptr<Sprite> sprite = nullptr;
 };
 
 class Text

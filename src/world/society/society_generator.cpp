@@ -11,7 +11,6 @@
 #include "ecs/components/selectable.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_angle.hpp"
-#include "graphics/tile_render_data.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -112,7 +111,7 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
 
     member.sprite.layer_z = renderer::layer_z_offset_characters;
 
-    registry.emplace<SpriteRenderData>(entity, member.sprite);
+    registry.emplace<Sprite>(entity, member.sprite);
     registry.emplace<CarriedItems>(entity, member.carried_items);
     registry.emplace<WearedItems>(entity, member.weared_items);
     registry.emplace<WieldedItems>(entity, member.wielded_items);
@@ -165,7 +164,7 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
 
   return SocietyGenerator::MemberComponents{agent,
                                             biology,
-                                            SpriteRenderData{
+                                            Sprite{
                                                 .resource_id = "spritesheet-characters"_hs,
                                                 .id = parameters.character_id,
                                                 .category = "character",

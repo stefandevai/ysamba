@@ -26,9 +26,9 @@ class Camera;
 struct Quad;
 class Text;
 struct NinePatch;
-struct TileRenderData;
+struct Tile;
 class Texture;
-struct SpriteRenderData;
+struct Sprite;
 
 struct UniformData
 {
@@ -82,8 +82,8 @@ class Batch
   // Pin a texture so it can't be cleared and return its slot index
   uint32_t pin_texture(WGPUTextureView texture_view);
 
-  void sprite(SpriteRenderData& sprite, const double x, const double y, const double z);
-  void tile(const TileRenderData& tile, const double x, const double y, const double z);
+  void sprite(Sprite& sprite, const double x, const double y, const double z);
+  void tile(const Tile& tile, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);

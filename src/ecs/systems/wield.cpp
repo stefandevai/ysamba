@@ -55,13 +55,13 @@ void WieldSystem::update(entt::registry& registry)
     {
       wielded_items.right_hand = item;
       registry.remove<Position>(item);
-      registry.remove<SpriteRenderData>(item);
+      registry.remove<Sprite>(item);
     }
     else if (!registry.valid(wielded_items.left_hand))
     {
       wielded_items.left_hand = item;
       registry.remove<Position>(item);
-      registry.remove<SpriteRenderData>(item);
+      registry.remove<Sprite>(item);
     }
     else
     {

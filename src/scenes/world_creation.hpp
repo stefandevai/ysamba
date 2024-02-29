@@ -6,7 +6,7 @@
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/tile_render_data.hpp"
+#include "ecs/components/sprite.hpp"
 #include "world/world.hpp"
 
 namespace dl::ui
@@ -43,7 +43,7 @@ class WorldCreation : public Scene
   };
   SceneState m_scene_state = SceneState::Normal;
   World m_world{m_game_context};
-  SpriteRenderData m_world_sprite{};
+  Sprite m_world_sprite{};
   std::unique_ptr<Texture> m_texture = nullptr;
   int m_seed = 0;
   std::vector<float> m_height_map{};

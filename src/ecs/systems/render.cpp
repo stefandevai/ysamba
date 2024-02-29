@@ -11,6 +11,7 @@
 #include "core/game_context.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
+#include "ecs/components/sprite.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"
 #include "graphics/quad.hpp"
@@ -38,12 +39,11 @@ RenderSystem::RenderSystem(GameContext& game_context, World& world)
     const auto& frame_size = m_world_texture->get_frame_size();
     glm::vec2 size{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
     auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame, frame_data.width, frame_data.height);
-    m_tiles.insert(
-        {tile_data.first, TileRenderData{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
+    m_tiles.insert({tile_data.first, Tile{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
 
   assert(m_game_context.registry != nullptr);
-  m_game_context.registry->on_construct<SpriteRenderData>().connect<&RenderSystem::m_create_sprite>(this);
+  m_game_context.registry->on_construct<Sprite>().connect<&RenderSystem::m_create_sprite>(this);
 }
 
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
@@ -94,13 +94,13 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   // }
 
   {
-    auto items_view = registry.view<const Position, const SpriteRenderData>();
+    auto items_view = registry.view<const Position, const Sprite>();
     const auto& tile_size = m_world.get_tile_size();
 
     for (auto entity : items_view)
     {
       const auto& position = registry.get<Position>(entity);
-      auto& render_data = registry.get<SpriteRenderData>(entity);
+      auto& render_data = registry.get<Sprite>(entity);
 
       const auto position_x = std::round(position.x) * tile_size.x - render_data.anchor.x;
       const auto position_y
@@ -339,7 +339,7 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
 
 void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity)
 {
-  auto& sprite_data = registry.get<SpriteRenderData>(entity);
+  auto& sprite_data = registry.get<Sprite>(entity);
 
   // Load texture and render data
   if (sprite_data.texture == nullptr)

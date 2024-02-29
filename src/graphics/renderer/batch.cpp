@@ -4,6 +4,8 @@
 
 #include "core/asset_manager.hpp"
 #include "core/game_context.hpp"
+#include "ecs/components/sprite.hpp"
+#include "ecs/components/tile.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/color.hpp"
 #include "graphics/display.hpp"
@@ -12,7 +14,6 @@
 #include "graphics/quad.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/text.hpp"
-#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -75,7 +76,7 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
   return slot_index;
 }
 
-void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, const double z)
+void Batch::sprite(Sprite& sprite, const double x, const double y, const double z)
 {
   // Set texture if it has not been set
   if (sprite.texture == nullptr)
@@ -156,7 +157,7 @@ void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, con
   m_current_vb->index_buffer_count += 6;
 }
 
-void Batch::tile(const TileRenderData& tile, const double x, const double y, const double z)
+void Batch::tile(const Tile& tile, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 

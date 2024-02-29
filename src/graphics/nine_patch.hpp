@@ -3,8 +3,8 @@
 #include <glm/vec2.hpp>
 
 #include "./color.hpp"
+#include "ecs/components/sprite.hpp"
 #include "graphics/renderer/texture.hpp"
-#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -26,8 +26,8 @@ struct NinePatch
   glm::vec2 size{};
 
   // Sprites for each patch
-  std::array<SpriteRenderData, 8> border_patches{};
-  SpriteRenderData center_patch{};
+  std::array<Sprite, 8> border_patches{};
+  Sprite center_patch{};
 
   // Actual sprite texture
   const Texture* texture = nullptr;

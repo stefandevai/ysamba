@@ -2,8 +2,8 @@
 
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
+#include "ecs/components/sprite.hpp"
 #include "graphics/text.hpp"
-#include "graphics/tile_render_data.hpp"
 #include "ui/types.hpp"
 
 namespace dl::ui
@@ -29,7 +29,7 @@ class HomeMenu : public Scene
   ui::ItemList<WorldMetadata> m_worlds_metadata{};
   ui::WorldList* m_world_list = nullptr;
   Text m_instructions;
-  SpriteRenderData m_typography;
+  Sprite m_typography;
 
   void m_load_worlds_metadata();
 };

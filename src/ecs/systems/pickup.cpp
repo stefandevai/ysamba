@@ -7,9 +7,9 @@
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
+#include "ecs/components/sprite.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
-#include "graphics/tile_render_data.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -102,7 +102,7 @@ void PickupSystem::update(entt::registry& registry)
     }
 
     registry.remove<Position>(item);
-    registry.remove<SpriteRenderData>(item);
+    registry.remove<Sprite>(item);
     stop_pickup(registry, entity, job);
   }
 }

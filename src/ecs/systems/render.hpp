@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "graphics/tile_render_data.hpp"
+#include "ecs/components/tile.hpp"
 
 namespace dl
 {
@@ -29,7 +29,7 @@ class RenderSystem
   Renderer& m_renderer;
   Batch& m_batch;
   World& m_world;
-  std::unordered_map<uint32_t, TileRenderData> m_tiles{};
+  std::unordered_map<uint32_t, Tile> m_tiles{};
   const uint32_t m_world_texture_id;
   const Texture* m_world_texture = nullptr;
   static constexpr int m_frustum_tile_padding = 1;

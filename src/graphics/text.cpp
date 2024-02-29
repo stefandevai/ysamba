@@ -123,7 +123,7 @@ void Text::update_wrapped()
     Character character;
 
     character.code = *it;
-    character.sprite = std::make_unique<SpriteRenderData>();
+    character.sprite = std::make_unique<Sprite>();
     character.sprite->texture = m_font->get_atlas();
     character.sprite->color = character_color;
     character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
@@ -179,7 +179,7 @@ void Text::update_non_wrapped()
     Character character;
 
     character.code = *it;
-    character.sprite = std::make_unique<SpriteRenderData>();
+    character.sprite = std::make_unique<Sprite>();
     character.sprite->texture = m_font->get_atlas();
     character.sprite->color = color;
     character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);

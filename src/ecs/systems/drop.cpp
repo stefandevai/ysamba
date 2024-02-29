@@ -11,10 +11,10 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/sprite.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/tile_render_data.hpp"
 #include "ui/components/label.hpp"
 #include "ui/compositions/item_selection.hpp"
 #include "ui/ui_manager.hpp"
@@ -124,13 +124,13 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
                                  static_cast<double>(target.position.x),
                                  static_cast<double>(target.position.y),
                                  static_cast<double>(target.position.z));
-      registry.emplace<SpriteRenderData>(item,
-                                         SpriteRenderData{
-                                             .resource_id = m_world.get_texture_id(),
-                                             .id = item_component.id,
-                                             .category = "item",
-                                             .layer_z = 1,
-                                         });
+      registry.emplace<Sprite>(item,
+                               Sprite{
+                                   .resource_id = m_world.get_texture_id(),
+                                   .id = item_component.id,
+                                   .category = "item",
+                                   .layer_z = 1,
+                               });
     }
 
     stop_drop(registry, entity, job);

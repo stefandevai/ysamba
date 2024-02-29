@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "ecs/components/position.hpp"
-#include "graphics/tile_render_data.hpp"
+#include "ecs/components/sprite.hpp"
 
 namespace dl
 {
@@ -38,7 +38,7 @@ class SpatialHash
 
     for (const auto entity : entities)
     {
-      if (!registry.all_of<Position, SpriteRenderData, T...>(entity))
+      if (!registry.all_of<Position, Sprite, T...>(entity))
       {
         continue;
       }

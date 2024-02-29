@@ -33,10 +33,10 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/sprite.hpp"
 #include "ecs/components/walk_path.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
-#include "graphics/tile_render_data.hpp"
 #include "world/grid_3d.hpp"
 #include "world/world.hpp"
 
@@ -169,7 +169,7 @@ void save_game(World& world, const WorldMetadata& world_metadata, entt::registry
       .get<WearedItems>(archive)
       .get<WieldedItems>(archive)
       .get<WalkPath>(archive)
-      .get<SpriteRenderData>(archive)
+      .get<Sprite>(archive)
       .get<SocietyAgent>(archive)
       .get<Selectable>(archive)
       .get<Item>(archive)
@@ -201,7 +201,7 @@ void load_game(World& world, const WorldMetadata& world_metadata, entt::registry
       .get<WearedItems>(archive)
       .get<WieldedItems>(archive)
       .get<WalkPath>(archive)
-      .get<SpriteRenderData>(archive)
+      .get<Sprite>(archive)
       .get<SocietyAgent>(archive)
       .get<Selectable>(archive)
       .get<Item>(archive)
