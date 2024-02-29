@@ -28,7 +28,6 @@
 #include "graphics/camera.hpp"
 #include "graphics/display.hpp"
 #include "graphics/renderer/texture.hpp"
-#include "graphics/sprite.hpp"
 #include "graphics/tile_render_data.hpp"
 
 namespace dl

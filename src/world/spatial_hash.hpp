@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "ecs/components/position.hpp"
-#include "ecs/components/visibility.hpp"
 #include "graphics/tile_render_data.hpp"
 
 namespace dl

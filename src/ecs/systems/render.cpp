@@ -11,10 +11,8 @@
 #include "core/game_context.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
-#include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/frame_data_types.hpp"
-#include "graphics/multi_sprite.hpp"
 #include "graphics/quad.hpp"
 #include "graphics/renderer/batch.hpp"
 #include "graphics/renderer/renderer.hpp"
@@ -38,15 +36,14 @@ RenderSystem::RenderSystem(GameContext& game_context, World& world)
     const auto& frame_data = m_world_texture->id_to_frame(tile_data.first, frame_data_type::tile);
 
     const auto& frame_size = m_world_texture->get_frame_size();
-    glm::vec2 size{frame_size.x, frame_size.y};
-    auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame);
+    glm::vec2 size{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
+    auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame, frame_data.width, frame_data.height);
     m_tiles.insert(
         {tile_data.first, TileRenderData{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
 
   assert(m_game_context.registry != nullptr);
   m_game_context.registry->on_construct<SpriteRenderData>().connect<&RenderSystem::m_create_sprite>(this);
-  m_game_context.registry->on_update<SpriteRenderData>().connect<&RenderSystem::m_update_sprite>(this);
 }
 
 void RenderSystem::render(entt::registry& registry, const Camera& camera)
@@ -333,16 +330,10 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
       return;
     }
 
-    // TODO: Add multi sprite pool
-    auto multi_sprite
-        = MultiSprite{m_world_texture_id, tile.frame_data->frame, tile.frame_data->width, tile.frame_data->height};
-    multi_sprite.texture = m_world_texture;
-    multi_sprite.frame_angle = tile.frame_data->angle;
-
-    m_batch.multi_sprite(&multi_sprite,
-                         (world_x - tile.frame_data->anchor_x) * tile_size.x,
-                         (world_y - tile.frame_data->anchor_y) * tile_size.y,
-                         world_z * tile_size.y + z_index);
+    m_batch.tile(tile,
+                 (world_x - tile.frame_data->anchor_x) * tile_size.x,
+                 (world_y - tile.frame_data->anchor_y) * tile_size.y,
+                 world_z * tile_size.y + z_index * m_z_index_increment);
   }
 }
 
@@ -390,7 +381,5 @@ void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity
     }
   }
 }
-
-void RenderSystem::m_update_sprite(entt::registry& registry, entt::entity entity) {}
 
 }  // namespace dl

@@ -23,8 +23,8 @@ enum class SpriteType
 struct FrameData
 {
   uint32_t frame = 0;
-  uint32_t width = 0;
-  uint32_t height = 0;
+  uint32_t width = 1;
+  uint32_t height = 1;
   uint32_t pattern_width = 0;
   uint32_t pattern_height = 0;
   int anchor_x = 0;

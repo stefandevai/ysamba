@@ -15,7 +15,6 @@
 #include "definitions.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "world/chunk_manager.hpp"

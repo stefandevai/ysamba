@@ -7,9 +7,9 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/visibility.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace dl
 {
@@ -24,7 +24,7 @@ class SocietyGenerator
   {
     SocietyAgent agent;
     Biology biology;
-    Visibility visibility;
+    SpriteRenderData sprite;
     CarriedItems carried_items;
     WearedItems weared_items;
     WieldedItems wielded_items;

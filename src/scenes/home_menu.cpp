@@ -12,7 +12,6 @@
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
-#include "graphics/sprite.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
 #include "ui/compositions/world_list.hpp"

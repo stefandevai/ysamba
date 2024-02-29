@@ -8,11 +8,9 @@
 #include "graphics/color.hpp"
 #include "graphics/display.hpp"
 #include "graphics/frame_angle.hpp"
-#include "graphics/multi_sprite.hpp"
 #include "graphics/nine_patch.hpp"
 #include "graphics/quad.hpp"
 #include "graphics/renderer/utils.hpp"
-#include "graphics/sprite.hpp"
 #include "graphics/text.hpp"
 #include "graphics/tile_render_data.hpp"
 
@@ -154,157 +152,6 @@ void Batch::sprite(SpriteRenderData& sprite, const double x, const double y, con
 
   // Bottom right vertex
   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
-
-  m_current_vb->index_buffer_count += 6;
-}
-
-void Batch::sprite(Sprite* sprite, const double x, const double y, const double z)
-{
-  assert(m_current_vb != nullptr);
-
-  if (sprite->texture == nullptr)
-  {
-    sprite->texture = m_game_context.asset_manager->get<Texture>(sprite->resource_id);
-  }
-
-  const glm::vec2& size = sprite->get_size();
-  const auto& texture_coordinates = sprite->get_texture_coordinates();
-  unsigned int color = sprite->color.int_color;
-
-  assert(size.x != 0);
-  assert(size.y != 0);
-
-  if (sprite->color.opacity_factor < 1.0)
-  {
-    const auto& sprite_color = sprite->color.rgba_color;
-    color = Color::rgba_to_int(sprite_color.r,
-                               sprite_color.g,
-                               sprite_color.b,
-                               static_cast<uint8_t>(sprite_color.a * sprite->color.opacity_factor));
-  }
-
-  // Build vector of textures to bind when rendering
-  // texture_index is the index in texture_views that will
-  // be translated to a index in the shader.
-  float texture_index = 0.00f;
-  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite->texture->view);
-  if (it >= upper_bound)
-  {
-    texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite->texture->view;
-    ++m_texture_slot_index;
-    should_update_texture_bind_group = true;
-  }
-  else
-  {
-    texture_index = it - texture_views.begin();
-  }
-
-  // Top left vertex
-  if (sprite->frame_angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color);
-  }
-
-  // Top right vertex
-  if (sprite->frame_angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color);
-  }
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
-
-  // Bottom right vertex
-  m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
-
-  m_current_vb->index_buffer_count += 6;
-}
-
-void Batch::multi_sprite(MultiSprite* sprite, const double x, const double y, const double z)
-{
-  assert(m_current_vb != nullptr);
-
-  // Load texture if it has not been loaded
-  if (sprite->texture == nullptr)
-  {
-    sprite->texture = m_game_context.asset_manager->get<Texture>(sprite->resource_id);
-  }
-
-  unsigned int color = sprite->color.int_color;
-
-  assert(sprite->texture != nullptr);
-
-  if (sprite->color.opacity_factor < 1.0)
-  {
-    const auto& sprite_color = sprite->color.rgba_color;
-    color = Color::rgba_to_int(sprite_color.r,
-                               sprite_color.g,
-                               sprite_color.b,
-                               static_cast<uint8_t>(sprite_color.a * sprite->color.opacity_factor));
-  }
-
-  // Build vector of textures to bind when rendering
-  // texture_index is the index in texture_views that will
-  // be translated to a index in the shader.
-  float texture_index = 0.00f;
-  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite->texture->view);
-  if (it >= upper_bound)
-  {
-    texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite->texture->view;
-    ++m_texture_slot_index;
-    should_update_texture_bind_group = true;
-  }
-  else
-  {
-    texture_index = it - texture_views.begin();
-  }
-
-  const auto& size = sprite->get_size();
-  const std::array<glm::vec2, 4> texture_coordinates = sprite->get_texture_coordinates();
-  const auto& frame_size = sprite->texture->get_frame_size();
-  const int frame_width = frame_size.x * size.x;
-  const int frame_height = frame_size.y * size.y;
-
-  // Top left vertex
-  // Change according to the angle that the quad will be rendered
-  if (sprite->frame_angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(
-        glm::vec3{x, y + frame_height, z + frame_height}, texture_coordinates[0], texture_index, color);
-  }
-
-  // Top right vertex
-  if (sprite->frame_angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + frame_width, y, z}, texture_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(
-        glm::vec3{x + frame_width, y + frame_height, z + frame_height}, texture_coordinates[1], texture_index, color);
-  }
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + frame_height, z}, texture_coordinates[3], texture_index, color);
-
-  // Bottom right vertex
-  m_current_vb->emplace(glm::vec3{x + frame_width, y + frame_height, z}, texture_coordinates[2], texture_index, color);
 
   m_current_vb->index_buffer_count += 6;
 }

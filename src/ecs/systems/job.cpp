@@ -13,6 +13,7 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "graphics/frame_data_types.hpp"
+#include "graphics/tile_render_data.hpp"
 
 namespace
 {
@@ -169,11 +170,13 @@ void JobSystem::m_update_tile_job(const Job& job,
         registry.emplace<Position>(drop, position.x, position.y, position.z);
       }
 
-      registry.emplace<Visibility>(drop,
-                                   m_world.get_texture_id(),
-                                   item.first,
-                                   frame_data_type::item,
-                                   job.target.position.z + renderer::layer_z_offset_items);
+      registry.emplace<SpriteRenderData>(drop,
+                                         SpriteRenderData{
+                                             .resource_id = m_world.get_texture_id(),
+                                             .id = item.first,
+                                             .category = frame_data_type::item,
+                                             .layer_z = renderer::layer_z_offset_items,
+                                         });
       registry.emplace<Item>(drop, item.first);
     }
   }

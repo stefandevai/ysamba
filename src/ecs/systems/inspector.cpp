@@ -10,8 +10,8 @@
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/visibility.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/tile_render_data.hpp"
 #include "ui/compositions/inspector.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/tile_data.hpp"
@@ -51,7 +51,13 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   {
     m_target_quad = registry.create();
     registry.emplace<entt::tag<"ui"_hs>>(m_target_quad);
-    registry.emplace<Visibility>(m_target_quad, "spritesheet-tileset"_hs, 1, 4);
+    registry.emplace<SpriteRenderData>(m_target_quad,
+                                       SpriteRenderData{
+                                           .resource_id = "spritesheet-tileset"_hs,
+                                           .id = 1,
+                                           .layer_z = 4,
+                                           .category = "tile",
+                                       });
     registry.emplace<Position>(m_target_quad, 0.0, 0.0, 0.0);
   }
 
@@ -61,7 +67,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   quad_position.z = mouse_tile.z;
 
   const auto entity
-      = m_world.spatial_hash.get_by_component<Visibility>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+      = m_world.spatial_hash.get_by_component<SpriteRenderData>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
   bool updated_inspector_content = false;
 
   if (registry.valid(entity))
@@ -113,7 +119,7 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
     /* const auto& position = registry.get<Position>(entity); */
     /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
   }
-  else if (registry.all_of<Item, Visibility>(entity))
+  else if (registry.all_of<Item, SpriteRenderData>(entity))
   {
     const auto& item = registry.get<Item>(entity);
     if (item.id <= 0)

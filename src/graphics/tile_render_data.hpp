@@ -65,4 +65,10 @@ struct SpriteRenderData
     size.y = height;
   }
 };
+
+template <typename Archive>
+void serialize(Archive& archive, SpriteRenderData& sprite)
+{
+  archive(sprite.resource_id, sprite.id, sprite.layer_z, sprite.category);
+}
 }  // namespace dl

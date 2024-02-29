@@ -45,7 +45,6 @@ class RenderSystem
                      const int z_index = 0);
 
   void m_create_sprite(entt::registry& registry, entt::entity entity);
-  void m_update_sprite(entt::registry& registry, entt::entity entity);
 
   friend class RenderEditor;
 };
