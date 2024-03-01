@@ -71,5 +71,31 @@
     "label": "start fire",
     "turns_into": 14,
     "qualities_required": ["fire_starter"]
+  },
+  {
+    "id": 6,
+    "type": 1,
+    "label": "harvest plant",
+    "gives_in_place": true,
+    "gives": [
+      {
+        "item_id": 13,
+        "quantity": [1, 1]
+      }
+    ],
+    "turns_into": 0
+  },
+  {
+    "id": 7,
+    "type": 1,
+    "label": "harvest quinoa",
+    "gives_in_place": true,
+    "gives": [
+      {
+        "item_id": 12,
+        "quantity": [1, 1]
+      }
+    ],
+    "turns_into": 0
   }
 ]

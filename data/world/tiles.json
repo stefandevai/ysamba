@@ -422,12 +422,22 @@
     {
       "id": 53,
       "name": "quinoa plant",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 7
+        }
+      ]
     },
     {
       "id": 54,
       "name": "quinoa plant",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 7
+        }
+      ]
     },
     {
       "id": 55,
@@ -437,12 +447,22 @@
     {
       "id": 56,
       "name": "plant",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 6
+        }
+      ]
     },
     {
       "id": 57,
       "name": "plant",
-      "flags": ["WALKABLE"]
+      "flags": ["WALKABLE"],
+      "actions": [
+        {
+          "id": 6
+        }
+      ]
     },
     {
       "id": 58,

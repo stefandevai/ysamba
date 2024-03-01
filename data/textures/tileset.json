@@ -1128,6 +1128,20 @@
             "angle": "parallel",
             "frame": 585,
             "game_id": 131
+        },
+        {
+            "type": "item",
+            "sprite_type": "single",
+            "angle": "parallel",
+            "frame": 26,
+            "game_id": 13
+        },
+        {
+            "type": "item",
+            "sprite_type": "single",
+            "angle": "parallel",
+            "frame": 95,
+            "game_id": 12
         }
     ]
 }
