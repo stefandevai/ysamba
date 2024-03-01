@@ -14,5 +14,6 @@ enum class JobType
   Wear,
   Wield,
   Drop,
+  BuildHut,
 };
 }

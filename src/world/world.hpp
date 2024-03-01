@@ -140,6 +140,9 @@ class World
   // Check if a specific tile is has WALKABLE flag
   [[nodiscard]] bool is_walkable(const int x, const int y, const int z) const;
 
+  // Check if a specific tile is empty
+  [[nodiscard]] bool is_empty(const int x, const int y, const int z) const;
+
   // Check if the world has a specific pattern for a given position
   [[nodiscard]] bool has_pattern(const std::vector<uint32_t>& pattern,
                                  const Vector2i& size,

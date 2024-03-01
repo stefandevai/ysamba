@@ -27,12 +27,18 @@ class Grid3D
   const Cell& cell_at(const int x, const int y, const int z) const;
   const Cell& cell_at(const Vector3i& position) const;
   const Cell& cell_at(const Vector3& position) const;
+  int height_at(const int x, const int y) const;
+  int height_at(const Vector2i& position) const;
+  int height_at(const Vector2& position) const;
   void set(const uint32_t id, const int x, const int y, const int z);
   void set(const uint32_t id, const Vector3i& position);
   void set(const uint32_t id, const Vector3& position);
   void set_decoration(const uint32_t id, const int x, const int y, const int z);
   void set_decoration(const uint32_t id, const Vector3i& position);
   void set_decoration(const uint32_t id, const Vector3& position);
+  void set_height(const int height, const int x, const int y);
+  void set_height(const int height, const Vector2i& position);
+  void set_height(const int height, const Vector2& position);
   void set_size(const int width, const int height, const int depth);
   void set_size(const Vector3i& size);
 
@@ -47,7 +53,7 @@ class Grid3D
 
  private:
   uint32_t m_index(const int x, const int y, const int z) const;
-  bool m_in_bounds(const int x, const int y, const int z) const;
+  bool m_in_bounds(const int x, const int y, const int z = 0) const;
   bool m_is_any_neighbour_empty(const int x, const int y, const int z) const;
 };
 

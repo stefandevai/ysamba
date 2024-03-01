@@ -28,6 +28,7 @@ const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
     {0, "Harvest"},
     {1, "Break"},
     {2, "Dig"},
+    {3, "Build hut"},
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
@@ -259,6 +260,11 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
       m_select_tile_target(mouse_tile, JobType::Dig, registry);
       break;
     }
+    case ActionMenuState::SelectHutTarget:
+    {
+      m_select_hut_target(mouse_tile, registry);
+      break;
+    }
     default:
     {
       m_dispose();
@@ -345,6 +351,66 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
 
       m_create_job(job_type, tile.id, tile_position, registry, entity);
     }
+    m_dispose();
+  }
+}
+
+void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::registry& registry)
+{
+  const uint32_t hut_size = 3;
+  const uint32_t hut_height = 2;
+  bool can_build = true;
+
+  // Check if soil is buildable
+  for (uint32_t j = 0; j < hut_size; ++j)
+  {
+    for (uint32_t i = 0; i < hut_size; ++i)
+    {
+      if (!m_world.is_walkable(tile_position.x + i, tile_position.y + j, tile_position.z))
+      {
+        can_build = false;
+        break;
+      }
+    }
+
+    if (!can_build)
+    {
+      break;
+    }
+  }
+
+  // Check if there's space over the ground to build the hut
+  for (uint32_t j = 0; j < hut_size; ++j)
+  {
+    for (uint32_t i = 0; i < hut_size; ++i)
+    {
+      if (!m_world.is_empty(tile_position.x + i, tile_position.y + j, tile_position.z + 1))
+      {
+        can_build = false;
+        break;
+      }
+    }
+
+    if (!can_build)
+    {
+      break;
+    }
+  }
+
+  if (can_build)
+  {
+    // TEMP: Build hut
+    m_world.set_decoration(139, tile_position.x, tile_position.y, tile_position.z);
+    m_world.set_decoration(140, tile_position.x + 1, tile_position.y, tile_position.z);
+    m_world.set_decoration(141, tile_position.x + 2, tile_position.y, tile_position.z);
+    m_world.set_decoration(142, tile_position.x, tile_position.y + 1, tile_position.z);
+    m_world.set_decoration(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
+    m_world.set_decoration(145, tile_position.x, tile_position.y + 2, tile_position.z);
+    m_world.set_decoration(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
+    m_world.set_decoration(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
+    m_world.set_decoration(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+
+    // TODO: Assign build hut job
     m_dispose();
   }
 }

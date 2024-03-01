@@ -67,6 +67,11 @@ void World::set_terrain(const uint32_t tile_id, const int x, const int y, const 
   auto& chunk = chunk_manager.at(x, y, z);
   chunk.tiles.set(
       tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+
+  if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  {
+    chunk.tiles.compute_visibility();
+  }
 }
 
 void World::set_decoration(const uint32_t tile_id, const int x, const int y, const int z)
@@ -74,6 +79,11 @@ void World::set_decoration(const uint32_t tile_id, const int x, const int y, con
   auto& chunk = chunk_manager.at(x, y, z);
   chunk.tiles.set_decoration(
       tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+
+  if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  {
+    chunk.tiles.compute_visibility();
+  }
 }
 
 void World::replace(const uint32_t from, const uint32_t to, const int x, const int y, const int z)
@@ -361,6 +371,12 @@ bool World::is_walkable(const int x, const int y, const int z) const
   }
 
   return walkable;
+}
+
+bool World::is_empty(const int x, const int y, const int z) const
+{
+  const auto& cell = cell_at(x, y, z);
+  return cell.terrain == 0 && cell.decoration == 0;
 }
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const

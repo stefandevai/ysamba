@@ -10,7 +10,6 @@ uint32_t Grid3D::terrain_at(const int x, const int y, const int z) const
 {
   if (!m_in_bounds(x, y, z))
   {
-    // spdlog::debug("OUT OF BOUNDS {} {} {}", x, y, z);
     return 0;
   }
 
@@ -28,7 +27,6 @@ uint32_t Grid3D::decoration_at(const int x, const int y, const int z) const
 {
   if (!m_in_bounds(x, y, z))
   {
-    // spdlog::debug("OUT OF BOUNDS {} {} {}", x, y, z);
     return 0;
   }
 
@@ -60,6 +58,23 @@ const Cell& Grid3D::cell_at(const Vector3i& position) const { return cell_at(pos
 const Cell& Grid3D::cell_at(const Vector3& position) const
 {
   return cell_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+}
+
+int Grid3D::height_at(const int x, const int y) const
+{
+  if (!m_in_bounds(x, y))
+  {
+    return 0;
+  }
+
+  return height_map[x + y * size.x];
+}
+
+int Grid3D::height_at(const Vector2i& position) const { return height_at(position.x, position.y); }
+
+int Grid3D::height_at(const Vector2& position) const
+{
+  return height_at(static_cast<int>(position.x), static_cast<int>(position.y));
 }
 
 void Grid3D::set(const uint32_t id, const int x, const int y, const int z)
@@ -97,6 +112,26 @@ void Grid3D::set_decoration(const uint32_t id, const Vector3i& position)
 void Grid3D::set_decoration(const uint32_t id, const Vector3& position)
 {
   set_decoration(id, static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+}
+
+void Grid3D::set_height(const int height, const int x, const int y)
+{
+  if (!m_in_bounds(x, y))
+  {
+    return;
+  }
+
+  height_map[x + y * size.x] = height;
+}
+
+void Grid3D::set_height(const int height, const Vector2i& position)
+{
+  return set_height(height, position.x, position.y);
+}
+
+void Grid3D::set_height(const int height, const Vector2& position)
+{
+  return set_height(height, static_cast<int>(position.x), static_cast<int>(position.y));
 }
 
 void Grid3D::set_size(const int width, const int height, const int depth)
@@ -179,9 +214,10 @@ void Grid3D::compute_visibility()
     {
       for (int x = 0; x < size.x; ++x)
       {
-        const auto id = terrain_at(x, y, z);
+        const auto terrain = terrain_at(x, y, z);
+        const auto decoration = decoration_at(x, y, z);
 
-        if (id == 0)
+        if (terrain == 0 && decoration == 0)
         {
           continue;
         }
@@ -193,7 +229,14 @@ void Grid3D::compute_visibility()
           continue;
         }
 
+        // Update visibility
         set_flags(DL_CELL_FLAG_VISIBLE, x, y, z);
+
+        // Update height map if needed
+        if (height_at(x, y) < z)
+        {
+          set_height(z, x, y);
+        }
       }
     }
   }
@@ -203,7 +246,7 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
 {
   // Check visible tiles in 45deg top down view
   // Top tile
-  if (terrain_at(x, y, z + 1) == 0)
+  if (terrain_at(x, y, z + 1) == 0 && decoration_at(x, y, z + 1) == 0)
   {
     return true;
   }

@@ -33,6 +33,7 @@ class ActionSystem
     SelectHarvestTarget = 0,
     SelectBreakTarget,
     SelectDigTarget,
+    SelectHutTarget,
     Closed,
     Open,
   };
@@ -59,6 +60,7 @@ class ActionSystem
   void m_close_select_target();
   void m_dispose();
   void m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry);
+  void m_select_hut_target(const Vector3i& tile_position, entt::registry& registry);
   void m_create_job(const JobType job_type,
                     const uint32_t id,
                     const Vector3i& position,

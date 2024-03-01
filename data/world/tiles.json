@@ -883,6 +883,56 @@
           "id": 0
         }
       ]
+    },
+    {
+      "id": 139,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 140,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 141,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 142,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 143,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 144,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 145,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 146,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 147,
+      "name": "hut structure",
+      "flags": []
+    },
+    {
+      "id": 148,
+      "name": "hut structure",
+      "flags": []
     }
   ]
 }

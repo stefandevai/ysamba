@@ -1142,6 +1142,77 @@
             "angle": "parallel",
             "frame": 95,
             "game_id": 12
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 768,
+            "game_id": 139
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 844,
+            "game_id": 140
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 770,
+            "game_id": 141
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 800,
+            "game_id": 142
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 801,
+            "game_id": 143
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 802,
+            "game_id": 144
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 832,
+            "game_id": 145
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 833,
+            "game_id": 146
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 834,
+            "game_id": 147
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "parallel",
+            "frame": 769,
+            "game_id": 148,
+            "front_face_id": 143
         }
     ]
 }
