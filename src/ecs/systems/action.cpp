@@ -357,8 +357,7 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
 
 void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::registry& registry)
 {
-  const uint32_t hut_size = 3;
-  const uint32_t hut_height = 2;
+  const uint32_t hut_size = 5;
   bool can_build = true;
 
   // Check if soil is buildable
@@ -399,16 +398,80 @@ void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::regi
 
   if (can_build)
   {
-    // TEMP: Build hut
-    m_world.set_decoration(139, tile_position.x, tile_position.y, tile_position.z);
-    m_world.set_decoration(140, tile_position.x + 1, tile_position.y, tile_position.z);
-    m_world.set_decoration(141, tile_position.x + 2, tile_position.y, tile_position.z);
-    m_world.set_decoration(142, tile_position.x, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(145, tile_position.x, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+    // TEMP: Build hut structure
+    assert(hut_size >= 3);
+
+    if (hut_size == 3)
+    {
+      // Perimeter
+      m_world.set_decoration(139, tile_position.x, tile_position.y, tile_position.z);
+      m_world.set_decoration(140, tile_position.x + 1, tile_position.y, tile_position.z);
+      m_world.set_decoration(141, tile_position.x + 2, tile_position.y, tile_position.z);
+      m_world.set_decoration(142, tile_position.x, tile_position.y + 1, tile_position.z);
+      m_world.set_decoration(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
+      m_world.set_decoration(145, tile_position.x, tile_position.y + 2, tile_position.z);
+      m_world.set_decoration(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
+      m_world.set_decoration(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
+
+      // Top
+      m_world.set_decoration(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+    }
+    else if (hut_size == 4)
+    {
+      // Perimeter
+      m_world.set_decoration(149, tile_position.x, tile_position.y, tile_position.z);
+      m_world.set_decoration(155, tile_position.x + 3, tile_position.y, tile_position.z);
+      m_world.set_decoration(152, tile_position.x, tile_position.y + 1, tile_position.z);
+      m_world.set_decoration(153, tile_position.x + 3, tile_position.y + 1, tile_position.z);
+      m_world.set_decoration(175, tile_position.x, tile_position.y + 2, tile_position.z);
+      m_world.set_decoration(181, tile_position.x + 3, tile_position.y + 2, tile_position.z);
+      m_world.set_decoration(182, tile_position.x, tile_position.y + 3, tile_position.z);
+      m_world.set_decoration(183, tile_position.x + 1, tile_position.y + 3, tile_position.z);
+      m_world.set_decoration(187, tile_position.x + 2, tile_position.y + 3, tile_position.z);
+      m_world.set_decoration(188, tile_position.x + 3, tile_position.y + 3, tile_position.z);
+
+      // Top
+      m_world.set_decoration(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+      m_world.set_decoration(154, tile_position.x + 2, tile_position.y + 1, tile_position.z + 1);
+      m_world.set_decoration(169, tile_position.x + 1, tile_position.y + 2, tile_position.z + 1);
+      m_world.set_decoration(173, tile_position.x + 2, tile_position.y + 2, tile_position.z + 1);
+    }
+    else
+    {
+      // Perimeter structure parts
+      m_world.set_decoration(149, tile_position.x, tile_position.y, tile_position.z);
+      m_world.set_decoration(155, tile_position.x + hut_size - 1, tile_position.y, tile_position.z);
+      m_world.set_decoration(156, tile_position.x, tile_position.y + 1, tile_position.z);
+      m_world.set_decoration(159, tile_position.x + hut_size - 1, tile_position.y + 1, tile_position.z);
+
+      m_world.set_decoration(175, tile_position.x, tile_position.y + hut_size - 2, tile_position.z);
+      m_world.set_decoration(181, tile_position.x + hut_size - 1, tile_position.y + hut_size - 2, tile_position.z);
+      m_world.set_decoration(182, tile_position.x, tile_position.y + hut_size - 1, tile_position.z);
+      m_world.set_decoration(183, tile_position.x + 1, tile_position.y + hut_size - 1, tile_position.z);
+      m_world.set_decoration(187, tile_position.x + hut_size - 2, tile_position.y + hut_size - 1, tile_position.z);
+      m_world.set_decoration(188, tile_position.x + hut_size - 1, tile_position.y + hut_size - 1, tile_position.z);
+
+      // Top structure parts
+      m_world.set_decoration(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+      m_world.set_decoration(154, tile_position.x + hut_size - 2, tile_position.y + 1, tile_position.z + 1);
+      m_world.set_decoration(169, tile_position.x + 1, tile_position.y + hut_size - 2, tile_position.z + 1);
+      m_world.set_decoration(173, tile_position.x + hut_size - 2, tile_position.y + hut_size - 2, tile_position.z + 1);
+
+      // Tiled parts
+      for (uint32_t i = 2; i < hut_size - 2; ++i)
+      {
+        // Horizontal structure parts
+        m_world.set_decoration(151, tile_position.x + i, tile_position.y + 1, tile_position.z + 1);
+        m_world.set_decoration(170, tile_position.x + i, tile_position.y + hut_size - 2, tile_position.z + 1);
+        m_world.set_decoration(184, tile_position.x + i, tile_position.y + hut_size - 1, tile_position.z);
+
+        // Vertical structure parts
+        m_world.set_decoration(157, tile_position.x + 1, tile_position.y + i, tile_position.z + 1);
+        m_world.set_decoration(158, tile_position.x + hut_size - 2, tile_position.y + i, tile_position.z + 1);
+        m_world.set_decoration(160, tile_position.x, tile_position.y + i, tile_position.z);
+        m_world.set_decoration(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
+      }
+    }
 
     // TODO: Assign build hut job
     m_dispose();
