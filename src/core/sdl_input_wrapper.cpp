@@ -311,6 +311,13 @@ void SDLInputWrapper::update()
 
       m_key_down[index] = true;
       m_any_key_down = true;
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+      if (event.key.keysym.sym == SDLK_F3)
+      {
+        debug_tools.open = !debug_tools.open;
+      }
+#endif
       break;
     }
 

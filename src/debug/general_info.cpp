@@ -193,8 +193,6 @@ void GeneralInfo::update()
 #endif
   }
 
-  /* ImPlot::ShowDemoWindow(); */
-
   ImGui::End();
 }
 

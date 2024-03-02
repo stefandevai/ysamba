@@ -276,8 +276,8 @@ bool Gameplay::m_update_input_real_time()
     will_quit = true;
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-    auto& debug_tools = DebugTools::get_instance();
-    debug_tools.open = false;
+    // auto& debug_tools = DebugTools::get_instance();
+    // debug_tools.open = false;
 #endif
   }
   else if (m_input_manager.poll_action("toggle_pause"_hs))
@@ -351,8 +351,8 @@ bool Gameplay::m_update_input_turn_based()
     will_quit = true;
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-    auto& debug_tools = DebugTools::get_instance();
-    debug_tools.open = false;
+    // auto& debug_tools = DebugTools::get_instance();
+    // debug_tools.open = false;
 #endif
   }
   else if (m_input_manager.poll_action("add_item"_hs))

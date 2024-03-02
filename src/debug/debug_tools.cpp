@@ -76,7 +76,7 @@ void DebugTools::update()
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
-  // m_update_menu_bar();
+  m_update_menu_bar();
 
   if (show_demo_window)
   {
@@ -144,7 +144,15 @@ void DebugTools::m_update_menu_bar()
   }
 }
 
-void DebugTools::init_general_info(GameContext& context) { m_general_info = std::make_unique<GeneralInfo>(context); }
+void DebugTools::init_general_info(GameContext& context)
+{
+  if (m_general_info != nullptr)
+  {
+    return;
+  }
+
+  m_general_info = std::make_unique<GeneralInfo>(context);
+}
 
 void DebugTools::init_camera_inspector(Camera& camera)
 {

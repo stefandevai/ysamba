@@ -18,7 +18,7 @@ namespace dl
 class DebugTools
 {
  public:
-  bool open = true;
+  bool open = false;
 
   DebugTools() = default;
   ~DebugTools();
