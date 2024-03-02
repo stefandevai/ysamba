@@ -14,10 +14,17 @@ class Point
   Point(const T x, const T y) : x(x), y(y) {}
   Point() : x(0), y(0) {}
 
-  void operator=(const Point& b)
+  Point(const Point& rhs)
+  {
+    x = rhs.x;
+    y = rhs.y;
+  }
+
+  Point& operator=(const Point& b)
   {
     x = b.x;
     y = b.y;
+    return *this;
   }
 
   bool operator==(const Point& b) const { return (x == b.x && y == b.y); }
