@@ -21,7 +21,6 @@
     "imgui",
     "implot",
     "spdlog",
-    "fmt",
     "date"
   ]
 }
