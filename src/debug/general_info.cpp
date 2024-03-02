@@ -78,7 +78,6 @@ float get_cpu_usage_macos()
     return 0.0f;
   }
 
-  task_basic_info_t basic_info;
   thread_array_t thread_list;
   mach_msg_type_number_t thread_count;
 
@@ -86,9 +85,6 @@ float get_cpu_usage_macos()
   mach_msg_type_number_t thread_info_count;
 
   thread_basic_info_t basic_info_th;
-  uint32_t stat_thread = 0;  // Mach threads
-
-  basic_info = (task_basic_info_t)tinfo;
 
   // get threads in the task
   kr = task_threads(port, &thread_list, &thread_count);
@@ -97,11 +93,6 @@ float get_cpu_usage_macos()
   {
     spdlog::debug("Could not get cpu usage");
     return 0.0f;
-  }
-
-  if (thread_count > 0)
-  {
-    stat_thread += thread_count;
   }
 
   long tot_cpu = 0;
