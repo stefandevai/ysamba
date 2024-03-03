@@ -97,9 +97,9 @@
   <SidebarBase title={`Frame ${$selectedTiles[0].index}`}>
     {#each currentFrame as item, index}
       {#key item.frame}
-        <Accordion title="Game ID: {item.id}" open={index === 0}>
+        <Accordion title="Game ID: {item.game_id}" open={index === 0}>
           <p>Game ID:</p>
-          <input class="input" id="id" type="number" bind:value={item.id} />
+          <input class="input" id="id" type="number" bind:value={item.game_id} />
           <p>Type:</p>
           <div class="select input-group">
             <select bind:value={item.type}>

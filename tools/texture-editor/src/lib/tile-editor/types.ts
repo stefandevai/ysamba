@@ -18,7 +18,7 @@ export const AngleTypes = ['orthogonal', 'parallel'] as const;
 type AnyFrame = {
   key: number;
   frame: number;
-  id: number;
+  game_id: number;
   type: typeof FrameTypes[number];
   sprite_type: typeof SpriteTypes[number];
   angle: typeof AngleTypes[number];

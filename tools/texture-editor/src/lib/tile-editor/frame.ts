@@ -6,5 +6,5 @@ export const defaultFrame : Frame = {
   sprite_type: 'single',
   angle: 'parallel',
   frame: -1,
-  id: -1,
+  game_id: -1,
 };
