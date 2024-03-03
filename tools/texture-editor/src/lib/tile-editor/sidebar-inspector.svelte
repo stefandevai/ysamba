@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import Accordion from '../../common/accordion.svelte';
   import SidebarBase from '../../common/sidebar-base.svelte';
   import { selectedTiles, textureFrames } from './store';
@@ -7,6 +8,7 @@
   import { defaultFrame } from './frame';
 
   let currentFrame: Frame[] | null = [structuredClone(defaultFrame)];
+  let firstGameIdInput: null | HTMLInputElement = null;
 
   const getInspectorData = (tiles: Position[]) => {
     if (tiles.length === 0 || !$textureFrames) {
@@ -39,7 +41,7 @@
     textureFrames.set(newFrames);
   }
 
-  const handleAdd = (frameNumber: number) => {
+  const handleAdd = async (frameNumber: number) => {
     const newFrames: Array<Array<Frame>> = structuredClone($textureFrames);
     newFrames[frameNumber].push({
       ...defaultFrame,
@@ -47,6 +49,12 @@
       key: newFrames[frameNumber].length,
     });
     textureFrames.set(newFrames);
+
+    await tick();
+
+    if (firstGameIdInput != null) {
+      firstGameIdInput.focus();
+    }
   }
 
   const handleSpriteTypeChange = (event: Event, key: number) => {
@@ -84,6 +92,14 @@
     }
   }
 
+  const getAccordionTitle = (frame: FrameFormValues) => {
+    if (frame.game_id < 0 || frame.game_id == null) {
+      return "New Frame";
+    }
+
+    return `Game ID: ${frame.game_id}`;
+  }
+
   textureFrames.subscribe(() => {
     getInspectorData($selectedTiles);
   });
@@ -95,11 +111,15 @@
 
 {#if currentFrame && $selectedTiles.length > 0}
   <SidebarBase title={`Frame ${$selectedTiles[0].index}`}>
-    {#each currentFrame as item, index}
+    {#each currentFrame.reverse() as item, index}
       {#key item.frame}
-        <Accordion title="Game ID: {item.game_id}" open={index === 0}>
+        <Accordion title={getAccordionTitle(item)} open={index === 0}>
           <p>Game ID:</p>
-          <input class="input" id="id" type="number" bind:value={item.game_id} />
+          {#if index === 0}
+            <input class="input" id="id" type="number" bind:value={item.game_id} bind:this={firstGameIdInput} />
+          {:else}
+            <input class="input" id="id" type="number" bind:value={item.game_id} />
+          {/if}
           <p>Type:</p>
           <div class="select input-group">
             <select bind:value={item.type}>

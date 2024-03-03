@@ -42,6 +42,10 @@ type MultipleFrame = AnyFrame & {
 
 export type Frame = SingleFrame | MultipleFrame;
 
+export type FrameFormValues = Omit<Frame, 'game_id'> & {
+  game_id: null | number;
+};
+
 export type FrameArray = Array<Frame[]>;
 
 export type TextureData = {
