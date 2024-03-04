@@ -202,30 +202,6 @@ Vector3i World::mouse_to_world(const Camera& camera) const
   return screen_to_world(mouse_position, camera);
 }
 
-std::stack<std::pair<int, int>> World::get_path_between(const Vector3i& from, const Vector3i& to)
-{
-  std::stack<std::pair<int, int>> path{};
-
-  // TODO: Use A* algorithm instead
-  TCOD_bresenham_data_t bresenham_data;
-  int x = to.x;
-  int y = to.y;
-
-  TCOD_line_init_mt(x, y, from.x, from.y, &bresenham_data);
-
-  do
-  {
-    if (x == from.x && y == from.y)
-    {
-      break;
-    }
-
-    path.push({x, y});
-  } while (!TCOD_line_step_mt(&x, &y, &bresenham_data));
-
-  return path;
-}
-
 std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
 {
   // If tile is adjacent, just return a single step and avoid A* altogether

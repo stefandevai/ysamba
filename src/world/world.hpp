@@ -125,9 +125,6 @@ class World
     return m_societies.at(society_id);
   };
 
-  // Get a path between two points
-  [[nodiscard]] std::stack<std::pair<int, int>> get_path_between(const Vector3i& from, const Vector3i& to);
-
   // Find path between two points
   [[nodiscard]] std::vector<Vector3i> find_path(const Vector3i& from, const Vector3i& to);
 
