@@ -70,6 +70,7 @@ class ActionSystem
                                 const entt::entity entity,
                                 entt::registry& registry);
   bool m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry);
+  bool m_can_build_hut(const uint32_t hut_size, const Vector3i& position);
   std::function<void(const uint32_t)> m_on_select_generic_action
       = [this](const uint32_t i) { m_state = static_cast<ActionMenuState>(i); };
 };

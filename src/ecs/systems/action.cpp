@@ -358,45 +358,8 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
 void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::registry& registry)
 {
   const uint32_t hut_size = 5;
-  bool can_build = true;
 
-  // Check if soil is buildable
-  for (uint32_t j = 0; j < hut_size; ++j)
-  {
-    for (uint32_t i = 0; i < hut_size; ++i)
-    {
-      if (!m_world.is_walkable(tile_position.x + i, tile_position.y + j, tile_position.z))
-      {
-        can_build = false;
-        break;
-      }
-    }
-
-    if (!can_build)
-    {
-      break;
-    }
-  }
-
-  // Check if there's space over the ground to build the hut
-  for (uint32_t j = 0; j < hut_size; ++j)
-  {
-    for (uint32_t i = 0; i < hut_size; ++i)
-    {
-      if (!m_world.is_empty(tile_position.x + i, tile_position.y + j, tile_position.z + 1))
-      {
-        can_build = false;
-        break;
-      }
-    }
-
-    if (!can_build)
-    {
-      break;
-    }
-  }
-
-  if (can_build)
+  if (m_can_build_hut(hut_size, tile_position))
   {
     // TEMP: Build hut structure
     assert(hut_size >= 3);
@@ -476,6 +439,35 @@ void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::regi
     // TODO: Assign build hut job
     m_dispose();
   }
+}
+
+bool ActionSystem::m_can_build_hut(const uint32_t hut_size, const Vector3i& position)
+{
+  // Check if soil is buildable
+  for (uint32_t j = 0; j < hut_size; ++j)
+  {
+    for (uint32_t i = 0; i < hut_size; ++i)
+    {
+      if (!m_world.is_walkable(position.x + i, position.y + j, position.z))
+      {
+        return false;
+      }
+    }
+  }
+
+  // Check if there's space over the ground to build the hut
+  for (uint32_t j = 0; j < hut_size; ++j)
+  {
+    for (uint32_t i = 0; i < hut_size; ++i)
+    {
+      if (!m_world.is_empty(position.x + i, position.y + j, position.z + 1))
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 void ActionSystem::m_create_job(
