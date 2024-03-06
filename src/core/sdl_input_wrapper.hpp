@@ -20,15 +20,17 @@ class SDLInputWrapper
   void update();
   void quit();
 
-  bool is_any_key_down();
-  bool is_key_down(const uint32_t key);
-  bool is_key_up(const uint32_t key);
-  inline std::pair<bool, bool> get_mouse_state_down() { return m_mouse_state_down; };
-  inline std::pair<bool, bool> get_mouse_state_up() { return m_mouse_state_up; };
-  const Vector2i& get_mouse_position() { return m_mouse_position; };
+  bool is_any_key_down() const;
+  bool is_key_down(const uint32_t key) const;
+  bool is_key_up(const uint32_t key) const;
+  bool is_dragging() const { return m_is_dragging; }
+  inline std::pair<bool, bool> get_mouse_state_down() const { return m_mouse_state_down; }
+  inline std::pair<bool, bool> get_mouse_state_up() const { return m_mouse_state_up; }
+  const Vector4i& get_drag_bounds() const { return m_drag_bounds; }
+  const Vector2i& get_mouse_position() const { return m_mouse_position; }
   bool window_size_changed() const { return m_window_size_changed; }
   const Vector2i& get_scroll() const { return m_scroll; }
-  bool should_quit();
+  bool should_quit() const;
   void text_input_start();
   void text_input_stop();
   const std::string& get_text_input() const;
@@ -44,8 +46,10 @@ class SDLInputWrapper
   std::pair<bool, bool> m_mouse_state_up{false, false};
   Vector2i m_mouse_position{0, 0};
   Vector2i m_scroll{0, 0};
+  Vector4i m_drag_bounds{0, 0, 0, 0};
   bool m_window_size_changed = false;
   bool m_capture_text_input = false;
+  bool m_is_dragging = false;
   std::string m_text_input{};
 };
 }  // namespace dl

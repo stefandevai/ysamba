@@ -332,6 +332,12 @@ void SDLInputWrapper::update()
     {
       m_mouse_position.x = event.motion.x;
       m_mouse_position.y = event.motion.y;
+
+      if (m_is_dragging)
+      {
+        m_drag_bounds.z = m_mouse_position.x;
+        m_drag_bounds.w = m_mouse_position.y;
+      }
       break;
     }
 
@@ -344,6 +350,13 @@ void SDLInputWrapper::update()
       else if (event.button.button == SDL_BUTTON_RIGHT)
       {
         m_mouse_state_down.second = true;
+      }
+
+      if (!m_is_dragging)
+      {
+        m_is_dragging = true;
+        m_drag_bounds.x = m_mouse_position.x;
+        m_drag_bounds.y = m_mouse_position.y;
       }
       break;
     }
@@ -359,6 +372,11 @@ void SDLInputWrapper::update()
       {
         m_mouse_state_up.second = true;
         m_mouse_state_down.second = false;
+      }
+
+      if (!m_is_dragging)
+      {
+        m_is_dragging = false;
       }
       break;
     }
@@ -417,13 +435,13 @@ void SDLInputWrapper::update()
 #endif
 }
 
-bool SDLInputWrapper::is_any_key_down() { return m_any_key_down; }
+bool SDLInputWrapper::is_any_key_down() const { return m_any_key_down; }
 
-bool SDLInputWrapper::is_key_down(const uint32_t key) { return m_key_down[key_map.at(key)]; }
+bool SDLInputWrapper::is_key_down(const uint32_t key) const { return m_key_down.at(key_map.at(key)); }
 
-bool SDLInputWrapper::is_key_up(const uint32_t key) { return m_key_up[key_map.at(key)]; }
+bool SDLInputWrapper::is_key_up(const uint32_t key) const { return m_key_up.at(key_map.at(key)); }
 
-bool SDLInputWrapper::should_quit() { return m_should_quit; }
+bool SDLInputWrapper::should_quit() const { return m_should_quit; }
 
 void SDLInputWrapper::quit() { m_should_quit = true; }
 

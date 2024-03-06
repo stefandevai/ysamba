@@ -56,7 +56,7 @@ void InputManager::pop_context()
   m_context_stack.pop_back();
 }
 
-bool InputManager::is_context(const uint32_t key)
+bool InputManager::is_context(const uint32_t key) const
 {
   const auto& current_context = m_context_stack.back();
 
@@ -68,7 +68,7 @@ bool InputManager::is_context(const uint32_t key)
   return true;
 }
 
-bool InputManager::poll_action(const uint32_t action_key)
+bool InputManager::poll_action(const uint32_t action_key) const
 {
   if (m_context_stack.empty())
   {
@@ -95,13 +95,13 @@ bool InputManager::poll_action(const uint32_t action_key)
   return false;
 }
 
-bool InputManager::is_key_down(const uint32_t key) { return m_sdl_input_wrapper.is_key_down(key); }
+bool InputManager::is_key_down(const uint32_t key) const { return m_sdl_input_wrapper.is_key_down(key); }
 
-bool InputManager::is_any_key_down() { return m_sdl_input_wrapper.is_any_key_down(); }
+bool InputManager::is_any_key_down() const { return m_sdl_input_wrapper.is_any_key_down(); }
 
-bool InputManager::is_key_up(const uint32_t key) { return m_sdl_input_wrapper.is_key_up(key); }
+bool InputManager::is_key_up(const uint32_t key) const { return m_sdl_input_wrapper.is_key_up(key); }
 
-bool InputManager::is_clicking(const MouseButton button)
+bool InputManager::is_clicking(const MouseButton button) const
 {
   const auto& mouse_state = m_sdl_input_wrapper.get_mouse_state_down();
 
@@ -117,7 +117,7 @@ bool InputManager::is_clicking(const MouseButton button)
   return false;
 }
 
-bool InputManager::has_clicked(const MouseButton button)
+bool InputManager::has_clicked(const MouseButton button) const
 {
   const auto& mouse_state = m_sdl_input_wrapper.get_mouse_state_up();
 
@@ -133,7 +133,7 @@ bool InputManager::has_clicked(const MouseButton button)
   return false;
 }
 
-bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size)
+bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size) const
 {
   if (has_clicked(button))
   {
@@ -149,9 +149,13 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
   return false;
 }
 
+bool InputManager::is_dragging() const { return m_sdl_input_wrapper.is_dragging(); }
+
+const Vector4i& InputManager::get_drag_bounds() const { return m_sdl_input_wrapper.get_drag_bounds(); }
+
 const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
 
-const std::shared_ptr<InputContext> InputManager::get_current_context()
+const std::shared_ptr<InputContext> InputManager::get_current_context() const
 {
   if (m_context_stack.empty())
   {
@@ -162,7 +166,7 @@ const std::shared_ptr<InputContext> InputManager::get_current_context()
   return m_context_stack.back();
 }
 
-bool InputManager::should_quit() { return m_sdl_input_wrapper.should_quit(); }
+bool InputManager::should_quit() const { return m_sdl_input_wrapper.should_quit(); }
 
 void InputManager::quit() { m_sdl_input_wrapper.quit(); }
 

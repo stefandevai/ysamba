@@ -40,27 +40,29 @@ class InputManager
   void push_context(const uint32_t context_key);
   void pop_context();
 
-  [[nodiscard]] bool is_context(const uint32_t key);
-  [[nodiscard]] bool poll_action(const uint32_t action);
-  [[nodiscard]] bool is_key_down(const uint32_t key);
-  [[nodiscard]] bool is_any_key_down();
-  [[nodiscard]] bool is_key_up(const uint32_t key);
-  [[nodiscard]] bool is_clicking(const MouseButton button);
-  [[nodiscard]] bool has_clicked(const MouseButton button);
-  [[nodiscard]] bool has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size);
+  [[nodiscard]] bool is_context(const uint32_t key) const;
+  [[nodiscard]] bool poll_action(const uint32_t action) const;
+  [[nodiscard]] bool is_key_down(const uint32_t key) const;
+  [[nodiscard]] bool is_any_key_down() const;
+  [[nodiscard]] bool is_key_up(const uint32_t key) const;
+  [[nodiscard]] bool is_clicking(const MouseButton button) const;
+  [[nodiscard]] bool has_clicked(const MouseButton button) const;
+  [[nodiscard]] bool has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size) const;
   [[nodiscard]] bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
   [[nodiscard]] bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
+  [[nodiscard]] bool is_dragging() const;
   [[nodiscard]] const Vector2i& get_scroll() const { return m_sdl_input_wrapper.get_scroll(); }
   [[nodiscard]] const Vector2i& get_mouse_position() const;
-  [[nodiscard]] const std::shared_ptr<InputContext> get_current_context();
+  [[nodiscard]] const Vector4i& get_drag_bounds() const;
+  [[nodiscard]] const std::shared_ptr<InputContext> get_current_context() const;
   [[nodiscard]] bool window_size_changed() const;
   void text_input_start();
   void text_input_stop();
   const std::string& get_text_input() const;
 
-  void set_text_input(const std::string& text);
-  [[nodiscard]] bool should_quit();
+  [[nodiscard]] bool should_quit() const;
   void quit();
+  void set_text_input(const std::string& text);
 
  private:
   static std::unique_ptr<InputManager> m_instance;
