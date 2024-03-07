@@ -21,9 +21,10 @@ class SDLInputWrapper
   void quit();
 
   bool is_any_key_down() const;
-  bool is_key_down(const uint32_t key) const;
-  bool is_key_up(const uint32_t key) const;
+  bool is_key_down(const uint32_t key);
+  bool is_key_up(const uint32_t key);
   bool is_dragging() const { return m_is_dragging; }
+  bool has_dragged() const { return m_has_dragged; }
   inline std::pair<bool, bool> get_mouse_state_down() const { return m_mouse_state_down; }
   inline std::pair<bool, bool> get_mouse_state_up() const { return m_mouse_state_up; }
   const Vector4i& get_drag_bounds() const { return m_drag_bounds; }
@@ -33,6 +34,7 @@ class SDLInputWrapper
   bool should_quit() const;
   void text_input_start();
   void text_input_stop();
+  void reset_drag() { m_has_dragged = false; }
   const std::string& get_text_input() const;
 
   void set_text_input(const std::string& text);
@@ -50,6 +52,7 @@ class SDLInputWrapper
   bool m_window_size_changed = false;
   bool m_capture_text_input = false;
   bool m_is_dragging = false;
+  bool m_has_dragged = false;
   std::string m_text_input{};
 };
 }  // namespace dl

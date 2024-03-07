@@ -68,7 +68,7 @@ bool InputManager::is_context(const uint32_t key) const
   return true;
 }
 
-bool InputManager::poll_action(const uint32_t action_key) const
+bool InputManager::poll_action(const uint32_t action_key)
 {
   if (m_context_stack.empty())
   {
@@ -95,7 +95,7 @@ bool InputManager::poll_action(const uint32_t action_key) const
   return false;
 }
 
-bool InputManager::is_key_down(const uint32_t key) const { return m_sdl_input_wrapper.is_key_down(key); }
+bool InputManager::is_key_down(const uint32_t key) { return m_sdl_input_wrapper.is_key_down(key); }
 
 bool InputManager::is_any_key_down() const { return m_sdl_input_wrapper.is_any_key_down(); }
 
@@ -151,6 +151,8 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
 
 bool InputManager::is_dragging() const { return m_sdl_input_wrapper.is_dragging(); }
 
+bool InputManager::has_dragged() const { return m_sdl_input_wrapper.has_dragged(); }
+
 const Vector4i& InputManager::get_drag_bounds() const { return m_sdl_input_wrapper.get_drag_bounds(); }
 
 const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
@@ -179,6 +181,8 @@ void InputManager::text_input_stop() { m_sdl_input_wrapper.text_input_stop(); }
 const std::string& InputManager::get_text_input() const { return m_sdl_input_wrapper.get_text_input(); }
 
 void InputManager::set_text_input(const std::string& text) { m_sdl_input_wrapper.set_text_input(text); }
+
+void InputManager::reset_drag() { m_sdl_input_wrapper.reset_drag(); }
 
 void InputManager::m_parse_input()
 {

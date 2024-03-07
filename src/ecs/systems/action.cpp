@@ -235,14 +235,14 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
 
   m_show_select_target_text();
 
+  const auto mouse_tile = m_world.mouse_to_world(camera);
+
   if (m_input_manager.poll_action("close_menu"_hs))
   {
     m_dispose();
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
-    const auto mouse_tile = m_world.mouse_to_world(camera);
-
     switch (m_state)
     {
     case ActionMenuState::SelectHarvestTarget:
@@ -267,7 +267,50 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     }
     default:
     {
-      m_dispose();
+      // m_dispose();
+      break;
+    }
+    }
+  }
+  else if (m_input_manager.is_dragging())
+  {
+    const auto& tile_size = m_world.get_tile_size();
+    const auto& drag_bounds = m_input_manager.get_drag_bounds();
+
+    Vector2i area{};
+    area.x = std::abs(drag_bounds.z - drag_bounds.x) / tile_size.x;
+    area.y = std::abs(drag_bounds.w - drag_bounds.y) / tile_size.y;
+
+    switch (m_state)
+    {
+    case ActionMenuState::SelectHutTarget:
+    {
+      m_preview_hut_target(mouse_tile, area, registry);
+      break;
+    }
+    default:
+    {
+      break;
+    }
+    }
+  }
+  else if (m_input_manager.has_dragged())
+  {
+    const auto& tile_size = m_world.get_tile_size();
+    const auto& drag_bounds = m_input_manager.get_drag_bounds();
+
+    const int area_width = std::abs(drag_bounds.z - drag_bounds.x) / tile_size.x;
+    const int area_height = std::abs(drag_bounds.w - drag_bounds.y) / tile_size.y;
+
+    switch (m_state)
+    {
+    case ActionMenuState::SelectHutTarget:
+    {
+      m_select_hut_target(mouse_tile, registry);
+      break;
+    }
+    default:
+    {
       break;
     }
     }
@@ -355,9 +398,102 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
   }
 }
 
+void ActionSystem::m_preview_hut_target(const Vector3i& tile_position, const Vector2i& area, entt::registry& registry)
+{
+  using namespace entt::literals;
+
+  const uint32_t hut_size = std::max(std::max(area.x, area.y), 3);
+
+  for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
+  {
+    registry.destroy(entity);
+  }
+
+  const auto texture_id = m_world.get_texture_id();
+
+  auto add_hut_part = [&registry, texture_id](const uint32_t id, const double x, const double y, const double z) {
+    auto entity = registry.create();
+    registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
+    registry.emplace<Sprite>(entity, Sprite{.id = id, .resource_id = texture_id, .layer_z = 4});
+    registry.emplace<Position>(entity, x, y, z);
+  };
+
+  if (hut_size == 3)
+  {
+    // Perimeter
+    add_hut_part(139, tile_position.x, tile_position.y, tile_position.z);
+    add_hut_part(140, tile_position.x + 1, tile_position.y, tile_position.z);
+    add_hut_part(141, tile_position.x + 2, tile_position.y, tile_position.z);
+    add_hut_part(142, tile_position.x, tile_position.y + 1, tile_position.z);
+    add_hut_part(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
+    add_hut_part(145, tile_position.x, tile_position.y + 2, tile_position.z);
+    add_hut_part(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
+    add_hut_part(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
+
+    // Top
+    add_hut_part(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+  }
+  else if (hut_size == 4)
+  {
+    // Perimeter
+    add_hut_part(149, tile_position.x, tile_position.y, tile_position.z);
+    add_hut_part(155, tile_position.x + 3, tile_position.y, tile_position.z);
+    add_hut_part(152, tile_position.x, tile_position.y + 1, tile_position.z);
+    add_hut_part(153, tile_position.x + 3, tile_position.y + 1, tile_position.z);
+    add_hut_part(175, tile_position.x, tile_position.y + 2, tile_position.z);
+    add_hut_part(181, tile_position.x + 3, tile_position.y + 2, tile_position.z);
+    add_hut_part(182, tile_position.x, tile_position.y + 3, tile_position.z);
+    add_hut_part(183, tile_position.x + 1, tile_position.y + 3, tile_position.z);
+    add_hut_part(187, tile_position.x + 2, tile_position.y + 3, tile_position.z);
+    add_hut_part(188, tile_position.x + 3, tile_position.y + 3, tile_position.z);
+
+    // Top
+    add_hut_part(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+    add_hut_part(154, tile_position.x + 2, tile_position.y + 1, tile_position.z + 1);
+    add_hut_part(169, tile_position.x + 1, tile_position.y + 2, tile_position.z + 1);
+    add_hut_part(173, tile_position.x + 2, tile_position.y + 2, tile_position.z + 1);
+  }
+  else
+  {
+    // Perimeter structure parts
+    add_hut_part(149, tile_position.x, tile_position.y, tile_position.z);
+    add_hut_part(155, tile_position.x + hut_size - 1, tile_position.y, tile_position.z);
+    add_hut_part(156, tile_position.x, tile_position.y + 1, tile_position.z);
+    add_hut_part(159, tile_position.x + hut_size - 1, tile_position.y + 1, tile_position.z);
+
+    add_hut_part(175, tile_position.x, tile_position.y + hut_size - 2, tile_position.z);
+    add_hut_part(181, tile_position.x + hut_size - 1, tile_position.y + hut_size - 2, tile_position.z);
+    add_hut_part(182, tile_position.x, tile_position.y + hut_size - 1, tile_position.z);
+    add_hut_part(183, tile_position.x + 1, tile_position.y + hut_size - 1, tile_position.z);
+    add_hut_part(187, tile_position.x + hut_size - 2, tile_position.y + hut_size - 1, tile_position.z);
+    add_hut_part(188, tile_position.x + hut_size - 1, tile_position.y + hut_size - 1, tile_position.z);
+
+    // Top structure parts
+    add_hut_part(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+    add_hut_part(154, tile_position.x + hut_size - 2, tile_position.y + 1, tile_position.z + 1);
+    add_hut_part(169, tile_position.x + 1, tile_position.y + hut_size - 2, tile_position.z + 1);
+    add_hut_part(173, tile_position.x + hut_size - 2, tile_position.y + hut_size - 2, tile_position.z + 1);
+
+    // Tiled parts
+    for (uint32_t i = 2; i < hut_size - 2; ++i)
+    {
+      // Horizontal structure parts
+      add_hut_part(151, tile_position.x + i, tile_position.y + 1, tile_position.z + 1);
+      add_hut_part(170, tile_position.x + i, tile_position.y + hut_size - 2, tile_position.z + 1);
+      add_hut_part(184, tile_position.x + i, tile_position.y + hut_size - 1, tile_position.z);
+
+      // Vertical structure parts
+      add_hut_part(157, tile_position.x + 1, tile_position.y + i, tile_position.z + 1);
+      add_hut_part(158, tile_position.x + hut_size - 2, tile_position.y + i, tile_position.z + 1);
+      add_hut_part(160, tile_position.x, tile_position.y + i, tile_position.z);
+      add_hut_part(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
+    }
+  }
+}
+
 void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::registry& registry)
 {
-  const uint32_t hut_size = 5;
+  const uint32_t hut_size = 0;
 
   if (m_can_build_hut(hut_size, tile_position))
   {
@@ -443,6 +579,11 @@ void ActionSystem::m_select_hut_target(const Vector3i& tile_position, entt::regi
 
 bool ActionSystem::m_can_build_hut(const uint32_t hut_size, const Vector3i& position)
 {
+  if (hut_size < 3)
+  {
+    return false;
+  }
+
   // Check if soil is buildable
   for (uint32_t j = 0; j < hut_size; ++j)
   {

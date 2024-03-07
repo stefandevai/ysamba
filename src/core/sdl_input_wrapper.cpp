@@ -374,9 +374,10 @@ void SDLInputWrapper::update()
         m_mouse_state_down.second = false;
       }
 
-      if (!m_is_dragging)
+      if (m_is_dragging)
       {
         m_is_dragging = false;
+        m_has_dragged = true;
       }
       break;
     }
@@ -437,9 +438,9 @@ void SDLInputWrapper::update()
 
 bool SDLInputWrapper::is_any_key_down() const { return m_any_key_down; }
 
-bool SDLInputWrapper::is_key_down(const uint32_t key) const { return m_key_down.at(key_map.at(key)); }
+bool SDLInputWrapper::is_key_down(const uint32_t key) { return m_key_down[key_map.at(key)]; }
 
-bool SDLInputWrapper::is_key_up(const uint32_t key) const { return m_key_up.at(key_map.at(key)); }
+bool SDLInputWrapper::is_key_up(const uint32_t key) { return m_key_up[key_map.at(key)]; }
 
 bool SDLInputWrapper::should_quit() const { return m_should_quit; }
 
