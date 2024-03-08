@@ -281,11 +281,16 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     area.x = std::abs(drag_bounds.z - drag_bounds.x) / tile_size.x;
     area.y = std::abs(drag_bounds.w - drag_bounds.y) / tile_size.y;
 
+    Vector3i begin{};
+    begin.x = mouse_tile.x - area.x;
+    begin.y = mouse_tile.y - area.y;
+    begin.z = mouse_tile.z;
+
     switch (m_state)
     {
     case ActionMenuState::SelectHutTarget:
     {
-      m_preview_hut_target(mouse_tile, area, registry);
+      m_preview_hut_target(begin, area, registry);
       break;
     }
     default:
@@ -299,14 +304,20 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     const auto& tile_size = m_world.get_tile_size();
     const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
-    const int area_width = std::abs(drag_bounds.z - drag_bounds.x) / tile_size.x;
-    const int area_height = std::abs(drag_bounds.w - drag_bounds.y) / tile_size.y;
+    Vector2i area{};
+    area.x = std::abs(drag_bounds.z - drag_bounds.x) / tile_size.x;
+    area.y = std::abs(drag_bounds.w - drag_bounds.y) / tile_size.y;
+
+    Vector3i begin{};
+    begin.x = mouse_tile.x - area.x;
+    begin.y = mouse_tile.y - area.y;
+    begin.z = mouse_tile.z;
 
     switch (m_state)
     {
     case ActionMenuState::SelectHutTarget:
     {
-      m_select_hut_target(mouse_tile, registry);
+      m_select_hut_target(begin, registry);
       break;
     }
     default:
