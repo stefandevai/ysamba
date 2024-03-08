@@ -414,7 +414,7 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position, const Vec
   auto add_hut_part = [&registry, texture_id](const uint32_t id, const double x, const double y, const double z) {
     auto entity = registry.create();
     registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
-    registry.emplace<Sprite>(entity, Sprite{.id = id, .resource_id = texture_id, .layer_z = 4});
+    registry.emplace<Sprite>(entity, Sprite{.id = id, .resource_id = texture_id, .layer_z = 4, .category = "tile"});
     registry.emplace<Position>(entity, x, y, z);
   };
 
