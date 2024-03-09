@@ -278,13 +278,34 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
     Vector2i area{};
-    area.x = std::abs(drag_bounds.z - drag_bounds.x) / tile_size.x;
-    area.y = std::abs(drag_bounds.w - drag_bounds.y) / tile_size.y;
+    area.x = std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(tile_size.x));
+    area.y = std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(tile_size.y));
 
-    Vector3i begin{};
-    begin.x = mouse_tile.x - area.x;
-    begin.y = mouse_tile.y - area.y;
-    begin.z = mouse_tile.z;
+    Vector2i direction;
+
+    if (drag_bounds.x <= drag_bounds.z)
+    {
+      direction.x = 0;
+    }
+    else
+    {
+      direction.x = 1;
+    }
+
+    if (drag_bounds.y <= drag_bounds.w)
+    {
+      direction.y = 0;
+    }
+    else
+    {
+      direction.y = 1;
+    }
+
+    Vector3i begin = m_world.screen_to_world(Vector2i{drag_bounds.x, drag_bounds.y}, camera);
+
+    const uint32_t hut_size = std::max(std::max(area.x, area.y), 3);
+    begin.x -= hut_size * direction.x;
+    begin.y -= hut_size * direction.y;
 
     switch (m_state)
     {
@@ -301,6 +322,7 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   }
   else if (m_input_manager.has_dragged())
   {
+    spdlog::debug("HAS DRAGGED");
     const auto& tile_size = m_world.get_tile_size();
     const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
@@ -420,12 +442,41 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position, const Vec
     registry.destroy(entity);
   }
 
+  const auto& tile_size = m_world.get_tile_size();
+
+  // Create area preview
+  // for (uint32_t j = 0; j < hut_size; ++j)
+  // {
+  //   for (uint32_t i = 0; i < hut_size; ++i)
+  //   {
+  //     const auto entity = registry.create();
+  //     registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
+  //     registry.emplace<Position>(entity, tile_position.x + i, tile_position.y + j, tile_position.z);
+  //     auto& quad = registry.emplace<Quad>(entity, tile_size.x, tile_size.y, 0x5588cc88);
+  //     quad.z_index = 4;
+  //   }
+  // }
+
+  // Create hut preview
   const auto texture_id = m_world.get_texture_id();
 
-  auto add_hut_part = [&registry, texture_id](const uint32_t id, const double x, const double y, const double z) {
-    auto entity = registry.create();
+  Color sprite_color{0xFFFFFF99};
+  if (!m_can_build_hut(hut_size, tile_position))
+  {
+    sprite_color = Color{0xFF0000FF};
+  }
+
+  auto add_hut_part = [&registry, &sprite_color, texture_id](const uint32_t id, const double x, const double y, const double z) {
+    const auto entity = registry.create();
     registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
-    registry.emplace<Sprite>(entity, Sprite{.id = id, .resource_id = texture_id, .layer_z = 4, .category = "tile"});
+    const auto sprite = Sprite{
+      .id = id,
+      .resource_id = texture_id,
+      .layer_z = 4,
+      .category = "tile",
+      .color = sprite_color,
+    };
+    registry.emplace<Sprite>(entity, sprite);
     registry.emplace<Position>(entity, x, y, z);
   };
 

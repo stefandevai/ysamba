@@ -287,6 +287,7 @@ void SDLInputWrapper::update()
 
   m_mouse_state_up.first = false;
   m_mouse_state_up.second = false;
+  m_has_dragged = false;
 
   // Update key status
   SDL_Event event;
@@ -357,6 +358,8 @@ void SDLInputWrapper::update()
         m_is_dragging = true;
         m_drag_bounds.x = m_mouse_position.x;
         m_drag_bounds.y = m_mouse_position.y;
+        m_drag_bounds.z = m_mouse_position.x;
+        m_drag_bounds.w = m_mouse_position.y;
       }
       break;
     }

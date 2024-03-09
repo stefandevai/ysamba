@@ -40,35 +40,37 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4f {
   switch(idx)
   {
     case 0: {
-      color = textureSample(textures[0], texture_sampler, in.uv);
+      color = textureSample(textures[0], texture_sampler, in.uv) * in.color;
     }
     case 1: {
-      color = textureSample(textures[1], texture_sampler, in.uv);
+      color = textureSample(textures[1], texture_sampler, in.uv) * in.color;
     }
     case 2: {
-      color = textureSample(textures[2], texture_sampler, in.uv);
+      color = textureSample(textures[2], texture_sampler, in.uv) * in.color;
     }
     case 3: {
-      color = textureSample(textures[3], texture_sampler, in.uv);
+      color = textureSample(textures[3], texture_sampler, in.uv) * in.color;
     }
     case 4: {
-      color = textureSample(textures[4], texture_sampler, in.uv);
+      color = textureSample(textures[4], texture_sampler, in.uv) * in.color;
     }
     case 5: {
-      color = textureSample(textures[5], texture_sampler, in.uv);
+      color = textureSample(textures[5], texture_sampler, in.uv) * in.color;
     }
     case 6: {
-      color = textureSample(textures[6], texture_sampler, in.uv);
+      color = textureSample(textures[6], texture_sampler, in.uv) * in.color;
     }
     case 7: {
-      color = textureSample(textures[7], texture_sampler, in.uv);
+      color = textureSample(textures[7], texture_sampler, in.uv) * in.color;
     }
-    default { }
+    default {
+      color = in.color;
+    }
   }
 
   if (color.a < 0.1) {
     discard;
   }
 
-  return color * in.color;
+  return color;
 }
