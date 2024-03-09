@@ -9,6 +9,7 @@
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -20,6 +21,7 @@
 #include "ui/components/label.hpp"
 #include "ui/compositions/action_menu.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/society/job2.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -152,8 +154,13 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     {
       for (const auto entity : m_selected_entities)
       {
+        const auto job_entity = registry.create();
+        registry.emplace<Target>(job_entity, mouse_tile, 0, 0);
+        registry.emplace<JobData>(job_entity, JobType::Walk);
+
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
+        agent.jobs.push(Job2{0, job_entity});
+        // agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
       }
     }
   }
@@ -241,33 +248,33 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     return;
   }
 
-  switch(m_state)
+  switch (m_state)
   {
-    case ActionMenuState::SelectHarvestTarget:
-    {
-      m_select_harvest_target(camera, registry);
-      break;
-    }
-    case ActionMenuState::SelectBreakTarget:
-    {
-      m_select_break_target(camera, registry);
-      break;
-    }
-    case ActionMenuState::SelectDigTarget:
-    {
-      m_select_dig_target(camera, registry);
-      break;
-    }
-    case ActionMenuState::SelectHutTarget:
-    {
-      m_select_hut_target(camera, registry);
-      break;
-    }
-    default:
-    {
-      m_dispose();
-      break;
-    }
+  case ActionMenuState::SelectHarvestTarget:
+  {
+    m_select_harvest_target(camera, registry);
+    break;
+  }
+  case ActionMenuState::SelectBreakTarget:
+  {
+    m_select_break_target(camera, registry);
+    break;
+  }
+  case ActionMenuState::SelectDigTarget:
+  {
+    m_select_dig_target(camera, registry);
+    break;
+  }
+  case ActionMenuState::SelectHutTarget:
+  {
+    m_select_hut_target(camera, registry);
+    break;
+  }
+  default:
+  {
+    m_dispose();
+    break;
+  }
   }
 }
 
@@ -390,10 +397,8 @@ void ActionSystem::m_select_hut_target(const Camera& camera, entt::registry& reg
   const auto& tile_size = m_world.get_tile_size();
   const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
-  Vector2i area{
-    std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(tile_size.x)),
-    std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(tile_size.y))
-  };
+  Vector2i area{std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(tile_size.x)),
+                std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(tile_size.y))};
 
   const uint32_t hut_size = std::max(std::max(area.x, area.y), 3);
 
@@ -416,7 +421,9 @@ void ActionSystem::m_select_hut_target(const Camera& camera, entt::registry& reg
   }
 }
 
-void ActionSystem::m_preview_hut_target(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry)
+void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
+                                        const uint32_t hut_size,
+                                        entt::registry& registry)
 {
   assert(hut_size >= 3);
 
@@ -433,19 +440,20 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position, const uin
     sprite_color = Color{0xFF0000FF};
   }
 
-  auto add_hut_part = [&registry, &sprite_color, texture_id](const uint32_t id, const double x, const double y, const double z) {
-    const auto entity = registry.create();
-    registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
-    const auto sprite = Sprite{
-      .id = id,
-      .resource_id = texture_id,
-      .layer_z = 4,
-      .category = "tile",
-      .color = sprite_color,
-    };
-    registry.emplace<Sprite>(entity, sprite);
-    registry.emplace<Position>(entity, x, y, z);
-  };
+  auto add_hut_part
+      = [&registry, &sprite_color, texture_id](const uint32_t id, const double x, const double y, const double z) {
+          const auto entity = registry.create();
+          registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
+          const auto sprite = Sprite{
+              .id = id,
+              .resource_id = texture_id,
+              .layer_z = 4,
+              .category = "tile",
+              .color = sprite_color,
+          };
+          registry.emplace<Sprite>(entity, sprite);
+          registry.emplace<Position>(entity, x, y, z);
+        };
 
   if (hut_size == 3)
   {
@@ -648,8 +656,8 @@ void ActionSystem::m_create_job(
     const JobType job_type, const uint32_t id, const Vector3i& position, entt::registry& registry, entt::entity entity)
 {
   auto& agent = registry.get<SocietyAgent>(entity);
-  agent.jobs.push(Job{JobType::Walk, 2, Target{position}});
-  agent.jobs.push(Job{job_type, 2, Target{Vector3i{position}, id}});
+  // agent.jobs.push(Job{JobType::Walk, 2, Target{position}});
+  // agent.jobs.push(Job{job_type, 2, Target{Vector3i{position}, id}});
 }
 
 bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,

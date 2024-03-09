@@ -9,6 +9,7 @@
 #include "ecs/components/action_wear.hpp"
 #include "ecs/components/action_wield.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -18,7 +19,7 @@
 namespace
 {
 template <typename T>
-void check_component(entt::registry& registry, entt::entity entity, const dl::Job* job)
+void check_component(entt::registry& registry, entt::entity entity, const entt::entity job)
 {
   if (!registry.all_of<T>(entity))
   {
@@ -44,64 +45,65 @@ void JobSystem::update(entt::registry& registry, const double delta)
     }
 
     auto& current_job = agent.jobs.top();
+    auto& job_data = registry.get<JobData>(current_job.entity);
 
-    if (current_job.status == JobStatus::Waiting)
+    if (job_data.status == JobStatus2::Waiting)
     {
-      current_job.status = JobStatus::InProgress;
+      job_data.status = JobStatus2::InProgress;
 
-      switch (current_job.type)
+      switch (job_data.type)
       {
       case JobType::Walk:
-        registry.emplace_or_replace<ActionWalk>(entity, &current_job);
+        registry.emplace_or_replace<ActionWalk>(entity, current_job.entity);
         break;
-      case JobType::Pickup:
-        registry.emplace<ActionPickup>(entity, &current_job);
-        break;
-      case JobType::Wear:
-        registry.emplace<ActionWear>(entity, &current_job);
-        break;
-      case JobType::Wield:
-        registry.emplace<ActionWield>(entity, &current_job);
-        break;
-      case JobType::Drop:
-        registry.emplace<ActionDrop>(entity, &current_job);
-        break;
+      // case JobType::Pickup:
+      //   registry.emplace<ActionPickup>(entity, &current_job);
+      //   break;
+      // case JobType::Wear:
+      //   registry.emplace<ActionWear>(entity, &current_job);
+      //   break;
+      // case JobType::Wield:
+      //   registry.emplace<ActionWield>(entity, &current_job);
+      //   break;
+      // case JobType::Drop:
+      //   registry.emplace<ActionDrop>(entity, &current_job);
+      //   break;
       default:
-        m_create_or_assign_job_progress(current_job, registry);
+        // m_create_or_assign_job_progress(current_job, registry);
         break;
       }
     }
-    else if (current_job.status == JobStatus::InProgress)
+    else if (job_data.status == JobStatus2::InProgress)
     {
-      switch (current_job.type)
+      switch (job_data.type)
       {
       case JobType::Walk:
-        check_component<ActionWalk>(registry, entity, &current_job);
+        check_component<ActionWalk>(registry, entity, current_job.entity);
         break;
-      case JobType::Pickup:
-        check_component<ActionPickup>(registry, entity, &current_job);
-        break;
-      case JobType::Wear:
-        check_component<ActionWear>(registry, entity, &current_job);
-        break;
-      case JobType::Wield:
-        check_component<ActionWield>(registry, entity, &current_job);
-        break;
-      case JobType::Drop:
-        check_component<ActionDrop>(registry, entity, &current_job);
-        break;
-      case JobType::Harvest:
-      case JobType::Break:
-      case JobType::Dig:
-      case JobType::PrepareFirecamp:
-      case JobType::StartFire:
-        m_update_tile_job(current_job, delta, entity, registry);
-        break;
+      // case JobType::Pickup:
+      //   check_component<ActionPickup>(registry, entity, &current_job);
+      //   break;
+      // case JobType::Wear:
+      //   check_component<ActionWear>(registry, entity, &current_job);
+      //   break;
+      // case JobType::Wield:
+      //   check_component<ActionWield>(registry, entity, &current_job);
+      //   break;
+      // case JobType::Drop:
+      //   check_component<ActionDrop>(registry, entity, &current_job);
+      //   break;
+      // case JobType::Harvest:
+      // case JobType::Break:
+      // case JobType::Dig:
+      // case JobType::PrepareFirecamp:
+      // case JobType::StartFire:
+      //   m_update_tile_job(current_job, delta, entity, registry);
+      //   break;
       default:
         break;
       }
     }
-    if (current_job.status == JobStatus::Finished)
+    if (job_data.status == JobStatus2::Finished)
     {
       agent.jobs.pop();
     }

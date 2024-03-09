@@ -267,8 +267,8 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
     const auto mouse_tile = m_world.mouse_to_world(camera);
 
     auto& agent = registry.get<SocietyAgent>(m_selected_entity);
-    agent.jobs.push(Job{JobType::Walk, 2, Target{mouse_tile}});
-    agent.jobs.push(Job{JobType::Drop, 2, Target{mouse_tile, static_cast<uint32_t>(m_target_item)}});
+    // agent.jobs.push(Job{JobType::Walk, 2, Target{mouse_tile}});
+    // agent.jobs.push(Job{JobType::Drop, 2, Target{mouse_tile, static_cast<uint32_t>(m_target_item)}});
 
     m_dispose();
   }
@@ -325,8 +325,8 @@ void DropSystem::m_create_job(
     const JobType job_type, const uint32_t id, const Vector2i& position, entt::registry& registry, entt::entity entity)
 {
   auto& agent = registry.get<SocietyAgent>(entity);
-  agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{position.x, position.y, 0}}});
-  agent.jobs.push(Job{job_type, 2, Target{Vector3i{position.x, position.y, 0}, id}});
+  // agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{position.x, position.y, 0}}});
+  // agent.jobs.push(Job{job_type, 2, Target{Vector3i{position.x, position.y, 0}, id}});
 }
 
 }  // namespace dl

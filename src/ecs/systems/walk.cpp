@@ -5,9 +5,11 @@
 #include "config.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/action_walk.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/movement.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/walk_path.hpp"
+#include "world/target.hpp"
 #include "world/world.hpp"
 
 namespace
@@ -25,13 +27,13 @@ void add_movement_component(entt::registry& registry, entt::entity entity)
 
 namespace dl
 {
-const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
   registry.remove<ActionWalk>(entity);
   registry.remove<WalkPath>(entity);
   registry.remove<Movement>(entity);
 
-  assert(job != nullptr);
-  job->status = JobStatus::Finished;
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus2::Finished;
 };
 
 WalkSystem::WalkSystem(World& world, entt::registry& registry) : m_world(world)
@@ -46,10 +48,8 @@ void WalkSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_walk = registry.get<ActionWalk>(entity);
-    const auto job = action_walk.job;
 
-    assert(job != nullptr);
-    const auto& target = job->target;
+    const auto& target = registry.get<Target>(action_walk.job);
     const auto& position = registry.get<Position>(entity);
     auto& movement = registry.get<Movement>(entity);
 
@@ -67,7 +67,7 @@ void WalkSystem::update(entt::registry& registry)
     // If the entity collided a certain number of times in a row, stop walking
     if (movement.retries > config::pathfinding::tries_after_collision)
     {
-      stop_walk(registry, entity, job);
+      stop_walk(registry, entity, action_walk.job);
       continue;
     }
 
@@ -86,7 +86,7 @@ void WalkSystem::update(entt::registry& registry)
       // If the target path is empty, that means that the target disappeared.
       if (walk_path.steps.empty())
       {
-        stop_walk(registry, entity, job);
+        stop_walk(registry, entity, action_walk.job);
         continue;
       }
 
@@ -109,7 +109,7 @@ void WalkSystem::update(entt::registry& registry)
       continue;
     }
 
-    stop_walk(registry, entity, job);
+    stop_walk(registry, entity, action_walk.job);
   }
 }
 
