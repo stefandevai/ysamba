@@ -18,7 +18,7 @@ namespace dl
 {
 const auto stop_pickup = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
   auto& job_data = registry.get<JobData>(job);
-  job_data.status = JobStatus2::Finished;
+  job_data.status = JobStatus::Finished;
   registry.remove<ActionPickup>(entity);
 };
 

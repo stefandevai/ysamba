@@ -1,36 +1,19 @@
 #pragma once
 
-#include <cstdint>
-#include <entt/entity/registry.hpp>
-
-#include "./job_type.hpp"
-#include "core/maths/vector.hpp"
-#include "world/target.hpp"
+#include <entt/entity/entity.hpp>
 
 namespace dl
 {
-enum class JobStatus
+struct Job
 {
-  Waiting,
-  InProgress,
-  Finished,
-};
-
-class Job
-{
- public:
-  JobType type;
   int priority = 0;
-  Target target;
-  mutable double time_left = 0.05;
-  mutable entt::entity progress_entity = entt::null;
-  mutable JobStatus status = JobStatus::Waiting;
   int insertion_index = 0;
   static int current_index;
+  entt::entity entity = entt::null;
 
   Job() = default;
 
-  Job(const JobType type, const int priority, const Target& target) : type(type), priority(priority), target(target)
+  Job(const int priority, const entt::entity entity) : priority(priority), entity(entity)
   {
     insertion_index = ++current_index;
   }
@@ -48,6 +31,6 @@ class Job
 template <typename Archive>
 void serialize(Archive& archive, Job& job)
 {
-  archive(job.type, job.priority, job.target, job.time_left, job.status, job.insertion_index);
+  archive(job.priority, job.insertion_index, job.entity, job.current_index);
 }
 }  // namespace dl

@@ -21,7 +21,7 @@
 #include "ui/components/label.hpp"
 #include "ui/compositions/action_menu.hpp"
 #include "ui/ui_manager.hpp"
-#include "world/society/job2.hpp"
+#include "world/society/job.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -159,7 +159,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
         registry.emplace<JobData>(job_entity, JobType::Walk);
 
         auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job2{0, job_entity});
+        agent.jobs.push(Job{0, job_entity});
       }
     }
   }
@@ -663,8 +663,8 @@ void ActionSystem::m_create_job(
   registry.emplace<JobData>(main_job, job_type);
 
   auto& agent = registry.get<SocietyAgent>(entity);
-  agent.jobs.push(Job2{2, walk_job});
-  agent.jobs.push(Job2{2, main_job});
+  agent.jobs.push(Job{2, walk_job});
+  agent.jobs.push(Job{2, main_job});
 }
 
 bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,

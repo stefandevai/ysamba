@@ -26,7 +26,7 @@ namespace dl
 {
 const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
   auto& job_data = registry.get<JobData>(job);
-  job_data.status = JobStatus2::Finished;
+  job_data.status = JobStatus::Finished;
   registry.remove<ActionDrop>(entity);
 };
 
@@ -277,8 +277,8 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
     registry.emplace<JobData>(drop_job, JobType::Drop);
 
     auto& agent = registry.get<SocietyAgent>(m_selected_entity);
-    agent.jobs.push(Job2{2, walk_job});
-    agent.jobs.push(Job2{2, drop_job});
+    agent.jobs.push(Job{2, walk_job});
+    agent.jobs.push(Job{2, drop_job});
 
     m_dispose();
   }

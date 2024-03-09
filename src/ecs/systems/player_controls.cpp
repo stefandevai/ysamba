@@ -10,7 +10,7 @@
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "world/society/job2.hpp"
+#include "world/society/job.hpp"
 #include "world/target.hpp"
 
 namespace dl
@@ -20,7 +20,7 @@ void walk(entt::registry& registry, SocietyAgent& agent, const Vector3i target)
   const auto job_entity = registry.create();
   registry.emplace<Target>(job_entity, std::move(target), 0, 0);
   registry.emplace<JobData>(job_entity, JobType::Walk);
-  agent.jobs.push(Job2{0, job_entity});
+  agent.jobs.push(Job{0, job_entity});
 }
 
 PlayerControlsSystem::PlayerControlsSystem(EventEmitter& event_emitter) : m_event_emitter(event_emitter) {}

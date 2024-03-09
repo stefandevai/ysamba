@@ -5,7 +5,8 @@
 
 #include "core/input_manager.hpp"
 #include "ui/types.hpp"
-#include "world/society/job.hpp"
+#include "world/society/job_type.hpp"
+#include "world/target.hpp"
 
 namespace dl::ui
 {

@@ -2,7 +2,6 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "world/society/job.hpp"
 #include "world/world.hpp"
 
 namespace dl

@@ -15,6 +15,7 @@
 #include "ecs/components/society_agent.hpp"
 #include "ecs/components/sprite.hpp"
 #include "graphics/frame_data_types.hpp"
+#include "world/target.hpp"
 
 namespace
 {
@@ -47,9 +48,9 @@ void JobSystem::update(entt::registry& registry, const double delta)
     auto& current_job = agent.jobs.top();
     auto& job_data = registry.get<JobData>(current_job.entity);
 
-    if (job_data.status == JobStatus2::Waiting)
+    if (job_data.status == JobStatus::Waiting)
     {
-      job_data.status = JobStatus2::InProgress;
+      job_data.status = JobStatus::InProgress;
 
       switch (job_data.type)
       {
@@ -73,7 +74,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
         break;
       }
     }
-    else if (job_data.status == JobStatus2::InProgress)
+    else if (job_data.status == JobStatus::InProgress)
     {
       switch (job_data.type)
       {
@@ -100,11 +101,11 @@ void JobSystem::update(entt::registry& registry, const double delta)
         m_update_tile_job(current_job.entity, delta, entity, registry);
         break;
       default:
-        job_data.status = JobStatus2::Finished;
+        job_data.status = JobStatus::Finished;
         break;
       }
     }
-    if (job_data.status == JobStatus2::Finished)
+    if (job_data.status == JobStatus::Finished)
     {
       agent.jobs.pop();
     }
@@ -118,14 +119,14 @@ void JobSystem::m_update_tile_job(const entt::entity job,
 {
   auto& job_data = registry.get<JobData>(job);
 
-  if (job_data.status != JobStatus2::InProgress)
+  if (job_data.status != JobStatus::InProgress)
   {
     return;
   }
 
   if (!registry.valid(job_data.progress_entity))
   {
-    job_data.status = JobStatus2::Finished;
+    job_data.status = JobStatus::Finished;
     return;
   }
 
@@ -137,7 +138,7 @@ void JobSystem::m_update_tile_job(const entt::entity job,
   {
     const auto& target = registry.get<Target>(job);
 
-    job_data.status = JobStatus2::Finished;
+    job_data.status = JobStatus::Finished;
     registry.destroy(job_data.progress_entity);
 
     const auto& tile = m_world.get(target.position.x, target.position.y, target.position.z);

@@ -6,7 +6,7 @@
 
 namespace dl
 {
-enum class JobStatus2
+enum class JobStatus
 {
   Waiting,
   InProgress,
@@ -16,7 +16,7 @@ enum class JobStatus2
 struct JobData
 {
   JobType type;
-  JobStatus2 status = JobStatus2::Waiting;
+  JobStatus status = JobStatus::Waiting;
   entt::entity progress_entity = entt::null;
 };
 
