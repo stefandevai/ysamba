@@ -195,6 +195,7 @@ void Gameplay::m_update_action_systems()
 {
   m_action_system.update(m_registry, m_camera);
   m_pickup_system.update(m_registry);
+  m_build_hut_system.update(m_registry);
   m_wear_system.update(m_registry);
   m_wield_system.update(m_registry);
   m_inspector_system.update(m_registry, m_camera);

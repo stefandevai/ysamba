@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "constants.hpp"
+#include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/action_drop.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_walk.hpp"
@@ -69,6 +70,9 @@ void JobSystem::update(entt::registry& registry, const double delta)
       case JobType::Drop:
         registry.emplace<ActionDrop>(entity, current_job.entity);
         break;
+      case JobType::BuildHut:
+        registry.emplace<ActionBuildHut>(entity, current_job.entity);
+        break;
       default:
         m_create_or_assign_job_progress(current_job.entity, registry);
         break;
@@ -92,6 +96,9 @@ void JobSystem::update(entt::registry& registry, const double delta)
         break;
       case JobType::Drop:
         check_component<ActionDrop>(registry, entity, current_job.entity);
+        break;
+      case JobType::BuildHut:
+        check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
       case JobType::Break:

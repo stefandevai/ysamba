@@ -10,6 +10,7 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/job_data.hpp"
+#include "ecs/components/job_data_build_hut.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -100,11 +101,6 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
   if (m_input_manager.poll_action("open_action_menu"_hs))
   {
-    if (m_selected_entities.empty())
-    {
-      return;
-    }
-
     m_action_menu->set_actions(m_menu_items);
     m_action_menu->set_on_select(m_on_select_generic_action);
     m_input_manager.push_context("action_menu"_hs);
@@ -529,91 +525,105 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
 
 void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry)
 {
-  for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
-  {
-    registry.destroy(entity);
-  }
-
   if (!m_can_build_hut(hut_size, tile_position))
   {
+    for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
+    {
+      registry.destroy(entity);
+    }
     return;
   }
 
-  assert(hut_size >= 3);
+  // assert(hut_size >= 3);
+  //
+  // if (hut_size == 3)
+  // {
+  //   // Perimeter
+  //   m_world.set_decoration(139, tile_position.x, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(140, tile_position.x + 1, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(141, tile_position.x + 2, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(142, tile_position.x, tile_position.y + 1, tile_position.z);
+  //   m_world.set_decoration(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
+  //   m_world.set_decoration(145, tile_position.x, tile_position.y + 2, tile_position.z);
+  //   m_world.set_decoration(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
+  //   m_world.set_decoration(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
+  //
+  //   // Top
+  //   m_world.set_decoration(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+  // }
+  // else if (hut_size == 4)
+  // {
+  //   // Perimeter
+  //   m_world.set_decoration(149, tile_position.x, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(155, tile_position.x + 3, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(152, tile_position.x, tile_position.y + 1, tile_position.z);
+  //   m_world.set_decoration(153, tile_position.x + 3, tile_position.y + 1, tile_position.z);
+  //   m_world.set_decoration(175, tile_position.x, tile_position.y + 2, tile_position.z);
+  //   m_world.set_decoration(181, tile_position.x + 3, tile_position.y + 2, tile_position.z);
+  //   m_world.set_decoration(182, tile_position.x, tile_position.y + 3, tile_position.z);
+  //   m_world.set_decoration(183, tile_position.x + 1, tile_position.y + 3, tile_position.z);
+  //   m_world.set_decoration(187, tile_position.x + 2, tile_position.y + 3, tile_position.z);
+  //   m_world.set_decoration(188, tile_position.x + 3, tile_position.y + 3, tile_position.z);
+  //
+  //   // Top
+  //   m_world.set_decoration(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+  //   m_world.set_decoration(154, tile_position.x + 2, tile_position.y + 1, tile_position.z + 1);
+  //   m_world.set_decoration(169, tile_position.x + 1, tile_position.y + 2, tile_position.z + 1);
+  //   m_world.set_decoration(173, tile_position.x + 2, tile_position.y + 2, tile_position.z + 1);
+  // }
+  // else
+  // {
+  //   // Perimeter structure parts
+  //   m_world.set_decoration(149, tile_position.x, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(155, tile_position.x + hut_size - 1, tile_position.y, tile_position.z);
+  //   m_world.set_decoration(156, tile_position.x, tile_position.y + 1, tile_position.z);
+  //   m_world.set_decoration(159, tile_position.x + hut_size - 1, tile_position.y + 1, tile_position.z);
+  //
+  //   m_world.set_decoration(175, tile_position.x, tile_position.y + hut_size - 2, tile_position.z);
+  //   m_world.set_decoration(181, tile_position.x + hut_size - 1, tile_position.y + hut_size - 2, tile_position.z);
+  //   m_world.set_decoration(182, tile_position.x, tile_position.y + hut_size - 1, tile_position.z);
+  //   m_world.set_decoration(183, tile_position.x + 1, tile_position.y + hut_size - 1, tile_position.z);
+  //   m_world.set_decoration(187, tile_position.x + hut_size - 2, tile_position.y + hut_size - 1, tile_position.z);
+  //   m_world.set_decoration(188, tile_position.x + hut_size - 1, tile_position.y + hut_size - 1, tile_position.z);
+  //
+  //   // Top structure parts
+  //   m_world.set_decoration(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
+  //   m_world.set_decoration(154, tile_position.x + hut_size - 2, tile_position.y + 1, tile_position.z + 1);
+  //   m_world.set_decoration(169, tile_position.x + 1, tile_position.y + hut_size - 2, tile_position.z + 1);
+  //   m_world.set_decoration(173, tile_position.x + hut_size - 2, tile_position.y + hut_size - 2, tile_position.z + 1);
+  //
+  //   // Tiled parts
+  //   for (uint32_t i = 2; i < hut_size - 2; ++i)
+  //   {
+  //     // Horizontal structure parts
+  //     m_world.set_decoration(151, tile_position.x + i, tile_position.y + 1, tile_position.z + 1);
+  //     m_world.set_decoration(170, tile_position.x + i, tile_position.y + hut_size - 2, tile_position.z + 1);
+  //     m_world.set_decoration(184, tile_position.x + i, tile_position.y + hut_size - 1, tile_position.z);
+  //
+  //     // Vertical structure parts
+  //     m_world.set_decoration(157, tile_position.x + 1, tile_position.y + i, tile_position.z + 1);
+  //     m_world.set_decoration(158, tile_position.x + hut_size - 2, tile_position.y + i, tile_position.z + 1);
+  //     m_world.set_decoration(160, tile_position.x, tile_position.y + i, tile_position.z);
+  //     m_world.set_decoration(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
+  //   }
+  // }
 
-  if (hut_size == 3)
+  for (auto entity : m_selected_entities)
   {
-    // Perimeter
-    m_world.set_decoration(139, tile_position.x, tile_position.y, tile_position.z);
-    m_world.set_decoration(140, tile_position.x + 1, tile_position.y, tile_position.z);
-    m_world.set_decoration(141, tile_position.x + 2, tile_position.y, tile_position.z);
-    m_world.set_decoration(142, tile_position.x, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(145, tile_position.x, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
+    const auto walk_job = registry.create();
+    registry.emplace<Target>(walk_job, tile_position);
+    registry.emplace<JobData>(walk_job, JobType::Walk);
 
-    // Top
-    m_world.set_decoration(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
-  }
-  else if (hut_size == 4)
-  {
-    // Perimeter
-    m_world.set_decoration(149, tile_position.x, tile_position.y, tile_position.z);
-    m_world.set_decoration(155, tile_position.x + 3, tile_position.y, tile_position.z);
-    m_world.set_decoration(152, tile_position.x, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(153, tile_position.x + 3, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(175, tile_position.x, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(181, tile_position.x + 3, tile_position.y + 2, tile_position.z);
-    m_world.set_decoration(182, tile_position.x, tile_position.y + 3, tile_position.z);
-    m_world.set_decoration(183, tile_position.x + 1, tile_position.y + 3, tile_position.z);
-    m_world.set_decoration(187, tile_position.x + 2, tile_position.y + 3, tile_position.z);
-    m_world.set_decoration(188, tile_position.x + 3, tile_position.y + 3, tile_position.z);
+    const auto build_hut_job = registry.create();
+    registry.emplace<Target>(build_hut_job, tile_position);
+    registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
+    registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
 
-    // Top
-    m_world.set_decoration(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
-    m_world.set_decoration(154, tile_position.x + 2, tile_position.y + 1, tile_position.z + 1);
-    m_world.set_decoration(169, tile_position.x + 1, tile_position.y + 2, tile_position.z + 1);
-    m_world.set_decoration(173, tile_position.x + 2, tile_position.y + 2, tile_position.z + 1);
-  }
-  else
-  {
-    // Perimeter structure parts
-    m_world.set_decoration(149, tile_position.x, tile_position.y, tile_position.z);
-    m_world.set_decoration(155, tile_position.x + hut_size - 1, tile_position.y, tile_position.z);
-    m_world.set_decoration(156, tile_position.x, tile_position.y + 1, tile_position.z);
-    m_world.set_decoration(159, tile_position.x + hut_size - 1, tile_position.y + 1, tile_position.z);
-
-    m_world.set_decoration(175, tile_position.x, tile_position.y + hut_size - 2, tile_position.z);
-    m_world.set_decoration(181, tile_position.x + hut_size - 1, tile_position.y + hut_size - 2, tile_position.z);
-    m_world.set_decoration(182, tile_position.x, tile_position.y + hut_size - 1, tile_position.z);
-    m_world.set_decoration(183, tile_position.x + 1, tile_position.y + hut_size - 1, tile_position.z);
-    m_world.set_decoration(187, tile_position.x + hut_size - 2, tile_position.y + hut_size - 1, tile_position.z);
-    m_world.set_decoration(188, tile_position.x + hut_size - 1, tile_position.y + hut_size - 1, tile_position.z);
-
-    // Top structure parts
-    m_world.set_decoration(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
-    m_world.set_decoration(154, tile_position.x + hut_size - 2, tile_position.y + 1, tile_position.z + 1);
-    m_world.set_decoration(169, tile_position.x + 1, tile_position.y + hut_size - 2, tile_position.z + 1);
-    m_world.set_decoration(173, tile_position.x + hut_size - 2, tile_position.y + hut_size - 2, tile_position.z + 1);
-
-    // Tiled parts
-    for (uint32_t i = 2; i < hut_size - 2; ++i)
-    {
-      // Horizontal structure parts
-      m_world.set_decoration(151, tile_position.x + i, tile_position.y + 1, tile_position.z + 1);
-      m_world.set_decoration(170, tile_position.x + i, tile_position.y + hut_size - 2, tile_position.z + 1);
-      m_world.set_decoration(184, tile_position.x + i, tile_position.y + hut_size - 1, tile_position.z);
-
-      // Vertical structure parts
-      m_world.set_decoration(157, tile_position.x + 1, tile_position.y + i, tile_position.z + 1);
-      m_world.set_decoration(158, tile_position.x + hut_size - 2, tile_position.y + i, tile_position.z + 1);
-      m_world.set_decoration(160, tile_position.x, tile_position.y + i, tile_position.z);
-      m_world.set_decoration(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
-    }
+    auto& agent = registry.get<SocietyAgent>(entity);
+    agent.jobs.push(Job{2, walk_job});
+    agent.jobs.push(Job{2, build_hut_job});
   }
 
-  // TODO: Assign build hut job
   m_dispose();
 }
 

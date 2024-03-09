@@ -7,6 +7,7 @@
 #include "core/events/emitter.hpp"
 #include "core/input_manager.hpp"
 #include "ecs/systems/action.hpp"
+#include "ecs/systems/build_hut.hpp"
 #include "ecs/systems/drop.hpp"
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/inspector.hpp"
@@ -65,6 +66,7 @@ class Gameplay : public Scene
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter};
   PickupSystem m_pickup_system{m_world};
+  BuildHutSystem m_build_hut_system{m_world};
   WalkSystem m_walk_system{m_world, m_registry};
   JobSystem m_job_system{m_world};
   InventorySystem m_inventory_system{m_world, m_ui_manager};
