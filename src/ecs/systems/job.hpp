@@ -17,7 +17,10 @@ class JobSystem
  private:
   World& m_world;
 
-  void m_update_tile_job(const Job& job, const double delta, const entt::entity agent, entt::registry& registry);
-  void m_create_or_assign_job_progress(const Job& job, entt::registry& registry);
+  void m_update_tile_job(const entt::entity job,
+                         const double delta,
+                         const entt::entity agent,
+                         entt::registry& registry);
+  void m_create_or_assign_job_progress(const entt::entity job, entt::registry& registry);
 };
 }  // namespace dl

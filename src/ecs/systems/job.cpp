@@ -69,7 +69,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
         registry.emplace<ActionDrop>(entity, current_job.entity);
         break;
       default:
-        // m_create_or_assign_job_progress(current_job, registry);
+        m_create_or_assign_job_progress(current_job.entity, registry);
         break;
       }
     }
@@ -92,13 +92,13 @@ void JobSystem::update(entt::registry& registry, const double delta)
       case JobType::Drop:
         check_component<ActionDrop>(registry, entity, current_job.entity);
         break;
-      // case JobType::Harvest:
-      // case JobType::Break:
-      // case JobType::Dig:
-      // case JobType::PrepareFirecamp:
-      // case JobType::StartFire:
-      //   m_update_tile_job(current_job, delta, entity, registry);
-      //   break;
+      case JobType::Harvest:
+      case JobType::Break:
+      case JobType::Dig:
+      case JobType::PrepareFirecamp:
+      case JobType::StartFire:
+        m_update_tile_job(current_job.entity, delta, entity, registry);
+        break;
       default:
         job_data.status = JobStatus2::Finished;
         break;
@@ -111,42 +111,46 @@ void JobSystem::update(entt::registry& registry, const double delta)
   }
 }
 
-void JobSystem::m_update_tile_job(const Job& job,
+void JobSystem::m_update_tile_job(const entt::entity job,
                                   const double delta,
                                   const entt::entity agent,
                                   entt::registry& registry)
 {
-  if (job.status != JobStatus::InProgress)
+  auto& job_data = registry.get<JobData>(job);
+
+  if (job_data.status != JobStatus2::InProgress)
   {
     return;
   }
 
-  if (!registry.valid(job.progress_entity))
+  if (!registry.valid(job_data.progress_entity))
   {
-    job.status = JobStatus::Finished;
+    job_data.status = JobStatus2::Finished;
     return;
   }
 
-  auto& job_progress = registry.get<JobProgress>(job.progress_entity);
+  auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
 
   job_progress.time_left -= delta;
 
   if (job_progress.time_left < 0.0)
   {
-    job.status = JobStatus::Finished;
-    registry.destroy(job.progress_entity);
+    const auto& target = registry.get<Target>(job);
 
-    const auto& tile = m_world.get(job.target.position.x, job.target.position.y, job.target.position.z);
+    job_data.status = JobStatus2::Finished;
+    registry.destroy(job_data.progress_entity);
+
+    const auto& tile = m_world.get(target.position.x, target.position.y, target.position.z);
 
     // Check if target tile is still there
-    if (tile.id != job.target.id)
+    if (tile.id != target.id)
     {
       return;
     }
 
     const auto& tile_data = m_world.get_tile_data(tile.id);
-    const auto& action = tile_data.actions.at(job.type);
-    const auto& target_position = job.target.position;
+    const auto& action = tile_data.actions.at(job_data.type);
+    const auto& target_position = target.position;
 
     m_world.replace(tile.id, action.turns_into, target_position.x, target_position.y, target_position.z);
 
@@ -185,30 +189,31 @@ void JobSystem::m_update_tile_job(const Job& job,
   }
 }
 
-void JobSystem::m_create_or_assign_job_progress(const Job& job, entt::registry& registry)
+void JobSystem::m_create_or_assign_job_progress(const entt::entity job, entt::registry& registry)
 {
-  const auto& target_position = job.target.position;
+  auto& job_data = registry.get<JobData>(job);
+  const auto& target = registry.get<Target>(job);
   const auto existing_entity = m_world.spatial_hash.get_by_component<JobProgress>(
-      target_position.x, target_position.y, target_position.z, registry);
+      target.position.x, target.position.y, target.position.z, registry);
 
   if (registry.valid(existing_entity))
   {
     const auto& job_progress = registry.get<JobProgress>(existing_entity);
-    if (job_progress.type == job.type)
+    if (job_progress.type == job_data.type)
     {
-      job.progress_entity = existing_entity;
+      job_data.progress_entity = existing_entity;
     }
   }
   else
   {
     const auto entity = registry.create();
-    registry.emplace<JobProgress>(entity, job.type, 0.1);
+    registry.emplace<JobProgress>(entity, job_data.type, 0.1);
     registry.emplace<Position>(entity,
-                               static_cast<double>(target_position.x),
-                               static_cast<double>(target_position.y),
-                               static_cast<double>(target_position.z));
+                               static_cast<double>(target.position.x),
+                               static_cast<double>(target.position.y),
+                               static_cast<double>(target.position.z));
 
-    job.progress_entity = entity;
+    job_data.progress_entity = entity;
   }
 }
 

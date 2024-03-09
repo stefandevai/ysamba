@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entt/entity/entity.hpp>
+
 #include "world/society/job_type.hpp"
 
 namespace dl
@@ -15,6 +17,7 @@ struct JobData
 {
   JobType type;
   JobStatus2 status = JobStatus2::Waiting;
+  entt::entity progress_entity = entt::null;
 };
 
 template <typename Archive>
