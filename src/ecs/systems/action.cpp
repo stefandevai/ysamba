@@ -160,7 +160,6 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
         auto& agent = registry.get<SocietyAgent>(entity);
         agent.jobs.push(Job2{0, job_entity});
-        // agent.jobs.push(Job{JobType::Walk, 0, Target{mouse_tile, 0, 0}});
       }
     }
   }
@@ -655,9 +654,17 @@ bool ActionSystem::m_can_build_hut(const uint32_t hut_size, const Vector3i& posi
 void ActionSystem::m_create_job(
     const JobType job_type, const uint32_t id, const Vector3i& position, entt::registry& registry, entt::entity entity)
 {
+  const auto walk_job = registry.create();
+  registry.emplace<Target>(walk_job, position);
+  registry.emplace<JobData>(walk_job, JobType::Walk);
+
+  const auto main_job = registry.create();
+  registry.emplace<Target>(main_job, position, id);
+  registry.emplace<JobData>(main_job, job_type);
+
   auto& agent = registry.get<SocietyAgent>(entity);
-  // agent.jobs.push(Job{JobType::Walk, 2, Target{position}});
-  // agent.jobs.push(Job{job_type, 2, Target{Vector3i{position}, id}});
+  agent.jobs.push(Job2{2, walk_job});
+  agent.jobs.push(Job2{2, main_job});
 }
 
 bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,

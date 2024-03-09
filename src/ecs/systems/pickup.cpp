@@ -6,17 +6,20 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/sprite.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
+#include "world/target.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-const auto stop_pickup = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_pickup = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus2::Finished;
   registry.remove<ActionPickup>(entity);
-  job->status = JobStatus::Finished;
 };
 
 PickupSystem::PickupSystem(World& world) : m_world(world) {}
@@ -27,20 +30,19 @@ void PickupSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_pickup = registry.get<ActionPickup>(entity);
-    const auto& job = action_pickup.job;
-    const auto& target = job->target;
+    const auto& target = registry.get<Target>(action_pickup.job);
     const entt::entity item = static_cast<entt::entity>(target.id);
 
     if (!registry.valid(item))
     {
-      stop_pickup(registry, entity, job);
+      stop_pickup(registry, entity, action_pickup.job);
       continue;
     }
 
     // Check if target tile is still there
     if (!m_world.spatial_hash.has(item, target.position.x, target.position.y, target.position.z))
     {
-      stop_pickup(registry, entity, job);
+      stop_pickup(registry, entity, action_pickup.job);
       continue;
     }
 
@@ -51,7 +53,7 @@ void PickupSystem::update(entt::registry& registry)
 
     if (!registry.valid(container_entity))
     {
-      stop_pickup(registry, entity, job);
+      stop_pickup(registry, entity, action_pickup.job);
       continue;
     }
 
@@ -73,7 +75,7 @@ void PickupSystem::update(entt::registry& registry)
       {
         // Should not get here
         spdlog::warn("Could not pickup item in wield slot");
-        stop_pickup(registry, entity, job);
+        stop_pickup(registry, entity, action_pickup.job);
         continue;
       }
     }
@@ -97,13 +99,13 @@ void PickupSystem::update(entt::registry& registry)
     {
       // Should not get here
       spdlog::warn("Could not pickup item in any slot");
-      stop_pickup(registry, entity, job);
+      stop_pickup(registry, entity, action_pickup.job);
       continue;
     }
 
     registry.remove<Position>(item);
     registry.remove<Sprite>(item);
-    stop_pickup(registry, entity, job);
+    stop_pickup(registry, entity, action_pickup.job);
   }
 }
 

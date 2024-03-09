@@ -5,15 +5,18 @@
 #include "ecs/components/action_wield.hpp"
 #include "ecs/components/biology.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/wielded_items.hpp"
+#include "world/target.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-const auto stop_wield = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_wield = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus2::Finished;
   registry.remove<ActionWield>(entity);
-  job->status = JobStatus::Finished;
 };
 
 WieldSystem::WieldSystem(World& world) : m_world(world) {}
@@ -24,27 +27,26 @@ void WieldSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_wield = registry.get<ActionWield>(entity);
-    const auto& job = action_wield.job;
-    const auto& target = job->target;
+    const auto& target = registry.get<Target>(action_wield.job);
     const entt::entity item = static_cast<entt::entity>(target.id);
 
     if (!registry.valid(item))
     {
-      stop_wield(registry, entity, job);
+      stop_wield(registry, entity, action_wield.job);
       continue;
     }
 
     // Check if target tile is still there
     if (!m_world.spatial_hash.has(item, target.position.x, target.position.y, target.position.z))
     {
-      stop_wield(registry, entity, job);
+      stop_wield(registry, entity, action_wield.job);
       continue;
     }
 
     if (!registry.all_of<WieldedItems>(entity))
     {
       spdlog::warn("Trying to wield object in an entity without WieldedItems component");
-      stop_wield(registry, entity, job);
+      stop_wield(registry, entity, action_wield.job);
       continue;
     }
 
@@ -70,7 +72,7 @@ void WieldSystem::update(entt::registry& registry)
       spdlog::warn("Trying to wield {} when both hands are occupied", item_data.name);
     }
 
-    stop_wield(registry, entity, job);
+    stop_wield(registry, entity, action_wield.job);
   }
 }
 

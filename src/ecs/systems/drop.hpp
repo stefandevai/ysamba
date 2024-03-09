@@ -54,10 +54,5 @@ class DropSystem
   void m_close_drop_menu();
   void m_close_select_target();
   void m_dispose();
-  void m_create_job(const JobType job_type,
-                    const uint32_t id,
-                    const Vector2i& position,
-                    entt::registry& registry,
-                    entt::entity entity);
 };
 }  // namespace dl

@@ -56,18 +56,18 @@ void JobSystem::update(entt::registry& registry, const double delta)
       case JobType::Walk:
         registry.emplace_or_replace<ActionWalk>(entity, current_job.entity);
         break;
-      // case JobType::Pickup:
-      //   registry.emplace<ActionPickup>(entity, &current_job);
-      //   break;
-      // case JobType::Wear:
-      //   registry.emplace<ActionWear>(entity, &current_job);
-      //   break;
-      // case JobType::Wield:
-      //   registry.emplace<ActionWield>(entity, &current_job);
-      //   break;
-      // case JobType::Drop:
-      //   registry.emplace<ActionDrop>(entity, &current_job);
-      //   break;
+      case JobType::Pickup:
+        registry.emplace<ActionPickup>(entity, current_job.entity);
+        break;
+      case JobType::Wear:
+        registry.emplace<ActionWear>(entity, current_job.entity);
+        break;
+      case JobType::Wield:
+        registry.emplace<ActionWield>(entity, current_job.entity);
+        break;
+      case JobType::Drop:
+        registry.emplace<ActionDrop>(entity, current_job.entity);
+        break;
       default:
         // m_create_or_assign_job_progress(current_job, registry);
         break;
@@ -80,18 +80,18 @@ void JobSystem::update(entt::registry& registry, const double delta)
       case JobType::Walk:
         check_component<ActionWalk>(registry, entity, current_job.entity);
         break;
-      // case JobType::Pickup:
-      //   check_component<ActionPickup>(registry, entity, &current_job);
-      //   break;
-      // case JobType::Wear:
-      //   check_component<ActionWear>(registry, entity, &current_job);
-      //   break;
-      // case JobType::Wield:
-      //   check_component<ActionWield>(registry, entity, &current_job);
-      //   break;
-      // case JobType::Drop:
-      //   check_component<ActionDrop>(registry, entity, &current_job);
-      //   break;
+      case JobType::Pickup:
+        check_component<ActionPickup>(registry, entity, current_job.entity);
+        break;
+      case JobType::Wear:
+        check_component<ActionWear>(registry, entity, current_job.entity);
+        break;
+      case JobType::Wield:
+        check_component<ActionWield>(registry, entity, current_job.entity);
+        break;
+      case JobType::Drop:
+        check_component<ActionDrop>(registry, entity, current_job.entity);
+        break;
       // case JobType::Harvest:
       // case JobType::Break:
       // case JobType::Dig:
@@ -100,6 +100,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
       //   m_update_tile_job(current_job, delta, entity, registry);
       //   break;
       default:
+        job_data.status = JobStatus2::Finished;
         break;
       }
     }

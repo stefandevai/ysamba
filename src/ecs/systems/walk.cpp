@@ -28,12 +28,11 @@ void add_movement_component(entt::registry& registry, entt::entity entity)
 namespace dl
 {
 const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus2::Finished;
   registry.remove<ActionWalk>(entity);
   registry.remove<WalkPath>(entity);
   registry.remove<Movement>(entity);
-
-  auto& job_data = registry.get<JobData>(job);
-  job_data.status = JobStatus2::Finished;
 };
 
 WalkSystem::WalkSystem(World& world, entt::registry& registry) : m_world(world)

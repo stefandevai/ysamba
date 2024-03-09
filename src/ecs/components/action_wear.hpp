@@ -1,11 +1,11 @@
 #pragma once
 
-#include "world/society/job.hpp"
+#include <entt/entity/entity.hpp>
 
 namespace dl
 {
 struct ActionWear
 {
-  const Job* job = nullptr;
+  entt::entity job = entt::null;
 };
 }  // namespace dl

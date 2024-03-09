@@ -5,16 +5,19 @@
 #include "ecs/components/action_wear.hpp"
 #include "ecs/components/biology.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/sprite.hpp"
 #include "ecs/components/weared_items.hpp"
+#include "world/target.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-const auto stop_wear = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_wear = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus2::Finished;
   registry.remove<ActionWear>(entity);
-  job->status = JobStatus::Finished;
 };
 
 WearSystem::WearSystem(World& world) : m_world(world) {}
@@ -25,20 +28,19 @@ void WearSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_wear = registry.get<ActionWear>(entity);
-    const auto& job = action_wear.job;
-    const auto& target = job->target;
+    const auto& target = registry.get<Target>(action_wear.job);
     const entt::entity item = static_cast<entt::entity>(target.id);
 
     if (!registry.valid(item))
     {
-      stop_wear(registry, entity, job);
+      stop_wear(registry, entity, action_wear.job);
       continue;
     }
 
     // Check if target tile is still there
     if (!m_world.spatial_hash.has(item, target.position.x, target.position.y, target.position.z))
     {
-      stop_wear(registry, entity, job);
+      stop_wear(registry, entity, action_wear.job);
       continue;
     }
 
@@ -72,7 +74,7 @@ void WearSystem::update(entt::registry& registry)
       spdlog::warn("Agent doesn't have the body parts to wear '{}'", item_data.name);
     }
 
-    stop_wear(registry, entity, job);
+    stop_wear(registry, entity, action_wear.job);
   }
 }
 

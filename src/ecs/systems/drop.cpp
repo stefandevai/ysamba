@@ -8,6 +8,7 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -18,13 +19,15 @@
 #include "ui/components/label.hpp"
 #include "ui/compositions/item_selection.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/target.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const Job* job) {
+const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus2::Finished;
   registry.remove<ActionDrop>(entity);
-  job->status = JobStatus::Finished;
 };
 
 DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
@@ -50,13 +53,12 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
   for (const auto entity : view)
   {
     auto& action_drop = registry.get<ActionDrop>(entity);
-    const auto& job = action_drop.job;
-    const auto& target = job->target;
+    const auto& target = registry.get<Target>(action_drop.job);
     const entt::entity item = static_cast<entt::entity>(target.id);
 
     if (!registry.valid(item))
     {
-      stop_drop(registry, entity, job);
+      stop_drop(registry, entity, action_drop.job);
       continue;
     }
 
@@ -133,7 +135,7 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
                                });
     }
 
-    stop_drop(registry, entity, job);
+    stop_drop(registry, entity, action_drop.job);
   }
 
   if (m_state == DropMenuState::Open)
@@ -266,9 +268,17 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
   {
     const auto mouse_tile = m_world.mouse_to_world(camera);
 
+    const auto walk_job = registry.create();
+    registry.emplace<Target>(walk_job, mouse_tile);
+    registry.emplace<JobData>(walk_job, JobType::Walk);
+
+    const auto drop_job = registry.create();
+    registry.emplace<Target>(drop_job, mouse_tile, static_cast<uint32_t>(m_target_item));
+    registry.emplace<JobData>(drop_job, JobType::Drop);
+
     auto& agent = registry.get<SocietyAgent>(m_selected_entity);
-    // agent.jobs.push(Job{JobType::Walk, 2, Target{mouse_tile}});
-    // agent.jobs.push(Job{JobType::Drop, 2, Target{mouse_tile, static_cast<uint32_t>(m_target_item)}});
+    agent.jobs.push(Job2{2, walk_job});
+    agent.jobs.push(Job2{2, drop_job});
 
     m_dispose();
   }
@@ -320,13 +330,4 @@ void DropSystem::m_dispose()
   m_selected_entity = entt::null;
   m_input_manager.pop_context();
 }
-
-void DropSystem::m_create_job(
-    const JobType job_type, const uint32_t id, const Vector2i& position, entt::registry& registry, entt::entity entity)
-{
-  auto& agent = registry.get<SocietyAgent>(entity);
-  // agent.jobs.push(Job{JobType::Walk, 2, Target{Vector3i{position.x, position.y, 0}}});
-  // agent.jobs.push(Job{job_type, 2, Target{Vector3i{position.x, position.y, 0}, id}});
-}
-
 }  // namespace dl
