@@ -77,6 +77,7 @@ class ActionSystem
   void m_select_break_target(const Camera& camera, entt::registry& registry);
   void m_select_dig_target(const Camera& camera, entt::registry& registry);
   void m_select_hut_target(const Camera& camera, entt::registry& registry);
-  void m_preview_hut_target(const Vector3i& tile_position, const Vector2i& area, entt::registry& registry);
+  void m_preview_hut_target(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry);
+  void m_create_hut_job(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry);
 };
 }  // namespace dl
