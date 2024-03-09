@@ -60,8 +60,6 @@ class ActionSystem
   void m_close_select_target();
   void m_dispose();
   void m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry);
-  void m_preview_hut_target(const Vector3i& tile_position, const Vector2i& area, entt::registry& registry);
-  void m_select_hut_target(const Vector3i& tile_position, entt::registry& registry);
   void m_create_job(const JobType job_type,
                     const uint32_t id,
                     const Vector3i& position,
@@ -74,5 +72,11 @@ class ActionSystem
   bool m_can_build_hut(const uint32_t hut_size, const Vector3i& position);
   std::function<void(const uint32_t)> m_on_select_generic_action
       = [this](const uint32_t i) { m_state = static_cast<ActionMenuState>(i); };
+
+  void m_select_harvest_target(const Camera& camera, entt::registry& registry);
+  void m_select_break_target(const Camera& camera, entt::registry& registry);
+  void m_select_dig_target(const Camera& camera, entt::registry& registry);
+  void m_select_hut_target(const Camera& camera, entt::registry& registry);
+  void m_preview_hut_target(const Vector3i& tile_position, const Vector2i& area, entt::registry& registry);
 };
 }  // namespace dl
