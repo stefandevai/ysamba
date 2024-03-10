@@ -66,8 +66,8 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       auto son_parameters = MemberParameters();
       son_parameters.member_id = son_id;
       son_parameters.character_id = 4;
-      // son_parameters.speed = 80;
-      son_parameters.speed = 100;
+      son_parameters.speed = 80;
+      // son_parameters.speed = 100;
       son_parameters.name = name_generator.generate();
       spdlog::info("Sons's name: {}", son_parameters.name);
       members.push_back(m_get_member_components(society, son_parameters));
@@ -81,8 +81,8 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       auto daughter_parameters = MemberParameters();
       daughter_parameters.member_id = daughter_id;
       daughter_parameters.character_id = 5;
-      // daughter_parameters.speed = 80;
-      daughter_parameters.speed = 100;
+      daughter_parameters.speed = 80;
+      // daughter_parameters.speed = 100;
       daughter_parameters.name = name_generator.generate();
       spdlog::info("Daughters's name: {}", daughter_parameters.name);
       members.push_back(m_get_member_components(society, daughter_parameters));
