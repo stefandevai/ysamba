@@ -15,9 +15,10 @@
 
 namespace dl
 {
-void walk(entt::registry& registry, SocietyAgent& agent, const Vector3i target)
+void walk(entt::registry& registry, SocietyAgent& agent, const Vector3 target)
 {
   const auto job_entity = registry.create();
+  spdlog::warn("TARGET {} {}", target.x, target.y);
   registry.emplace<Target>(job_entity, std::move(target), 0, 0);
   registry.emplace<JobData>(job_entity, JobType::Walk);
   agent.jobs.push(Job{0, job_entity});
@@ -44,35 +45,35 @@ void PlayerControlsSystem::update(entt::registry& registry, const entt::entity p
 
   if (m_input_manager.poll_action("move_left"_hs))
   {
-    walk(registry, agent, {position.x - 1, position.y, position.z});
+    walk(registry, agent, {position.x - 1.0, position.y, position.z});
   }
   else if (m_input_manager.poll_action("move_top"_hs))
   {
-    walk(registry, agent, {position.x, position.y - 1, position.z});
+    walk(registry, agent, {position.x, position.y - 1.0, position.z});
   }
   else if (m_input_manager.poll_action("move_right"_hs))
   {
-    walk(registry, agent, {position.x + 1, position.y, position.z});
+    walk(registry, agent, {position.x + 1.0, position.y, position.z});
   }
   else if (m_input_manager.poll_action("move_bottom"_hs))
   {
-    walk(registry, agent, {position.x, position.y + 1, position.z});
+    walk(registry, agent, {position.x, position.y + 1.0, position.z});
   }
   else if (m_input_manager.poll_action("move_top_left"_hs))
   {
-    walk(registry, agent, {position.x - 1, position.y - 1, position.z});
+    walk(registry, agent, {position.x - 1.0, position.y - 1.0, position.z});
   }
   else if (m_input_manager.poll_action("move_top_right"_hs))
   {
-    walk(registry, agent, {position.x + 1, position.y - 1, position.z});
+    walk(registry, agent, {position.x + 1.0, position.y - 1.0, position.z});
   }
   else if (m_input_manager.poll_action("move_bottom_right"_hs))
   {
-    walk(registry, agent, {position.x + 1, position.y + 1, position.z});
+    walk(registry, agent, {position.x + 1.0, position.y + 1.0, position.z});
   }
   else if (m_input_manager.poll_action("move_bottom_left"_hs))
   {
-    walk(registry, agent, {position.x - 1, position.y + 1, position.z});
+    walk(registry, agent, {position.x - 1.0, position.y + 1.0, position.z});
   }
 
   // Update game until all jobs are done

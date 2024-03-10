@@ -41,7 +41,7 @@ void List::init()
 
   const auto height = static_cast<int>(m_items.size() * (line_height + line_spacing)) + 2 * margin.y;
 
-  size = {width + 2 * margin.x, height};
+  size = Vector2i{width + 2 * margin.x, height};
 }
 
 }  // namespace dl::ui

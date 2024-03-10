@@ -9,11 +9,11 @@ namespace dl::ui
 {
 TextInput::TextInput(UIContext& context) : UIComponent(context)
 {
-  size = {160, 32};
+  size = Vector2i{160, 32};
   m_container = emplace<Container>(size, 0x2f4241ff);
   m_label = m_container->emplace<Label>("");
   m_label->wrap = false;
-  m_label->margin = {8, 0};
+  m_label->margin = Vector2i{8, 0};
   m_label->y_alignment = YAlignement::Center;
 }
 

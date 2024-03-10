@@ -78,6 +78,8 @@ void WalkSystem::update(entt::registry& registry)
 
     auto& walk_path = registry.get<WalkPath>(entity);
 
+    spdlog::warn("Pos {} {} {} {}", position.x, position.y, target.position.x, target.position.y);
+
     // If the target is not adjacent, move towards the target
     if (std::abs(target.position.x - std::round(position.x)) > target.distance_offset
         || std::abs(target.position.y - std::round(position.y)) > target.distance_offset)
@@ -97,8 +99,10 @@ void WalkSystem::update(entt::registry& registry)
         current_target_position = walk_path.steps.back();
       }
 
-      const auto x_dir = current_target_position.x - std::round(position.x);
-      const auto y_dir = current_target_position.y - std::round(position.y);
+      auto x_dir = current_target_position.x - position.x;
+      auto y_dir = current_target_position.y - position.y;
+      x_dir = x_dir > 0.0 ? 1.0 : x_dir < 0.0 ? -1.0 : 0.0;
+      y_dir = y_dir > 0.0 ? 1.0 : y_dir < 0.0 ? -1.0 : 0.0;
 
       registry.patch<Movement>(entity, [x_dir, y_dir](auto& movement_component) {
         movement_component.direction.x = x_dir;

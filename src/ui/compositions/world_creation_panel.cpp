@@ -11,22 +11,22 @@ namespace dl::ui
 {
 WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context)
 {
-  size = {250, 100};
-  position = {30, 30, 0};
+  size = Vector2i{250, 100};
+  position = Vector3i{30, 30, 0};
   placement = Placement::Absolute;
   x_alignment = XAlignement::Right;
 
   m_label = emplace<Label>("Name:");
-  m_label->position = {20, 20, 0};
+  m_label->position = Vector3i{20, 20, 0};
 
   m_text_input = emplace<TextInput>();
   m_text_input->size.x = 250;
-  m_text_input->position = {20, 40, 0};
+  m_text_input->position = Vector3i{20, 40, 0};
   m_text_input->placeholder = "Enter world name";
 
   m_save_button = emplace<Button>();
   m_save_button->size.x = 250;
-  m_save_button->position = {20, 80, 0};
+  m_save_button->position = Vector3i{20, 80, 0};
   m_save_button->text = "Save";
 }
 

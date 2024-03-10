@@ -11,13 +11,13 @@ namespace dl::ui
 {
 DebugInfo::DebugInfo(UIContext& context, const Camera& camera) : UIComponent(context), m_camera(camera)
 {
-  size = {200, 100};
-  position = {30, 30, 0};
+  size = Vector2i{200, 100};
+  position = Vector3i{30, 30, 0};
 
   m_container = emplace<Container>(size, 0x1b242066);
 
   m_label = m_container->emplace<Label>();
-  m_label->position = {15, 15, 0};
+  m_label->position = Vector3i{15, 15, 0};
   m_label->wrap = true;
 
   placement = Placement::Absolute;

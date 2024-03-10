@@ -58,7 +58,7 @@ void ButtonList<T>::m_create_buttons()
 
   const auto height = static_cast<int>(items_size * button_size.y + (items_size - 1) * line_spacing + 2 * margin.y);
 
-  size = {button_size.x, height};
+  size = Vector2i{button_size.x, height};
 }
 
 template <typename T>

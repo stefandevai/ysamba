@@ -181,11 +181,11 @@ void AStar::step()
 
       if (can_climb_up)
       {
-        neighbor = {neighbor.x, neighbor.y, neighbor.z + 1};
+        neighbor = Vector3i{neighbor.x, neighbor.y, neighbor.z + 1};
       }
       else if (can_climb_down)
       {
-        neighbor = {neighbor.x, neighbor.y, neighbor.z - 1};
+        neighbor = Vector3i{neighbor.x, neighbor.y, neighbor.z - 1};
       }
       else
       {

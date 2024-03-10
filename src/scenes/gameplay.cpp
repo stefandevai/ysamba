@@ -252,7 +252,7 @@ void Gameplay::load_default_game()
 
   m_game_context.world_metadata.id = "test";
   m_game_context.world_metadata.seed = 100;
-  m_game_context.world_metadata.world_size = {256, 256, 10};
+  m_game_context.world_metadata.world_size = Vector3i{256, 256, 10};
 
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 

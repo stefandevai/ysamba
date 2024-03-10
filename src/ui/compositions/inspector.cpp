@@ -11,14 +11,14 @@ namespace dl::ui
 Inspector::Inspector(UIContext& context) : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
-  size = {250, 100};
-  position = {30, 30, 0};
+  size = Vector2i{250, 100};
+  position = Vector3i{30, 30, 0};
 
   m_window_frame = emplace<WindowFrame>();
   m_window_frame->size = size;
 
   m_label = m_window_frame->emplace<Label>("");
-  m_label->position = {20, 20, 0};
+  m_label->position = Vector3i{20, 20, 0};
 
   placement = Placement::Absolute;
   x_alignment = XAlignement::Right;
