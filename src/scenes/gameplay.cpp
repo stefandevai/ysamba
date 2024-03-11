@@ -180,11 +180,9 @@ bool Gameplay::m_update_turn_based()
 
 void Gameplay::m_update_turn_systems()
 {
-  using namespace entt::literals;
-
   const auto delta = m_game_context.clock->delta;
 
-  m_game_system.update();
+  m_game_system.update(m_registry);
   // m_society_system.update(m_registry, delta);
   m_physics_system.update(m_registry, delta);
   m_walk_system.update(m_registry);

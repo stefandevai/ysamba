@@ -11,7 +11,7 @@ class GameSystem
  public:
   GameSystem(entt::registry& registry, World& world);
 
-  void update();
+  void update(entt::registry& registry);
 
  private:
   World& m_world;

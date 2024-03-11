@@ -5,6 +5,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 
+#include "ecs/components/biology.hpp"
 #include "ecs/components/position.hpp"
 #include "world/world.hpp"
 
@@ -17,7 +18,27 @@ GameSystem::GameSystem(entt::registry& registry, World& world) : m_world(world)
   registry.on_destroy<Position>().connect<&GameSystem::m_remove_from_spatial_hash>(this);
 }
 
-void GameSystem::update() {}
+void GameSystem::update(entt::registry& registry)
+{
+  auto view = registry.view<Biology>();
+
+  for (const auto entity : view)
+  {
+    auto& biology = registry.get<Biology>(entity);
+
+    if (biology.energy == 500)
+    {
+      continue;
+    }
+
+    biology.energy += 100;
+
+    if (biology.energy > 500)
+    {
+      biology.energy = 500;
+    }
+  }
+}
 
 void GameSystem::m_add_to_spatial_hash(entt::registry& registry, entt::entity entity)
 {

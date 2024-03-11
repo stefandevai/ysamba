@@ -19,41 +19,27 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<Biology, Position, Movement>();
   view.each([this, &registry, delta](auto entity, auto& biology, auto& position, auto& movement) {
-    // spdlog::warn("HREEEEEEEEEEEEEEEEEEEEE");
-    // spdlog::debug("Movement dir: {} {}", movement.direction.x, movement.direction.y);
     if (movement.direction.x == 0 && movement.direction.y == 0)
     {
       return;
     }
 
-    biology.turn_threshold -= biology.speed * 1000.0 * delta;
+    // TODO: Get movement cost from tile / item data
+    const uint32_t movement_cost = 100 + biology.movement_cost;
 
-    // spdlog::debug("Turn thre: {} {}", biology.turn_threshold, biology.speed, delta);
-
-    if (biology.turn_threshold > 0.0)
+    if (movement_cost > biology.energy)
     {
       return;
     }
 
-    // spdlog::debug("Position: ({}, {}, {})", position.x, position.y, position.z);
-
+    biology.energy -= movement_cost;
     movement.collided = false;
-    biology.turn_threshold = 200.0;
-
-    const auto speed_divide_factor = 100.0;
-    const auto position_variation = (biology.speed / speed_divide_factor);
-
-    // spdlog::debug("Direction: ({}, {})", movement.direction.x, movement.direction.y);
-    // spdlog::debug("Position variation: {}", position_variation);
 
     Position candidate_position{
-        position.x + movement.direction.x * position_variation,
-        position.y + movement.direction.y * position_variation,
+        position.x + movement.direction.x,
+        position.y + movement.direction.y,
         position.z,
     };
-
-    // spdlog::debug("Candidate position: ({}, {}, {})", candidate_position.x, candidate_position.y,
-    // candidate_position.z);
 
     Position target_position = Position{position};
 
@@ -170,12 +156,12 @@ bool PhysicsSystem::m_collides(const int x, const int y, const int z, entt::regi
     return true;
   }
 
-  const auto entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
-
-  if (registry.valid(entity))
-  {
-    return true;
-  }
+  // const auto entity = m_world.spatial_hash.get_by_component<entt::tag<"collidable"_hs>>(x, y, z, registry);
+  //
+  // if (registry.valid(entity))
+  // {
+  //   return true;
+  // }
 
   return false;
 }

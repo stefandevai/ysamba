@@ -42,18 +42,18 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
   for (auto i = 0; i < first_generation_members; ++i)
   {
     const auto father_id = society.add_first_member(Sex::Male);
-    auto father_parameters = MemberParameters();
+    MemberParameters father_parameters{};
     father_parameters.member_id = father_id;
     father_parameters.character_id = 0;
-    father_parameters.speed = 100;
+    father_parameters.movement_cost = 100;
     father_parameters.name = name_generator.generate();
     members.push_back(m_get_member_components(society, father_parameters));
 
     const auto mother_id = society.add_spouse(father_id);
-    auto mother_parameters = MemberParameters();
+    MemberParameters mother_parameters{};
     mother_parameters.member_id = mother_id;
     mother_parameters.character_id = 1;
-    mother_parameters.speed = 100;
+    mother_parameters.movement_cost = 100;
     mother_parameters.name = name_generator.generate();
     spdlog::info("Mothers's name: {}", mother_parameters.name);
     members.push_back(m_get_member_components(society, mother_parameters));
@@ -63,11 +63,11 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     for (auto j = 0; j < number_of_sons; ++j)
     {
       const auto son_id = society.add_son(father_id);
-      auto son_parameters = MemberParameters();
+      MemberParameters son_parameters{};
       son_parameters.member_id = son_id;
       son_parameters.character_id = 4;
-      son_parameters.speed = 80;
-      // son_parameters.speed = 100;
+      son_parameters.movement_cost = 120;
+      // son_parameters.movement_cost = 100;
       son_parameters.name = name_generator.generate();
       spdlog::info("Sons's name: {}", son_parameters.name);
       members.push_back(m_get_member_components(society, son_parameters));
@@ -78,11 +78,11 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     for (auto j = 0; j < number_of_daughters; ++j)
     {
       const auto daughter_id = society.add_daughter(father_id);
-      auto daughter_parameters = MemberParameters();
+      MemberParameters daughter_parameters{};
       daughter_parameters.member_id = daughter_id;
       daughter_parameters.character_id = 5;
-      daughter_parameters.speed = 80;
-      // daughter_parameters.speed = 100;
+      daughter_parameters.movement_cost = 120;
+      // daughter_parameters.movement_cost = 100;
       daughter_parameters.name = name_generator.generate();
       spdlog::info("Daughters's name: {}", daughter_parameters.name);
       members.push_back(m_get_member_components(society, daughter_parameters));
@@ -157,7 +157,7 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   const auto weared_items = WearedItems{};
   const auto wielded_items = WieldedItems{};
 
-  auto biology = Biology{member->sex, parameters.speed};
+  auto biology = Biology{member->sex, parameters.movement_cost};
 
   // Defined in body_parts.json
   biology.body_parts = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};

@@ -50,7 +50,7 @@ class SocietyGenerator
   {
     uint32_t member_id;
     uint32_t character_id;
-    int speed;
+    uint32_t movement_cost;
     std::string name;
   };
 
