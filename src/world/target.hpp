@@ -6,7 +6,7 @@ struct Target
 {
   Vector3 position;
   uint32_t id = 0;
-  uint32_t distance_offset = 1;
+  double distance_offset = 1.0;
 };
 
 template <typename Archive>

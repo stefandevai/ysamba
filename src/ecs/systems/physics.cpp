@@ -19,8 +19,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 {
   auto view = registry.view<Biology, Position, Movement>();
   view.each([this, &registry, delta](auto entity, auto& biology, auto& position, auto& movement) {
-    spdlog::debug("HREEEEEEEEEEEEEEEEEEEEE");
-    spdlog::debug("Movement dir: {} {}", movement.direction.x, movement.direction.y);
+    // spdlog::warn("HREEEEEEEEEEEEEEEEEEEEE");
+    // spdlog::debug("Movement dir: {} {}", movement.direction.x, movement.direction.y);
     if (movement.direction.x == 0 && movement.direction.y == 0)
     {
       return;
@@ -28,14 +28,14 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
 
     biology.turn_threshold -= biology.speed * 1000.0 * delta;
 
-    spdlog::debug("Turn thre: {} {}", biology.turn_threshold, biology.speed, delta);
+    // spdlog::debug("Turn thre: {} {}", biology.turn_threshold, biology.speed, delta);
 
     if (biology.turn_threshold > 0.0)
     {
       return;
     }
 
-    spdlog::debug("Position: ({}, {}, {})", position.x, position.y, position.z);
+    // spdlog::debug("Position: ({}, {}, {})", position.x, position.y, position.z);
 
     movement.collided = false;
     biology.turn_threshold = 200.0;
@@ -43,8 +43,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
     const auto speed_divide_factor = 100.0;
     const auto position_variation = (biology.speed / speed_divide_factor);
 
-    spdlog::debug("Direction: ({}, {})", movement.direction.x, movement.direction.y);
-    spdlog::debug("Position variation: {}", position_variation);
+    // spdlog::debug("Direction: ({}, {})", movement.direction.x, movement.direction.y);
+    // spdlog::debug("Position variation: {}", position_variation);
 
     Position candidate_position{
         position.x + movement.direction.x * position_variation,
@@ -52,7 +52,8 @@ void PhysicsSystem::update(entt::registry& registry, const double delta)
         position.z,
     };
 
-    spdlog::debug("Candidate position: ({}, {}, {})", candidate_position.x, candidate_position.y, candidate_position.z);
+    // spdlog::debug("Candidate position: ({}, {}, {})", candidate_position.x, candidate_position.y,
+    // candidate_position.z);
 
     Position target_position = Position{position};
 
