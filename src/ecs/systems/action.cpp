@@ -561,35 +561,38 @@ void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_
   const uint32_t cost_per_tile = 200;
   const uint32_t total_cost = cost_per_tile * hut_size * hut_size;
   const auto job_progress_entity = registry.create();
-  registry.emplace<JobProgress>(job_progress_entity, JobType::BuildHut, total_cost);
+  auto& progress = registry.emplace<JobProgress>(job_progress_entity, JobType::BuildHut, total_cost);
   registry.emplace<Position>(job_progress_entity,
                              static_cast<double>(tile_position.x),
                              static_cast<double>(tile_position.y),
                              static_cast<double>(tile_position.z));
 
   // Assign a build hut job for each agent
-  auto assign_build_hut_job = [&registry, &tile_position, hut_size, job_progress_entity](const entt::entity entity) {
-    const auto offset_x = random::get_integer(0, hut_size);
-    const auto offset_y = random::get_integer(0, hut_size);
-    const auto job_target = Vector3i{tile_position.x + offset_x, tile_position.y + offset_y, tile_position.z};
+  auto assign_build_hut_job
+      = [&registry, &tile_position, &progress, hut_size, job_progress_entity](const entt::entity entity) {
+          const auto offset_x = random::get_integer(0, hut_size);
+          const auto offset_y = random::get_integer(0, hut_size);
+          const auto job_target = Vector3i{tile_position.x + offset_x, tile_position.y + offset_y, tile_position.z};
 
-    // Create a walk job to walk until the target
-    const auto walk_job = registry.create();
-    registry.emplace<Target>(walk_job, job_target);
-    registry.emplace<JobData>(walk_job, JobType::Walk);
+          // Create a walk job to walk until the target
+          const auto walk_job = registry.create();
+          registry.emplace<Target>(walk_job, job_target);
+          registry.emplace<JobData>(walk_job, JobType::Walk);
 
-    // Create the main job
-    const auto build_hut_job = registry.create();
-    registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
+          // Create the main job
+          const auto build_hut_job = registry.create();
+          registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
 
-    // Assign the progress entity to the job
-    auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
-    job_data.progress_entity = job_progress_entity;
+          // Assign the progress entity to the job
+          auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
+          job_data.progress_entity = job_progress_entity;
 
-    auto& agent = registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{2, walk_job});
-    agent.jobs.push(Job{2, build_hut_job});
-  };
+          auto& agent = registry.get<SocietyAgent>(entity);
+          agent.jobs.push(Job{2, walk_job});
+          agent.jobs.push(Job{2, build_hut_job});
+
+          progress.agents.push_back(entity);
+        };
 
   if (m_selected_entities.empty())
   {

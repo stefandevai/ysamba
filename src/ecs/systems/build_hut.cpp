@@ -18,6 +18,8 @@ namespace dl
 {
 const auto stop_build_hut = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
   auto& job_data = registry.get<JobData>(job);
+  auto& progress = registry.get<JobProgress>(job_data.progress_entity);
+  progress.agents.erase(std::remove(progress.agents.begin(), progress.agents.end(), entity));
   job_data.status = JobStatus::Finished;
   registry.remove<ActionBuildHut>(entity);
 };
@@ -45,64 +47,90 @@ void BuildHutSystem::update(entt::registry& registry)
       continue;
     }
 
-    auto& biology = registry.get<Biology>(entity);
-
-    if (biology.energy <= biology.work_cost)
-    {
-      continue;
-    }
-
-    biology.energy -= biology.work_cost;
-
     assert(registry.all_of<JobProgress>(job_data.progress_entity));
     auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
-    job_progress.progress += 100;
 
     if (job_progress.progress < job_progress.total_cost)
     {
-      // Don't walk if agent is already walking
-      if (registry.all_of<ActionWalk>(entity))
+      // Consumate work
+      auto& biology = registry.get<Biology>(entity);
+
+      if (biology.energy <= biology.work_cost)
       {
         continue;
       }
 
-      // Randomly walk during action
-      const auto dice_roll = random::get_integer(0, 100);
+      biology.energy -= biology.work_cost;
+      job_progress.progress += 100;
+      m_random_walk(registry, entity, action_build_hut.job);
+      continue;
+    }
 
-      if (dice_roll < 20)
+    // Job is done
+    // Walk outside of hut bounds
+    // Agent is already walking
+    if (registry.all_of<ActionWalk>(entity))
+    {
+      continue;
+    }
+
+    const auto& target = registry.get<Position>(job_data.progress_entity);
+    auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
+    const uint32_t hut_size = job_data_build_hut.hut_size;
+    const auto& position = registry.get<Position>(entity);
+
+    if (m_is_within_hut_bounds(position, target, hut_size))
+    {
+      const uint32_t distance_to_bottom = (target.y + hut_size) - position.y;
+      const uint32_t distance_to_top = position.y - (target.y - 1);
+      const uint32_t distance_to_left = position.x - (target.x - 1);
+      const uint32_t distance_to_right = (target.x + hut_size) - position.x;
+
+      const uint32_t min = std::min({distance_to_bottom, distance_to_top, distance_to_left, distance_to_right});
+
+      Vector3i new_position{position.x, position.y, position.z};
+
+      if (min == distance_to_bottom)
       {
-        job_data.status = JobStatus::Waiting;
-        auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
-        const uint32_t hut_size = job_data_build_hut.hut_size;
-        const auto& job_position = registry.get<Position>(job_data.progress_entity);
-
-        const auto offset_x = random::get_integer(0, hut_size);
-        const auto offset_y = random::get_integer(0, hut_size);
-
-        const auto new_position = Vector3i{job_position.x + offset_x, job_position.y + offset_y, job_position.z};
-
-        const auto walk_job = registry.create();
-        registry.emplace<Target>(walk_job, new_position);
-        registry.emplace<JobData>(walk_job, JobType::Walk);
-
-        auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{0, walk_job});
+        new_position.y = target.y + hut_size;
       }
+      else if (min == distance_to_top)
+      {
+        new_position.y = target.y - 1;
+      }
+      else if (min == distance_to_left)
+      {
+        new_position.x = target.x - 1;
+      }
+      else if (min == distance_to_right)
+      {
+        new_position.x = target.x + hut_size;
+      }
+
+      const auto walk_job = registry.create();
+      registry.emplace<Target>(walk_job, new_position, 0, 0);
+      registry.emplace<JobData>(walk_job, JobType::Walk);
+
+      auto& agent = registry.get<SocietyAgent>(entity);
+      agent.jobs.push(Job{0, walk_job});
 
       continue;
     }
 
-    // Build hut
+    // Agent is not within hut bounds.
+    // If there are still agents within the hut bounds, remove the build hut action, freeing them for other jobs
+    if (job_progress.agents.size() > 1)
+    {
+      stop_build_hut(registry, entity, action_build_hut.job);
+      continue;
+    }
+
+    // There are no more agents within the hut bounds. Place the hut and remove the build hut action
     // First, remove preview placeholder
     for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
     {
       registry.destroy(entity);
     }
-
-    const auto& target = registry.get<Position>(job_data.progress_entity);
-    auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
-
-    const uint32_t hut_size = job_data_build_hut.hut_size;
 
     assert(hut_size >= 3);
 
@@ -179,9 +207,50 @@ void BuildHutSystem::update(entt::registry& registry)
       }
     }
 
-    registry.destroy(job_data.progress_entity);
     stop_build_hut(registry, entity, action_build_hut.job);
+    registry.destroy(job_data.progress_entity);
   }
+}
+
+void BuildHutSystem::m_random_walk(entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
+  // Don't walk if agent is already walking
+  if (registry.all_of<ActionWalk>(entity))
+  {
+    return;
+  }
+
+  // Randomly walk during action
+  const auto dice_roll = random::get_integer(0, 100);
+
+  if (dice_roll < 20)
+  {
+    auto& job_data = registry.get<JobData>(job);
+    job_data.status = JobStatus::Waiting;
+    auto& job_data_build_hut = registry.get<JobDataBuildHut>(job);
+    const uint32_t hut_size = job_data_build_hut.hut_size;
+    const auto& job_position = registry.get<Position>(job_data.progress_entity);
+
+    const auto offset_x = random::get_integer(0, hut_size);
+    const auto offset_y = random::get_integer(0, hut_size);
+
+    const auto new_position = Vector3i{job_position.x + offset_x, job_position.y + offset_y, job_position.z};
+
+    const auto walk_job = registry.create();
+    registry.emplace<Target>(walk_job, new_position);
+    registry.emplace<JobData>(walk_job, JobType::Walk);
+
+    auto& agent = registry.get<SocietyAgent>(entity);
+    agent.jobs.push(Job{0, walk_job});
+  }
+}
+
+bool BuildHutSystem::m_is_within_hut_bounds(const Position& agent_position,
+                                            const Position& hut_position,
+                                            const uint32_t hut_size)
+{
+  return agent_position.x >= hut_position.x && agent_position.x < hut_position.x + hut_size
+         && agent_position.y >= hut_position.y && agent_position.y < hut_position.y + hut_size;
 }
 
 }  // namespace dl
