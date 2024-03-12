@@ -2,12 +2,15 @@
 
 #include <spdlog/spdlog.h>
 
+#include "core/random.hpp"
 #include "ecs/components/action_build_hut.hpp"
+#include "ecs/components/action_walk.hpp"
 #include "ecs/components/biology.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_data_build_hut.hpp"
 #include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
+#include "ecs/components/society_agent.hpp"
 #include "world/target.hpp"
 #include "world/world.hpp"
 
@@ -37,6 +40,11 @@ void BuildHutSystem::update(entt::registry& registry)
       continue;
     }
 
+    if (job_data.status != JobStatus::InProgress)
+    {
+      continue;
+    }
+
     auto& biology = registry.get<Biology>(entity);
 
     if (biology.energy <= biology.work_cost)
@@ -52,10 +60,40 @@ void BuildHutSystem::update(entt::registry& registry)
 
     if (job_progress.progress < job_progress.total_cost)
     {
+      // Don't walk if agent is already walking
+      if (registry.all_of<ActionWalk>(entity))
+      {
+        continue;
+      }
+
+      // Randomly walk during action
+      const auto dice_roll = random::get_integer(0, 100);
+
+      if (dice_roll < 20)
+      {
+        job_data.status = JobStatus::Waiting;
+        auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
+        const uint32_t hut_size = job_data_build_hut.hut_size;
+        const auto& job_position = registry.get<Position>(job_data.progress_entity);
+
+        const auto offset_x = random::get_integer(0, hut_size);
+        const auto offset_y = random::get_integer(0, hut_size);
+
+        const auto new_position = Vector3i{job_position.x + offset_x, job_position.y + offset_y, job_position.z};
+
+        const auto walk_job = registry.create();
+        registry.emplace<Target>(walk_job, new_position);
+        registry.emplace<JobData>(walk_job, JobType::Walk);
+
+        auto& agent = registry.get<SocietyAgent>(entity);
+        agent.jobs.push(Job{0, walk_job});
+      }
+
       continue;
     }
 
-    // Remove preview placeholder
+    // Build hut
+    // First, remove preview placeholder
     for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
     {
       registry.destroy(entity);
@@ -68,6 +106,7 @@ void BuildHutSystem::update(entt::registry& registry)
 
     assert(hut_size >= 3);
 
+    // Place hut structure tiles
     if (hut_size == 3)
     {
       // Perimeter

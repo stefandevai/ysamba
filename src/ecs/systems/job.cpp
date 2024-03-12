@@ -65,23 +65,22 @@ void JobSystem::update(entt::registry& registry)
       switch (job_data.type)
       {
       case JobType::Walk:
-        registry.emplace_or_replace<ActionWalk>(entity, current_job.entity);
+        check_component<ActionWalk>(registry, entity, current_job.entity);
         break;
       case JobType::Pickup:
-        registry.emplace<ActionPickup>(entity, current_job.entity);
+        check_component<ActionPickup>(registry, entity, current_job.entity);
         break;
       case JobType::Wear:
-        registry.emplace<ActionWear>(entity, current_job.entity);
+        check_component<ActionWear>(registry, entity, current_job.entity);
         break;
       case JobType::Wield:
-        registry.emplace<ActionWield>(entity, current_job.entity);
+        check_component<ActionWield>(registry, entity, current_job.entity);
         break;
       case JobType::Drop:
-        registry.emplace<ActionDrop>(entity, current_job.entity);
+        check_component<ActionDrop>(registry, entity, current_job.entity);
         break;
       case JobType::BuildHut:
-        // m_create_or_assign_build_hub_job_progress(entity, current_job.entity, registry);
-        registry.emplace<ActionBuildHut>(entity, current_job.entity);
+        check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
       case JobType::Break:
@@ -240,40 +239,6 @@ void JobSystem::m_create_or_assign_job_progress(const entt::entity job, entt::re
   {
     const auto entity = registry.create();
     registry.emplace<JobProgress>(entity, job_data.type, 200);
-    registry.emplace<Position>(entity,
-                               static_cast<double>(target.position.x),
-                               static_cast<double>(target.position.y),
-                               static_cast<double>(target.position.z));
-
-    job_data.progress_entity = entity;
-  }
-}
-
-void JobSystem::m_create_or_assign_build_hub_job_progress(const entt::entity entity,
-                                                          const entt::entity job,
-                                                          entt::registry& registry)
-{
-  auto& job_data = registry.get<JobData>(job);
-  const auto& target = registry.get<Target>(job);
-  const auto existing_entity = m_world.spatial_hash.get_by_component<JobProgress>(
-      target.position.x, target.position.y, target.position.z, registry);
-
-  if (registry.valid(existing_entity))
-  {
-    const auto& job_progress = registry.get<JobProgress>(existing_entity);
-    if (job_progress.type == job_data.type)
-    {
-      job_data.progress_entity = existing_entity;
-    }
-  }
-  else
-  {
-    const auto& job_data_build_hut = registry.get<JobDataBuildHut>(job);
-    const uint32_t cost_per_tile = 200;
-    const uint32_t total_cost = cost_per_tile * job_data_build_hut.hut_size * job_data_build_hut.hut_size;
-
-    const auto entity = registry.create();
-    registry.emplace<JobProgress>(entity, job_data.type, total_cost);
     registry.emplace<Position>(entity,
                                static_cast<double>(target.position.x),
                                static_cast<double>(target.position.y),

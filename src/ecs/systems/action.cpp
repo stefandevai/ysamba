@@ -580,9 +580,9 @@ void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_
 
     // Create the main job
     const auto build_hut_job = registry.create();
-    registry.emplace<Target>(build_hut_job, job_target);
     registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
 
+    // Assign the progress entity to the job
     auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
     job_data.progress_entity = job_progress_entity;
 
