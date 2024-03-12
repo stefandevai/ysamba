@@ -195,9 +195,13 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select([this, &registry, mouse_tile, selected_entity](const uint32_t i) {
+        const auto job = registry.create();
+        registry.emplace<Target>(job, mouse_tile, static_cast<uint32_t>(selected_entity));
+        registry.emplace<JobData>(job, static_cast<JobType>(i));
+
         for (const auto entity : m_selected_entities)
         {
-          m_create_job(static_cast<JobType>(i), static_cast<uint32_t>(selected_entity), mouse_tile, registry, entity);
+          m_assign_job(job, mouse_tile, registry, entity);
         }
         m_dispose();
       });
@@ -217,9 +221,13 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select([this, &registry, mouse_tile, &tile_data](const uint32_t i) {
+        const auto job = registry.create();
+        registry.emplace<Target>(job, mouse_tile, tile_data.id);
+        registry.emplace<JobData>(job, static_cast<JobType>(i));
+
         for (const auto entity : m_selected_entities)
         {
-          m_create_job(static_cast<JobType>(i), tile_data.id, mouse_tile, registry, entity);
+          m_assign_job(job, mouse_tile, registry, entity);
         }
         m_dispose();
       });
@@ -336,6 +344,11 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
       }
     }
 
+    const auto job = registry.create();
+    registry.emplace<Target>(job, tile_position, tile.id);
+    registry.emplace<JobData>(job, job_type);
+    bool job_added = false;
+
     for (const auto entity : m_selected_entities)
     {
       // Check if the agent has the necessary qualities to perform the action
@@ -348,7 +361,13 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
         }
       }
 
-      m_create_job(job_type, tile.id, tile_position, registry, entity);
+      m_assign_job(job, tile_position, registry, entity);
+      job_added = true;
+    }
+
+    if (!job_added)
+    {
+      registry.destroy(job);
     }
     m_dispose();
   }
@@ -534,15 +553,16 @@ void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_
     return;
   }
 
-  auto assign_build_hut_job = [&registry, &tile_position, hut_size](const entt::entity entity) {
+  const auto build_hut_job = registry.create();
+  registry.emplace<Target>(build_hut_job, tile_position);
+  registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
+  registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
+
+  // Assign a build hut job for each agent
+  auto assign_build_hut_job = [&registry, &tile_position, build_hut_job](const entt::entity entity) {
     const auto walk_job = registry.create();
     registry.emplace<Target>(walk_job, tile_position);
     registry.emplace<JobData>(walk_job, JobType::Walk);
-
-    const auto build_hut_job = registry.create();
-    registry.emplace<Target>(build_hut_job, tile_position);
-    registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
-    registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
 
     auto& agent = registry.get<SocietyAgent>(entity);
     agent.jobs.push(Job{2, walk_job});
@@ -596,20 +616,18 @@ bool ActionSystem::m_can_build_hut(const uint32_t hut_size, const Vector3i& posi
   return true;
 }
 
-void ActionSystem::m_create_job(
-    const JobType job_type, const uint32_t id, const Vector3i& position, entt::registry& registry, entt::entity entity)
+void ActionSystem::m_assign_job(const entt::entity job,
+                                const Vector3i& position,
+                                entt::registry& registry,
+                                const entt::entity entity)
 {
   const auto walk_job = registry.create();
   registry.emplace<Target>(walk_job, position);
   registry.emplace<JobData>(walk_job, JobType::Walk);
 
-  const auto main_job = registry.create();
-  registry.emplace<Target>(main_job, position, id);
-  registry.emplace<JobData>(main_job, job_type);
-
   auto& agent = registry.get<SocietyAgent>(entity);
   agent.jobs.push(Job{2, walk_job});
-  agent.jobs.push(Job{2, main_job});
+  agent.jobs.push(Job{2, job});
 }
 
 bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,

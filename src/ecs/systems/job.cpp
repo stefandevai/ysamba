@@ -49,6 +49,13 @@ void JobSystem::update(entt::registry& registry)
     }
 
     auto& current_job = agent.jobs.top();
+
+    if (!registry.valid(current_job.entity))
+    {
+      agent.jobs.pop();
+      continue;
+    }
+
     auto& job_data = registry.get<JobData>(current_job.entity);
 
     if (job_data.status == JobStatus::Waiting)
@@ -73,7 +80,7 @@ void JobSystem::update(entt::registry& registry)
         registry.emplace<ActionDrop>(entity, current_job.entity);
         break;
       case JobType::BuildHut:
-        m_create_or_assign_build_hub_job_progress(current_job.entity, registry);
+        m_create_or_assign_build_hub_job_progress(entity, current_job.entity, registry);
         registry.emplace<ActionBuildHut>(entity, current_job.entity);
         break;
       case JobType::Harvest:
@@ -108,7 +115,7 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionDrop>(registry, entity, current_job.entity);
         break;
       case JobType::BuildHut:
-        check_component<ActionBuildHut>(registry, entity, current_job.entity);
+        // check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
       case JobType::Break:
@@ -242,7 +249,9 @@ void JobSystem::m_create_or_assign_job_progress(const entt::entity job, entt::re
   }
 }
 
-void JobSystem::m_create_or_assign_build_hub_job_progress(const entt::entity job, entt::registry& registry)
+void JobSystem::m_create_or_assign_build_hub_job_progress(const entt::entity entity,
+                                                          const entt::entity job,
+                                                          entt::registry& registry)
 {
   auto& job_data = registry.get<JobData>(job);
   const auto& target = registry.get<Target>(job);

@@ -61,11 +61,10 @@ class ActionSystem
   void m_close_select_target();
   void m_dispose();
   void m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry);
-  void m_create_job(const JobType job_type,
-                    const uint32_t id,
+  void m_assign_job(const entt::entity job,
                     const Vector3i& position,
                     entt::registry& registry,
-                    entt::entity entity);
+                    const entt::entity entity);
   bool m_has_qualities_required(const std::vector<std::string>& qualities_required,
                                 const entt::entity entity,
                                 entt::registry& registry);
