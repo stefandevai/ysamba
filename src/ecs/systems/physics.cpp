@@ -15,10 +15,10 @@ namespace dl
 {
 PhysicsSystem::PhysicsSystem(World& world) : m_world(world) {}
 
-void PhysicsSystem::update(entt::registry& registry, const double delta)
+void PhysicsSystem::update(entt::registry& registry)
 {
   auto view = registry.view<Biology, Position, Movement>();
-  view.each([this, &registry, delta](auto entity, auto& biology, auto& position, auto& movement) {
+  view.each([this, &registry](auto entity, auto& biology, auto& position, auto& movement) {
     if (movement.direction.x == 0 && movement.direction.y == 0)
     {
       return;

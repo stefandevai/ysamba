@@ -47,8 +47,6 @@ void BuildHutSystem::update(entt::registry& registry)
     auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
     job_progress.progress += 100;
 
-    spdlog::debug("BUILD HUT PROGRESS: {}/{}", job_progress.progress, job_progress.total_cost);
-
     if (job_progress.progress < job_progress.total_cost)
     {
       continue;

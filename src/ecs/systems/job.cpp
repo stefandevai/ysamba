@@ -36,7 +36,7 @@ namespace dl
 {
 JobSystem::JobSystem(World& world) : m_world(world) {}
 
-void JobSystem::update(entt::registry& registry, const double delta)
+void JobSystem::update(entt::registry& registry)
 {
   auto view = registry.view<SocietyAgent, const Position>();
   for (const auto entity : view)
@@ -115,7 +115,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
       case JobType::Dig:
       case JobType::PrepareFirecamp:
       case JobType::StartFire:
-        m_update_tile_job(current_job.entity, delta, entity, registry);
+        m_update_tile_job(current_job.entity, entity, registry);
         break;
       default:
         job_data.status = JobStatus::Finished;
@@ -129,10 +129,7 @@ void JobSystem::update(entt::registry& registry, const double delta)
   }
 }
 
-void JobSystem::m_update_tile_job(const entt::entity job,
-                                  const double delta,
-                                  const entt::entity agent,
-                                  entt::registry& registry)
+void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity agent, entt::registry& registry)
 {
   auto& job_data = registry.get<JobData>(job);
 
