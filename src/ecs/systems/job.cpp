@@ -80,7 +80,7 @@ void JobSystem::update(entt::registry& registry)
         registry.emplace<ActionDrop>(entity, current_job.entity);
         break;
       case JobType::BuildHut:
-        m_create_or_assign_build_hub_job_progress(entity, current_job.entity, registry);
+        // m_create_or_assign_build_hub_job_progress(entity, current_job.entity, registry);
         registry.emplace<ActionBuildHut>(entity, current_job.entity);
         break;
       case JobType::Harvest:
@@ -115,7 +115,7 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionDrop>(registry, entity, current_job.entity);
         break;
       case JobType::BuildHut:
-        // check_component<ActionBuildHut>(registry, entity, current_job.entity);
+        check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
       case JobType::Break:
