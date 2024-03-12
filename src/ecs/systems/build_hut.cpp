@@ -5,6 +5,7 @@
 #include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_data_build_hut.hpp"
+#include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "world/target.hpp"
 #include "world/world.hpp"
@@ -25,6 +26,24 @@ void BuildHutSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_build_hut = registry.get<ActionBuildHut>(entity);
+    auto& job_data = registry.get<JobData>(action_build_hut.job);
+
+    if (!registry.valid(job_data.progress_entity))
+    {
+      stop_build_hut(registry, entity, action_build_hut.job);
+      continue;
+    }
+
+    auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
+    job_progress.time_left -= 0.001;
+
+    if (job_progress.time_left > 0.0)
+    {
+      continue;
+    }
+
+    registry.destroy(job_data.progress_entity);
+
     const auto& target = registry.get<Target>(action_build_hut.job);
     auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
 

@@ -534,8 +534,7 @@ void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_
     return;
   }
 
-  for (auto entity : m_selected_entities)
-  {
+  auto assign_build_hut_job = [&registry, &tile_position, hut_size](const entt::entity entity) {
     const auto walk_job = registry.create();
     registry.emplace<Target>(walk_job, tile_position);
     registry.emplace<JobData>(walk_job, JobType::Walk);
@@ -548,6 +547,16 @@ void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_
     auto& agent = registry.get<SocietyAgent>(entity);
     agent.jobs.push(Job{2, walk_job});
     agent.jobs.push(Job{2, build_hut_job});
+  };
+
+  if (m_selected_entities.empty())
+  {
+    auto entities = m_select_available_entities(registry);
+    std::for_each(entities.begin(), entities.end(), assign_build_hut_job);
+  }
+  else
+  {
+    std::for_each(m_selected_entities.begin(), m_selected_entities.end(), assign_build_hut_job);
   }
 
   m_dispose();
@@ -681,6 +690,25 @@ bool ActionSystem::m_has_consumables(const std::map<uint32_t, uint32_t>& consuma
   (void)consumables;
   (void)registry;
   return true;
+}
+
+std::vector<entt::entity> ActionSystem::m_select_available_entities(entt::registry& registry)
+{
+  std::vector<entt::entity> entities;
+
+  for (const auto entity : registry.view<SocietyAgent, Selectable>())
+  {
+    const auto& agent = registry.get<SocietyAgent>(entity);
+
+    if (!agent.jobs.empty())
+    {
+      continue;
+    }
+
+    entities.push_back(entity);
+  }
+
+  return entities;
 }
 
 }  // namespace dl
