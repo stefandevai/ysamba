@@ -46,6 +46,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     father_parameters.member_id = father_id;
     father_parameters.character_id = 0;
     father_parameters.movement_cost = 100;
+    father_parameters.work_cost = 150;
     father_parameters.name = name_generator.generate();
     members.push_back(m_get_member_components(society, father_parameters));
 
@@ -54,6 +55,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
     mother_parameters.member_id = mother_id;
     mother_parameters.character_id = 1;
     mother_parameters.movement_cost = 100;
+    mother_parameters.work_cost = 150;
     mother_parameters.name = name_generator.generate();
     spdlog::info("Mothers's name: {}", mother_parameters.name);
     members.push_back(m_get_member_components(society, mother_parameters));
@@ -67,7 +69,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       son_parameters.member_id = son_id;
       son_parameters.character_id = 4;
       son_parameters.movement_cost = 120;
-      // son_parameters.movement_cost = 100;
+      son_parameters.work_cost = 200;
       son_parameters.name = name_generator.generate();
       spdlog::info("Sons's name: {}", son_parameters.name);
       members.push_back(m_get_member_components(society, son_parameters));
@@ -82,7 +84,7 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
       daughter_parameters.member_id = daughter_id;
       daughter_parameters.character_id = 5;
       daughter_parameters.movement_cost = 120;
-      // daughter_parameters.movement_cost = 100;
+      daughter_parameters.work_cost = 200;
       daughter_parameters.name = name_generator.generate();
       spdlog::info("Daughters's name: {}", daughter_parameters.name);
       members.push_back(m_get_member_components(society, daughter_parameters));
@@ -157,7 +159,7 @@ SocietyGenerator::MemberComponents SocietyGenerator::m_get_member_components(con
   const auto weared_items = WearedItems{};
   const auto wielded_items = WieldedItems{};
 
-  auto biology = Biology{member->sex, parameters.movement_cost};
+  auto biology = Biology{member->sex, parameters.movement_cost, parameters.work_cost};
 
   // Defined in body_parts.json
   biology.body_parts = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};

@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "ecs/components/action_build_hut.hpp"
+#include "ecs/components/biology.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_data_build_hut.hpp"
 #include "ecs/components/job_progress.hpp"
@@ -22,7 +23,7 @@ BuildHutSystem::BuildHutSystem(World& world) : m_world(world) {}
 
 void BuildHutSystem::update(entt::registry& registry)
 {
-  auto view = registry.view<ActionBuildHut, const Position>();
+  auto view = registry.view<ActionBuildHut, Biology, const Position>();
   for (const auto entity : view)
   {
     auto& action_build_hut = registry.get<ActionBuildHut>(entity);
@@ -34,10 +35,21 @@ void BuildHutSystem::update(entt::registry& registry)
       continue;
     }
 
-    auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
-    job_progress.time_left -= 0.001;
+    auto& biology = registry.get<Biology>(entity);
 
-    if (job_progress.time_left > 0.0)
+    if (biology.energy <= biology.work_cost)
+    {
+      continue;
+    }
+
+    biology.energy -= biology.work_cost;
+
+    auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
+    job_progress.progress += 100;
+
+    spdlog::debug("BUILD HUT PROGRESS: {}/{}", job_progress.progress, job_progress.total_cost);
+
+    if (job_progress.progress < job_progress.total_cost)
     {
       continue;
     }

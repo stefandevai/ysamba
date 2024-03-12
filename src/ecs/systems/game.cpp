@@ -9,6 +9,10 @@
 #include "ecs/components/position.hpp"
 #include "world/world.hpp"
 
+// TEMP
+#include "ecs/components/job_progress.hpp"
+// TEMP
+
 namespace dl
 {
 GameSystem::GameSystem(entt::registry& registry, World& world) : m_world(world)
@@ -47,6 +51,11 @@ void GameSystem::m_add_to_spatial_hash(entt::registry& registry, entt::entity en
   if (registry.all_of<entt::tag<"ui"_hs>>(entity))
   {
     return;
+  }
+
+  if (registry.all_of<JobProgress>(entity))
+  {
+    spdlog::debug("AAAAAAAAAAAAAAAAADDING JOB PROGRESS");
   }
 
   auto& position = registry.get<Position>(entity);

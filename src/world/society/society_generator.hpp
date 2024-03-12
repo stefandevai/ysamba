@@ -51,6 +51,7 @@ class SocietyGenerator
     uint32_t member_id;
     uint32_t character_id;
     uint32_t movement_cost;
+    uint32_t work_cost;
     std::string name;
   };
 

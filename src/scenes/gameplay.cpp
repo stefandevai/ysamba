@@ -187,13 +187,13 @@ void Gameplay::m_update_turn_systems()
   m_physics_system.update(m_registry, delta);
   m_walk_system.update(m_registry);
   m_job_system.update(m_registry, delta);
+  m_build_hut_system.update(m_registry);
 }
 
 void Gameplay::m_update_action_systems()
 {
   m_action_system.update(m_registry, m_camera);
   m_pickup_system.update(m_registry);
-  m_build_hut_system.update(m_registry);
   m_wear_system.update(m_registry);
   m_wield_system.update(m_registry);
   m_inspector_system.update(m_registry, m_camera);

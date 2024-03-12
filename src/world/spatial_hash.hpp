@@ -38,7 +38,7 @@ class SpatialHash
 
     for (const auto entity : entities)
     {
-      if (!registry.all_of<Position, Sprite, T...>(entity))
+      if (!registry.all_of<Position, T...>(entity))
       {
         continue;
       }

@@ -10,7 +10,10 @@ namespace dl
 struct Biology
 {
   Biology() = default;
-  Biology(const Sex sex, const uint32_t movement_cost) : sex(sex), movement_cost(movement_cost) {}
+  Biology(const Sex sex, const uint32_t movement_cost, const uint32_t work_cost)
+      : sex(sex), movement_cost(movement_cost), work_cost(work_cost)
+  {
+  }
 
   /* double age_in_days; */
   /* double height_in_cm; */
@@ -19,7 +22,8 @@ struct Biology
 
   // STR:10;END:10;QI:10;SOCIAL:INTRO;
   /* std::string genetics; */
-  int movement_cost{};
+  uint32_t movement_cost{};
+  uint32_t work_cost{};
   std::vector<uint32_t> body_parts{};
   uint32_t energy = 0;
 };

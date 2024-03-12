@@ -9,8 +9,10 @@
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/action_wear.hpp"
 #include "ecs/components/action_wield.hpp"
+#include "ecs/components/biology.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/job_data.hpp"
+#include "ecs/components/job_data_build_hut.hpp"
 #include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -145,11 +147,19 @@ void JobSystem::m_update_tile_job(const entt::entity job,
     return;
   }
 
+  auto& biology = registry.get<Biology>(agent);
+
+  if (biology.energy <= biology.work_cost)
+  {
+    return;
+  }
+
+  biology.energy -= biology.work_cost;
+
   auto& job_progress = registry.get<JobProgress>(job_data.progress_entity);
+  job_progress.progress += 100;
 
-  job_progress.time_left -= delta;
-
-  if (job_progress.time_left > 0.0)
+  if (job_progress.progress < job_progress.total_cost)
   {
     return;
   }
@@ -225,7 +235,7 @@ void JobSystem::m_create_or_assign_job_progress(const entt::entity job, entt::re
   else
   {
     const auto entity = registry.create();
-    registry.emplace<JobProgress>(entity, job_data.type, 0.1);
+    registry.emplace<JobProgress>(entity, job_data.type, 200);
     registry.emplace<Position>(entity,
                                static_cast<double>(target.position.x),
                                static_cast<double>(target.position.y),
@@ -252,8 +262,12 @@ void JobSystem::m_create_or_assign_build_hub_job_progress(const entt::entity job
   }
   else
   {
+    const auto& job_data_build_hut = registry.get<JobDataBuildHut>(job);
+    const uint32_t cost_per_tile = 200;
+    const uint32_t total_cost = cost_per_tile * job_data_build_hut.hut_size * job_data_build_hut.hut_size;
+
     const auto entity = registry.create();
-    registry.emplace<JobProgress>(entity, job_data.type, 0.5);
+    registry.emplace<JobProgress>(entity, job_data.type, total_cost);
     registry.emplace<Position>(entity,
                                static_cast<double>(target.position.x),
                                static_cast<double>(target.position.y),
