@@ -15,5 +15,6 @@ enum class JobType
   Wield,
   Drop,
   BuildHut,
+  PlaceHutExterior,
 };
 }

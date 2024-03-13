@@ -97,5 +97,10 @@
       }
     ],
     "turns_into": 0
+  },
+  {
+    "id": 8,
+    "type": 5,
+    "label": "place hut exterior"
   }
 ]

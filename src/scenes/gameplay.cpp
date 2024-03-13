@@ -155,7 +155,7 @@ bool Gameplay::m_update_real_time()
   else
   {
     m_update_turn_systems();
-    m_turn_delay = 0.3;
+    m_turn_delay = 0.1;
   }
 
   m_update_action_systems();

@@ -55,14 +55,14 @@
             "type": "character",
             "sprite_type": "single",
             "angle": "orthogonal",
-            "frame": 37
+            "frame": 36
         },
         {
             "game_id": 5,
             "type": "character",
             "sprite_type": "single",
             "angle": "orthogonal",
-            "frame": 38
+            "frame": 37
         }
     ]
 }

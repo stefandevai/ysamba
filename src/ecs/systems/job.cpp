@@ -82,6 +82,8 @@ void JobSystem::update(entt::registry& registry)
       case JobType::BuildHut:
         check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
+      case JobType::PlaceHutExterior:
+        break;
       case JobType::Harvest:
       case JobType::Break:
       case JobType::Dig:
@@ -115,6 +117,9 @@ void JobSystem::update(entt::registry& registry)
         break;
       case JobType::BuildHut:
         check_component<ActionBuildHut>(registry, entity, current_job.entity);
+        break;
+      case JobType::PlaceHutExterior:
+        job_data.status = JobStatus::Finished;
         break;
       case JobType::Harvest:
       case JobType::Break:
