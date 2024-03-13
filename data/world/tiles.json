@@ -1133,6 +1133,11 @@
       "id": 188,
       "name": "hut structure",
       "flags": []
+    },
+    {
+      "id": 189,
+      "name": "nopal",
+      "flags": []
     }
   ]
 }

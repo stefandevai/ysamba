@@ -1499,6 +1499,13 @@
             "angle": "orthogonal",
             "frame": 969,
             "game_id": 188
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "angle": "orthogonal",
+            "frame": 84,
+            "game_id": 189
         }
     ]
 }
