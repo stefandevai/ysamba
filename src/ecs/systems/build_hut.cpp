@@ -6,6 +6,8 @@
 #include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/biology.hpp"
+#include "ecs/components/home.hpp"
+#include "ecs/components/home_floor.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_data_build_hut.hpp"
 #include "ecs/components/job_progress.hpp"
@@ -74,6 +76,9 @@ void BuildHutSystem::update(entt::registry& registry)
       continue;
     }
 
+    // NOTE: Taking target as a reference causes a weird bug where the top part
+    // is placed placed with an offset such as target is modified in some way.
+    // This is a workaround.
     const auto& target = registry.get<Position>(job_data.progress_entity);
     auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
     const uint32_t hut_size = job_data_build_hut.hut_size;
@@ -134,21 +139,66 @@ void BuildHutSystem::update(entt::registry& registry)
 
     assert(hut_size >= 3);
 
+    const auto home_entity = registry.create();
+    registry.emplace<Position>(home_entity, target.x, target.y, target.z);
+    registry.emplace<Home>(home_entity, 0, Vector3i{static_cast<int>(hut_size), static_cast<int>(hut_size), 2});
+
     // Place hut structure tiles
     if (hut_size == 3)
     {
-      // Perimeter
-      m_world.set_decoration(139, target.x, target.y, target.z);
-      m_world.set_decoration(140, target.x + 1, target.y, target.z);
-      m_world.set_decoration(141, target.x + 2, target.y, target.z);
-      m_world.set_decoration(142, target.x, target.y + 1, target.z);
-      m_world.set_decoration(144, target.x + 2, target.y + 1, target.z);
-      m_world.set_decoration(145, target.x, target.y + 2, target.z);
-      m_world.set_decoration(146, target.x + 1, target.y + 2, target.z);
-      m_world.set_decoration(147, target.x + 2, target.y + 2, target.z);
+      // Create entities for the home floor
+      std::array<entt::entity, 8> home_floor{};
+
+      for (uint32_t i = 0; i < home_floor.size(); ++i)
+      {
+        home_floor[i] = registry.create();
+      }
 
       // Top
+      // NOTE: If this is set after the perimeter, for some reason the const reference to target is modified.
+      // Weird bug. Maybe a bug in entt? An issue with references?
       m_world.set_decoration(148, target.x + 1, target.y + 1, target.z + 1);
+
+      // Perimeter
+      Vector3 home_floor_position = Vector3{target.x, target.y, target.z};
+      m_world.set_decoration(139, target.x, target.y, target.z);
+      registry.emplace<Position>(home_floor[0], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[0], home_entity);
+
+      home_floor_position = Vector3{target.x + 1, target.y, target.z};
+      m_world.set_decoration(140, target.x + 1, target.y, target.z);
+      registry.emplace<Position>(home_floor[1], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[1], home_entity);
+
+      home_floor_position = Vector3{target.x + 2, target.y, target.z};
+      m_world.set_decoration(141, target.x + 2, target.y, target.z);
+      registry.emplace<Position>(home_floor[2], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[2], home_entity);
+
+      home_floor_position = Vector3{target.x, target.y + 1, target.z};
+      m_world.set_decoration(142, target.x, target.y + 1, target.z);
+      registry.emplace<Position>(home_floor[3], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[3], home_entity);
+
+      home_floor_position = Vector3{target.x + 2, target.y + 1, target.z};
+      m_world.set_decoration(144, target.x + 2, target.y + 1, target.z);
+      registry.emplace<Position>(home_floor[4], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[4], home_entity);
+
+      home_floor_position = Vector3{target.x, target.y + 2, target.z};
+      m_world.set_decoration(145, target.x, target.y + 2, target.z);
+      registry.emplace<Position>(home_floor[5], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[5], home_entity);
+
+      home_floor_position = Vector3{target.x + 1, target.y + 2, target.z};
+      m_world.set_decoration(146, target.x + 1, target.y + 2, target.z);
+      registry.emplace<Position>(home_floor[6], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[6], home_entity);
+
+      home_floor_position = Vector3{target.x + 2, target.y + 2, target.z};
+      m_world.set_decoration(147, target.x + 2, target.y + 2, target.z);
+      registry.emplace<Position>(home_floor[7], home_floor_position);
+      registry.emplace<HomeFloor>(home_floor[7], home_entity);
     }
     else if (hut_size == 4)
     {
