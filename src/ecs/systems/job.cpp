@@ -84,7 +84,6 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::PlaceHutExterior:
-        spdlog::debug("HHEHEHEHEHHE1");
         check_component<ActionPlaceHutExterior>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
@@ -122,7 +121,6 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::PlaceHutExterior:
-        spdlog::debug("HHEHEHEHEHHE2");
         check_component<ActionPlaceHutExterior>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:

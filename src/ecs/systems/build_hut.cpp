@@ -27,6 +27,12 @@ const auto stop_build_hut = [](entt::registry& registry, const entt::entity enti
   registry.remove<ActionBuildHut>(entity);
 };
 
+const auto stop_place_exterior = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+  auto& job_data = registry.get<JobData>(job);
+  job_data.status = JobStatus::Finished;
+  registry.remove<ActionPlaceHutExterior>(entity);
+};
+
 BuildHutSystem::BuildHutSystem(World& world) : m_world(world) {}
 
 void BuildHutSystem::update(entt::registry& registry)
@@ -266,13 +272,13 @@ void BuildHutSystem::update(entt::registry& registry)
   for (const auto entity : place_hut_view)
   {
     const auto& action = registry.get<ActionPlaceHutExterior>(entity);
-    const auto& target = registry.get<Target>(action.job);
+    const auto& action_target = registry.get<Target>(action.job);
     const auto floor_entity = m_world.spatial_hash.get_by_component<HomeFloor>(
-        target.position.x, target.position.y, target.position.z, registry);
+        action_target.position.x, action_target.position.y, action_target.position.z, registry);
 
     if (!registry.valid(floor_entity))
     {
-      // TODO: Stop action
+      stop_place_exterior(registry, entity, action.job);
       continue;
     }
 
@@ -280,10 +286,22 @@ void BuildHutSystem::update(entt::registry& registry)
     const auto& home = registry.get<Home>(home_floor.home_entity);
     const auto& home_position = registry.get<Position>(home_floor.home_entity);
 
-    auto& job_data = registry.get<JobData>(action.job);
-    job_data.status = JobStatus::Finished;
-
     spdlog::debug("Placing hut exterior at ({}, {}, {})", home_position.x, home_position.y, home_position.z);
+
+    // Top
+    m_world.set_decoration(199, home_position.x + 1, home_position.y + 1, home_position.z + 1);
+
+    // Perimeter
+    m_world.set_decoration(190, home_position.x, home_position.y, home_position.z);
+    m_world.set_decoration(191, home_position.x + 1, home_position.y, home_position.z);
+    m_world.set_decoration(192, home_position.x + 2, home_position.y, home_position.z);
+    m_world.set_decoration(193, home_position.x, home_position.y + 1, home_position.z);
+    m_world.set_decoration(195, home_position.x + 2, home_position.y + 1, home_position.z);
+    m_world.set_decoration(196, home_position.x, home_position.y + 2, home_position.z);
+    m_world.set_decoration(197, home_position.x + 1, home_position.y + 2, home_position.z);
+    m_world.set_decoration(198, home_position.x + 2, home_position.y + 2, home_position.z);
+
+    stop_place_exterior(registry, entity, action.job);
   }
 }
 
