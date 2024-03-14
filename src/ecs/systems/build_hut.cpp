@@ -4,6 +4,7 @@
 
 #include "core/random.hpp"
 #include "ecs/components/action_build_hut.hpp"
+#include "ecs/components/action_place_hut_exterior.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/biology.hpp"
 #include "ecs/components/home.hpp"
@@ -156,7 +157,7 @@ void BuildHutSystem::update(entt::registry& registry)
 
       // Top
       // NOTE: If this is set after the perimeter, for some reason the const reference to target is modified.
-      // Weird bug. Maybe a bug in entt? An issue with references?
+      // Weird bug. Maybe entt causes it? An issue with references?
       m_world.set_decoration(148, target.x + 1, target.y + 1, target.z + 1);
 
       // Perimeter
@@ -259,6 +260,30 @@ void BuildHutSystem::update(entt::registry& registry)
 
     stop_build_hut(registry, entity, action_build_hut.job);
     registry.destroy(job_data.progress_entity);
+  }
+
+  auto place_hut_view = registry.view<ActionPlaceHutExterior, Biology, const Position>();
+  for (const auto entity : place_hut_view)
+  {
+    const auto& action = registry.get<ActionPlaceHutExterior>(entity);
+    const auto& target = registry.get<Target>(action.job);
+    const auto floor_entity = m_world.spatial_hash.get_by_component<HomeFloor>(
+        target.position.x, target.position.y, target.position.z, registry);
+
+    if (!registry.valid(floor_entity))
+    {
+      // TODO: Stop action
+      continue;
+    }
+
+    const auto& home_floor = registry.get<HomeFloor>(floor_entity);
+    const auto& home = registry.get<Home>(home_floor.home_entity);
+    const auto& home_position = registry.get<Position>(home_floor.home_entity);
+
+    auto& job_data = registry.get<JobData>(action.job);
+    job_data.status = JobStatus::Finished;
+
+    spdlog::debug("Placing hut exterior at ({}, {}, {})", home_position.x, home_position.y, home_position.z);
   }
 }
 

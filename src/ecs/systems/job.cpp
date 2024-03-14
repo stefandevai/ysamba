@@ -6,6 +6,7 @@
 #include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/action_drop.hpp"
 #include "ecs/components/action_pickup.hpp"
+#include "ecs/components/action_place_hut_exterior.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/action_wear.hpp"
 #include "ecs/components/action_wield.hpp"
@@ -83,6 +84,8 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::PlaceHutExterior:
+        spdlog::debug("HHEHEHEHEHHE1");
+        check_component<ActionPlaceHutExterior>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
       case JobType::Break:
@@ -119,7 +122,8 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionBuildHut>(registry, entity, current_job.entity);
         break;
       case JobType::PlaceHutExterior:
-        job_data.status = JobStatus::Finished;
+        spdlog::debug("HHEHEHEHEHHE2");
+        check_component<ActionPlaceHutExterior>(registry, entity, current_job.entity);
         break;
       case JobType::Harvest:
       case JobType::Break:
