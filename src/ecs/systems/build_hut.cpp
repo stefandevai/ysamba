@@ -146,127 +146,37 @@ void BuildHutSystem::update(entt::registry& registry)
 
     assert(hut_size >= 3);
 
-    const auto home_entity = registry.create();
-    registry.emplace<Position>(home_entity, target.x, target.y, target.z);
-    registry.emplace<Home>(home_entity, 0, Vector3i{static_cast<int>(hut_size), static_cast<int>(hut_size), 2});
-
     // Place hut structure tiles
     if (hut_size == 3)
     {
-      // Create entities for the home floor
-      std::array<entt::entity, 8> home_floor{};
-
-      for (uint32_t i = 0; i < home_floor.size(); ++i)
-      {
-        home_floor[i] = registry.create();
-      }
-
       // Top
       // NOTE: If this is set after the perimeter, for some reason the const reference to target is modified.
       // Weird bug. Maybe entt causes it? An issue with references?
       m_world.set_decoration(148, target.x + 1, target.y + 1, target.z + 1);
 
       // Perimeter
-      Vector3 home_floor_position = Vector3{target.x, target.y, target.z};
       m_world.set_decoration(139, target.x, target.y, target.z);
-      registry.emplace<Position>(home_floor[0], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[0], home_entity);
-
-      home_floor_position = Vector3{target.x + 1, target.y, target.z};
       m_world.set_decoration(140, target.x + 1, target.y, target.z);
-      registry.emplace<Position>(home_floor[1], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[1], home_entity);
-
-      home_floor_position = Vector3{target.x + 2, target.y, target.z};
       m_world.set_decoration(141, target.x + 2, target.y, target.z);
-      registry.emplace<Position>(home_floor[2], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[2], home_entity);
-
-      home_floor_position = Vector3{target.x, target.y + 1, target.z};
       m_world.set_decoration(142, target.x, target.y + 1, target.z);
-      registry.emplace<Position>(home_floor[3], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[3], home_entity);
-
-      home_floor_position = Vector3{target.x + 2, target.y + 1, target.z};
       m_world.set_decoration(144, target.x + 2, target.y + 1, target.z);
-      registry.emplace<Position>(home_floor[4], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[4], home_entity);
-
-      home_floor_position = Vector3{target.x, target.y + 2, target.z};
       m_world.set_decoration(145, target.x, target.y + 2, target.z);
-      registry.emplace<Position>(home_floor[5], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[5], home_entity);
-
-      home_floor_position = Vector3{target.x + 1, target.y + 2, target.z};
       m_world.set_decoration(146, target.x + 1, target.y + 2, target.z);
-      registry.emplace<Position>(home_floor[6], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[6], home_entity);
-
-      home_floor_position = Vector3{target.x + 2, target.y + 2, target.z};
       m_world.set_decoration(147, target.x + 2, target.y + 2, target.z);
-      registry.emplace<Position>(home_floor[7], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[7], home_entity);
     }
     else if (hut_size == 4)
     {
-      // Create entities for the home floor
-      std::array<entt::entity, 10> home_floor{};
-
-      for (uint32_t i = 0; i < home_floor.size(); ++i)
-      {
-        home_floor[i] = registry.create();
-      }
-
       // Perimeter
-      Vector3 home_floor_position = Vector3{target.x, target.y, target.z};
       m_world.set_decoration(149, target.x, target.y, target.z);
-      registry.emplace<Position>(home_floor[0], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[0], home_entity);
-
-      home_floor_position = Vector3{target.x + 3, target.y, target.z};
       m_world.set_decoration(155, target.x + 3, target.y, target.z);
-      registry.emplace<Position>(home_floor[1], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[1], home_entity);
-
-      home_floor_position = Vector3{target.x, target.y + 1, target.z};
       m_world.set_decoration(152, target.x, target.y + 1, target.z);
-      registry.emplace<Position>(home_floor[2], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[2], home_entity);
-
-      home_floor_position = Vector3{target.x + 3, target.y + 1, target.z};
       m_world.set_decoration(153, target.x + 3, target.y + 1, target.z);
-      registry.emplace<Position>(home_floor[3], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[3], home_entity);
-
-      home_floor_position = Vector3{target.x, target.y + 2, target.z};
       m_world.set_decoration(175, target.x, target.y + 2, target.z);
-      registry.emplace<Position>(home_floor[4], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[4], home_entity);
-
-      home_floor_position = Vector3{target.x + 3, target.y + 2, target.z};
       m_world.set_decoration(181, target.x + 3, target.y + 2, target.z);
-      registry.emplace<Position>(home_floor[5], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[5], home_entity);
-
-      home_floor_position = Vector3{target.x, target.y + 3, target.z};
       m_world.set_decoration(182, target.x, target.y + 3, target.z);
-      registry.emplace<Position>(home_floor[6], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[6], home_entity);
-
-      home_floor_position = Vector3{target.x + 1, target.y + 3, target.z};
       m_world.set_decoration(183, target.x + 1, target.y + 3, target.z);
-      registry.emplace<Position>(home_floor[7], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[7], home_entity);
-
-      home_floor_position = Vector3{target.x + 2, target.y + 3, target.z};
       m_world.set_decoration(187, target.x + 2, target.y + 3, target.z);
-      registry.emplace<Position>(home_floor[8], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[8], home_entity);
-
-      home_floor_position = Vector3{target.x + 3, target.y + 3, target.z};
       m_world.set_decoration(188, target.x + 3, target.y + 3, target.z);
-      registry.emplace<Position>(home_floor[9], home_floor_position);
-      registry.emplace<HomeFloor>(home_floor[9], home_entity);
 
       // Top
       m_world.set_decoration(150, target.x + 1, target.y + 1, target.z + 1);
@@ -311,6 +221,25 @@ void BuildHutSystem::update(entt::registry& registry)
       }
     }
 
+    // Create entities for the home floor
+    const auto home_entity = registry.create();
+    registry.emplace<Position>(home_entity, target);
+    registry.emplace<Home>(home_entity, 0, Vector3i{static_cast<int>(hut_size), static_cast<int>(hut_size), 2});
+
+    std::vector<entt::entity> home_floor(hut_size * hut_size);
+
+    for (uint32_t j = 0; j < hut_size; ++j)
+    {
+      for (uint32_t i = 0; i < hut_size; ++i)
+      {
+        const auto home_floor_position = Vector3{target.x + i, target.y + j, target.z};
+        const uint32_t index = j * hut_size + i;
+        home_floor[index] = registry.create();
+        registry.emplace<Position>(home_floor[index], home_floor_position);
+        registry.emplace<HomeFloor>(home_floor[index], home_entity);
+      }
+    }
+
     stop_build_hut(registry, entity, action_build_hut.job);
     registry.destroy(job_data.progress_entity);
   }
@@ -338,7 +267,9 @@ void BuildHutSystem::update(entt::registry& registry)
     assert(home.size.x == home.size.y);
     assert(home.size.x >= 3);
 
-    switch (home.size.x)
+    const int hut_size = home.size.x;
+
+    switch (hut_size)
     {
     case 3:
       // Top
@@ -354,29 +285,79 @@ void BuildHutSystem::update(entt::registry& registry)
       m_world.set_decoration(197, home_position.x + 1, home_position.y + 2, home_position.z);
       m_world.set_decoration(198, home_position.x + 2, home_position.y + 2, home_position.z);
       break;
-    case 4:
+    // case 4:
+    //   // Top
+    //   m_world.set_decoration(201, home_position.x + 1, home_position.y + 1, home_position.z + 1);
+    //   m_world.set_decoration(205, home_position.x + 2, home_position.y + 1, home_position.z + 1);
+    //   m_world.set_decoration(221, home_position.x + 1, home_position.y + 2, home_position.z + 1);
+    //   m_world.set_decoration(225, home_position.x + 2, home_position.y + 2, home_position.z + 1);
+    //
+    //   // Perimeter
+    //   m_world.set_decoration(200, home_position.x, home_position.y, home_position.z);
+    //   m_world.set_decoration(206, home_position.x + 3, home_position.y, home_position.z);
+    //
+    //   m_world.set_decoration(207, home_position.x, home_position.y + 1, home_position.z);
+    //   m_world.set_decoration(211, home_position.x + 3, home_position.y + 1, home_position.z);
+    //
+    //   m_world.set_decoration(227, home_position.x, home_position.y + 2, home_position.z);
+    //   m_world.set_decoration(233, home_position.x + 3, home_position.y + 2, home_position.z);
+    //
+    //   m_world.set_decoration(234, home_position.x, home_position.y + 3, home_position.z);
+    //   m_world.set_decoration(235, home_position.x + 1, home_position.y + 3, home_position.z);
+    //   m_world.set_decoration(239, home_position.x + 2, home_position.y + 3, home_position.z);
+    //   m_world.set_decoration(240, home_position.x + 3, home_position.y + 3, home_position.z);
+    //   break;
+    default:
       // Top
       m_world.set_decoration(201, home_position.x + 1, home_position.y + 1, home_position.z + 1);
-      m_world.set_decoration(205, home_position.x + 2, home_position.y + 1, home_position.z + 1);
-      m_world.set_decoration(221, home_position.x + 1, home_position.y + 2, home_position.z + 1);
-      m_world.set_decoration(225, home_position.x + 2, home_position.y + 2, home_position.z + 1);
+      m_world.set_decoration(205, home_position.x + hut_size - 2, home_position.y + 1, home_position.z + 1);
+      m_world.set_decoration(221, home_position.x + 1, home_position.y + hut_size - 2, home_position.z + 1);
+      m_world.set_decoration(225, home_position.x + hut_size - 2, home_position.y + hut_size - 2, home_position.z + 1);
+
+      // Place center top parts if needed
+      if (hut_size > 4)
+      {
+        const int center_size = hut_size - 4;
+
+        for (int j = 0; j < center_size; ++j)
+        {
+          for (int i = 0; i < center_size; ++i)
+          {
+            m_world.set_decoration(209, home_position.x + 2 + i, home_position.y + 2 + j, home_position.z + 1);
+          }
+        }
+      }
 
       // Perimeter
       m_world.set_decoration(200, home_position.x, home_position.y, home_position.z);
-      m_world.set_decoration(206, home_position.x + 3, home_position.y, home_position.z);
+      m_world.set_decoration(206, home_position.x + hut_size - 1, home_position.y, home_position.z);
 
       m_world.set_decoration(207, home_position.x, home_position.y + 1, home_position.z);
-      m_world.set_decoration(211, home_position.x + 3, home_position.y + 1, home_position.z);
+      m_world.set_decoration(211, home_position.x + hut_size - 1, home_position.y + 1, home_position.z);
 
-      m_world.set_decoration(227, home_position.x, home_position.y + 2, home_position.z);
-      m_world.set_decoration(233, home_position.x + 3, home_position.y + 2, home_position.z);
+      m_world.set_decoration(227, home_position.x, home_position.y + hut_size - 2, home_position.z);
+      m_world.set_decoration(233, home_position.x + hut_size - 1, home_position.y + hut_size - 2, home_position.z);
 
-      m_world.set_decoration(234, home_position.x, home_position.y + 3, home_position.z);
-      m_world.set_decoration(235, home_position.x + 1, home_position.y + 3, home_position.z);
-      m_world.set_decoration(239, home_position.x + 2, home_position.y + 3, home_position.z);
-      m_world.set_decoration(240, home_position.x + 3, home_position.y + 3, home_position.z);
-      break;
-    default:
+      m_world.set_decoration(234, home_position.x, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_decoration(235, home_position.x + 1, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_decoration(239, home_position.x + hut_size - 2, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_decoration(240, home_position.x + hut_size - 1, home_position.y + hut_size - 1, home_position.z);
+
+      // Tiled parts
+      for (int i = 2; i < hut_size - 2; ++i)
+      {
+        // Horizontal structure parts
+        m_world.set_decoration(202, home_position.x + i, home_position.y + 1, home_position.z + 1);
+        m_world.set_decoration(222, home_position.x + i, home_position.y + hut_size - 2, home_position.z + 1);
+        m_world.set_decoration(236, home_position.x + i, home_position.y + hut_size - 1, home_position.z);
+
+        // Vertical structure parts
+        m_world.set_decoration(208, home_position.x + 1, home_position.y + i, home_position.z + 1);
+        m_world.set_decoration(210, home_position.x + hut_size - 2, home_position.y + i, home_position.z + 1);
+        m_world.set_decoration(212, home_position.x, home_position.y + i, home_position.z);
+        m_world.set_decoration(215, home_position.x + hut_size - 1, home_position.y + i, home_position.z);
+      }
+
       break;
     }
 
