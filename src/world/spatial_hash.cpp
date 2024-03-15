@@ -18,14 +18,14 @@ void SpatialHash::load(const uint32_t cell_dimension)
   m_cell_dimension = cell_dimension;
 }
 
-int SpatialHash::add(const entt::entity object, const int x, const int y, const int z)
+uint32_t SpatialHash::add(const entt::entity object, const int x, const int y, const int z)
 {
   const auto key = m_get_key(x, y, z);
   m_hash.emplace(key, object);
   return key;
 }
 
-void SpatialHash::remove(const entt::entity object, const int key)
+void SpatialHash::remove(const entt::entity object, const uint32_t key)
 {
   auto range = m_hash.equal_range(key);
   for (auto i = range.first; i != range.second; ++i)
@@ -38,7 +38,7 @@ void SpatialHash::remove(const entt::entity object, const int key)
   }
 }
 
-int SpatialHash::update(const entt::entity object, const int x, const int y, const int z, const int key)
+uint32_t SpatialHash::update(const entt::entity object, const int x, const int y, const int z, const uint32_t key)
 {
   const auto new_key = m_get_key(x, y, z);
 
@@ -103,24 +103,20 @@ std::vector<entt::entity> SpatialHash::get_if(const Vector3i& position, TestFunc
   return objects;
 }
 
-int SpatialHash::m_get_key(const int x, const int y, const int z) const
+uint32_t SpatialHash::m_get_key(const int x, const int y, const int z) const
 {
-  const auto grid_x = x / m_cell_dimension;
-  const auto grid_y = y / m_cell_dimension;
-  const auto grid_z = z / m_cell_dimension;
+  const uint32_t grid_x = static_cast<uint32_t>(x / m_cell_dimension);
+  const uint32_t grid_y = static_cast<uint32_t>(y / m_cell_dimension);
+  const uint32_t grid_z = static_cast<uint32_t>(z / m_cell_dimension);
 
-  const auto hash_x = std::hash<int>()(grid_x);
-  const auto hash_y = std::hash<int>()(grid_y);
-  const auto hash_z = std::hash<int>()(grid_z);
-
-  return hash_x ^ hash_y ^ hash_z;
+  return (grid_x * 73856093) ^ (grid_y * 19349663) ^ (grid_z * 83492791);
 }
 
 constexpr std::array<int, 3> lookup_index{-1, 0, 1};
 
-std::array<int, 27> SpatialHash::m_get_search_keys(const int x, const int y, const int z) const
+std::array<uint32_t, 27> SpatialHash::m_get_search_keys(const int x, const int y, const int z) const
 {
-  std::array<int, 27> keys{};
+  std::array<uint32_t, 27> keys{};
 
   int i = 0;
 

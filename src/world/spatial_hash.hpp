@@ -19,9 +19,9 @@ class SpatialHash
   SpatialHash(const uint32_t cell_dimension);
 
   void load(const uint32_t cell_dimension);
-  int add(const entt::entity object, const int x, const int y, const int z);
-  void remove(const entt::entity object, const int key);
-  int update(const entt::entity object, const int x, const int y, const int z, const int key);
+  uint32_t add(const entt::entity object, const int x, const int y, const int z);
+  void remove(const entt::entity object, const uint32_t key);
+  uint32_t update(const entt::entity object, const int x, const int y, const int z, const uint32_t key);
   [[nodiscard]] std::vector<entt::entity> get(const int x, const int y, const int z) const;
   [[nodiscard]] bool has(entt::entity entity, const int x, const int y, const int z) const;
   [[nodiscard]] std::vector<entt::entity> get_if(const Vector3i& position, TestFunction test_function) const;
@@ -58,11 +58,11 @@ class SpatialHash
   }
 
  private:
-  using HashMap = std::unordered_multimap<int, entt::entity>;
-  HashMap m_hash;
-  uint32_t m_cell_dimension;
+  using HashMap = std::unordered_multimap<uint32_t, entt::entity>;
+  HashMap m_hash{};
+  uint32_t m_cell_dimension{};
 
-  int m_get_key(const int x, const int y, const int z) const;
-  std::array<int, 27> m_get_search_keys(const int x, const int y, const int z) const;
+  uint32_t m_get_key(const int x, const int y, const int z) const;
+  std::array<uint32_t, 27> m_get_search_keys(const int x, const int y, const int z) const;
 };
 }  // namespace dl

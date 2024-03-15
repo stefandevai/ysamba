@@ -86,7 +86,7 @@ void BuildHutSystem::update(entt::registry& registry)
     // NOTE: Taking target as a reference causes a weird bug where the top part
     // is placed placed with an offset such as target is modified in some way.
     // This is a workaround.
-    const auto& target = registry.get<Position>(job_data.progress_entity);
+    const auto target = registry.get<Position>(job_data.progress_entity);
     auto& job_data_build_hut = registry.get<JobDataBuildHut>(action_build_hut.job);
     const uint32_t hut_size = job_data_build_hut.hut_size;
     const auto& position = registry.get<Position>(entity);
@@ -150,8 +150,6 @@ void BuildHutSystem::update(entt::registry& registry)
     if (hut_size == 3)
     {
       // Top
-      // NOTE: If this is set after the perimeter, for some reason the const reference to target is modified.
-      // Weird bug. Maybe entt causes it? An issue with references?
       m_world.set_decoration(148, target.x + 1, target.y + 1, target.z + 1);
 
       // Perimeter
@@ -223,7 +221,7 @@ void BuildHutSystem::update(entt::registry& registry)
 
     // Create entities for the home floor
     const auto home_entity = registry.create();
-    registry.emplace<Position>(home_entity, target);
+    registry.emplace<Position>(home_entity, target.x, target.y, target.z);
     registry.emplace<Home>(home_entity, 0, Vector3i{static_cast<int>(hut_size), static_cast<int>(hut_size), 2});
 
     std::vector<entt::entity> home_floor(hut_size * hut_size);
@@ -232,10 +230,9 @@ void BuildHutSystem::update(entt::registry& registry)
     {
       for (uint32_t i = 0; i < hut_size; ++i)
       {
-        const auto home_floor_position = Vector3{target.x + i, target.y + j, target.z};
         const uint32_t index = j * hut_size + i;
         home_floor[index] = registry.create();
-        registry.emplace<Position>(home_floor[index], home_floor_position);
+        registry.emplace<Position>(home_floor[index], target.x + i, target.y + j, target.z);
         registry.emplace<HomeFloor>(home_floor[index], home_entity);
       }
     }
@@ -262,8 +259,6 @@ void BuildHutSystem::update(entt::registry& registry)
     const auto& home = registry.get<Home>(home_floor.home_entity);
     const auto& home_position = registry.get<Position>(home_floor.home_entity);
 
-    spdlog::debug("Placing hut exterior at ({}, {}, {})", home_position.x, home_position.y, home_position.z);
-
     assert(home.size.x == home.size.y);
     assert(home.size.x >= 3);
 
@@ -285,28 +280,6 @@ void BuildHutSystem::update(entt::registry& registry)
       m_world.set_decoration(197, home_position.x + 1, home_position.y + 2, home_position.z);
       m_world.set_decoration(198, home_position.x + 2, home_position.y + 2, home_position.z);
       break;
-    // case 4:
-    //   // Top
-    //   m_world.set_decoration(201, home_position.x + 1, home_position.y + 1, home_position.z + 1);
-    //   m_world.set_decoration(205, home_position.x + 2, home_position.y + 1, home_position.z + 1);
-    //   m_world.set_decoration(221, home_position.x + 1, home_position.y + 2, home_position.z + 1);
-    //   m_world.set_decoration(225, home_position.x + 2, home_position.y + 2, home_position.z + 1);
-    //
-    //   // Perimeter
-    //   m_world.set_decoration(200, home_position.x, home_position.y, home_position.z);
-    //   m_world.set_decoration(206, home_position.x + 3, home_position.y, home_position.z);
-    //
-    //   m_world.set_decoration(207, home_position.x, home_position.y + 1, home_position.z);
-    //   m_world.set_decoration(211, home_position.x + 3, home_position.y + 1, home_position.z);
-    //
-    //   m_world.set_decoration(227, home_position.x, home_position.y + 2, home_position.z);
-    //   m_world.set_decoration(233, home_position.x + 3, home_position.y + 2, home_position.z);
-    //
-    //   m_world.set_decoration(234, home_position.x, home_position.y + 3, home_position.z);
-    //   m_world.set_decoration(235, home_position.x + 1, home_position.y + 3, home_position.z);
-    //   m_world.set_decoration(239, home_position.x + 2, home_position.y + 3, home_position.z);
-    //   m_world.set_decoration(240, home_position.x + 3, home_position.y + 3, home_position.z);
-    //   break;
     default:
       // Top
       m_world.set_decoration(201, home_position.x + 1, home_position.y + 1, home_position.z + 1);

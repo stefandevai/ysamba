@@ -11,10 +11,10 @@ struct Position
   double x{};
   double y{};
   double z{};
-  int spatial_hash_index = 9999;
+  uint32_t spatial_hash_index = 9999999;
 
   Position() = default;
-  Position(double x, double y, double z) : x(x), y(y), z(z) {}
+  Position(const double x, const double y, const double z) : x(x), y(y), z(z) {}
   Position(const Vector3& position) : x(position.x), y(position.y), z(position.z) {}
 };
 
