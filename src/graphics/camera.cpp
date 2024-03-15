@@ -19,7 +19,7 @@ namespace dl
 {
 Camera::Camera(const Display& display)
 {
-  const auto& display_size = display.get_size();
+  const auto& display_size = display.get_window_size();
   set_size({static_cast<double>(display_size.x), static_cast<double>(display_size.y)});
 }
 

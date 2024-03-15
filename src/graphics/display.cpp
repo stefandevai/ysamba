@@ -16,10 +16,6 @@
 
 namespace dl
 {
-SDL_Window* Display::m_window = nullptr;
-int Display::m_width = 0;
-int Display::m_height = 0;
-
 Display::~Display()
 {
   if (!m_has_loaded)
@@ -37,9 +33,9 @@ Display::~Display()
 
 void Display::load(const int width, const int height, const std::string& title)
 {
-  m_width = width;
-  m_height = height;
   m_title = title;
+
+  SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
 
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
   {
@@ -47,11 +43,15 @@ void Display::load(const int width, const int height, const std::string& title)
     return;
   }
 
-  // const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-  const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
+  const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+  // const SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_ALLOW_HIGHDPI);
   m_window = SDL_CreateWindow(
-      m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, window_flags);
+      m_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
   SDL_SetWindowMinimumSize(m_window, width, height);
+  SDL_GetWindowSize(m_window, &m_window_size.x, &m_window_size.y);
+  SDL_GL_GetDrawableSize(m_window, &m_physical_size.x, &m_physical_size.y);
+  m_pixel_scale.x = m_physical_size.x / static_cast<double>(m_window_size.x);
+  m_pixel_scale.y = m_physical_size.y / static_cast<double>(m_window_size.y);
 
   WGPUInstanceDescriptor desc = {
       .nextInChain = nullptr,
@@ -115,17 +115,16 @@ void Display::load(const int width, const int height, const std::string& title)
   m_has_loaded = true;
 }
 
-const Vector2i Display::get_size() const { return {m_width, m_height}; }
+const Vector2i& Display::get_physical_size() { return m_physical_size; }
 
-const Vector2i Display::get_window_size() { return {m_width, m_height}; }
+const Vector2i& Display::get_window_size() { return m_window_size; }
+
+const Vector2& Display::get_pixel_scale() { return m_pixel_scale; }
 
 void Display::set_title(const std::string& title) { SDL_SetWindowTitle(m_window, title.c_str()); }
 
 void Display::set_size(const int width, const int height)
 {
-  m_width = width;
-  m_height = height;
-
   auto flags = SDL_GetWindowFlags(m_window);
 
   // If the window is maximazed, don't resize it
@@ -135,14 +134,18 @@ void Display::set_size(const int width, const int height)
   }
 
   SDL_SetWindowSize(m_window, width, height);
+  SDL_GetWindowSize(m_window, &m_window_size.x, &m_window_size.y);
+  SDL_GL_GetDrawableSize(m_window, &m_physical_size.x, &m_physical_size.y);
+  m_pixel_scale.x = m_physical_size.x / static_cast<double>(m_window_size.x);
+  m_pixel_scale.y = m_physical_size.y / static_cast<double>(m_window_size.y);
 }
 
 void Display::update_viewport()
 {
-  int width, height;
-  SDL_GetWindowSize(m_window, &width, &height);
-  m_width = width;
-  m_height = height;
+  SDL_GetWindowSize(m_window, &m_window_size.x, &m_window_size.y);
+  SDL_GL_GetDrawableSize(m_window, &m_physical_size.x, &m_physical_size.y);
+  m_pixel_scale.x = m_physical_size.x / static_cast<double>(m_window_size.x);
+  m_pixel_scale.y = m_physical_size.y / static_cast<double>(m_window_size.y);
 
   wgpuSurfaceRelease(wgpu_context.surface);
   wgpu_context.surface = SDL_GetWGPUSurface(wgpu_context.instance, m_window);
@@ -159,8 +162,8 @@ void Display::m_configure_surface()
   surface_configuration.viewFormatCount = 1;
   surface_configuration.viewFormats = &wgpu_context.surface_format;
   surface_configuration.alphaMode = WGPUCompositeAlphaMode_Auto;
-  surface_configuration.width = m_width;
-  surface_configuration.height = m_height;
+  surface_configuration.width = m_physical_size.x;
+  surface_configuration.height = m_physical_size.y;
   surface_configuration.presentMode = WGPUPresentMode_Fifo;
 
   wgpuSurfaceConfigure(wgpu_context.surface, &surface_configuration);
