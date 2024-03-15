@@ -53,7 +53,7 @@ void Camera::update_target(const entt::registry& registry)
   m_last_target_position = position;
   const auto& display_size = Display::get_window_size();
   set_position({position.x * m_grid_size.x - display_size.x / 2.0 * zoom,
-                position.y * m_grid_size.y - display_size.y / 2.0 * zoom});
+                (position.y - position.z) * m_grid_size.y - display_size.y / 2.0 * zoom});
 }
 
 void Camera::update_dirty()
