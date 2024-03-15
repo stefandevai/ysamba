@@ -102,5 +102,11 @@
     "id": 8,
     "type": 11,
     "label": "place hut exterior"
+  },
+  {
+    "id": 9,
+    "type": 12,
+    "label": "construct entrance",
+    "turns_into": 241
   }
 ]

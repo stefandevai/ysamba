@@ -91,6 +91,7 @@ void JobSystem::update(entt::registry& registry)
       case JobType::Dig:
       case JobType::PrepareFirecamp:
       case JobType::StartFire:
+      case JobType::ConstructEntrance:
         m_create_or_assign_job_progress(current_job.entity, registry);
         break;
       default:
@@ -128,6 +129,7 @@ void JobSystem::update(entt::registry& registry)
       case JobType::Dig:
       case JobType::PrepareFirecamp:
       case JobType::StartFire:
+      case JobType::ConstructEntrance:
         m_update_tile_job(current_job.entity, entity, registry);
         break;
       default:

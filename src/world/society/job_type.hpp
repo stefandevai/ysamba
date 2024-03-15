@@ -16,5 +16,6 @@ enum class JobType
   Drop,
   BuildHut,
   PlaceHutExterior,
+  ConstructEntrance,
 };
 }

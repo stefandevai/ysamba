@@ -1427,7 +1427,12 @@
     {
       "id": 197,
       "name": "oca",
-      "flags": []
+      "flags": [],
+      "actions": [
+        {
+          "id": 9
+        }
+      ]
     },
     {
       "id": 198,
@@ -1617,32 +1622,62 @@
     {
       "id": 235,
       "name": "oca",
-      "flags": []
+      "flags": [],
+      "actions": [
+        {
+          "id": 9
+        }
+      ]
     },
     {
       "id": 236,
       "name": "oca",
-      "flags": []
+      "flags": [],
+      "actions": [
+        {
+          "id": 9
+        }
+      ]
     },
     {
       "id": 237,
       "name": "oca",
-      "flags": []
+      "flags": [],
+      "actions": [
+        {
+          "id": 9
+        }
+      ]
     },
     {
       "id": 238,
       "name": "oca",
-      "flags": []
+      "flags": [],
+      "actions": [
+        {
+          "id": 9
+        }
+      ]
     },
     {
       "id": 239,
       "name": "oca",
-      "flags": []
+      "flags": [],
+      "actions": [
+        {
+          "id": 9
+        }
+      ]
     },
     {
       "id": 240,
       "name": "oca",
       "flags": []
+    },
+    {
+      "id": 241,
+      "name": "oca entrance",
+      "flags": ["WALKABLE"]
     }
   ]
 }
