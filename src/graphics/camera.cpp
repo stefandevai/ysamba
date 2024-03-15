@@ -258,8 +258,8 @@ void Camera::m_calculate_grid_size()
   {
     m_size_in_tiles.x = std::ceil(m_size.x / m_grid_size.x);
     m_size_in_tiles.y = std::ceil(m_size.y / m_grid_size.y);
-    position_in_tiles.x = view_position.x / m_grid_size.x;
-    position_in_tiles.y = view_position.y / m_grid_size.y;
+    position_in_tiles.x = std::floor(view_position.x / m_grid_size.x);
+    position_in_tiles.y = std::floor(view_position.y / m_grid_size.y);
   }
 }
 

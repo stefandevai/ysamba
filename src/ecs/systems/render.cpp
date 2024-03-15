@@ -52,47 +52,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
   m_render_tiles(camera);
 
-  // {
-  //   auto items_view = registry.view<const Position, const Visibility>();
-  //
-  //   for (auto entity : items_view)
-  //   {
-  //     const auto& position = registry.get<Position>(entity);
-  //     auto& visibility = registry.get<Visibility>(entity);
-  //
-  //     if (visibility.sprite == nullptr)
-  //     {
-  //       visibility.sprite = std::make_unique<Sprite>(visibility.resource_id, visibility.frame,
-  //       visibility.frame_angle);
-  //     }
-  //     if (visibility.sprite->texture == nullptr)
-  //     {
-  //       visibility.sprite->texture = m_renderer.get_texture(visibility.sprite->resource_id);
-  //       visibility.sprite->frame_angle = visibility.frame_angle;
-  //
-  //       // Set specific frame according to the texture data loaded in a separated json file.
-  //       // This allows flexibility by separating the texture frames from game ids.
-  //       if (visibility.frame_id > 0 && !visibility.frame_type.empty())
-  //       {
-  //         const auto& frame_data = visibility.sprite->texture->id_to_frame(visibility.frame_id,
-  //         visibility.frame_type); visibility.sprite->set_frame(frame_data.frame); visibility.sprite->frame_angle =
-  //         frame_data.angle;
-  //       }
-  //     }
-  //
-  //     const auto tile_size = m_world.get_tile_size();
-  //
-  //     const auto position_x = std::round(position.x) * tile_size.x;
-  //     const auto position_y = std::round(position.y) * tile_size.y;
-  //     const auto position_z = std::round(position.z) * tile_size.y;
-  //
-  //     m_batch.sprite(visibility.sprite.get(),
-  //                    position_x,
-  //                    position_y + visibility.layer_z * m_z_index_increment,
-  //                    position_z + visibility.layer_z * m_z_index_increment);
-  //   }
-  // }
-
   {
     auto items_view = registry.view<const Position, const Sprite>();
     const auto& tile_size = m_world.get_tile_size();
@@ -144,18 +103,21 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
 void RenderSystem::m_render_tiles(const Camera& camera)
 {
-  const auto& camera_size = camera.get_size_in_tiles();
   const auto& tile_size = m_world.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
+  const auto& camera_size = camera.get_size_in_tiles();
+
+  // Padding added to the right side to handle certain HDPI screen inconsistencies
+  const int padding = 1;
 
   {
     const auto first_chunk_position
         = m_world.chunk_manager.world_to_chunk(Vector3i{camera_position.x, camera_position.y, 0});
 
     // Loop through chunks
-    for (int j = first_chunk_position.y; j < camera_position.y + camera_size.y; j += world::chunk_size.y)
+    for (int j = first_chunk_position.y; j <= camera_position.y + camera_size.y; j += world::chunk_size.y)
     {
-      for (int i = first_chunk_position.x; i < camera_position.x + camera_size.x; i += world::chunk_size.x)
+      for (int i = first_chunk_position.x; i <= camera_position.x + camera_size.x; i += world::chunk_size.x)
       {
         const auto& chunk = m_world.chunk_manager.at(i, j, 0);
 
@@ -179,11 +141,11 @@ void RenderSystem::m_render_tiles(const Camera& camera)
         }
         if ((j + world::chunk_size.y) - (camera_position.y + camera_size.y) > 0)
         {
-          upper_bound_j = world::chunk_size.y - ((j + world::chunk_size.y) - (camera_position.y + camera_size.y));
+          upper_bound_j = world::chunk_size.y - ((j + world::chunk_size.y) - (camera_position.y + camera_size.y + padding));
         }
         if ((i + world::chunk_size.x) - (camera_position.x + camera_size.x) > 0)
         {
-          upper_bound_i = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x));
+          upper_bound_i = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x + padding));
         }
 
         for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)
@@ -250,7 +212,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
         }
         if ((i + world::chunk_size.x) - (camera_position.x + camera_size.x) > 0)
         {
-          upper_bound_i = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x));
+          upper_bound_i = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x + padding));
         }
 
         for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)

@@ -78,7 +78,7 @@ void Gameplay::load()
 
   auto& debug_tools = DebugTools::get_instance();
   debug_tools.init_general_info(m_game_context);
-  // debug_tools.init_camera_inspector(m_camera);
+  debug_tools.init_camera_inspector(m_camera);
   // debug_tools.init_world_generation(m_world.chunk_manager);
   /* debug_tools.init_chunk_debugger(*this); */
   /* debug_tools.init_render_editor(m_render_system); */
