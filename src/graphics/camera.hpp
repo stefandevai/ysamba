@@ -58,7 +58,7 @@ class Camera
   const Vector2& get_size() const { return m_size; }
   const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
   const Vector2i& get_grid_size() const { return m_grid_size; }
-  void set_position(const Vector3& position);
+  void set_position(const Vector2& position);
   void set_size(const Vector2& size);
   void set_frustum(const float left, const float right, const float bottom, const float top);
   void set_tile_size(const Vector2i& size);

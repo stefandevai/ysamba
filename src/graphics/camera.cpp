@@ -51,10 +51,9 @@ void Camera::update_target(const entt::registry& registry)
   }
 
   m_last_target_position = position;
-  const auto display_size = Display::get_window_size();
+  const auto& display_size = Display::get_window_size();
   set_position({position.x * m_grid_size.x - display_size.x / 2.0 * zoom,
-                position.y * m_grid_size.y - display_size.y / 2.0 * zoom,
-                position.z * m_grid_size.y});
+                position.y * m_grid_size.y - display_size.y / 2.0 * zoom});
 }
 
 void Camera::update_dirty()
@@ -98,14 +97,12 @@ void Camera::move_in_grid(const Vector3i& quantity)
   move(Vector3{quantity.x * m_grid_size.x, quantity.y * m_grid_size.y, quantity.z * m_grid_size.y});
 }
 
-void Camera::set_position(const Vector3& position)
+void Camera::set_position(const Vector2& position)
 {
   movement_offset.x = position.x * (1.0 / zoom);
   movement_offset.y = position.y * (1.0 / zoom);
-  movement_offset.z = position.z * (1.0 / zoom);
   m_position.x = position.x * (1.0 / zoom);
   m_position.y = position.y * m_scaling_factor * (1.0 / zoom) + m_camera_z;
-  m_position.z = position.z * (1.0 / zoom) + m_camera_z;
 
   dirty = true;
 }
