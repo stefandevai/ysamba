@@ -2,6 +2,7 @@
 
 #include <webgpu/wgpu.h>
 
+#include "core/maths/vector.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__APPLE__)
@@ -15,8 +16,6 @@
 
 namespace dl
 {
-struct Vector2i;
-
 class Display
 {
  public:
@@ -27,16 +26,18 @@ class Display
   void load(const int width, const int height, const std::string& title);
   void set_title(const std::string& title);
   void set_size(const int width, const int height);
-  const Vector2i get_size() const;
-  static const Vector2i get_window_size();
+  static const Vector2i& get_window_size();
+  static const Vector2i& get_physical_size();
+  static const Vector2& get_pixel_scale();
   void update_viewport();
 
  private:
   bool m_has_loaded = false;
 
-  static SDL_Window* m_window;
-  static int m_width;
-  static int m_height;
+  inline static SDL_Window* m_window = nullptr;
+  inline static Vector2i m_window_size{};
+  inline static Vector2i m_physical_size{};
+  inline static Vector2 m_pixel_scale{};
   std::string m_title;
 
   void m_configure_surface();

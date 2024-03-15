@@ -321,6 +321,17 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 
 void Batch::push_scissor(Vector4i scissor)
 {
+  // Scale scissor if using High DPI mode
+  const auto& scale = Display::get_pixel_scale();
+
+  if (scale.x > 1.0 || scale.y > 1.0)
+  {
+    scissor.x *= scale.x;
+    scissor.z *= scale.x;
+    scissor.y *= scale.x;
+    scissor.w *= scale.x;
+  }
+
   // Try to reuse a vertex buffer
   if (batch_data.size() > 1)
   {

@@ -80,7 +80,7 @@ void Renderer::m_load_depth_buffer(WGPUDevice device)
     wgpuTextureRelease(depth_texture);
   }
 
-  const auto& display_size = Display::get_window_size();
+  const auto& display_size = Display::get_physical_size();
 
   const auto depth_texture_format = WGPUTextureFormat_Depth24Plus;
 

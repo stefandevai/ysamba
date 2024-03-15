@@ -7,7 +7,6 @@
 #include "./button.hpp"
 #include "./container.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/display.hpp"
 #include "world/metadata.hpp"
 
 namespace dl::ui
