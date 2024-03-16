@@ -4,6 +4,12 @@
 
 #include "core/input_manager.hpp"
 
+namespace dl::ui
+{
+class UIManager;
+class Notification;
+}  // namespace dl::ui
+
 namespace dl
 {
 class World;
@@ -14,7 +20,7 @@ class Camera;
 class BuildHutSystem
 {
  public:
-  BuildHutSystem(World& world, EventEmitter& event_emitter);
+  BuildHutSystem(World& world, EventEmitter& event_emitter, ui::UIManager& ui_manager);
 
   void update(entt::registry& registry);
   void update_state(entt::registry& registry, const Camera& camera);
@@ -27,8 +33,10 @@ class BuildHutSystem
   };
 
   State m_state = State::None;
-  InputManager& m_input_manager = InputManager::get_instance();
   World& m_world;
+  InputManager& m_input_manager = InputManager::get_instance();
+  ui::UIManager& m_ui_manager;
+  ui::Notification* m_notification = nullptr;
 
   void m_random_walk(entt::registry& registry, const entt::entity entity, const entt::entity job);
   bool m_is_within_hut_bounds(const Position& agent_position, const Position& hut_position, const uint32_t hut_size);

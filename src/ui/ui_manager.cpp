@@ -2,10 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "./components/container.hpp"
-#include "./components/label.hpp"
+#include "./compositions/notification.hpp"
 #include "core/asset_manager.hpp"
-// #include "graphics/batch.hpp"
 #include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
@@ -46,6 +44,13 @@ void UIManager::render()
 
     component->render();
   }
+}
+
+Notification* UIManager::notify(const std::string& notification)
+{
+  auto component = emplace<Notification>(notification);
+  component->show();
+  return component;
 }
 
 void UIManager::force_hide_all()

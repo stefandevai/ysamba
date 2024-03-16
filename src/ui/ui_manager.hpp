@@ -19,6 +19,8 @@ namespace dl::ui
 {
 using namespace entt::literals;
 
+class Notification;
+
 class UIManager
 {
  public:
@@ -43,6 +45,7 @@ class UIManager
 
   void update();
   void render();
+  Notification* notify(const std::string& notification);
   void force_hide_all();
 
  private:

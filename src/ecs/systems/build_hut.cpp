@@ -18,6 +18,8 @@
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "graphics/camera.hpp"
+#include "ui/compositions/notification.hpp"
+#include "ui/ui_manager.hpp"
 #include "world/target.hpp"
 #include "world/world.hpp"
 
@@ -37,7 +39,8 @@ const auto stop_place_exterior = [](entt::registry& registry, const entt::entity
   registry.remove<ActionPlaceHutExterior>(entity);
 };
 
-BuildHutSystem::BuildHutSystem(World& world, EventEmitter& event_emitter) : m_world(world)
+BuildHutSystem::BuildHutSystem(World& world, EventEmitter& event_emitter, ui::UIManager& ui_manager)
+    : m_world(world), m_ui_manager(ui_manager)
 {
   event_emitter.on<SelectHutTargetEvent>([this](const SelectHutTargetEvent& event, EventEmitter& emitter) {
     (void)emitter;
@@ -377,6 +380,18 @@ void BuildHutSystem::m_update_select_target(entt::registry& registry, const Came
   {
     m_input_manager.push_context("action_menu"_hs);
   }
+  if (m_input_manager.poll_action("close_menu"_hs))
+  {
+    m_input_manager.pop_context();
+    m_ui_manager.erase(m_notification);
+    m_state = State::None;
+    return;
+  }
+
+  if (m_notification == nullptr)
+  {
+    m_notification = m_ui_manager.notify("Select area for hut");
+  }
 
   m_select_hut_target(registry, camera);
 }
@@ -619,6 +634,7 @@ void BuildHutSystem::m_create_hut_job(const Vector3i& tile_position, const uint3
   std::for_each(entities.begin(), entities.end(), assign_build_hut_job);
 
   m_input_manager.pop_context();
+  m_ui_manager.erase(m_notification);
   m_state = State::None;
 }
 

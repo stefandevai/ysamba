@@ -273,7 +273,6 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   }
   case ActionMenuState::SelectHutTarget:
   {
-    // m_select_hut_target(camera, registry);
     m_event_emitter.publish(SelectHutTargetEvent{});
     m_dispose();
     break;
