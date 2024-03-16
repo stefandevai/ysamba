@@ -36,11 +36,12 @@ class UIManager
   }
 
   template <typename T, typename... Args>
-  void erase(const T* component)
+  void erase(T*& component)
   {
     m_components.erase(std::find_if(m_components.begin(),
                                     m_components.end(),
                                     [component](std::unique_ptr<UIComponent>& c) { return c.get() == component; }));
+    component = nullptr;
   }
 
   void update();
