@@ -258,8 +258,6 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
                                  const int z,
                                  const int z_index)
 {
-  using namespace entt::literals;
-
   if (tile_id <= 0)
   {
     return;

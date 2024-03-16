@@ -1,9 +1,11 @@
 #include "./build_hut.hpp"
 
+#include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
+#include "core/json.hpp"
 #include "core/random.hpp"
 #include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/action_place_hut_exterior.hpp"
@@ -160,6 +162,7 @@ void BuildHutSystem::update(entt::registry& registry)
 
     assert(hut_size >= 3);
 
+    // TODO: Use bitmasks to represent huts
     // Place hut structure tiles
     if (hut_size == 3)
     {
@@ -284,6 +287,7 @@ void BuildHutSystem::update(entt::registry& registry)
 
     const int hut_size = home.size.x;
 
+    // TODO: Use bitmasks to represent huts
     switch (hut_size)
     {
     case 3:
@@ -502,6 +506,7 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
     registry.emplace<Position>(entity, x, y, z);
   };
 
+  // TODO: Use bitmasks to represent huts
   if (hut_size == 3)
   {
     // Perimeter
@@ -516,6 +521,9 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
 
     // Top
     add_hut_part(148, position.x + 1, position.y + 1, position.z + 1);
+
+    // TODO: Automatically add bottom tile parts
+    add_hut_part(143, position.x + 1, position.y + 1, position.z);
   }
   else if (hut_size == 4)
   {
@@ -536,6 +544,10 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
     add_hut_part(154, position.x + 2, position.y + 1, position.z + 1);
     add_hut_part(169, position.x + 1, position.y + 2, position.z + 1);
     add_hut_part(173, position.x + 2, position.y + 2, position.z + 1);
+
+    // TODO: Automatically add bottom tile parts
+    add_hut_part(176, position.x + 1, position.y + 2, position.z);
+    add_hut_part(180, position.x + 2, position.y + 2, position.z);
   }
   else
   {
@@ -560,6 +572,10 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
     add_hut_part(169, position.x + 1, position.y + hut_size - 2, position.z + 1);
     add_hut_part(173, position.x + hut_size - 2, position.y + hut_size - 2, position.z + 1);
 
+    // TODO: Automatically add bottom tile parts
+    add_hut_part(176, position.x + 1, position.y + hut_size - 2, position.z);
+    add_hut_part(180, position.x + hut_size - 2, position.y + hut_size - 2, position.z);
+
     // Tiled parts
     for (int i = 2; i < static_cast<int>(hut_size) - 2; ++i)
     {
@@ -577,6 +593,9 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
         add_hut_part(160, position.x, position.y + i, position.z);
         add_hut_part(163, position.x + hut_size - 1, position.y + i, position.z);
       }
+
+      // TODO: Automatically add bottom tile parts
+      add_hut_part(177, position.x + i, position.y + hut_size - 2, position.z);
     }
   }
 }
