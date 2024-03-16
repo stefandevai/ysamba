@@ -192,6 +192,10 @@ void AStar::step()
         continue;
       }
     }
+    else if (!walkable)
+    {
+      continue;
+    }
 
     // Skip if node is in the closed set
     const auto closed_it = std::find_if(

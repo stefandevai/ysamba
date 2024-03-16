@@ -217,7 +217,7 @@ std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
     a_star.step();
   } while (a_star.state == AStar::State::SEARCHING);
 
-  // a_star.debug(*m_game_context.registry, true, false);
+  // a_star.debug(*m_game_context.registry, false, true);
 
   if (a_star.state == AStar::State::SUCCEEDED)
   {
