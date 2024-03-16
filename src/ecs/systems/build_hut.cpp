@@ -190,7 +190,9 @@ void BuildHutSystem::update(entt::registry& registry)
       m_world.set_decoration(156, target.x, target.y + 1, target.z);
       m_world.set_decoration(159, target.x + hut_size - 1, target.y + 1, target.z);
 
+      m_world.set_decoration(168, target.x, target.y + hut_size - 3, target.z);
       m_world.set_decoration(175, target.x, target.y + hut_size - 2, target.z);
+      m_world.set_decoration(174, target.x + hut_size - 1, target.y + hut_size - 3, target.z);
       m_world.set_decoration(181, target.x + hut_size - 1, target.y + hut_size - 2, target.z);
       m_world.set_decoration(182, target.x, target.y + hut_size - 1, target.z);
       m_world.set_decoration(183, target.x + 1, target.y + hut_size - 1, target.z);
@@ -214,8 +216,12 @@ void BuildHutSystem::update(entt::registry& registry)
         // Vertical structure parts
         m_world.set_decoration(157, target.x + 1, target.y + i, target.z + 1);
         m_world.set_decoration(158, target.x + hut_size - 2, target.y + i, target.z + 1);
-        m_world.set_decoration(160, target.x, target.y + i, target.z);
-        m_world.set_decoration(163, target.x + hut_size - 1, target.y + i, target.z);
+
+        if (i < hut_size - 3)
+        {
+          m_world.set_decoration(160, target.x, target.y + i, target.z);
+          m_world.set_decoration(163, target.x + hut_size - 1, target.y + i, target.z);
+        }
       }
     }
 

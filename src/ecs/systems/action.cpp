@@ -514,7 +514,9 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
     add_hut_part(156, tile_position.x, tile_position.y + 1, tile_position.z);
     add_hut_part(159, tile_position.x + hut_size - 1, tile_position.y + 1, tile_position.z);
 
+    add_hut_part(168, tile_position.x, tile_position.y + hut_size - 3, tile_position.z);
     add_hut_part(175, tile_position.x, tile_position.y + hut_size - 2, tile_position.z);
+    add_hut_part(174, tile_position.x + hut_size - 1, tile_position.y + hut_size - 3, tile_position.z);
     add_hut_part(181, tile_position.x + hut_size - 1, tile_position.y + hut_size - 2, tile_position.z);
     add_hut_part(182, tile_position.x, tile_position.y + hut_size - 1, tile_position.z);
     add_hut_part(183, tile_position.x + 1, tile_position.y + hut_size - 1, tile_position.z);
@@ -538,8 +540,12 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
       // Vertical structure parts
       add_hut_part(157, tile_position.x + 1, tile_position.y + i, tile_position.z + 1);
       add_hut_part(158, tile_position.x + hut_size - 2, tile_position.y + i, tile_position.z + 1);
-      add_hut_part(160, tile_position.x, tile_position.y + i, tile_position.z);
-      add_hut_part(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
+
+      if (i < static_cast<int>(hut_size) - 3)
+      {
+        add_hut_part(160, tile_position.x, tile_position.y + i, tile_position.z);
+        add_hut_part(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
+      }
     }
   }
 }
