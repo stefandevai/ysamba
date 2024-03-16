@@ -4,6 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
 #include "core/random.hpp"
@@ -272,7 +273,9 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   }
   case ActionMenuState::SelectHutTarget:
   {
-    m_select_hut_target(camera, registry);
+    // m_select_hut_target(camera, registry);
+    m_event_emitter.publish(SelectHutTargetEvent{});
+    m_dispose();
     break;
   }
   default:
@@ -408,245 +411,6 @@ void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& reg
   m_select_tile_target(mouse_tile, JobType::Dig, registry);
 }
 
-void ActionSystem::m_select_hut_target(const Camera& camera, entt::registry& registry)
-{
-  const auto& grid_size = camera.get_grid_size();
-  const auto& drag_bounds = m_input_manager.get_drag_bounds();
-
-  Vector2i area{std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(grid_size.x)),
-                std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(grid_size.y))};
-
-  const uint32_t hut_size = std::max(std::max(area.x, area.y), 3);
-
-  Vector2i direction;
-  direction.x = drag_bounds.x <= drag_bounds.z ? 0 : 1;
-  direction.y = drag_bounds.y <= drag_bounds.w ? 0 : 1;
-
-  Vector3i begin = m_world.screen_to_world(Vector2i{drag_bounds.x, drag_bounds.y}, camera);
-
-  begin.x -= hut_size * direction.x;
-  begin.y -= hut_size * direction.y;
-
-  if (m_input_manager.is_dragging())
-  {
-    m_preview_hut_target(begin, hut_size, registry);
-  }
-  else if (m_input_manager.has_dragged())
-  {
-    m_create_hut_job(begin, hut_size, registry);
-  }
-}
-
-void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
-                                        const uint32_t hut_size,
-                                        entt::registry& registry)
-{
-  assert(hut_size >= 3);
-
-  for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
-  {
-    registry.destroy(entity);
-  }
-
-  const auto texture_id = m_world.get_texture_id();
-
-  Color sprite_color{0xFFFFFF99};
-  if (!m_can_build_hut(hut_size, tile_position))
-  {
-    sprite_color = Color{0xFF0000FF};
-  }
-
-  auto add_hut_part
-      = [&registry, &sprite_color, texture_id](const uint32_t id, const int x, const int y, const int z) {
-          const auto entity = registry.create();
-          registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
-          const auto sprite = Sprite{
-              .id = id,
-              .resource_id = texture_id,
-              .layer_z = 4,
-              .category = "tile",
-              .color = sprite_color,
-          };
-          registry.emplace<Sprite>(entity, sprite);
-          registry.emplace<Position>(entity, x, y, z);
-        };
-
-  if (hut_size == 3)
-  {
-    // Perimeter
-    add_hut_part(139, tile_position.x, tile_position.y, tile_position.z);
-    add_hut_part(140, tile_position.x + 1, tile_position.y, tile_position.z);
-    add_hut_part(141, tile_position.x + 2, tile_position.y, tile_position.z);
-    add_hut_part(142, tile_position.x, tile_position.y + 1, tile_position.z);
-    add_hut_part(144, tile_position.x + 2, tile_position.y + 1, tile_position.z);
-    add_hut_part(145, tile_position.x, tile_position.y + 2, tile_position.z);
-    add_hut_part(146, tile_position.x + 1, tile_position.y + 2, tile_position.z);
-    add_hut_part(147, tile_position.x + 2, tile_position.y + 2, tile_position.z);
-
-    // Top
-    add_hut_part(148, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
-  }
-  else if (hut_size == 4)
-  {
-    // Perimeter
-    add_hut_part(149, tile_position.x, tile_position.y, tile_position.z);
-    add_hut_part(155, tile_position.x + 3, tile_position.y, tile_position.z);
-    add_hut_part(152, tile_position.x, tile_position.y + 1, tile_position.z);
-    add_hut_part(153, tile_position.x + 3, tile_position.y + 1, tile_position.z);
-    add_hut_part(175, tile_position.x, tile_position.y + 2, tile_position.z);
-    add_hut_part(181, tile_position.x + 3, tile_position.y + 2, tile_position.z);
-    add_hut_part(182, tile_position.x, tile_position.y + 3, tile_position.z);
-    add_hut_part(183, tile_position.x + 1, tile_position.y + 3, tile_position.z);
-    add_hut_part(187, tile_position.x + 2, tile_position.y + 3, tile_position.z);
-    add_hut_part(188, tile_position.x + 3, tile_position.y + 3, tile_position.z);
-
-    // Top
-    add_hut_part(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
-    add_hut_part(154, tile_position.x + 2, tile_position.y + 1, tile_position.z + 1);
-    add_hut_part(169, tile_position.x + 1, tile_position.y + 2, tile_position.z + 1);
-    add_hut_part(173, tile_position.x + 2, tile_position.y + 2, tile_position.z + 1);
-  }
-  else
-  {
-    // Perimeter structure parts
-    add_hut_part(149, tile_position.x, tile_position.y, tile_position.z);
-    add_hut_part(155, tile_position.x + hut_size - 1, tile_position.y, tile_position.z);
-    add_hut_part(156, tile_position.x, tile_position.y + 1, tile_position.z);
-    add_hut_part(159, tile_position.x + hut_size - 1, tile_position.y + 1, tile_position.z);
-
-    add_hut_part(168, tile_position.x, tile_position.y + hut_size - 3, tile_position.z);
-    add_hut_part(175, tile_position.x, tile_position.y + hut_size - 2, tile_position.z);
-    add_hut_part(174, tile_position.x + hut_size - 1, tile_position.y + hut_size - 3, tile_position.z);
-    add_hut_part(181, tile_position.x + hut_size - 1, tile_position.y + hut_size - 2, tile_position.z);
-    add_hut_part(182, tile_position.x, tile_position.y + hut_size - 1, tile_position.z);
-    add_hut_part(183, tile_position.x + 1, tile_position.y + hut_size - 1, tile_position.z);
-    add_hut_part(187, tile_position.x + hut_size - 2, tile_position.y + hut_size - 1, tile_position.z);
-    add_hut_part(188, tile_position.x + hut_size - 1, tile_position.y + hut_size - 1, tile_position.z);
-
-    // Top structure parts
-    add_hut_part(150, tile_position.x + 1, tile_position.y + 1, tile_position.z + 1);
-    add_hut_part(154, tile_position.x + hut_size - 2, tile_position.y + 1, tile_position.z + 1);
-    add_hut_part(169, tile_position.x + 1, tile_position.y + hut_size - 2, tile_position.z + 1);
-    add_hut_part(173, tile_position.x + hut_size - 2, tile_position.y + hut_size - 2, tile_position.z + 1);
-
-    // Tiled parts
-    for (int i = 2; i < static_cast<int>(hut_size) - 2; ++i)
-    {
-      // Horizontal structure parts
-      add_hut_part(151, tile_position.x + i, tile_position.y + 1, tile_position.z + 1);
-      add_hut_part(170, tile_position.x + i, tile_position.y + hut_size - 2, tile_position.z + 1);
-      add_hut_part(184, tile_position.x + i, tile_position.y + hut_size - 1, tile_position.z);
-
-      // Vertical structure parts
-      add_hut_part(157, tile_position.x + 1, tile_position.y + i, tile_position.z + 1);
-      add_hut_part(158, tile_position.x + hut_size - 2, tile_position.y + i, tile_position.z + 1);
-
-      if (i < static_cast<int>(hut_size) - 3)
-      {
-        add_hut_part(160, tile_position.x, tile_position.y + i, tile_position.z);
-        add_hut_part(163, tile_position.x + hut_size - 1, tile_position.y + i, tile_position.z);
-      }
-    }
-  }
-}
-
-void ActionSystem::m_create_hut_job(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry)
-{
-  using namespace entt::literals;
-
-  if (!m_can_build_hut(hut_size, tile_position))
-  {
-    for (const auto entity : registry.view<entt::tag<"hut_preview"_hs>>())
-    {
-      registry.destroy(entity);
-    }
-    return;
-  }
-
-  // Create progress entity
-  const uint32_t cost_per_tile = 200;
-  const uint32_t total_cost = cost_per_tile * hut_size * hut_size;
-  const auto job_progress_entity = registry.create();
-  auto& progress = registry.emplace<JobProgress>(job_progress_entity, JobType::BuildHut, total_cost);
-  registry.emplace<Position>(job_progress_entity,
-                             static_cast<double>(tile_position.x),
-                             static_cast<double>(tile_position.y),
-                             static_cast<double>(tile_position.z));
-
-  // Assign a build hut job for each agent
-  auto assign_build_hut_job
-      = [&registry, &tile_position, &progress, hut_size, job_progress_entity](const entt::entity entity) {
-          const auto offset_x = random::get_integer(0, hut_size);
-          const auto offset_y = random::get_integer(0, hut_size);
-          const auto job_target = Vector3i{tile_position.x + offset_x, tile_position.y + offset_y, tile_position.z};
-
-          // Create a walk job to walk until the target
-          const auto walk_job = registry.create();
-          registry.emplace<Target>(walk_job, job_target);
-          registry.emplace<JobData>(walk_job, JobType::Walk);
-
-          // Create the main job
-          const auto build_hut_job = registry.create();
-          registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
-
-          // Assign the progress entity to the job
-          auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
-          job_data.progress_entity = job_progress_entity;
-
-          auto& agent = registry.get<SocietyAgent>(entity);
-          agent.jobs.push(Job{2, walk_job});
-          agent.jobs.push(Job{2, build_hut_job});
-
-          progress.agents.push_back(entity);
-        };
-
-  if (m_selected_entities.empty())
-  {
-    auto entities = m_select_available_entities(registry);
-    std::for_each(entities.begin(), entities.end(), assign_build_hut_job);
-  }
-  else
-  {
-    std::for_each(m_selected_entities.begin(), m_selected_entities.end(), assign_build_hut_job);
-  }
-
-  m_dispose();
-}
-
-bool ActionSystem::m_can_build_hut(const uint32_t hut_size, const Vector3i& position)
-{
-  if (hut_size < 3)
-  {
-    return false;
-  }
-
-  // Check if soil is buildable
-  for (uint32_t j = 0; j < hut_size; ++j)
-  {
-    for (uint32_t i = 0; i < hut_size; ++i)
-    {
-      if (!m_world.is_walkable(position.x + i, position.y + j, position.z))
-      {
-        return false;
-      }
-    }
-  }
-
-  // Check if there's space over the ground to build the hut
-  for (uint32_t j = 0; j < hut_size; ++j)
-  {
-    for (uint32_t i = 0; i < hut_size; ++i)
-    {
-      if (!m_world.is_empty(position.x + i, position.y + j, position.z + 1))
-      {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
 void ActionSystem::m_assign_job(const entt::entity job,
                                 const Vector3i& position,
                                 entt::registry& registry,
@@ -739,25 +503,6 @@ bool ActionSystem::m_has_consumables(const std::map<uint32_t, uint32_t>& consuma
   (void)consumables;
   (void)registry;
   return true;
-}
-
-std::vector<entt::entity> ActionSystem::m_select_available_entities(entt::registry& registry)
-{
-  std::vector<entt::entity> entities;
-
-  for (const auto entity : registry.view<SocietyAgent, Selectable>())
-  {
-    const auto& agent = registry.get<SocietyAgent>(entity);
-
-    if (!agent.jobs.empty())
-    {
-      continue;
-    }
-
-    entities.push_back(entity);
-  }
-
-  return entities;
 }
 
 }  // namespace dl

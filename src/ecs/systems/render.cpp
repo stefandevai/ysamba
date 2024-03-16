@@ -141,11 +141,13 @@ void RenderSystem::m_render_tiles(const Camera& camera)
         }
         if ((j + world::chunk_size.y) - (camera_position.y + camera_size.y) > 0)
         {
-          upper_bound_j = world::chunk_size.y - ((j + world::chunk_size.y) - (camera_position.y + camera_size.y + padding));
+          upper_bound_j
+              = world::chunk_size.y - ((j + world::chunk_size.y) - (camera_position.y + camera_size.y + padding));
         }
         if ((i + world::chunk_size.x) - (camera_position.x + camera_size.x) > 0)
         {
-          upper_bound_i = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x + padding));
+          upper_bound_i
+              = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x + padding));
         }
 
         for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)
@@ -212,7 +214,8 @@ void RenderSystem::m_render_tiles(const Camera& camera)
         }
         if ((i + world::chunk_size.x) - (camera_position.x + camera_size.x) > 0)
         {
-          upper_bound_i = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x + padding));
+          upper_bound_i
+              = world::chunk_size.x - ((i + world::chunk_size.x) - (camera_position.x + camera_size.x + padding));
         }
 
         for (int local_j = lower_bound_j; local_j < upper_bound_j; ++local_j)

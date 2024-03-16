@@ -197,6 +197,7 @@ void Gameplay::m_update_action_systems()
   m_inspector_system.update(m_registry, m_camera);
   m_inventory_system.update(m_registry);
   m_drop_system.update(m_registry, m_camera);
+  m_build_hut_system.update_state(m_registry, m_camera);
 }
 
 void Gameplay::m_update_all_systems()
