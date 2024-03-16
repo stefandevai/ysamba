@@ -410,11 +410,11 @@ void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& reg
 
 void ActionSystem::m_select_hut_target(const Camera& camera, entt::registry& registry)
 {
-  const auto& tile_size = m_world.get_tile_size();
+  const auto& grid_size = camera.get_grid_size();
   const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
-  Vector2i area{std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(tile_size.x)),
-                std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(tile_size.y))};
+  Vector2i area{std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(grid_size.x)),
+                std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(grid_size.y))};
 
   const uint32_t hut_size = std::max(std::max(area.x, area.y), 3);
 
