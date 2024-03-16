@@ -6,6 +6,7 @@
 
 #include "./animation_manager.hpp"
 #include "./components/component.hpp"
+#include "./compositions/notification.hpp"
 #include "./context.hpp"
 #include "core/clock.hpp"
 
@@ -18,8 +19,6 @@ class Renderer;
 namespace dl::ui
 {
 using namespace entt::literals;
-
-class Notification;
 
 class UIManager
 {
@@ -38,10 +37,14 @@ class UIManager
   template <typename T, typename... Args>
   void erase(T*& component)
   {
-    m_components.erase(std::find_if(m_components.begin(),
-                                    m_components.end(),
-                                    [component](std::unique_ptr<UIComponent>& c) { return c.get() == component; }));
-    component = nullptr;
+    auto it = std::find_if(m_components.begin(), m_components.end(), [component](std::unique_ptr<UIComponent>& c) {
+      return c.get() == component;
+    });
+    if (it != m_components.end())
+    {
+      m_components.erase(it);
+      component = nullptr;
+    }
   }
 
   void update();
@@ -52,8 +55,9 @@ class UIManager
  private:
   AssetManager* m_asset_manager = nullptr;
   Renderer* m_renderer = nullptr;
-  std::vector<std::unique_ptr<UIComponent>> m_components;
-  std::vector<glm::mat4> m_matrix_stack;
+  std::vector<std::unique_ptr<UIComponent>> m_components{};
+  std::vector<std::unique_ptr<Notification>> m_notifications{};
+  std::vector<glm::mat4> m_matrix_stack{};
   AnimationManager m_animation_manager{};
   Clock m_clock{};
 

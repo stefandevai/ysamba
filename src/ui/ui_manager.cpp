@@ -2,7 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "./compositions/notification.hpp"
 #include "core/asset_manager.hpp"
 #include "graphics/renderer/renderer.hpp"
 
@@ -31,6 +30,19 @@ void UIManager::update()
 
     component->m_update();
   }
+
+  for (auto& notification : m_notifications)
+  {
+    if (notification->state == UIComponent::State::Hidden)
+    {
+      continue;
+    }
+
+    notification->m_update();
+  }
+
+  // Remove notifications after they are hidden
+  std::erase_if(m_notifications, [](const auto& component) { return component->state == UIComponent::State::Hidden; });
 }
 
 void UIManager::render()
@@ -44,13 +56,24 @@ void UIManager::render()
 
     component->render();
   }
+
+  for (auto& notification : m_notifications)
+  {
+    if (notification->state == UIComponent::State::Hidden)
+    {
+      continue;
+    }
+
+    notification->render();
+  }
 }
 
 Notification* UIManager::notify(const std::string& notification)
 {
-  auto component = emplace<Notification>(notification);
+  auto component = std::make_unique<Notification>(m_context, notification);
   component->show();
-  return component;
+  m_notifications.push_back(std::move(component));
+  return &(*m_notifications.back());
 }
 
 void UIManager::force_hide_all()

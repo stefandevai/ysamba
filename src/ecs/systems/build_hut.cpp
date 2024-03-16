@@ -383,7 +383,8 @@ void BuildHutSystem::m_update_select_target(entt::registry& registry, const Came
   if (m_input_manager.poll_action("close_menu"_hs))
   {
     m_input_manager.pop_context();
-    m_ui_manager.erase(m_notification);
+    m_notification->hide();
+    m_notification = nullptr;
     m_state = State::None;
     return;
   }
@@ -634,7 +635,8 @@ void BuildHutSystem::m_create_hut_job(const Vector3i& tile_position, const uint3
   std::for_each(entities.begin(), entities.end(), assign_build_hut_job);
 
   m_input_manager.pop_context();
-  m_ui_manager.erase(m_notification);
+  m_notification->hide();
+  m_notification = nullptr;
   m_state = State::None;
 }
 
