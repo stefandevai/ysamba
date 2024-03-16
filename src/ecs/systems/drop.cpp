@@ -16,8 +16,8 @@
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
 #include "graphics/camera.hpp"
-#include "ui/components/label.hpp"
 #include "ui/compositions/item_selection.hpp"
+#include "ui/compositions/notification.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/target.hpp"
 #include "world/world.hpp"
@@ -39,11 +39,6 @@ DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world)
   };
 
   m_drop_menu = m_ui_manager.emplace<ui::ItemSelection>(std::move(on_select));
-
-  m_select_target_label = m_ui_manager.emplace<ui::Label>("Select target");
-  m_select_target_label->state = ui::UIComponent::State::Hidden;
-  m_select_target_label->x_alignment = ui::XAlignement::Center;
-  m_select_target_label->position.y = 30;
 }
 
 void DropSystem::update(entt::registry& registry, const Camera& camera)
@@ -258,7 +253,11 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
   }
 
   m_close_drop_menu();
-  m_show_select_target_text();
+
+  if (m_notification == nullptr)
+  {
+    m_notification = m_ui_manager.notify("Drop where?");
+  }
 
   if (m_input_manager.poll_action("close_menu"_hs))
   {
@@ -294,16 +293,6 @@ void DropSystem::m_open_drop_menu()
   }
 }
 
-void DropSystem::m_show_select_target_text()
-{
-  assert(m_select_target_label != nullptr);
-
-  if (m_select_target_label->state == ui::UIComponent::State::Hidden)
-  {
-    m_select_target_label->show();
-  }
-}
-
 void DropSystem::m_close_drop_menu()
 {
   if (m_drop_menu->state == ui::UIComponent::State::Visible)
@@ -312,18 +301,15 @@ void DropSystem::m_close_drop_menu()
   }
 }
 
-void DropSystem::m_close_select_target()
-{
-  if (m_select_target_label->state == ui::UIComponent::State::Visible)
-  {
-    m_select_target_label->hide();
-  }
-}
-
 void DropSystem::m_dispose()
 {
+  if (m_notification != nullptr)
+  {
+    m_notification->hide();
+    m_notification = nullptr;
+  }
+
   m_close_drop_menu();
-  m_close_select_target();
 
   m_state = DropMenuState::Closed;
   m_target_item = entt::null;

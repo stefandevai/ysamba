@@ -9,7 +9,7 @@ namespace dl::ui
 {
 class UIManager;
 class ItemSelection;
-class Label;
+class Notification;
 }  // namespace dl::ui
 
 namespace dl
@@ -38,7 +38,7 @@ class DropSystem
   static const ui::ItemList<uint32_t> m_menu_items;
   ui::ItemList<std::pair<entt::entity, entt::entity>> m_items{};
   ui::ItemSelection* m_drop_menu = nullptr;
-  ui::Label* m_select_target_label = nullptr;
+  ui::Notification* m_notification = nullptr;
   entt::entity m_selected_entity = entt::null;
   entt::entity m_target_item = entt::null;
 
@@ -48,10 +48,8 @@ class DropSystem
   void m_update_drop_menu();
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);
   void m_update_closed_menu(entt::registry& registry);
-  void m_show_select_target_text();
   void m_open_drop_menu();
   void m_close_drop_menu();
-  void m_close_select_target();
   void m_dispose();
 };
 }  // namespace dl

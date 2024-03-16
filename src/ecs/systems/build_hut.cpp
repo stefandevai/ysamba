@@ -702,8 +702,13 @@ std::vector<entt::entity> BuildHutSystem::m_select_available_entities(entt::regi
 void BuildHutSystem::m_dispose()
 {
   m_input_manager.pop_context();
-  m_notification->hide();
-  m_notification = nullptr;
+
+  if (m_notification != nullptr)
+  {
+    m_notification->hide();
+    m_notification = nullptr;
+  }
+
   m_state = State::None;
 }
 

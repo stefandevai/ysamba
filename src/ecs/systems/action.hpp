@@ -12,7 +12,7 @@ namespace dl::ui
 {
 class UIManager;
 class ActionMenu;
-class Label;
+class Notification;
 }  // namespace dl::ui
 
 namespace dl
@@ -45,7 +45,7 @@ class ActionSystem
   static const ui::ItemList<uint32_t> m_menu_items;
   ui::ItemList<uint32_t> m_actions{};
   ui::ActionMenu* m_action_menu = nullptr;
-  ui::Label* m_select_target_label = nullptr;
+  ui::Notification* m_notification = nullptr;
   EventEmitter& m_event_emitter;
 
   std::vector<entt::entity> m_selected_entities{};
@@ -55,10 +55,8 @@ class ActionSystem
   void m_update_action_menu();
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);
   void m_update_closed_menu(entt::registry& registry, const Camera& camera);
-  void m_show_select_target_text();
   void m_open_action_menu();
   void m_close_action_menu();
-  void m_close_select_target();
   void m_dispose();
   void m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry);
   void m_assign_job(const entt::entity job,

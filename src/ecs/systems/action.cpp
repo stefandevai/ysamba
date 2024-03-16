@@ -22,8 +22,8 @@
 #include "ecs/systems/pickup.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/quad.hpp"
-#include "ui/components/label.hpp"
 #include "ui/compositions/action_menu.hpp"
+#include "ui/compositions/notification.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/society/job.hpp"
 #include "world/world.hpp"
@@ -41,11 +41,6 @@ ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter
     : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
 {
   m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
-
-  m_select_target_label = m_ui_manager.emplace<ui::Label>("Select target");
-  m_select_target_label->state = ui::UIComponent::State::Hidden;
-  m_select_target_label->x_alignment = ui::XAlignement::Center;
-  m_select_target_label->position.y = 30;
 }
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)
@@ -246,8 +241,6 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
 
   m_close_action_menu();
 
-  m_show_select_target_text();
-
   if (m_input_manager.poll_action("close_menu"_hs))
   {
     m_dispose();
@@ -295,16 +288,6 @@ void ActionSystem::m_open_action_menu()
   }
 }
 
-void ActionSystem::m_show_select_target_text()
-{
-  assert(m_select_target_label != nullptr);
-
-  if (m_select_target_label->state == ui::UIComponent::State::Hidden)
-  {
-    m_select_target_label->show();
-  }
-}
-
 void ActionSystem::m_close_action_menu()
 {
   if (m_action_menu->state == ui::UIComponent::State::Visible)
@@ -313,18 +296,15 @@ void ActionSystem::m_close_action_menu()
   }
 }
 
-void ActionSystem::m_close_select_target()
-{
-  if (m_select_target_label->state == ui::UIComponent::State::Visible)
-  {
-    m_select_target_label->hide();
-  }
-}
-
 void ActionSystem::m_dispose()
 {
+  if (m_notification != nullptr)
+  {
+    m_notification->hide();
+    m_notification = nullptr;
+  }
+
   m_close_action_menu();
-  m_close_select_target();
 
   m_state = ActionMenuState::Closed;
   m_input_manager.pop_context();
@@ -379,6 +359,11 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
 
 void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry& registry)
 {
+  if (m_notification == nullptr)
+  {
+    m_notification = m_ui_manager.notify("Harvest where?");
+  }
+
   if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
     return;
@@ -390,6 +375,11 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
 
 void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& registry)
 {
+  if (m_notification == nullptr)
+  {
+    m_notification = m_ui_manager.notify("Break where?");
+  }
+
   if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
     return;
@@ -401,6 +391,11 @@ void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& r
 
 void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& registry)
 {
+  if (m_notification == nullptr)
+  {
+    m_notification = m_ui_manager.notify("Dig where?");
+  }
+
   if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
     return;
