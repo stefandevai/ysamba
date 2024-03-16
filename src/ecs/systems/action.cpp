@@ -457,7 +457,7 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
   }
 
   auto add_hut_part
-      = [&registry, &sprite_color, texture_id](const uint32_t id, const double x, const double y, const double z) {
+      = [&registry, &sprite_color, texture_id](const uint32_t id, const int x, const int y, const int z) {
           const auto entity = registry.create();
           registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
           const auto sprite = Sprite{
@@ -528,7 +528,7 @@ void ActionSystem::m_preview_hut_target(const Vector3i& tile_position,
     add_hut_part(173, tile_position.x + hut_size - 2, tile_position.y + hut_size - 2, tile_position.z + 1);
 
     // Tiled parts
-    for (uint32_t i = 2; i < hut_size - 2; ++i)
+    for (int i = 2; i < static_cast<int>(hut_size) - 2; ++i)
     {
       // Horizontal structure parts
       add_hut_part(151, tile_position.x + i, tile_position.y + 1, tile_position.z + 1);
