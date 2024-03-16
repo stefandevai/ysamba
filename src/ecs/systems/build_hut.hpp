@@ -46,5 +46,6 @@ class BuildHutSystem
   void m_preview_hut_target(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry);
   void m_create_hut_job(const Vector3i& tile_position, const uint32_t hut_size, entt::registry& registry);
   std::vector<entt::entity> m_select_available_entities(entt::registry& registry);
+  void m_dispose();
 };
 }  // namespace dl

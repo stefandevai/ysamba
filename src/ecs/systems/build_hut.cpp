@@ -382,10 +382,7 @@ void BuildHutSystem::m_update_select_target(entt::registry& registry, const Came
   }
   if (m_input_manager.poll_action("close_menu"_hs))
   {
-    m_input_manager.pop_context();
-    m_notification->hide();
-    m_notification = nullptr;
-    m_state = State::None;
+    m_dispose();
     return;
   }
 
@@ -634,10 +631,7 @@ void BuildHutSystem::m_create_hut_job(const Vector3i& tile_position, const uint3
   auto entities = m_select_available_entities(registry);
   std::for_each(entities.begin(), entities.end(), assign_build_hut_job);
 
-  m_input_manager.pop_context();
-  m_notification->hide();
-  m_notification = nullptr;
-  m_state = State::None;
+  m_dispose();
 }
 
 bool BuildHutSystem::m_can_build_hut(const uint32_t hut_size, const Vector3i& position)
@@ -703,6 +697,14 @@ std::vector<entt::entity> BuildHutSystem::m_select_available_entities(entt::regi
   }
 
   return free_entities;
+}
+
+void BuildHutSystem::m_dispose()
+{
+  m_input_manager.pop_context();
+  m_notification->hide();
+  m_notification = nullptr;
+  m_state = State::None;
 }
 
 }  // namespace dl
