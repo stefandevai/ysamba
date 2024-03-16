@@ -25,6 +25,7 @@ char32_t UTF8Iterator::operator*()
 UTF8Iterator& UTF8Iterator::operator++()
 {
   m_dirty = true;
+
   string_iterator += m_get_code_point_size();
   return *this;
 }
@@ -34,6 +35,29 @@ UTF8Iterator UTF8Iterator::operator++(int)
   m_dirty = true;
   UTF8Iterator temp = *this;
   ++(*this);
+  return temp;
+}
+
+UTF8Iterator UTF8Iterator::operator+=(int quantity)
+{
+  m_dirty = true;
+  UTF8Iterator temp = *this;
+
+  if (quantity > 0)
+  {
+    for (int i = 0; i < quantity; ++i)
+    {
+      ++(*this);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < -quantity; ++i)
+    {
+      --(*this);
+    }
+  }
+
   return temp;
 }
 
@@ -67,6 +91,8 @@ UTF8Iterator UTF8Iterator::operator--(int)
   --(*this);
   return temp;
 }
+
+UTF8Iterator UTF8Iterator::operator-=(int quantity) { return operator+=(-quantity); }
 
 uint8_t UTF8Iterator::m_get_code_point() const
 {

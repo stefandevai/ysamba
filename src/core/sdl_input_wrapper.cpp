@@ -5,7 +5,6 @@
 #include <entt/core/hashed_string.hpp>
 
 #include "./input_manager.hpp"
-#include "core/utf8.hpp"
 #include "definitions.hpp"
 
 #ifdef DL_BUILD_DEBUG_TOOLS
@@ -408,7 +407,9 @@ void SDLInputWrapper::update()
     {
       if (m_capture_text_input)
       {
-        m_text_input += event.text.text;
+        const std::string input_text{event.text.text};
+        m_text_input.insert(m_cursor.string_iterator, input_text.begin(), input_text.end());
+        ++m_cursor;
       }
       break;
     }
@@ -422,15 +423,32 @@ void SDLInputWrapper::update()
   {
     if (m_key_down[SDLK_BACKSPACE] && !m_text_input.empty())
     {
-      UTF8Iterator it = m_text_input.end();
-      --it;
-      m_text_input.erase(it.string_iterator, m_text_input.end());
+      --m_cursor;
+      m_text_input.erase(m_cursor.string_iterator);
     }
     else if (m_key_down[SDLK_v] && SDL_GetModState() & KMOD_CTRL)
     {
-      char* temp = SDL_GetClipboardText();
-      m_text_input += temp;
-      SDL_free(temp);
+      char* clipboard_text = SDL_GetClipboardText();
+      const std::string clipboard_string{clipboard_text};
+
+      m_text_input.insert(m_cursor.string_iterator, clipboard_string.begin(), clipboard_string.end());
+      m_cursor += clipboard_string.size();
+
+      SDL_free(clipboard_text);
+    }
+    else if (m_key_down[SDLK_LEFT])
+    {
+      if (m_cursor.string_iterator != m_text_input.begin())
+      {
+        --m_cursor;
+      }
+    }
+    else if (m_key_down[SDLK_RIGHT])
+    {
+      if (m_cursor.string_iterator != m_text_input.end())
+      {
+        ++m_cursor;
+      }
     }
   }
 

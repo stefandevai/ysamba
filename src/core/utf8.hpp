@@ -31,9 +31,13 @@ class UTF8Iterator
 
   UTF8Iterator operator++(int);
 
+  UTF8Iterator operator+=(int quantity);
+
   UTF8Iterator& operator--();
 
   UTF8Iterator operator--(int);
+
+  UTF8Iterator operator-=(int quantity);
 
   bool operator==(const UTF8Iterator& rhs) const { return string_iterator == rhs.string_iterator; }
 
