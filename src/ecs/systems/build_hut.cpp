@@ -169,6 +169,9 @@ void BuildHutSystem::update(entt::registry& registry)
       // Top
       m_world.set_decoration(148, target.x + 1, target.y + 1, target.z + 1);
 
+      // TODO: Add sprites for when top is not displayed
+      m_world.set_decoration(148, target.x + 1, target.y, target.z);
+
       // Perimeter
       m_world.set_decoration(139, target.x, target.y, target.z);
       m_world.set_decoration(140, target.x + 1, target.y, target.z);
@@ -198,6 +201,10 @@ void BuildHutSystem::update(entt::registry& registry)
       m_world.set_decoration(154, target.x + 2, target.y + 1, target.z + 1);
       m_world.set_decoration(169, target.x + 1, target.y + 2, target.z + 1);
       m_world.set_decoration(173, target.x + 2, target.y + 2, target.z + 1);
+
+      // TODO: Add sprites for when top is not displayed
+      m_world.set_decoration(150, target.x + 1, target.y, target.z);
+      m_world.set_decoration(154, target.x + 2, target.y, target.z);
     }
     else
     {
@@ -222,6 +229,10 @@ void BuildHutSystem::update(entt::registry& registry)
       m_world.set_decoration(169, target.x + 1, target.y + hut_size - 2, target.z + 1);
       m_world.set_decoration(173, target.x + hut_size - 2, target.y + hut_size - 2, target.z + 1);
 
+      // TODO: Draw specific sprites for when top is not displayed
+      m_world.set_decoration(150, target.x + 1, target.y, target.z);
+      m_world.set_decoration(154, target.x + hut_size - 2, target.y, target.z);
+
       // Tiled parts
       for (uint32_t i = 2; i < hut_size - 2; ++i)
       {
@@ -229,6 +240,9 @@ void BuildHutSystem::update(entt::registry& registry)
         m_world.set_decoration(151, target.x + i, target.y + 1, target.z + 1);
         m_world.set_decoration(170, target.x + i, target.y + hut_size - 2, target.z + 1);
         m_world.set_decoration(184, target.x + i, target.y + hut_size - 1, target.z);
+
+        // TODO: Draw specific sprites for when top is not displayed
+        m_world.set_decoration(151, target.x + i, target.y, target.z);
 
         // Vertical structure parts
         m_world.set_decoration(157, target.x + 1, target.y + i, target.z + 1);
@@ -294,6 +308,9 @@ void BuildHutSystem::update(entt::registry& registry)
       // Top
       m_world.set_decoration(199, home_position.x + 1, home_position.y + 1, home_position.z + 1);
 
+      // TODO: Draw specific sprites for when top is not displayed
+      m_world.set_decoration(199, home_position.x + 1, home_position.y, home_position.z);
+
       // Perimeter
       m_world.set_decoration(190, home_position.x, home_position.y, home_position.z);
       m_world.set_decoration(191, home_position.x + 1, home_position.y, home_position.z);
@@ -310,6 +327,10 @@ void BuildHutSystem::update(entt::registry& registry)
       m_world.set_decoration(205, home_position.x + hut_size - 2, home_position.y + 1, home_position.z + 1);
       m_world.set_decoration(221, home_position.x + 1, home_position.y + hut_size - 2, home_position.z + 1);
       m_world.set_decoration(225, home_position.x + hut_size - 2, home_position.y + hut_size - 2, home_position.z + 1);
+
+      // TODO: Draw specific sprites for when top is not displayed
+      m_world.set_decoration(201, home_position.x + 1, home_position.y, home_position.z);
+      m_world.set_decoration(205, home_position.x + hut_size - 2, home_position.y, home_position.z);
 
       // Place center top parts if needed
       if (hut_size > 4)
@@ -347,6 +368,9 @@ void BuildHutSystem::update(entt::registry& registry)
         m_world.set_decoration(202, home_position.x + i, home_position.y + 1, home_position.z + 1);
         m_world.set_decoration(222, home_position.x + i, home_position.y + hut_size - 2, home_position.z + 1);
         m_world.set_decoration(236, home_position.x + i, home_position.y + hut_size - 1, home_position.z);
+
+        // TODO: Draw specific sprites for when top is not displayed
+        m_world.set_decoration(202, home_position.x + i, home_position.y, home_position.z);
 
         // Vertical structure parts
         m_world.set_decoration(208, home_position.x + 1, home_position.y + i, home_position.z + 1);
