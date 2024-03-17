@@ -22,7 +22,6 @@
             "type": "tile",
             "sprite_type": "single",
             "frame": 2,
-            "front_face_id": 15,
             "game_id": 2
         },
         {

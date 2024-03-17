@@ -12,13 +12,8 @@
     },
     {
       "id": 2,
-      "name": "grass",
-      "flags": ["WALKABLE"],
-      "actions": [
-        {
-          "id": 0
-        }
-      ]
+      "name": "selection area",
+      "flags": []
     },
     {
       "id": 3,
@@ -42,8 +37,8 @@
     },
     {
       "id": 6,
-      "name": "dirt",
-      "flags": ["WALKABLE"]
+      "name": "selected entity",
+      "flags": []
     },
     {
       "id": 7,
