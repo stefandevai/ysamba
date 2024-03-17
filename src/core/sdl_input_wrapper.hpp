@@ -37,6 +37,7 @@ class SDLInputWrapper
   void text_input_stop();
   void reset_drag() { m_has_dragged = false; }
   const std::string& get_text_input() const;
+  int get_text_input_cursor_index() const;
 
   void set_text_input(const std::string& text);
 

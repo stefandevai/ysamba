@@ -408,7 +408,7 @@ void SDLInputWrapper::update()
       if (m_capture_text_input)
       {
         const std::string input_text{event.text.text};
-        const auto index = std::distance(m_text_input.begin(), m_cursor.string_iterator);
+        const auto index = std::distance(std::as_const(m_text_input).begin(), m_cursor.string_iterator);
         m_text_input.insert(m_cursor.string_iterator, input_text.begin(), input_text.end());
         m_cursor = m_text_input.begin() + index;
         ++m_cursor;
@@ -427,10 +427,10 @@ void SDLInputWrapper::update()
     {
       if (m_cursor.string_iterator != m_text_input.begin())
       {
-        const auto iterator_before_backspace = m_cursor.string_iterator;
+        const auto old_position = m_cursor.string_iterator;
         --m_cursor;
-        const auto index = std::distance(m_text_input.begin(), m_cursor.string_iterator);
-        m_text_input.erase(m_cursor.string_iterator, iterator_before_backspace);
+        const auto index = std::distance(std::as_const(m_text_input).begin(), m_cursor.string_iterator);
+        m_text_input.erase(m_cursor.string_iterator, old_position);
         m_cursor = m_text_input.begin() + index;
       }
     }
@@ -438,13 +438,12 @@ void SDLInputWrapper::update()
     {
       char* clipboard_text = SDL_GetClipboardText();
       const std::string clipboard_string{clipboard_text};
+      SDL_free(clipboard_text);
 
-      const auto index = std::distance(m_text_input.begin(), m_cursor.string_iterator);
+      const auto index = std::distance(std::as_const(m_text_input).begin(), m_cursor.string_iterator);
       m_text_input.insert(m_cursor.string_iterator, clipboard_string.begin(), clipboard_string.end());
       m_cursor = m_text_input.begin() + index;
       m_cursor += clipboard_string.size();
-
-      SDL_free(clipboard_text);
     }
     else if (m_key_down[SDLK_LEFT])
     {
@@ -481,6 +480,7 @@ void SDLInputWrapper::text_input_start()
 {
   SDL_StartTextInput();
   m_capture_text_input = true;
+  m_cursor = m_text_input.end();
 }
 
 void SDLInputWrapper::text_input_stop()
@@ -488,9 +488,26 @@ void SDLInputWrapper::text_input_stop()
   m_capture_text_input = false;
   SDL_StopTextInput();
   m_text_input.clear();
+  m_cursor = m_text_input.end();
 }
 
 const std::string& SDLInputWrapper::get_text_input() const { return m_text_input; }
 
-void SDLInputWrapper::set_text_input(const std::string& text) { m_text_input = text; }
+int SDLInputWrapper::get_text_input_cursor_index() const
+{
+  if (!m_capture_text_input)
+  {
+    return 0;
+  }
+
+  const auto index = std::distance(std::as_const(m_text_input).begin(), m_cursor.string_iterator);
+
+  return index;
+}
+
+void SDLInputWrapper::set_text_input(const std::string& text)
+{
+  m_text_input = text;
+  m_cursor = m_text_input.end();
+}
 }  // namespace dl

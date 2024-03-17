@@ -17,7 +17,7 @@ constexpr uint32_t unicode_slash = 0x2F;
 constexpr uint32_t unicode_hash = 0x23;
 
 Text::Text(const std::string_view text, const uint32_t typeface, const unsigned int font_size, const bool is_static)
-    : value(text), typeface(typeface), m_font_size(font_size), m_is_static(is_static)
+    : value(text), typeface(typeface), font_size(font_size), m_is_static(is_static)
 {
 }
 
@@ -32,7 +32,7 @@ void Text::initialize(AssetManager& asset_manager)
 
   assert(m_font != nullptr && "Failed to initialize text, font is nullptr");
   update();
-  m_has_initialized = true;
+  has_initialized = true;
 }
 
 void Text::update()
@@ -51,7 +51,7 @@ void Text::update_wrapped()
 {
   characters.clear();
   assert(m_font != nullptr);
-  const auto scale = m_font_size / static_cast<float>(m_font->get_size());
+  const auto scale = font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
   float char_pos_y = 0.f;
   const auto max_character_top = m_font->get_max_character_top();
@@ -131,7 +131,7 @@ void Text::update_wrapped()
     assert(typeface != 0);
     assert(character.sprite->texture != nullptr);
 
-    // if (m_font_size != m_font->get_size())
+    // if (font_size != m_font->get_size())
     // {
     //   character.sprite->transform = std::make_unique<Transform>();
     //   character.sprite->transform->scale.x = scale;
@@ -158,7 +158,7 @@ void Text::update_non_wrapped()
 
   characters.clear();
 
-  const auto scale = m_font_size / static_cast<float>(m_font->get_size());
+  const auto scale = font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
 
   if (value.empty())
@@ -192,7 +192,7 @@ void Text::update_non_wrapped()
     assert(typeface != 0);
     assert(character.sprite->texture != nullptr);
 
-    // if (m_font_size != m_font->get_size())
+    // if (font_size != m_font->get_size())
     // {
     //   character.sprite->transform = std::make_unique<Transform>();
     //   character.sprite->transform->scale.x = scale;
@@ -213,24 +213,42 @@ void Text::update_non_wrapped()
   m_size.y = m_font->get_max_character_top() * scale;
 }
 
+Vector2i Text::get_position_at(const int index) const
+{
+  Vector2i position{-1, -1};
+
+  if (index < 1 || static_cast<uint32_t>(index) > characters.size())
+  {
+    return position;
+  }
+
+  const int char_index = index - 1;
+  const int char_y = characters[char_index].y;
+
+  position.y = (char_y / font_size) * font_size;
+  position.x = characters[char_index].x + characters[char_index].w;
+
+  return position;
+}
+
 void Text::set_typeface(const uint32_t typeface)
 {
   this->typeface = typeface;
-  m_has_initialized = false;
+  has_initialized = false;
 }
 
 void Text::set_text(const std::string_view text)
 {
   value = text;
   wrap_width = 0;
-  m_has_initialized = false;
+  has_initialized = false;
 }
 
 void Text::set_text_wrapped(const std::string_view text, const int wrap_width)
 {
   value = text;
   this->wrap_width = wrap_width;
-  m_has_initialized = false;
+  has_initialized = false;
 }
 
 void Text::m_process_command(UTF8Iterator& it, Color& character_color)

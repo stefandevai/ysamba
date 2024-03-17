@@ -60,6 +60,7 @@ class InputManager
   void text_input_start();
   void text_input_stop();
   const std::string& get_text_input() const;
+  int get_text_input_cursor_index() const;
   void reset_drag();
 
   [[nodiscard]] bool should_quit() const;

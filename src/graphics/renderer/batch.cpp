@@ -245,7 +245,7 @@ void Batch::text(Text& text, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
-  if (!text.m_has_initialized)
+  if (!text.has_initialized)
   {
     assert(m_game_context.asset_manager != nullptr);
     text.initialize(*m_game_context.asset_manager);

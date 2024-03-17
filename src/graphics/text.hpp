@@ -31,11 +31,12 @@ class Text
  public:
   std::string value = "";
   uint32_t typeface = "font-1980"_hs;
+  size_t font_size = 16;
   std::vector<Character> characters{};
   Color color{0xFFFFFFFF};
   double line_height = 1.2;
   const Font* m_font = nullptr;
-  bool m_has_initialized = false;
+  bool has_initialized = false;
   uint32_t wrap_width = 0;
 
   Text(const std::string_view text,
@@ -56,18 +57,18 @@ class Text
   const std::string& get_text() const { return value; }
   uint32_t get_typeface() const { return typeface; }
   bool get_is_static() const { return m_is_static; }
-  size_t get_font_size() const { return m_font_size; }
-  bool get_has_initialized() const { return m_has_initialized; }
+  size_t get_font_size() const { return font_size; }
+  bool get_has_initialized() const { return has_initialized; }
   Vector2i get_size() const { return m_size; }
+  Vector2i get_position_at(const int index) const;
 
   void set_text(const std::string_view text);
   void set_text_wrapped(const std::string_view text, const int wrap_width);
   void set_typeface(const uint32_t typeface);
-  void set_font_size(const size_t font_size) { m_font_size = font_size; }
+  void set_font_size(const size_t font_size) { this->font_size = font_size; }
   void set_is_static(const bool is_static) { m_is_static = is_static; }
 
  private:
-  size_t m_font_size = 16;
   bool m_is_static = true;
   Vector2i m_size{0, 0};
 

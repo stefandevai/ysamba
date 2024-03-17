@@ -1,6 +1,8 @@
 #pragma once
 
 #include "./component.hpp"
+#include "core/timer.hpp"
+#include "graphics/quad.hpp"
 
 namespace dl::ui
 {
@@ -12,22 +14,33 @@ class TextInput : public UIComponent
  public:
   std::string text = "";
   std::string placeholder = "";
+  int cursor_index{};
 
   TextInput(UIContext& context);
 
   void init();
   void update();
+  void render();
 
  private:
-  enum class State
+  enum class InputState
   {
     Display,
     Focus,
   };
 
+  enum class CursorState
+  {
+    Display,
+    Hide,
+  };
+
   Container* m_container = nullptr;
   Label* m_label = nullptr;
-  State m_state = State::Display;
+  InputState m_state = InputState::Display;
+  CursorState m_cursor_state = CursorState::Display;
+  Quad m_cursor{1, 0, {0x00000000}};
+  Timer m_cursor_timer{};
 };
 
 }  // namespace dl::ui

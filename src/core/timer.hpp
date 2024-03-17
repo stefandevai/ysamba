@@ -25,6 +25,13 @@ class Timer
   }
 
   template <typename Unit = std::chrono::microseconds>
+  std::size_t elapsed()
+  {
+    const auto now = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<Unit>(now - first).count();
+  }
+
+  template <typename Unit = std::chrono::microseconds>
   void print(const std::string& what)
   {
     const auto duration = std::chrono::duration_cast<Unit>(second - first).count();

@@ -180,6 +180,8 @@ void InputManager::text_input_stop() { m_sdl_input_wrapper.text_input_stop(); }
 
 const std::string& InputManager::get_text_input() const { return m_sdl_input_wrapper.get_text_input(); }
 
+int InputManager::get_text_input_cursor_index() const { return m_sdl_input_wrapper.get_text_input_cursor_index(); }
+
 void InputManager::set_text_input(const std::string& text) { m_sdl_input_wrapper.set_text_input(text); }
 
 void InputManager::reset_drag() { m_sdl_input_wrapper.reset_drag(); }
