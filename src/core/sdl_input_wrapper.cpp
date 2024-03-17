@@ -408,7 +408,9 @@ void SDLInputWrapper::update()
       if (m_capture_text_input)
       {
         const std::string input_text{event.text.text};
+        const auto index = std::distance(m_text_input.begin(), m_cursor.string_iterator);
         m_text_input.insert(m_cursor.string_iterator, input_text.begin(), input_text.end());
+        m_cursor = m_text_input.begin() + index;
         ++m_cursor;
       }
       break;
@@ -423,15 +425,23 @@ void SDLInputWrapper::update()
   {
     if (m_key_down[SDLK_BACKSPACE] && !m_text_input.empty())
     {
-      --m_cursor;
-      m_text_input.erase(m_cursor.string_iterator);
+      if (m_cursor.string_iterator != m_text_input.begin())
+      {
+        const auto iterator_before_backspace = m_cursor.string_iterator;
+        --m_cursor;
+        const auto index = std::distance(m_text_input.begin(), m_cursor.string_iterator);
+        m_text_input.erase(m_cursor.string_iterator, iterator_before_backspace);
+        m_cursor = m_text_input.begin() + index;
+      }
     }
     else if (m_key_down[SDLK_v] && SDL_GetModState() & KMOD_CTRL)
     {
       char* clipboard_text = SDL_GetClipboardText();
       const std::string clipboard_string{clipboard_text};
 
+      const auto index = std::distance(m_text_input.begin(), m_cursor.string_iterator);
       m_text_input.insert(m_cursor.string_iterator, clipboard_string.begin(), clipboard_string.end());
+      m_cursor = m_text_input.begin() + index;
       m_cursor += clipboard_string.size();
 
       SDL_free(clipboard_text);

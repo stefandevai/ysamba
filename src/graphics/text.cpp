@@ -161,6 +161,11 @@ void Text::update_non_wrapped()
   const auto scale = m_font_size / static_cast<float>(m_font->get_size());
   float char_pos_x = 0.f;
 
+  if (value.empty())
+  {
+    return;
+  }
+
   for (UTF8Iterator it = value.begin(); it != value.end(); ++it)
   {
     const auto& ch = m_font->get_char_data(*it);

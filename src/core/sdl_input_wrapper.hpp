@@ -55,6 +55,6 @@ class SDLInputWrapper
   bool m_is_dragging = false;
   bool m_has_dragged = false;
   std::string m_text_input{};
-  UTF8Iterator m_cursor{m_text_input.end()};
+  UTF8Iterator m_cursor{m_text_input.begin()};
 };
 }  // namespace dl

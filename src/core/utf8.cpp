@@ -26,7 +26,13 @@ UTF8Iterator& UTF8Iterator::operator++()
 {
   m_dirty = true;
 
-  string_iterator += m_get_code_point_size();
+  const auto size = m_get_code_point_size();
+
+  for (int i = 0; i < size; ++i)
+  {
+    ++string_iterator;
+  }
+
   return *this;
 }
 

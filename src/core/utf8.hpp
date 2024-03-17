@@ -15,9 +15,7 @@ class UTF8Iterator
   using pointer = const char32_t*;
   using reference = const char32_t&;
 
-  std::string::const_iterator string_iterator;
-
-  UTF8Iterator(std::string::const_iterator it) : string_iterator(it) {}
+  std::string::iterator string_iterator;
 
   UTF8Iterator(std::string::iterator it) : string_iterator(it) {}
 
@@ -45,11 +43,7 @@ class UTF8Iterator
 
   bool operator==(std::string::iterator rhs) const { return string_iterator == rhs; }
 
-  bool operator==(std::string::const_iterator rhs) const { return string_iterator == rhs; }
-
   bool operator!=(std::string::iterator rhs) const { return string_iterator != rhs; }
-
-  bool operator!=(std::string::const_iterator rhs) const { return string_iterator != rhs; }
 
  private:
   static constexpr uint8_t m_first_bit_mask = 0x80;
