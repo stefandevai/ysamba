@@ -87,7 +87,7 @@ void Text::update_wrapped()
       continue;
     }
 
-    // Skip if character is a space
+    // If character is a space or another invisible character, set sprite as null and correct dimensions
     if (*it == unicode_space)
     {
       last_word_index = characters.end() - 1;
@@ -174,23 +174,29 @@ void Text::update_non_wrapped()
     const float w = ch.bw * scale;
     const float h = ch.bh * scale;
 
-    // Skip if character is a space
-    if (w == 0.0 || h == 0.0)
-    {
-      char_pos_x += (ch.ax >> 6) * scale;
-      continue;
-    }
-
     Character character;
 
     character.code = *it;
-    character.sprite = std::make_unique<Sprite>();
-    character.sprite->texture = m_font->get_atlas();
-    character.sprite->color = color;
-    character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
 
-    assert(typeface != 0);
-    assert(character.sprite->texture != nullptr);
+    // If character is a space or another invisible character, set sprite as null and correct dimensions
+    if (w == 0.0 || h == 0.0)
+    {
+      character.sprite = nullptr;
+      character.w = (ch.ax >> 6) * scale;
+      character.h = font_size;
+    }
+    else
+    {
+      character.sprite = std::make_unique<Sprite>();
+      character.sprite->texture = m_font->get_atlas();
+      character.sprite->color = color;
+      character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
+      character.w = w;
+      character.h = h;
+
+      assert(typeface != 0);
+      assert(character.sprite->texture != nullptr);
+    }
 
     // if (font_size != m_font->get_size())
     // {
@@ -201,8 +207,6 @@ void Text::update_non_wrapped()
 
     character.x = x;
     character.y = y;
-    character.w = w;
-    character.h = h;
 
     characters.push_back(std::move(character));
 
