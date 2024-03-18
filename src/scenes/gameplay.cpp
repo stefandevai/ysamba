@@ -78,8 +78,8 @@ void Gameplay::load()
 
   auto& debug_tools = DebugTools::get_instance();
   debug_tools.init_general_info(m_game_context);
-  debug_tools.init_camera_inspector(m_camera);
-  // debug_tools.init_world_generation(m_world.chunk_manager);
+  // debug_tools.init_camera_inspector(m_camera);
+  debug_tools.init_world_generation(m_world.chunk_manager);
   /* debug_tools.init_chunk_debugger(*this); */
   /* debug_tools.init_render_editor(m_render_system); */
 #endif
@@ -253,10 +253,10 @@ void Gameplay::load_default_game()
 
   m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
 
-  m_world.generate_societies();
-  auto society_blueprint = m_world.get_society("otomi"_hs);
-  auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
+  // m_world.generate_societies();
+  // auto society_blueprint = m_world.get_society("otomi"_hs);
+  // auto components = SocietyGenerator::generate_members(society_blueprint);
+  // SocietyGenerator::place_members(components, m_world, m_camera, m_registry);
   m_world.has_initialized = true;
   m_has_loaded = true;
 }

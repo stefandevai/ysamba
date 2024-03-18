@@ -86,6 +86,7 @@ void ChunkManager::regenerate_chunks()
   chunks.clear();
   m_chunks_loading.clear();
   m_chunks_to_add.clear();
+  update({0,0,0});
 }
 #endif
 
