@@ -20,7 +20,6 @@ class TextInput : public UIComponent
 
   void init();
   void update();
-  void render();
 
  private:
   enum class InputState
@@ -39,7 +38,7 @@ class TextInput : public UIComponent
   Label* m_label = nullptr;
   InputState m_state = InputState::Display;
   CursorState m_cursor_state = CursorState::Display;
-  Quad m_cursor{1, 0, {0x00000000}};
+  Container* m_cursor = nullptr;
   Timer m_cursor_timer{};
 };
 

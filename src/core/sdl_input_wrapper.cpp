@@ -500,9 +500,7 @@ int SDLInputWrapper::get_text_input_cursor_index() const
     return 0;
   }
 
-  const auto index = std::distance(UTF8Iterator(m_text_input.begin()), m_cursor);
-
-  return index;
+  return std::distance(UTF8Iterator(m_text_input.begin()), m_cursor);
 }
 
 void SDLInputWrapper::set_text_input(const std::string& text)
