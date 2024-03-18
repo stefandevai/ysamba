@@ -144,7 +144,9 @@ void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
 
-  const auto generator = utils::get_island_noise_generator(island_params);
+  // const auto generator = utils::get_island_noise_generator(island_params);
+  FastNoise::SmartNode<> generator
+      = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAL8AAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
 
   generator->GenUniformGrid2D(raw_height_map.data(),
                               offset.x - m_generation_padding,
