@@ -9,5 +9,5 @@ struct IslandNoiseParams;
 
 namespace dl::utils
 {
-const FastNoise::SmartNode<FastNoise::Remap> get_island_noise_generator(const IslandNoiseParams& params);
+const FastNoise::SmartNode<> get_island_noise_generator(const IslandNoiseParams& params);
 }

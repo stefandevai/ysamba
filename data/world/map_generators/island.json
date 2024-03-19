@@ -1,7 +1,7 @@
 {
     "mask": {
         "octaves": 4,
-        "frequency": 0.016,
+        "frequency": 0.08,
         "lacunarity": 3.2,
         "gain": 0.32,
         "weighted_strength": 0.25,
