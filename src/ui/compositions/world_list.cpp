@@ -1,6 +1,7 @@
 #include "./world_list.hpp"
 
 #include <spdlog/spdlog.h>
+#include <entt/core/hashed_string.hpp>
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
@@ -25,6 +26,36 @@ WorldList::WorldList(UIContext& context) : UIComponent(context)
   m_scrollable_list->list->line_spacing = 15;
 }
 
+void WorldList::update()
+{
+  using namespace entt::literals;
+
+  if (!m_input_manager.is_context("list_selection"_hs))
+  {
+    return;
+  }
+
+  if (m_input_manager.poll_action("quit"_hs))
+  {
+    hide();
+  }
+}
+
+void WorldList::show()
+{
+  using namespace entt::literals;
+
+  m_input_manager.push_context("list_selection"_hs);
+  m_scrollable_list->reset_scroll();
+  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+}
+
+void WorldList::hide()
+{
+  m_input_manager.pop_context();
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
+
 void WorldList::set_actions(const ItemList<WorldMetadata>& actions)
 {
   dirty = true;
@@ -33,15 +64,11 @@ void WorldList::set_actions(const ItemList<WorldMetadata>& actions)
 
 void WorldList::set_on_select(const std::function<void(const WorldMetadata&)>& on_select)
 {
-  m_scrollable_list->set_on_select(on_select);
+  m_scrollable_list->set_on_select([this, on_select](const WorldMetadata& metadata) {
+      // Hide component before selecting a world so that the input context is correctly popped
+      hide();
+      on_select(metadata);
+  });
 }
-
-void WorldList::show()
-{
-  m_scrollable_list->reset_scroll();
-  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
-}
-
-void WorldList::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
 
 }  // namespace dl::ui

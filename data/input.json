@@ -64,5 +64,8 @@
     },
     "text_input": {
         "quit": ["k_escape"]
+    },
+    "list_selection": {
+        "quit": ["k_escape"]
     }
 }

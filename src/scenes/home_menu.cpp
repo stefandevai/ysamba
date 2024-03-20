@@ -50,18 +50,14 @@ void HomeMenu::load()
   m_has_loaded = true;
 }
 
-void HomeMenu::update()
+void HomeMenu::process_input()
 {
   using namespace entt::literals;
 
-  if (!has_loaded())
+  if (!m_input_manager.is_context("home_menu"_hs))
   {
     return;
   }
-
-  const auto delta = m_game_context.clock->delta;
-
-  m_camera.update(delta);
 
   if (m_input_manager.poll_action("quit"_hs))
   {
@@ -84,7 +80,20 @@ void HomeMenu::update()
   {
     m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
   }
+}
 
+void HomeMenu::update()
+{
+  if (!has_loaded())
+  {
+    return;
+  }
+
+  process_input();
+
+  const auto delta = m_game_context.clock->delta;
+
+  m_camera.update(delta);
   m_renderer.clear_color(27, 36, 32);
   m_ui_manager.update();
 }

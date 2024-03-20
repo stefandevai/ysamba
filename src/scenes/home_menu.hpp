@@ -21,6 +21,7 @@ class HomeMenu : public Scene
   HomeMenu(GameContext& game_context);
 
   void load() override;
+  void process_input();
   void update() override;
   void render() override;
 

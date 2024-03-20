@@ -30,8 +30,6 @@ Gameplay::Gameplay(GameContext& game_context) : Scene("gameplay", game_context) 
 
 void Gameplay::load()
 {
-  using namespace entt::literals;
-
   m_game_context.registry = &m_registry;
 
   m_camera.set_tile_size(m_world.get_tile_size());
@@ -89,8 +87,6 @@ void Gameplay::load()
 
 void Gameplay::update()
 {
-  using namespace entt::literals;
-
   if (!has_loaded())
   {
     return;
@@ -125,6 +121,8 @@ void Gameplay::update()
 
 bool Gameplay::m_update_paused()
 {
+  using namespace entt::literals;
+
   if (m_input_manager.is_context("gameplay"_hs))
   {
     if (m_update_input_real_time())
