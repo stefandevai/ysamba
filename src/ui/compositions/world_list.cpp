@@ -6,6 +6,7 @@
 #include "ui/animation.hpp"
 #include "ui/components/scrollable_list.hpp"
 #include "ui/components/window_frame.hpp"
+#include "ui/components/button_list.hpp"
 
 namespace dl::ui
 {
@@ -21,6 +22,7 @@ WorldList::WorldList(UIContext& context) : UIComponent(context)
   m_scrollable_list = m_window_frame->emplace<ScrollableList<WorldMetadata>>();
   m_scrollable_list->size = Vector2i{152, 252};
   m_scrollable_list->position = Vector3i{24, 24, 0};
+  m_scrollable_list->list->line_spacing = 15;
 }
 
 void WorldList::set_actions(const ItemList<WorldMetadata>& actions)

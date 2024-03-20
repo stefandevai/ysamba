@@ -17,6 +17,8 @@ class ScrollableList : public UIComponent
  public:
   uint32_t color = 0x1b2420aa;
   std::string title{};
+  ButtonList<T>* list = nullptr;
+  Scrollable* scrollable = nullptr;
 
   ScrollableList(UIContext& context);
 
@@ -26,8 +28,6 @@ class ScrollableList : public UIComponent
   void reset_scroll();
 
  private:
-  ButtonList<T>* m_list = nullptr;
-  Scrollable* m_scrollable = nullptr;
   Label* m_title_label = nullptr;
   std::function<void(const T i)> m_on_select;
   ItemList<T> m_items;

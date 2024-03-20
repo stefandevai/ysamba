@@ -46,7 +46,7 @@ void ButtonList<T>::m_create_buttons()
     button->label_x_alignment = XAlignement::Left;
     button->label_y_alignment = YAlignement::Center;
     button->position.x = margin.x;
-    button->position.y = i * (button_size.y + line_spacing) + margin.y;
+    button->position.y = i * (button_size.y + line_spacing) + margin.y + i;
     button->background_color = 0x00000000;
 
     if (on_select)
