@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "core/input_manager.hpp"
+#include "core/maths/vector.hpp"
 
 namespace dl::ui
 {
@@ -40,6 +41,7 @@ class BuildHutSystem
 
   // Caches hut size in preview between updates so that we don't have to redraw the preview every frame
   uint32_t m_last_hut_size = 0;
+  Vector2i m_last_direction{};
 
   void m_random_walk(entt::registry& registry, const entt::entity entity, const entt::entity job);
   bool m_is_within_hut_bounds(const Position& agent_position, const Position& hut_position, const uint32_t hut_size);

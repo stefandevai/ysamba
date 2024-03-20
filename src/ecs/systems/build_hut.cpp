@@ -465,28 +465,25 @@ bool BuildHutSystem::m_is_within_hut_bounds(const Position& agent_position,
 
 void BuildHutSystem::m_select_hut_target(entt::registry& registry, const Camera& camera)
 {
-  const auto& grid_size = camera.get_grid_size();
   const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
-  Vector2i area{std::ceil(std::abs(drag_bounds.z - drag_bounds.x) / static_cast<float>(grid_size.x)),
-                std::ceil(std::abs(drag_bounds.w - drag_bounds.y) / static_cast<float>(grid_size.y))};
-
-  const uint32_t hut_size = std::max(std::max(area.x, area.y), 3);
-
-  Vector2i direction;
-  direction.x = drag_bounds.x <= drag_bounds.z ? 0 : 1;
-  direction.y = drag_bounds.y <= drag_bounds.w ? 0 : 1;
-
   Vector3i begin = m_world.screen_to_world(Vector2i{drag_bounds.x, drag_bounds.y}, camera);
+  Vector3i end = m_world.screen_to_world(Vector2i{drag_bounds.z, drag_bounds.w}, camera);
+  Vector2i direction{begin.x <= end.x ? 0 : 1, begin.y <= end.y ? 0 : 1};
+  Vector2i area{std::abs(end.x - (begin.x)), std::abs(end.y - (begin.y))};
 
-  begin.x -= hut_size * direction.x;
-  begin.y -= hut_size * direction.y;
+  const uint32_t hut_size = std::max(std::max(area.x + 1, area.y + 1), 3);
+
+  // Change where we start rendering the hut depending on the drag direction
+  begin.x -= (hut_size - 1) * direction.x;
+  begin.y -= (hut_size - 1) * direction.y;
 
   if (m_input_manager.is_dragging())
   {
-    if (m_last_hut_size != hut_size)
+    if (m_last_hut_size != hut_size || m_last_direction != direction)
     {
       m_last_hut_size = hut_size;
+      m_last_direction = direction;
       m_preview_hut_target(begin, hut_size, registry);
     }
   }
