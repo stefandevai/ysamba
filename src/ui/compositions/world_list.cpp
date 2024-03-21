@@ -1,13 +1,14 @@
 #include "./world_list.hpp"
 
 #include <spdlog/spdlog.h>
+
 #include <entt/core/hashed_string.hpp>
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
+#include "ui/components/button_list.hpp"
 #include "ui/components/scrollable_list.hpp"
 #include "ui/components/window_frame.hpp"
-#include "ui/components/button_list.hpp"
 
 namespace dl::ui
 {
@@ -65,9 +66,9 @@ void WorldList::set_actions(const ItemList<WorldMetadata>& actions)
 void WorldList::set_on_select(const std::function<void(const WorldMetadata&)>& on_select)
 {
   m_scrollable_list->set_on_select([this, on_select](const WorldMetadata& metadata) {
-      // Hide component before selecting a world so that the input context is correctly popped
-      hide();
-      on_select(metadata);
+    // Hide component before selecting a world so that the input context is correctly popped
+    hide();
+    on_select(metadata);
   });
 }
 

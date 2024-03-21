@@ -6,8 +6,10 @@ namespace dl::utils
 {
 const FastNoise::SmartNode<> get_island_noise_generator(const IslandNoiseParams& params)
 {
+  // FastNoise::SmartNode<> generator = FastNoise::NewFromEncodedNodeTree(
+  //     "FwAAAIC/AACAPwAAAL8AAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
   FastNoise::SmartNode<> generator = FastNoise::NewFromEncodedNodeTree(
-      "FwAAAIC/AACAPwAAAL8AAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
+      "FwAAAIC/AACAPwAAAAAAAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
 
   return generator;
 

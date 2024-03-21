@@ -21,7 +21,7 @@ GameChunkGenerator::GameChunkGenerator() : GameChunkGenerator(world::chunk_size)
 GameChunkGenerator::GameChunkGenerator(const Vector3i& size) : size(size)
 {
   // map_to_tiles = static_cast<float>(world::chunk_size.x);
-  const float frequency = 0.016f / map_to_tiles;
+  const float frequency = 0.020f / map_to_tiles;
 
   island_params.layer_1_octaves = 4;
   island_params.frequency = frequency;
