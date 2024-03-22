@@ -30,10 +30,10 @@ void HomeMenu::load()
       .resource_id = "ysamba-typography"_hs,
   };
 
-  m_instructions.color.set(0xCCC1AFFF);
-  m_instructions.set_font_size(16);
-  m_instructions.set_typeface("font-1980"_hs);
-  m_instructions.set_text_wrapped("instructions"_t, 200);
+  // m_instructions.color.set(0xCCC1AFFF);
+  // m_instructions.set_font_size(16);
+  // m_instructions.set_typeface("font-1980"_hs);
+  // m_instructions.set_text_wrapped("instructions"_t, 200);
 
   m_load_worlds_metadata();
 
@@ -46,6 +46,47 @@ void HomeMenu::load()
   m_world_list = m_ui_manager.emplace<ui::WorldList>();
   m_world_list->set_on_select(on_select_world);
   m_world_list->set_actions(m_worlds_metadata);
+
+  m_button_list = m_ui_manager.emplace<ui::ButtonList<MenuChoice>>();
+
+  m_button_list->set_items({
+    { MenuChoice::Play, "Play" },
+    { MenuChoice::NewWorld, "New World" },
+    { MenuChoice::Settings, "Settings" },
+    { MenuChoice::Credits, "Credits" },
+  });
+
+  m_button_list->position = Vector3i{75, 193, 0};
+  m_button_list->button_size = Vector2i{200, 25};
+  m_button_list->button_text_color.set(0xCCC1AFFF);
+  
+  m_button_list->set_on_select([this](const MenuChoice choice)
+  {
+    switch(choice)
+    {
+      case MenuChoice::Play: {
+        m_load_worlds_metadata();
+
+        if (m_worlds_metadata.empty())
+        {
+          spdlog::warn("No worlds found");
+          return;
+        }
+
+        m_world_list->set_actions(m_worlds_metadata);
+        m_world_list->show();
+        break;
+      }
+      case MenuChoice::NewWorld: {
+        m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
+        break;
+      }
+      case MenuChoice::Settings:
+      case MenuChoice::Credits:
+      default:
+        break;
+    }
+  });
 
   m_has_loaded = true;
 }
@@ -108,7 +149,7 @@ void HomeMenu::render()
   }
 
   m_renderer.ui_pass.batch.sprite(m_typography, 60, 60, 0);
-  m_renderer.ui_pass.batch.text(m_instructions, 75, 193, 0);
+  // m_renderer.ui_pass.batch.text(m_instructions, 75, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }

@@ -16,14 +16,13 @@ class Button : public UIComponent
   XAlignement label_x_alignment = XAlignement::Center;
   YAlignement label_y_alignment = YAlignement::Center;
 
+  Label* label = nullptr;
+  Container* container = nullptr;
+
   Button(UIContext& context);
 
   void init();
   void update();
-
- private:
-  Label* m_label = nullptr;
-  Container* m_container = nullptr;
 };
 
 }  // namespace dl::ui

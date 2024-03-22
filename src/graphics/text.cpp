@@ -59,6 +59,8 @@ void Text::update_wrapped()
   auto last_word_index = characters.begin();
   Color character_color = color;
 
+  assert(wrap_width != 0);
+
   for (UTF8Iterator it = value.begin(); it != value.end(); ++it)
   {
     auto ch = m_font->get_char_data(*it);
