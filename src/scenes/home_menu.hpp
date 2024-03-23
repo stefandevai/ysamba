@@ -4,8 +4,8 @@
 #include "core/input_manager.hpp"
 #include "ecs/components/sprite.hpp"
 #include "graphics/text.hpp"
-#include "ui/types.hpp"
 #include "ui/components/button_list.hpp"
+#include "ui/types.hpp"
 
 namespace dl::ui
 {

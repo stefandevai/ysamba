@@ -76,6 +76,9 @@ class UIComponent
   virtual void show();
   virtual void hide();
 
+  // Hides the component without triggering animations (if any)
+  void force_hide();
+
   // Propagates state to children
   void propagate_state();
 
@@ -112,6 +115,9 @@ class UIComponent
       state = State::Animating;
     }
   }
+
+  // Returns true if state is not Hidden and has been initialized
+  bool is_active();
 
  protected:
   UIContext& m_context;

@@ -28,7 +28,7 @@ void WindowFrame::init()
 
 void WindowFrame::render()
 {
-  if (state == State::Hidden)
+  if (!is_active())
   {
     return;
   }

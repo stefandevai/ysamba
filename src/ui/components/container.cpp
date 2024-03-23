@@ -17,7 +17,7 @@ Container::Container(UIContext& context, const Vector2i& size, const uint32_t co
 
 void Container::render()
 {
-  if (state == State::Hidden)
+  if (!is_active())
   {
     return;
   }

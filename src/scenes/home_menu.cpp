@@ -38,7 +38,7 @@ void HomeMenu::load()
   m_load_worlds_metadata();
 
   const auto on_select_world = [this](const WorldMetadata& world_metadata) {
-    m_ui_manager.force_hide_all();
+    m_world_list->force_hide();
     m_game_context.world_metadata = world_metadata;
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   };
@@ -50,41 +50,42 @@ void HomeMenu::load()
   m_button_list = m_ui_manager.emplace<ui::ButtonList<MenuChoice>>();
 
   m_button_list->set_items({
-    { MenuChoice::Play, "Play" },
-    { MenuChoice::NewWorld, "New World" },
-    { MenuChoice::Settings, "Settings" },
-    { MenuChoice::Credits, "Credits" },
+      {MenuChoice::Play, "Play"},
+      {MenuChoice::NewWorld, "New World"},
+      {MenuChoice::Settings, "Settings"},
+      {MenuChoice::Credits, "Credits"},
   });
 
   m_button_list->position = Vector3i{75, 193, 0};
   m_button_list->button_size = Vector2i{200, 25};
   m_button_list->button_text_color.set(0xCCC1AFFF);
-  
-  m_button_list->set_on_select([this](const MenuChoice choice)
-  {
-    switch(choice)
+
+  m_button_list->set_on_select([this](const MenuChoice choice) {
+    switch (choice)
     {
-      case MenuChoice::Play: {
-        m_load_worlds_metadata();
+    case MenuChoice::Play:
+    {
+      m_load_worlds_metadata();
 
-        if (m_worlds_metadata.empty())
-        {
-          spdlog::warn("No worlds found");
-          return;
-        }
+      if (m_worlds_metadata.empty())
+      {
+        spdlog::warn("No worlds found");
+        return;
+      }
 
-        m_world_list->set_actions(m_worlds_metadata);
-        m_world_list->show();
-        break;
-      }
-      case MenuChoice::NewWorld: {
-        m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
-        break;
-      }
-      case MenuChoice::Settings:
-      case MenuChoice::Credits:
-      default:
-        break;
+      m_world_list->set_actions(m_worlds_metadata);
+      m_world_list->show();
+      break;
+    }
+    case MenuChoice::NewWorld:
+    {
+      m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
+      break;
+    }
+    case MenuChoice::Settings:
+    case MenuChoice::Credits:
+    default:
+      break;
     }
   });
 

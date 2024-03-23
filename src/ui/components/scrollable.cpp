@@ -53,7 +53,7 @@ void Scrollable::update()
 
 void Scrollable::render()
 {
-  if (state == UIComponent::State::Hidden)
+  if (!is_active())
   {
     return;
   }

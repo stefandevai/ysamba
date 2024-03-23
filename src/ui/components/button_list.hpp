@@ -1,16 +1,17 @@
 #pragma once
 
-#include "./component.hpp"
-#include <entt/entity/entity.hpp>
 #include <spdlog/spdlog.h>
-#include "ui/types.hpp"
+
+#include <entt/entity/entity.hpp>
 
 #include "./button.hpp"
-#include "./label.hpp"
+#include "./component.hpp"
 #include "./container.hpp"
+#include "./label.hpp"
 #include "core/maths/vector.hpp"
-#include "world/metadata.hpp"
 #include "graphics/color.hpp"
+#include "ui/types.hpp"
+#include "world/metadata.hpp"
 
 namespace dl::ui
 {
@@ -25,12 +26,9 @@ class ButtonList : public UIComponent
   Color button_text_color = Color{0xFFFFFFFF};
   std::function<void(const T)> on_select;
 
-  ButtonList(UIContext& context) : UIComponent(context) { }
+  ButtonList(UIContext& context) : UIComponent(context) {}
 
-  void init()
-  {
-    m_create_buttons();
-  }
+  void init() { m_create_buttons(); }
 
   void set_items(const ItemList<T>& items)
   {
@@ -86,7 +84,6 @@ class ButtonList : public UIComponent
 
     size = Vector2i{button_size.x, height};
   }
-
 };
 
 }  // namespace dl::ui

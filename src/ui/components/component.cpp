@@ -29,7 +29,7 @@ void UIComponent::m_init()
 
 void UIComponent::m_update_geometry()
 {
-  if (state == State::Hidden)
+  if (!is_active())
   {
     return;
   }
@@ -107,7 +107,7 @@ void UIComponent::m_update()
 
 void UIComponent::render()
 {
-  if (state == State::Hidden)
+  if (!is_active())
   {
     return;
   }
@@ -122,6 +122,8 @@ void UIComponent::show() { state = State::Visible; }
 
 void UIComponent::hide() { state = State::Hidden; }
 
+void UIComponent::force_hide() { state = State::Hidden; }
+
 void UIComponent::propagate_state()
 {
   for (auto& child : children)
@@ -130,6 +132,8 @@ void UIComponent::propagate_state()
     child->propagate_state();
   }
 }
+
+bool UIComponent::is_active() { return state != State::Hidden && has_initialized; }
 
 bool UIComponent::m_is_positioned()
 {
