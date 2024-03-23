@@ -10,65 +10,59 @@
             "game_id": 0,
             "type": "character",
             "sprite_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 0,
             "width": 1,
             "height": 2,
             "anchor_x": 0,
-            "anchor_y": 1,
-            "faces": {
-                "front": 0
-            }
+            "anchor_y": 1
         },
         {
             "game_id": 1,
             "type": "character",
             "sprite_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 1,
             "width": 1,
             "height": 2,
             "anchor_x": 0,
-            "anchor_y": 1,
-            "faces": {
-                "front": 1
-            }
+            "anchor_y": 1
         },
         {
             "game_id": 2,
             "type": "character",
             "sprite_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 2,
             "width": 1,
             "height": 2,
             "anchor_x": 0,
-            "anchor_y": 1,
-            "faces": {
-                "front": 2
-            }
+            "anchor_y": 1
         },
         {
             "game_id": 3,
             "type": "character",
             "sprite_type": "multiple",
+            "angle": "orthogonal",
+            "frame": 3,
             "width": 1,
             "height": 2,
             "anchor_x": 0,
-            "anchor_y": 1,
-            "faces": {
-                "front": 3
-            }
+            "anchor_y": 1
         },
         {
             "game_id": 4,
             "type": "character",
             "sprite_type": "single",
-            "faces": {
-                "front": 36
-            }
+            "angle": "orthogonal",
+            "frame": 36
         },
         {
             "game_id": 5,
             "type": "character",
             "sprite_type": "single",
-            "faces": {
-                "front": 37
-            }
+            "angle": "orthogonal",
+            "frame": 37
         }
     ]
 }
