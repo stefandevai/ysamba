@@ -199,12 +199,91 @@ void Texture::load_metadata(const std::string& filepath)
   {
     const auto type = item["type"].get<std::string>();
     const auto game_id = item["game_id"].get<uint32_t>();
+    const auto& sprite_type_str = item["sprite_type"].get<std::string>();
 
     FrameData frame_data{};
 
-    frame_data.frame = item["frame"].get<uint32_t>();
+    if (item.contains("frame"))
+    {
+      // frame_data.frame = item["frame"].get<uint32_t>();
+      frame_data.faces[DL_RENDER_FACE_TOP] = item["frame"].get<uint32_t>();
+    }
+    else if (item.contains("faces") && item.contains("default_face"))
+    {
+      const auto default_face = item["default_face"].get<std::string>();
 
-    const auto& sprite_type_str = item["sprite_type"].get<std::string>();
+      if (default_face == "top")
+      {
+        frame_data.default_face = DL_RENDER_FACE_TOP;
+      }
+      else if (default_face == "front")
+      {
+        frame_data.default_face = DL_RENDER_FACE_FRONT;
+      }
+      else if (default_face == "back")
+      {
+        frame_data.default_face = DL_RENDER_FACE_BACK;
+      }
+      else if (default_face == "bottom")
+      {
+        frame_data.default_face = DL_RENDER_FACE_BOTTOM;
+      }
+      else if (default_face == "left")
+      {
+        frame_data.default_face = DL_RENDER_FACE_LEFT;
+      }
+      else if (default_face == "right")
+      {
+        frame_data.default_face = DL_RENDER_FACE_RIGHT;
+      }
+      else if (default_face == "center_horizontal")
+      {
+        frame_data.default_face = DL_RENDER_FACE_CENTER_HORIZONTAL;
+      }
+      else if (default_face == "center_vertical")
+      {
+        frame_data.default_face = DL_RENDER_FACE_CENTER_VERTICAL;
+      }
+
+      const auto& faces = item["faces"];
+
+      if (faces.contains("top"))
+      {
+        frame_data.faces[DL_RENDER_FACE_TOP] = faces["top"].get<uint32_t>();
+      }
+      if (faces.contains("front"))
+      {
+        frame_data.faces[DL_RENDER_FACE_FRONT] = faces["front"].get<uint32_t>();
+      }
+      if (faces.contains("back"))
+      {
+        frame_data.faces[DL_RENDER_FACE_BACK] = faces["back"].get<uint32_t>();
+      }
+      if (faces.contains("bottom"))
+      {
+        frame_data.faces[DL_RENDER_FACE_BOTTOM] = faces["bottom"].get<uint32_t>();
+      }
+      if (faces.contains("left"))
+      {
+        frame_data.faces[DL_RENDER_FACE_LEFT] = faces["left"].get<uint32_t>();
+      }
+      if (faces.contains("right"))
+      {
+        frame_data.faces[DL_RENDER_FACE_RIGHT] = faces["right"].get<uint32_t>();
+      }
+      if (faces.contains("center_horizontal"))
+      {
+        frame_data.faces[DL_RENDER_FACE_CENTER_HORIZONTAL] = faces["center_horizontal"].get<uint32_t>();
+      }
+      if (faces.contains("center_vertical"))
+      {
+        frame_data.faces[DL_RENDER_FACE_CENTER_VERTICAL] = faces["center_vertical"].get<uint32_t>();
+      }
+    }
+    else
+    {
+      spdlog::critical("Frame data is missing for game id: {}", game_id);
+    }
 
     if (sprite_type_str == "single")
     {
@@ -215,30 +294,30 @@ void Texture::load_metadata(const std::string& filepath)
       frame_data.sprite_type = SpriteType::Multiple;
     }
 
-    if (item.contains("angle"))
-    {
-      if (item["angle"] == "orthogonal")
-      {
-        frame_data.angle = FrameAngle::Orthogonal;
-      }
-      else
-      {
-        frame_data.angle = FrameAngle::Parallel;
-      }
-    }
-    else
-    {
-      frame_data.angle = FrameAngle::Parallel;
-    }
+    // if (item.contains("angle"))
+    // {
+    //   if (item["angle"] == "orthogonal")
+    //   {
+    //     frame_data.angle = FrameAngle::Orthogonal;
+    //   }
+    //   else
+    //   {
+    //     frame_data.angle = FrameAngle::Parallel;
+    //   }
+    // }
+    // else
+    // {
+    //   frame_data.angle = FrameAngle::Parallel;
+    // }
 
-    if (item.contains("front_face_id"))
-    {
-      frame_data.front_face_id = item["front_face_id"].get<std::uint32_t>();
-    }
-    else
-    {
-      frame_data.front_face_id = game_id;
-    }
+    // if (item.contains("front_face_id"))
+    // {
+    //   frame_data.front_face_id = item["front_face_id"].get<std::uint32_t>();
+    // }
+    // else
+    // {
+    //   frame_data.front_face_id = game_id;
+    // }
 
     if (frame_data.sprite_type == SpriteType::Multiple)
     {

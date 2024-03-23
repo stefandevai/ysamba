@@ -99,7 +99,7 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   const glm::vec2& size = sprite.size;
   const auto& texture_coordinates = sprite.uv_coordinates;
   unsigned int color = sprite.color.int_color;
-  const auto angle = sprite.frame_data != nullptr ? sprite.frame_data->angle : FrameAngle::Parallel;
+  // const auto angle = sprite.frame_data != nullptr ? sprite.frame_data->angle : FrameAngle::Parallel;
 
   if (sprite.color.opacity_factor < 1.0)
   {
@@ -129,24 +129,25 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   }
 
   // Top left vertex
-  if (angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color);
-  }
+  // if (angle == FrameAngle::Parallel)
+  // {
+  m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color);
+  // }
 
   // Top right vertex
-  if (angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index, color);
-  }
+  // if (angle == FrameAngle::Parallel)
+  // {
+  m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index,
+  //   color);
+  // }
 
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
@@ -185,24 +186,24 @@ void Batch::tile(const Tile& tile, const double x, const double y, const double 
   }
 
   // Top left vertex
-  if (tile.frame_data->angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x, y, z}, uv_coordinates[0], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, uv_coordinates[0], texture_index, color);
-  }
+  // if (tile.frame_data->angle == FrameAngle::Parallel)
+  // {
+  m_current_vb->emplace(glm::vec3{x, y, z}, uv_coordinates[0], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, uv_coordinates[0], texture_index, color);
+  // }
 
   // Top right vertex
-  if (tile.frame_data->angle == FrameAngle::Parallel)
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
-  }
-  else
-  {
-    m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
-  }
+  // if (tile.frame_data->angle == FrameAngle::Parallel)
+  // {
+  m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
+  // }
+  // else
+  // {
+  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
+  // }
 
   // Bottom left vertex
   m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);

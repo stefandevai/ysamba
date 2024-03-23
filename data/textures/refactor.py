@@ -1,7 +1,7 @@
 import json
 
-data_filepath = 'characters_old.json'
-output_filepath = 'characters.json'
+data_filepath = 'tileset_old.json'
+output_filepath = 'tileset.json'
 
 file = open(data_filepath, 'r')
 data = json.load(file)
@@ -36,11 +36,14 @@ for frame in data['frames']:
     faces = { }
 
     if front_face_frame != -1:
+        frame['default_face'] = 'top'
         faces['top'] = frame_id
         faces['front'] = front_face_frame
     elif angle == 'orthogonal':
+        frame['default_face'] = 'front'
         faces['front'] = frame_id
     else:
+        frame['default_face'] = 'top'
         faces['top'] = frame_id
 
     frame['faces'] = faces

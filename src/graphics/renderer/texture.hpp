@@ -22,17 +22,19 @@ enum class SpriteType
 
 struct FrameData
 {
-  uint32_t frame = 0;
+  // uint32_t frame = 0;
   uint32_t width = 1;
   uint32_t height = 1;
   uint32_t pattern_width = 0;
   uint32_t pattern_height = 0;
   int anchor_x = 0;
   int anchor_y = 0;
-  uint32_t front_face_id = 0;
-  FrameAngle angle = FrameAngle::Parallel;
+  // uint32_t front_face_id = 0;
+  RenderFace default_face = DL_RENDER_FACE_TOP;
+  // FrameAngle angle = FrameAngle::Parallel;
   SpriteType sprite_type = SpriteType::Single;
   std::vector<uint32_t> pattern{};
+  std::array<uint32_t, 8> faces{};
 
   struct PairHash
   {

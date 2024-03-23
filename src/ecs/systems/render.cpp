@@ -38,7 +38,8 @@ RenderSystem::RenderSystem(GameContext& game_context, World& world)
 
     const auto& frame_size = m_world_texture->get_frame_size();
     glm::vec2 size{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
-    auto uv_coordinates = m_world_texture->get_frame_coords(frame_data.frame, frame_data.width, frame_data.height);
+    auto uv_coordinates = m_world_texture->get_frame_coords(
+        frame_data.faces[frame_data.default_face], frame_data.width, frame_data.height);
     m_tiles.insert({tile_data.first, Tile{m_world_texture, &frame_data, std::move(size), std::move(uv_coordinates)}});
   }
 
@@ -276,12 +277,12 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
                  world_y * tile_size.y + z_index * m_z_index_increment,
                  world_z * tile_size.y + z_index * m_z_index_increment);
 
-    // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
-    if (chunk.tiles.is_bottom_empty(x, y, z))
-    {
-      const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
-      m_batch.tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
-    }
+    // // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
+    // if (chunk.tiles.is_bottom_empty(x, y, z))
+    // {
+    //   const auto& bottom_tile = m_tiles.at(tile.frame_data->front_face_id);
+    //   m_batch.tile(bottom_tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y);
+    // }
   }
   else if (tile.frame_data->sprite_type == SpriteType::Multiple)
   {
@@ -319,15 +320,15 @@ void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity
       {
       case SpriteType::Single:
       {
-        sprite_data.uv_coordinates = sprite_data.texture->get_frame_coords(frame_data.frame);
+        sprite_data.uv_coordinates = sprite_data.texture->get_frame_coords(frame_data.faces[frame_data.default_face]);
         const auto& frame_size = sprite_data.texture->get_frame_size();
         sprite_data.size = glm::vec2{frame_size.x, frame_size.y};
         break;
       }
       case SpriteType::Multiple:
       {
-        sprite_data.uv_coordinates
-            = sprite_data.texture->get_frame_coords(frame_data.frame, frame_data.width, frame_data.height);
+        sprite_data.uv_coordinates = sprite_data.texture->get_frame_coords(
+            frame_data.faces[frame_data.default_face], frame_data.width, frame_data.height);
         const auto& frame_size = sprite_data.texture->get_frame_size();
         sprite_data.size = glm::vec2{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
         sprite_data.anchor = glm::vec2{frame_size.x * frame_data.anchor_x, frame_size.y * frame_data.anchor_y};
