@@ -87,7 +87,11 @@ void Texture::load(const WGPUDevice device, const unsigned char* data, const Vec
   // Load metadata
   if (m_data_filepath != "")
   {
-    load_metadata(m_data_filepath);
+    m_load_metadata(m_data_filepath);
+  }
+  else
+  {
+    m_generate_uv_coordinates();
   }
 
   const auto queue = wgpuDeviceGetQueue(device);
@@ -156,7 +160,7 @@ void Texture::load(const WGPUDevice device, const unsigned char* data, const Vec
 }
 
 // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame, const int width, const int height) const
+std::array<glm::vec2, 4> Texture::m_calculate_uv_coordinates(const int frame, const int width, const int height) const
 {
   const float frame_width = 1.0f / static_cast<float>(m_horizontal_frames);
   const float frame_height = 1.0f / static_cast<float>(m_vertical_frames);
@@ -178,12 +182,17 @@ std::array<glm::vec2, 4> Texture::get_frame_coords(const int frame, const int wi
   };
 }
 
+const std::array<glm::vec2, 4>& Texture::get_uv_coordinates(const uint32_t frame) const
+{
+  return m_uv_coordinates.at(frame);
+}
+
 const FrameData& Texture::id_to_frame(const uint32_t id, const std::string& type) const
 {
   return m_frame_data.at(std::make_pair(id, type));
 }
 
-void Texture::load_metadata(const std::string& filepath)
+void Texture::m_load_metadata(const std::string& filepath)
 {
   JSON json{filepath};
 
@@ -203,10 +212,35 @@ void Texture::load_metadata(const std::string& filepath)
 
     FrameData frame_data{};
 
+    if (sprite_type_str == "single")
+    {
+      frame_data.sprite_type = SpriteType::Single;
+    }
+    else if (sprite_type_str == "multiple")
+    {
+      frame_data.sprite_type = SpriteType::Multiple;
+    }
+
+    if (frame_data.sprite_type == SpriteType::Multiple)
+    {
+      frame_data.width = item["width"].get<uint32_t>();
+      frame_data.height = item["height"].get<uint32_t>();
+      frame_data.anchor_x = item["anchor_x"].get<int>();
+      frame_data.anchor_y = item["anchor_y"].get<int>();
+
+      if (type == "tile")
+      {
+        frame_data.pattern = item["pattern"].get<std::vector<uint32_t>>();
+        frame_data.pattern_width = item["pattern_width"].get<uint32_t>();
+        frame_data.pattern_height = item["pattern_height"].get<uint32_t>();
+      }
+    }
+
     if (item.contains("frame"))
     {
-      // frame_data.frame = item["frame"].get<uint32_t>();
-      frame_data.faces[DL_RENDER_FACE_TOP] = item["frame"].get<uint32_t>();
+      const auto frame_id = item["frame"].get<uint32_t>();
+      frame_data.faces[DL_RENDER_FACE_TOP] = frame_id;
+      m_generate_uv_coordinate(frame_id, frame_data);
     }
     else if (item.contains("faces") && item.contains("default_face"))
     {
@@ -249,35 +283,51 @@ void Texture::load_metadata(const std::string& filepath)
 
       if (faces.contains("top"))
       {
-        frame_data.faces[DL_RENDER_FACE_TOP] = faces["top"].get<uint32_t>();
+        const auto frame_id = faces["top"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_TOP] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("front"))
       {
-        frame_data.faces[DL_RENDER_FACE_FRONT] = faces["front"].get<uint32_t>();
+        const auto frame_id = faces["front"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_FRONT] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("back"))
       {
-        frame_data.faces[DL_RENDER_FACE_BACK] = faces["back"].get<uint32_t>();
+        const auto frame_id = faces["back"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_BACK] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("bottom"))
       {
-        frame_data.faces[DL_RENDER_FACE_BOTTOM] = faces["bottom"].get<uint32_t>();
+        const auto frame_id = faces["bottom"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_BOTTOM] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("left"))
       {
-        frame_data.faces[DL_RENDER_FACE_LEFT] = faces["left"].get<uint32_t>();
+        const auto frame_id = faces["left"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_LEFT] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("right"))
       {
-        frame_data.faces[DL_RENDER_FACE_RIGHT] = faces["right"].get<uint32_t>();
+        const auto frame_id = faces["right"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_RIGHT] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("center_horizontal"))
       {
-        frame_data.faces[DL_RENDER_FACE_CENTER_HORIZONTAL] = faces["center_horizontal"].get<uint32_t>();
+        const auto frame_id = faces["center_horizontal"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_CENTER_HORIZONTAL] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("center_vertical"))
       {
-        frame_data.faces[DL_RENDER_FACE_CENTER_VERTICAL] = faces["center_vertical"].get<uint32_t>();
+        const auto frame_id = faces["center_vertical"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_CENTER_VERTICAL] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
       }
     }
     else
@@ -285,59 +335,23 @@ void Texture::load_metadata(const std::string& filepath)
       spdlog::critical("Frame data is missing for game id: {}", game_id);
     }
 
-    if (sprite_type_str == "single")
-    {
-      frame_data.sprite_type = SpriteType::Single;
-    }
-    else if (sprite_type_str == "multiple")
-    {
-      frame_data.sprite_type = SpriteType::Multiple;
-    }
-
-    // if (item.contains("angle"))
-    // {
-    //   if (item["angle"] == "orthogonal")
-    //   {
-    //     frame_data.angle = FrameAngle::Orthogonal;
-    //   }
-    //   else
-    //   {
-    //     frame_data.angle = FrameAngle::Parallel;
-    //   }
-    // }
-    // else
-    // {
-    //   frame_data.angle = FrameAngle::Parallel;
-    // }
-
-    // if (item.contains("front_face_id"))
-    // {
-    //   frame_data.front_face_id = item["front_face_id"].get<std::uint32_t>();
-    // }
-    // else
-    // {
-    //   frame_data.front_face_id = game_id;
-    // }
-
-    if (frame_data.sprite_type == SpriteType::Multiple)
-    {
-      frame_data.width = item["width"].get<uint32_t>();
-      frame_data.height = item["height"].get<uint32_t>();
-      frame_data.anchor_x = item["anchor_x"].get<int>();
-      frame_data.anchor_y = item["anchor_y"].get<int>();
-
-      if (type == "tile")
-      {
-        frame_data.pattern = item["pattern"].get<std::vector<uint32_t>>();
-        frame_data.pattern_width = item["pattern_width"].get<uint32_t>();
-        frame_data.pattern_height = item["pattern_height"].get<uint32_t>();
-      }
-    }
-
     m_frame_data[std::make_pair(game_id, type)] = frame_data;
   }
 
   has_metadata = true;
+}
+
+void Texture::m_generate_uv_coordinates()
+{
+  for (int i = 0; i < m_horizontal_frames * m_vertical_frames; ++i)
+  {
+    m_uv_coordinates.insert({static_cast<uint32_t>(i), m_calculate_uv_coordinates(i)});
+  }
+}
+
+void Texture::m_generate_uv_coordinate(const uint32_t frame_id, const FrameData& frame_data)
+{
+  m_uv_coordinates.insert({frame_id, m_calculate_uv_coordinates(frame_id, frame_data.width, frame_data.height)});
 }
 
 }  // namespace dl

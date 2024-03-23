@@ -3,7 +3,6 @@
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
 #include "ecs/components/sprite.hpp"
-#include "graphics/text.hpp"
 #include "ui/components/button_list.hpp"
 #include "ui/types.hpp"
 
@@ -39,7 +38,6 @@ class HomeMenu : public Scene
   ui::ItemList<WorldMetadata> m_worlds_metadata{};
   ui::WorldList* m_world_list = nullptr;
   ui::ButtonList<MenuChoice>* m_button_list = nullptr;
-  // Text m_instructions;
   Sprite m_typography;
 
   void m_load_worlds_metadata();

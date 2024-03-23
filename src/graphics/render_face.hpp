@@ -1,11 +1,5 @@
 #pragma once
 
-// enum class FrameAngle
-// {
-//   Parallel,
-//   Orthogonal,
-// };
-
 // Defines in which face a sprite can be rendered.
 // Top, Front, Back, Bottom, Left, Right are the faces of a cube.
 // CenterHorizontal, CenterVertical render the sprite in the center of the cube area.

@@ -30,11 +30,6 @@ void HomeMenu::load()
       .resource_id = "ysamba-typography"_hs,
   };
 
-  // m_instructions.color.set(0xCCC1AFFF);
-  // m_instructions.set_font_size(16);
-  // m_instructions.set_typeface("font-1980"_hs);
-  // m_instructions.set_text_wrapped("instructions"_t, 200);
-
   m_load_worlds_metadata();
 
   const auto on_select_world = [this](const WorldMetadata& world_metadata) {
@@ -150,7 +145,6 @@ void HomeMenu::render()
   }
 
   m_renderer.ui_pass.batch.sprite(m_typography, 60, 60, 0);
-  // m_renderer.ui_pass.batch.text(m_instructions, 75, 193, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }

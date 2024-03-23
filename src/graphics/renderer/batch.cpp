@@ -9,9 +9,9 @@
 #include "graphics/camera.hpp"
 #include "graphics/color.hpp"
 #include "graphics/display.hpp"
-#include "graphics/frame_angle.hpp"
 #include "graphics/nine_patch.hpp"
 #include "graphics/quad.hpp"
+#include "graphics/render_face.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/text.hpp"
 
@@ -90,8 +90,11 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   {
     const auto& size = sprite.texture->get_size();
     sprite.size = glm::vec2{size.x, size.y};
-    sprite.uv_coordinates = sprite.texture->get_frame_coords();
+    sprite.uv_coordinates = sprite.texture->get_uv_coordinates();
   }
+
+  // const auto frame = sprite.frame_data != nullptr ? sprite.frame_data->faces[face] : 0;
+  // const auto& texture_coordinates = sprite.texture->get_uv_coordinates(frame);
 
   assert(sprite.texture != nullptr);
   assert(sprite.size.x != 0 && sprite.size.y != 0);
@@ -99,7 +102,6 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   const glm::vec2& size = sprite.size;
   const auto& texture_coordinates = sprite.uv_coordinates;
   unsigned int color = sprite.color.int_color;
-  // const auto angle = sprite.frame_data != nullptr ? sprite.frame_data->angle : FrameAngle::Parallel;
 
   if (sprite.color.opacity_factor < 1.0)
   {
@@ -136,14 +138,14 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
 void Batch::tile(const Tile& tile, const double x, const double y, const double z, const RenderFace face)
 {
   assert(m_current_vb != nullptr);
+  assert(tile.texture != nullptr);
+  assert(tile.frame_data != nullptr);
+  assert(tile.size.x != 0);
+  assert(tile.size.y != 0);
 
   const auto& size = tile.size;
-  const auto& uv_coordinates = tile.uv_coordinates;
   const uint32_t color = 0xFFFFFFFF;
-
-  assert(tile.texture != nullptr);
-  assert(size.x != 0);
-  assert(size.y != 0);
+  const auto& uv_coordinates = tile.texture->get_uv_coordinates(tile.frame_data->faces[face]);
 
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;

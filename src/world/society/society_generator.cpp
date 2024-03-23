@@ -10,7 +10,6 @@
 #include "core/random.hpp"
 #include "ecs/components/selectable.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/frame_angle.hpp"
 #include "world/world.hpp"
 
 namespace dl
