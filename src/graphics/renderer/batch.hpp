@@ -82,8 +82,10 @@ class Batch
   // Pin a texture so it can't be cleared and return its slot index
   uint32_t pin_texture(WGPUTextureView texture_view);
 
-  void sprite(Sprite& sprite, const double x, const double y, const double z);
-  void tile(const Tile& tile, const double x, const double y, const double z);
+  void sprite(
+      Sprite& sprite, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
+  void tile(
+      const Tile& tile, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
@@ -92,6 +94,16 @@ class Batch
   void pop_scissor();
 
  private:
+  struct SpriteBatchData
+  {
+    const RenderFace face{};
+    const glm::vec3& position;
+    const glm::vec2& size;
+    const std::array<glm::vec2, 4>& texture_coordinates;
+    uint32_t color{};
+    float texture_index{};
+  };
+
   GameContext& m_game_context;
   WGPUContext& m_context;
   BatchData<VertexData>* m_current_vb = nullptr;
@@ -102,5 +114,8 @@ class Batch
 
   void m_load_batch_data();
   void m_load_textures();
+  void m_emplace_sprite_face(const SpriteBatchData data);
+  void m_emplace_sprite_face_top(const SpriteBatchData data);
+  void m_emplace_sprite_face_front(const SpriteBatchData data);
 };
 }  // namespace dl

@@ -76,7 +76,7 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
   return slot_index;
 }
 
-void Batch::sprite(Sprite& sprite, const double x, const double y, const double z)
+void Batch::sprite(Sprite& sprite, const double x, const double y, const double z, const RenderFace face)
 {
   // Set texture if it has not been set
   if (sprite.texture == nullptr)
@@ -128,37 +128,12 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
     texture_index = it - texture_views.begin();
   }
 
-  // Top left vertex
-  // if (angle == FrameAngle::Parallel)
-  // {
-  m_current_vb->emplace(glm::vec3{x, y, z}, texture_coordinates[0], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, texture_coordinates[0], texture_index, color);
-  // }
+  SpriteBatchData data{face, glm::vec3{x, y, z}, size, texture_coordinates, color, texture_index};
 
-  // Top right vertex
-  // if (angle == FrameAngle::Parallel)
-  // {
-  m_current_vb->emplace(glm::vec3{x + size.x, y, z}, texture_coordinates[1], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, texture_coordinates[1], texture_index,
-  //   color);
-  // }
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, texture_coordinates[3], texture_index, color);
-
-  // Bottom right vertex
-  m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, texture_coordinates[2], texture_index, color);
-
-  m_current_vb->index_buffer_count += 6;
+  m_emplace_sprite_face(std::move(data));
 }
 
-void Batch::tile(const Tile& tile, const double x, const double y, const double z)
+void Batch::tile(const Tile& tile, const double x, const double y, const double z, const RenderFace face)
 {
   assert(m_current_vb != nullptr);
 
@@ -185,33 +160,9 @@ void Batch::tile(const Tile& tile, const double x, const double y, const double 
     texture_index = it - texture_views.begin();
   }
 
-  // Top left vertex
-  // if (tile.frame_data->angle == FrameAngle::Parallel)
-  // {
-  m_current_vb->emplace(glm::vec3{x, y, z}, uv_coordinates[0], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(glm::vec3{x, y + size.y, z + size.y}, uv_coordinates[0], texture_index, color);
-  // }
+  SpriteBatchData data{face, glm::vec3{x, y, z}, size, uv_coordinates, color, texture_index};
 
-  // Top right vertex
-  // if (tile.frame_data->angle == FrameAngle::Parallel)
-  // {
-  m_current_vb->emplace(glm::vec3{x + size.x, y, z}, uv_coordinates[1], texture_index, color);
-  // }
-  // else
-  // {
-  //   m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z + size.y}, uv_coordinates[1], texture_index, color);
-  // }
-
-  // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, uv_coordinates[3], texture_index, color);
-
-  // Bottom right vertex
-  m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, uv_coordinates[2], texture_index, color);
-
-  m_current_vb->index_buffer_count += 6;
+  m_emplace_sprite_face(std::move(data));
 }
 
 void Batch::quad(const Quad* quad, const double x, const double y, const double z)
@@ -356,4 +307,94 @@ void Batch::push_scissor(Vector4i scissor)
 }
 
 void Batch::pop_scissor() { m_current_vb = &batch_data[0]; }
+
+void Batch::m_emplace_sprite_face(const SpriteBatchData data)
+{
+  switch (data.face)
+  {
+  case DL_RENDER_FACE_TOP:
+    m_emplace_sprite_face_top(std::move(data));
+    break;
+  case DL_RENDER_FACE_FRONT:
+    m_emplace_sprite_face_front(std::move(data));
+    break;
+  case DL_RENDER_FACE_BOTTOM:
+    // TODO
+    break;
+  case DL_RENDER_FACE_LEFT:
+    // TODO
+    break;
+  case DL_RENDER_FACE_RIGHT:
+    // TODO
+    break;
+  case DL_RENDER_FACE_BACK:
+    // TODO
+    break;
+  case DL_RENDER_FACE_CENTER_HORIZONTAL:
+    // TODO
+    break;
+  case DL_RENDER_FACE_CENTER_VERTICAL:
+    // TODO
+    break;
+  default:
+    break;
+  }
+}
+
+void Batch::m_emplace_sprite_face_top(const SpriteBatchData data)
+{
+  // Top left vertex
+  m_current_vb->emplace(data.position, data.texture_coordinates[0], data.texture_index, data.color);
+
+  // Top right vertex
+  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y, data.position.z},
+                        data.texture_coordinates[1],
+                        data.texture_index,
+                        data.color);
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z},
+                        data.texture_coordinates[3],
+                        data.texture_index,
+                        data.color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z},
+                        data.texture_coordinates[2],
+                        data.texture_index,
+                        data.color);
+
+  m_current_vb->index_buffer_count += 6;
+}
+
+void Batch::m_emplace_sprite_face_front(const SpriteBatchData data)
+{
+  // Top left vertex
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z + data.size.y},
+                        data.texture_coordinates[0],
+                        data.texture_index,
+                        data.color);
+
+  // Top right vertex
+  m_current_vb->emplace(
+      glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z + data.size.y},
+      data.texture_coordinates[1],
+      data.texture_index,
+      data.color);
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z},
+                        data.texture_coordinates[3],
+                        data.texture_index,
+                        data.color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z},
+                        data.texture_coordinates[2],
+                        data.texture_index,
+                        data.color);
+
+  m_current_vb->index_buffer_count += 6;
+}
+
 }  // namespace dl

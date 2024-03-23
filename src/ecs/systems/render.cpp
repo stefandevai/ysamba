@@ -67,7 +67,14 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
           = std::round(position.y) * tile_size.y - render_data.anchor.y + render_data.layer_z * m_z_index_increment;
       const auto position_z = std::round(position.z) * tile_size.y + render_data.layer_z * m_z_index_increment;
 
-      m_batch.sprite(render_data, position_x, position_y, position_z);
+      if (render_data.frame_data != nullptr)
+      {
+        m_batch.sprite(render_data, position_x, position_y, position_z, render_data.frame_data->default_face);
+      }
+      else
+      {
+        m_batch.sprite(render_data, position_x, position_y, position_z);
+      }
     }
   }
 
@@ -275,7 +282,8 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     m_batch.tile(tile,
                  world_x * tile_size.x,
                  world_y * tile_size.y + z_index * m_z_index_increment,
-                 world_z * tile_size.y + z_index * m_z_index_increment);
+                 world_z * tile_size.y + z_index * m_z_index_increment,
+                 tile.frame_data->default_face);
 
     // // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
     // if (chunk.tiles.is_bottom_empty(x, y, z))
@@ -297,7 +305,8 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     m_batch.tile(tile,
                  (world_x - tile.frame_data->anchor_x) * tile_size.x,
                  (world_y - tile.frame_data->anchor_y) * tile_size.y,
-                 world_z * tile_size.y + z_index * m_z_index_increment);
+                 world_z * tile_size.y + z_index * m_z_index_increment,
+                 tile.frame_data->default_face);
   }
 }
 
