@@ -9,6 +9,7 @@ namespace dl::ui
 {
 class UIManager;
 class Inventory;
+class SocietyInventory;
 }  // namespace dl::ui
 
 namespace dl
@@ -35,12 +36,12 @@ class InventorySystem
   ui::UIManager& m_ui_manager;
   std::vector<entt::entity> m_carried_items{};
   std::vector<entt::entity> m_weared_items{};
-  std::vector<entt::entity> m_storage_items{};
+  std::vector<entt::entity> m_society_items{};
   ui::ItemList<uint32_t> m_carried_items_names{};
   ui::ItemList<uint32_t> m_weared_items_names{};
-  ui::ItemList<uint32_t> m_storage_items_names{};
+  ui::ItemList<uint32_t> m_society_items_names{};
   ui::Inventory* m_inventory = nullptr;
-  ui::Inventory* m_society_inventory = nullptr;
+  ui::SocietyInventory* m_society_inventory = nullptr;
   State m_state = State::Closed;
   InputManager& m_input_manager = InputManager::get_instance();
 
@@ -53,6 +54,8 @@ class InventorySystem
   void m_dispose();
   std::vector<entt::entity> m_get_selected_entities(entt::registry& registry);
   void m_update_items(entt::registry& registry, const std::vector<entt::entity>& selected_entities);
+  std::vector<entt::entity> m_get_carried_items(entt::registry& registry);
   std::vector<entt::entity> m_get_storage_items(entt::registry& registry);
+  std::vector<entt::entity> m_get_society_items(entt::registry& registry);
 };
 }  // namespace dl

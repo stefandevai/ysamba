@@ -3,14 +3,18 @@
 #include <spdlog/spdlog.h>
 
 #include <entt/core/hashed_string.hpp>
+#include <iterator>
 
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
+#include "ecs/components/society_agent.hpp"
+#include "ecs/components/storage_area.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
 #include "ui/compositions/inventory.hpp"
+#include "ui/compositions/society_inventory.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
@@ -24,7 +28,7 @@ InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager) : m_wo
   };
 
   m_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
-  m_society_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
+  m_society_inventory = m_ui_manager.emplace<ui::SocietyInventory>(on_select);
 }
 
 void InventorySystem::update(entt::registry& registry)
@@ -156,10 +160,10 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
     return;
   }
 
-  m_storage_items = m_get_storage_items(registry);
-  m_storage_items_names.clear();
+  m_society_items = m_get_society_items(registry);
+  m_society_items_names.clear();
 
-  for (const auto entity : m_storage_items)
+  for (const auto entity : m_society_items)
   {
     if (!registry.all_of<Item>(entity))
     {
@@ -168,10 +172,10 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
 
     const auto& item = registry.get<Item>(entity);
     const auto& item_data = m_world.get_item_data(item.id);
-    m_storage_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+    m_society_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
   }
 
-  // m_society_inventory->set_items(m_storage_items_names);
+  m_society_inventory->set_items(m_society_items_names);
   m_society_inventory->show();
 }
 
@@ -260,9 +264,54 @@ void InventorySystem::m_update_items(entt::registry& registry, const std::vector
   }
 }
 
+std::vector<entt::entity> InventorySystem::m_get_carried_items(entt::registry& registry)
+{
+  std::vector<entt::entity> items{};
+
+  auto selectable_view = registry.view<Selectable>();
+
+  for (const auto entity : selectable_view)
+  {
+    if (registry.all_of<CarriedItems>(entity))
+    {
+      const auto& carried_items = registry.get<CarriedItems>(entity);
+      items.insert(items.begin(), carried_items.items.begin(), carried_items.items.end());
+    }
+  }
+
+  return items;
+}
+
 std::vector<entt::entity> InventorySystem::m_get_storage_items(entt::registry& registry)
 {
   std::vector<entt::entity> items{};
+
+  auto storage_view = registry.view<StorageArea>();
+
+  for (const auto entity : storage_view)
+  {
+    const auto& position = registry.get<Position>(entity);
+    const auto entities = m_world.spatial_hash.get_all_by_component<Item>(position.x, position.y, position.z, registry);
+    items.insert(items.end(), std::make_move_iterator(entities.begin()), std::make_move_iterator(entities.end()));
+  }
+
+  return items;
+}
+
+std::vector<entt::entity> InventorySystem::m_get_society_items(entt::registry& registry)
+{
+  std::vector<entt::entity> items{};
+
+  const auto storage_items = m_get_storage_items(registry);
+
+  items.insert(
+      items.end(), std::make_move_iterator(storage_items.begin()), std::make_move_iterator(storage_items.end()));
+
+  const auto carried_items = m_get_carried_items(registry);
+
+  items.insert(
+      items.end(), std::make_move_iterator(carried_items.begin()), std::make_move_iterator(carried_items.end()));
+
   return items;
 }
 

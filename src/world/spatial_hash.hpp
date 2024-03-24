@@ -34,7 +34,35 @@ class SpatialHash
   {
     const auto& entities = get(x, y, z);
 
-    entt::entity candidate = entt::null;
+    for (const auto entity : entities)
+    {
+      if (!registry.all_of<Position, T...>(entity))
+      {
+        continue;
+      }
+
+      const auto& position = registry.get<Position>(entity);
+      const auto rounded_x = std::round(position.x);
+      const auto rounded_y = std::round(position.y);
+      const auto rounded_z = std::round(position.z);
+
+      if (z == rounded_z && x == rounded_x && y == rounded_y)
+      {
+        return entity;
+      }
+    }
+
+    return entt::null;
+  }
+
+  template <typename... T>
+  [[nodiscard]] std::vector<entt::entity> get_all_by_component(const int x,
+                                                               const int y,
+                                                               const int z,
+                                                               const entt::registry& registry) const
+  {
+    const auto& entities = get(x, y, z);
+    std::vector<entt::entity> entities_with_components{};
 
     for (const auto entity : entities)
     {
@@ -50,11 +78,11 @@ class SpatialHash
 
       if (z == rounded_z && x == rounded_x && y == rounded_y)
       {
-        candidate = entity;
+        entities_with_components.push_back(entity);
       }
     }
 
-    return candidate;
+    return entities_with_components;
   }
 
  private:
