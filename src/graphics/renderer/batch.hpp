@@ -2,22 +2,21 @@
 
 #include <webgpu/wgpu.h>
 
-#include <array>
-#include <vector>
-
-#include "core/maths/vector.hpp"
-#include "graphics/renderer/shader.hpp"
-#include "graphics/renderer/spritesheet.hpp"
-#include "graphics/renderer/wgpu_context.hpp"
-
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <array>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <vector>
 
+#include "core/maths/vector.hpp"
+#include "graphics/render_face.hpp"
 #include "graphics/renderer/batch_data.hpp"
+#include "graphics/renderer/shader.hpp"
+#include "graphics/renderer/texture.hpp"
 #include "graphics/renderer/vertex_data.hpp"
+#include "graphics/renderer/wgpu_context.hpp"
 
 namespace dl
 {
@@ -27,7 +26,6 @@ struct Quad;
 class Text;
 struct NinePatch;
 struct Tile;
-class Spritesheet;
 struct Sprite;
 
 struct UniformData
@@ -108,7 +106,7 @@ class Batch
   WGPUContext& m_context;
   BatchData<VertexData>* m_current_vb = nullptr;
 
-  Spritesheet m_dummy_texture;
+  Texture m_dummy_texture;
   uint32_t m_texture_slot_index_base = 0;
   uint32_t m_texture_slot_index = m_texture_slot_index_base;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <webgpu/wgpu.h>
+// #include <webgpu/wgpu.h>
 
 #include <array>
 #include <glm/vec2.hpp>
@@ -10,6 +10,7 @@
 
 #include "core/maths/vector.hpp"
 #include "graphics/frame_data.hpp"
+#include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
@@ -19,25 +20,18 @@ class Spritesheet
   bool has_loaded = false;
   bool has_metadata = false;
 
-  WGPUTexture texture;
-  WGPUTextureView view;
+  std::unique_ptr<Texture> texture = nullptr;
 
   Spritesheet(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels = 4);
   // Create full sized texture
   Spritesheet(const std::string& filepath);
   // Create texture atlas
   Spritesheet(const std::string& filepath, const std::string& data_filepath);
-  ~Spritesheet();
-
-  static Spritesheet dummy(const WGPUDevice device);
 
   // Loads after setting filepath
   void load(const WGPUDevice device);
 
-  // Loads texture from data
-  void load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels);
-
-  inline const Vector2i& get_size() const { return m_size; }
+  inline const Vector2i& get_size() const { return texture->size; }
   inline const Vector2i& get_frame_size() const { return m_frame_size; }
   inline int get_horizontal_frames() const { return m_horizontal_frames; }
   inline int get_vertical_frames() const { return m_vertical_frames; }
@@ -50,11 +44,9 @@ class Spritesheet
 
  private:
   FrameData::Map m_frame_data;
-  std::string m_filepath{};
   std::string m_data_filepath{};
   int m_horizontal_frames = 1;
   int m_vertical_frames = 1;
-  Vector2i m_size{};
   Vector2i m_frame_size{};
 
   // Map where the key is the frame id and the value is an array of uv coordinates for a quad

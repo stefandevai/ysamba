@@ -4,69 +4,27 @@
 
 #include "core/json.hpp"
 
-extern "C"
-{
-#define STBI_ONLY_PNG
-#define STBI_ONLY_JPEG
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-}
-
 namespace dl
 {
 // Create full sized texture
-Spritesheet::Spritesheet(const std::string& filepath) : m_filepath(filepath) {}
+Spritesheet::Spritesheet(const std::string& filepath) : texture(std::make_unique<Texture>(filepath)) {}
 
 // Create texture atlas
 Spritesheet::Spritesheet(const std::string& filepath, const std::string& data_filepath)
-    : m_filepath(filepath), m_data_filepath(data_filepath)
+    : texture(std::make_unique<Texture>(filepath)), m_data_filepath(data_filepath)
 {
 }
 
 // Load texture from data on constructor
 Spritesheet::Spritesheet(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
+    : texture(std::make_unique<Texture>(device, data, size, channels))
 {
   m_generate_uv_coordinates();
-  load(device, data, size, channels);
-}
-
-Spritesheet::~Spritesheet()
-{
-  if (has_loaded)
-  {
-    wgpuTextureViewRelease(view);
-    wgpuTextureDestroy(texture);
-    wgpuTextureRelease(texture);
-  }
-}
-
-Spritesheet Spritesheet::dummy(const WGPUDevice device)
-{
-  static constexpr unsigned char dummy_data = 0;
-  Spritesheet dummy_texture{device, &dummy_data, Vector2i{1, 1}, 1};
-  return dummy_texture;
 }
 
 void Spritesheet::load(const WGPUDevice device)
 {
-  assert(!m_filepath.empty() && "Spritesheet filepath is empty");
-
-  int width = 0;
-  int height = 0;
-  int channels = 0;
-  unsigned char* image_data;
-
-  // image_data = stbi_load (filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-  image_data = stbi_load(m_filepath.c_str(), &width, &height, &channels, 0);
-
-  if (image_data == nullptr)
-  {
-    spdlog::critical("Failed to load texture: {}", m_filepath);
-    return;
-  }
-
-  load(device, image_data, Vector2i{width, height}, channels);
-  stbi_image_free(image_data);
+  texture->load(device);
 
   // Load metadata
   if (m_data_filepath != "")
@@ -77,73 +35,6 @@ void Spritesheet::load(const WGPUDevice device)
   {
     m_generate_uv_coordinates();
   }
-}
-
-void Spritesheet::load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
-{
-  m_size = size;
-
-  const auto queue = wgpuDeviceGetQueue(device);
-
-  WGPUTextureFormat format;
-  switch (channels)
-  {
-  case 1:
-    format = WGPUTextureFormat_R8Unorm;
-    break;
-
-  case 4:
-    format = WGPUTextureFormat_RGBA8Unorm;
-    break;
-
-  default:
-    format = WGPUTextureFormat_RGBA8Unorm;
-    break;
-  }
-
-  WGPUTextureDescriptor textureDesc{
-      .label = "WorldPipeline Texture",
-      .dimension = WGPUTextureDimension_2D,
-      .size = {static_cast<uint32_t>(m_size.x), static_cast<uint32_t>(m_size.y), 1},
-      .mipLevelCount = 1,
-      .sampleCount = 1,
-      .format = format,
-      .usage = WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst,
-      .viewFormatCount = 0,
-      .viewFormats = nullptr,
-  };
-
-  texture = wgpuDeviceCreateTexture(device, &textureDesc);
-  assert(texture != nullptr);
-
-  WGPUImageCopyTexture destination = {
-      .texture = texture,
-      .mipLevel = 0,
-      .origin = {0, 0, 0},
-      .aspect = WGPUTextureAspect_All,
-  };
-
-  WGPUTextureDataLayout source = {
-      .offset = 0,
-      .bytesPerRow = channels * textureDesc.size.width,
-      .rowsPerImage = textureDesc.size.height,
-  };
-
-  wgpuQueueWriteTexture(
-      queue, &destination, data, m_size.x * m_size.y * channels * sizeof(unsigned char), &source, &textureDesc.size);
-
-  WGPUTextureViewDescriptor textureViewDesc{
-      .label = "WorldPipeline Texture View",
-      .aspect = WGPUTextureAspect_All,
-      .baseArrayLayer = 0,
-      .arrayLayerCount = 1,
-      .baseMipLevel = 0,
-      .mipLevelCount = 1,
-      .dimension = WGPUTextureViewDimension_2D,
-      .format = textureDesc.format,
-  };
-  view = wgpuTextureCreateView(texture, &textureViewDesc);
-  assert(view != nullptr);
 
   has_loaded = true;
 }
@@ -198,10 +89,12 @@ void Spritesheet::m_load_metadata(const std::string& filepath)
     const auto tile_width = json.object["tile_width"].get<int>();
     const auto tile_height = json.object["tile_height"].get<int>();
 
-    m_horizontal_frames = m_size.x / tile_width;
-    m_vertical_frames = m_size.y / tile_height;
+    const auto& size = texture->size;
 
-    m_frame_size = Vector2i{m_size.x / m_horizontal_frames, m_size.y / m_vertical_frames};
+    m_horizontal_frames = size.x / tile_width;
+    m_vertical_frames = size.y / tile_height;
+
+    m_frame_size = Vector2i{size.x / m_horizontal_frames, size.y / m_vertical_frames};
   }
 
   const auto items = json.object["frames"].get<std::vector<nlohmann::json>>();

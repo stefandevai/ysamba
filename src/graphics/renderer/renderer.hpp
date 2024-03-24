@@ -7,6 +7,7 @@
 #include "graphics/renderer/passes/main_render_pass.hpp"
 #include "graphics/renderer/passes/ui_render_pass.hpp"
 #include "graphics/renderer/shader.hpp"
+#include "graphics/renderer/spritesheet.hpp"
 
 namespace dl
 {

@@ -12,6 +12,7 @@
 #include "graphics/nine_patch.hpp"
 #include "graphics/quad.hpp"
 #include "graphics/render_face.hpp"
+#include "graphics/renderer/spritesheet.hpp"
 #include "graphics/renderer/utils.hpp"
 #include "graphics/text.hpp"
 
@@ -20,7 +21,7 @@ namespace dl
 Batch::Batch(GameContext& game_context)
     : m_game_context(game_context),
       m_context(m_game_context.display->wgpu_context),
-      m_dummy_texture(Spritesheet::dummy(m_context.device))
+      m_dummy_texture(Texture::dummy(m_context.device))
 {
 }
 
@@ -117,11 +118,11 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   // be translated to a index in the shader.
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->view);
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite.texture->view;
+    texture_views[m_texture_slot_index] = sprite.texture->texture->view;
     ++m_texture_slot_index;
     should_update_texture_bind_group = true;
   }
@@ -149,11 +150,11 @@ void Batch::tile(const Tile& tile, const double x, const double y, const double 
 
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, tile.texture->view);
+  const auto it = std::find(texture_views.begin(), upper_bound, tile.texture->texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = tile.texture->view;
+    texture_views[m_texture_slot_index] = tile.texture->texture->view;
     ++m_texture_slot_index;
     should_update_texture_bind_group = true;
   }
