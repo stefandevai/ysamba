@@ -78,8 +78,8 @@ void UIRenderPass::load(const Shader& shader)
   batch.load();
 
   // Pin font texture as the first texture (slot index 0)
-  const auto font_texture = m_game_context.asset_manager->get<Font>("font-1980"_hs)->get_atlas();
-  const auto slot_index = batch.pin_texture(font_texture->texture->view);
+  const auto& font_texture = m_game_context.asset_manager->get<Font>("font-1980"_hs)->texture;
+  const auto slot_index = batch.pin_texture(font_texture->view);
   assert(slot_index == 0);
 
   // Create sampler

@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
-#include "graphics/renderer/spritesheet.hpp"
+#include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
@@ -27,6 +27,7 @@ class Font
 {
  public:
   bool has_loaded = false;
+  std::unique_ptr<Texture> texture = nullptr;
 
   Font(const std::string& path, std::size_t size = 16);
   void load(const WGPUDevice device);
@@ -34,7 +35,6 @@ class Font
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
   };
-  inline const Spritesheet* get_atlas() const { return m_texture_atlas.get(); };
   inline size_t get_size() const { return m_size; };
   inline int get_max_character_top() const { return m_max_character_top; };
 
@@ -42,7 +42,6 @@ class Font
   std::string m_path{};
   std::size_t m_size;
   std::map<char32_t, CharacterData> m_chars;
-  std::unique_ptr<Spritesheet> m_texture_atlas = nullptr;
   Vector2i m_atlas_size{};
   int m_max_character_top = 0;
 

@@ -64,14 +64,10 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
           = std::round(position.y) * tile_size.y - render_data.anchor.y + render_data.layer_z * m_z_index_increment;
       const auto position_z = std::round(position.z) * tile_size.y + render_data.layer_z * m_z_index_increment;
 
-      if (render_data.frame_data != nullptr)
-      {
-        m_batch.sprite(render_data, position_x, position_y, position_z, render_data.frame_data->default_face);
-      }
-      else
-      {
-        m_batch.sprite(render_data, position_x, position_y, position_z);
-      }
+      assert(render_data.spritesheet != nullptr && "Sprite Texture not found");
+      assert(render_data.frame_data != nullptr && "Sprite Frame data not found");
+
+      m_batch.sprite(render_data, position_x, position_y, position_z, render_data.frame_data->default_face);
     }
   }
 
@@ -311,28 +307,20 @@ void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity
 {
   auto& sprite_data = registry.get<Sprite>(entity);
 
-  // Load texture and render data
-  if (sprite_data.texture == nullptr)
-  {
-    const auto spritesheet = m_game_context.asset_manager->get<Spritesheet>(sprite_data.resource_id);
-    sprite_data.texture = spritesheet->texture.get();
-    assert(sprite_data.texture != nullptr && "Texture not found");
+  assert(sprite_data.resource_id != 0 && "Resource ID not found while creating sprite");
 
-    if (spritesheet->has_metadata)
-    {
-      const auto& frame_data = spritesheet->id_to_frame(sprite_data.id, sprite_data.category);
-      const auto& frame_size = spritesheet->get_frame_size();
-      sprite_data.frame_data = &frame_data;
-      sprite_data.uv_coordinates = spritesheet->get_uv_coordinates(frame_data.faces[frame_data.default_face]);
-      sprite_data.size = glm::vec2{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
-      sprite_data.anchor = glm::vec2{frame_size.x * frame_data.anchor_x, frame_size.y * frame_data.anchor_y};
-    }
-    else
-    {
-      sprite_data.frame_data = nullptr;
-      sprite_data.uv_coordinates = spritesheet->get_uv_coordinates();
-    }
-  }
+  // Load texture and render data
+  const auto spritesheet = m_game_context.asset_manager->get<Spritesheet>(sprite_data.resource_id);
+  sprite_data.spritesheet = spritesheet;
+
+  assert(spritesheet->has_metadata && "Spritesheet metadata not found");
+
+  const auto& frame_data = spritesheet->id_to_frame(sprite_data.id, sprite_data.category);
+  const auto& frame_size = spritesheet->get_frame_size();
+  sprite_data.frame_data = &frame_data;
+  sprite_data.uv_coordinates = spritesheet->get_uv_coordinates(frame_data.faces[frame_data.default_face]);
+  sprite_data.size = glm::vec2{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
+  sprite_data.anchor = glm::vec2{frame_size.x * frame_data.anchor_x, frame_size.y * frame_data.anchor_y};
 }
 
 }  // namespace dl

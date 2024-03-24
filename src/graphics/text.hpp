@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
-#include "ecs/components/sprite.hpp"
+#include "ecs/components/sprite_freeform.hpp"
 
 namespace dl
 {
@@ -23,7 +23,7 @@ struct Character
   int y;
   int w;
   int h;
-  std::unique_ptr<Sprite> sprite = nullptr;
+  std::unique_ptr<SpriteFreeform> sprite = nullptr;
 };
 
 class Text

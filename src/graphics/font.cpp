@@ -104,7 +104,7 @@ void Font::load(const WGPUDevice device)
 
   assert(m_atlas_size.x > 0 && m_atlas_size.y > 0 && "Atlas size is invalid");
 
-  m_texture_atlas = std::make_unique<Spritesheet>(device, data.data(), m_atlas_size, 1);
+  texture = std::make_unique<Texture>(device, data.data(), m_atlas_size, 1);
 
   FT_Done_Face(face);
   FT_Done_FreeType(ft);

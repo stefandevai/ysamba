@@ -36,7 +36,6 @@ class TextureAtlas
 
   std::unique_ptr<Texture> texture = nullptr;
 
-  // Create texture atlas
   TextureAtlas(const std::string& filepath, const std::string& data_filepath);
 
   // Loads after setting filepath

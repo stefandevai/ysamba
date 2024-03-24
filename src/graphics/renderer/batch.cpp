@@ -80,11 +80,12 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
 
 void Batch::sprite(Sprite& sprite, const double x, const double y, const double z, const RenderFace face)
 {
-  assert(sprite.texture != nullptr);
+  assert(sprite.spritesheet != nullptr);
+  assert(sprite.frame_data != nullptr);
   assert(sprite.size.x != 0 && sprite.size.y != 0);
 
   const glm::vec2& size = sprite.size;
-  const auto& texture_coordinates = sprite.uv_coordinates;
+  const auto& texture_coordinates = sprite.spritesheet->get_uv_coordinates(sprite.frame_data->faces[face]);
   unsigned int color = sprite.color.int_color;
 
   if (sprite.color.opacity_factor < 1.0)
@@ -101,11 +102,11 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   // be translated to a index in the shader.
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->view);
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite.spritesheet->texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite.texture->view;
+    texture_views[m_texture_slot_index] = sprite.spritesheet->texture->view;
     ++m_texture_slot_index;
     should_update_texture_bind_group = true;
   }
@@ -297,7 +298,7 @@ void Batch::text(Text& text, const double x, const double y, const double z)
       character.sprite->color.opacity_factor = text.color.opacity_factor;
     }
 
-    sprite(*character.sprite, character.x + x, character.y + y, z);
+    sprite_freeform(*character.sprite, character.x + x, character.y + y, z);
   }
 }
 
