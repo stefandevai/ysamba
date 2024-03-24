@@ -56,7 +56,7 @@ void StorageAreaSystem::m_update_select_area(entt::registry& registry, const Cam
 
   if (m_notification == nullptr)
   {
-    m_notification = m_ui_manager.notify("Select area for hut");
+    m_notification = m_ui_manager.notify("Select storage area");
   }
 
   m_select_area(registry, camera);

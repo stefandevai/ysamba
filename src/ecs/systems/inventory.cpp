@@ -18,17 +18,26 @@ namespace dl
 {
 InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  auto on_select = [this](const int i) { m_state = static_cast<InventoryState>(i); };
+  auto on_select = [](const int i) {
+    // TODO: Open item details menu
+    (void)i;
+  };
+
   m_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
+  m_society_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
 }
 
 void InventorySystem::update(entt::registry& registry)
 {
-  if (m_state == InventoryState::Open)
+  if (m_state == State::OpenSelected)
   {
     m_update_inventory(registry);
   }
-  else if (m_state == InventoryState::Closed)
+  else if (m_state == State::OpenSociety)
+  {
+    m_update_society_inventory(registry);
+  }
+  else if (m_state == State::Closed)
   {
     m_update_closed_inventory(registry);
   }
@@ -39,6 +48,23 @@ void InventorySystem::m_update_inventory(entt::registry& registry)
   using namespace entt::literals;
 
   m_open_inventory(registry);
+
+  if (!m_input_manager.is_context("inventory"_hs))
+  {
+    return;
+  }
+
+  if (m_input_manager.poll_action("close_inventory"_hs))
+  {
+    m_dispose();
+  }
+}
+
+void InventorySystem::m_update_society_inventory(entt::registry& registry)
+{
+  using namespace entt::literals;
+
+  m_open_society_inventory(registry);
 
   if (!m_input_manager.is_context("inventory"_hs))
   {
@@ -64,9 +90,18 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 
   if (m_input_manager.poll_action("open_inventory"_hs))
   {
-    m_update_items(registry);
+    const auto entities = m_get_selected_entities(registry);
 
-    m_state = InventoryState::Open;
+    if (entities.empty())
+    {
+      m_state = State::OpenSociety;
+    }
+    else
+    {
+      m_update_items(registry, entities);
+      m_state = State::OpenSelected;
+    }
+
     m_input_manager.push_context("inventory"_hs);
   }
 }
@@ -112,22 +147,67 @@ void InventorySystem::m_open_inventory(entt::registry& registry)
   }
 }
 
-void InventorySystem::m_close_inventory() { m_inventory->hide(); }
+void InventorySystem::m_open_society_inventory(entt::registry& registry)
+{
+  assert(m_society_inventory != nullptr);
+
+  if (m_society_inventory->state != ui::UIComponent::State::Hidden)
+  {
+    return;
+  }
+
+  m_storage_items = m_get_storage_items(registry);
+  m_storage_items_names.clear();
+
+  for (const auto entity : m_storage_items)
+  {
+    if (!registry.all_of<Item>(entity))
+    {
+      continue;
+    }
+
+    const auto& item = registry.get<Item>(entity);
+    const auto& item_data = m_world.get_item_data(item.id);
+    m_storage_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+  }
+
+  // m_society_inventory->set_items(m_storage_items_names);
+  m_society_inventory->show();
+}
+
+void InventorySystem::m_close_inventory()
+{
+  switch (m_state)
+  {
+  case State::OpenSelected:
+  {
+    m_inventory->hide();
+    break;
+  }
+  case State::OpenSociety:
+  {
+    m_society_inventory->hide();
+    break;
+  }
+  default:
+  {
+    break;
+  }
+  }
+}
 
 void InventorySystem::m_dispose()
 {
   m_close_inventory();
-  m_state = InventoryState::Closed;
+  m_state = State::Closed;
   m_input_manager.pop_context();
 }
 
-void InventorySystem::m_update_items(entt::registry& registry)
+std::vector<entt::entity> InventorySystem::m_get_selected_entities(entt::registry& registry)
 {
-  m_carried_items.clear();
-  m_weared_items.clear();
   std::vector<entt::entity> selected_entities{};
-  auto view = registry.view<Selectable>();
 
+  auto view = registry.view<Selectable>();
   for (const auto entity : view)
   {
     const auto& selectable = registry.get<Selectable>(entity);
@@ -140,39 +220,50 @@ void InventorySystem::m_update_items(entt::registry& registry)
     selected_entities.push_back(entity);
   }
 
-  if (!selected_entities.empty())
-  {
-    for (const auto entity : selected_entities)
-    {
-      if (registry.all_of<WieldedItems>(entity))
-      {
-        const auto& items = registry.get<WieldedItems>(entity);
-        const auto left_hand = items.left_hand;
-        const auto right_hand = items.right_hand;
+  return selected_entities;
+}
 
-        if (registry.valid(left_hand))
-        {
-          m_weared_items.push_back(left_hand);
-        }
-        if (registry.valid(right_hand) && right_hand != left_hand)
-        {
-          m_weared_items.push_back(right_hand);
-        }
-      }
-      if (registry.all_of<WearedItems>(entity))
+void InventorySystem::m_update_items(entt::registry& registry, const std::vector<entt::entity>& selected_entities)
+{
+  assert(!selected_entities.empty());
+
+  m_carried_items.clear();
+  m_weared_items.clear();
+
+  for (const auto entity : selected_entities)
+  {
+    if (registry.all_of<WieldedItems>(entity))
+    {
+      const auto& items = registry.get<WieldedItems>(entity);
+      const auto left_hand = items.left_hand;
+      const auto right_hand = items.right_hand;
+
+      if (registry.valid(left_hand))
       {
-        const auto& items = registry.get<WearedItems>(entity);
-        m_weared_items.insert(m_weared_items.end(), items.items.begin(), items.items.end());
+        m_weared_items.push_back(left_hand);
       }
-      if (registry.all_of<CarriedItems>(entity))
+      if (registry.valid(right_hand) && right_hand != left_hand)
       {
-        const auto& items = registry.get<CarriedItems>(entity);
-        m_carried_items.insert(m_carried_items.begin(), items.items.begin(), items.items.end());
+        m_weared_items.push_back(right_hand);
       }
     }
-    return;
+    if (registry.all_of<WearedItems>(entity))
+    {
+      const auto& items = registry.get<WearedItems>(entity);
+      m_weared_items.insert(m_weared_items.end(), items.items.begin(), items.items.end());
+    }
+    if (registry.all_of<CarriedItems>(entity))
+    {
+      const auto& items = registry.get<CarriedItems>(entity);
+      m_carried_items.insert(m_carried_items.begin(), items.items.begin(), items.items.end());
+    }
   }
-
-  // TODO: Implement society inventory
 }
+
+std::vector<entt::entity> InventorySystem::m_get_storage_items(entt::registry& registry)
+{
+  std::vector<entt::entity> items{};
+  return items;
+}
+
 }  // namespace dl
