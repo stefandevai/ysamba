@@ -20,7 +20,7 @@ namespace dl
 Batch::Batch(GameContext& game_context)
     : m_game_context(game_context),
       m_context(m_game_context.display->wgpu_context),
-      m_dummy_texture(Texture::dummy(m_context.device))
+      m_dummy_texture(Spritesheet::dummy(m_context.device))
 {
 }
 
@@ -82,7 +82,7 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   if (sprite.texture == nullptr)
   {
     assert(sprite.resource_id != 0 && "Sprite resource id is empty");
-    sprite.texture = m_game_context.asset_manager->get<Texture>(sprite.resource_id);
+    sprite.texture = m_game_context.asset_manager->get<Spritesheet>(sprite.resource_id);
   }
 
   // Set default size as texture size if size is not yet set
@@ -232,7 +232,7 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 
   if (nine_patch.texture == nullptr)
   {
-    nine_patch.texture = m_game_context.asset_manager->get<Texture>(nine_patch.resource_id);
+    nine_patch.texture = m_game_context.asset_manager->get<Spritesheet>(nine_patch.resource_id);
   }
 
   if (nine_patch.dirty)

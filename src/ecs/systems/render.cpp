@@ -314,7 +314,7 @@ void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity
   // Load texture and render data
   if (sprite_data.texture == nullptr)
   {
-    sprite_data.texture = m_game_context.asset_manager->get<Texture>(sprite_data.resource_id);
+    sprite_data.texture = m_game_context.asset_manager->get<Spritesheet>(sprite_data.resource_id);
     assert(sprite_data.texture != nullptr && "Texture not found");
 
     if (sprite_data.texture->has_metadata)

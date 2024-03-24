@@ -1,6 +1,6 @@
 #include "./sprite.hpp"
 
-#include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/spritesheet.hpp"
 
 namespace dl
 {

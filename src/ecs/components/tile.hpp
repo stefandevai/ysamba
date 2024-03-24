@@ -5,12 +5,12 @@
 
 namespace dl
 {
-class Texture;
+class Spritesheet;
 struct FrameData;
 
 struct Tile
 {
-  const Texture* texture = nullptr;
+  const Spritesheet* texture = nullptr;
   const FrameData* frame_data = nullptr;
   const glm::vec2 size{};
 };

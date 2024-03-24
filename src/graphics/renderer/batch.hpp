@@ -7,7 +7,7 @@
 
 #include "core/maths/vector.hpp"
 #include "graphics/renderer/shader.hpp"
-#include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/spritesheet.hpp"
 #include "graphics/renderer/wgpu_context.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -27,7 +27,7 @@ struct Quad;
 class Text;
 struct NinePatch;
 struct Tile;
-class Texture;
+class Spritesheet;
 struct Sprite;
 
 struct UniformData
@@ -108,7 +108,7 @@ class Batch
   WGPUContext& m_context;
   BatchData<VertexData>* m_current_vb = nullptr;
 
-  Texture m_dummy_texture;
+  Spritesheet m_dummy_texture;
   uint32_t m_texture_slot_index_base = 0;
   uint32_t m_texture_slot_index = m_texture_slot_index_base;
 

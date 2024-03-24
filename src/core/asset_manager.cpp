@@ -35,7 +35,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
     {
       assert(asset_info.contains("path") && "Texture path not specified");
       const auto& filepath = asset_info["path"].get<std::string>();
-      add<Texture>(hashed_id, filepath);
+      add<Spritesheet>(hashed_id, filepath);
     }
     break;
 
@@ -47,7 +47,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       const auto& filepath = asset_info["path"].get<std::string>();
       const auto data_filepath = asset_info["data_path"].get<std::string>();
 
-      add<Texture>(hashed_id, filepath, data_filepath);
+      add<Spritesheet>(hashed_id, filepath, data_filepath);
     }
     break;
 

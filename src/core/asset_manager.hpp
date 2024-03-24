@@ -10,17 +10,17 @@
 
 #include "graphics/display.hpp"
 #include "graphics/font.hpp"
-#include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/spritesheet.hpp"
 
 namespace dl
 {
-using Asset = std::variant<std::unique_ptr<Texture>, std::unique_ptr<Font>>;
+using Asset = std::variant<std::unique_ptr<Spritesheet>, std::unique_ptr<Font>>;
 
 struct AssetLoader
 {
   AssetLoader(const WGPUDevice& device) : m_device(device) {}
 
-  void operator()(const std::unique_ptr<Texture>& texture) { texture->load(m_device); }
+  void operator()(const std::unique_ptr<Spritesheet>& texture) { texture->load(m_device); }
 
   void operator()(const std::unique_ptr<Font>& font) { font->load(m_device); }
 

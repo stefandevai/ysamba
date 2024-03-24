@@ -28,7 +28,7 @@
 #include "ecs/components/sprite.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/display.hpp"
-#include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/spritesheet.hpp"
 
 namespace dl
 {
@@ -413,7 +413,7 @@ void World::m_load_tile_data()
 
   const auto actions = m_load_actions();
 
-  const auto texture = m_game_context.asset_manager->get<Texture>(m_texture_id);
+  const auto texture = m_game_context.asset_manager->get<Spritesheet>(m_texture_id);
 
   assert(texture != nullptr && "World texture is not loaded in order to get tile size");
 

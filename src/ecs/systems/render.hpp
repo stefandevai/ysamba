@@ -14,7 +14,7 @@ struct Position;
 struct Vector2i;
 struct Chunk;
 class Batch;
-class Texture;
+class Spritesheet;
 class Renderer;
 struct GameContext;
 
@@ -31,7 +31,7 @@ class RenderSystem
   World& m_world;
   std::unordered_map<uint32_t, Tile> m_tiles{};
   const uint32_t m_world_texture_id;
-  const Texture* m_world_texture = nullptr;
+  const Spritesheet* m_world_texture = nullptr;
   static constexpr int m_frustum_tile_padding = 1;
   static constexpr double m_z_index_increment = 0.02;
 

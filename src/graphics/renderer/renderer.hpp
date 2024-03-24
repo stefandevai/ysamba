@@ -34,7 +34,7 @@ class Renderer
 
   void resize();
   void clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a = 1.0f);
-  const Texture* get_texture(const uint32_t resource_id);
+  const Spritesheet* get_texture(const uint32_t resource_id);
 
  private:
   bool m_has_loaded = false;
