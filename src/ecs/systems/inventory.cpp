@@ -47,6 +47,7 @@ void InventorySystem::update(entt::registry& registry)
   }
 }
 
+// Updates inventory for selected entities
 void InventorySystem::m_update_selected_inventory()
 {
   using namespace entt::literals;
@@ -62,6 +63,7 @@ void InventorySystem::m_update_selected_inventory()
   }
 }
 
+// Updates inventory for all society agents and storage area
 void InventorySystem::m_update_society_inventory()
 {
   using namespace entt::literals;
@@ -77,6 +79,7 @@ void InventorySystem::m_update_society_inventory()
   }
 }
 
+// Updates the closed inventory state
 void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 {
   using namespace entt::literals;
@@ -99,7 +102,7 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
     }
     else
     {
-      m_open_inventory(registry, entities);
+      m_open_selected_inventory(registry, entities);
       m_state = State::OpenSelected;
     }
 
@@ -107,7 +110,9 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
   }
 }
 
-void InventorySystem::m_open_inventory(entt::registry& registry, const std::vector<entt::entity>& selected_entities)
+// Opens inventory for selected entities
+void InventorySystem::m_open_selected_inventory(entt::registry& registry,
+                                                const std::vector<entt::entity>& selected_entities)
 {
   assert(m_selected_inventory != nullptr);
 
@@ -153,6 +158,7 @@ void InventorySystem::m_open_inventory(entt::registry& registry, const std::vect
   m_selected_inventory->show();
 }
 
+// Opens inventory for all society agents and storage area
 void InventorySystem::m_open_society_inventory(entt::registry& registry)
 {
   assert(m_society_inventory != nullptr);
@@ -181,6 +187,7 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
   m_society_inventory->show();
 }
 
+// Closes any inventory open
 void InventorySystem::m_close_inventory()
 {
   switch (m_state)
@@ -202,6 +209,7 @@ void InventorySystem::m_close_inventory()
   }
 }
 
+// Removes UI elements and pops input context
 void InventorySystem::m_dispose()
 {
   m_close_inventory();
@@ -229,6 +237,7 @@ std::vector<entt::entity> InventorySystem::m_get_selected_entities(entt::registr
   return selected_entities;
 }
 
+// Gets weared items by society agents. If selected_entities is empty, all society agents are considered
 std::vector<entt::entity> InventorySystem::m_get_weared_items(entt::registry& registry,
                                                               const std::vector<entt::entity>& selected_entities)
 {
@@ -279,6 +288,7 @@ std::vector<entt::entity> InventorySystem::m_get_weared_items(entt::registry& re
   return items;
 }
 
+// Gets carried items by society agents. If selected_entities is empty, all society agents are considered
 std::vector<entt::entity> InventorySystem::m_get_carried_items(entt::registry& registry,
                                                                const std::vector<entt::entity>& selected_entities)
 {
@@ -330,6 +340,7 @@ std::vector<entt::entity> InventorySystem::m_get_storage_items(entt::registry& r
   return items;
 }
 
+// Gets items in storage area and items carried by all society agents
 std::vector<entt::entity> InventorySystem::m_get_society_items(entt::registry& registry)
 {
   std::vector<entt::entity> items{};
