@@ -10,8 +10,6 @@
 
 #include "core/maths/vector.hpp"
 #include "graphics/frame_data.hpp"
-#include "graphics/render_face.hpp"
-#include "graphics/sprite_type.hpp"
 
 namespace dl
 {

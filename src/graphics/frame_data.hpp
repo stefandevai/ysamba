@@ -1,5 +1,8 @@
 #pragma once
 
+#include "graphics/render_face.hpp"
+#include "graphics/sprite_type.hpp"
+
 namespace dl
 {
 struct FrameData
