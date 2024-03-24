@@ -184,6 +184,7 @@ void Gameplay::m_update_turn_systems()
   m_walk_system.update(m_registry);
   m_job_system.update(m_registry);
   m_build_hut_system.update(m_registry);
+  m_storage_area_system.update(m_registry);
 }
 
 void Gameplay::m_update_action_systems()
@@ -196,6 +197,7 @@ void Gameplay::m_update_action_systems()
   m_inventory_system.update(m_registry);
   m_drop_system.update(m_registry, m_camera);
   m_build_hut_system.update_state(m_registry, m_camera);
+  m_storage_area_system.update_state(m_registry, m_camera);
 }
 
 void Gameplay::m_update_all_systems()

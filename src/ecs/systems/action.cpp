@@ -35,6 +35,7 @@ const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
     {1, "Break"},
     {2, "Dig"},
     {3, "Build hut"},
+    {4, "Select storage area"},
 };
 
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
@@ -267,6 +268,12 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   case ActionMenuState::SelectHutTarget:
   {
     m_event_emitter.publish(SelectHutTargetEvent{});
+    m_dispose();
+    break;
+  }
+  case ActionMenuState::SelectStorageTarget:
+  {
+    m_event_emitter.publish(SelectStorageEvent{});
     m_dispose();
     break;
   }

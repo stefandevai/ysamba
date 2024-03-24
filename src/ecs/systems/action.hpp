@@ -35,6 +35,7 @@ class ActionSystem
     SelectBreakTarget,
     SelectDigTarget,
     SelectHutTarget,
+    SelectStorageTarget,
     Closed,
     Open,
   };

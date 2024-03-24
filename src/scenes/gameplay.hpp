@@ -17,6 +17,7 @@
 #include "ecs/systems/pickup.hpp"
 #include "ecs/systems/player_controls.hpp"
 #include "ecs/systems/render.hpp"
+#include "ecs/systems/storage_area.hpp"
 // #include "ecs/systems/society.hpp"
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
@@ -67,6 +68,7 @@ class Gameplay : public Scene
   ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter};
   PickupSystem m_pickup_system{m_world};
   BuildHutSystem m_build_hut_system{m_world, m_event_emitter, m_ui_manager};
+  StorageAreaSystem m_storage_area_system{m_world, m_event_emitter, m_ui_manager};
   WalkSystem m_walk_system{m_world, m_registry};
   JobSystem m_job_system{m_world};
   InventorySystem m_inventory_system{m_world, m_ui_manager};
