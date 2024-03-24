@@ -84,6 +84,7 @@ class Batch
       Sprite& sprite, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
   void tile(
       const Tile& tile, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
+  void texture(const Texture& texture, const double x, const double y, const double z);
   void quad(const Quad* quad, const double x, const double y, const double z);
   void text(Text& text, const double x, const double y, const double z);
   void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);

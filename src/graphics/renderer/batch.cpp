@@ -168,6 +168,46 @@ void Batch::tile(const Tile& tile, const double x, const double y, const double 
   m_emplace_sprite_face(std::move(data));
 }
 
+void Batch::texture(const Texture& texture, const double x, const double y, const double z)
+{
+  assert(m_current_vb != nullptr);
+  assert(texture.size.x != 0);
+  assert(texture.size.y != 0);
+
+  const auto& size = texture.size;
+  const uint32_t color = 0xFFFFFFFF;
+
+  float texture_index = 0.00f;
+  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(texture_views.begin(), upper_bound, texture.view);
+
+  if (it >= upper_bound)
+  {
+    texture_index = static_cast<float>(m_texture_slot_index);
+    texture_views[m_texture_slot_index] = texture.view;
+    ++m_texture_slot_index;
+    should_update_texture_bind_group = true;
+  }
+  else
+  {
+    texture_index = it - texture_views.begin();
+  }
+
+  // Top left vertex
+  m_current_vb->emplace(glm::vec3{x, y, z}, glm::vec2{0.0f, 0.0f}, texture_index, color);
+
+  // Top right vertex
+  m_current_vb->emplace(glm::vec3{x + size.x, y, z}, glm::vec2{1.0f, 0.0f}, texture_index, color);
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{x, y + size.y, z}, glm::vec2{0.0f, 1.0f}, texture_index, color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(glm::vec3{x + size.x, y + size.y, z}, glm::vec2{1.0f, 1.0f}, texture_index, color);
+
+  m_current_vb->index_buffer_count += 6;
+}
+
 void Batch::quad(const Quad* quad, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);

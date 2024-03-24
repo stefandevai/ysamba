@@ -16,6 +16,7 @@
 #include "core/serialization.hpp"
 #include "core/utils.hpp"
 #include "graphics/color.hpp"
+#include "graphics/renderer/texture.hpp"
 #include "ui/compositions/world_creation_panel.hpp"
 #include "world/generators/island_generator.hpp"
 #include "world/metadata.hpp"
@@ -69,7 +70,9 @@ void WorldCreation::render()
     return;
   }
 
-  m_renderer.ui_pass.batch.sprite(m_world_sprite, 0, 0, 0);
+  assert(m_texture != nullptr);
+
+  m_renderer.ui_pass.batch.texture(*m_texture, 16, 16, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }
@@ -184,12 +187,8 @@ void WorldCreation::m_create_map_representation()
     }
   }
 
-  m_texture = std::make_unique<Spritesheet>(
+  m_texture = std::make_unique<Texture>(
       m_game_context.display->wgpu_context.device, pixel_data.data(), Vector2i{world_size.x, world_size.y});
-
-  m_world_sprite = {
-      .texture = m_texture.get(),
-  };
 
   m_renderer.ui_pass.batch.clear_textures();
 }
