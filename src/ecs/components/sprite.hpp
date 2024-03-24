@@ -7,7 +7,7 @@
 
 namespace dl
 {
-class Spritesheet;
+class Texture;
 struct FrameData;
 
 struct Sprite
@@ -15,7 +15,7 @@ struct Sprite
   uint32_t id{};
   uint32_t resource_id{};
   uint32_t layer_z{};
-  const Spritesheet* texture = nullptr;
+  const Texture* texture = nullptr;
   const FrameData* frame_data = nullptr;
   Color color{0xFFFFFFFF};
   glm::vec2 size{};

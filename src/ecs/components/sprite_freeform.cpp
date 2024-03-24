@@ -1,6 +1,6 @@
 #include "./sprite_freeform.hpp"
 
-#include "graphics/renderer/texture_atlas.hpp"
+#include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
@@ -18,7 +18,7 @@ void SpriteFreeform::set_uv_with_size(const float top, const float left, const f
 {
   assert(texture != nullptr && "Texture has not been initialized when setting uv with size");
 
-  const auto& texture_size = texture->get_size();
+  const auto& texture_size = texture->size;
 
   const float uv_top = height / static_cast<float>(texture_size.y);
   const float uv_bottom = top / static_cast<float>(texture_size.y);

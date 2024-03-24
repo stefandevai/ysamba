@@ -33,7 +33,7 @@ struct NinePatch
   SpriteFreeform center_patch{};
 
   // Actual sprite texture
-  const TextureAtlas* texture = nullptr;
+  const TextureAtlas* texture_atlas = nullptr;
 
   // Flag to trigger patche (re)generation
   bool dirty = true;

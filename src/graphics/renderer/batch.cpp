@@ -80,24 +80,6 @@ uint32_t Batch::pin_texture(WGPUTextureView texture_view)
 
 void Batch::sprite(Sprite& sprite, const double x, const double y, const double z, const RenderFace face)
 {
-  // Set texture if it has not been set
-  if (sprite.texture == nullptr)
-  {
-    assert(sprite.resource_id != 0 && "Sprite resource id is empty");
-    sprite.texture = m_game_context.asset_manager->get<Spritesheet>(sprite.resource_id);
-  }
-
-  // Set default size as texture size if size is not yet set
-  if (sprite.size.x == 0 && sprite.size.y == 0 && sprite.texture != nullptr)
-  {
-    const auto& size = sprite.texture->get_size();
-    sprite.size = glm::vec2{size.x, size.y};
-    sprite.uv_coordinates = sprite.texture->get_uv_coordinates();
-  }
-
-  // const auto frame = sprite.frame_data != nullptr ? sprite.frame_data->faces[face] : 0;
-  // const auto& texture_coordinates = sprite.texture->get_uv_coordinates(frame);
-
   assert(sprite.texture != nullptr);
   assert(sprite.size.x != 0 && sprite.size.y != 0);
 
@@ -119,11 +101,11 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   // be translated to a index in the shader.
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->texture->view);
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite.texture->texture->view;
+    texture_views[m_texture_slot_index] = sprite.texture->view;
     ++m_texture_slot_index;
     should_update_texture_bind_group = true;
   }
@@ -139,13 +121,6 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
 
 void Batch::sprite_freeform(SpriteFreeform& sprite, const double x, const double y, const double z)
 {
-  // Set texture if it has not been set
-  if (sprite.texture == nullptr)
-  {
-    assert(sprite.resource_id != 0 && "Sprite resource id is empty");
-    sprite.texture = m_game_context.asset_manager->get<TextureAtlas>(sprite.resource_id);
-  }
-
   assert(sprite.texture != nullptr);
   assert(sprite.size.x != 0 && sprite.size.y != 0);
 
@@ -167,11 +142,11 @@ void Batch::sprite_freeform(SpriteFreeform& sprite, const double x, const double
   // be translated to a index in the shader.
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->texture->view);
+  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite.texture->texture->view;
+    texture_views[m_texture_slot_index] = sprite.texture->view;
     ++m_texture_slot_index;
     should_update_texture_bind_group = true;
   }
@@ -330,9 +305,9 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
 {
   assert(m_current_vb != nullptr);
 
-  if (nine_patch.texture == nullptr)
+  if (nine_patch.texture_atlas == nullptr)
   {
-    nine_patch.texture = m_game_context.asset_manager->get<TextureAtlas>(nine_patch.resource_id);
+    nine_patch.texture_atlas = m_game_context.asset_manager->get<TextureAtlas>(nine_patch.resource_id);
   }
 
   if (nine_patch.dirty)

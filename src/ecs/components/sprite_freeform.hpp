@@ -7,13 +7,13 @@
 
 namespace dl
 {
-class TextureAtlas;
+class Texture;
 
 struct SpriteFreeform
 {
   uint32_t id{};
   uint32_t resource_id{};
-  const TextureAtlas* texture = nullptr;
+  const Texture* texture = nullptr;
   Color color{0xFFFFFFFF};
   glm::vec2 size{};
   std::array<glm::vec2, 4> uv_coordinates{};
