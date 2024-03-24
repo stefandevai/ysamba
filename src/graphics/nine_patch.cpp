@@ -4,21 +4,20 @@
 
 namespace dl
 {
-NinePatch::NinePatch(const uint32_t resource_id,
-                     const uint32_t top,
-                     const uint32_t left,
-                     const uint32_t bottom,
-                     const uint32_t right,
-                     const uint32_t border)
-    : resource_id(resource_id), top(top), left(left), bottom(bottom), right(right), border(border)
-{
-}
+NinePatch::NinePatch(const uint32_t id, const uint32_t resource_id) : id(id), resource_id(resource_id) {}
 
 void NinePatch::generate_patches()
 {
   assert(texture != nullptr && "Texture is null while trying to generate 9 patches");
 
   const auto& texture_size = texture->get_size();
+  const auto& data = texture->get_metadata<NinePatchData>(id);
+
+  top = data.top;
+  left = data.left;
+  bottom = data.bottom;
+  right = data.right;
+  border = data.border;
 
   const float uv_top = top / static_cast<float>(texture_size.y);
   const float uv_left = left / static_cast<float>(texture_size.x);
@@ -114,25 +113,4 @@ void NinePatch::generate_patches()
 
   dirty = false;
 }
-
-// Get top-left, top-right, bottom-right and bottom-left uv coordinates
-std::array<glm::vec2, 4> NinePatch::get_texture_coordinates() const
-{
-  assert(texture != nullptr);
-
-  const auto& texture_size = texture->get_size();
-
-  const float top_uv = top / static_cast<float>(texture_size.y);
-  const float left_uv = left / static_cast<float>(texture_size.x);
-  const float bottom_uv = bottom / static_cast<float>(texture_size.y);
-  const float right_uv = right / static_cast<float>(texture_size.x);
-
-  return std::array<glm::vec2, 4>{
-      glm::vec2{left_uv, top_uv},
-      glm::vec2{right_uv, top_uv},
-      glm::vec2{right_uv, bottom_uv},
-      glm::vec2{left_uv, bottom_uv},
-  };
-}
-
 }  // namespace dl

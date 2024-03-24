@@ -1,7 +1,5 @@
 #pragma once
 
-// #include <webgpu/wgpu.h>
-
 #include <array>
 #include <glm/vec2.hpp>
 #include <string>

@@ -8,13 +8,13 @@
         },
         {
             "id": "ui",
-            "type": "texture",
+            "type": "texture_atlas",
             "path": "data/textures/ui.png",
             "data_path": "data/textures/ui.json"
         },
         {
             "id": "spritesheet-tileset",
-            "type": "texture_atlas",
+            "type": "spritesheet",
             "path": "data/textures/tileset.png",
             "uniform": true,
             "horizontal_frames": 32,
@@ -24,7 +24,7 @@
 
         {
             "id": "spritesheet-characters",
-            "type": "texture_atlas",
+            "type": "spritesheet",
             "path": "data/textures/characters.png",
             "uniform": true,
             "horizontal_frames": 32,

@@ -3,15 +3,21 @@
 #include <glm/vec2.hpp>
 
 #include "./color.hpp"
-#include "ecs/components/sprite.hpp"
-#include "graphics/renderer/spritesheet.hpp"
+#include "ecs/components/sprite_freeform.hpp"
+#include "graphics/renderer/texture_atlas.hpp"
 
 namespace dl
 {
 struct NinePatch
 {
-  // Id of the loaded resource
+  // Nine patch ID
+  uint32_t id{};
+
+  // Loaded resource ID
   uint32_t resource_id{};
+
+  // Total size of the nine patch including the border
+  glm::vec2 size{};
 
   // Top, left, bottom and right coordinates in the texture given in pixels
   uint32_t top{};
@@ -22,15 +28,12 @@ struct NinePatch
   // Border value for nine patch calculations
   uint32_t border{};
 
-  // Total size of the nine patch including the border
-  glm::vec2 size{};
-
   // Sprites for each patch
-  std::array<Sprite, 8> border_patches{};
-  Sprite center_patch{};
+  std::array<SpriteFreeform, 8> border_patches{};
+  SpriteFreeform center_patch{};
 
   // Actual sprite texture
-  const Spritesheet* texture = nullptr;
+  const TextureAtlas* texture = nullptr;
 
   // Flag to trigger patche (re)generation
   bool dirty = true;
@@ -39,18 +42,9 @@ struct NinePatch
   Color color{0xFFFFFFFF};
 
   NinePatch() = default;
-  NinePatch(const uint32_t resource_id) : resource_id(resource_id) {}
-  NinePatch(const uint32_t resource_id,
-            const uint32_t top,
-            const uint32_t left,
-            const uint32_t bottom,
-            const uint32_t right,
-            const uint32_t border);
+  NinePatch(const uint32_t id, const uint32_t resource_id);
 
   // (Re)generate patches
   void generate_patches();
-
-  // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> get_texture_coordinates() const;
 };
 }  // namespace dl

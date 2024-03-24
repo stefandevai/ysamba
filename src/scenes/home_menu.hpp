@@ -2,7 +2,6 @@
 
 #include "./scene.hpp"
 #include "core/input_manager.hpp"
-#include "ecs/components/sprite.hpp"
 #include "ui/components/button_list.hpp"
 #include "ui/types.hpp"
 
@@ -14,6 +13,7 @@ class WorldList;
 namespace dl
 {
 struct GameContext;
+class Texture;
 
 class HomeMenu : public Scene
 {
@@ -38,7 +38,7 @@ class HomeMenu : public Scene
   ui::ItemList<WorldMetadata> m_worlds_metadata{};
   ui::WorldList* m_world_list = nullptr;
   ui::ButtonList<MenuChoice>* m_button_list = nullptr;
-  Sprite m_typography;
+  Texture* m_typography = nullptr;
 
   void m_load_worlds_metadata();
 };

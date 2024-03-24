@@ -16,12 +16,8 @@ void WindowFrame::init()
 {
   using namespace entt::literals;
 
+  nine_patch.id = 0;
   nine_patch.resource_id = "ui"_hs;
-  nine_patch.top = 0;
-  nine_patch.left = 0;
-  nine_patch.bottom = 33;
-  nine_patch.right = 33;
-  nine_patch.border = 16;
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;
 }

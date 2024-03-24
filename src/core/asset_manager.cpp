@@ -35,9 +35,9 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
     {
       assert(asset_info.contains("path") && "Texture path not specified");
       const auto& filepath = asset_info["path"].get<std::string>();
-      add<Spritesheet>(hashed_id, filepath);
+      add<Texture>(hashed_id, filepath);
+      break;
     }
-    break;
 
     case AssetType::TextureAtlas:
     {
@@ -47,9 +47,21 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       const auto& filepath = asset_info["path"].get<std::string>();
       const auto data_filepath = asset_info["data_path"].get<std::string>();
 
-      add<Spritesheet>(hashed_id, filepath, data_filepath);
+      add<TextureAtlas>(hashed_id, filepath, data_filepath);
+      break;
     }
-    break;
+
+    case AssetType::Spritesheet:
+    {
+      assert(asset_info.contains("path") && "Texture atlas path not specified");
+      assert(asset_info.contains("data_path") && "Texture atlas data path not specified");
+
+      const auto& filepath = asset_info["path"].get<std::string>();
+      const auto data_filepath = asset_info["data_path"].get<std::string>();
+
+      add<Spritesheet>(hashed_id, filepath, data_filepath);
+      break;
+    }
 
     case AssetType::Font:
     {
@@ -59,14 +71,14 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       const auto filepath = asset_info["path"].get<std::string>();
       const auto size = asset_info["size"].get<std::size_t>();
       add<Font>(hashed_id, filepath, size);
+      break;
     }
-    break;
 
     default:
     {
       spdlog::warn("Asset type {} not supported", static_cast<int>(type));
+      break;
     }
-    break;
     }
   }
 }

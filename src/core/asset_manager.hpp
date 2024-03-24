@@ -11,16 +11,25 @@
 #include "graphics/display.hpp"
 #include "graphics/font.hpp"
 #include "graphics/renderer/spritesheet.hpp"
+#include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/texture_atlas.hpp"
 
 namespace dl
 {
-using Asset = std::variant<std::unique_ptr<Spritesheet>, std::unique_ptr<Font>>;
+using Asset = std::variant<std::unique_ptr<Texture>,
+                           std::unique_ptr<TextureAtlas>,
+                           std::unique_ptr<Spritesheet>,
+                           std::unique_ptr<Font>>;
 
 struct AssetLoader
 {
   AssetLoader(const WGPUDevice& device) : m_device(device) {}
 
-  void operator()(const std::unique_ptr<Spritesheet>& texture) { texture->load(m_device); }
+  void operator()(const std::unique_ptr<Texture>& texture) { texture->load(m_device); }
+
+  void operator()(const std::unique_ptr<TextureAtlas>& atlas) { atlas->load(m_device); }
+
+  void operator()(const std::unique_ptr<Spritesheet>& spritesheet) { spritesheet->load(m_device); }
 
   void operator()(const std::unique_ptr<Font>& font) { font->load(m_device); }
 
@@ -33,6 +42,7 @@ enum class AssetType
   None,
   Texture,
   TextureAtlas,
+  Spritesheet,
   Font,
 };
 
@@ -75,6 +85,7 @@ class AssetManager
   const std::unordered_map<std::string, AssetType> m_asset_types = {
       {"texture", AssetType::Texture},
       {"texture_atlas", AssetType::TextureAtlas},
+      {"spritesheet", AssetType::Spritesheet},
       {"font", AssetType::Font},
   };
   const Display& m_display;

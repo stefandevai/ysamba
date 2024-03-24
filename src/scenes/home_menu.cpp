@@ -12,6 +12,7 @@
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
+#include "graphics/renderer/texture.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
 #include "ui/compositions/world_list.hpp"
@@ -26,9 +27,7 @@ void HomeMenu::load()
   using namespace entt::literals;
   using namespace i18n::literals;
 
-  m_typography = {
-      .resource_id = "ysamba-typography"_hs,
-  };
+  m_typography = m_game_context.asset_manager->get<Texture>("ysamba-typography"_hs);
 
   m_load_worlds_metadata();
 
@@ -144,7 +143,7 @@ void HomeMenu::render()
     return;
   }
 
-  m_renderer.ui_pass.batch.sprite(m_typography, 60, 60, 0);
+  m_renderer.ui_pass.batch.texture(*m_typography, 60, 60, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }
