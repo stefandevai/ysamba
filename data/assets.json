@@ -9,7 +9,8 @@
         {
             "id": "ui",
             "type": "texture",
-            "path": "data/textures/ui.png"
+            "path": "data/textures/ui.png",
+            "data_path": "data/textures/ui.json"
         },
         {
             "id": "spritesheet-tileset",

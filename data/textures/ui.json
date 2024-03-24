@@ -1,0 +1,16 @@
+{
+    "name": "UI",
+    "filepath": "textures/ui.png",
+    "frames": [
+        {
+            "game_id": 0,
+            "type": "nine_patch",
+            "top": 0,
+            "left": 0,
+            "bottom": 33,
+            "right": 33,
+            "border": 16
+        }
+    ]
+}
+

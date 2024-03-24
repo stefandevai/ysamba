@@ -26,10 +26,7 @@ class Texture
   // Create full sized texture
   Texture(const std::string& filepath);
   // Create texture atlas
-  Texture(const std::string& filepath,
-          const int horizontal_frames,
-          const int vertical_frames,
-          const std::string& data_filepath = "");
+  Texture(const std::string& filepath, const std::string& data_filepath);
   ~Texture();
 
   static Texture dummy(const WGPUDevice device);
@@ -55,8 +52,8 @@ class Texture
   FrameData::Map m_frame_data;
   std::string m_filepath{};
   std::string m_data_filepath{};
-  const int m_horizontal_frames = 1;
-  const int m_vertical_frames = 1;
+  int m_horizontal_frames = 1;
+  int m_vertical_frames = 1;
   Vector2i m_size{};
   Vector2i m_frame_size{};
 

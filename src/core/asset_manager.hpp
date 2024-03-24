@@ -32,7 +32,6 @@ enum class AssetType
 {
   None,
   Texture,
-  Shader,
   TextureAtlas,
   Font,
 };
@@ -76,7 +75,6 @@ class AssetManager
   const std::unordered_map<std::string, AssetType> m_asset_types = {
       {"texture", AssetType::Texture},
       {"texture_atlas", AssetType::TextureAtlas},
-      {"shader", AssetType::Shader},
       {"font", AssetType::Font},
   };
   const Display& m_display;

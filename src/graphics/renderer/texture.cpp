@@ -18,20 +18,15 @@ namespace dl
 Texture::Texture(const std::string& filepath) : m_filepath(filepath) {}
 
 // Create texture atlas
-Texture::Texture(const std::string& filepath,
-                 const int horizontal_frames,
-                 const int vertical_frames,
-                 const std::string& data_filepath)
-    : m_filepath(filepath),
-      m_data_filepath(data_filepath),
-      m_horizontal_frames(horizontal_frames),
-      m_vertical_frames(vertical_frames)
+Texture::Texture(const std::string& filepath, const std::string& data_filepath)
+    : m_filepath(filepath), m_data_filepath(data_filepath)
 {
 }
 
 // Load texture from data on constructor
 Texture::Texture(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
 {
+  m_generate_uv_coordinates();
   load(device, data, size, channels);
 }
 
@@ -72,17 +67,6 @@ void Texture::load(const WGPUDevice device)
 
   load(device, image_data, Vector2i{width, height}, channels);
   stbi_image_free(image_data);
-}
-
-void Texture::load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
-{
-  m_size = size;
-
-  // If we have horizontal and vertical frames, calculate frame size
-  if (m_horizontal_frames > 0 && m_vertical_frames > 0)
-  {
-    m_frame_size = Vector2i{m_size.x / m_horizontal_frames, m_size.y / m_vertical_frames};
-  }
 
   // Load metadata
   if (m_data_filepath != "")
@@ -93,6 +77,11 @@ void Texture::load(const WGPUDevice device, const unsigned char* data, const Vec
   {
     m_generate_uv_coordinates();
   }
+}
+
+void Texture::load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels)
+{
+  m_size = size;
 
   const auto queue = wgpuDeviceGetQueue(device);
 
@@ -200,6 +189,17 @@ void Texture::m_load_metadata(const std::string& filepath)
   {
     spdlog::warn("Trying to load tileset data without frames: {}", filepath);
     return;
+  }
+
+  if (json.object.contains("tile_width") && json.object.contains("tile_height"))
+  {
+    const auto tile_width = json.object["tile_width"].get<int>();
+    const auto tile_height = json.object["tile_height"].get<int>();
+
+    m_horizontal_frames = m_size.x / tile_width;
+    m_vertical_frames = m_size.y / tile_height;
+
+    m_frame_size = Vector2i{m_size.x / m_horizontal_frames, m_size.y / m_vertical_frames};
   }
 
   const auto items = json.object["frames"].get<std::vector<nlohmann::json>>();

@@ -31,16 +31,6 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
     switch (type)
     {
-    case AssetType::Shader:
-    {
-      // assert(asset_info.contains("vertex_path") && "Vertex path not specified");
-      // assert(asset_info.contains("fragment_path") && "Fragment path not specified");
-      // const auto& vertex_path = asset_info["vertex_path"].get<std::string>();
-      // const auto& fragment_path = asset_info["fragment_path"].get<std::string>();
-      // add<ShaderProgram>(hashed_id, vertex_path, fragment_path);
-    }
-    break;
-
     case AssetType::Texture:
     {
       assert(asset_info.contains("path") && "Texture path not specified");
@@ -52,21 +42,12 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
     case AssetType::TextureAtlas:
     {
       assert(asset_info.contains("path") && "Texture atlas path not specified");
-      assert(asset_info.contains("horizontal_frames") && "Texture atlas horizontal_frames not specified");
-      assert(asset_info.contains("vertical_frames") && "Texture atlas vertical_frames not specified");
+      assert(asset_info.contains("data_path") && "Texture atlas data path not specified");
 
       const auto& filepath = asset_info["path"].get<std::string>();
-      const auto horizontal_frames = asset_info["horizontal_frames"].get<int>();
-      const auto vertical_frames = asset_info["vertical_frames"].get<int>();
+      const auto data_filepath = asset_info["data_path"].get<std::string>();
 
-      if (asset_info.contains("data_path"))
-      {
-        const auto data_filepath = asset_info["data_path"].get<std::string>();
-        add<Texture>(hashed_id, filepath, horizontal_frames, vertical_frames, data_filepath);
-        break;
-      }
-
-      add<Texture>(hashed_id, filepath, horizontal_frames, vertical_frames);
+      add<Texture>(hashed_id, filepath, data_filepath);
     }
     break;
 
