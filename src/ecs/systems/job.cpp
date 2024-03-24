@@ -220,7 +220,7 @@ void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity age
 
     registry.emplace<Sprite>(drop,
                              Sprite{
-                                 .resource_id = m_world.get_texture_id(),
+                                 .resource_id = m_world.get_spritesheet_id(),
                                  .id = item.first,
                                  .category = frame_data_type::item,
                                  .layer_z = renderer::layer_z_offset_items,

@@ -30,6 +30,7 @@ class Grid3D
   int height_at(const int x, const int y) const;
   int height_at(const Vector2i& position) const;
   int height_at(const Vector2& position) const;
+
   void set(const uint32_t id, const int x, const int y, const int z);
   void set(const uint32_t id, const Vector3i& position);
   void set(const uint32_t id, const Vector3& position);
@@ -50,6 +51,7 @@ class Grid3D
 
   void compute_visibility();
   bool is_bottom_empty(const int x, const int y, const int z) const;
+  bool has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const;
 
  private:
   uint32_t m_index(const int x, const int y, const int z) const;

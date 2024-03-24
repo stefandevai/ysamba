@@ -115,8 +115,8 @@ class World
   // Transform mouse coordinates to world coordinates
   [[nodiscard]] Vector3i mouse_to_world(const Camera& camera) const;
 
-  // Get the texture id for the tiles used in this world
-  [[nodiscard]] uint32_t get_texture_id() const { return m_texture_id; };
+  // Get the spritesheet id for the tiles used in this world
+  [[nodiscard]] uint32_t get_spritesheet_id() const { return m_spritesheet_id; };
 
   // Get a specific society
   [[nodiscard]] SocietyBlueprint get_society(const uint32_t society_id) const
@@ -161,7 +161,7 @@ class World
   }
 
  private:
-  uint32_t m_texture_id{};
+  uint32_t m_spritesheet_id{};
   int m_seed = 0;
   Vector2i m_tile_size{0, 0};
   std::map<uint32_t, SocietyBlueprint> m_societies;

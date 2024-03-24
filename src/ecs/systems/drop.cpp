@@ -123,7 +123,7 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
                                  static_cast<double>(target.position.z));
       registry.emplace<Sprite>(item,
                                Sprite{
-                                   .resource_id = m_world.get_texture_id(),
+                                   .resource_id = m_world.get_spritesheet_id(),
                                    .id = item_component.id,
                                    .category = "item",
                                    .layer_z = 1,

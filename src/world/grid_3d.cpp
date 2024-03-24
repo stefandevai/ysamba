@@ -283,6 +283,38 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
 
 bool Grid3D::is_bottom_empty(const int x, const int y, const int z) const { return terrain_at(x, y + 1, z) == 0; }
 
+bool Grid3D::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
+{
+  bool found_pattern = true;
+
+  for (int j = 0; j < size.y; ++j)
+  {
+    for (int i = 0; i < size.x; ++i)
+    {
+      const auto pattern_value = pattern[j * size.x + i];
+
+      if (pattern_value == 0)
+      {
+        continue;
+      }
+
+      const auto& cell = cell_at(position.x + i, position.y + j, position.z);
+
+      if (cell.decoration == pattern_value)
+      {
+        continue;
+      }
+
+      if (cell.terrain != pattern_value)
+      {
+        return false;
+      }
+    }
+  }
+
+  return found_pattern;
+}
+
 uint32_t Grid3D::m_index(const int x, const int y, const int z) const { return x + y * size.x + z * size.y * size.x; }
 
 bool Grid3D::m_in_bounds(const int x, const int y, const int z) const

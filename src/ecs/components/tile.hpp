@@ -10,7 +10,7 @@ struct FrameData;
 
 struct Tile
 {
-  const Spritesheet* texture = nullptr;
+  const Spritesheet* spritesheet = nullptr;
   const FrameData* frame_data = nullptr;
   const glm::vec2 size{};
 };

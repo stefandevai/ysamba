@@ -182,9 +182,4 @@ void Renderer::clear_color(const uint8_t r, const uint8_t g, const uint8_t b, co
   };
 }
 
-const Spritesheet* Renderer::get_texture(const uint32_t resource_id)
-{
-  return m_game_context.asset_manager->get<Spritesheet>(resource_id);
-}
-
 }  // namespace dl

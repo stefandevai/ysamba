@@ -20,11 +20,11 @@ struct Vector2
   bool operator==(const Vector2& rhs) const;
   Vector2& operator=(const Vector2& rhs);
   Vector2& operator=(const Vector2i& rhs);
-  Vector2 operator+(const Vector2& rhs);
+  Vector2 operator+(const Vector2& rhs) const;
   Vector2& operator+=(const Vector2& rhs);
-  Vector2 operator-(const Vector2& rhs);
+  Vector2 operator-(const Vector2& rhs) const;
   Vector2& operator-=(const Vector2& rhs);
-  Vector2 operator*(const double rhs);
+  Vector2 operator*(const double rhs) const;
   Vector2& operator*=(const double rhs);
 };
 
@@ -48,11 +48,11 @@ struct Vector2i
   bool operator==(const Vector2i& rhs) const;
   Vector2i& operator=(const Vector2i& rhs);
   Vector2i& operator=(const Vector2& rhs);
-  Vector2i operator+(const Vector2i& rhs);
+  Vector2i operator+(const Vector2i& rhs) const;
   Vector2i& operator+=(const Vector2i& rhs);
-  Vector2i operator-(const Vector2i& rhs);
+  Vector2i operator-(const Vector2i& rhs) const;
   Vector2i& operator-=(const Vector2i& rhs);
-  Vector2i operator*(const int rhs);
+  Vector2i operator*(const int rhs) const;
   Vector2i& operator*=(const int rhs);
 };
 
@@ -77,11 +77,11 @@ struct Vector3
   bool operator==(const Vector3& rhs) const;
   Vector3& operator=(const Vector3& rhs);
   Vector3& operator=(const Vector3i& rhs);
-  Vector3 operator+(const Vector3& rhs);
+  Vector3 operator+(const Vector3& rhs) const;
   Vector3& operator+=(const Vector3& rhs);
-  Vector3 operator-(const Vector3& rhs);
+  Vector3 operator-(const Vector3& rhs) const;
   Vector3& operator-=(const Vector3& rhs);
-  Vector3 operator*(const double rhs);
+  Vector3 operator*(const double rhs) const;
   Vector3& operator*=(const double rhs);
 };
 
@@ -106,11 +106,11 @@ struct Vector3i
   bool operator==(const Vector3i& rhs) const;
   Vector3i& operator=(const Vector3i& rhs);
   Vector3i& operator=(const Vector3& rhs);
-  Vector3i operator+(const Vector3i& rhs);
+  Vector3i operator+(const Vector3i& rhs) const;
   Vector3i& operator+=(const Vector3i& rhs);
-  Vector3i operator-(const Vector3i& rhs);
+  Vector3i operator-(const Vector3i& rhs) const;
   Vector3i& operator-=(const Vector3i& rhs);
-  Vector3i operator*(const int rhs);
+  Vector3i operator*(const int rhs) const;
   Vector3i& operator*=(const int rhs);
 };
 
@@ -135,11 +135,11 @@ struct Vector4d
 
   bool operator==(const Vector4d& rhs) const;
   Vector4d& operator=(const Vector4d& rhs);
-  Vector4d operator+(const Vector4d& rhs);
+  Vector4d operator+(const Vector4d& rhs) const;
   Vector4d& operator+=(const Vector4d& rhs);
-  Vector4d operator-(const Vector4d& rhs);
+  Vector4d operator-(const Vector4d& rhs) const;
   Vector4d& operator-=(const Vector4d& rhs);
-  Vector4d operator*(const double rhs);
+  Vector4d operator*(const double rhs) const;
   Vector4d& operator*=(const double rhs);
 };
 
@@ -164,11 +164,11 @@ struct Vector4i
 
   bool operator==(const Vector4i& rhs) const;
   Vector4i& operator=(const Vector4i& rhs);
-  Vector4i operator+(const Vector4i& rhs);
+  Vector4i operator+(const Vector4i& rhs) const;
   Vector4i& operator+=(const Vector4i& rhs);
-  Vector4i operator-(const Vector4i& rhs);
+  Vector4i operator-(const Vector4i& rhs) const;
   Vector4i& operator-=(const Vector4i& rhs);
-  Vector4i operator*(const int rhs);
+  Vector4i operator*(const int rhs) const;
   Vector4i& operator*=(const int rhs);
 };
 

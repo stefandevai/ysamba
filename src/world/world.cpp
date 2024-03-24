@@ -34,7 +34,7 @@ namespace dl
 {
 World::World(GameContext& game_context) : m_game_context(game_context)
 {
-  m_texture_id = entt::hashed_string::value(config::world::texture_id.c_str());
+  m_spritesheet_id = entt::hashed_string::value(config::world::texture_id.c_str());
   spatial_hash.load(config::world::spatial_hash_cell_size);
 
   spdlog::debug("Loading world \"{}\"", m_game_context.world_metadata.name);
@@ -357,34 +357,13 @@ bool World::is_empty(const int x, const int y, const int z) const
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
 {
-  bool found_pattern = true;
+  auto& chunk = chunk_manager.at(position);
 
-  for (int j = 0; j < size.y; ++j)
-  {
-    for (int i = 0; i < size.x; ++i)
-    {
-      const auto pattern_value = pattern[j * size.x + i];
+  const Vector3i local_position{std::abs(position.x - chunk.position.x),
+                                std::abs(position.y - chunk.position.y),
+                                std::abs(position.z - chunk.position.z)};
 
-      if (pattern_value == 0)
-      {
-        continue;
-      }
-
-      const auto& cell = cell_at(position.x + i, position.y + j, position.z);
-
-      if (cell.decoration == pattern_value)
-      {
-        continue;
-      }
-
-      if (cell.terrain != pattern_value)
-      {
-        return false;
-      }
-    }
-  }
-
-  return found_pattern;
+  return chunk.tiles.has_pattern(pattern, size, local_position);
 }
 
 const TileData& World::get_tile_data(const uint32_t id) const { return tile_data.at(id); }
@@ -398,7 +377,7 @@ entt::entity World::create_item(
 
   const auto render_data = Sprite{
       .id = id,
-      .resource_id = m_texture_id,
+      .resource_id = m_spritesheet_id,
       .category = "item",
       .layer_z = 1,
   };
@@ -413,11 +392,11 @@ void World::m_load_tile_data()
 
   const auto actions = m_load_actions();
 
-  const auto texture = m_game_context.asset_manager->get<Spritesheet>(m_texture_id);
+  const auto spritesheet = m_game_context.asset_manager->get<Spritesheet>(m_spritesheet_id);
 
-  assert(texture != nullptr && "World texture is not loaded in order to get tile size");
+  assert(spritesheet != nullptr && "World spritesheet is not loaded in order to get tile size");
 
-  m_tile_size = texture->get_frame_size();
+  m_tile_size = spritesheet->get_frame_size();
 
   assert(json_tile_data.object.contains("tiles") && "Tile data must contain a tiles array");
 

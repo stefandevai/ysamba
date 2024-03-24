@@ -140,16 +140,16 @@ void Batch::texture_slice(TextureSlice& slice, const double x, const double y, c
 void Batch::tile(const Tile& tile, const double x, const double y, const double z, const RenderFace face)
 {
   assert(m_current_vb != nullptr);
-  assert(tile.texture != nullptr);
+  assert(tile.spritesheet != nullptr);
   assert(tile.frame_data != nullptr);
   assert(tile.size.x != 0);
   assert(tile.size.y != 0);
 
   const auto& size = tile.size;
   const uint32_t color = 0xFFFFFFFF;
-  const auto& uv_coordinates = tile.texture->get_uv_coordinates(tile.frame_data->faces[face]);
+  const auto& uv_coordinates = tile.spritesheet->get_uv_coordinates(tile.frame_data->faces[face]);
 
-  const float texture_index = m_get_texture_index(tile.texture->texture->view);
+  const float texture_index = m_get_texture_index(tile.spritesheet->texture->view);
 
   SpriteBatchData data{face, glm::vec3{x, y, z}, size, uv_coordinates, color, texture_index};
 

@@ -505,7 +505,7 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
     registry.destroy(entity);
   }
 
-  const auto texture_id = m_world.get_texture_id();
+  const auto texture_id = m_world.get_spritesheet_id();
 
   auto add_hut_part
       = [&registry, texture_id](

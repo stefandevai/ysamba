@@ -27,17 +27,18 @@ RenderSystem::RenderSystem(GameContext& game_context, World& world)
       m_renderer(*m_game_context.renderer),
       m_batch(m_renderer.main_pass.batch),
       m_world(world),
-      m_world_texture_id(m_world.get_texture_id()),
-      m_world_texture(m_renderer.get_texture(m_world.get_texture_id()))
+      m_tile_size(world.get_tile_size())
 {
-  assert(m_world_texture != nullptr);
+  assert(m_game_context.asset_manager != nullptr);
+
+  const auto& world_spritesheet = m_game_context.asset_manager->get<Spritesheet>(m_world.get_spritesheet_id());
 
   for (const auto& tile_data : m_world.tile_data)
   {
-    const auto& frame_data = m_world_texture->id_to_frame(tile_data.first, frame_data_type::tile);
-    const auto& frame_size = m_world_texture->get_frame_size();
+    const auto& frame_data = world_spritesheet->id_to_frame(tile_data.first, frame_data_type::tile);
+    const auto& frame_size = world_spritesheet->get_frame_size();
     glm::vec2 size{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
-    m_tiles.insert({tile_data.first, Tile{m_world_texture, &frame_data, std::move(size)}});
+    m_tiles.insert({tile_data.first, Tile{world_spritesheet, &frame_data, std::move(size)}});
   }
 
   assert(m_game_context.registry != nullptr);
@@ -52,17 +53,16 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
   {
     auto items_view = registry.view<const Position, const Sprite>();
-    const auto& tile_size = m_world.get_tile_size();
 
     for (auto entity : items_view)
     {
       const auto& position = registry.get<Position>(entity);
       auto& render_data = registry.get<Sprite>(entity);
 
-      const auto position_x = std::round(position.x) * tile_size.x - render_data.anchor.x;
+      const auto position_x = std::round(position.x) * m_tile_size.x - render_data.anchor.x;
       const auto position_y
-          = std::round(position.y) * tile_size.y - render_data.anchor.y + render_data.layer_z * m_z_index_increment;
-      const auto position_z = std::round(position.z) * tile_size.y + render_data.layer_z * m_z_index_increment;
+          = std::round(position.y) * m_tile_size.y - render_data.anchor.y + render_data.layer_z * m_z_index_increment;
+      const auto position_z = std::round(position.z) * m_tile_size.y + render_data.layer_z * m_z_index_increment;
 
       assert(render_data.spritesheet != nullptr && "Sprite Texture not found");
       assert(render_data.frame_data != nullptr && "Sprite Frame data not found");
@@ -72,7 +72,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   }
 
   {
-    const auto& tile_size = m_world.get_tile_size();
     auto quad_view = registry.view<const Position, const Quad>();
 
     for (auto entity : quad_view)
@@ -80,9 +79,9 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto& position = registry.get<Position>(entity);
       auto& quad = registry.get<Quad>(entity);
 
-      const auto position_z = std::round(position.z) * tile_size.y;
-      const auto position_x = std::round(position.x) * tile_size.x;
-      const auto position_y = std::round(position.y) * tile_size.y;
+      const auto position_z = std::round(position.z) * m_tile_size.y;
+      const auto position_x = std::round(position.x) * m_tile_size.x;
+      const auto position_y = std::round(position.y) * m_tile_size.y;
 
       m_batch.quad(&quad,
                    position_x,
@@ -104,7 +103,6 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 
 void RenderSystem::m_render_tiles(const Camera& camera)
 {
-  const auto& tile_size = m_world.get_tile_size();
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& camera_size = camera.get_size_in_tiles();
 
@@ -165,9 +163,10 @@ void RenderSystem::m_render_tiles(const Camera& camera)
               }
 
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
+              const Vector3i local_position{local_i, local_j, z};
 
-              m_render_tile(chunk, cell.terrain, tile_size, local_i, local_j, z);
-              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z, 1);
+              m_render_tile(chunk, cell.terrain, local_position);
+              m_render_tile(chunk, cell.decoration, local_position, 1);
             }
           }
         }
@@ -177,7 +176,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
 
   {
     // Render visible tiles with y coordinate to the bottom of the camera frustum
-    // Each z level translates to tile_size.y increase in height in clip space,
+    // Each z level translates to m_tile_size.y increase in height in clip space,
     // therefore the highest y that can appear on the screen is
     // camera_position.y + camera_size.y + world_size.z.
     // Loop through chunks below the camera bottom to render tiles in other chunks
@@ -240,9 +239,10 @@ void RenderSystem::m_render_tiles(const Camera& camera)
               }
 
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
+              const Vector3i local_position{local_i, local_j, z};
 
-              m_render_tile(chunk, cell.terrain, tile_size, local_i, local_j, z);
-              m_render_tile(chunk, cell.decoration, tile_size, local_i, local_j, z, 1);
+              m_render_tile(chunk, cell.terrain, local_position);
+              m_render_tile(chunk, cell.decoration, local_position, 1);
             }
           }
         }
@@ -253,10 +253,7 @@ void RenderSystem::m_render_tiles(const Camera& camera)
 
 void RenderSystem::m_render_tile(const Chunk& chunk,
                                  const uint32_t tile_id,
-                                 const Vector2i& tile_size,
-                                 const int x,
-                                 const int y,
-                                 const int z,
+                                 const Vector3i& position,
                                  const int z_index)
 {
   if (tile_id <= 0)
@@ -264,41 +261,41 @@ void RenderSystem::m_render_tile(const Chunk& chunk,
     return;
   }
 
-  const int world_x = chunk.position.x + x;
-  const int world_y = chunk.position.y + y;
-  const int world_z = chunk.position.z + z;
-
   const auto& tile = m_tiles.at(tile_id);
+  const Vector3i world_position = chunk.position + position;
 
   if (tile.frame_data->sprite_type == SpriteType::Single)
   {
     m_batch.tile(tile,
-                 world_x * tile_size.x,
-                 world_y * tile_size.y + z_index * m_z_index_increment,
-                 world_z * tile_size.y + z_index * m_z_index_increment,
+                 world_position.x * m_tile_size.x,
+                 world_position.y * m_tile_size.y + z_index * m_z_index_increment,
+                 world_position.z * m_tile_size.y + z_index * m_z_index_increment,
                  tile.frame_data->default_face);
 
     // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
-    if (chunk.tiles.is_bottom_empty(x, y, z))
+    if (chunk.tiles.is_bottom_empty(position.x, position.y, position.z))
     {
-      m_batch.tile(
-          tile, world_x * tile_size.x, world_y * tile_size.y, (world_z - 1) * tile_size.y, DL_RENDER_FACE_FRONT);
+      m_batch.tile(tile,
+                   world_position.x * m_tile_size.x,
+                   world_position.y * m_tile_size.y,
+                   (world_position.z - 1) * m_tile_size.y,
+                   DL_RENDER_FACE_FRONT);
     }
   }
   else if (tile.frame_data->sprite_type == SpriteType::Multiple)
   {
-    // TODO: Check pattern directly on chunk to avoid another lookup
-    if (!m_world.has_pattern(tile.frame_data->pattern,
-                             Vector2i{(int)tile.frame_data->pattern_width, (int)tile.frame_data->pattern_height},
-                             Vector3i{world_x, world_y, world_z}))
+    const auto pattern_size = tile.frame_data->pattern_size;
+
+    if (pattern_size.x > 1 && pattern_size.y > 1
+        && !chunk.tiles.has_pattern(tile.frame_data->pattern, pattern_size, position))
     {
       return;
     }
 
     m_batch.tile(tile,
-                 (world_x - tile.frame_data->anchor_x) * tile_size.x,
-                 (world_y - tile.frame_data->anchor_y) * tile_size.y,
-                 world_z * tile_size.y + z_index * m_z_index_increment,
+                 (world_position.x - tile.frame_data->anchor_x) * m_tile_size.x,
+                 (world_position.y - tile.frame_data->anchor_y) * m_tile_size.y,
+                 world_position.z * m_tile_size.y + z_index * m_z_index_increment,
                  tile.frame_data->default_face);
   }
 }

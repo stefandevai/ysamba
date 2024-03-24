@@ -126,8 +126,9 @@ void Spritesheet::m_load_metadata(const std::string& filepath)
       if (type == "tile")
       {
         frame_data.pattern = item["pattern"].get<std::vector<uint32_t>>();
-        frame_data.pattern_width = item["pattern_width"].get<uint32_t>();
-        frame_data.pattern_height = item["pattern_height"].get<uint32_t>();
+        const auto pattern_width = item["pattern_width"].get<int>();
+        const auto pattern_height = item["pattern_height"].get<int>();
+        frame_data.pattern_size = Vector2i{pattern_width, pattern_height};
       }
     }
 
