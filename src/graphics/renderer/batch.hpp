@@ -118,5 +118,10 @@ class Batch
   void m_emplace_sprite_face(const SpriteBatchData data);
   void m_emplace_sprite_face_top(const SpriteBatchData data);
   void m_emplace_sprite_face_front(const SpriteBatchData data);
+
+  // Build vector of textures to bind when rendering
+  // texture_index is the index in texture_views that will
+  // be translated to a index in the shader.
+  float m_get_texture_index(const WGPUTextureView texture_view);
 };
 }  // namespace dl

@@ -97,23 +97,7 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
                                static_cast<uint8_t>(sprite_color.a * sprite.color.opacity_factor));
   }
 
-  // Build vector of textures to bind when rendering
-  // texture_index is the index in texture_views that will
-  // be translated to a index in the shader.
-  float texture_index = 0.00f;
-  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite.spritesheet->texture->view);
-  if (it >= upper_bound)
-  {
-    texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite.spritesheet->texture->view;
-    ++m_texture_slot_index;
-    should_update_texture_bind_group = true;
-  }
-  else
-  {
-    texture_index = it - texture_views.begin();
-  }
+  const float texture_index = m_get_texture_index(sprite.spritesheet->texture->view);
 
   SpriteBatchData data{face, glm::vec3{x, y, z}, size, texture_coordinates, color, texture_index};
 
@@ -136,23 +120,7 @@ void Batch::texture_slice(TextureSlice& slice, const double x, const double y, c
         slice_color.r, slice_color.g, slice_color.b, static_cast<uint8_t>(slice_color.a * slice.color.opacity_factor));
   }
 
-  // Build vector of textures to bind when rendering
-  // texture_index is the index in texture_views that will
-  // be translated to a index in the shader.
-  float texture_index = 0.00f;
-  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, slice.texture->view);
-  if (it >= upper_bound)
-  {
-    texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = slice.texture->view;
-    ++m_texture_slot_index;
-    should_update_texture_bind_group = true;
-  }
-  else
-  {
-    texture_index = it - texture_views.begin();
-  }
+  const float texture_index = m_get_texture_index(slice.texture->view);
 
   // Top left vertex
   m_current_vb->emplace(glm::vec3{x, y, z}, uv_coordinates[0], texture_index, color);
@@ -181,20 +149,7 @@ void Batch::tile(const Tile& tile, const double x, const double y, const double 
   const uint32_t color = 0xFFFFFFFF;
   const auto& uv_coordinates = tile.texture->get_uv_coordinates(tile.frame_data->faces[face]);
 
-  float texture_index = 0.00f;
-  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, tile.texture->texture->view);
-  if (it >= upper_bound)
-  {
-    texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = tile.texture->texture->view;
-    ++m_texture_slot_index;
-    should_update_texture_bind_group = true;
-  }
-  else
-  {
-    texture_index = it - texture_views.begin();
-  }
+  const float texture_index = m_get_texture_index(tile.texture->texture->view);
 
   SpriteBatchData data{face, glm::vec3{x, y, z}, size, uv_coordinates, color, texture_index};
 
@@ -210,21 +165,7 @@ void Batch::texture(const Texture& texture, const double x, const double y, cons
   const auto& size = texture.size;
   const uint32_t color = 0xFFFFFFFF;
 
-  float texture_index = 0.00f;
-  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, texture.view);
-
-  if (it >= upper_bound)
-  {
-    texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = texture.view;
-    ++m_texture_slot_index;
-    should_update_texture_bind_group = true;
-  }
-  else
-  {
-    texture_index = it - texture_views.begin();
-  }
+  const float texture_index = m_get_texture_index(texture.view);
 
   // Top left vertex
   m_current_vb->emplace(glm::vec3{x, y, z}, glm::vec2{0.0f, 0.0f}, texture_index, color);
@@ -471,6 +412,30 @@ void Batch::m_emplace_sprite_face_front(const SpriteBatchData data)
                         data.color);
 
   m_current_vb->index_buffer_count += 6;
+}
+
+// Build vector of textures to bind when rendering
+// texture_index is the index in texture_views that will
+// be translated to a index in the shader.
+float Batch::m_get_texture_index(const WGPUTextureView texture_view)
+{
+  float texture_index = 0.00f;
+  const auto upper_bound = texture_views.begin() + m_texture_slot_index;
+  const auto it = std::find(texture_views.begin(), upper_bound, texture_view);
+
+  if (it >= upper_bound)
+  {
+    texture_index = static_cast<float>(m_texture_slot_index);
+    texture_views[m_texture_slot_index] = texture_view;
+    ++m_texture_slot_index;
+    should_update_texture_bind_group = true;
+  }
+  else
+  {
+    texture_index = it - texture_views.begin();
+  }
+
+  return texture_index;
 }
 
 }  // namespace dl
