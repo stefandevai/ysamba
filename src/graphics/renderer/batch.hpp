@@ -27,7 +27,7 @@ class Text;
 struct NinePatch;
 struct Tile;
 struct Sprite;
-struct SpriteFreeform;
+struct TextureSlice;
 
 struct UniformData
 {
@@ -83,7 +83,7 @@ class Batch
 
   void sprite(
       Sprite& sprite, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
-  void sprite_freeform(SpriteFreeform& sprite, const double x, const double y, const double z);
+  void texture_slice(TextureSlice& slice, const double x, const double y, const double z);
   void tile(
       const Tile& tile, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
   void texture(const Texture& texture, const double x, const double y, const double z);

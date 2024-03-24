@@ -5,7 +5,7 @@
 #include "core/asset_manager.hpp"
 #include "core/game_context.hpp"
 #include "ecs/components/sprite.hpp"
-#include "ecs/components/sprite_freeform.hpp"
+#include "ecs/components/texture_slice.hpp"
 #include "ecs/components/tile.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/color.hpp"
@@ -120,22 +120,20 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
   m_emplace_sprite_face(std::move(data));
 }
 
-void Batch::sprite_freeform(SpriteFreeform& sprite, const double x, const double y, const double z)
+void Batch::texture_slice(TextureSlice& slice, const double x, const double y, const double z)
 {
-  assert(sprite.texture != nullptr);
-  assert(sprite.size.x != 0 && sprite.size.y != 0);
+  assert(slice.texture != nullptr);
+  assert(slice.size.x != 0 && slice.size.y != 0);
 
-  const glm::vec2& size = sprite.size;
-  const auto& uv_coordinates = sprite.uv_coordinates;
-  unsigned int color = sprite.color.int_color;
+  const glm::vec2& size = slice.size;
+  const auto& uv_coordinates = slice.uv_coordinates;
+  unsigned int color = slice.color.int_color;
 
-  if (sprite.color.opacity_factor < 1.0)
+  if (slice.color.opacity_factor < 1.0)
   {
-    const auto& sprite_color = sprite.color.rgba_color;
-    color = Color::rgba_to_int(sprite_color.r,
-                               sprite_color.g,
-                               sprite_color.b,
-                               static_cast<uint8_t>(sprite_color.a * sprite.color.opacity_factor));
+    const auto& slice_color = slice.color.rgba_color;
+    color = Color::rgba_to_int(
+        slice_color.r, slice_color.g, slice_color.b, static_cast<uint8_t>(slice_color.a * slice.color.opacity_factor));
   }
 
   // Build vector of textures to bind when rendering
@@ -143,11 +141,11 @@ void Batch::sprite_freeform(SpriteFreeform& sprite, const double x, const double
   // be translated to a index in the shader.
   float texture_index = 0.00f;
   const auto upper_bound = texture_views.begin() + m_texture_slot_index;
-  const auto it = std::find(texture_views.begin(), upper_bound, sprite.texture->view);
+  const auto it = std::find(texture_views.begin(), upper_bound, slice.texture->view);
   if (it >= upper_bound)
   {
     texture_index = static_cast<float>(m_texture_slot_index);
-    texture_views[m_texture_slot_index] = sprite.texture->view;
+    texture_views[m_texture_slot_index] = slice.texture->view;
     ++m_texture_slot_index;
     should_update_texture_bind_group = true;
   }
@@ -288,17 +286,17 @@ void Batch::text(Text& text, const double x, const double y, const double z)
   for (auto& character : text.characters)
   {
     // Character is a space
-    if (character.sprite == nullptr)
+    if (character.slice == nullptr)
     {
       continue;
     }
 
-    if (character.sprite->color.opacity_factor != text.color.opacity_factor)
+    if (character.slice->color.opacity_factor != text.color.opacity_factor)
     {
-      character.sprite->color.opacity_factor = text.color.opacity_factor;
+      character.slice->color.opacity_factor = text.color.opacity_factor;
     }
 
-    sprite_freeform(*character.sprite, character.x + x, character.y + y, z);
+    texture_slice(*character.slice, character.x + x, character.y + y, z);
   }
 }
 
@@ -326,27 +324,27 @@ void Batch::nine_patch(NinePatch& nine_patch, const double x, const double y, co
   }
 
   // Top left patch
-  sprite_freeform(nine_patch.border_patches[0], x, y, z);
+  texture_slice(nine_patch.border_patches[0], x, y, z);
   // Top center patch
-  sprite_freeform(nine_patch.border_patches[1], x + nine_patch.border, y, z);
+  texture_slice(nine_patch.border_patches[1], x + nine_patch.border, y, z);
   // Top right patch
-  sprite_freeform(nine_patch.border_patches[2], x + nine_patch.size.x - nine_patch.border, y, z);
+  texture_slice(nine_patch.border_patches[2], x + nine_patch.size.x - nine_patch.border, y, z);
   // Center right patch
-  sprite_freeform(nine_patch.border_patches[3], x + nine_patch.size.x - nine_patch.border, y + nine_patch.border, z);
+  texture_slice(nine_patch.border_patches[3], x + nine_patch.size.x - nine_patch.border, y + nine_patch.border, z);
   // Bottom right patch
-  sprite_freeform(nine_patch.border_patches[4],
-                  x + nine_patch.size.x - nine_patch.border,
-                  y + nine_patch.size.y - nine_patch.border,
-                  z);
+  texture_slice(nine_patch.border_patches[4],
+                x + nine_patch.size.x - nine_patch.border,
+                y + nine_patch.size.y - nine_patch.border,
+                z);
   // Bottom center patch
-  sprite_freeform(nine_patch.border_patches[5], x + nine_patch.border, y + nine_patch.size.y - nine_patch.border, z);
+  texture_slice(nine_patch.border_patches[5], x + nine_patch.border, y + nine_patch.size.y - nine_patch.border, z);
   // Bottom left patch
-  sprite_freeform(nine_patch.border_patches[6], x, y + nine_patch.size.y - nine_patch.border, z);
+  texture_slice(nine_patch.border_patches[6], x, y + nine_patch.size.y - nine_patch.border, z);
   // Center left patch
-  sprite_freeform(nine_patch.border_patches[7], x, y + nine_patch.border, z);
+  texture_slice(nine_patch.border_patches[7], x, y + nine_patch.border, z);
 
   // Center patch
-  sprite_freeform(nine_patch.center_patch, x + nine_patch.border, y + nine_patch.border, z);
+  texture_slice(nine_patch.center_patch, x + nine_patch.border, y + nine_patch.border, z);
 }
 
 void Batch::push_scissor(Vector4i scissor)

@@ -3,7 +3,7 @@
 #include <glm/vec2.hpp>
 
 #include "./color.hpp"
-#include "ecs/components/sprite_freeform.hpp"
+#include "ecs/components/texture_slice.hpp"
 #include "graphics/renderer/texture_atlas.hpp"
 
 namespace dl
@@ -29,8 +29,8 @@ struct NinePatch
   uint32_t border{};
 
   // Sprites for each patch
-  std::array<SpriteFreeform, 8> border_patches{};
-  SpriteFreeform center_patch{};
+  std::array<TextureSlice, 8> border_patches{};
+  TextureSlice center_patch{};
 
   // Actual sprite texture
   const TextureAtlas* texture_atlas = nullptr;

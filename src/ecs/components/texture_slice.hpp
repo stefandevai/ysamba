@@ -9,7 +9,7 @@ namespace dl
 {
 class Texture;
 
-struct SpriteFreeform
+struct TextureSlice
 {
   uint32_t id{};
   uint32_t resource_id{};
@@ -17,15 +17,14 @@ struct SpriteFreeform
   Color color{0xFFFFFFFF};
   glm::vec2 size{};
   std::array<glm::vec2, 4> uv_coordinates{};
-  std::string category{};
 
   void set_uv(const float top, const float left, const float bottom, const float right);
   void set_uv_with_size(const float top, const float left, const float width, const float height);
 };
 
 template <typename Archive>
-void serialize(Archive& archive, SpriteFreeform& sprite)
+void serialize(Archive& archive, TextureSlice& slice)
 {
-  archive(sprite.resource_id, sprite.id, sprite.category);
+  archive(slice.resource_id, slice.id);
 }
 }  // namespace dl

@@ -125,19 +125,19 @@ void Text::update_wrapped()
     Character character;
 
     character.code = *it;
-    character.sprite = std::make_unique<SpriteFreeform>();
-    character.sprite->texture = m_font->texture.get();
-    character.sprite->color = character_color;
-    character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
+    character.slice = std::make_unique<TextureSlice>();
+    character.slice->texture = m_font->texture.get();
+    character.slice->color = character_color;
+    character.slice->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
 
     assert(typeface != 0);
-    assert(character.sprite->texture != nullptr);
+    assert(character.slice->texture != nullptr);
 
     // if (font_size != m_font->get_size())
     // {
-    //   character.sprite->transform = std::make_unique<Transform>();
-    //   character.sprite->transform->scale.x = scale;
-    //   character.sprite->transform->scale.y = scale;
+    //   character.slice->transform = std::make_unique<Transform>();
+    //   character.slice->transform->scale.x = scale;
+    //   character.slice->transform->scale.y = scale;
     // }
 
     character.x = x;
@@ -183,28 +183,28 @@ void Text::update_non_wrapped()
     // If character is a space or another invisible character, set sprite as null and correct dimensions
     if (w == 0.0 || h == 0.0)
     {
-      character.sprite = nullptr;
+      character.slice = nullptr;
       character.w = (ch.ax >> 6) * scale;
       character.h = font_size;
     }
     else
     {
-      character.sprite = std::make_unique<SpriteFreeform>();
-      character.sprite->texture = m_font->texture.get();
-      character.sprite->color = color;
-      character.sprite->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
+      character.slice = std::make_unique<TextureSlice>();
+      character.slice->texture = m_font->texture.get();
+      character.slice->color = color;
+      character.slice->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
       character.w = w;
       character.h = h;
 
       assert(typeface != 0);
-      assert(character.sprite->texture != nullptr);
+      assert(character.slice->texture != nullptr);
     }
 
     // if (font_size != m_font->get_size())
     // {
-    //   character.sprite->transform = std::make_unique<Transform>();
-    //   character.sprite->transform->scale.x = scale;
-    //   character.sprite->transform->scale.y = scale;
+    //   character.slice->transform = std::make_unique<Transform>();
+    //   character.slice->transform->scale.x = scale;
+    //   character.slice->transform->scale.y = scale;
     // }
 
     character.x = x;

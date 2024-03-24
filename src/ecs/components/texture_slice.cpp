@@ -1,10 +1,10 @@
-#include "./sprite_freeform.hpp"
+#include "./texture_slice.hpp"
 
 #include "graphics/renderer/texture.hpp"
 
 namespace dl
 {
-void SpriteFreeform::set_uv(const float top, const float left, const float bottom, const float right)
+void TextureSlice::set_uv(const float top, const float left, const float bottom, const float right)
 {
   uv_coordinates = std::array<glm::vec2, 4>{
       glm::vec2{left, top},
@@ -14,7 +14,7 @@ void SpriteFreeform::set_uv(const float top, const float left, const float botto
   };
 }
 
-void SpriteFreeform::set_uv_with_size(const float top, const float left, const float width, const float height)
+void TextureSlice::set_uv_with_size(const float top, const float left, const float width, const float height)
 {
   assert(texture != nullptr && "Texture has not been initialized when setting uv with size");
 
