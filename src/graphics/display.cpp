@@ -65,18 +65,11 @@ void Display::load(const int width, const int height, const std::string& title)
   wgpu_context.surface = SDL_GetWGPUSurface(wgpu_context.instance, m_window);
   assert(wgpu_context.surface != nullptr);
 
-  WGPURequestAdapterOptions options
-      = {.compatibleSurface = wgpu_context.surface,
-         .powerPreference = WGPUPowerPreference_HighPerformance,
-         .forceFallbackAdapter = false,
-#if defined(__APPLE__)
-         .backendType = WGPUBackendType_Metal,
-#elif defined(_WIN32)
-         .backendType = WGPUBackendType_D3D12,
-#else
-         .backendType = WGPUBackendType_Vulkan,
-#endif
-        };
+  WGPURequestAdapterOptions options = {
+      .compatibleSurface = wgpu_context.surface,
+      .powerPreference = WGPUPowerPreference_HighPerformance,
+      .forceFallbackAdapter = false,
+  };
 
   wgpu_context.adapter = utils::request_adapter(wgpu_context.instance, &options);
 
