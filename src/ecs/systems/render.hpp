@@ -32,8 +32,8 @@ class RenderSystem
   static constexpr int m_frustum_tile_padding = 1;
   static constexpr double m_z_index_increment = 0.02;
 
-  void m_render_tiles(const Camera& camera);
-  void m_render_tile(const Chunk& chunk, const uint32_t tile_id, const Vector3i& position, const int z_index = 0);
+  void m_render_map_tiles(const Camera& camera);
+  void m_render_map_tile(const Chunk& chunk, const uint32_t tile_id, const Vector3i& position, const int z_index = 0);
 
   void m_create_sprite(entt::registry& registry, entt::entity entity);
 

@@ -49,7 +49,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
 
-  m_render_tiles(camera);
+  m_render_map_tiles(camera);
 
   {
     auto items_view = registry.view<const Position, const Sprite>();
@@ -101,7 +101,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
   }
 }
 
-void RenderSystem::m_render_tiles(const Camera& camera)
+void RenderSystem::m_render_map_tiles(const Camera& camera)
 {
   const auto& camera_position = camera.get_position_in_tiles();
   const auto& camera_size = camera.get_size_in_tiles();
@@ -165,8 +165,8 @@ void RenderSystem::m_render_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
               const Vector3i local_position{local_i, local_j, z};
 
-              m_render_tile(chunk, cell.terrain, local_position);
-              m_render_tile(chunk, cell.decoration, local_position, 1);
+              m_render_map_tile(chunk, cell.terrain, local_position);
+              m_render_map_tile(chunk, cell.decoration, local_position, 1);
             }
           }
         }
@@ -241,8 +241,8 @@ void RenderSystem::m_render_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
               const Vector3i local_position{local_i, local_j, z};
 
-              m_render_tile(chunk, cell.terrain, local_position);
-              m_render_tile(chunk, cell.decoration, local_position, 1);
+              m_render_map_tile(chunk, cell.terrain, local_position);
+              m_render_map_tile(chunk, cell.decoration, local_position, 1);
             }
           }
         }
@@ -251,10 +251,10 @@ void RenderSystem::m_render_tiles(const Camera& camera)
   }
 }
 
-void RenderSystem::m_render_tile(const Chunk& chunk,
-                                 const uint32_t tile_id,
-                                 const Vector3i& position,
-                                 const int z_index)
+void RenderSystem::m_render_map_tile(const Chunk& chunk,
+                                     const uint32_t tile_id,
+                                     const Vector3i& position,
+                                     const int z_index)
 {
   if (tile_id <= 0)
   {
