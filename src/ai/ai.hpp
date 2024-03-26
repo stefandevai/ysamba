@@ -1,43 +1,27 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
-#include <vector>
+
+#include "ai/operation_manager.hpp"
 
 namespace dl
 {
+struct GameContext;
 class World;
-}
+}  // namespace dl
 
 namespace dl::ai
 {
-enum class OperationType
-{
-  None,
-  Harvest,
-  Store,
-};
-
-struct Operation
-{
-  OperationType type;
-  double score;
-};
-
 class System
 {
  public:
-  System(World& world);
+  System(GameContext& game_context, World& world);
 
   void update(entt::registry& registry);
 
  private:
+  GameContext& m_game_context;
   World& m_world;
-
-  std::vector<Operation> m_get_available_operations(entt::registry& registry, entt::entity entity);
-  void m_compute_scores(entt::registry& registry, entt::entity entity, std::vector<Operation>& operations);
-  Operation m_select_best_operation(entt::registry& registry,
-                                    entt::entity entity,
-                                    const std::vector<Operation>& operations);
-  void m_dispatch_operation(entt::registry& registry, entt::entity entity, const Operation& operation);
+  OperationManager m_operation_manager{m_game_context, m_world};
 };
 }  // namespace dl::ai

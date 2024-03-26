@@ -2,12 +2,13 @@
 
 #include <spdlog/spdlog.h>
 
+#include "core/game_context.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "world/world.hpp"
 
 namespace dl::ai
 {
-System::System(World& world) : m_world(world) {}
+System::System(GameContext& game_context, World& world) : m_game_context(game_context), m_world(world) {}
 
 void System::update(entt::registry& registry)
 {
@@ -23,8 +24,8 @@ void System::update(entt::registry& registry)
       continue;
     }
 
-    // Get operations that we are currently available to compute score
-    auto operations = m_get_available_operations(registry, entity);
+    // Get operations that we are currently viable to compute score
+    auto operations = m_operation_manager.get_viable(entity);
 
     if (operations.empty())
     {
@@ -32,10 +33,13 @@ void System::update(entt::registry& registry)
     }
 
     // Compute score for all these operations
-    m_compute_scores(registry, entity, operations);
+    for (auto& operation : operations)
+    {
+      operation.score = m_operation_manager.compute_score(entity, operation);
+    }
 
     // Select the best score
-    auto operation = m_select_best_operation(registry, entity, operations);
+    const auto& operation = m_operation_manager.select_best(entity, operations);
 
     if (operation.type == OperationType::None)
     {
@@ -43,30 +47,7 @@ void System::update(entt::registry& registry)
     }
 
     // Convert operation to a series of jobs that can be concretely executed by the agents
-    m_dispatch_operation(registry, entity, operation);
+    m_operation_manager.dispatch(entity, operation);
   }
 }
-
-std::vector<Operation> System::m_get_available_operations(entt::registry& registry, entt::entity entity)
-{
-  std::vector<Operation> operations{};
-
-  return operations;
-}
-
-void System::m_compute_scores(entt::registry& registry, entt::entity entity, std::vector<Operation>& operations)
-{
-  assert(!operations.empty());
-}
-
-Operation System::m_select_best_operation(entt::registry& registry,
-                                          entt::entity entity,
-                                          const std::vector<Operation>& operations)
-{
-  assert(!operations.empty());
-
-  return operations[0];
-}
-
-void System::m_dispatch_operation(entt::registry& registry, entt::entity entity, const Operation& operation) {}
 }  // namespace dl::ai
