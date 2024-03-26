@@ -229,10 +229,10 @@ std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
 
 TileTarget World::search_by_flag(const std::string& flag, const int x, const int y, const int z) const
 {
-  std::map<std::pair<int, int>, std::pair<int, int>> paths;
-  TileTarget tile_target;
-  std::queue<std::pair<int, int>> position_queue;
-  std::set<std::pair<int, int>> visited;
+  std::map<std::pair<int, int>, std::pair<int, int>> paths{};
+  TileTarget tile_target{};
+  std::queue<std::pair<int, int>> position_queue{};
+  std::set<std::pair<int, int>> visited{};
   const auto displacements = {-1, 0, 1};
 
   bool found_tile = false;
@@ -299,6 +299,11 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
         break;
       }
     }
+  }
+
+  if (!found_tile)
+  {
+    spdlog::warn("Could not find tile with flag {}", flag);
   }
 
   return tile_target;
