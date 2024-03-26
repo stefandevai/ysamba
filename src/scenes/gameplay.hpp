@@ -19,6 +19,7 @@
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/storage_area.hpp"
 // #include "ecs/systems/society.hpp"
+#include "ai/ai.hpp"
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
 #include "ecs/systems/wield.hpp"
@@ -76,6 +77,7 @@ class Gameplay : public Scene
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager};
   PlayerControlsSystem m_player_controls_system{m_event_emitter};
+  ai::System m_ai_system{m_game_context, m_world};
 
   bool m_update_paused();
   bool m_update_real_time();

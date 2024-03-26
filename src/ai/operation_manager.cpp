@@ -1,6 +1,7 @@
+#include "./operation_manager.hpp"
+
 #include <spdlog/spdlog.h>
 
-#include "./ai.hpp"
 #include "core/game_context.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "world/world.hpp"
