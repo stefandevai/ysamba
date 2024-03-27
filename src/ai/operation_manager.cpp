@@ -74,7 +74,7 @@ void OperationManager::dispatch(entt::entity entity, const Operation& operation)
 {
   auto r = random::get_integer(0, 100);
 
-  if (r < 40)
+  if (r < 60)
   {
     dispatch_store(entity);
     return;
@@ -137,9 +137,13 @@ void OperationManager::dispatch_store(entt::entity entity)
   const auto job = m_registry.create();
   m_registry.emplace<Target>(job, Vector3i{position.x, position.y, position.z}, static_cast<uint32_t>(target_entity));
   m_registry.emplace<JobData>(job, JobType::Pickup);
-
-  // Add store job
   m_assign_job(job, Vector3i{position.x, position.y, position.z}, entity);
+
+  // Add drop job
+  const auto drop_job = m_registry.create();
+  m_registry.emplace<Target>(drop_job, Vector3i{48, 35, 11}, static_cast<uint32_t>(target_entity));
+  m_registry.emplace<JobData>(drop_job, JobType::Drop);
+  m_assign_job(drop_job, Vector3i{48, 35, 11}, entity);
 }
 
 void OperationManager::m_create_job(const JobType job_type, entt::entity entity, const Vector3i& position)
