@@ -146,6 +146,8 @@ void JobSystem::update(entt::registry& registry)
 
 void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity agent, entt::registry& registry)
 {
+  using namespace entt::literals;
+
   auto& job_data = registry.get<JobData>(job);
 
   if (job_data.status != JobStatus::InProgress)
@@ -205,6 +207,8 @@ void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity age
   for (const auto& item : action.gives)
   {
     const auto drop = registry.create();
+
+    registry.emplace<entt::tag<"storable"_hs>>(drop);
 
     if (action.gives_in_place)
     {

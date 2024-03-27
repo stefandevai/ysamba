@@ -1,10 +1,14 @@
 #include "./operation_manager.hpp"
 
 #include <spdlog/spdlog.h>
+#include <entt/core/hashed_string.hpp>
+#include <entt/core/type_traits.hpp>
 
+#include "core/random.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/carried_items.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_progress.hpp"
@@ -68,20 +72,30 @@ const Operation& OperationManager::select_best(entt::entity entity, std::vector<
 
 void OperationManager::dispatch(entt::entity entity, const Operation& operation)
 {
-  switch (operation.type)
+  auto r = random::get_integer(0, 100);
+
+  if (r < 40)
   {
-  case OperationType::None:
-    break;
-  case OperationType::Harvest:
-    dispatch_harvest(entity);
-    break;
-  case OperationType::Store:
     dispatch_store(entity);
-    break;
-  default:
-    spdlog::critical("Cannot dispatch unknown operation");
-    break;
+    return;
   }
+
+  dispatch_harvest(entity);
+
+  // switch (operation.type)
+  // {
+  // case OperationType::None:
+  //   break;
+  // case OperationType::Harvest:
+  //   dispatch_harvest(entity);
+  //   break;
+  // case OperationType::Store:
+  //   dispatch_store(entity);
+  //   break;
+  // default:
+  //   spdlog::critical("Cannot dispatch unknown operation");
+  //   break;
+  // }
 }
 
 void OperationManager::dispatch_harvest(entt::entity entity)
@@ -95,11 +109,37 @@ void OperationManager::dispatch_harvest(entt::entity entity)
 
 void OperationManager::dispatch_store(entt::entity entity)
 {
+  using namespace entt::literals;
+
   // Find nearest item to store
 
+  // TODO: Implement search in spatial hash
+  // const auto target = m_world.spatial_hash.find_with_component<Storable>(Vector3i{position.x, position.y, position.z});
+
+  auto storable_view = m_registry.view<Position, Item, entt::tag<"storable"_hs>>();
+
+  entt::entity target_entity = entt::null;
+
+  // TODO: Search better way to find an entity within a view
+  for (const auto storable : storable_view)
+  {
+    target_entity = storable;
+    break;
+  }
+
+  if (!m_registry.valid(target_entity))
+  {
+    return;
+  }
+
   // Add pickup job
+  const auto& position = m_registry.get<Position>(target_entity);
+  const auto job = m_registry.create();
+  m_registry.emplace<Target>(job, Vector3i{position.x, position.y, position.z}, static_cast<uint32_t>(target_entity));
+  m_registry.emplace<JobData>(job, JobType::Pickup);
 
   // Add store job
+  m_assign_job(job, Vector3i{position.x, position.y, position.z}, entity);
 }
 
 void OperationManager::m_create_job(const JobType job_type, entt::entity entity, const Vector3i& position)
