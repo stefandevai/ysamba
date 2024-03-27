@@ -115,6 +115,8 @@ const Cell& World::cell_at(const int x, const int y, const int z) const
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
+const Cell& World::cell_at(const Vector3i& position) const { return cell_at(position.x, position.y, position.z); }
+
 uint32_t World::terrain_at(const int x, const int y, const int z) const
 {
   const auto& chunk = chunk_manager.at(x, y, z);
@@ -122,11 +124,18 @@ uint32_t World::terrain_at(const int x, const int y, const int z) const
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
+uint32_t World::terrain_at(const Vector3i& position) const { return terrain_at(position.x, position.y, position.z); }
+
 uint32_t World::decoration_at(const int x, const int y, const int z) const
 {
   const auto& chunk = chunk_manager.at(x, y, z);
   return chunk.tiles.decoration_at(
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
+}
+
+uint32_t World::decoration_at(const Vector3i& position) const
+{
+  return decoration_at(position.x, position.y, position.z);
 }
 
 const TileData& World::get(const int x, const int y, const int z) const
@@ -141,11 +150,15 @@ const TileData& World::get(const int x, const int y, const int z) const
   return tile_data.at(cell.terrain);
 }
 
+const TileData& World::get(const Vector3i& position) const { return get(position.x, position.y, position.z); }
+
 const WorldTile World::get_all(const int x, const int y, const int z) const
 {
   const auto& cell = cell_at(x, y, z);
   return WorldTile{tile_data.at(cell.terrain), tile_data.at(cell.decoration)};
 }
+
+const WorldTile World::get_all(const Vector3i& position) const { return get_all(position.x, position.y, position.z); }
 
 const TileData& World::get_terrain(const int x, const int y, const int z) const
 {
@@ -153,10 +166,20 @@ const TileData& World::get_terrain(const int x, const int y, const int z) const
   return tile_data.at(tile_index);
 }
 
+const TileData& World::get_terrain(const Vector3i& position) const
+{
+  return get_terrain(position.x, position.y, position.z);
+}
+
 const TileData& World::get_decoration(const int x, const int y, const int z) const
 {
   const auto over_tile_index = decoration_at(x, y, z);
   return tile_data.at(over_tile_index);
+}
+
+const TileData& World::get_decoration(const Vector3i& position) const
+{
+  return get_decoration(position.x, position.y, position.z);
 }
 
 int World::get_elevation(const int x, const int y) const
@@ -171,6 +194,8 @@ int World::get_elevation(const int x, const int y) const
 
   return chunk.tiles.height_map[index];
 }
+
+int World::get_elevation(const Vector2i& position) const { return get_elevation(position.x, position.y); }
 
 Vector3i World::screen_to_world(const Vector2i& position, const Camera& camera) const
 {
@@ -227,70 +252,65 @@ std::vector<Vector3i> World::find_path(const Vector3i& from, const Vector3i& to)
   return {};
 }
 
-TileTarget World::search_by_flag(const std::string& flag, const int x, const int y, const int z) const
+TileTarget World::search_by_flag(const std::string& flag, const Vector3i& start) const
 {
-  std::map<std::pair<int, int>, std::pair<int, int>> paths{};
+  std::map<Vector3i, Vector3i> paths{};
   TileTarget tile_target{};
-  std::queue<std::pair<int, int>> position_queue{};
-  std::set<std::pair<int, int>> visited{};
+  std::queue<Vector3i> position_queue{};
+  std::set<Vector3i> visited{};
   const auto displacements = {-1, 0, 1};
 
   bool found_tile = false;
 
-  position_queue.push({x, y});
-  visited.insert({x, y});
+  position_queue.push(start);
+  visited.insert(start);
 
   while (!position_queue.empty() && !found_tile)
   {
-    const auto [center_x, center_y] = position_queue.front();
+    const auto& center = position_queue.front();
     position_queue.pop();
 
     for (const auto x_displacement : displacements)
     {
       for (const auto y_displacement : displacements)
       {
+        const auto current = Vector3i{center.x + x_displacement, center.y + y_displacement, center.z};
+
         if (x_displacement == 0 && y_displacement == 0)
         {
           continue;
         }
 
-        const auto current_x = center_x + x_displacement;
-        const auto current_y = center_y + y_displacement;
-
-        if (visited.contains({current_x, current_y}))
+        if (visited.contains(current))
         {
           continue;
         }
 
-        const auto position = std::make_pair(current_x, current_y);
+        paths[current] = center;
+        visited.insert(current);
 
-        paths[position] = std::make_pair(center_x, center_y);
-        visited.insert(position);
-
-        const auto& tile = get(current_x, current_y, z);
+        const auto& tile = get(current);
 
         if (tile.flags.contains(flag))
         {
-          tile_target.id = tile.id;
-          tile_target.x = current_x;
-          tile_target.y = current_y;
-          tile_target.z = z;
+          tile_target.position = current;
+
           found_tile = true;
 
-          const auto start = std::make_pair(x, y);
-          auto step = position;
+          auto step = &current;
 
-          while (step != start)
+          while (*step != start)
           {
-            step = paths[step];
-            tile_target.path.push(step);
+            step = &paths[*step];
+            tile_target.path.push(*step);
           }
+
           break;
         }
 
         if (tile.flags.contains(tile_flag::walkable))
         {
-          position_queue.push(position);
+          position_queue.push(current);
         }
       }
 
@@ -299,11 +319,6 @@ TileTarget World::search_by_flag(const std::string& flag, const int x, const int
         break;
       }
     }
-  }
-
-  if (!found_tile)
-  {
-    spdlog::warn("Could not find tile with flag {}", flag);
   }
 
   return tile_target;

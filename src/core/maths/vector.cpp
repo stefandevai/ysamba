@@ -1,5 +1,9 @@
 #include "./vector.hpp"
 
+#include <spdlog/spdlog.h>
+
+#include <tuple>
+
 namespace dl
 {
 Vector2::Vector2(const double x, const double y) : x(x), y(y) {}
@@ -11,12 +15,22 @@ Vector2::Vector2(const Vector2& other)
   x = other.x;
   y = other.y;
 }
+
 Vector2::Vector2(const Vector2i& other)
 {
   x = other.x;
   y = other.y;
 }
-bool Vector2::operator==(const Vector2& rhs) const { return x == rhs.x && y == rhs.y; }
+
+bool Vector2::operator==(const Vector2& rhs) const { return (x == rhs.x) && (y == rhs.y); }
+
+bool Vector2::operator<(const Vector2& rhs) const { return std::tie(x, y) < std::tie(rhs.x, rhs.y); }
+
+bool Vector2::operator<=(const Vector2& rhs) const { return operator<(rhs) || operator==(rhs); }
+
+bool Vector2::operator>(const Vector2& rhs) const { return x > rhs.x || y > rhs.y; }
+
+bool Vector2::operator>=(const Vector2& rhs) const { return operator>(rhs) || operator==(rhs); }
 
 Vector2& Vector2::operator=(const Vector2& rhs)
 {
@@ -75,7 +89,31 @@ Vector2i::Vector2i(const Vector2& other)
   y = other.y;
 }
 
-bool Vector2i::operator==(const Vector2i& rhs) const { return x == rhs.x && y == rhs.y; }
+bool Vector2i::operator==(const Vector2i& rhs) const
+{
+  // spdlog::debug("OPERATOR== ({}, {}) == ({}, {})", x, y, rhs.x, rhs.y);
+  return (y == rhs.y) && (x == rhs.x);
+}
+
+bool Vector2i::operator!=(const Vector2i& rhs) const
+{
+  // spdlog::debug("OPERATOR!= ({}, {}) != ({}, {})", x, y, rhs.x, rhs.y);
+  return !(*this == rhs);
+}
+// bool Vector2i::operator!=(const Vector2i& rhs) const { return !operator==(rhs); }
+
+bool Vector2i::operator<(const Vector2i& rhs) const
+{
+  // spdlog::debug("OPERATOR< ({}, {}) < ({}, {}): {}", x, y, rhs.x, rhs.y, x < rhs.x || y < rhs.y);
+
+  return std::tie(x, y) < std::tie(rhs.x, rhs.y);
+}
+
+bool Vector2i::operator<=(const Vector2i& rhs) const { return !(rhs < *this); }
+
+bool Vector2i::operator>(const Vector2i& rhs) const { return rhs < *this; }
+
+bool Vector2i::operator>=(const Vector2i& rhs) const { return !(*this < rhs); }
 
 Vector2i& Vector2i::operator=(const Vector2i& rhs)
 {
@@ -140,6 +178,14 @@ Vector3i::Vector3i(const Vector3& other)
 }
 
 bool Vector3i::operator==(const Vector3i& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
+
+bool Vector3i::operator<(const Vector3i& rhs) const { return std::tie(x, y, z) < std::tie(rhs.x, rhs.y, rhs.z); }
+
+bool Vector3i::operator<=(const Vector3i& rhs) const { return *this < rhs || *this == rhs; }
+
+bool Vector3i::operator>(const Vector3i& rhs) const { return x > rhs.x && y > rhs.y && z > rhs.z; }
+
+bool Vector3i::operator>=(const Vector3i& rhs) const { return *this > rhs || *this == rhs; }
 
 Vector3i& Vector3i::operator=(const Vector3i& rhs)
 {
@@ -209,6 +255,14 @@ Vector3::Vector3(const Vector3i& other)
 }
 
 bool Vector3::operator==(const Vector3& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
+
+bool Vector3::operator<(const Vector3& rhs) const { return x < rhs.x && y < rhs.y && z < rhs.z; }
+
+bool Vector3::operator<=(const Vector3& rhs) const { return *this < rhs || *this == rhs; }
+
+bool Vector3::operator>(const Vector3& rhs) const { return x > rhs.x && y > rhs.y && z > rhs.z; }
+
+bool Vector3::operator>=(const Vector3& rhs) const { return *this > rhs || *this == rhs; }
 
 Vector3& Vector3::operator=(const Vector3& rhs)
 {
@@ -281,6 +335,14 @@ Vector4d::Vector4d(const Vector4i& other)
 
 bool Vector4d::operator==(const Vector4d& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
 
+bool Vector4d::operator<(const Vector4d& rhs) const { return x < rhs.x && y < rhs.y < z < rhs.z && w < rhs.w; }
+
+bool Vector4d::operator<=(const Vector4d& rhs) const { return *this < rhs || *this == rhs; }
+
+bool Vector4d::operator>(const Vector4d& rhs) const { return x > rhs.x && y > rhs.y && z > rhs.z && w > rhs.w; }
+
+bool Vector4d::operator>=(const Vector4d& rhs) const { return *this > rhs || *this == rhs; }
+
 Vector4d& Vector4d::operator=(const Vector4d& rhs)
 {
   x = rhs.x;
@@ -347,6 +409,14 @@ Vector4i::Vector4i(const Vector4d& other)
 }
 
 bool Vector4i::operator==(const Vector4i& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
+
+bool Vector4i::operator<(const Vector4i& rhs) const { return x < rhs.x && y < rhs.y < z < rhs.z && w < rhs.w; }
+
+bool Vector4i::operator<=(const Vector4i& rhs) const { return *this < rhs || *this == rhs; }
+
+bool Vector4i::operator>(const Vector4i& rhs) const { return x > rhs.x && y > rhs.y && z > rhs.z && w > rhs.w; }
+
+bool Vector4i::operator>=(const Vector4i& rhs) const { return *this > rhs || *this == rhs; }
 
 Vector4i& Vector4i::operator=(const Vector4i& rhs)
 {

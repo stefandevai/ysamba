@@ -88,9 +88,9 @@ void OperationManager::dispatch_harvest(entt::entity entity)
 {
   // Find nearest harvest target
   const auto& position = m_registry.get<Position>(entity);
-  const auto& target = m_world.search_by_flag("HARVESTABLE", position.x, position.y, position.z);
+  const auto& target = m_world.search_by_flag("HARVESTABLE", Vector3i{position.x, position.y, position.z});
 
-  m_create_job(JobType::Harvest, entity, Vector3i{target.x, target.y, target.z});
+  m_create_job(JobType::Harvest, entity, target.position);
 }
 
 void OperationManager::dispatch_store(entt::entity entity)

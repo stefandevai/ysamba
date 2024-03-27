@@ -34,14 +34,11 @@ enum class Direction
 
 struct TileTarget
 {
-  TileTarget(uint32_t id, int x, int y, int z) : id(id), x(x), y(y), z(z) {}
-  TileTarget() : id(0), x(0), y(0), z(0) {}
+  TileTarget() = default;
+  explicit TileTarget(Vector3i position) : position(std::move(position)) {}
 
-  uint32_t id;
-  int x, y, z;
-  std::stack<std::pair<int, int>> path{};
-
-  explicit operator bool() { return id != 0; }
+  Vector3i position{};
+  std::stack<Vector3i> path{};
 };
 
 struct WorldTile
@@ -81,27 +78,35 @@ class World
 
   // Get cell by coordinates
   [[nodiscard]] const Cell& cell_at(const int x, const int y, const int z) const;
+  [[nodiscard]] const Cell& cell_at(const Vector3i& position) const;
 
   // Get tile id by coordinates
   [[nodiscard]] uint32_t terrain_at(const int x, const int y, const int z) const;
+  [[nodiscard]] uint32_t terrain_at(const Vector3i& position) const;
 
   // Get tile decoration by coordinates
   [[nodiscard]] uint32_t decoration_at(const int x, const int y, const int z) const;
+  [[nodiscard]] uint32_t decoration_at(const Vector3i& position) const;
 
   // Get tile data by coordinates
   [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get(const Vector3i& position) const;
 
   // Get all tiles in a tile map coordinate
   [[nodiscard]] const WorldTile get_all(const int x, const int y, const int z) const;
+  [[nodiscard]] const WorldTile get_all(const Vector3i& position) const;
 
   // Get terrain tile in a tile map coordinate
   [[nodiscard]] const TileData& get_terrain(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get_terrain(const Vector3i& position) const;
 
   // Get over terrain tile in a tile map coordinate
   [[nodiscard]] const TileData& get_decoration(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get_decoration(const Vector3i& position) const;
 
   // Gets the z elevation for a given (x, z) position
   [[nodiscard]] int get_elevation(const int x, const int y) const;
+  [[nodiscard]] int get_elevation(const Vector2i& position) const;
 
   // Get size of the tiles in the current tileset
   [[nodiscard]] const Vector2i& get_tile_size() { return m_tile_size; }
@@ -129,7 +134,7 @@ class World
   [[nodiscard]] std::vector<Vector3i> find_path(const Vector3i& from, const Vector3i& to);
 
   // Get a nearby tile containing a flag
-  [[nodiscard]] TileTarget search_by_flag(const std::string& flag, const int x, const int y, const int z) const;
+  [[nodiscard]] TileTarget search_by_flag(const std::string& flag, const Vector3i& start) const;
 
   // Check if a specific tile is adjacent to a position
   [[nodiscard]] bool adjacent(const uint32_t tile_id, const int x, const int y, const int z) const;

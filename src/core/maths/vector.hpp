@@ -18,6 +18,10 @@ struct Vector2
   Vector2(const Vector2i& other);
 
   bool operator==(const Vector2& rhs) const;
+  bool operator<(const Vector2& rhs) const;
+  bool operator<=(const Vector2& rhs) const;
+  bool operator>(const Vector2& rhs) const;
+  bool operator>=(const Vector2& rhs) const;
   Vector2& operator=(const Vector2& rhs);
   Vector2& operator=(const Vector2i& rhs);
   Vector2 operator+(const Vector2& rhs) const;
@@ -46,6 +50,11 @@ struct Vector2i
   Vector2i(const Vector2& other);
 
   bool operator==(const Vector2i& rhs) const;
+  bool operator!=(const Vector2i& rhs) const;
+  bool operator<(const Vector2i& rhs) const;
+  bool operator<=(const Vector2i& rhs) const;
+  bool operator>(const Vector2i& rhs) const;
+  bool operator>=(const Vector2i& rhs) const;
   Vector2i& operator=(const Vector2i& rhs);
   Vector2i& operator=(const Vector2& rhs);
   Vector2i operator+(const Vector2i& rhs) const;
@@ -75,6 +84,10 @@ struct Vector3
   Vector3(const Vector3i& other);
 
   bool operator==(const Vector3& rhs) const;
+  bool operator<(const Vector3& rhs) const;
+  bool operator<=(const Vector3& rhs) const;
+  bool operator>(const Vector3& rhs) const;
+  bool operator>=(const Vector3& rhs) const;
   Vector3& operator=(const Vector3& rhs);
   Vector3& operator=(const Vector3i& rhs);
   Vector3 operator+(const Vector3& rhs) const;
@@ -104,6 +117,10 @@ struct Vector3i
   Vector3i(const Vector3& other);
 
   bool operator==(const Vector3i& rhs) const;
+  bool operator<(const Vector3i& rhs) const;
+  bool operator<=(const Vector3i& rhs) const;
+  bool operator>(const Vector3i& rhs) const;
+  bool operator>=(const Vector3i& rhs) const;
   Vector3i& operator=(const Vector3i& rhs);
   Vector3i& operator=(const Vector3& rhs);
   Vector3i operator+(const Vector3i& rhs) const;
@@ -134,6 +151,10 @@ struct Vector4d
   Vector4d(const Vector4i& other);
 
   bool operator==(const Vector4d& rhs) const;
+  bool operator<(const Vector4d& rhs) const;
+  bool operator<=(const Vector4d& rhs) const;
+  bool operator>(const Vector4d& rhs) const;
+  bool operator>=(const Vector4d& rhs) const;
   Vector4d& operator=(const Vector4d& rhs);
   Vector4d operator+(const Vector4d& rhs) const;
   Vector4d& operator+=(const Vector4d& rhs);
@@ -163,6 +184,10 @@ struct Vector4i
   Vector4i(const Vector4d& other);
 
   bool operator==(const Vector4i& rhs) const;
+  bool operator<(const Vector4i& rhs) const;
+  bool operator<=(const Vector4i& rhs) const;
+  bool operator>(const Vector4i& rhs) const;
+  bool operator>=(const Vector4i& rhs) const;
   Vector4i& operator=(const Vector4i& rhs);
   Vector4i operator+(const Vector4i& rhs) const;
   Vector4i& operator+=(const Vector4i& rhs);
