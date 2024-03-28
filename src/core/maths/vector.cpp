@@ -1,7 +1,5 @@
 #include "./vector.hpp"
 
-#include <spdlog/spdlog.h>
-
 #include <tuple>
 
 namespace dl
@@ -89,25 +87,11 @@ Vector2i::Vector2i(const Vector2& other)
   y = other.y;
 }
 
-bool Vector2i::operator==(const Vector2i& rhs) const
-{
-  // spdlog::debug("OPERATOR== ({}, {}) == ({}, {})", x, y, rhs.x, rhs.y);
-  return (y == rhs.y) && (x == rhs.x);
-}
+bool Vector2i::operator==(const Vector2i& rhs) const { return (y == rhs.y) && (x == rhs.x); }
 
-bool Vector2i::operator!=(const Vector2i& rhs) const
-{
-  // spdlog::debug("OPERATOR!= ({}, {}) != ({}, {})", x, y, rhs.x, rhs.y);
-  return !(*this == rhs);
-}
-// bool Vector2i::operator!=(const Vector2i& rhs) const { return !operator==(rhs); }
+bool Vector2i::operator!=(const Vector2i& rhs) const { return !(*this == rhs); }
 
-bool Vector2i::operator<(const Vector2i& rhs) const
-{
-  // spdlog::debug("OPERATOR< ({}, {}) < ({}, {}): {}", x, y, rhs.x, rhs.y, x < rhs.x || y < rhs.y);
-
-  return std::tie(x, y) < std::tie(rhs.x, rhs.y);
-}
+bool Vector2i::operator<(const Vector2i& rhs) const { return std::tie(x, y) < std::tie(rhs.x, rhs.y); }
 
 bool Vector2i::operator<=(const Vector2i& rhs) const { return !(rhs < *this); }
 
