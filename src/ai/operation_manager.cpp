@@ -1,10 +1,15 @@
 #include "./operation_manager.hpp"
 
 #include <spdlog/spdlog.h>
+#include <entt/core/hashed_string.hpp>
+#include <entt/core/type_traits.hpp>
 
+#include "core/random.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/vector.hpp"
+#include "ecs/components/storage_area.hpp"
 #include "ecs/components/carried_items.hpp"
+#include "ecs/components/job_data.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_progress.hpp"
@@ -40,14 +45,40 @@ std::vector<Operation> OperationManager::get_viable(entt::entity entity)
 
 double OperationManager::compute_score(entt::entity entity, const Operation& operation)
 {
+  using namespace entt::literals;
+
   switch (operation.type)
   {
   case OperationType::None:
-    return 0.1;
-  case OperationType::Harvest:
-    return 1.0;
-  case OperationType::Store:
-    return 0.5;
+    return 0.0001;
+  case OperationType::Harvest: {
+      const auto& position = m_registry.get<Position>(entity);
+      const auto& target = m_world.search_by_flag("HARVESTABLE", Vector3i{position.x, position.y, position.z});
+      const auto distance_squared = std::pow(target.position.x - position.x, 2) + std::pow(target.position.y - position.y, 2) + std::pow(target.position.z - position.z, 2);
+
+      double score = 0.0;
+
+      if (distance_squared < 1200 /* 20^2*3 */)
+      {
+        score = 1.0 - distance_squared / 1200.0;
+      }
+
+      score = std::clamp(score, 0.0, 1.0);
+      return score;
+    }
+  case OperationType::Store: {
+      auto storage_area_view = m_registry.view<StorageArea>();
+
+      if (storage_area_view.size() == 0)
+      {
+        return 0.0;
+      }
+
+      auto storable_view = m_registry.view<entt::tag<"storable"_hs>>();
+      double score = storable_view.size() / 20.0;
+      score = std::clamp(score, 0.0, 0.99);
+      return score;
+    }
   default:
     spdlog::critical("Cannot score unknown operation");
     break;
@@ -95,11 +126,66 @@ void OperationManager::dispatch_harvest(entt::entity entity)
 
 void OperationManager::dispatch_store(entt::entity entity)
 {
+  using namespace entt::literals;
+
   // Find nearest item to store
 
-  // Add pickup job
+  // TODO: Implement search in spatial hash
+  // const auto target = m_world.spatial_hash.find_with_component<Storable>(Vector3i{position.x, position.y, position.z});
 
-  // Add store job
+  auto storage_area_view = m_registry.view<StorageArea>();
+
+  // Dirty hack to get a random storage area
+  auto r = random::get_integer(0, storage_area_view.size());
+  int idx = 0;
+  entt::entity storage_area_entity = entt::null;
+
+  for (const auto storage_area : storage_area_view)
+  {
+    if (idx == r)
+    {
+      storage_area_entity = storage_area;
+    }
+    ++idx;
+  }
+
+  if (!m_registry.valid(storage_area_entity))
+  {
+    return;
+  }
+
+  auto storable_view = m_registry.view<Position, Item, entt::tag<"storable"_hs>>();
+
+  entt::entity target_entity = entt::null;
+
+  // TODO: Search better way to find an entity within a view
+  for (const auto storable : storable_view)
+  {
+    target_entity = storable;
+    break;
+  }
+
+  if (!m_registry.valid(target_entity))
+  {
+    return;
+  }
+
+
+  // Add pickup job
+  m_registry.remove<entt::tag<"storable"_hs>>(target_entity);
+
+  const auto& position = m_registry.get<Position>(target_entity);
+  const auto job = m_registry.create();
+  m_registry.emplace<Target>(job, Vector3i{position.x, position.y, position.z}, static_cast<uint32_t>(target_entity));
+  m_registry.emplace<JobData>(job, JobType::Pickup);
+  m_assign_job(job, Vector3i{position.x, position.y, position.z}, entity);
+
+  // Add drop job
+  const auto storage_position = m_registry.get<Position>(storage_area_entity);
+  const auto drop_job = m_registry.create();
+  m_registry.emplace<Target>(drop_job, Vector3i{storage_position.x, storage_position.y, storage_position.z}, static_cast<uint32_t>(target_entity));
+  m_registry.emplace<JobData>(drop_job, JobType::Drop);
+  m_assign_job(drop_job, Vector3i{storage_position.x, storage_position.y, storage_position.z}, entity);
 }
 
 void OperationManager::m_create_job(const JobType job_type, entt::entity entity, const Vector3i& position)

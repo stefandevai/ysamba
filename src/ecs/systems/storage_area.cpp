@@ -127,7 +127,6 @@ void StorageAreaSystem::m_preview_area(const Vector3i& begin, const Vector3i& en
           .color = preview_tile_color,
       };
 
-      registry.emplace<StorageArea>(entity);
       registry.emplace<Sprite>(entity, sprite);
       registry.emplace<Position>(entity, i, j, begin.z);
       registry.emplace<entt::tag<"storage_preview"_hs>>(entity);
@@ -165,6 +164,7 @@ void StorageAreaSystem::m_set_storage_area(const Vector3i& begin, const Vector3i
           .color = Color{0x66EEAA77},
       };
 
+      registry.emplace<StorageArea>(entity);
       registry.emplace<Sprite>(entity, sprite);
       registry.emplace<Position>(entity, i, j, begin.z);
     }
