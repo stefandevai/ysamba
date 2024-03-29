@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entity/registry.hpp>
+#include <functional>
 #include <map>
 
 #include "core/input_manager.hpp"
@@ -53,6 +54,10 @@ class ActionSystem
   ActionMenuState m_state = ActionMenuState::Closed;
   InputManager& m_input_manager = InputManager::get_instance();
 
+  // Caches selected area preview between updates so that we don't have to update it every frame
+  Vector3i m_last_begin{};
+  Vector3i m_last_end{};
+
   void m_update_action_menu();
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);
   void m_update_closed_menu(entt::registry& registry, const Camera& camera);
@@ -74,5 +79,10 @@ class ActionSystem
   void m_select_harvest_target(const Camera& camera, entt::registry& registry);
   void m_select_break_target(const Camera& camera, entt::registry& registry);
   void m_select_dig_target(const Camera& camera, entt::registry& registry);
+  void m_select_area(entt::registry& registry,
+                     const Camera& camera,
+                     std::function<void(entt::registry&, const Vector3i&, const Vector3i&)> on_select);
+  void m_preview_area(entt::registry& registry, const Vector3i& begin, const Vector3i& end);
+  std::vector<entt::entity> m_select_available_entities(entt::registry& registry);
 };
 }  // namespace dl

@@ -321,47 +321,50 @@ void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const Job
 {
   const auto& tile = m_world.get(tile_position.x, tile_position.y, tile_position.z);
 
-  if (tile.actions.contains(job_type))
+  if (!tile.actions.contains(job_type))
   {
-    const auto& qualities_required = tile.actions.at(job_type).qualities_required;
-    const auto& consumed_items = tile.actions.at(job_type).consumes;
-
-    if (!consumed_items.empty())
-    {
-      if (!m_has_consumables(consumed_items, registry))
-      {
-        // TODO: Notify player that items are needed
-        return;
-      }
-    }
-
-    const auto job = registry.create();
-    registry.emplace<Target>(job, tile_position, tile.id);
-    registry.emplace<JobData>(job, job_type);
-    bool job_added = false;
-
-    for (const auto entity : m_selected_entities)
-    {
-      // Check if the agent has the necessary qualities to perform the action
-      if (!qualities_required.empty())
-      {
-        if (!m_has_qualities_required(qualities_required, entity, registry))
-        {
-          // TODO: Notify player that items with required qualities are needed
-          continue;
-        }
-      }
-
-      m_assign_job(job, tile_position, registry, entity);
-      job_added = true;
-    }
-
-    if (!job_added)
-    {
-      registry.destroy(job);
-    }
-    m_dispose();
+    return;
   }
+
+  const auto& qualities_required = tile.actions.at(job_type).qualities_required;
+  const auto& consumed_items = tile.actions.at(job_type).consumes;
+
+  if (!consumed_items.empty())
+  {
+    if (!m_has_consumables(consumed_items, registry))
+    {
+      // TODO: Notify player that items are needed
+      return;
+    }
+  }
+
+  const auto job = registry.create();
+  registry.emplace<Target>(job, tile_position, tile.id);
+  registry.emplace<JobData>(job, job_type);
+  bool job_added = false;
+
+  for (const auto entity : m_selected_entities)
+  {
+    // Check if the agent has the necessary qualities to perform the action
+    if (!qualities_required.empty())
+    {
+      if (!m_has_qualities_required(qualities_required, entity, registry))
+      {
+        // TODO: Notify player that items with required qualities are needed
+        continue;
+      }
+    }
+
+    m_assign_job(job, tile_position, registry, entity);
+    job_added = true;
+  }
+
+  if (!job_added)
+  {
+    registry.destroy(job);
+  }
+
+  m_dispose();
 }
 
 void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry& registry)
@@ -371,13 +374,51 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
     m_notification = m_ui_manager.notify("Harvest where?");
   }
 
-  if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
-  {
-    return;
-  }
+  // if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
+  // {
+  //   return;
+  // }
 
-  const auto mouse_tile = m_world.mouse_to_world(camera);
-  m_select_tile_target(mouse_tile, JobType::Harvest, registry);
+  // const auto mouse_tile = m_world.mouse_to_world(camera);
+  // m_select_tile_target(mouse_tile, JobType::Harvest, registry);
+
+  m_select_area(registry, camera, [this](entt::registry& registry, const Vector3i& begin, const Vector3i& end) {
+    std::vector<Vector3i> harvest_targets{};
+
+    for (int j = begin.y; j <= end.y; ++j)
+    {
+      for (int i = begin.x; i <= end.x; ++i)
+      {
+        const auto& tile = m_world.get(i, j, begin.z);
+
+        if (tile.actions.contains(JobType::Harvest))
+        {
+          harvest_targets.push_back({i, j, begin.z});
+        }
+      }
+    }
+
+    if (harvest_targets.empty())
+    {
+      return;
+    }
+
+    const auto entities = m_select_available_entities(registry);
+
+    for (const auto& target : harvest_targets)
+    {
+      const auto entity = random::select(entities);
+      const auto& tile = m_world.get(target);
+
+      // TODO: Check if the agent has the necessary qualities to perform the action
+      const auto job = registry.create();
+      registry.emplace<Target>(job, target, tile.id);
+      registry.emplace<JobData>(job, JobType::Harvest);
+      m_assign_job(job, target, registry, entity);
+    }
+
+    m_dispose();
+  });
 }
 
 void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& registry)
@@ -504,6 +545,112 @@ bool ActionSystem::m_has_consumables(const std::map<uint32_t, uint32_t>& consuma
   (void)consumables;
   (void)registry;
   return true;
+}
+
+void ActionSystem::m_select_area(entt::registry& registry,
+                                 const Camera& camera,
+                                 std::function<void(entt::registry&, const Vector3i&, const Vector3i&)> on_select)
+{
+  using namespace entt::literals;
+
+  const auto& drag_bounds = m_input_manager.get_drag_bounds();
+
+  Vector3i begin = m_world.screen_to_world(Vector2i{drag_bounds.x, drag_bounds.y}, camera);
+  Vector3i end = m_world.screen_to_world(Vector2i{drag_bounds.z, drag_bounds.w}, camera);
+
+  const Vector3i iteration_begin{std::min(begin.x, end.x), std::min(begin.y, end.y), begin.z};
+  const Vector3i iteration_end{std::max(begin.x, end.x), std::max(begin.y, end.y), begin.z};
+
+  if (m_input_manager.is_dragging())
+  {
+    if (iteration_begin == m_last_begin && iteration_end == m_last_end)
+    {
+      return;
+    }
+
+    m_last_begin = iteration_begin;
+    m_last_end = iteration_end;
+
+    m_preview_area(registry, iteration_begin, iteration_end);
+  }
+  else if (m_input_manager.has_dragged())
+  {
+    m_last_begin = Vector3i{};
+    m_last_end = Vector3i{};
+
+    for (const auto entity : registry.view<entt::tag<"area_preview"_hs>>())
+    {
+      registry.destroy(entity);
+    }
+
+    on_select(registry, iteration_begin, iteration_end);
+  }
+}
+
+void ActionSystem::m_preview_area(entt::registry& registry, const Vector3i& begin, const Vector3i& end)
+{
+  using namespace entt::literals;
+
+  assert(begin.x <= end.x && begin.y <= end.y);
+
+  for (const auto entity : registry.view<entt::tag<"area_preview"_hs>>())
+  {
+    registry.destroy(entity);
+  }
+
+  const auto texture_id = m_world.get_spritesheet_id();
+
+  Color preview_tile_color{0x66EEAA77};
+
+  for (int j = begin.y; j <= end.y; ++j)
+  {
+    for (int i = begin.x; i <= end.x; ++i)
+    {
+      const auto entity = registry.create();
+      const auto sprite = Sprite{
+          .id = 2,
+          .resource_id = texture_id,
+          .layer_z = 4,
+          .category = "tile",
+          .color = preview_tile_color,
+      };
+
+      registry.emplace<Sprite>(entity, sprite);
+      registry.emplace<Position>(entity, i, j, begin.z);
+      registry.emplace<entt::tag<"area_preview"_hs>>(entity);
+    }
+  }
+}
+
+std::vector<entt::entity> ActionSystem::m_select_available_entities(entt::registry& registry)
+{
+  std::vector<entt::entity> free_entities;
+  std::vector<entt::entity> selected_entities;
+
+  for (const auto entity : registry.view<SocietyAgent, Selectable>())
+  {
+    const auto& agent = registry.get<SocietyAgent>(entity);
+    const auto& selectable = registry.get<Selectable>(entity);
+
+    if (selectable.selected)
+    {
+      selected_entities.push_back(entity);
+    }
+
+    if (!agent.jobs.empty())
+    {
+      continue;
+    }
+
+    free_entities.push_back(entity);
+  }
+
+  if (!selected_entities.empty())
+  {
+    return selected_entities;
+  }
+
+  return free_entities;
 }
 
 }  // namespace dl
