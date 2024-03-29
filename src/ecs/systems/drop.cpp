@@ -126,7 +126,7 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
                                    .resource_id = m_world.get_spritesheet_id(),
                                    .id = item_component.id,
                                    .category = "item",
-                                   .layer_z = 1,
+                                   .layer_z = 2,
                                });
     }
 
