@@ -288,7 +288,6 @@ void SDLInputWrapper::update()
   m_mouse_state_up.second = false;
   m_has_dragged = false;
 
-  // Update key status
   SDL_Event event;
 
   while (SDL_PollEvent(&event))

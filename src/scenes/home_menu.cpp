@@ -63,7 +63,7 @@ void HomeMenu::load()
 
       if (m_worlds_metadata.empty())
       {
-        spdlog::warn("No worlds found");
+        m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
         return;
       }
 
@@ -105,7 +105,7 @@ void HomeMenu::process_input()
 
     if (m_worlds_metadata.empty())
     {
-      spdlog::warn("No worlds found");
+      m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
       return;
     }
 
