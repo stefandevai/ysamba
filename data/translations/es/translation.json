@@ -1,5 +1,8 @@
 {
     "title": "Colonización de Ysamba",
-    "instructions": "Jugar\nNuevo Mundo\nConfiguración\nCréditos"
+    "play": "Jugar",
+    "new_world": "Nuevo Mundo",
+    "settings": "Configuración",
+    "credits": "Créditos"
 }
 

@@ -1,4 +1,7 @@
 {
     "title": "Colonization of Ysamba",
-    "instructions": "Play\nNew world\nSettings\nCredits"
+    "play": "Play",
+    "new_world": "New World",
+    "settings": "Settings",
+    "credits": "Credits"
 }

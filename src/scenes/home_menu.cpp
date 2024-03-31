@@ -44,10 +44,10 @@ void HomeMenu::load()
   m_button_list = m_ui_manager.emplace<ui::ButtonList<MenuChoice>>();
 
   m_button_list->set_items({
-      {MenuChoice::Play, "Play"},
-      {MenuChoice::NewWorld, "New World"},
-      {MenuChoice::Settings, "Settings"},
-      {MenuChoice::Credits, "Credits"},
+      {MenuChoice::Play, "play"_t},
+      {MenuChoice::NewWorld, "new_world"_t},
+      {MenuChoice::Settings, "settings"_t},
+      {MenuChoice::Credits, "credits"_t},
   });
 
   m_button_list->position = Vector3i{75, 193, 0};
