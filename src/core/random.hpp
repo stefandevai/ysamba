@@ -36,4 +36,11 @@ static inline T get_normal_number(const T from, const T to)
 
   return static_cast<T>(n * (to - from) + from);
 }
+
+// Selects a random value from the given vector
+template <typename T>
+static inline T select(const std::vector<T>& values)
+{
+  return values[get_integer(0, values.size())];
+}
 }  // namespace dl::random

@@ -64,6 +64,8 @@ void StorageAreaSystem::m_update_select_area(entt::registry& registry, const Cam
 
 void StorageAreaSystem::m_select_area(entt::registry& registry, const Camera& camera)
 {
+  using namespace entt::literals;
+
   const auto& drag_bounds = m_input_manager.get_drag_bounds();
 
   Vector3i begin = m_world.screen_to_world(Vector2i{drag_bounds.x, drag_bounds.y}, camera);
@@ -89,6 +91,11 @@ void StorageAreaSystem::m_select_area(entt::registry& registry, const Camera& ca
   {
     m_last_begin = Vector3i{};
     m_last_end = Vector3i{};
+
+    for (const auto entity : registry.view<entt::tag<"storage_preview"_hs>>())
+    {
+      registry.destroy(entity);
+    }
 
     m_set_storage_area(iteration_begin, iteration_end, registry);
   }
@@ -136,16 +143,10 @@ void StorageAreaSystem::m_preview_area(const Vector3i& begin, const Vector3i& en
 
 void StorageAreaSystem::m_set_storage_area(const Vector3i& begin, const Vector3i& end, entt::registry& registry)
 {
-  using namespace entt::literals;
-
   assert(begin.x <= end.x && begin.y <= end.y);
 
   if (!m_is_area_valid(begin, end))
   {
-    for (const auto entity : registry.view<entt::tag<"storage_preview"_hs>>())
-    {
-      registry.destroy(entity);
-    }
     return;
   }
 
@@ -159,7 +160,7 @@ void StorageAreaSystem::m_set_storage_area(const Vector3i& begin, const Vector3i
       const auto sprite = Sprite{
           .id = 2,
           .resource_id = texture_id,
-          .layer_z = 4,
+          .layer_z = 1,
           .category = "tile",
           .color = Color{0x66EEAA77},
       };
