@@ -3,6 +3,9 @@
     "play": "Jugar",
     "new_world": "Nuevo Mundo",
     "settings": "Configuración",
-    "credits": "Créditos"
+    "credits": "Créditos",
+    "name_label": "Nombre:",
+    "enter_world_name": "Nombre del mundo",
+    "save": "Guardar"
 }
 
