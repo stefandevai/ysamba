@@ -29,6 +29,7 @@ class OperationManager
   // Disptach functions
   void dispatch_harvest(entt::entity entity);
   void dispatch_store(entt::entity entity);
+  void dispatch_eat(entt::entity entity);
 
  private:
   GameContext& m_game_context;

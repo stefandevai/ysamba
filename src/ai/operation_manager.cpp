@@ -113,6 +113,9 @@ void OperationManager::dispatch(entt::entity entity, const Operation& operation)
   case OperationType::Store:
     dispatch_store(entity);
     break;
+  case OperationType::Eat:
+    dispatch_eat(entity);
+    break;
   default:
     spdlog::critical("Cannot dispatch unknown operation");
     break;
@@ -192,6 +195,11 @@ void OperationManager::dispatch_store(entt::entity entity)
                              static_cast<uint32_t>(target_entity));
   m_registry.emplace<JobData>(drop_job, JobType::Drop);
   m_assign_job(drop_job, Vector3i{storage_position.x, storage_position.y, storage_position.z}, entity);
+}
+
+void OperationManager::dispatch_eat(entt::entity entity)
+{
+  using namespace entt::literals;
 }
 
 void OperationManager::m_create_job(const JobType job_type, entt::entity entity, const Vector3i& position)

@@ -3,6 +3,7 @@ enum class OperationType
   None,
   Harvest,
   Store,
+  Eat,
 };
 
 struct Operation
