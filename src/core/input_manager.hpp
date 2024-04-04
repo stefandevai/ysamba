@@ -30,24 +30,27 @@ class InputManager
   };
 
   InputManager();
+  ~InputManager() = default;
 
   // Removing copy-constructor and assignment operator
   InputManager(InputManager const&) = delete;
+  InputManager(InputManager const&&) = delete;
   void operator=(InputManager const&) = delete;
+  void operator=(InputManager const&&) = delete;
 
   static InputManager& get_instance();
   void update();
-  void push_context(const uint32_t context_key);
+  void push_context(uint32_t context_key);
   void pop_context();
 
-  [[nodiscard]] bool is_context(const uint32_t key) const;
-  [[nodiscard]] bool poll_action(const uint32_t action);
-  [[nodiscard]] bool is_key_down(const uint32_t key);
+  [[nodiscard]] bool is_context(uint32_t key) const;
+  [[nodiscard]] bool poll_action(uint32_t action);
+  [[nodiscard]] bool is_key_down(uint32_t key);
   [[nodiscard]] bool is_any_key_down() const;
-  [[nodiscard]] bool is_key_up(const uint32_t key) const;
-  [[nodiscard]] bool is_clicking(const MouseButton button) const;
-  [[nodiscard]] bool has_clicked(const MouseButton button) const;
-  [[nodiscard]] bool has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size) const;
+  [[nodiscard]] bool is_key_up(uint32_t key) const;
+  [[nodiscard]] bool is_clicking(MouseButton button) const;
+  [[nodiscard]] bool has_clicked(MouseButton button) const;
+  [[nodiscard]] bool has_clicked_bounds(MouseButton button, const Vector2i& position, const Vector2i& size) const;
   [[nodiscard]] bool is_scrolling_y() const { return m_sdl_input_wrapper.get_scroll().y != 0; }
   [[nodiscard]] bool is_scrolling_x() const { return m_sdl_input_wrapper.get_scroll().x != 0; }
   [[nodiscard]] bool is_dragging() const;

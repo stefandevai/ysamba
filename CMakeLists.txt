@@ -117,6 +117,15 @@ else()
     )
 endif()
 
-add_custom_target(clang-tidy-check clang-tidy -p ${CMAKE_BINARY_DIR}/compile_commands.json -checks=cert* ${SOURCE_FILES} DEPENDS ${SOURCE_FILES})
+add_custom_target(
+    clang-tidy-check
+    clang-tidy
+    -p ${CMAKE_BINARY_DIR}/compile_commands.json
+    -checks=cert*,modernize*,performance*,readability*,portability*,clang-analyzer*,misc*,bugprone*,cppcoreguidelines*,-misc-non-private-member-variables-in-classes
+    -header-filter=.*
+    -extra-arg=-std=c++20
+    ${SOURCE_FILES}
+    DEPENDS ${SOURCE_FILES}
+)
 
 add_custom_target(check DEPENDS clang-tidy-check)
