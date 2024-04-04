@@ -32,8 +32,8 @@ class InputManager
   InputManager();
 
   // Removing copy-constructor and assignment operator
-  InputManager(InputManager const&){};
-  void operator=(InputManager const&){};
+  InputManager(InputManager const&) = delete;
+  void operator=(InputManager const&) = delete;
 
   static InputManager& get_instance();
   void update();

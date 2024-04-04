@@ -15,8 +15,8 @@ class SDLInputWrapper
   SDLInputWrapper();
 
   // Removing copy-constructor and assignment operator
-  SDLInputWrapper(SDLInputWrapper const&){};
-  void operator=(SDLInputWrapper const&){};
+  SDLInputWrapper(SDLInputWrapper const&) = delete;
+  void operator=(SDLInputWrapper const&) = delete;
 
   void update();
   void quit();

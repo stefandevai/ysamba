@@ -29,13 +29,13 @@ class UTF8Iterator
 
   UTF8Iterator& operator++();
 
-  UTF8Iterator operator++(int);
+  const UTF8Iterator operator++(int);
 
   UTF8Iterator operator+=(int quantity);
 
   UTF8Iterator& operator--();
 
-  UTF8Iterator operator--(int);
+  const UTF8Iterator operator--(int);
 
   UTF8Iterator operator-=(int quantity);
 

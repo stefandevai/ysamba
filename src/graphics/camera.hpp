@@ -9,15 +9,12 @@
 #include "core/maths/vector.hpp"
 #include "ecs/components/position.hpp"
 
-namespace
-{
-constexpr float DEFAULT_ZOOM = 1.0f;
-}
-
 namespace dl
 {
 class Display;
 struct EventEmitter;
+
+constexpr float DEFAULT_ZOOM = 1.0f;
 
 enum class CameraState
 {

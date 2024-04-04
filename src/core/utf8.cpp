@@ -36,7 +36,7 @@ UTF8Iterator& UTF8Iterator::operator++()
   return *this;
 }
 
-UTF8Iterator UTF8Iterator::operator++(int)
+const UTF8Iterator UTF8Iterator::operator++(int)
 {
   m_dirty = true;
   UTF8Iterator temp = *this;
@@ -90,7 +90,7 @@ UTF8Iterator& UTF8Iterator::operator--()
   return *this;
 }
 
-UTF8Iterator UTF8Iterator::operator--(int)
+const UTF8Iterator UTF8Iterator::operator--(int)
 {
   m_dirty = true;
   UTF8Iterator temp = *this;
