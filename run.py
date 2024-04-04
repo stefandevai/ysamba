@@ -15,6 +15,7 @@ parser.add_argument('--run', '-r', action='store_true', help='run an already bui
 parser.add_argument('--make', '-m', action='store_true', help='build the project')
 parser.add_argument('--build', '-b', action='store_true', help='configure/build dialectics')
 parser.add_argument('--format', '-f', action='store_true', help='format code')
+parser.add_argument('--check', '-c', action='store', help='run static analysis on a file')
 
 def configure(build_path: Path) -> None:
     subprocess.run(["cmake", "-B", build_path, "-S", THIS_DIR], check=True)
@@ -24,6 +25,17 @@ def build(build_path: Path) -> None:
 
 def run(target_path: Path, data_path: Path) -> None:
     subprocess.run([target_path / TARGET_NAME], check=True, cwd=THIS_DIR)
+
+def check(filename: Path) -> None:
+    subprocess.run([
+        "clang-tidy",
+        "--checks=bug*,cert*,performance*,reada*,port*,clang-a*,misc*,cppco*,-misc-non-private-member-variables-in-classes",
+        "-header-filter=.*",
+        "-extra-arg=-std=c++20",
+        "-p",
+        "./build/compile_commands.json",
+        filename
+    ], check=True, cwd=THIS_DIR)
 
 def format() -> None:
     source_dir = THIS_DIR / "src"
@@ -42,11 +54,15 @@ def main() -> None:
 
     if args.make:
         build(build_path)
+
     if args.run:
         run(target_path, data_path)
 
     if args.format:
         format()
+
+    if args.check:
+        check(args.check)
 
     if len(sys.argv) < 2:
         configure(build_path)
