@@ -1,0 +1,5 @@
+Checks: 'cert*,modernize*,performance*,readability*,portability*,clang-analyzer*,misc*,bugprone*,cppcoreguidelines*,-misc-non-private-member-variables-in-classes'
+WarningAsErrors: true
+AnalyzeTemporaryDtors: false
+HeaderFilter: '.*'
+ExtraArgs: '-std=c++20'
