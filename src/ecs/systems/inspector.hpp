@@ -36,12 +36,12 @@ class InspectorSystem
   ui::UIManager& m_ui_manager;
   ui::Inspector* m_inspector = nullptr;
   InputManager& m_input_manager = InputManager::get_instance();
-  Vector2i m_last_mouse_position{0, 0};
-  Vector3 m_last_camera_position{0., 0., 0.};
+  Vector3i m_last_mouse_position{0, 0, 0};
+  Vector3 m_last_camera_position{0.0, 0.0, 0.0};
   entt::entity m_target_quad = entt::null;
 
   void m_update_input(entt::registry& registry);
-  void m_update_inspector_content(const Vector3i mouse_position, const entt::entity entity, entt::registry& registry);
+  bool m_update_inspector_content(const Vector3i mouse_position, const entt::entity entity, entt::registry& registry);
   void m_update_inspector_content(const Vector3i mouse_position, const TileData& tile_data);
   void m_destroy_inspector();
 };
