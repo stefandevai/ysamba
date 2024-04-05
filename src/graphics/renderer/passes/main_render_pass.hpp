@@ -32,9 +32,9 @@ class MainRenderPass
   MainRenderPass&& operator=(MainRenderPass&& rhs) = delete;
   MainRenderPass(MainRenderPass&& rhs) = delete;
 
-  void load(const Shader& shader, const WGPUTextureView depth_texture_view);
+  void load(const Shader& shader, WGPUTextureView depth_texture_view);
   void render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera);
-  void resize(const WGPUTextureView depth_texture_view);
+  void resize(WGPUTextureView depth_texture_view);
 
  private:
   enum BindGroupType

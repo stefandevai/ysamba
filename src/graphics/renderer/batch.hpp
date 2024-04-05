@@ -82,14 +82,14 @@ class Batch
   uint32_t pin_texture(WGPUTextureView texture_view);
 
   void sprite(
-      Sprite& sprite, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
-  void texture_slice(TextureSlice& slice, const double x, const double y, const double z);
+      Sprite& sprite, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
+  void texture_slice(TextureSlice& slice, double x, double y, double z);
   void tile(
-      const Tile& tile, const double x, const double y, const double z, const RenderFace face = DL_RENDER_FACE_TOP);
-  void texture(const Texture& texture, const double x, const double y, const double z);
-  void quad(const Quad* quad, const double x, const double y, const double z);
-  void text(Text& text, const double x, const double y, const double z);
-  void nine_patch(NinePatch& nine_patch, const double x, const double y, const double z);
+      const Tile& tile, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
+  void texture(const Texture& texture, double x, double y, double z);
+  void quad(const Quad* quad, double x, double y, double z);
+  void text(Text& text, double x, double y, double z);
+  void nine_patch(NinePatch& nine_patch, double x, double y, double z);
 
   void push_scissor(Vector4i scissor);
   void pop_scissor();
@@ -115,13 +115,13 @@ class Batch
 
   void m_load_batch_data();
   void m_load_textures();
-  void m_emplace_sprite_face(const SpriteBatchData data);
-  void m_emplace_sprite_face_top(const SpriteBatchData data);
-  void m_emplace_sprite_face_front(const SpriteBatchData data);
+  void m_emplace_sprite_face(SpriteBatchData data);
+  void m_emplace_sprite_face_top(SpriteBatchData data);
+  void m_emplace_sprite_face_front(SpriteBatchData data);
 
   // Build vector of textures to bind when rendering
   // texture_index is the index in texture_views that will
   // be translated to a index in the shader.
-  float m_get_texture_index(const WGPUTextureView texture_view);
+  float m_get_texture_index(WGPUTextureView texture_view);
 };
 }  // namespace dl

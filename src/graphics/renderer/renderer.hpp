@@ -34,7 +34,7 @@ class Renderer
   void render(const Camera& camera);
 
   void resize();
-  void clear_color(const uint8_t r, const uint8_t g, const uint8_t b, const float a = 1.0f);
+  void clear_color(uint8_t r, uint8_t g, uint8_t b, float a = 1.0f);
 
  private:
   bool m_has_loaded = false;

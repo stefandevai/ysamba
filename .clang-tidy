@@ -1,4 +1,4 @@
-Checks: 'cert*,modernize*,performance*,readability*,portability*,clang-analyzer*,misc*,bugprone*,cppcoreguidelines*,-misc-non-private-member-variables-in-classes,-modernize-use-trailing-return-type,-readability-identifier-length,-cppcoreguidelines-avoid-const-or-ref-data-members,-cppcoreguidelines-non-private-member-variables-in-classes,-readability-uppercase-literal-suffix'
+Checks: 'cert*,modernize*,performance*,readability*,portability*,clang-analyzer*,misc*,bugprone*,cppcoreguidelines*,-misc-non-private-member-variables-in-classes,-modernize-use-trailing-return-type,-readability-identifier-length,-cppcoreguidelines-avoid-const-or-ref-data-members,-cppcoreguidelines-non-private-member-variables-in-classes,-readability-uppercase-literal-suffix,-bugprone-easily-swappable-parameters'
 AnalyzeTemporaryDtors: false
 ExtraArgs:
   - '-std=c++20'

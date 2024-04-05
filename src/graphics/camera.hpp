@@ -41,28 +41,28 @@ class Camera
   Camera() = default;
   Camera(const Display& display);
 
-  void update(const float dt);
+  void update(float dt);
   // TODO: Implement different cameras so that other scenes can have a simpler update
   // then merge this method to the main update method
   void update_target(const entt::registry& registry);
   void update_dirty();
   void move(const Vector3& quantity);
   void move_in_grid(const Vector3i& quantity);
-  const Vector3& get_position() const;
-  const Vector3i& get_position_in_tiles() const;
-  const glm::mat4& get_view_matrix() const;
-  const Vector3& get_saved_position() const { return m_saved_position; }
-  const Vector2& get_size() const { return m_size; }
-  const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
-  const Vector2i& get_grid_size() const { return m_grid_size; }
+  [[nodiscard]] const Vector3& get_position() const;
+  [[nodiscard]] const Vector3i& get_position_in_tiles() const;
+  [[nodiscard]] const glm::mat4& get_view_matrix() const;
+  [[nodiscard]] const Vector3& get_saved_position() const { return m_saved_position; }
+  [[nodiscard]] const Vector2& get_size() const { return m_size; }
+  [[nodiscard]] const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
+  [[nodiscard]] const Vector2i& get_grid_size() const { return m_grid_size; }
   void set_position(const Vector2& position);
   void set_size(const Vector2& size);
-  void set_frustum(const float left, const float right, const float bottom, const float top);
+  void set_frustum(float left, float right, float bottom, float top);
   void set_tile_size(const Vector2i& size);
-  void set_yaw(const float yaw);
-  void set_pitch(const float pitch);
-  void set_zoom(const float zoom);
-  void set_target(const entt::entity target);
+  void set_yaw(float yaw);
+  void set_pitch(float pitch);
+  void set_zoom(float zoom);
+  void set_target(entt::entity target);
   void set_event_emitter(EventEmitter* emitter);
   void zoom_in();
   void zoom_out();

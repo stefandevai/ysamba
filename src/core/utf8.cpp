@@ -1,10 +1,18 @@
 #include "./utf8.hpp"
 
+#include <utility>
+
 namespace dl
 {
 UTF8Iterator& UTF8Iterator::operator=(const UTF8Iterator& rhs)
 {
   string_iterator = rhs.string_iterator;
+  return *this;
+}
+
+UTF8Iterator& UTF8Iterator::operator=(UTF8Iterator&& rhs) noexcept
+{
+  std::swap(string_iterator, rhs.string_iterator);
   return *this;
 }
 
