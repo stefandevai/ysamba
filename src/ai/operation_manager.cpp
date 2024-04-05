@@ -30,7 +30,7 @@ std::vector<Operation> OperationManager::get_viable(entt::entity entity)
   // TODO: Select viable operations based on the entity's and world's current state Use the concept of operation
   // buckets to group similar operations together according to their priority
   operations.push_back(Operation{OperationType::None});
-  operations.push_back(Operation{OperationType::Harvest});
+  // operations.push_back(Operation{OperationType::Harvest});
   operations.push_back(Operation{OperationType::Store});
 
   return operations;

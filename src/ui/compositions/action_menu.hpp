@@ -2,6 +2,7 @@
 
 #include "ui/components/component.hpp"
 #include "ui/types.hpp"
+#include "world/society/job_type.hpp"
 
 namespace dl::ui
 {
@@ -12,14 +13,14 @@ class WindowFrame;
 class ActionMenu : public UIComponent
 {
  public:
-  ActionMenu(UIContext& context, const ItemList<uint32_t>& items, const std::function<void(const uint32_t)>& on_select);
-  void set_actions(const ItemList<uint32_t>& actions);
-  void set_on_select(const std::function<void(const uint32_t)>& on_select);
+  ActionMenu(UIContext& context, const ItemList<JobType>& items, const std::function<void(const JobType)>& on_select);
+  void set_actions(const ItemList<JobType>& actions);
+  void set_on_select(const std::function<void(const JobType)>& on_select);
   void show();
   void hide();
 
  private:
-  ScrollableList<uint32_t>* m_scrollable_list = nullptr;
+  ScrollableList<JobType>* m_scrollable_list = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };
 

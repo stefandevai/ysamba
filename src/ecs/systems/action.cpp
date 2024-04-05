@@ -23,12 +23,12 @@
 
 namespace dl
 {
-const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
-    {0, "Harvest"},
-    {1, "Break"},
-    {2, "Dig"},
-    {3, "Build hut"},
-    {4, "Select storage area"},
+const ui::ItemList<JobType> ActionSystem::m_menu_items = {
+    {JobType::Harvest, "Harvest"},
+    {JobType::Break, "Break"},
+    {JobType::Dig, "Dig"},
+    {JobType::BuildHut, "Build hut"},
+    {JobType::SelectStorageArea, "Select storage area"},
 };
 
 ActionSystem::ActionSystem(World& world,
@@ -42,17 +42,23 @@ ActionSystem::ActionSystem(World& world,
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)
 {
-  if (m_state == ActionMenuState::Open)
+  switch (m_state)
+  {
+  case ActionMenuState::Open:
   {
     m_update_action_menu();
+    break;
   }
-  else if (m_state == ActionMenuState::Closed)
+  case ActionMenuState::Closed:
   {
     m_update_closed_menu(registry, camera);
+    break;
   }
-  else
+  case ActionMenuState::SelectTarget:
   {
     m_update_selecting_target(registry, camera);
+    break;
+  }
   }
 }
 
@@ -73,15 +79,18 @@ void ActionSystem::m_update_action_menu()
   }
   else if (m_input_manager.poll_action("harvest"_hs))
   {
-    m_state = ActionMenuState::SelectHarvestTarget;
+    m_selected_job_type = JobType::Harvest;
+    m_state = ActionMenuState::SelectTarget;
   }
   else if (m_input_manager.poll_action("break"_hs))
   {
-    m_state = ActionMenuState::SelectBreakTarget;
+    m_selected_job_type = JobType::Break;
+    m_state = ActionMenuState::SelectTarget;
   }
   else if (m_input_manager.poll_action("dig"_hs))
   {
-    m_state = ActionMenuState::SelectDigTarget;
+    m_selected_job_type = JobType::Dig;
+    m_state = ActionMenuState::SelectTarget;
   }
 }
 
@@ -169,23 +178,22 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1
           && PickupSystem::can_pickup(registry, m_selected_entities[0], item_data))
       {
-        m_actions.push_back({static_cast<uint32_t>(JobType::Pickup), "pickup"});
+        m_actions.push_back({JobType::Pickup, "pickup"});
       }
       if (item_data.flags.contains("WEARABLE") && m_selected_entities.size() == 1)
       {
-        m_actions.push_back({static_cast<uint32_t>(JobType::Wear), "wear"});
+        m_actions.push_back({JobType::Wear, "wear"});
       }
       if (item_data.flags.contains("WIELDABLE") && m_selected_entities.size() == 1)
       {
-        m_actions.push_back({static_cast<uint32_t>(JobType::Wield), "wield"});
+        m_actions.push_back({JobType::Wield, "wield"});
       }
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select(
-          [this, mouse_tile, selected_entity](const uint32_t i)
+          [this, mouse_tile, selected_entity](const JobType job_type)
           {
-            m_action_manager.create_item_job_bulk(
-                static_cast<JobType>(i), m_selected_entities, selected_entity, mouse_tile);
+            m_action_manager.create_item_job_bulk(job_type, m_selected_entities, selected_entity, mouse_tile);
             m_dispose();
           });
       m_input_manager.push_context("action_menu"_hs);
@@ -199,14 +207,14 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       for (const auto& action : tile_data.actions)
       {
-        m_actions.push_back({static_cast<uint32_t>(action.first), action.second.label});
+        m_actions.push_back({action.first, action.second.label});
       }
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select(
-          [this, mouse_tile](const uint32_t i)
+          [this, mouse_tile](const JobType job_type)
           {
-            m_action_manager.create_tile_job_bulk(static_cast<JobType>(i), m_selected_entities, mouse_tile);
+            m_action_manager.create_tile_job_bulk(job_type, m_selected_entities, mouse_tile);
             m_dispose();
           });
       m_input_manager.push_context("action_menu"_hs);
@@ -227,30 +235,30 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     return;
   }
 
-  switch (m_state)
+  switch (m_selected_job_type)
   {
-  case ActionMenuState::SelectHarvestTarget:
+  case JobType::Harvest:
   {
     m_select_harvest_target(camera, registry);
     break;
   }
-  case ActionMenuState::SelectBreakTarget:
+  case JobType::Break:
   {
     m_select_break_target(camera, registry);
     break;
   }
-  case ActionMenuState::SelectDigTarget:
+  case JobType::Dig:
   {
     m_select_dig_target(camera, registry);
     break;
   }
-  case ActionMenuState::SelectHutTarget:
+  case JobType::BuildHut:
   {
     m_event_emitter.publish(SelectHutTargetEvent{});
     m_dispose();
     break;
   }
-  case ActionMenuState::SelectStorageTarget:
+  case JobType::SelectStorageArea:
   {
     m_event_emitter.publish(SelectStorageEvent{});
     m_dispose();
@@ -293,6 +301,7 @@ void ActionSystem::m_dispose()
   m_close_action_menu();
 
   m_state = ActionMenuState::Closed;
+  m_selected_job_type = JobType::None;
   m_input_manager.pop_context();
 }
 
@@ -427,6 +436,8 @@ void ActionSystem::m_select_area(entt::registry& registry,
     {
       registry.destroy(entity);
     }
+
+    spdlog::debug("Selecting area from ");
 
     on_select(registry, iteration_begin, iteration_end);
   }
