@@ -378,13 +378,11 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
     m_notification = m_ui_manager.notify("Harvest where?");
   }
 
-  // if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
-  // {
-  //   return;
-  // }
-
-  // const auto mouse_tile = m_world.mouse_to_world(camera);
-  // m_select_tile_target(mouse_tile, JobType::Harvest, registry);
+  if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
+  {
+    const auto mouse_tile = m_world.mouse_to_world(camera);
+    m_select_tile_target(mouse_tile, JobType::Harvest, registry);
+  }
 
   m_select_area(registry,
                 camera,

@@ -5,8 +5,8 @@
 #include <unordered_map>
 
 #include "./maths/vector.hpp"
-#include "core/utf8.hpp"
 #include "core/timer.hpp"
+#include "core/utf8.hpp"
 
 namespace dl
 {
