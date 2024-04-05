@@ -17,11 +17,13 @@ namespace dl
 StorageAreaSystem::StorageAreaSystem(World& world, EventEmitter& event_emitter, ui::UIManager& ui_manager)
     : m_world(world), m_ui_manager(ui_manager)
 {
-  event_emitter.on<SelectStorageEvent>([this](const SelectStorageEvent& event, EventEmitter& emitter) {
-    (void)emitter;
-    (void)event;
-    m_state = State::SelectArea;
-  });
+  event_emitter.on<SelectStorageEvent>(
+      [this](const SelectStorageEvent& event, EventEmitter& emitter)
+      {
+        (void)emitter;
+        (void)event;
+        m_state = State::SelectArea;
+      });
 }
 
 void StorageAreaSystem::update(entt::registry& registry) { using namespace entt::literals; }

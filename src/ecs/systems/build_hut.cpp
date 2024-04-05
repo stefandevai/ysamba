@@ -27,7 +27,8 @@
 
 namespace dl
 {
-const auto stop_build_hut = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+const auto stop_build_hut = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
   auto& job_data = registry.get<JobData>(job);
   auto& progress = registry.get<JobProgress>(job_data.progress_entity);
   progress.agents.erase(std::remove(progress.agents.begin(), progress.agents.end(), entity));
@@ -35,7 +36,8 @@ const auto stop_build_hut = [](entt::registry& registry, const entt::entity enti
   registry.remove<ActionBuildHut>(entity);
 };
 
-const auto stop_place_exterior = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+const auto stop_place_exterior = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
   auto& job_data = registry.get<JobData>(job);
   job_data.status = JobStatus::Finished;
   registry.remove<ActionPlaceHutExterior>(entity);
@@ -44,11 +46,13 @@ const auto stop_place_exterior = [](entt::registry& registry, const entt::entity
 BuildHutSystem::BuildHutSystem(World& world, EventEmitter& event_emitter, ui::UIManager& ui_manager)
     : m_world(world), m_ui_manager(ui_manager)
 {
-  event_emitter.on<SelectHutTargetEvent>([this](const SelectHutTargetEvent& event, EventEmitter& emitter) {
-    (void)emitter;
-    (void)event;
-    m_state = State::SelectHutTarget;
-  });
+  event_emitter.on<SelectHutTargetEvent>(
+      [this](const SelectHutTargetEvent& event, EventEmitter& emitter)
+      {
+        (void)emitter;
+        (void)event;
+        m_state = State::SelectHutTarget;
+      });
 }
 
 void BuildHutSystem::update(entt::registry& registry)
@@ -509,19 +513,20 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
 
   auto add_hut_part
       = [&registry, texture_id](
-            const uint32_t id, const int x, const int y, const int z, const Color& color = Color{0xFFFFFF99}) {
-          const auto entity = registry.create();
-          registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
-          const auto sprite = Sprite{
-              .id = id,
-              .resource_id = texture_id,
-              .layer_z = 4,
-              .category = "tile",
-              .color = color,
-          };
-          registry.emplace<Sprite>(entity, sprite);
-          registry.emplace<Position>(entity, x, y, z);
-        };
+            const uint32_t id, const int x, const int y, const int z, const Color& color = Color{0xFFFFFF99})
+  {
+    const auto entity = registry.create();
+    registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
+    const auto sprite = Sprite{
+        .id = id,
+        .resource_id = texture_id,
+        .layer_z = 4,
+        .category = "tile",
+        .color = color,
+    };
+    registry.emplace<Sprite>(entity, sprite);
+    registry.emplace<Position>(entity, x, y, z);
+  };
 
   Color preview_tile_color{0x66EEAA77};
 
@@ -657,30 +662,31 @@ void BuildHutSystem::m_create_hut_job(const Vector3i& position, const uint32_t h
 
   // Assign a build hut job for each agent
   auto assign_build_hut_job
-      = [&registry, &position, &progress, hut_size, job_progress_entity](const entt::entity entity) {
-          const auto offset_x = random::get_integer(0, hut_size);
-          const auto offset_y = random::get_integer(0, hut_size);
-          const auto job_target = Vector3i{position.x + offset_x, position.y + offset_y, position.z};
+      = [&registry, &position, &progress, hut_size, job_progress_entity](const entt::entity entity)
+  {
+    const auto offset_x = random::get_integer(0, hut_size);
+    const auto offset_y = random::get_integer(0, hut_size);
+    const auto job_target = Vector3i{position.x + offset_x, position.y + offset_y, position.z};
 
-          // Create a walk job to walk until the target
-          const auto walk_job = registry.create();
-          registry.emplace<Target>(walk_job, job_target);
-          registry.emplace<JobData>(walk_job, JobType::Walk);
+    // Create a walk job to walk until the target
+    const auto walk_job = registry.create();
+    registry.emplace<Target>(walk_job, job_target);
+    registry.emplace<JobData>(walk_job, JobType::Walk);
 
-          // Create the main job
-          const auto build_hut_job = registry.create();
-          registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
+    // Create the main job
+    const auto build_hut_job = registry.create();
+    registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
 
-          // Assign the progress entity to the job
-          auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
-          job_data.progress_entity = job_progress_entity;
+    // Assign the progress entity to the job
+    auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
+    job_data.progress_entity = job_progress_entity;
 
-          auto& agent = registry.get<SocietyAgent>(entity);
-          agent.jobs.push(Job{2, walk_job});
-          agent.jobs.push(Job{2, build_hut_job});
+    auto& agent = registry.get<SocietyAgent>(entity);
+    agent.jobs.push(Job{2, walk_job});
+    agent.jobs.push(Job{2, build_hut_job});
 
-          progress.agents.push_back(entity);
-        };
+    progress.agents.push_back(entity);
+  };
 
   auto entities = m_select_available_entities(registry);
   std::for_each(entities.begin(), entities.end(), assign_build_hut_job);

@@ -24,7 +24,8 @@
 
 namespace dl
 {
-const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+const auto stop_drop = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
   auto& job_data = registry.get<JobData>(job);
   job_data.status = JobStatus::Finished;
   registry.remove<ActionDrop>(entity);
@@ -32,7 +33,8 @@ const auto stop_drop = [](entt::registry& registry, const entt::entity entity, c
 
 DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  const auto on_select = [this](const ui::EntityPair entities) {
+  const auto on_select = [this](const ui::EntityPair entities)
+  {
     m_selected_entity = entities.first;
     m_target_item = entities.second;
     m_state = DropMenuState::SelectingTarget;

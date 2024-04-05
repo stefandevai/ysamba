@@ -193,17 +193,19 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_tile, selected_entity](const uint32_t i) {
-        const auto job = registry.create();
-        registry.emplace<Target>(job, mouse_tile, static_cast<uint32_t>(selected_entity));
-        registry.emplace<JobData>(job, static_cast<JobType>(i));
+      m_action_menu->set_on_select(
+          [this, &registry, mouse_tile, selected_entity](const uint32_t i)
+          {
+            const auto job = registry.create();
+            registry.emplace<Target>(job, mouse_tile, static_cast<uint32_t>(selected_entity));
+            registry.emplace<JobData>(job, static_cast<JobType>(i));
 
-        for (const auto entity : m_selected_entities)
-        {
-          m_assign_job(job, mouse_tile, registry, entity);
-        }
-        m_dispose();
-      });
+            for (const auto entity : m_selected_entities)
+            {
+              m_assign_job(job, mouse_tile, registry, entity);
+            }
+            m_dispose();
+          });
       m_input_manager.push_context("action_menu"_hs);
       m_state = ActionMenuState::Open;
     }
@@ -219,17 +221,19 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_tile, &tile_data](const uint32_t i) {
-        const auto job = registry.create();
-        registry.emplace<Target>(job, mouse_tile, tile_data.id);
-        registry.emplace<JobData>(job, static_cast<JobType>(i));
+      m_action_menu->set_on_select(
+          [this, &registry, mouse_tile, &tile_data](const uint32_t i)
+          {
+            const auto job = registry.create();
+            registry.emplace<Target>(job, mouse_tile, tile_data.id);
+            registry.emplace<JobData>(job, static_cast<JobType>(i));
 
-        for (const auto entity : m_selected_entities)
-        {
-          m_assign_job(job, mouse_tile, registry, entity);
-        }
-        m_dispose();
-      });
+            for (const auto entity : m_selected_entities)
+            {
+              m_assign_job(job, mouse_tile, registry, entity);
+            }
+            m_dispose();
+          });
       m_input_manager.push_context("action_menu"_hs);
       m_state = ActionMenuState::Open;
     }
@@ -382,43 +386,46 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
   // const auto mouse_tile = m_world.mouse_to_world(camera);
   // m_select_tile_target(mouse_tile, JobType::Harvest, registry);
 
-  m_select_area(registry, camera, [this](entt::registry& registry, const Vector3i& begin, const Vector3i& end) {
-    std::vector<Vector3i> harvest_targets{};
+  m_select_area(registry,
+                camera,
+                [this](entt::registry& registry, const Vector3i& begin, const Vector3i& end)
+                {
+                  std::vector<Vector3i> harvest_targets{};
 
-    for (int j = begin.y; j <= end.y; ++j)
-    {
-      for (int i = begin.x; i <= end.x; ++i)
-      {
-        const auto& tile = m_world.get(i, j, begin.z);
+                  for (int j = begin.y; j <= end.y; ++j)
+                  {
+                    for (int i = begin.x; i <= end.x; ++i)
+                    {
+                      const auto& tile = m_world.get(i, j, begin.z);
 
-        if (tile.actions.contains(JobType::Harvest))
-        {
-          harvest_targets.push_back({i, j, begin.z});
-        }
-      }
-    }
+                      if (tile.actions.contains(JobType::Harvest))
+                      {
+                        harvest_targets.push_back({i, j, begin.z});
+                      }
+                    }
+                  }
 
-    if (harvest_targets.empty())
-    {
-      return;
-    }
+                  if (harvest_targets.empty())
+                  {
+                    return;
+                  }
 
-    const auto entities = m_select_available_entities(registry);
+                  const auto entities = m_select_available_entities(registry);
 
-    for (const auto& target : harvest_targets)
-    {
-      const auto entity = random::select(entities);
-      const auto& tile = m_world.get(target);
+                  for (const auto& target : harvest_targets)
+                  {
+                    const auto entity = random::select(entities);
+                    const auto& tile = m_world.get(target);
 
-      // TODO: Check if the agent has the necessary qualities to perform the action
-      const auto job = registry.create();
-      registry.emplace<Target>(job, target, tile.id);
-      registry.emplace<JobData>(job, JobType::Harvest);
-      m_assign_job(job, target, registry, entity);
-    }
+                    // TODO: Check if the agent has the necessary qualities to perform the action
+                    const auto job = registry.create();
+                    registry.emplace<Target>(job, target, tile.id);
+                    registry.emplace<JobData>(job, JobType::Harvest);
+                    m_assign_job(job, target, registry, entity);
+                  }
 
-    m_dispose();
-  });
+                  m_dispose();
+                });
 }
 
 void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& registry)

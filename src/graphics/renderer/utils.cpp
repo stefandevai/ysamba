@@ -14,20 +14,21 @@ WGPUAdapter request_adapter(WGPUInstance instance, WGPURequestAdapterOptions con
   UserData user_data;
 
   auto on_adapter_request_ended
-      = [](WGPURequestAdapterStatus status, WGPUAdapter adapter, char const* message, void* user_data_) {
-          UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
+      = [](WGPURequestAdapterStatus status, WGPUAdapter adapter, char const* message, void* user_data_)
+  {
+    UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
 
-          if (status == WGPURequestAdapterStatus_Success && adapter)
-          {
-            user_data.adapter = adapter;
-          }
-          else
-          {
-            spdlog::critical("Failed to request WebGPU adapter: ", message);
-          }
+    if (status == WGPURequestAdapterStatus_Success && adapter)
+    {
+      user_data.adapter = adapter;
+    }
+    else
+    {
+      spdlog::critical("Failed to request WebGPU adapter: ", message);
+    }
 
-          user_data.request_ended = true;
-        };
+    user_data.request_ended = true;
+  };
 
   wgpuInstanceRequestAdapter(instance, options, on_adapter_request_ended, (void*)&user_data);
 
@@ -46,20 +47,21 @@ WGPUDevice request_device(WGPUAdapter adapter, WGPUDeviceDescriptor const* descr
   UserData user_data;
 
   auto on_device_request_ended
-      = [](WGPURequestDeviceStatus status, WGPUDevice device, char const* message, void* user_data_) {
-          UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
+      = [](WGPURequestDeviceStatus status, WGPUDevice device, char const* message, void* user_data_)
+  {
+    UserData& user_data = *reinterpret_cast<UserData*>(user_data_);
 
-          if (status == WGPURequestDeviceStatus_Success && device)
-          {
-            user_data.device = device;
-          }
-          else
-          {
-            spdlog::critical("Failed to request WebGPU device: ", message);
-          }
+    if (status == WGPURequestDeviceStatus_Success && device)
+    {
+      user_data.device = device;
+    }
+    else
+    {
+      spdlog::critical("Failed to request WebGPU device: ", message);
+    }
 
-          user_data.request_ended = true;
-        };
+    user_data.request_ended = true;
+  };
 
   wgpuAdapterRequestDevice(adapter, descriptor, on_device_request_ended, (void*)&user_data);
 
@@ -70,9 +72,8 @@ WGPUDevice request_device(WGPUAdapter adapter, WGPUDeviceDescriptor const* descr
 
 void device_set_uncaptured_error_callback(WGPUDevice device)
 {
-  auto on_device_error = [](WGPUErrorType type, const char* message, void*) {
-    spdlog::critical("Device error: {}, {}", (uint32_t)type, message);
-  };
+  auto on_device_error = [](WGPUErrorType type, const char* message, void*)
+  { spdlog::critical("Device error: {}, {}", (uint32_t)type, message); };
   wgpuDeviceSetUncapturedErrorCallback(device, on_device_error, nullptr);
 }
 

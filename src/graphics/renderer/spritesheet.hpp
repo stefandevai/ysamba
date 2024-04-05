@@ -60,8 +60,6 @@ class Spritesheet
   void m_generate_uv_coordinate(uint32_t frame_id, const FrameData& frame_data);
 
   // Calculate top-left, top-right, bottom-right and bottom-left uv coordinates
-  [[nodiscard]] std::array<glm::vec2, 4> m_calculate_uv_coordinates(int frame = 0,
-                                                      int width = 1,
-                                                      int height = 1) const;
+  [[nodiscard]] std::array<glm::vec2, 4> m_calculate_uv_coordinates(int frame = 0, int width = 1, int height = 1) const;
 };
 }  // namespace dl

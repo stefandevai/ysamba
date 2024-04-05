@@ -81,11 +81,9 @@ class Batch
   // Pin a texture so it can't be cleared and return its slot index
   uint32_t pin_texture(WGPUTextureView texture_view);
 
-  void sprite(
-      Sprite& sprite, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
+  void sprite(Sprite& sprite, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
   void texture_slice(TextureSlice& slice, double x, double y, double z);
-  void tile(
-      const Tile& tile, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
+  void tile(const Tile& tile, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
   void texture(const Texture& texture, double x, double y, double z);
   void quad(const Quad* quad, double x, double y, double z);
   void text(Text& text, double x, double y, double z);

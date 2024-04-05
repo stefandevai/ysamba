@@ -1,6 +1,7 @@
 #include "./world_creation_panel.hpp"
 
 #include <spdlog/spdlog.h>
+
 #include <i18n_keyval/i18n.hpp>
 
 #include "ui/animation.hpp"
