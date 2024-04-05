@@ -51,11 +51,20 @@ class InputManager
   [[nodiscard]] bool is_clicking(MouseButton button) const;
   [[nodiscard]] bool has_clicked(MouseButton button) const;
   [[nodiscard]] bool has_clicked_bounds(MouseButton button, const Vector2i& position, const Vector2i& size) const;
-  [[nodiscard]] static bool is_scrolling_y() { return m_sdl_input_wrapper.get_scroll().y != 0; }
-  [[nodiscard]] static bool is_scrolling_x() { return m_sdl_input_wrapper.get_scroll().x != 0; }
+  [[nodiscard]] static bool is_scrolling_y()
+  {
+    return m_sdl_input_wrapper.get_scroll().y != 0;
+  }
+  [[nodiscard]] static bool is_scrolling_x()
+  {
+    return m_sdl_input_wrapper.get_scroll().x != 0;
+  }
   [[nodiscard]] bool is_dragging() const;
   [[nodiscard]] bool has_dragged() const;
-  [[nodiscard]] static const Vector2i& get_scroll() { return m_sdl_input_wrapper.get_scroll(); }
+  [[nodiscard]] static const Vector2i& get_scroll()
+  {
+    return m_sdl_input_wrapper.get_scroll();
+  }
   [[nodiscard]] const Vector2i& get_mouse_position() const;
   [[nodiscard]] const Vector4i& get_drag_bounds() const;
   [[nodiscard]] const std::shared_ptr<InputContext> get_current_context() const;

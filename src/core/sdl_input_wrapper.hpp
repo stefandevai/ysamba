@@ -27,18 +27,45 @@ class SDLInputWrapper
   [[nodiscard]] bool is_any_key_down() const;
   [[nodiscard]] bool is_key_down(uint32_t key);
   [[nodiscard]] bool is_key_up(uint32_t key);
-  [[nodiscard]] bool is_dragging() const { return m_is_dragging; }
-  [[nodiscard]] bool has_dragged() const { return m_has_dragged; }
-  [[nodiscard]] inline std::pair<bool, bool> get_mouse_state_down() const { return m_mouse_state_down; }
-  [[nodiscard]] inline std::pair<bool, bool> get_mouse_state_up() const { return m_mouse_state_up; }
-  [[nodiscard]] const Vector4i& get_drag_bounds() const { return m_drag_bounds; }
-  [[nodiscard]] const Vector2i& get_mouse_position() const { return m_mouse_position; }
-  [[nodiscard]] bool window_size_changed() const { return m_window_size_changed; }
-  [[nodiscard]] const Vector2i& get_scroll() const { return m_scroll; }
+  [[nodiscard]] bool is_dragging() const
+  {
+    return m_is_dragging;
+  }
+  [[nodiscard]] bool has_dragged() const
+  {
+    return m_has_dragged;
+  }
+  [[nodiscard]] inline std::pair<bool, bool> get_mouse_state_down() const
+  {
+    return m_mouse_state_down;
+  }
+  [[nodiscard]] inline std::pair<bool, bool> get_mouse_state_up() const
+  {
+    return m_mouse_state_up;
+  }
+  [[nodiscard]] const Vector4i& get_drag_bounds() const
+  {
+    return m_drag_bounds;
+  }
+  [[nodiscard]] const Vector2i& get_mouse_position() const
+  {
+    return m_mouse_position;
+  }
+  [[nodiscard]] bool window_size_changed() const
+  {
+    return m_window_size_changed;
+  }
+  [[nodiscard]] const Vector2i& get_scroll() const
+  {
+    return m_scroll;
+  }
   [[nodiscard]] bool should_quit() const;
   void text_input_start();
   void text_input_stop();
-  void reset_drag() { m_has_dragged = false; }
+  void reset_drag()
+  {
+    m_has_dragged = false;
+  }
   [[nodiscard]] const std::string& get_text_input() const;
   [[nodiscard]] int get_text_input_cursor_index() const;
 

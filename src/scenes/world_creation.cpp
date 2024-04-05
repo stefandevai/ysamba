@@ -163,7 +163,10 @@ void WorldCreation::m_generate_map()
   m_height_map = std::move(generator.raw_height_map);
 }
 
-void WorldCreation::m_generate_world() { m_world.generate_societies(); }
+void WorldCreation::m_generate_world()
+{
+  m_world.generate_societies();
+}
 
 void WorldCreation::m_create_map_representation()
 {

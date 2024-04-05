@@ -131,6 +131,9 @@ struct BatchData
     scissor = {0, 0, -1, -1};
   }
 
-  bool has_scissor() { return scissor.z > -1 && scissor.w > -1; }
+  bool has_scissor()
+  {
+    return scissor.z > -1 && scissor.w > -1;
+  }
 };
 }  // namespace dl

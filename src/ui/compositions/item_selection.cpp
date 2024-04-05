@@ -39,6 +39,9 @@ void ItemSelection::show()
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 
-void ItemSelection::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
+void ItemSelection::hide()
+{
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
 
 }  // namespace dl::ui

@@ -45,17 +45,35 @@ class UTF8Iterator
 
   UTF8Iterator operator-=(int quantity);
 
-  bool operator==(const UTF8Iterator& rhs) const { return string_iterator == rhs.string_iterator; }
+  bool operator==(const UTF8Iterator& rhs) const
+  {
+    return string_iterator == rhs.string_iterator;
+  }
 
-  bool operator!=(const UTF8Iterator& rhs) const { return string_iterator != rhs.string_iterator; }
+  bool operator!=(const UTF8Iterator& rhs) const
+  {
+    return string_iterator != rhs.string_iterator;
+  }
 
-  bool operator==(std::string::iterator rhs) const { return string_iterator == rhs; }
+  bool operator==(std::string::iterator rhs) const
+  {
+    return string_iterator == rhs;
+  }
 
-  bool operator==(std::string::const_iterator rhs) const { return string_iterator == rhs; }
+  bool operator==(std::string::const_iterator rhs) const
+  {
+    return string_iterator == rhs;
+  }
 
-  bool operator!=(std::string::iterator rhs) const { return string_iterator != rhs; }
+  bool operator!=(std::string::iterator rhs) const
+  {
+    return string_iterator != rhs;
+  }
 
-  bool operator!=(std::string::const_iterator rhs) const { return string_iterator != rhs; }
+  bool operator!=(std::string::const_iterator rhs) const
+  {
+    return string_iterator != rhs;
+  }
 
  private:
   static constexpr uint8_t m_first_bit_mask = 0x80;

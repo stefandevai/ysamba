@@ -150,7 +150,10 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, 
       fmt::format("({}, {}, {})\n{}", mouse_position.x, mouse_position.y, mouse_position.z, tile_data.name));
 }
 
-void InspectorSystem::m_destroy_inspector() { m_inspector->hide(); }
+void InspectorSystem::m_destroy_inspector()
+{
+  m_inspector->hide();
+}
 
 void InspectorSystem::m_update_input(entt::registry& registry)
 {

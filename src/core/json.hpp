@@ -27,11 +27,26 @@ class JSON
 
   void load(const std::string& filepath);
   void save(const std::string& filepath);
-  void set_filepath(const std::string& filepath) { m_filepath = filepath; };
-  void set_pretty_print(const bool status) { m_pretty_print = status; };
-  [[nodiscard]] std::string get_filepath() const { return m_filepath; };
-  [[nodiscard]] bool get_pretty_print() const { return m_pretty_print; };
-  [[nodiscard]] bool get_has_loaded() const { return m_has_loaded; }
+  void set_filepath(const std::string& filepath)
+  {
+    m_filepath = filepath;
+  };
+  void set_pretty_print(const bool status)
+  {
+    m_pretty_print = status;
+  };
+  [[nodiscard]] std::string get_filepath() const
+  {
+    return m_filepath;
+  };
+  [[nodiscard]] bool get_pretty_print() const
+  {
+    return m_pretty_print;
+  };
+  [[nodiscard]] bool get_has_loaded() const
+  {
+    return m_has_loaded;
+  }
 
  private:
   std::string m_filepath{};

@@ -197,7 +197,10 @@ void OperationManager::dispatch_store(entt::entity entity)
   m_assign_job(drop_job, Vector3i{storage_position.x, storage_position.y, storage_position.z}, entity);
 }
 
-void OperationManager::dispatch_eat(entt::entity entity) { using namespace entt::literals; }
+void OperationManager::dispatch_eat(entt::entity entity)
+{
+  using namespace entt::literals;
+}
 
 void OperationManager::m_create_job(const JobType job_type, entt::entity entity, const Vector3i& position)
 {

@@ -34,8 +34,14 @@ void SocietyInventory::set_items(const ItemList<uint32_t>& items)
   dirty = true;
 }
 
-void SocietyInventory::show() { animate<AnimationFadeIn>(0.3, Easing::OutQuart); }
+void SocietyInventory::show()
+{
+  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+}
 
-void SocietyInventory::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
+void SocietyInventory::hide()
+{
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
 
 }  // namespace dl::ui

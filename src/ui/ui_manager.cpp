@@ -14,7 +14,10 @@ UIManager::UIManager(AssetManager* asset_manager, Renderer* renderer)
   m_matrix_stack.push_back(glm::mat4(1));
 }
 
-UIManager::~UIManager() { m_matrix_stack.clear(); }
+UIManager::~UIManager()
+{
+  m_matrix_stack.clear();
+}
 
 void UIManager::update()
 {

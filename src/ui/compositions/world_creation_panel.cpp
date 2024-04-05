@@ -34,9 +34,15 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context
   m_save_button->text = "save"_t;
 }
 
-std::string& WorldCreationPanel::get_name() { return m_text_input->text; }
+std::string& WorldCreationPanel::get_name()
+{
+  return m_text_input->text;
+}
 
-void WorldCreationPanel::on_save(const std::function<void()>& on_save_fn) { m_save_button->on_click = on_save_fn; }
+void WorldCreationPanel::on_save(const std::function<void()>& on_save_fn)
+{
+  m_save_button->on_click = on_save_fn;
+}
 
 bool WorldCreationPanel::validate()
 {

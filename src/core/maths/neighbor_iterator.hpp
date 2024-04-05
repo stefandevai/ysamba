@@ -22,7 +22,10 @@ class NeighborIterator
 
   NeighborIterator(reference center) : center(center) {}
 
-  NeighborIterator(const NeighborIterator& other) : center(other.center) { neighbor = other.neighbor; }
+  NeighborIterator(const NeighborIterator& other) : center(other.center)
+  {
+    neighbor = other.neighbor;
+  }
 
   const NeighborIterator& operator=(const NeighborIterator& rhs)
   {
@@ -88,9 +91,15 @@ class NeighborIterator
     return temp;
   }
 
-  bool operator==(const NeighborIterator& rhs) const { return center == rhs.center; }
+  bool operator==(const NeighborIterator& rhs) const
+  {
+    return center == rhs.center;
+  }
 
-  bool operator!=(const NeighborIterator& rhs) const { return center != rhs.center; }
+  bool operator!=(const NeighborIterator& rhs) const
+  {
+    return center != rhs.center;
+  }
 
  private:
   static constexpr std::array<int, 8> m_x_offsets{-1, 0, 1, 1, 1, 0, -1, -1};

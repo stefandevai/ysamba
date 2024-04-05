@@ -16,7 +16,10 @@ namespace dl
 {
 IslandGenerator::IslandGenerator() {}
 
-IslandGenerator::IslandGenerator(const Vector3i& size) : size(size) { m_load_params(m_default_params_filepath); }
+IslandGenerator::IslandGenerator(const Vector3i& size) : size(size)
+{
+  m_load_params(m_default_params_filepath);
+}
 
 void IslandGenerator::generate(const int seed)
 {
@@ -59,7 +62,10 @@ void IslandGenerator::generate(const int seed)
   // TEMP Visualize island mask
 }
 
-void IslandGenerator::set_size(const Vector3i& size) { this->size = size; }
+void IslandGenerator::set_size(const Vector3i& size)
+{
+  this->size = size;
+}
 
 void IslandGenerator::m_load_params(const std::string& filepath)
 {

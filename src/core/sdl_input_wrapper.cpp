@@ -466,15 +466,30 @@ void SDLInputWrapper::update()
 #endif
 }
 
-bool SDLInputWrapper::is_any_key_down() const { return m_any_key_down; }
+bool SDLInputWrapper::is_any_key_down() const
+{
+  return m_any_key_down;
+}
 
-bool SDLInputWrapper::is_key_down(const uint32_t key) { return m_key_down[key_map.at(key)]; }
+bool SDLInputWrapper::is_key_down(const uint32_t key)
+{
+  return m_key_down[key_map.at(key)];
+}
 
-bool SDLInputWrapper::is_key_up(const uint32_t key) { return m_key_up[key_map.at(key)]; }
+bool SDLInputWrapper::is_key_up(const uint32_t key)
+{
+  return m_key_up[key_map.at(key)];
+}
 
-bool SDLInputWrapper::should_quit() const { return m_should_quit; }
+bool SDLInputWrapper::should_quit() const
+{
+  return m_should_quit;
+}
 
-void SDLInputWrapper::quit() { m_should_quit = true; }
+void SDLInputWrapper::quit()
+{
+  m_should_quit = true;
+}
 
 void SDLInputWrapper::text_input_start()
 {
@@ -491,7 +506,10 @@ void SDLInputWrapper::text_input_stop()
   m_cursor = m_text_input.end();
 }
 
-const std::string& SDLInputWrapper::get_text_input() const { return m_text_input; }
+const std::string& SDLInputWrapper::get_text_input() const
+{
+  return m_text_input;
+}
 
 int SDLInputWrapper::get_text_input_cursor_index() const
 {

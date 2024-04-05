@@ -51,10 +51,22 @@ class Camera
   [[nodiscard]] const Vector3& get_position() const;
   [[nodiscard]] const Vector3i& get_position_in_tiles() const;
   [[nodiscard]] const glm::mat4& get_view_matrix() const;
-  [[nodiscard]] const Vector3& get_saved_position() const { return m_saved_position; }
-  [[nodiscard]] const Vector2& get_size() const { return m_size; }
-  [[nodiscard]] const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
-  [[nodiscard]] const Vector2i& get_grid_size() const { return m_grid_size; }
+  [[nodiscard]] const Vector3& get_saved_position() const
+  {
+    return m_saved_position;
+  }
+  [[nodiscard]] const Vector2& get_size() const
+  {
+    return m_size;
+  }
+  [[nodiscard]] const Vector2i& get_size_in_tiles() const
+  {
+    return m_size_in_tiles;
+  }
+  [[nodiscard]] const Vector2i& get_grid_size() const
+  {
+    return m_grid_size;
+  }
   void set_position(const Vector2& position);
   void set_size(const Vector2& size);
   void set_frustum(float left, float right, float bottom, float top);

@@ -45,8 +45,14 @@ void Inventory::set_carried_items(const ItemList<uint32_t>& items)
   dirty = true;
 }
 
-void Inventory::show() { animate<AnimationFadeIn>(0.3, Easing::OutQuart); }
+void Inventory::show()
+{
+  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+}
 
-void Inventory::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
+void Inventory::hide()
+{
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
 
 }  // namespace dl::ui

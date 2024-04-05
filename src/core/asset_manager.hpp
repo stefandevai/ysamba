@@ -25,13 +25,25 @@ struct AssetLoader
 {
   AssetLoader(const WGPUDevice& device) : m_device(device) {}
 
-  void operator()(const std::unique_ptr<Texture>& texture) { texture->load(m_device); }
+  void operator()(const std::unique_ptr<Texture>& texture)
+  {
+    texture->load(m_device);
+  }
 
-  void operator()(const std::unique_ptr<TextureAtlas>& atlas) { atlas->load(m_device); }
+  void operator()(const std::unique_ptr<TextureAtlas>& atlas)
+  {
+    atlas->load(m_device);
+  }
 
-  void operator()(const std::unique_ptr<Spritesheet>& spritesheet) { spritesheet->load(m_device); }
+  void operator()(const std::unique_ptr<Spritesheet>& spritesheet)
+  {
+    spritesheet->load(m_device);
+  }
 
-  void operator()(const std::unique_ptr<Font>& font) { font->load(m_device); }
+  void operator()(const std::unique_ptr<Font>& font)
+  {
+    font->load(m_device);
+  }
 
  private:
   const WGPUDevice& m_device;

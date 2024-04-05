@@ -126,7 +126,10 @@ struct ImGui_ImplSDL2_Data
   char* ClipboardTextData;
   bool MouseCanUseGlobalState;
 
-  ImGui_ImplSDL2_Data() { memset((void*)this, 0, sizeof(*this)); }
+  ImGui_ImplSDL2_Data()
+  {
+    memset((void*)this, 0, sizeof(*this));
+  }
 };
 
 // Backend data stored in io.BackendPlatformUserData to allow support for multiple Dear ImGui contexts
@@ -149,7 +152,10 @@ static const char* ImGui_ImplSDL2_GetClipboardText(void*)
   return bd->ClipboardTextData;
 }
 
-static void ImGui_ImplSDL2_SetClipboardText(void*, const char* text) { SDL_SetClipboardText(text); }
+static void ImGui_ImplSDL2_SetClipboardText(void*, const char* text)
+{
+  SDL_SetClipboardText(text);
+}
 
 // Note: native IME will only display if user calls SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1") _before_ SDL_CreateWindow().
 static void ImGui_ImplSDL2_SetPlatformImeData(ImGuiViewport*, ImGuiPlatformImeData* data)
@@ -644,14 +650,20 @@ bool ImGui_ImplSDL2_InitForD3D(SDL_Window* window)
   return ImGui_ImplSDL2_Init(window, nullptr);
 }
 
-bool ImGui_ImplSDL2_InitForMetal(SDL_Window* window) { return ImGui_ImplSDL2_Init(window, nullptr); }
+bool ImGui_ImplSDL2_InitForMetal(SDL_Window* window)
+{
+  return ImGui_ImplSDL2_Init(window, nullptr);
+}
 
 bool ImGui_ImplSDL2_InitForSDLRenderer(SDL_Window* window, SDL_Renderer* renderer)
 {
   return ImGui_ImplSDL2_Init(window, renderer);
 }
 
-bool ImGui_ImplSDL2_InitForOther(SDL_Window* window) { return ImGui_ImplSDL2_Init(window, nullptr); }
+bool ImGui_ImplSDL2_InitForOther(SDL_Window* window)
+{
+  return ImGui_ImplSDL2_Init(window, nullptr);
+}
 
 void ImGui_ImplSDL2_Shutdown()
 {

@@ -29,10 +29,22 @@ class Spritesheet
   // Loads after setting filepath
   void load(WGPUDevice device);
 
-  [[nodiscard]] inline const Vector2i& get_size() const { return texture->size; }
-  [[nodiscard]] inline const Vector2i& get_frame_size() const { return m_frame_size; }
-  [[nodiscard]] inline int get_horizontal_frames() const { return m_horizontal_frames; }
-  [[nodiscard]] inline int get_vertical_frames() const { return m_vertical_frames; }
+  [[nodiscard]] inline const Vector2i& get_size() const
+  {
+    return texture->size;
+  }
+  [[nodiscard]] inline const Vector2i& get_frame_size() const
+  {
+    return m_frame_size;
+  }
+  [[nodiscard]] inline int get_horizontal_frames() const
+  {
+    return m_horizontal_frames;
+  }
+  [[nodiscard]] inline int get_vertical_frames() const
+  {
+    return m_vertical_frames;
+  }
 
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
   [[nodiscard]] const std::array<glm::vec2, 4>& get_uv_coordinates(uint32_t frame = 0) const;

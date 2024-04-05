@@ -116,11 +116,20 @@ void UIComponent::render()
   }
 }
 
-void UIComponent::show() { state = State::Visible; }
+void UIComponent::show()
+{
+  state = State::Visible;
+}
 
-void UIComponent::hide() { state = State::Hidden; }
+void UIComponent::hide()
+{
+  state = State::Hidden;
+}
 
-void UIComponent::force_hide() { state = State::Hidden; }
+void UIComponent::force_hide()
+{
+  state = State::Hidden;
+}
 
 void UIComponent::propagate_state()
 {
@@ -131,7 +140,10 @@ void UIComponent::propagate_state()
   }
 }
 
-bool UIComponent::is_active() { return state != State::Hidden && has_initialized; }
+bool UIComponent::is_active()
+{
+  return state != State::Hidden && has_initialized;
+}
 
 bool UIComponent::m_is_positioned()
 {

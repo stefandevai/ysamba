@@ -10,7 +10,10 @@ namespace dl
 {
 SpatialHash::SpatialHash() : m_cell_dimension(0) {}
 
-SpatialHash::SpatialHash(const uint32_t cell_dimension) { load(cell_dimension); }
+SpatialHash::SpatialHash(const uint32_t cell_dimension)
+{
+  load(cell_dimension);
+}
 
 void SpatialHash::load(const uint32_t cell_dimension)
 {

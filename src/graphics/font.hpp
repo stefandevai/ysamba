@@ -35,8 +35,14 @@ class Font
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
   };
-  [[nodiscard]] inline size_t get_size() const { return m_size; };
-  [[nodiscard]] inline int get_max_character_top() const { return m_max_character_top; };
+  [[nodiscard]] inline size_t get_size() const
+  {
+    return m_size;
+  };
+  [[nodiscard]] inline int get_max_character_top() const
+  {
+    return m_max_character_top;
+  };
 
  private:
   std::string m_path{};

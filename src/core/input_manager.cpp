@@ -18,7 +18,10 @@ SDLInputWrapper InputManager::m_sdl_input_wrapper = SDLInputWrapper();
 std::unordered_map<uint32_t, std::shared_ptr<InputContext>> InputManager::m_available_contexts = {};
 std::vector<std::shared_ptr<InputContext>> InputManager::m_context_stack = {};
 
-InputManager::InputManager() { m_parse_input(); }
+InputManager::InputManager()
+{
+  m_parse_input();
+}
 
 InputManager& InputManager::get_instance()
 {
@@ -30,7 +33,10 @@ InputManager& InputManager::get_instance()
   return *m_instance;
 }
 
-void InputManager::update() { m_sdl_input_wrapper.update(); }
+void InputManager::update()
+{
+  m_sdl_input_wrapper.update();
+}
 
 void InputManager::push_context(const uint32_t context_key)
 {
@@ -95,11 +101,20 @@ bool InputManager::poll_action(const uint32_t action_key)
   return false;
 }
 
-bool InputManager::is_key_down(const uint32_t key) { return m_sdl_input_wrapper.is_key_down(key); }
+bool InputManager::is_key_down(const uint32_t key)
+{
+  return m_sdl_input_wrapper.is_key_down(key);
+}
 
-bool InputManager::is_any_key_down() const { return m_sdl_input_wrapper.is_any_key_down(); }
+bool InputManager::is_any_key_down() const
+{
+  return m_sdl_input_wrapper.is_any_key_down();
+}
 
-bool InputManager::is_key_up(const uint32_t key) const { return m_sdl_input_wrapper.is_key_up(key); }
+bool InputManager::is_key_up(const uint32_t key) const
+{
+  return m_sdl_input_wrapper.is_key_up(key);
+}
 
 bool InputManager::is_clicking(const MouseButton button) const
 {
@@ -149,13 +164,25 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
   return false;
 }
 
-bool InputManager::is_dragging() const { return m_sdl_input_wrapper.is_dragging(); }
+bool InputManager::is_dragging() const
+{
+  return m_sdl_input_wrapper.is_dragging();
+}
 
-bool InputManager::has_dragged() const { return m_sdl_input_wrapper.has_dragged(); }
+bool InputManager::has_dragged() const
+{
+  return m_sdl_input_wrapper.has_dragged();
+}
 
-const Vector4i& InputManager::get_drag_bounds() const { return m_sdl_input_wrapper.get_drag_bounds(); }
+const Vector4i& InputManager::get_drag_bounds() const
+{
+  return m_sdl_input_wrapper.get_drag_bounds();
+}
 
-const Vector2i& InputManager::get_mouse_position() const { return m_sdl_input_wrapper.get_mouse_position(); }
+const Vector2i& InputManager::get_mouse_position() const
+{
+  return m_sdl_input_wrapper.get_mouse_position();
+}
 
 const std::shared_ptr<InputContext> InputManager::get_current_context() const
 {
@@ -168,23 +195,50 @@ const std::shared_ptr<InputContext> InputManager::get_current_context() const
   return m_context_stack.back();
 }
 
-bool InputManager::should_quit() const { return m_sdl_input_wrapper.should_quit(); }
+bool InputManager::should_quit() const
+{
+  return m_sdl_input_wrapper.should_quit();
+}
 
-void InputManager::quit() { m_sdl_input_wrapper.quit(); }
+void InputManager::quit()
+{
+  m_sdl_input_wrapper.quit();
+}
 
-bool InputManager::window_size_changed() const { return m_sdl_input_wrapper.window_size_changed(); }
+bool InputManager::window_size_changed() const
+{
+  return m_sdl_input_wrapper.window_size_changed();
+}
 
-void InputManager::text_input_start() { m_sdl_input_wrapper.text_input_start(); }
+void InputManager::text_input_start()
+{
+  m_sdl_input_wrapper.text_input_start();
+}
 
-void InputManager::text_input_stop() { m_sdl_input_wrapper.text_input_stop(); }
+void InputManager::text_input_stop()
+{
+  m_sdl_input_wrapper.text_input_stop();
+}
 
-const std::string& InputManager::get_text_input() const { return m_sdl_input_wrapper.get_text_input(); }
+const std::string& InputManager::get_text_input() const
+{
+  return m_sdl_input_wrapper.get_text_input();
+}
 
-int InputManager::get_text_input_cursor_index() const { return m_sdl_input_wrapper.get_text_input_cursor_index(); }
+int InputManager::get_text_input_cursor_index() const
+{
+  return m_sdl_input_wrapper.get_text_input_cursor_index();
+}
 
-void InputManager::set_text_input(const std::string& text) { m_sdl_input_wrapper.set_text_input(text); }
+void InputManager::set_text_input(const std::string& text)
+{
+  m_sdl_input_wrapper.set_text_input(text);
+}
 
-void InputManager::reset_drag() { m_sdl_input_wrapper.reset_drag(); }
+void InputManager::reset_drag()
+{
+  m_sdl_input_wrapper.reset_drag();
+}
 
 void InputManager::m_parse_input()
 {

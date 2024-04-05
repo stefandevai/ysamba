@@ -11,7 +11,10 @@ namespace dl
 {
 struct CompareVectorSizes
 {
-  bool operator()(const IslandData& a, const IslandData& b) const { return a.points.size() > b.points.size(); }
+  bool operator()(const IslandData& a, const IslandData& b) const
+  {
+    return a.points.size() > b.points.size();
+  }
 };
 
 using IslandQueue = std::priority_queue<IslandData, std::vector<IslandData>, CompareVectorSizes>;

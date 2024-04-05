@@ -30,8 +30,14 @@ void Inspector::set_content(const std::string& text)
   m_label->set_text(text);
 }
 
-void Inspector::show() { animate<AnimationFadeIn>(0.3, Easing::OutQuart); }
+void Inspector::show()
+{
+  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+}
 
-void Inspector::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
+void Inspector::hide()
+{
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
 
 }  // namespace dl::ui

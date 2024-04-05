@@ -106,7 +106,10 @@ const UTF8Iterator UTF8Iterator::operator--(int)
   return temp;
 }
 
-UTF8Iterator UTF8Iterator::operator-=(int quantity) { return operator+=(-quantity); }
+UTF8Iterator UTF8Iterator::operator-=(int quantity)
+{
+  return operator+=(-quantity);
+}
 
 uint8_t UTF8Iterator::m_get_code_point() const
 {
