@@ -36,6 +36,11 @@ uint32_t max_steps = 700;
 uint32_t tries_after_collision = 3;
 }  // namespace pathfinding
 
+namespace ai
+{
+int default_job_priority = 2;
+}
+
 namespace gameplay
 {
 double default_zoom = 1.0;
@@ -98,6 +103,13 @@ void load(const std::filesystem::path& filepath)
 
     json::assign_if_contains<uint32_t>(pathfinding, "max_steps", pathfinding::max_steps);
     json::assign_if_contains<uint32_t>(pathfinding, "tries_after_collision", pathfinding::tries_after_collision);
+  }
+
+  if (json.object.contains("ai"))
+  {
+    auto& ai = json.object.at("ai");
+
+    json::assign_if_contains<int>(ai, "default_job_priority", ai::default_job_priority);
   }
 
   if (json.object.contains("gameplay"))

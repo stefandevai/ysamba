@@ -9,6 +9,11 @@
 #include "world/society/job_type.hpp"
 #include "world/target.hpp"
 
+namespace dl::ai
+{
+class ActionManager;
+}
+
 namespace dl::ui
 {
 class UIManager;
@@ -26,7 +31,7 @@ struct EventEmitter;
 class ActionSystem
 {
  public:
-  ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter);
+  ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter, ai::ActionManager& action_manager);
   void update(entt::registry& registry, const Camera& camera);
 
  private:
@@ -49,6 +54,7 @@ class ActionSystem
   ui::ActionMenu* m_action_menu = nullptr;
   ui::Notification* m_notification = nullptr;
   EventEmitter& m_event_emitter;
+  ai::ActionManager& m_action_manager;
 
   std::vector<entt::entity> m_selected_entities{};
   ActionMenuState m_state = ActionMenuState::Closed;
@@ -64,15 +70,6 @@ class ActionSystem
   void m_open_action_menu();
   void m_close_action_menu();
   void m_dispose();
-  void m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry);
-  void m_assign_job(const entt::entity job,
-                    const Vector3i& position,
-                    entt::registry& registry,
-                    const entt::entity entity);
-  bool m_has_qualities_required(const std::vector<std::string>& qualities_required,
-                                const entt::entity entity,
-                                entt::registry& registry);
-  bool m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry);
   std::function<void(const uint32_t)> m_on_select_generic_action
       = [this](const uint32_t i) { m_state = static_cast<ActionMenuState>(i); };
 
