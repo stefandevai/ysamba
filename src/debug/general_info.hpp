@@ -12,10 +12,7 @@ class GeneralInfo
   GeneralInfo(GameContext& camera);
   ~GeneralInfo();
   void update();
-  void toggle()
-  {
-    open = !open;
-  }
+  void toggle() { open = !open; }
 
  private:
   GameContext& m_game_context;

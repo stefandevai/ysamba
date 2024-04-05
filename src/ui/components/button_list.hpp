@@ -28,10 +28,7 @@ class ButtonList : public UIComponent
 
   ButtonList(UIContext& context) : UIComponent(context) {}
 
-  void init()
-  {
-    m_create_buttons();
-  }
+  void init() { m_create_buttons(); }
 
   void set_items(const ItemList<T>& items)
   {

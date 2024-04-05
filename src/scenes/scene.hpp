@@ -24,14 +24,8 @@ class Scene
   virtual void render() = 0;
   void resize();
   void check_window_size();
-  [[nodiscard]] bool has_loaded() const
-  {
-    return m_has_loaded;
-  }
-  [[nodiscard]] uint32_t get_key() const
-  {
-    return m_scene_key;
-  }
+  [[nodiscard]] bool has_loaded() const { return m_has_loaded; }
+  [[nodiscard]] uint32_t get_key() const { return m_scene_key; }
 
  protected:
   const uint32_t m_scene_key{};

@@ -109,16 +109,10 @@ class World
   [[nodiscard]] int get_elevation(const Vector2i& position) const;
 
   // Get size of the tiles in the current tileset
-  [[nodiscard]] const Vector2i& get_tile_size()
-  {
-    return m_tile_size;
-  }
+  [[nodiscard]] const Vector2i& get_tile_size() { return m_tile_size; }
 
   // Get the seed used in this world generation
-  [[nodiscard]] int get_seed() const
-  {
-    return m_seed;
-  };
+  [[nodiscard]] int get_seed() const { return m_seed; };
 
   // Transform screen coordinates to world coordinates
   [[nodiscard]] Vector3i screen_to_world(const Vector2i& position, const Camera& camera) const;
@@ -127,10 +121,7 @@ class World
   [[nodiscard]] Vector3i mouse_to_world(const Camera& camera) const;
 
   // Get the spritesheet id for the tiles used in this world
-  [[nodiscard]] uint32_t get_spritesheet_id() const
-  {
-    return m_spritesheet_id;
-  };
+  [[nodiscard]] uint32_t get_spritesheet_id() const { return m_spritesheet_id; };
 
   // Get a specific society
   [[nodiscard]] SocietyBlueprint get_society(const uint32_t society_id) const

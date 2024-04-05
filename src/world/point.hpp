@@ -27,64 +27,28 @@ class Point
     return *this;
   }
 
-  bool operator==(const Point& b) const
-  {
-    return (x == b.x && y == b.y);
-  }
+  bool operator==(const Point& b) const { return (x == b.x && y == b.y); }
 
-  bool operator!=(const Point& b) const
-  {
-    return (x != b.x || y != b.y);
-  }
+  bool operator!=(const Point& b) const { return (x != b.x || y != b.y); }
 
-  bool operator<(Point const& p) const
-  {
-    return std::tie(x, y) < std::tie(p.x, p.y);
-  }
+  bool operator<(Point const& p) const { return std::tie(x, y) < std::tie(p.x, p.y); }
 
-  Point left() const
-  {
-    return Point(x - 1, y);
-  }
+  Point left() const { return Point(x - 1, y); }
 
-  Point right() const
-  {
-    return Point(x + 1, y);
-  }
+  Point right() const { return Point(x + 1, y); }
 
-  Point bottom() const
-  {
-    return Point(x, y - 1);
-  }
+  Point bottom() const { return Point(x, y - 1); }
 
-  Point top() const
-  {
-    return Point(x, y + 1);
-  }
+  Point top() const { return Point(x, y + 1); }
 
-  Point top_left() const
-  {
-    return Point(x - 1, y + 1);
-  }
+  Point top_left() const { return Point(x - 1, y + 1); }
 
-  Point top_right() const
-  {
-    return Point(x + 1, y + 1);
-  }
+  Point top_right() const { return Point(x + 1, y + 1); }
 
-  Point bottom_right() const
-  {
-    return Point(x + 1, y - 1);
-  }
+  Point bottom_right() const { return Point(x + 1, y - 1); }
 
-  Point bottom_left() const
-  {
-    return Point(x - 1, y - 1);
-  }
+  Point bottom_left() const { return Point(x - 1, y - 1); }
 
-  constexpr int to_index(const int width) const
-  {
-    return y * width + x;
-  }
+  constexpr int to_index(const int width) const { return y * width + x; }
 };
 }  // namespace dl

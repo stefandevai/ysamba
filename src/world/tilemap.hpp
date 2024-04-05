@@ -22,15 +22,9 @@ class Tilemap
   Tilemap();
   Tilemap(std::vector<int> tiles, const int width, const int height);
 
-  int operator[](int i) const
-  {
-    return tiles[i];
-  }
+  int operator[](int i) const { return tiles[i]; }
 
-  int& operator[](int i)
-  {
-    return tiles[i];
-  }
+  int& operator[](int i) { return tiles[i]; }
 
   void set(const int id, const int x, const int y);
   int at(const int x, const int y) const;

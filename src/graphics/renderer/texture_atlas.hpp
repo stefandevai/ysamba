@@ -41,10 +41,7 @@ class TextureAtlas
   // Loads after setting filepath
   void load(WGPUDevice device);
 
-  [[nodiscard]] inline const Vector2i& get_size() const
-  {
-    return texture->size;
-  }
+  [[nodiscard]] inline const Vector2i& get_size() const { return texture->size; }
 
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
   [[nodiscard]] const std::array<glm::vec2, 4>& get_uv_coordinates(uint32_t frame = 0) const;

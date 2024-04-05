@@ -17,20 +17,14 @@ struct BayData;
 class CompareVectorSizes
 {
  public:
-  bool operator()(const IslandData& a, const IslandData& b) const
-  {
-    return a.points.size() > b.points.size();
-  }
+  bool operator()(const IslandData& a, const IslandData& b) const { return a.points.size() > b.points.size(); }
 };
 
 template <class T>
 class ComparePointsX
 {
  public:
-  bool operator()(const std::shared_ptr<Point<T>>& a, const std::shared_ptr<Point<T>>& b) const
-  {
-    return a->x < b->x;
-  }
+  bool operator()(const std::shared_ptr<Point<T>>& a, const std::shared_ptr<Point<T>>& b) const { return a->x < b->x; }
 };
 
 struct RiverData

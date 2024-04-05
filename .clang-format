@@ -14,4 +14,4 @@ AlignConsecutiveAssignments: false
 BinPackArguments: false
 BinPackParameters: false
 AlignTrailingComments: false
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline

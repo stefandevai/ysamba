@@ -11,10 +11,7 @@ class CameraInspector
 
   CameraInspector(Camera& camera);
   void update();
-  void toggle()
-  {
-    open = !open;
-  }
+  void toggle() { open = !open; }
 
  private:
   Camera& m_camera;

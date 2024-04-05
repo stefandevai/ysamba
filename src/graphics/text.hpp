@@ -54,43 +54,19 @@ class Text
   void update_wrapped();
   void update_non_wrapped();
 
-  const std::string& get_text() const
-  {
-    return value;
-  }
-  uint32_t get_typeface() const
-  {
-    return typeface;
-  }
-  bool get_is_static() const
-  {
-    return m_is_static;
-  }
-  size_t get_font_size() const
-  {
-    return font_size;
-  }
-  bool get_has_initialized() const
-  {
-    return has_initialized;
-  }
-  Vector2i get_size() const
-  {
-    return m_size;
-  }
+  const std::string& get_text() const { return value; }
+  uint32_t get_typeface() const { return typeface; }
+  bool get_is_static() const { return m_is_static; }
+  size_t get_font_size() const { return font_size; }
+  bool get_has_initialized() const { return has_initialized; }
+  Vector2i get_size() const { return m_size; }
   Vector2i get_position_at(const int index) const;
 
   void set_text(const std::string_view text);
   void set_text_wrapped(const std::string_view text, const int wrap_width);
   void set_typeface(const uint32_t typeface);
-  void set_font_size(const size_t font_size)
-  {
-    this->font_size = font_size;
-  }
-  void set_is_static(const bool is_static)
-  {
-    m_is_static = is_static;
-  }
+  void set_font_size(const size_t font_size) { this->font_size = font_size; }
+  void set_is_static(const bool is_static) { m_is_static = is_static; }
 
  private:
   bool m_is_static = true;
