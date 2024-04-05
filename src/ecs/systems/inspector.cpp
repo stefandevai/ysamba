@@ -67,11 +67,11 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   quad_position.y = mouse_tile.y;
   quad_position.z = mouse_tile.z;
 
-  const auto entities
-      = m_world.spatial_hash.get_all_by_component<Sprite>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+  auto entities = m_world.spatial_hash.get_all_by_component<Sprite>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+
   bool updated_inspector_content = false;
 
-  for (const auto entity : entities)
+  for (auto entity : entities)
   {
     if (registry.valid(entity))
     {

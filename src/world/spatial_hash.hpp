@@ -34,8 +34,13 @@ class SpatialHash
   {
     const auto& entities = get(x, y, z);
 
-    for (const auto entity : entities)
+    for (auto it = entities.rbegin(); it != entities.rend(); ++it)
     {
+      const auto entity = *it;
+      if (!registry.valid(entity))
+      {
+        continue;
+      }
       if (!registry.all_of<Position, T...>(entity))
       {
         continue;
@@ -64,8 +69,14 @@ class SpatialHash
     const auto& entities = get(x, y, z);
     std::vector<entt::entity> entities_with_components{};
 
-    for (const auto entity : entities)
+    for (auto it = entities.rbegin(); it != entities.rend(); ++it)
     {
+      const auto entity = *it;
+
+      if (!registry.valid(entity))
+      {
+        continue;
+      }
       if (!registry.all_of<Position, T...>(entity))
       {
         continue;
