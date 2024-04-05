@@ -63,7 +63,7 @@ class Gameplay : public Scene
   double m_turn_delay = 0.0;
 
   ai::ActionManager m_action_manager{m_game_context, m_world};
-  ai::System m_ai_system{m_game_context, m_world};
+  ai::System m_ai_system{m_game_context, m_world, m_action_manager};
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_game_context, m_world};
