@@ -338,45 +338,69 @@ void SDLInputWrapper::update()
         m_drag_bounds.z = m_mouse_position.x;
         m_drag_bounds.w = m_mouse_position.y;
       }
-      break;
-    }
-
-    case SDL_MOUSEBUTTONDOWN:
-    {
-      if (event.button.button == SDL_BUTTON_LEFT)
-      {
-        m_mouse_state_down.first = true;
-      }
-      else if (event.button.button == SDL_BUTTON_RIGHT)
-      {
-        m_mouse_state_down.second = true;
-      }
-
-      if (!m_is_dragging)
+      else if (m_mouse_state_down.first || m_mouse_state_down.second)
       {
         m_is_dragging = true;
         m_drag_bounds.x = m_mouse_position.x;
         m_drag_bounds.y = m_mouse_position.y;
         m_drag_bounds.z = m_mouse_position.x;
         m_drag_bounds.w = m_mouse_position.y;
+        m_mouse_state_down.first = false;
+        m_mouse_state_down.second = false;
+      }
+      break;
+    }
+
+    case SDL_MOUSEBUTTONDOWN:
+    {
+      if (!m_mouse_down_timer.is_running)
+      {
+        m_mouse_down_timer.start();
+      }
+
+      if (!m_is_dragging)
+      {
+        // Enter dragging mode if mouse is held down for 200ms
+        if (m_mouse_down_timer.elapsed<std::chrono::milliseconds>() > 200)
+        {
+          m_is_dragging = true;
+          m_drag_bounds.x = m_mouse_position.x;
+          m_drag_bounds.y = m_mouse_position.y;
+          m_drag_bounds.z = m_mouse_position.x;
+          m_drag_bounds.w = m_mouse_position.y;
+          m_mouse_state_down.first = false;
+          m_mouse_state_down.second = false;
+        }
+        else if (event.button.button == SDL_BUTTON_LEFT)
+        {
+          m_mouse_state_down.first = true;
+        }
+        else if (event.button.button == SDL_BUTTON_RIGHT)
+        {
+          m_mouse_state_down.second = true;
+        }
       }
       break;
     }
 
     case SDL_MOUSEBUTTONUP:
     {
-      if (event.button.button == SDL_BUTTON_LEFT)
-      {
-        m_mouse_state_up.first = true;
-        m_mouse_state_down.first = false;
-      }
-      else if (event.button.button == SDL_BUTTON_RIGHT)
-      {
-        m_mouse_state_up.second = true;
-        m_mouse_state_down.second = false;
-      }
+      m_mouse_down_timer.stop();
 
-      if (m_is_dragging)
+      if (!m_is_dragging)
+      {
+        if (event.button.button == SDL_BUTTON_LEFT)
+        {
+          m_mouse_state_up.first = true;
+          m_mouse_state_down.first = false;
+        }
+        else if (event.button.button == SDL_BUTTON_RIGHT)
+        {
+          m_mouse_state_up.second = true;
+          m_mouse_state_down.second = false;
+        }
+      }
+      else
       {
         m_is_dragging = false;
         m_has_dragged = true;

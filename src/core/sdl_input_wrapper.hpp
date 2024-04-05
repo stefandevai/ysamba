@@ -6,6 +6,7 @@
 
 #include "./maths/vector.hpp"
 #include "core/utf8.hpp"
+#include "core/timer.hpp"
 
 namespace dl
 {
@@ -36,11 +37,11 @@ class SDLInputWrapper
   [[nodiscard]] bool window_size_changed() const { return m_window_size_changed; }
   [[nodiscard]] const Vector2i& get_scroll() const { return m_scroll; }
   [[nodiscard]] bool should_quit() const;
+  [[nodiscard]] const std::string& get_text_input() const;
+  [[nodiscard]] int get_text_input_cursor_index() const;
   void text_input_start();
   void text_input_stop();
   void reset_drag() { m_has_dragged = false; }
-  [[nodiscard]] const std::string& get_text_input() const;
-  [[nodiscard]] int get_text_input_cursor_index() const;
 
   void set_text_input(const std::string& text);
 
@@ -60,5 +61,6 @@ class SDLInputWrapper
   bool m_has_dragged = false;
   std::string m_text_input{};
   UTF8Iterator m_cursor{m_text_input.begin()};
+  Timer m_mouse_down_timer{};
 };
 }  // namespace dl
