@@ -32,7 +32,7 @@ class InputManager
   InputManager();
   ~InputManager() = default;
 
-  // Removing copy-constructor and assignment operator
+  // Removing copy/move constructors and assignment operators
   InputManager(InputManager const&) = delete;
   InputManager(InputManager const&&) = delete;
   void operator=(InputManager const&) = delete;

@@ -9,8 +9,6 @@
 
 namespace dl::ui
 {
-InputManager& UIComponent::m_input_manager = InputManager::get_instance();
-
 void UIComponent::m_init()
 {
   init();

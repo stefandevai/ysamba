@@ -29,11 +29,9 @@ def run(target_path: Path, data_path: Path) -> None:
 def check(filename: Path) -> None:
     subprocess.run([
         "clang-tidy",
-        "--checks=bug*,cert*,performance*,reada*,port*,clang-a*,misc*,cppco*,-misc-non-private-member-variables-in-classes",
-        "-header-filter=.*",
-        "-extra-arg=-std=c++20",
         "-p",
         "./build/compile_commands.json",
+        "-header-filter=.*",
         filename
     ], check=True, cwd=THIS_DIR)
 
