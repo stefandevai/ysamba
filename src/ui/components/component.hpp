@@ -99,9 +99,9 @@ class UIComponent
   template <typename T, typename... Args>
   void erase(const T* component)
   {
-    children.erase(std::find_if(children.begin(), children.end(), [component](std::unique_ptr<UIComponent>& c) {
-      return c.get() == component;
-    }));
+    children.erase(std::find_if(children.begin(),
+                                children.end(),
+                                [component](std::unique_ptr<UIComponent>& c) { return c.get() == component; }));
   }
 
   template <typename T, typename... Args>

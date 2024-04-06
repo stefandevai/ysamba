@@ -67,7 +67,8 @@ class ActionSystem
   void m_open_action_menu();
   void m_close_action_menu();
   void m_dispose();
-  std::function<void(const JobType)> m_on_select_generic_action = [this](const JobType job_type) {
+  std::function<void(const JobType)> m_on_select_generic_action = [this](const JobType job_type)
+  {
     m_selected_job_type = job_type;
     m_state = ActionMenuState::SelectTarget;
   };

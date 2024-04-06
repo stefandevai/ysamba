@@ -198,10 +198,12 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, mouse_tile, selected_entity](const JobType job_type) {
-        m_action_manager.create_item_job_bulk(job_type, m_selected_entities, selected_entity, mouse_tile);
-        m_dispose();
-      });
+      m_action_menu->set_on_select(
+          [this, mouse_tile, selected_entity](const JobType job_type)
+          {
+            m_action_manager.create_item_job_bulk(job_type, m_selected_entities, selected_entity, mouse_tile);
+            m_dispose();
+          });
       m_input_manager.push_context("action_menu"_hs);
       m_state = ActionMenuState::Open;
     }
@@ -217,10 +219,12 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, mouse_tile](const JobType job_type) {
-        m_action_manager.create_tile_job_bulk(job_type, m_selected_entities, mouse_tile);
-        m_dispose();
-      });
+      m_action_menu->set_on_select(
+          [this, mouse_tile](const JobType job_type)
+          {
+            m_action_manager.create_tile_job_bulk(job_type, m_selected_entities, mouse_tile);
+            m_dispose();
+          });
       m_input_manager.push_context("action_menu"_hs);
       m_state = ActionMenuState::Open;
     }
@@ -327,37 +331,40 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
     }
   }
 
-  m_select_area(registry, camera, [this](entt::registry& registry, const Vector3i& begin, const Vector3i& end) {
-    std::vector<Vector3i> harvest_targets{};
+  m_select_area(registry,
+                camera,
+                [this](entt::registry& registry, const Vector3i& begin, const Vector3i& end)
+                {
+                  std::vector<Vector3i> harvest_targets{};
 
-    for (int j = begin.y; j <= end.y; ++j)
-    {
-      for (int i = begin.x; i <= end.x; ++i)
-      {
-        const auto& tile = m_world.get(i, j, begin.z);
+                  for (int j = begin.y; j <= end.y; ++j)
+                  {
+                    for (int i = begin.x; i <= end.x; ++i)
+                    {
+                      const auto& tile = m_world.get(i, j, begin.z);
 
-        if (tile.actions.contains(JobType::Harvest))
-        {
-          harvest_targets.push_back({i, j, begin.z});
-        }
-      }
-    }
+                      if (tile.actions.contains(JobType::Harvest))
+                      {
+                        harvest_targets.push_back({i, j, begin.z});
+                      }
+                    }
+                  }
 
-    if (harvest_targets.empty())
-    {
-      return;
-    }
+                  if (harvest_targets.empty())
+                  {
+                    return;
+                  }
 
-    const auto entities = m_select_available_entities(registry);
+                  const auto entities = m_select_available_entities(registry);
 
-    for (const auto& target : harvest_targets)
-    {
-      const auto entity = random::select(entities);
-      m_action_manager.create_tile_job(JobType::Harvest, entity, target);
-    }
+                  for (const auto& target : harvest_targets)
+                  {
+                    const auto entity = random::select(entities);
+                    m_action_manager.create_tile_job(JobType::Harvest, entity, target);
+                  }
 
-    m_dispose();
-  });
+                  m_dispose();
+                });
 }
 
 void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& registry)

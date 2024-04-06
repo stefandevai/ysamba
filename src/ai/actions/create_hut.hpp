@@ -39,7 +39,8 @@ static bool create_job(CreateJobParams params)
   bool job_assigned = false;
 
   // Assign a build hut job for each agent
-  auto assign_build_hut_job = [&params, &progress, job_progress_entity, &job_assigned](const entt::entity entity) {
+  auto assign_build_hut_job = [&params, &progress, job_progress_entity, &job_assigned](const entt::entity entity)
+  {
     const auto offset_x = random::get_integer(0, params.hut_size);
     const auto offset_y = random::get_integer(0, params.hut_size);
     const auto job_target = Vector3i{params.position.x + offset_x, params.position.y + offset_y, params.position.z};

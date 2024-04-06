@@ -27,7 +27,8 @@ void add_movement_component(entt::registry& registry, entt::entity entity)
 
 namespace dl
 {
-const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
   auto& job_data = registry.get<JobData>(job);
   job_data.status = JobStatus::Finished;
   registry.remove<ActionWalk>(entity);
@@ -108,10 +109,12 @@ void WalkSystem::update(entt::registry& registry)
     x_dir = x_dir > 0.0 ? 1.0 : x_dir < 0.0 ? -1.0 : 0.0;
     y_dir = y_dir > 0.0 ? 1.0 : y_dir < 0.0 ? -1.0 : 0.0;
 
-    registry.patch<Movement>(entity, [x_dir, y_dir](auto& movement_component) {
-      movement_component.direction.x = x_dir;
-      movement_component.direction.y = y_dir;
-    });
+    registry.patch<Movement>(entity,
+                             [x_dir, y_dir](auto& movement_component)
+                             {
+                               movement_component.direction.x = x_dir;
+                               movement_component.direction.y = y_dir;
+                             });
   }
 }
 

@@ -130,7 +130,8 @@ bool create_tile_job(CreateTileJobParams params)
   const auto& qualities_required = tile.actions.at(params.job_type).qualities_required;
   bool job_assigned = false;
 
-  const auto assign_job = [&params, &tile, &qualities_required, &job_assigned](const entt::entity entity) {
+  const auto assign_job = [&params, &tile, &qualities_required, &job_assigned](const entt::entity entity)
+  {
     // Check if the agent has the necessary qualities to perform the action
     if (!qualities_required.empty())
     {
@@ -172,7 +173,8 @@ bool create_item_job(CreateItemJobParams params)
 
   bool job_assigned = false;
 
-  const auto assign_job = [&params, &job_assigned](const entt::entity entity) {
+  const auto assign_job = [&params, &job_assigned](const entt::entity entity)
+  {
     const auto job = params.registry.create();
     params.registry.emplace<Target>(job, params.position, static_cast<uint32_t>(params.item));
     params.registry.emplace<JobData>(job, params.job_type);

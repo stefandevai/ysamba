@@ -36,31 +36,41 @@ void Gameplay::load()
   m_camera.set_zoom(config::gameplay::default_zoom);
   m_camera.set_event_emitter(&m_event_emitter);
 
-  m_event_emitter.on<CameraMovedEvent>([this](const CameraMovedEvent& event, EventEmitter& emitter) {
-    (void)emitter;
-    m_world.chunk_manager.update({event.position_in_tiles.x, event.position_in_tiles.y, 0});
-  });
-  m_event_emitter.on<CameraZoomedEvent>([this](const CameraZoomedEvent& event, EventEmitter& emitter) {
-    (void)emitter;
-    m_world.chunk_manager.set_frustum(event.frustum);
-  });
+  m_event_emitter.on<CameraMovedEvent>(
+      [this](const CameraMovedEvent& event, EventEmitter& emitter)
+      {
+        (void)emitter;
+        m_world.chunk_manager.update({event.position_in_tiles.x, event.position_in_tiles.y, 0});
+      });
+  m_event_emitter.on<CameraZoomedEvent>(
+      [this](const CameraZoomedEvent& event, EventEmitter& emitter)
+      {
+        (void)emitter;
+        m_world.chunk_manager.set_frustum(event.frustum);
+      });
 
-  m_event_emitter.on<EnterTurnBasedEvent>([this](const EnterTurnBasedEvent& event, EventEmitter& emitter) {
-    (void)emitter;
-    m_enter_turn_based(event.entity);
-    m_camera.set_target(event.entity);
-  });
-  m_event_emitter.on<LeaveTurnBasedEvent>([this](const LeaveTurnBasedEvent& event, EventEmitter& emitter) {
-    (void)event;
-    (void)emitter;
-    m_leave_turn_based();
-    m_camera.set_target(entt::null);
-  });
-  m_event_emitter.on<UpdateGameEvent>([this](const UpdateGameEvent& event, EventEmitter& emitter) {
-    (void)event;
-    (void)emitter;
-    m_update_all_systems();
-  });
+  m_event_emitter.on<EnterTurnBasedEvent>(
+      [this](const EnterTurnBasedEvent& event, EventEmitter& emitter)
+      {
+        (void)emitter;
+        m_enter_turn_based(event.entity);
+        m_camera.set_target(event.entity);
+      });
+  m_event_emitter.on<LeaveTurnBasedEvent>(
+      [this](const LeaveTurnBasedEvent& event, EventEmitter& emitter)
+      {
+        (void)event;
+        (void)emitter;
+        m_leave_turn_based();
+        m_camera.set_target(entt::null);
+      });
+  m_event_emitter.on<UpdateGameEvent>(
+      [this](const UpdateGameEvent& event, EventEmitter& emitter)
+      {
+        (void)event;
+        (void)emitter;
+        m_update_all_systems();
+      });
 
 #ifndef DL_BUILD_DEBUG_TOOLS
   load_game();

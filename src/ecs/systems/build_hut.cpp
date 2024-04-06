@@ -29,7 +29,8 @@
 
 namespace dl
 {
-const auto stop_build_hut = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+const auto stop_build_hut = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
   auto& job_data = registry.get<JobData>(job);
   auto& progress = registry.get<JobProgress>(job_data.progress_entity);
   progress.agents.erase(std::remove(progress.agents.begin(), progress.agents.end(), entity));
@@ -37,7 +38,8 @@ const auto stop_build_hut = [](entt::registry& registry, const entt::entity enti
   registry.remove<ActionBuildHut>(entity);
 };
 
-const auto stop_place_exterior = [](entt::registry& registry, const entt::entity entity, const entt::entity job) {
+const auto stop_place_exterior = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
+{
   auto& job_data = registry.get<JobData>(job);
   job_data.status = JobStatus::Finished;
   registry.remove<ActionPlaceHutExterior>(entity);
@@ -46,11 +48,13 @@ const auto stop_place_exterior = [](entt::registry& registry, const entt::entity
 BuildHutSystem::BuildHutSystem(World& world, EventEmitter& event_emitter, ui::UIManager& ui_manager)
     : m_world(world), m_ui_manager(ui_manager)
 {
-  event_emitter.on<SelectHutTargetEvent>([this](const SelectHutTargetEvent& event, EventEmitter& emitter) {
-    (void)emitter;
-    (void)event;
-    m_state = State::SelectHutTarget;
-  });
+  event_emitter.on<SelectHutTargetEvent>(
+      [this](const SelectHutTargetEvent& event, EventEmitter& emitter)
+      {
+        (void)emitter;
+        (void)event;
+        m_state = State::SelectHutTarget;
+      });
 }
 
 void BuildHutSystem::update(entt::registry& registry)
@@ -510,19 +514,20 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
 
   auto add_hut_part
       = [&registry, texture_id](
-            const uint32_t id, const int x, const int y, const int z, const Color& color = Color{0xFFFFFF99}) {
-          const auto entity = registry.create();
-          registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
-          const auto sprite = Sprite{
-              .id = id,
-              .resource_id = texture_id,
-              .layer_z = 4,
-              .category = "tile",
-              .color = color,
-          };
-          registry.emplace<Sprite>(entity, sprite);
-          registry.emplace<Position>(entity, x, y, z);
-        };
+            const uint32_t id, const int x, const int y, const int z, const Color& color = Color{0xFFFFFF99})
+  {
+    const auto entity = registry.create();
+    registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
+    const auto sprite = Sprite{
+        .id = id,
+        .resource_id = texture_id,
+        .layer_z = 4,
+        .category = "tile",
+        .color = color,
+    };
+    registry.emplace<Sprite>(entity, sprite);
+    registry.emplace<Position>(entity, x, y, z);
+  };
 
   Color preview_tile_color{0x66EEAA77};
 

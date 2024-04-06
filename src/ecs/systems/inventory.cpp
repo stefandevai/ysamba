@@ -22,7 +22,8 @@ namespace dl
 {
 InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 {
-  auto on_select = [](const int i) {
+  auto on_select = [](const int i)
+  {
     // TODO: Open item details menu
     (void)i;
   };
@@ -243,7 +244,8 @@ std::vector<entt::entity> InventorySystem::m_get_weared_items(entt::registry& re
 {
   std::vector<entt::entity> items{};
 
-  const auto push_items = [&registry, &items](const entt::entity entity) {
+  const auto push_items = [&registry, &items](const entt::entity entity)
+  {
     if (registry.all_of<WieldedItems>(entity))
     {
       const auto& wielded_items = registry.get<WieldedItems>(entity);
@@ -294,7 +296,8 @@ std::vector<entt::entity> InventorySystem::m_get_carried_items(entt::registry& r
 {
   std::vector<entt::entity> items{};
 
-  const auto push_items = [&registry, &items](const entt::entity entity) {
+  const auto push_items = [&registry, &items](const entt::entity entity)
+  {
     if (registry.all_of<CarriedItems>(entity))
     {
       const auto& carried_items = registry.get<CarriedItems>(entity);

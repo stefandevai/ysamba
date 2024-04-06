@@ -31,7 +31,8 @@ void HomeMenu::load()
 
   m_load_worlds_metadata();
 
-  const auto on_select_world = [this](const WorldMetadata& world_metadata) {
+  const auto on_select_world = [this](const WorldMetadata& world_metadata)
+  {
     m_world_list->force_hide();
     m_game_context.world_metadata = world_metadata;
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
@@ -54,34 +55,36 @@ void HomeMenu::load()
   m_button_list->button_size = Vector2i{200, 25};
   m_button_list->button_text_color.set(0xCCC1AFFF);
 
-  m_button_list->set_on_select([this](const MenuChoice choice) {
-    switch (choice)
-    {
-    case MenuChoice::Play:
-    {
-      m_load_worlds_metadata();
-
-      if (m_worlds_metadata.empty())
+  m_button_list->set_on_select(
+      [this](const MenuChoice choice)
       {
-        m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
-        return;
-      }
+        switch (choice)
+        {
+        case MenuChoice::Play:
+        {
+          m_load_worlds_metadata();
 
-      m_world_list->set_actions(m_worlds_metadata);
-      m_world_list->show();
-      break;
-    }
-    case MenuChoice::NewWorld:
-    {
-      m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
-      break;
-    }
-    case MenuChoice::Settings:
-    case MenuChoice::Credits:
-    default:
-      break;
-    }
-  });
+          if (m_worlds_metadata.empty())
+          {
+            m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
+            return;
+          }
+
+          m_world_list->set_actions(m_worlds_metadata);
+          m_world_list->show();
+          break;
+        }
+        case MenuChoice::NewWorld:
+        {
+          m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
+          break;
+        }
+        case MenuChoice::Settings:
+        case MenuChoice::Credits:
+        default:
+          break;
+        }
+      });
 
   m_has_loaded = true;
 }
@@ -169,8 +172,8 @@ void HomeMenu::m_load_worlds_metadata()
     }
   }
 
-  std::sort(m_worlds_metadata.begin(), m_worlds_metadata.end(), [](const auto& lhs, const auto& rhs) {
-    return lhs.first.updated_at > rhs.first.updated_at;
-  });
+  std::sort(m_worlds_metadata.begin(),
+            m_worlds_metadata.end(),
+            [](const auto& lhs, const auto& rhs) { return lhs.first.updated_at > rhs.first.updated_at; });
 }
 }  // namespace dl
