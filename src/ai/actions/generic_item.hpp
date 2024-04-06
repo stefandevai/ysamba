@@ -22,7 +22,7 @@ struct CreateJobParams
   entt::entity item = entt::null;
 };
 
-static bool create_job(CreateJobParams params)
+static bool job(CreateJobParams params)
 {
   assert(params.item != entt::null && "No item provided for job");
 
@@ -34,7 +34,7 @@ static bool create_job(CreateJobParams params)
     params.registry.emplace<Target>(job, params.position, static_cast<uint32_t>(params.item));
     params.registry.emplace<JobData>(job, params.job_type);
 
-    action::walk::create_job({
+    action::walk::job({
         .registry = params.registry,
         .agent_entity = entity,
         .position = params.position,
@@ -42,7 +42,7 @@ static bool create_job(CreateJobParams params)
     });
 
     auto& agent = params.registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{config::ai::default_job_priority, job});
+    agent.push_job(Job{config::ai::default_job_priority, job});
 
     job_assigned = true;
   };

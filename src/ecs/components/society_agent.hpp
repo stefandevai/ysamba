@@ -1,5 +1,6 @@
 #pragma once
 
+#include <entt/entity/registry.hpp>
 #include <queue>
 #include <string>
 
@@ -44,7 +45,28 @@ struct SocietyAgent
   Metier metiers;
   State state = State::Idle;
   double time_to_next_action = 0.0;
-  std::priority_queue<Job> jobs{};
+  std::vector<Job> jobs{};
+
+  void push_job(Job job)
+  {
+    jobs.push_back(std::move(job));
+    std::push_heap(jobs.begin(), jobs.end());
+  }
+
+  void pop_job()
+  {
+    std::pop_heap(jobs.begin(), jobs.end());
+    jobs.pop_back();
+  }
+
+  void clear_jobs(entt::registry& registry)
+  {
+    for (auto& job : jobs)
+    {
+      registry.destroy(job.entity);
+    }
+    jobs.clear();
+  }
 };
 
 template <typename Archive>

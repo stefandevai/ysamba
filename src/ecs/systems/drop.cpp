@@ -4,6 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "ai/actions/generic_item.hpp"
 #include "ecs/components/action_drop.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/container.hpp"
@@ -269,17 +270,13 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
   {
     const auto mouse_tile = m_world.mouse_to_world(camera);
 
-    const auto walk_job = registry.create();
-    registry.emplace<Target>(walk_job, mouse_tile);
-    registry.emplace<JobData>(walk_job, JobType::Walk);
-
-    const auto drop_job = registry.create();
-    registry.emplace<Target>(drop_job, mouse_tile, static_cast<uint32_t>(m_target_item));
-    registry.emplace<JobData>(drop_job, JobType::Drop);
-
-    auto& agent = registry.get<SocietyAgent>(m_selected_entity);
-    agent.jobs.push(Job{2, walk_job});
-    agent.jobs.push(Job{2, drop_job});
+    action::generic_item::job({
+        .registry = registry,
+        .position = mouse_tile,
+        .job_type = JobType::Drop,
+        .entities = {m_selected_entity},
+        .item = m_target_item,
+    });
 
     m_dispose();
   }

@@ -23,7 +23,7 @@ struct CreateJobParams
   const std::vector<entt::entity> entities;
 };
 
-static bool create_job(CreateJobParams params)
+static bool job(CreateJobParams params)
 {
   if (!utils::validate_tile_action({.registry = params.registry,
                                     .world = params.world,
@@ -62,7 +62,7 @@ static bool create_job(CreateJobParams params)
     // TODO: Create walk job if needed on the respective action system
     if (params.job_type != JobType::Walk)
     {
-      walk::create_job({
+      walk::job({
           .registry = params.registry,
           .agent_entity = entity,
           .agent = &agent,
@@ -71,7 +71,7 @@ static bool create_job(CreateJobParams params)
       });
     }
 
-    agent.jobs.push(Job{config::ai::default_job_priority, job});
+    agent.push_job(Job{config::ai::default_job_priority, job});
     job_assigned = true;
   };
 

@@ -122,7 +122,7 @@ void OperationManager::dispatch_harvest(entt::entity entity)
   const auto& position = m_registry.get<Position>(entity);
   const auto& target = m_world.search_by_flag("HARVESTABLE", Vector3i{position.x, position.y, position.z});
 
-  action::generic_tile::create_job({
+  action::generic_tile::job({
       .world = m_world,
       .registry = m_registry,
       .position = target.position,
@@ -182,7 +182,7 @@ void OperationManager::dispatch_store(entt::entity entity)
   m_registry.remove<entt::tag<"storable"_hs>>(target_entity);
 
   const auto& position = m_registry.get<Position>(target_entity);
-  action::generic_item::create_job({
+  action::generic_item::job({
       .registry = m_registry,
       .position = Vector3i{position.x, position.y, position.z},
       .job_type = JobType::Pickup,
@@ -192,7 +192,7 @@ void OperationManager::dispatch_store(entt::entity entity)
 
   // Add drop job
   const auto storage_position = m_registry.get<Position>(storage_area_entity);
-  action::generic_item::create_job({
+  action::generic_item::job({
       .registry = m_registry,
       .position = Vector3i{storage_position.x, storage_position.y, storage_position.z},
       .job_type = JobType::Drop,

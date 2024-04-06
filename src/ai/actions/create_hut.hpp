@@ -24,7 +24,7 @@ struct CreateJobParams
   int priority = config::ai::default_job_priority;
 };
 
-static bool create_job(CreateJobParams params)
+static bool job(CreateJobParams params)
 {
   // Create progress entity
   const uint32_t cost_per_tile = 200;
@@ -59,8 +59,8 @@ static bool create_job(CreateJobParams params)
     job_data.progress_entity = job_progress_entity;
 
     auto& agent = params.registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{params.priority, walk_job});
-    agent.jobs.push(Job{params.priority, build_hut_job});
+    agent.push_job(Job{params.priority, walk_job});
+    agent.push_job(Job{params.priority, build_hut_job});
 
     progress.agents.push_back(entity);
 

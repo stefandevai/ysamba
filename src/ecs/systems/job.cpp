@@ -49,11 +49,11 @@ void JobSystem::update(entt::registry& registry)
       continue;
     }
 
-    auto& current_job = agent.jobs.top();
+    auto& current_job = agent.jobs.front();
 
     if (!registry.valid(current_job.entity))
     {
-      agent.jobs.pop();
+      agent.pop_job();
       continue;
     }
 
@@ -139,7 +139,7 @@ void JobSystem::update(entt::registry& registry)
     }
     if (job_data.status == JobStatus::Finished)
     {
-      agent.jobs.pop();
+      agent.pop_job();
     }
   }
 }

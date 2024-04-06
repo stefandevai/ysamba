@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "./scene.hpp"
+#include "ai/ai.hpp"
 #include "core/events/emitter.hpp"
 #include "core/input_manager.hpp"
 #include "ecs/systems/action.hpp"
@@ -18,7 +19,6 @@
 #include "ecs/systems/player_controls.hpp"
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/storage_area.hpp"
-#include "ai/ai.hpp"
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
 #include "ecs/systems/wield.hpp"

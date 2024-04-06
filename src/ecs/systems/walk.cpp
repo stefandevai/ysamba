@@ -29,8 +29,12 @@ namespace dl
 {
 const auto stop_walk = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
 {
-  auto& job_data = registry.get<JobData>(job);
-  job_data.status = JobStatus::Finished;
+  if (registry.valid(job))
+  {
+    auto& job_data = registry.get<JobData>(job);
+    job_data.status = JobStatus::Finished;
+  }
+
   registry.remove<ActionWalk>(entity);
   registry.remove<WalkPath>(entity);
   registry.remove<Movement>(entity);
@@ -48,6 +52,12 @@ void WalkSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_walk = registry.get<ActionWalk>(entity);
+
+    if (!registry.valid(action_walk.job))
+    {
+      stop_walk(registry, entity, action_walk.job);
+      continue;
+    }
 
     const auto& target = registry.get<Target>(action_walk.job);
     const auto& position = registry.get<Position>(entity);

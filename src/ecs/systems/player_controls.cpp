@@ -4,6 +4,7 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "ai/actions/walk.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
 #include "ecs/components/action_walk.hpp"
@@ -17,17 +18,17 @@ namespace dl
 {
 void walk(entt::registry& registry, SocietyAgent& agent, const Vector3 target)
 {
-  const auto job_entity = registry.create();
-  registry.emplace<Target>(job_entity, std::move(target), 0, 0);
-  registry.emplace<JobData>(job_entity, JobType::Walk);
+  // Cancel all previous jobs if player moves
+  if (!agent.jobs.empty())
+  {
+    agent.clear_jobs(registry);
+  }
 
-  // // Cancel all previous jobs if player moves
-  // if (!agent.jobs.empty())
-  // {
-  //   agent.jobs.clear();
-  // }
-
-  agent.jobs.push(Job{0, job_entity});
+  action::walk::job({
+      .registry = registry,
+      .agent = &agent,
+      .position = target,
+  });
 }
 
 PlayerControlsSystem::PlayerControlsSystem(EventEmitter& event_emitter) : m_event_emitter(event_emitter) {}

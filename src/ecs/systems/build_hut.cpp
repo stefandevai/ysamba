@@ -31,17 +31,23 @@ namespace dl
 {
 const auto stop_build_hut = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
 {
-  auto& job_data = registry.get<JobData>(job);
-  auto& progress = registry.get<JobProgress>(job_data.progress_entity);
-  progress.agents.erase(std::remove(progress.agents.begin(), progress.agents.end(), entity));
-  job_data.status = JobStatus::Finished;
+  if (registry.valid(job))
+  {
+    auto& job_data = registry.get<JobData>(job);
+    auto& progress = registry.get<JobProgress>(job_data.progress_entity);
+    progress.agents.erase(std::remove(progress.agents.begin(), progress.agents.end(), entity));
+    job_data.status = JobStatus::Finished;
+  }
   registry.remove<ActionBuildHut>(entity);
 };
 
 const auto stop_place_exterior = [](entt::registry& registry, const entt::entity entity, const entt::entity job)
 {
-  auto& job_data = registry.get<JobData>(job);
-  job_data.status = JobStatus::Finished;
+  if (registry.valid(job))
+  {
+    auto& job_data = registry.get<JobData>(job);
+    job_data.status = JobStatus::Finished;
+  }
   registry.remove<ActionPlaceHutExterior>(entity);
 };
 
@@ -65,6 +71,13 @@ void BuildHutSystem::update(entt::registry& registry)
   for (const auto entity : view)
   {
     auto& action_build_hut = registry.get<ActionBuildHut>(entity);
+
+    if (!registry.valid(action_build_hut.job))
+    {
+      stop_build_hut(registry, entity, action_build_hut.job);
+      continue;
+    }
+
     auto& job_data = registry.get<JobData>(action_build_hut.job);
 
     if (!registry.valid(job_data.progress_entity))
@@ -141,7 +154,7 @@ void BuildHutSystem::update(entt::registry& registry)
         new_position.x = target.x + hut_size;
       }
 
-      action::walk::create_job({
+      action::walk::job({
           .registry = registry,
           .agent_entity = entity,
           .position = new_position,
@@ -151,6 +164,37 @@ void BuildHutSystem::update(entt::registry& registry)
     }
 
     // Agent is not within hut bounds.
+    // Remove inactive agents or agents with invalid jobs
+    std::erase_if(job_progress.agents,
+                  [&registry](const auto entity)
+                  {
+                    if (!registry.valid(entity))
+                    {
+                      return true;
+                    }
+
+                    if (!registry.all_of<ActionBuildHut>(entity))
+                    {
+                      return true;
+                    }
+
+                    const auto& agent = registry.get<SocietyAgent>(entity);
+
+                    if (agent.jobs.empty())
+                    {
+                      return true;
+                    }
+
+                    const auto& current_job = agent.jobs.front();
+
+                    if (!registry.valid(current_job.entity))
+                    {
+                      return true;
+                    }
+
+                    return false;
+                  });
+
     // If there are still agents within the hut bounds, remove the build hut action, freeing them for other jobs
     if (job_progress.agents.size() > 1)
     {
@@ -451,7 +495,7 @@ void BuildHutSystem::m_random_walk(entt::registry& registry, const entt::entity 
 
     const auto new_position = Vector3i{job_position.x + offset_x, job_position.y + offset_y, job_position.z};
 
-    action::walk::create_job({
+    action::walk::job({
         .registry = registry,
         .agent_entity = entity,
         .position = new_position,
@@ -653,7 +697,7 @@ void BuildHutSystem::m_create_hut_job(const Vector3i& position, const uint32_t h
 
   auto entities = m_select_available_entities(registry);
 
-  action::create_hut::create_job({
+  action::create_hut::job({
       .registry = registry,
       .entities = entities,
       .position = position,

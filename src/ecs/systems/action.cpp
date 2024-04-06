@@ -154,7 +154,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     {
       for (const auto entity : m_selected_entities)
       {
-        action::walk::create_job({
+        action::walk::job({
             .registry = registry,
             .agent_entity = entity,
             .position = mouse_tile,
@@ -200,7 +200,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       m_action_menu->set_on_select(
           [this, mouse_tile, selected_entity, &registry](const JobType job_type)
           {
-            action::generic_item::create_job({
+            action::generic_item::job({
                 .registry = registry,
                 .position = mouse_tile,
                 .job_type = job_type,
@@ -227,7 +227,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       m_action_menu->set_on_select(
           [this, mouse_tile, &registry](const JobType job_type)
           {
-            action::generic_tile::create_job({
+            action::generic_tile::job({
                 .world = m_world,
                 .registry = registry,
                 .position = mouse_tile,
@@ -334,7 +334,7 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
   if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
     const auto mouse_tile = m_world.mouse_to_world(camera);
-    const bool created = action::generic_tile::create_job({
+    const bool created = action::generic_tile::job({
         .world = m_world,
         .registry = registry,
         .position = mouse_tile,
@@ -377,7 +377,7 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
                   for (const auto& target : harvest_targets)
                   {
                     const auto entity = random::select(entities);
-                    action::generic_tile::create_job({
+                    action::generic_tile::job({
                         .world = m_world,
                         .registry = registry,
                         .position = target,
@@ -403,7 +403,7 @@ void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& r
   }
 
   const auto mouse_tile = m_world.mouse_to_world(camera);
-  const bool created = action::generic_tile::create_job({
+  const bool created = action::generic_tile::job({
       .world = m_world,
       .registry = registry,
       .position = mouse_tile,
@@ -430,7 +430,7 @@ void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& reg
   }
 
   const auto mouse_tile = m_world.mouse_to_world(camera);
-  const bool created = action::generic_tile::create_job({
+  const bool created = action::generic_tile::job({
       .world = m_world,
       .registry = registry,
       .position = mouse_tile,
@@ -479,8 +479,6 @@ void ActionSystem::m_select_area(entt::registry& registry,
     {
       registry.destroy(entity);
     }
-
-    spdlog::debug("Selecting area from ");
 
     on_select(registry, iteration_begin, iteration_end);
   }

@@ -15,6 +15,7 @@
 #include "definitions.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
+#include "ecs/components/society_agent.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/text.hpp"
 #include "world/chunk_manager.hpp"
@@ -54,7 +55,6 @@ void Gameplay::load()
       {
         (void)emitter;
         m_enter_turn_based(event.entity);
-        m_camera.set_target(event.entity);
       });
   m_event_emitter.on<LeaveTurnBasedEvent>(
       [this](const LeaveTurnBasedEvent& event, EventEmitter& emitter)
@@ -404,8 +404,17 @@ bool Gameplay::m_update_input_turn_based()
 
 void Gameplay::m_enter_turn_based(entt::entity entity)
 {
-  m_current_state = State::PLAYING_TURN_BASED;
+  // Set current player
   m_player = entity;
+
+  // Camera will follow the selected entity
+  m_camera.set_target(entity);
+
+  // Remove current jobs and leave control to the player
+  auto& agent = m_registry.get<SocietyAgent>(entity);
+  agent.clear_jobs(m_registry);
+
+  m_current_state = State::PLAYING_TURN_BASED;
 }
 
 void Gameplay::m_leave_turn_based()

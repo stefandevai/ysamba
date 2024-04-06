@@ -23,7 +23,7 @@ struct CreateJobParams
   int offset = WALK_TARGET_OFFSET;
 };
 
-static void create_job(CreateJobParams params)
+static void job(CreateJobParams params)
 {
   if (params.agent == nullptr)
   {
@@ -33,6 +33,6 @@ static void create_job(CreateJobParams params)
   const auto job = params.registry.create();
   params.registry.emplace<Target>(job, params.position, 0, params.offset);
   params.registry.emplace<JobData>(job, JobType::Walk);
-  params.agent->jobs.push(Job{params.priority, job});
+  params.agent->push_job(Job{params.priority, job});
 }
 }  // namespace dl::action::walk
