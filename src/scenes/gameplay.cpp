@@ -190,7 +190,6 @@ void Gameplay::m_update_turn_systems()
 {
   m_game_system.update(m_registry);
   m_ai_system.update(m_registry);
-  // m_society_system.update(m_registry, delta);
   m_physics_system.update(m_registry);
   m_walk_system.update(m_registry);
   m_job_system.update(m_registry);

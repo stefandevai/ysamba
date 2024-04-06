@@ -18,7 +18,6 @@
 #include "ecs/systems/player_controls.hpp"
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/storage_area.hpp"
-// #include "ecs/systems/society.hpp"
 #include "ai/ai.hpp"
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
@@ -65,7 +64,6 @@ class Gameplay : public Scene
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_game_context, m_world};
-  // SocietySystem m_society_system{m_world};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
   ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter};
   PickupSystem m_pickup_system{m_world};
