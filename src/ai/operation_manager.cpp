@@ -5,7 +5,8 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 
-#include "ai/action_manager.hpp"
+#include "ai/actions/generic_item.hpp"
+#include "ai/actions/generic_tile.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/vector.hpp"
 #include "core/random.hpp"
@@ -16,8 +17,8 @@
 
 namespace dl::ai
 {
-OperationManager::OperationManager(GameContext& game_context, World& world, ai::ActionManager& action_manager)
-    : m_game_context(game_context), m_registry(*game_context.registry), m_world(world), m_action_manager(action_manager)
+OperationManager::OperationManager(GameContext& game_context, World& world)
+    : m_game_context(game_context), m_registry(*game_context.registry), m_world(world)
 {
 }
 
@@ -121,7 +122,13 @@ void OperationManager::dispatch_harvest(entt::entity entity)
   const auto& position = m_registry.get<Position>(entity);
   const auto& target = m_world.search_by_flag("HARVESTABLE", Vector3i{position.x, position.y, position.z});
 
-  m_action_manager.create_tile_job(JobType::Harvest, entity, target.position);
+  action::generic_tile::create_job({
+      .world = m_world,
+      .registry = m_registry,
+      .position = target.position,
+      .job_type = JobType::Harvest,
+      .entities = {entity},
+  });
 }
 
 void OperationManager::dispatch_store(entt::entity entity)
@@ -175,13 +182,23 @@ void OperationManager::dispatch_store(entt::entity entity)
   m_registry.remove<entt::tag<"storable"_hs>>(target_entity);
 
   const auto& position = m_registry.get<Position>(target_entity);
-  m_action_manager.create_item_job(
-      JobType::Pickup, entity, target_entity, Vector3i{position.x, position.y, position.z});
+  action::generic_item::create_job({
+      .registry = m_registry,
+      .position = Vector3i{position.x, position.y, position.z},
+      .job_type = JobType::Pickup,
+      .entities = {entity},
+      .item = target_entity,
+  });
 
   // Add drop job
   const auto storage_position = m_registry.get<Position>(storage_area_entity);
-  m_action_manager.create_item_job(
-      JobType::Drop, entity, target_entity, Vector3i{storage_position.x, storage_position.y, storage_position.z});
+  action::generic_item::create_job({
+      .registry = m_registry,
+      .position = Vector3i{storage_position.x, storage_position.y, storage_position.z},
+      .job_type = JobType::Drop,
+      .entities = {entity},
+      .item = target_entity,
+  });
 }
 
 void OperationManager::dispatch_eat(entt::entity entity)

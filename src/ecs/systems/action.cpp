@@ -4,7 +4,9 @@
 
 #include <entt/core/hashed_string.hpp>
 
-#include "ai/action_manager.hpp"
+#include "ai/actions/generic_item.hpp"
+#include "ai/actions/generic_tile.hpp"
+#include "ai/actions/utils.hpp"
 #include "ai/actions/walk.hpp"
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
@@ -32,11 +34,8 @@ const ui::ItemList<JobType> ActionSystem::m_menu_items = {
     {JobType::SelectStorageArea, "Select storage area"},
 };
 
-ActionSystem::ActionSystem(World& world,
-                           ui::UIManager& ui_manager,
-                           EventEmitter& event_emitter,
-                           ai::ActionManager& action_manager)
-    : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter), m_action_manager(action_manager)
+ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
+    : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
 {
   m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
 }
@@ -199,9 +198,15 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select(
-          [this, mouse_tile, selected_entity](const JobType job_type)
+          [this, mouse_tile, selected_entity, &registry](const JobType job_type)
           {
-            m_action_manager.create_item_job_bulk(job_type, m_selected_entities, selected_entity, mouse_tile);
+            action::generic_item::create_job({
+                .registry = registry,
+                .position = mouse_tile,
+                .job_type = job_type,
+                .entities = m_selected_entities,
+                .item = selected_entity,
+            });
             m_dispose();
           });
       m_input_manager.push_context("action_menu"_hs);
@@ -220,9 +225,15 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select(
-          [this, mouse_tile](const JobType job_type)
+          [this, mouse_tile, &registry](const JobType job_type)
           {
-            m_action_manager.create_tile_job_bulk(job_type, m_selected_entities, mouse_tile);
+            action::generic_tile::create_job({
+                .world = m_world,
+                .registry = registry,
+                .position = mouse_tile,
+                .job_type = job_type,
+                .entities = m_selected_entities,
+            });
             m_dispose();
           });
       m_input_manager.push_context("action_menu"_hs);
@@ -323,7 +334,13 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
   if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
     const auto mouse_tile = m_world.mouse_to_world(camera);
-    const bool created = m_action_manager.create_tile_job_bulk(JobType::Harvest, m_selected_entities, mouse_tile);
+    const bool created = action::generic_tile::create_job({
+        .world = m_world,
+        .registry = registry,
+        .position = mouse_tile,
+        .job_type = JobType::Harvest,
+        .entities = m_selected_entities,
+    });
 
     if (created)
     {
@@ -360,7 +377,13 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
                   for (const auto& target : harvest_targets)
                   {
                     const auto entity = random::select(entities);
-                    m_action_manager.create_tile_job(JobType::Harvest, entity, target);
+                    action::generic_tile::create_job({
+                        .world = m_world,
+                        .registry = registry,
+                        .position = target,
+                        .job_type = JobType::Harvest,
+                        .entities = {entity},
+                    });
                   }
 
                   m_dispose();
@@ -380,7 +403,13 @@ void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& r
   }
 
   const auto mouse_tile = m_world.mouse_to_world(camera);
-  const bool created = m_action_manager.create_tile_job_bulk(JobType::Break, m_selected_entities, mouse_tile);
+  const bool created = action::generic_tile::create_job({
+      .world = m_world,
+      .registry = registry,
+      .position = mouse_tile,
+      .job_type = JobType::Break,
+      .entities = m_selected_entities,
+  });
 
   if (created)
   {
@@ -401,7 +430,13 @@ void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& reg
   }
 
   const auto mouse_tile = m_world.mouse_to_world(camera);
-  const bool created = m_action_manager.create_tile_job_bulk(JobType::Dig, m_selected_entities, mouse_tile);
+  const bool created = action::generic_tile::create_job({
+      .world = m_world,
+      .registry = registry,
+      .position = mouse_tile,
+      .job_type = JobType::Dig,
+      .entities = m_selected_entities,
+  });
 
   if (created)
   {

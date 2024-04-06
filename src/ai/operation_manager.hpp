@@ -15,12 +15,10 @@ struct Vector3i;
 
 namespace dl::ai
 {
-class ActionManager;
-
 class OperationManager
 {
  public:
-  OperationManager(GameContext& game_context, World& world, ai::ActionManager& action_manager);
+  OperationManager(GameContext& game_context, World& world);
 
   std::vector<Operation> get_viable(entt::entity entity);
   double compute_score(entt::entity entity, const Operation& operation);
@@ -36,6 +34,5 @@ class OperationManager
   GameContext& m_game_context;
   entt::registry& m_registry;
   World& m_world;
-  ai::ActionManager& m_action_manager;
 };
 }  // namespace dl::ai

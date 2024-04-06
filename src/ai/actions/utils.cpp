@@ -1,8 +1,9 @@
 #include "./utils.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <entt/entity/registry.hpp>
 
-#include "ai/actions/walk.hpp"
 #include "config.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/carried_items.hpp"
@@ -113,82 +114,5 @@ bool has_qualities_required(HasQualitiesRequiredParams params)
     }
   }
   return true;
-}
-
-bool create_tile_job(CreateTileJobParams params)
-{
-  if (!validate_tile_action({.registry = params.registry,
-                             .world = params.world,
-                             .position = params.position,
-                             .job_type = params.job_type}))
-  {
-    // TODO: Notify player that validation failed for action
-    return false;
-  }
-
-  const auto& tile = params.world.get(params.position);
-  const auto& qualities_required = tile.actions.at(params.job_type).qualities_required;
-  bool job_assigned = false;
-
-  const auto assign_job = [&params, &tile, &qualities_required, &job_assigned](const entt::entity entity)
-  {
-    // Check if the agent has the necessary qualities to perform the action
-    if (!qualities_required.empty())
-    {
-      if (!utils::has_qualities_required({.world = params.world,
-                                          .registry = params.registry,
-                                          .entity = entity,
-                                          .qualities_required = qualities_required}))
-      {
-        // TODO: Notify player that items with required qualities are needed
-        return;
-      }
-    }
-
-    auto& agent = params.registry.get<SocietyAgent>(entity);
-    const auto job = params.registry.create();
-
-    params.registry.emplace<Target>(job, params.position, tile.id);
-    params.registry.emplace<JobData>(job, params.job_type);
-
-    // TODO: Create walk job if needed on the respective action system
-    if (params.job_type != JobType::Walk)
-    {
-      action::walk::create_job(
-          {.registry = params.registry, .agent_entity = entity, .agent = &agent, .position = params.position});
-    }
-
-    agent.jobs.push(Job{config::ai::default_job_priority, job});
-    job_assigned = true;
-  };
-
-  std::for_each(params.entities.begin(), params.entities.end(), assign_job);
-
-  return job_assigned;
-}
-
-bool create_item_job(CreateItemJobParams params)
-{
-  assert(params.item != entt::null && "No item provided for job");
-
-  bool job_assigned = false;
-
-  const auto assign_job = [&params, &job_assigned](const entt::entity entity)
-  {
-    const auto job = params.registry.create();
-    params.registry.emplace<Target>(job, params.position, static_cast<uint32_t>(params.item));
-    params.registry.emplace<JobData>(job, params.job_type);
-
-    action::walk::create_job({.registry = params.registry, .agent_entity = entity, .position = params.position});
-
-    auto& agent = params.registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{config::ai::default_job_priority, job});
-
-    job_assigned = true;
-  };
-
-  std::for_each(params.entities.begin(), params.entities.end(), assign_job);
-
-  return job_assigned;
 }
 }  // namespace dl::utils

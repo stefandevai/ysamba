@@ -31,7 +31,7 @@ struct EventEmitter;
 class ActionSystem
 {
  public:
-  ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter, ai::ActionManager& action_manager);
+  ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter);
   void update(entt::registry& registry, const Camera& camera);
 
  private:
@@ -50,7 +50,6 @@ class ActionSystem
   ui::ActionMenu* m_action_menu = nullptr;
   ui::Notification* m_notification = nullptr;
   EventEmitter& m_event_emitter;
-  ai::ActionManager& m_action_manager;
 
   std::vector<entt::entity> m_selected_entities{};
   ActionMenuState m_state = ActionMenuState::Closed;
