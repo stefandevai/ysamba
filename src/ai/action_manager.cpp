@@ -2,8 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ai/actions/utils.hpp"
-#include "ai/actions/walk.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/vector.hpp"
 #include "world/world.hpp"
@@ -17,43 +15,16 @@ ActionManager::ActionManager(GameContext& game_context, World& world)
 
 bool ActionManager::create_tile_job(const JobType job_type, entt::entity entity, const Vector3i& position)
 {
-  switch (job_type)
-  {
-  case JobType::Walk:
-  {
-    action::walk::create_job({.registry = m_registry, .agent_entity = entity, .position = position});
-    return true;
-  }
-  default:
-    return utils::create_tile_job({.world = m_world,
-                                   .registry = m_registry,
-                                   .position = position,
-                                   .job_type = job_type,
-                                   .selected_entity = entity});
-  }
+  return m_create_tile_job(
+      {.world = m_world, .registry = m_registry, .position = position, .job_type = job_type, .entities = {entity}});
 }
 
 bool ActionManager::create_tile_job_bulk(const JobType job_type,
                                          const std::vector<entt::entity>& entities,
                                          const Vector3i& position)
 {
-  switch (job_type)
-  {
-  case JobType::Walk:
-  {
-    for (const auto entity : entities)
-    {
-      action::walk::create_job({.registry = m_registry, .agent_entity = entity, .position = position});
-    }
-    return true;
-  }
-  default:
-    return utils::create_tile_job({.world = m_world,
-                                   .registry = m_registry,
-                                   .position = position,
-                                   .job_type = job_type,
-                                   .selected_entities = &entities});
-  }
+  return m_create_tile_job(
+      {.world = m_world, .registry = m_registry, .position = position, .job_type = job_type, .entities = entities});
 }
 
 bool ActionManager::create_item_job(const JobType job_type,
@@ -61,16 +32,8 @@ bool ActionManager::create_item_job(const JobType job_type,
                                     entt::entity item,
                                     const Vector3i& position)
 {
-  const auto job = m_registry.create();
-  m_registry.emplace<Target>(job, position, static_cast<uint32_t>(item));
-  m_registry.emplace<JobData>(job, job_type);
-
-  action::walk::create_job({.registry = m_registry, .agent_entity = entity, .position = position});
-
-  auto& agent = m_registry.get<SocietyAgent>(entity);
-  agent.jobs.push(Job{2, job});
-
-  return true;
+  return m_create_item_job(
+      {.registry = m_registry, .position = position, .job_type = job_type, .entities = {entity}, .item = item});
 }
 
 bool ActionManager::create_item_job_bulk(const JobType job_type,
@@ -78,19 +41,45 @@ bool ActionManager::create_item_job_bulk(const JobType job_type,
                                          entt::entity item,
                                          const Vector3i& position)
 {
-  const auto job = m_registry.create();
-  m_registry.emplace<Target>(job, position, static_cast<uint32_t>(item));
-  m_registry.emplace<JobData>(job, job_type);
-
-  for (const auto entity : entities)
-  {
-    // TODO: Abstract tile job creation into a function
-    action::walk::create_job({.registry = m_registry, .agent_entity = entity, .position = position});
-
-    auto& agent = m_registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{2, job});
-  }
-
-  return true;
+  return m_create_item_job(
+      {.registry = m_registry, .position = position, .job_type = job_type, .entities = entities, .item = item});
 }
+
+bool ActionManager::m_create_tile_job(utils::CreateTileJobParams params)
+{
+  switch (params.job_type)
+  {
+  case JobType::Harvest:
+  case JobType::Break:
+  case JobType::Dig:
+  case JobType::PrepareFirecamp:
+  case JobType::StartFire:
+  case JobType::PlaceHutExterior:
+  case JobType::ConstructEntrance:
+    return utils::create_tile_job(std::move(params));
+  default:
+  {
+    spdlog::critical("Tile job not implemented");
+    return false;
+  }
+  }
+}
+
+bool ActionManager::m_create_item_job(utils::CreateItemJobParams params)
+{
+  switch (params.job_type)
+  {
+  case JobType::Pickup:
+  case JobType::Wear:
+  case JobType::Wield:
+  case JobType::Drop:
+    return utils::create_item_job(std::move(params));
+  default:
+  {
+    spdlog::critical("Item job not implemented");
+    return false;
+  }
+  }
+}
+
 }  // namespace dl::ai

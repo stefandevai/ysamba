@@ -5,6 +5,7 @@
 #include <entt/core/hashed_string.hpp>
 
 #include "ai/action_manager.hpp"
+#include "ai/actions/walk.hpp"
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
@@ -152,7 +153,14 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     // If we are not selecting an entity, walk to the target
     else if (!m_selected_entities.empty())
     {
-      m_action_manager.create_tile_job_bulk(JobType::Walk, m_selected_entities, mouse_tile);
+      for (const auto entity : m_selected_entities)
+      {
+        action::walk::create_job({
+            .registry = registry,
+            .agent_entity = entity,
+            .position = mouse_tile,
+        });
+      }
     }
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Right))

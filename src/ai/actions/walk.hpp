@@ -11,6 +11,8 @@
 
 namespace dl::action::walk
 {
+constexpr int WALK_TARGET_OFFSET = 0;
+
 struct CreateJobParams
 {
   entt::registry& registry;
@@ -18,6 +20,7 @@ struct CreateJobParams
   SocietyAgent* agent = nullptr;
   const Vector3i& position;
   int priority = config::ai::default_job_priority;
+  int offset = WALK_TARGET_OFFSET;
 };
 
 static void create_job(CreateJobParams params)
@@ -28,7 +31,7 @@ static void create_job(CreateJobParams params)
   }
 
   const auto job = params.registry.create();
-  params.registry.emplace<Target>(job, params.position);
+  params.registry.emplace<Target>(job, params.position, 0, params.offset);
   params.registry.emplace<JobData>(job, JobType::Walk);
   params.agent->jobs.push(Job{params.priority, job});
 }

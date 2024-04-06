@@ -36,8 +36,16 @@ struct CreateTileJobParams
   entt::registry& registry;
   const Vector3i& position;
   JobType job_type{};
-  entt::entity selected_entity = entt::null;
-  const std::vector<entt::entity>* selected_entities = nullptr;
+  const std::vector<entt::entity> entities;
+};
+
+struct CreateItemJobParams
+{
+  entt::registry& registry;
+  const Vector3i& position;
+  JobType job_type{};
+  const std::vector<entt::entity>& entities;
+  entt::entity item = entt::null;
 };
 
 bool has_consumables(entt::registry& registry, const std::map<uint32_t, uint32_t>& consumables);
@@ -47,4 +55,6 @@ bool validate_tile_action(ValidateTileActionParams params);
 bool has_qualities_required(HasQualitiesRequiredParams params);
 
 bool create_tile_job(CreateTileJobParams params);
+
+bool create_item_job(CreateItemJobParams params);
 }  // namespace dl::utils

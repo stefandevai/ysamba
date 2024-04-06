@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "ai/actions/walk.hpp"
+#include "config.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
@@ -116,9 +117,6 @@ bool has_qualities_required(HasQualitiesRequiredParams params)
 
 bool create_tile_job(CreateTileJobParams params)
 {
-  assert((params.selected_entities != nullptr || params.selected_entity != entt::null)
-         && "No entities provided for job");
-
   if (!validate_tile_action({.registry = params.registry,
                              .world = params.world,
                              .position = params.position,
@@ -160,18 +158,36 @@ bool create_tile_job(CreateTileJobParams params)
           {.registry = params.registry, .agent_entity = entity, .agent = &agent, .position = params.position});
     }
 
-    agent.jobs.push(Job{2, job});
+    agent.jobs.push(Job{config::ai::default_job_priority, job});
     job_assigned = true;
   };
 
-  if (params.selected_entities != nullptr)
+  std::for_each(params.entities.begin(), params.entities.end(), assign_job);
+
+  return job_assigned;
+}
+
+bool create_item_job(CreateItemJobParams params)
+{
+  assert(params.item != entt::null && "No item provided for job");
+
+  bool job_assigned = false;
+
+  const auto assign_job = [&params, &job_assigned](const entt::entity entity)
   {
-    std::for_each(params.selected_entities->begin(), params.selected_entities->end(), assign_job);
-  }
-  else if (params.selected_entity != entt::null)
-  {
-    assign_job(params.selected_entity);
-  }
+    const auto job = params.registry.create();
+    params.registry.emplace<Target>(job, params.position, static_cast<uint32_t>(params.item));
+    params.registry.emplace<JobData>(job, params.job_type);
+
+    action::walk::create_job({.registry = params.registry, .agent_entity = entity, .position = params.position});
+
+    auto& agent = params.registry.get<SocietyAgent>(entity);
+    agent.jobs.push(Job{config::ai::default_job_priority, job});
+
+    job_assigned = true;
+  };
+
+  std::for_each(params.entities.begin(), params.entities.end(), assign_job);
 
   return job_assigned;
 }

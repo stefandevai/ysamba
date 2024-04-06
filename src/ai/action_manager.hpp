@@ -3,6 +3,7 @@
 #include <entt/entity/registry.hpp>
 #include <vector>
 
+#include "ai/actions/utils.hpp"
 #include "world/society/job_type.hpp"
 
 namespace dl
@@ -33,5 +34,8 @@ class ActionManager
   GameContext& m_game_context;
   entt::registry& m_registry;
   World& m_world;
+
+  bool m_create_tile_job(utils::CreateTileJobParams params);
+  bool m_create_item_job(utils::CreateItemJobParams params);
 };
 }  // namespace dl::ai
