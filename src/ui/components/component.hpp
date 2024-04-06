@@ -67,7 +67,12 @@ class UIComponent
   std::vector<std::unique_ptr<UIComponent>> children;
 
   UIComponent(UIContext& context) : m_context(context) {}
-  virtual ~UIComponent() {}
+  virtual ~UIComponent() = default;
+
+  UIComponent(UIComponent const&) = delete;
+  UIComponent(UIComponent const&&) = delete;
+  UIComponent& operator=(UIComponent const&) = delete;
+  UIComponent& operator=(UIComponent&&) = delete;
 
   virtual void init() {}
   virtual void update_geometry() {}
@@ -121,7 +126,7 @@ class UIComponent
 
  protected:
   UIContext& m_context;
-  static InputManager& m_input_manager;
+  InputManager& m_input_manager = InputManager::get_instance();
   glm::mat4 m_transform_matrix{};
 
   void m_init();

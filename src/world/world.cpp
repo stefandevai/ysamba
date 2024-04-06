@@ -115,7 +115,10 @@ const Cell& World::cell_at(const int x, const int y, const int z) const
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
-const Cell& World::cell_at(const Vector3i& position) const { return cell_at(position.x, position.y, position.z); }
+const Cell& World::cell_at(const Vector3i& position) const
+{
+  return cell_at(position.x, position.y, position.z);
+}
 
 uint32_t World::terrain_at(const int x, const int y, const int z) const
 {
@@ -124,7 +127,10 @@ uint32_t World::terrain_at(const int x, const int y, const int z) const
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
-uint32_t World::terrain_at(const Vector3i& position) const { return terrain_at(position.x, position.y, position.z); }
+uint32_t World::terrain_at(const Vector3i& position) const
+{
+  return terrain_at(position.x, position.y, position.z);
+}
 
 uint32_t World::decoration_at(const int x, const int y, const int z) const
 {
@@ -150,7 +156,10 @@ const TileData& World::get(const int x, const int y, const int z) const
   return tile_data.at(cell.terrain);
 }
 
-const TileData& World::get(const Vector3i& position) const { return get(position.x, position.y, position.z); }
+const TileData& World::get(const Vector3i& position) const
+{
+  return get(position.x, position.y, position.z);
+}
 
 const WorldTile World::get_all(const int x, const int y, const int z) const
 {
@@ -158,7 +167,10 @@ const WorldTile World::get_all(const int x, const int y, const int z) const
   return WorldTile{tile_data.at(cell.terrain), tile_data.at(cell.decoration)};
 }
 
-const WorldTile World::get_all(const Vector3i& position) const { return get_all(position.x, position.y, position.z); }
+const WorldTile World::get_all(const Vector3i& position) const
+{
+  return get_all(position.x, position.y, position.z);
+}
 
 const TileData& World::get_terrain(const int x, const int y, const int z) const
 {
@@ -195,7 +207,10 @@ int World::get_elevation(const int x, const int y) const
   return chunk.tiles.height_map[index];
 }
 
-int World::get_elevation(const Vector2i& position) const { return get_elevation(position.x, position.y); }
+int World::get_elevation(const Vector2i& position) const
+{
+  return get_elevation(position.x, position.y);
+}
 
 Vector3i World::screen_to_world(const Vector2i& position, const Camera& camera) const
 {
@@ -386,9 +401,15 @@ bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& si
   return chunk.tiles.has_pattern(pattern, size, local_position);
 }
 
-const TileData& World::get_tile_data(const uint32_t id) const { return tile_data.at(id); }
+const TileData& World::get_tile_data(const uint32_t id) const
+{
+  return tile_data.at(id);
+}
 
-const ItemData& World::get_item_data(const uint32_t id) const { return item_data.at(id); }
+const ItemData& World::get_item_data(const uint32_t id) const
+{
+  return item_data.at(id);
+}
 
 entt::entity World::create_item(
     entt::registry& registry, const uint32_t id, const int x, const int y, const int z) const

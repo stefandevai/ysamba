@@ -36,16 +36,17 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     return;
   }
 
-  const auto mouse_position = m_input_manager.get_mouse_position();
+  const auto mouse_tile = m_world.mouse_to_world(camera);
   const auto& camera_position = camera.get_position();
 
   // The mouse didn't change the position, nothing changed, don't update
-  if (mouse_position == m_last_mouse_position && camera_position == m_last_camera_position)
+  if (mouse_tile == m_last_mouse_position && camera_position == m_last_camera_position)
   {
     return;
   }
 
-  const auto mouse_tile = m_world.mouse_to_world(camera);
+  m_last_mouse_position = mouse_tile;
+  m_last_camera_position = camera_position;
 
   if (!registry.valid(m_target_quad))
   {
@@ -66,17 +67,20 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   quad_position.y = mouse_tile.y;
   quad_position.z = mouse_tile.z;
 
-  const auto entity = m_world.spatial_hash.get_by_component<Sprite>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+  auto entities = m_world.spatial_hash.get_all_by_component<Sprite>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
+
   bool updated_inspector_content = false;
 
-  if (registry.valid(entity))
+  for (auto entity : entities)
   {
-    const auto& position = registry.get<Position>(entity);
-
-    if (position.z >= mouse_tile.z)
+    if (registry.valid(entity))
     {
-      m_update_inspector_content(mouse_tile, entity, registry);
-      updated_inspector_content = true;
+      updated_inspector_content = m_update_inspector_content(mouse_tile, entity, registry);
+    }
+
+    if (updated_inspector_content)
+    {
+      break;
     }
   }
 
@@ -95,15 +99,14 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
   {
     m_destroy_inspector();
   }
-
-  m_last_mouse_position = mouse_position;
-  m_last_camera_position = camera_position;
 }
 
-void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
+bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
                                                  const entt::entity entity,
                                                  entt::registry& registry)
 {
+  bool updated_inspector_content = false;
+
   if (m_inspector->state == ui::UIComponent::State::Hidden)
   {
     m_inspector->show();
@@ -112,23 +115,19 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
   if (registry.all_of<SocietyAgent>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
-    // m_inspector->set_content(agent.name);
     m_inspector->set_content(
         fmt::format("({}, {}, {})\n{}", mouse_position.x, mouse_position.y, mouse_position.z, agent.name));
-    /* const auto& position = registry.get<Position>(entity); */
-    /* text.set_text(agent.name + " (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")"); */
+    updated_inspector_content = true;
   }
   else if (registry.all_of<Item, Sprite>(entity))
   {
     const auto& item = registry.get<Item>(entity);
     if (item.id <= 0)
     {
-      return;
+      return false;
     }
 
     const auto& item_data = m_world.get_item_data(item.id);
-    // m_inspector->set_content(item_data.name + "\nWeight: " + item_data.weight_string +
-    //                          "\nVolume: " + item_data.volume_string);
     m_inspector->set_content(fmt::format("({}, {}, {})\n{}\nWeight: {}\nVolume: {}",
                                          mouse_position.x,
                                          mouse_position.y,
@@ -136,7 +135,9 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
                                          item_data.name,
                                          item_data.weight_string,
                                          item_data.volume_string));
+    updated_inspector_content = true;
   }
+  return updated_inspector_content;
 }
 
 void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, const TileData& tile_data)
@@ -150,7 +151,10 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, 
       fmt::format("({}, {}, {})\n{}", mouse_position.x, mouse_position.y, mouse_position.z, tile_data.name));
 }
 
-void InspectorSystem::m_destroy_inspector() { m_inspector->hide(); }
+void InspectorSystem::m_destroy_inspector()
+{
+  m_inspector->hide();
+}
 
 void InspectorSystem::m_update_input(entt::registry& registry)
 {

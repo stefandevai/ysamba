@@ -24,7 +24,10 @@ StorageAreaSystem::StorageAreaSystem(World& world, EventEmitter& event_emitter, 
   });
 }
 
-void StorageAreaSystem::update(entt::registry& registry) { using namespace entt::literals; }
+void StorageAreaSystem::update(entt::registry& registry)
+{
+  using namespace entt::literals;
+}
 
 void StorageAreaSystem::update_state(entt::registry& registry, const Camera& camera)
 {

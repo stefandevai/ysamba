@@ -18,16 +18,16 @@ class Texture
   WGPUTexture texture;
   WGPUTextureView view;
 
-  Texture(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels = 4);
+  Texture(WGPUDevice device, const unsigned char* data, const Vector2i& size, int channels = 4);
   Texture(const std::string& filepath);
   ~Texture();
 
-  static Texture dummy(const WGPUDevice device);
+  static Texture dummy(WGPUDevice device);
 
   // Loads after setting filepath
-  void load(const WGPUDevice device);
+  void load(WGPUDevice device);
 
   // Loads texture from data
-  void load(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels);
+  void load(WGPUDevice device, const unsigned char* data, const Vector2i& size, int channels);
 };
 }  // namespace dl

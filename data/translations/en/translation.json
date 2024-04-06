@@ -1,4 +1,10 @@
 {
     "title": "Colonization of Ysamba",
-    "instructions": "Play\nNew world\nSettings\nCredits"
+    "play": "Play",
+    "new_world": "New World",
+    "settings": "Settings",
+    "credits": "Credits",
+    "name_label": "Name:",
+    "enter_world_name": "Enter world name",
+    "save": "Save"
 }

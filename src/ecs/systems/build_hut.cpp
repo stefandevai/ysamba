@@ -3,6 +3,8 @@
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
+#include "ai/actions/create_hut.hpp"
+#include "ai/actions/walk.hpp"
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/json.hpp"
@@ -135,13 +137,12 @@ void BuildHutSystem::update(entt::registry& registry)
         new_position.x = target.x + hut_size;
       }
 
-      const auto walk_job = registry.create();
-      registry.emplace<Target>(walk_job, new_position, 0, 0);
-      registry.emplace<JobData>(walk_job, JobType::Walk);
-
-      auto& agent = registry.get<SocietyAgent>(entity);
-      agent.jobs.push(Job{0, walk_job});
-
+      action::walk::create_job({
+          .registry = registry,
+          .agent_entity = entity,
+          .position = new_position,
+          .priority = 0,
+      });
       continue;
     }
 
@@ -446,12 +447,12 @@ void BuildHutSystem::m_random_walk(entt::registry& registry, const entt::entity 
 
     const auto new_position = Vector3i{job_position.x + offset_x, job_position.y + offset_y, job_position.z};
 
-    const auto walk_job = registry.create();
-    registry.emplace<Target>(walk_job, new_position);
-    registry.emplace<JobData>(walk_job, JobType::Walk);
-
-    auto& agent = registry.get<SocietyAgent>(entity);
-    agent.jobs.push(Job{0, walk_job});
+    action::walk::create_job({
+        .registry = registry,
+        .agent_entity = entity,
+        .position = new_position,
+        .priority = 0,
+    });
   }
 }
 
@@ -645,45 +646,14 @@ void BuildHutSystem::m_create_hut_job(const Vector3i& position, const uint32_t h
     return;
   }
 
-  // Create progress entity
-  const uint32_t cost_per_tile = 200;
-  const uint32_t total_cost = cost_per_tile * hut_size * hut_size;
-  const auto job_progress_entity = registry.create();
-  auto& progress = registry.emplace<JobProgress>(job_progress_entity, JobType::BuildHut, total_cost);
-  registry.emplace<Position>(job_progress_entity,
-                             static_cast<double>(position.x),
-                             static_cast<double>(position.y),
-                             static_cast<double>(position.z));
-
-  // Assign a build hut job for each agent
-  auto assign_build_hut_job
-      = [&registry, &position, &progress, hut_size, job_progress_entity](const entt::entity entity) {
-          const auto offset_x = random::get_integer(0, hut_size);
-          const auto offset_y = random::get_integer(0, hut_size);
-          const auto job_target = Vector3i{position.x + offset_x, position.y + offset_y, position.z};
-
-          // Create a walk job to walk until the target
-          const auto walk_job = registry.create();
-          registry.emplace<Target>(walk_job, job_target);
-          registry.emplace<JobData>(walk_job, JobType::Walk);
-
-          // Create the main job
-          const auto build_hut_job = registry.create();
-          registry.emplace<JobDataBuildHut>(build_hut_job, hut_size);
-
-          // Assign the progress entity to the job
-          auto& job_data = registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
-          job_data.progress_entity = job_progress_entity;
-
-          auto& agent = registry.get<SocietyAgent>(entity);
-          agent.jobs.push(Job{2, walk_job});
-          agent.jobs.push(Job{2, build_hut_job});
-
-          progress.agents.push_back(entity);
-        };
-
   auto entities = m_select_available_entities(registry);
-  std::for_each(entities.begin(), entities.end(), assign_build_hut_job);
+
+  action::create_hut::create_job({
+      .registry = registry,
+      .entities = entities,
+      .position = position,
+      .hut_size = hut_size,
+  });
 
   m_dispose();
 }

@@ -251,7 +251,10 @@ void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
   chunks.push_back(std::move(generator.chunk));
 }
 
-void ChunkManager::set_frustum(const Vector2i& frustum) { this->frustum = frustum; }
+void ChunkManager::set_frustum(const Vector2i& frustum)
+{
+  this->frustum = frustum;
+}
 
 Chunk& ChunkManager::at(const int x, const int y, const int z) const
 {
@@ -273,7 +276,10 @@ Chunk& ChunkManager::at(const int x, const int y, const int z) const
   return ChunkManager::null;
 }
 
-Chunk& ChunkManager::at(const Vector3i& position) const { return at(position.x, position.y, position.z); }
+Chunk& ChunkManager::at(const Vector3i& position) const
+{
+  return at(position.x, position.y, position.z);
+}
 
 Chunk& ChunkManager::in(const int x, const int y, const int z) const
 {
@@ -291,7 +297,10 @@ Chunk& ChunkManager::in(const int x, const int y, const int z) const
   return ChunkManager::null;
 }
 
-Chunk& ChunkManager::in(const Vector3i& position) const { return in(position.x, position.y, position.z); }
+Chunk& ChunkManager::in(const Vector3i& position) const
+{
+  return in(position.x, position.y, position.z);
+}
 
 Vector3i ChunkManager::world_to_chunk(const int x, const int y, const int z) const
 {

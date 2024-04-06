@@ -75,7 +75,10 @@ int distance(const dl::Vector3i& a, const dl::Vector3i& b)
   // return result;
 }
 
-bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b) { return a.f > b.f || (a.f == b.f && a.h > b.h); }
+bool node_compare(const dl::AStar::Node& a, const dl::AStar::Node& b)
+{
+  return a.f > b.f || (a.f == b.f && a.h > b.h);
+}
 }  // namespace
 
 namespace dl

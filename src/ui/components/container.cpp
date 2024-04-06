@@ -42,5 +42,8 @@ void Container::set_size(const Vector2i& size)
   quad->h = size.y;
 }
 
-void Container::set_color(const uint32_t color) { quad->color = Color{color}; }
+void Container::set_color(const uint32_t color)
+{
+  quad->color = Color{color};
+}
 }  // namespace dl::ui

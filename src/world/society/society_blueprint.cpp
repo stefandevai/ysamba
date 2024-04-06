@@ -48,9 +48,15 @@ uint32_t SocietyBlueprint::add_child(const uint32_t parent_id, const Sex sex)
   return identifier;
 }
 
-uint32_t SocietyBlueprint::add_son(const uint32_t parent_id) { return add_child(parent_id, Sex::Male); }
+uint32_t SocietyBlueprint::add_son(const uint32_t parent_id)
+{
+  return add_child(parent_id, Sex::Male);
+}
 
-uint32_t SocietyBlueprint::add_daughter(const uint32_t parent_id) { return add_child(parent_id, Sex::Female); }
+uint32_t SocietyBlueprint::add_daughter(const uint32_t parent_id)
+{
+  return add_child(parent_id, Sex::Female);
+}
 
 uint32_t SocietyBlueprint::add_spouse(const uint32_t member_id)
 {

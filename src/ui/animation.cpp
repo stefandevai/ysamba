@@ -6,45 +6,90 @@ namespace dl::ui::animation
 {
 constexpr double pi = 3.14159265358979323846;
 
-double in_sine(const double t) { return 1 - std::cos((t * pi) / 2.0); }
+double in_sine(const double t)
+{
+  return 1 - std::cos((t * pi) / 2.0);
+}
 
-double out_sine(const double t) { return std::sin((t * pi) / 2.0); }
+double out_sine(const double t)
+{
+  return std::sin((t * pi) / 2.0);
+}
 
-double in_out_sine(const double t) { return -(std::cos(pi * t) - 1.0) / 2.0; }
+double in_out_sine(const double t)
+{
+  return -(std::cos(pi * t) - 1.0) / 2.0;
+}
 
-double in_quad(const double t) { return t * t; }
+double in_quad(const double t)
+{
+  return t * t;
+}
 
-double out_quad(const double t) { return 1.0 - (1.0 - t) * (1.0 - t); }
+double out_quad(const double t)
+{
+  return 1.0 - (1.0 - t) * (1.0 - t);
+}
 
-double in_out_quad(const double t) { return t < 0.5 ? 2.0 * t * t : 1.0 - std::pow(-2.0 * t + 2.0, 2) / 2.0; }
+double in_out_quad(const double t)
+{
+  return t < 0.5 ? 2.0 * t * t : 1.0 - std::pow(-2.0 * t + 2.0, 2) / 2.0;
+}
 
-double in_cubic(const double t) { return t * t * t; }
+double in_cubic(const double t)
+{
+  return t * t * t;
+}
 
-double out_cubic(const double t) { return 1.0 - std::pow(1.0 - t, 3.0); }
+double out_cubic(const double t)
+{
+  return 1.0 - std::pow(1.0 - t, 3.0);
+}
 
-double in_out_cubic(const double t) { return t < 0.5 ? 4.0 * t * t * t : 1.0 - std::pow(-2.0 * t + 2.0, 3.0) / 2.0; }
+double in_out_cubic(const double t)
+{
+  return t < 0.5 ? 4.0 * t * t * t : 1.0 - std::pow(-2.0 * t + 2.0, 3.0) / 2.0;
+}
 
-double in_quart(const double t) { return t * t * t * t; }
+double in_quart(const double t)
+{
+  return t * t * t * t;
+}
 
-double out_quart(const double t) { return 1.0 - std::pow(1.0 - t, 4.0); }
+double out_quart(const double t)
+{
+  return 1.0 - std::pow(1.0 - t, 4.0);
+}
 
 double in_out_quart(const double t)
 {
   return t < 0.5 ? 8.0 * t * t * t * t : 1.0 - std::pow(-2.0 * t + 2.0, 4.0) / 2.0;
 }
 
-double in_quint(const double t) { return t * t * t * t * t; }
+double in_quint(const double t)
+{
+  return t * t * t * t * t;
+}
 
-double out_quint(const double t) { return 1.0 - std::pow(1.0 - t, 5.0); }
+double out_quint(const double t)
+{
+  return 1.0 - std::pow(1.0 - t, 5.0);
+}
 
 double in_out_quint(const double t)
 {
   return t < 0.5 ? 16.0 * t * t * t * t * t : 1.0 - std::pow(-2.0 * t + 2.0, 5.0) / 2.0;
 }
 
-double in_expo(const double t) { return t == 0.0 ? 0.0 : std::pow(2.0, 10.0 * t - 10.0); }
+double in_expo(const double t)
+{
+  return t == 0.0 ? 0.0 : std::pow(2.0, 10.0 * t - 10.0);
+}
 
-double out_expo(const double t) { return t == 1.0 ? 1.0 : 1.0 - std::pow(2.0, -10.0 * t); }
+double out_expo(const double t)
+{
+  return t == 1.0 ? 1.0 : 1.0 - std::pow(2.0, -10.0 * t);
+}
 
 double in_out_expo(const double t)
 {
@@ -54,9 +99,15 @@ double in_out_expo(const double t)
                     : (2.0 - std::pow(2.0, -20.0 * t + 10.0)) / 2.0;
 }
 
-double in_circ(const double t) { return 1.0 - std::sqrt(1.0 - std::pow(t, 2.0)); }
+double in_circ(const double t)
+{
+  return 1.0 - std::sqrt(1.0 - std::pow(t, 2.0));
+}
 
-double out_circ(const double t) { return std::sqrt(1.0 - std::pow(t - 1.0, 2.0)); }
+double out_circ(const double t)
+{
+  return std::sqrt(1.0 - std::pow(t - 1.0, 2.0));
+}
 
 double in_out_circ(const double t)
 {
@@ -136,7 +187,10 @@ double out_bounce(const double t)
   }
 }
 
-double in_bounce(const double t) { return 1.0 - out_bounce(1.0 - t); }
+double in_bounce(const double t)
+{
+  return 1.0 - out_bounce(1.0 - t);
+}
 
 double in_out_bounce(const double t)
 {

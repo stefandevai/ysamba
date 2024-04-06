@@ -9,7 +9,7 @@ namespace dl
 class Shader
 {
  public:
-  WGPUShaderModule module;
+  WGPUShaderModule module{};
 
   Shader() = default;
   ~Shader();

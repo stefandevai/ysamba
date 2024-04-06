@@ -18,7 +18,7 @@
         "camera_move_south": ["k_down"],
         "camera_move_north": ["k_up"],
         "save_game": ["k_s"],
-        "load_game": ["k_l"],
+        "load_game": ["k_o"],
         "display_seed": ["k_e"],
         "open_action_menu": ["k_a"],
         "open_inventory": ["k_i"],

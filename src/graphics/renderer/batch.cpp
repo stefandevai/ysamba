@@ -66,7 +66,10 @@ bool Batch::empty()
   return true;
 }
 
-void Batch::clear_textures() { m_texture_slot_index = m_texture_slot_index_base; }
+void Batch::clear_textures()
+{
+  m_texture_slot_index = m_texture_slot_index_base;
+}
 
 uint32_t Batch::pin_texture(WGPUTextureView texture_view)
 {
@@ -323,7 +326,10 @@ void Batch::push_scissor(Vector4i scissor)
   utils::populate_quad_index_buffer(m_context.queue, m_current_vb->index_buffer, SECONDARY_BATCH_INDEX_COUNT);
 }
 
-void Batch::pop_scissor() { m_current_vb = &batch_data[0]; }
+void Batch::pop_scissor()
+{
+  m_current_vb = &batch_data[0];
+}
 
 void Batch::m_emplace_sprite_face(const SpriteBatchData data)
 {

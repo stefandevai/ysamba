@@ -17,15 +17,15 @@ class Scene
 {
  public:
   Scene(const std::string& scene_key, GameContext& game_context);
-  virtual ~Scene(){};
+  virtual ~Scene() = default;
 
   virtual void load() = 0;
   virtual void update() = 0;
   virtual void render() = 0;
   void resize();
   void check_window_size();
-  bool has_loaded() const { return m_has_loaded; }
-  uint32_t get_key() const { return m_scene_key; }
+  [[nodiscard]] bool has_loaded() const { return m_has_loaded; }
+  [[nodiscard]] uint32_t get_key() const { return m_scene_key; }
 
  protected:
   const uint32_t m_scene_key{};

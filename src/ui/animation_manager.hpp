@@ -11,7 +11,7 @@ class AnimationManager
 
   AnimationManager() = default;
 
-  void update(const double delta);
+  void update(double delta);
 };
 
 }  // namespace dl::ui

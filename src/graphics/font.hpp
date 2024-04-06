@@ -30,13 +30,13 @@ class Font
   std::unique_ptr<Texture> texture = nullptr;
 
   Font(const std::string& path, std::size_t size = 16);
-  void load(const WGPUDevice device);
-  const CharacterData& get_char_data(char32_t c) const
+  void load(WGPUDevice device);
+  [[nodiscard]] const CharacterData& get_char_data(char32_t c) const
   {
     return ((c >= CHAR_BOTTOM_LIMIT && c < CHAR_TOP_LIMIT) ? m_chars.at(c) : m_empty_char_data);
   };
-  inline size_t get_size() const { return m_size; };
-  inline int get_max_character_top() const { return m_max_character_top; };
+  [[nodiscard]] inline size_t get_size() const { return m_size; };
+  [[nodiscard]] inline int get_max_character_top() const { return m_max_character_top; };
 
  private:
   std::string m_path{};

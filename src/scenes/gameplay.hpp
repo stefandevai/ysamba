@@ -19,6 +19,7 @@
 #include "ecs/systems/render.hpp"
 #include "ecs/systems/storage_area.hpp"
 // #include "ecs/systems/society.hpp"
+#include "ai/action_manager.hpp"
 #include "ai/ai.hpp"
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
@@ -61,12 +62,14 @@ class Gameplay : public Scene
   entt::entity m_player;
   double m_turn_delay = 0.0;
 
+  ai::ActionManager m_action_manager{m_game_context, m_world};
+  ai::System m_ai_system{m_game_context, m_world, m_action_manager};
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_game_context, m_world};
   // SocietySystem m_society_system{m_world};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
-  ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter};
+  ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter, m_action_manager};
   PickupSystem m_pickup_system{m_world};
   BuildHutSystem m_build_hut_system{m_world, m_event_emitter, m_ui_manager};
   StorageAreaSystem m_storage_area_system{m_world, m_event_emitter, m_ui_manager};
@@ -77,7 +80,6 @@ class Gameplay : public Scene
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager};
   PlayerControlsSystem m_player_controls_system{m_event_emitter};
-  ai::System m_ai_system{m_game_context, m_world};
 
   bool m_update_paused();
   bool m_update_real_time();

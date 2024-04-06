@@ -39,15 +39,15 @@ class TextureAtlas
   TextureAtlas(const std::string& filepath, const std::string& data_filepath);
 
   // Loads after setting filepath
-  void load(const WGPUDevice device);
+  void load(WGPUDevice device);
 
-  inline const Vector2i& get_size() const { return texture->size; }
+  [[nodiscard]] inline const Vector2i& get_size() const { return texture->size; }
 
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  const std::array<glm::vec2, 4>& get_uv_coordinates(const uint32_t frame = 0) const;
+  [[nodiscard]] const std::array<glm::vec2, 4>& get_uv_coordinates(uint32_t frame = 0) const;
 
   template <typename T>
-  const T& get_metadata(const uint32_t game_id) const
+  [[nodiscard]] const T& get_metadata(const uint32_t game_id) const
   {
     return std::get<T>(m_frame_data.at(game_id));
   }

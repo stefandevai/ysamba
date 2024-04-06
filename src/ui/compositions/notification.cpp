@@ -15,8 +15,14 @@ Notification::Notification(UIContext& context, const std::string& text) : UIComp
   m_label->position.y = 30;
 }
 
-void Notification::show() { animate<AnimationFadeIn>(0.3, Easing::OutQuart); }
+void Notification::show()
+{
+  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+}
 
-void Notification::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
+void Notification::hide()
+{
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
 
 }  // namespace dl::ui

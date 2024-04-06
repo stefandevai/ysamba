@@ -74,11 +74,20 @@ void Camera::update_dirty()
   dirty = false;
 }
 
-const glm::mat4& Camera::get_view_matrix() const { return view_matrix; }
+const glm::mat4& Camera::get_view_matrix() const
+{
+  return view_matrix;
+}
 
-const Vector3& Camera::get_position() const { return view_position; }
+const Vector3& Camera::get_position() const
+{
+  return view_position;
+}
 
-const Vector3i& Camera::get_position_in_tiles() const { return position_in_tiles; }
+const Vector3i& Camera::get_position_in_tiles() const
+{
+  return position_in_tiles;
+}
 
 void Camera::move(const Vector3& quantity)
 {
@@ -167,7 +176,10 @@ void Camera::set_zoom(const float zoom)
   dirty = true;
 }
 
-void Camera::set_target(const entt::entity target) { this->target = target; }
+void Camera::set_target(const entt::entity target)
+{
+  this->target = target;
+}
 
 void Camera::zoom_in()
 {
@@ -201,7 +213,10 @@ void Camera::reset_zoom()
   dirty = true;
 }
 
-void Camera::set_event_emitter(EventEmitter* emitter) { m_event_emitter = emitter; }
+void Camera::set_event_emitter(EventEmitter* emitter)
+{
+  m_event_emitter = emitter;
+}
 
 void Camera::m_calculate_center_position()
 {

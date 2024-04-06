@@ -23,9 +23,9 @@ class Display
 
   Display() = default;
   ~Display();
-  void load(const int width, const int height, const std::string& title);
+  void load(int width, int height, const std::string& title);
   void set_title(const std::string& title);
-  void set_size(const int width, const int height);
+  void set_size(int width, int height);
   static const Vector2i& get_window_size();
   static const Vector2i& get_physical_size();
   static const Vector2& get_pixel_scale();

@@ -27,6 +27,10 @@
     "tries_after_collision": 8
   },
 
+  "ai": {
+    "default_job_priority": 2
+  },
+
   "gameplay": {
     "default_zoom": 2.0
   },

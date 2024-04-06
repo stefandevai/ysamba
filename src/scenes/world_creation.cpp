@@ -72,7 +72,7 @@ void WorldCreation::render()
 
   assert(m_texture != nullptr);
 
-  m_renderer.ui_pass.batch.texture(*m_texture, 16, 16, 0);
+  m_renderer.ui_pass.batch.texture(*m_texture, 15, 15, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }
@@ -163,7 +163,10 @@ void WorldCreation::m_generate_map()
   m_height_map = std::move(generator.raw_height_map);
 }
 
-void WorldCreation::m_generate_world() { m_world.generate_societies(); }
+void WorldCreation::m_generate_world()
+{
+  m_world.generate_societies();
+}
 
 void WorldCreation::m_create_map_representation()
 {

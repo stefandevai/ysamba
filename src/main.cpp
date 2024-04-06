@@ -1,6 +1,6 @@
 #include "core/game.hpp"
 
-int main()
+auto main() -> int
 {
   dl::Game game{};
 

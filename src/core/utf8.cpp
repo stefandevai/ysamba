@@ -1,10 +1,18 @@
 #include "./utf8.hpp"
 
+#include <utility>
+
 namespace dl
 {
 UTF8Iterator& UTF8Iterator::operator=(const UTF8Iterator& rhs)
 {
   string_iterator = rhs.string_iterator;
+  return *this;
+}
+
+UTF8Iterator& UTF8Iterator::operator=(UTF8Iterator&& rhs) noexcept
+{
+  std::swap(string_iterator, rhs.string_iterator);
   return *this;
 }
 
@@ -36,7 +44,7 @@ UTF8Iterator& UTF8Iterator::operator++()
   return *this;
 }
 
-UTF8Iterator UTF8Iterator::operator++(int)
+const UTF8Iterator UTF8Iterator::operator++(int)
 {
   m_dirty = true;
   UTF8Iterator temp = *this;
@@ -90,7 +98,7 @@ UTF8Iterator& UTF8Iterator::operator--()
   return *this;
 }
 
-UTF8Iterator UTF8Iterator::operator--(int)
+const UTF8Iterator UTF8Iterator::operator--(int)
 {
   m_dirty = true;
   UTF8Iterator temp = *this;
@@ -98,7 +106,10 @@ UTF8Iterator UTF8Iterator::operator--(int)
   return temp;
 }
 
-UTF8Iterator UTF8Iterator::operator-=(int quantity) { return operator+=(-quantity); }
+UTF8Iterator UTF8Iterator::operator-=(int quantity)
+{
+  return operator+=(-quantity);
+}
 
 uint8_t UTF8Iterator::m_get_code_point() const
 {

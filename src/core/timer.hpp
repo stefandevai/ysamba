@@ -12,6 +12,7 @@ class Timer
  public:
   std::chrono::time_point<std::chrono::high_resolution_clock> first;
   std::chrono::time_point<std::chrono::high_resolution_clock> second;
+  bool is_running = false;
 
   Timer() = default;
 
@@ -43,7 +44,7 @@ class Timer
   void print(const std::string& what, const double interval)
   {
     const auto now = std::chrono::high_resolution_clock::now();
-    const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last_printed).count();
+    const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - m_last_printed).count();
 
     if (elapsed < interval)
     {
@@ -51,11 +52,11 @@ class Timer
     }
 
     print<Unit>(what);
-    last_printed = now;
+    m_last_printed = now;
   }
 
  private:
-  std::chrono::time_point<std::chrono::high_resolution_clock> last_printed;
+  std::chrono::time_point<std::chrono::high_resolution_clock> m_last_printed;
 };
 
 }  // namespace dl

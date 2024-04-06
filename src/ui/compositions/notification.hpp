@@ -10,8 +10,8 @@ class Notification : public UIComponent
 {
  public:
   Notification(UIContext& context, const std::string& text);
-  void show();
-  void hide();
+  void show() override;
+  void hide() override;
 
  private:
   Label* m_label = nullptr;

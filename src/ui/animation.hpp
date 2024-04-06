@@ -67,7 +67,7 @@ struct AnimationFadeOut : public Animation
 
 namespace animation
 {
-double get_ease_value(const double t, Easing easing);
+double get_ease_value(double t, Easing easing);
 }
 
 }  // namespace dl::ui

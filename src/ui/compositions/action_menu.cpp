@@ -10,8 +10,8 @@
 namespace dl::ui
 {
 ActionMenu::ActionMenu(UIContext& context,
-                       const ItemList<uint32_t>& items,
-                       const std::function<void(const uint32_t)>& on_select)
+                       const ItemList<JobType>& items,
+                       const std::function<void(const JobType)>& on_select)
     : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
@@ -21,7 +21,7 @@ ActionMenu::ActionMenu(UIContext& context,
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_scrollable_list = m_window_frame->emplace<ScrollableList<uint32_t>>();
+  m_scrollable_list = m_window_frame->emplace<ScrollableList<JobType>>();
   m_scrollable_list->size = Vector2i{152, 252};
   m_scrollable_list->position = Vector3i{24, 24, 0};
   m_scrollable_list->set_on_select(on_select);
@@ -32,13 +32,13 @@ ActionMenu::ActionMenu(UIContext& context,
   }
 }
 
-void ActionMenu::set_actions(const ItemList<uint32_t>& actions)
+void ActionMenu::set_actions(const ItemList<JobType>& actions)
 {
   dirty = true;
   m_scrollable_list->set_items(actions);
 }
 
-void ActionMenu::set_on_select(const std::function<void(const uint32_t)>& on_select)
+void ActionMenu::set_on_select(const std::function<void(const JobType)>& on_select)
 {
   m_scrollable_list->set_on_select(on_select);
 }
@@ -49,6 +49,9 @@ void ActionMenu::show()
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 
-void ActionMenu::hide() { animate<AnimationFadeOut>(0.3, Easing::OutQuart); }
+void ActionMenu::hide()
+{
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
 
 }  // namespace dl::ui

@@ -4,59 +4,62 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "ai/action_manager.hpp"
+#include "ai/actions/walk.hpp"
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
 #include "core/random.hpp"
-#include "ecs/components/action_pickup.hpp"
-#include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
-#include "ecs/components/job_data.hpp"
-#include "ecs/components/job_data_build_hut.hpp"
-#include "ecs/components/job_progress.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
-#include "ecs/components/weared_items.hpp"
-#include "ecs/components/wielded_items.hpp"
 #include "ecs/systems/pickup.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/quad.hpp"
 #include "ui/compositions/action_menu.hpp"
 #include "ui/compositions/notification.hpp"
 #include "ui/ui_manager.hpp"
-#include "world/society/job.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-const ui::ItemList<uint32_t> ActionSystem::m_menu_items = {
-    {0, "Harvest"},
-    {1, "Break"},
-    {2, "Dig"},
-    {3, "Build hut"},
-    {4, "Select storage area"},
+const ui::ItemList<JobType> ActionSystem::m_menu_items = {
+    {JobType::Harvest, "Harvest"},
+    {JobType::Break, "Break"},
+    {JobType::Dig, "Dig"},
+    {JobType::BuildHut, "Build hut"},
+    {JobType::SelectStorageArea, "Select storage area"},
 };
 
-ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
-    : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
+ActionSystem::ActionSystem(World& world,
+                           ui::UIManager& ui_manager,
+                           EventEmitter& event_emitter,
+                           ai::ActionManager& action_manager)
+    : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter), m_action_manager(action_manager)
 {
   m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
 }
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)
 {
-  if (m_state == ActionMenuState::Open)
+  switch (m_state)
+  {
+  case ActionMenuState::Open:
   {
     m_update_action_menu();
+    break;
   }
-  else if (m_state == ActionMenuState::Closed)
+  case ActionMenuState::Closed:
   {
     m_update_closed_menu(registry, camera);
+    break;
   }
-  else
+  case ActionMenuState::SelectTarget:
   {
     m_update_selecting_target(registry, camera);
+    break;
+  }
   }
 }
 
@@ -77,15 +80,18 @@ void ActionSystem::m_update_action_menu()
   }
   else if (m_input_manager.poll_action("harvest"_hs))
   {
-    m_state = ActionMenuState::SelectHarvestTarget;
+    m_selected_job_type = JobType::Harvest;
+    m_state = ActionMenuState::SelectTarget;
   }
   else if (m_input_manager.poll_action("break"_hs))
   {
-    m_state = ActionMenuState::SelectBreakTarget;
+    m_selected_job_type = JobType::Break;
+    m_state = ActionMenuState::SelectTarget;
   }
   else if (m_input_manager.poll_action("dig"_hs))
   {
-    m_state = ActionMenuState::SelectDigTarget;
+    m_selected_job_type = JobType::Dig;
+    m_state = ActionMenuState::SelectTarget;
   }
 }
 
@@ -149,12 +155,11 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     {
       for (const auto entity : m_selected_entities)
       {
-        const auto job_entity = registry.create();
-        registry.emplace<Target>(job_entity, mouse_tile, 0, 0);
-        registry.emplace<JobData>(job_entity, JobType::Walk);
-
-        auto& agent = registry.get<SocietyAgent>(entity);
-        agent.jobs.push(Job{0, job_entity});
+        action::walk::create_job({
+            .registry = registry,
+            .agent_entity = entity,
+            .position = mouse_tile,
+        });
       }
     }
   }
@@ -181,27 +186,20 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       if (item_data.flags.contains("PICKABLE") && m_selected_entities.size() == 1
           && PickupSystem::can_pickup(registry, m_selected_entities[0], item_data))
       {
-        m_actions.push_back({static_cast<uint32_t>(JobType::Pickup), "pickup"});
+        m_actions.push_back({JobType::Pickup, "pickup"});
       }
       if (item_data.flags.contains("WEARABLE") && m_selected_entities.size() == 1)
       {
-        m_actions.push_back({static_cast<uint32_t>(JobType::Wear), "wear"});
+        m_actions.push_back({JobType::Wear, "wear"});
       }
       if (item_data.flags.contains("WIELDABLE") && m_selected_entities.size() == 1)
       {
-        m_actions.push_back({static_cast<uint32_t>(JobType::Wield), "wield"});
+        m_actions.push_back({JobType::Wield, "wield"});
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_tile, selected_entity](const uint32_t i) {
-        const auto job = registry.create();
-        registry.emplace<Target>(job, mouse_tile, static_cast<uint32_t>(selected_entity));
-        registry.emplace<JobData>(job, static_cast<JobType>(i));
-
-        for (const auto entity : m_selected_entities)
-        {
-          m_assign_job(job, mouse_tile, registry, entity);
-        }
+      m_action_menu->set_on_select([this, mouse_tile, selected_entity](const JobType job_type) {
+        m_action_manager.create_item_job_bulk(job_type, m_selected_entities, selected_entity, mouse_tile);
         m_dispose();
       });
       m_input_manager.push_context("action_menu"_hs);
@@ -215,19 +213,12 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
 
       for (const auto& action : tile_data.actions)
       {
-        m_actions.push_back({static_cast<uint32_t>(action.first), action.second.label});
+        m_actions.push_back({action.first, action.second.label});
       }
 
       m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select([this, &registry, mouse_tile, &tile_data](const uint32_t i) {
-        const auto job = registry.create();
-        registry.emplace<Target>(job, mouse_tile, tile_data.id);
-        registry.emplace<JobData>(job, static_cast<JobType>(i));
-
-        for (const auto entity : m_selected_entities)
-        {
-          m_assign_job(job, mouse_tile, registry, entity);
-        }
+      m_action_menu->set_on_select([this, mouse_tile](const JobType job_type) {
+        m_action_manager.create_tile_job_bulk(job_type, m_selected_entities, mouse_tile);
         m_dispose();
       });
       m_input_manager.push_context("action_menu"_hs);
@@ -248,30 +239,30 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
     return;
   }
 
-  switch (m_state)
+  switch (m_selected_job_type)
   {
-  case ActionMenuState::SelectHarvestTarget:
+  case JobType::Harvest:
   {
     m_select_harvest_target(camera, registry);
     break;
   }
-  case ActionMenuState::SelectBreakTarget:
+  case JobType::Break:
   {
     m_select_break_target(camera, registry);
     break;
   }
-  case ActionMenuState::SelectDigTarget:
+  case JobType::Dig:
   {
     m_select_dig_target(camera, registry);
     break;
   }
-  case ActionMenuState::SelectHutTarget:
+  case JobType::BuildHut:
   {
     m_event_emitter.publish(SelectHutTargetEvent{});
     m_dispose();
     break;
   }
-  case ActionMenuState::SelectStorageTarget:
+  case JobType::SelectStorageArea:
   {
     m_event_emitter.publish(SelectStorageEvent{});
     m_dispose();
@@ -314,57 +305,8 @@ void ActionSystem::m_dispose()
   m_close_action_menu();
 
   m_state = ActionMenuState::Closed;
+  m_selected_job_type = JobType::None;
   m_input_manager.pop_context();
-}
-
-void ActionSystem::m_select_tile_target(const Vector3i& tile_position, const JobType job_type, entt::registry& registry)
-{
-  const auto& tile = m_world.get(tile_position.x, tile_position.y, tile_position.z);
-
-  if (!tile.actions.contains(job_type))
-  {
-    return;
-  }
-
-  const auto& qualities_required = tile.actions.at(job_type).qualities_required;
-  const auto& consumed_items = tile.actions.at(job_type).consumes;
-
-  if (!consumed_items.empty())
-  {
-    if (!m_has_consumables(consumed_items, registry))
-    {
-      // TODO: Notify player that items are needed
-      return;
-    }
-  }
-
-  const auto job = registry.create();
-  registry.emplace<Target>(job, tile_position, tile.id);
-  registry.emplace<JobData>(job, job_type);
-  bool job_added = false;
-
-  for (const auto entity : m_selected_entities)
-  {
-    // Check if the agent has the necessary qualities to perform the action
-    if (!qualities_required.empty())
-    {
-      if (!m_has_qualities_required(qualities_required, entity, registry))
-      {
-        // TODO: Notify player that items with required qualities are needed
-        continue;
-      }
-    }
-
-    m_assign_job(job, tile_position, registry, entity);
-    job_added = true;
-  }
-
-  if (!job_added)
-  {
-    registry.destroy(job);
-  }
-
-  m_dispose();
 }
 
 void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry& registry)
@@ -374,13 +316,16 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
     m_notification = m_ui_manager.notify("Harvest where?");
   }
 
-  // if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
-  // {
-  //   return;
-  // }
+  if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
+  {
+    const auto mouse_tile = m_world.mouse_to_world(camera);
+    const bool created = m_action_manager.create_tile_job_bulk(JobType::Harvest, m_selected_entities, mouse_tile);
 
-  // const auto mouse_tile = m_world.mouse_to_world(camera);
-  // m_select_tile_target(mouse_tile, JobType::Harvest, registry);
+    if (created)
+    {
+      m_dispose();
+    }
+  }
 
   m_select_area(registry, camera, [this](entt::registry& registry, const Vector3i& begin, const Vector3i& end) {
     std::vector<Vector3i> harvest_targets{};
@@ -408,13 +353,7 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
     for (const auto& target : harvest_targets)
     {
       const auto entity = random::select(entities);
-      const auto& tile = m_world.get(target);
-
-      // TODO: Check if the agent has the necessary qualities to perform the action
-      const auto job = registry.create();
-      registry.emplace<Target>(job, target, tile.id);
-      registry.emplace<JobData>(job, JobType::Harvest);
-      m_assign_job(job, target, registry, entity);
+      m_action_manager.create_tile_job(JobType::Harvest, entity, target);
     }
 
     m_dispose();
@@ -434,7 +373,12 @@ void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& r
   }
 
   const auto mouse_tile = m_world.mouse_to_world(camera);
-  m_select_tile_target(mouse_tile, JobType::Break, registry);
+  const bool created = m_action_manager.create_tile_job_bulk(JobType::Break, m_selected_entities, mouse_tile);
+
+  if (created)
+  {
+    m_dispose();
+  }
 }
 
 void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& registry)
@@ -450,101 +394,12 @@ void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& reg
   }
 
   const auto mouse_tile = m_world.mouse_to_world(camera);
-  m_select_tile_target(mouse_tile, JobType::Dig, registry);
-}
+  const bool created = m_action_manager.create_tile_job_bulk(JobType::Dig, m_selected_entities, mouse_tile);
 
-void ActionSystem::m_assign_job(const entt::entity job,
-                                const Vector3i& position,
-                                entt::registry& registry,
-                                const entt::entity entity)
-{
-  const auto walk_job = registry.create();
-  registry.emplace<Target>(walk_job, position);
-  registry.emplace<JobData>(walk_job, JobType::Walk);
-
-  auto& agent = registry.get<SocietyAgent>(entity);
-  agent.jobs.push(Job{2, walk_job});
-  agent.jobs.push(Job{2, job});
-}
-
-bool ActionSystem::m_has_qualities_required(const std::vector<std::string>& qualities_required,
-                                            const entt::entity entity,
-                                            entt::registry& registry)
-{
-  const auto& carried_items = registry.get<CarriedItems>(entity);
-  const auto& weared_items = registry.get<WearedItems>(entity);
-  const auto& wielded_items = registry.get<WieldedItems>(entity);
-
-  for (const auto& quality : qualities_required)
+  if (created)
   {
-    bool has_quality = false;
-
-    for (const auto item_entity : carried_items.items)
-    {
-      const auto& item = registry.get<Item>(item_entity);
-      const auto& item_data = m_world.get_item_data(item.id);
-
-      if (item_data.qualities.contains(quality))
-      {
-        has_quality = true;
-        continue;
-      }
-    }
-
-    if (!has_quality)
-    {
-      for (const auto item_entity : weared_items.items)
-      {
-        const auto& item = registry.get<Item>(item_entity);
-        const auto& item_data = m_world.get_item_data(item.id);
-
-        if (item_data.qualities.contains(quality))
-        {
-          has_quality = true;
-          continue;
-        }
-      }
-    }
-
-    if (!has_quality)
-    {
-      if (registry.valid(wielded_items.left_hand))
-      {
-        const auto& item = registry.get<Item>(wielded_items.left_hand);
-        const auto& item_data = m_world.get_item_data(item.id);
-
-        if (item_data.qualities.contains(quality))
-        {
-          has_quality = true;
-        }
-      }
-
-      if (!has_quality && registry.valid(wielded_items.right_hand))
-      {
-        const auto& item = registry.get<Item>(wielded_items.right_hand);
-        const auto& item_data = m_world.get_item_data(item.id);
-
-        if (item_data.qualities.contains(quality))
-        {
-          has_quality = true;
-        }
-      }
-    }
-
-    if (!has_quality)
-    {
-      return false;
-    }
+    m_dispose();
   }
-  return true;
-}
-
-bool ActionSystem::m_has_consumables(const std::map<uint32_t, uint32_t>& consumables, entt::registry& registry)
-{
-  // TODO: Check society inventory for consumable items
-  (void)consumables;
-  (void)registry;
-  return true;
 }
 
 void ActionSystem::m_select_area(entt::registry& registry,
@@ -582,6 +437,8 @@ void ActionSystem::m_select_area(entt::registry& registry,
     {
       registry.destroy(entity);
     }
+
+    spdlog::debug("Selecting area from ");
 
     on_select(registry, iteration_begin, iteration_end);
   }

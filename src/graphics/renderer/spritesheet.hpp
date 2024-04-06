@@ -20,25 +20,25 @@ class Spritesheet
 
   std::unique_ptr<Texture> texture = nullptr;
 
-  Spritesheet(const WGPUDevice device, const unsigned char* data, const Vector2i& size, const int channels = 4);
+  Spritesheet(WGPUDevice device, const unsigned char* data, const Vector2i& size, int channels = 4);
   // Create full sized texture
   Spritesheet(const std::string& filepath);
   // Create texture atlas
   Spritesheet(const std::string& filepath, const std::string& data_filepath);
 
   // Loads after setting filepath
-  void load(const WGPUDevice device);
+  void load(WGPUDevice device);
 
-  inline const Vector2i& get_size() const { return texture->size; }
-  inline const Vector2i& get_frame_size() const { return m_frame_size; }
-  inline int get_horizontal_frames() const { return m_horizontal_frames; }
-  inline int get_vertical_frames() const { return m_vertical_frames; }
+  [[nodiscard]] inline const Vector2i& get_size() const { return texture->size; }
+  [[nodiscard]] inline const Vector2i& get_frame_size() const { return m_frame_size; }
+  [[nodiscard]] inline int get_horizontal_frames() const { return m_horizontal_frames; }
+  [[nodiscard]] inline int get_vertical_frames() const { return m_vertical_frames; }
 
   // Get top-left, top-right, bottom-right and bottom-left uv coordinates
-  const std::array<glm::vec2, 4>& get_uv_coordinates(const uint32_t frame = 0) const;
+  [[nodiscard]] const std::array<glm::vec2, 4>& get_uv_coordinates(uint32_t frame = 0) const;
 
   // Convert a game id to a texture frame known from a metadata file
-  const FrameData& id_to_frame(const uint32_t id, const std::string& type) const;
+  [[nodiscard]] const FrameData& id_to_frame(uint32_t id, const std::string& type) const;
 
  private:
   FrameData::Map m_frame_data;
@@ -57,11 +57,9 @@ class Spritesheet
   void m_generate_uv_coordinates();
 
   // Generate uv coordinates for a single frame
-  void m_generate_uv_coordinate(const uint32_t frame_id, const FrameData& frame_data);
+  void m_generate_uv_coordinate(uint32_t frame_id, const FrameData& frame_data);
 
   // Calculate top-left, top-right, bottom-right and bottom-left uv coordinates
-  std::array<glm::vec2, 4> m_calculate_uv_coordinates(const int frame = 0,
-                                                      const int width = 1,
-                                                      const int height = 1) const;
+  [[nodiscard]] std::array<glm::vec2, 4> m_calculate_uv_coordinates(int frame = 0, int width = 1, int height = 1) const;
 };
 }  // namespace dl

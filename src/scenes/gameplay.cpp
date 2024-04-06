@@ -221,7 +221,10 @@ void Gameplay::render()
   m_renderer.render(m_camera);
 }
 
-void Gameplay::save_game() { serialization::save_game(m_world, m_game_context.world_metadata, m_registry); }
+void Gameplay::save_game()
+{
+  serialization::save_game(m_world, m_game_context.world_metadata, m_registry);
+}
 
 void Gameplay::load_game()
 {

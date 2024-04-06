@@ -110,13 +110,25 @@ void Display::load(const int width, const int height, const std::string& title)
   m_has_loaded = true;
 }
 
-const Vector2i& Display::get_physical_size() { return m_physical_size; }
+const Vector2i& Display::get_physical_size()
+{
+  return m_physical_size;
+}
 
-const Vector2i& Display::get_window_size() { return m_window_size; }
+const Vector2i& Display::get_window_size()
+{
+  return m_window_size;
+}
 
-const Vector2& Display::get_pixel_scale() { return m_pixel_scale; }
+const Vector2& Display::get_pixel_scale()
+{
+  return m_pixel_scale;
+}
 
-void Display::set_title(const std::string& title) { SDL_SetWindowTitle(m_window, title.c_str()); }
+void Display::set_title(const std::string& title)
+{
+  SDL_SetWindowTitle(m_window, title.c_str());
+}
 
 void Display::set_size(const int width, const int height)
 {

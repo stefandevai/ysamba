@@ -26,6 +26,12 @@ class UIManager
   UIManager(AssetManager* asset_manager, Renderer* renderer);
   ~UIManager();
 
+  // Remove copy/move constructors and assignment operators
+  UIManager(UIManager const&) = delete;
+  UIManager(UIManager const&&) = delete;
+  void operator=(UIManager const&) = delete;
+  void operator=(UIManager const&&) = delete;
+
   template <typename T, typename... Args>
   T* emplace(Args&&... args)
   {

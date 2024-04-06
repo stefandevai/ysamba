@@ -16,7 +16,10 @@ uint32_t Grid3D::terrain_at(const int x, const int y, const int z) const
   return values[m_index(x, y, z)].terrain;
 }
 
-uint32_t Grid3D::terrain_at(const Vector3i& position) const { return terrain_at(position.x, position.y, position.z); }
+uint32_t Grid3D::terrain_at(const Vector3i& position) const
+{
+  return terrain_at(position.x, position.y, position.z);
+}
 
 uint32_t Grid3D::terrain_at(const Vector3& position) const
 {
@@ -53,7 +56,10 @@ const Cell& Grid3D::cell_at(const int x, const int y, const int z) const
   return values[m_index(x, y, z)];
 }
 
-const Cell& Grid3D::cell_at(const Vector3i& position) const { return cell_at(position.x, position.y, position.z); }
+const Cell& Grid3D::cell_at(const Vector3i& position) const
+{
+  return cell_at(position.x, position.y, position.z);
+}
 
 const Cell& Grid3D::cell_at(const Vector3& position) const
 {
@@ -70,7 +76,10 @@ int Grid3D::height_at(const int x, const int y) const
   return height_map[x + y * size.x];
 }
 
-int Grid3D::height_at(const Vector2i& position) const { return height_at(position.x, position.y); }
+int Grid3D::height_at(const Vector2i& position) const
+{
+  return height_at(position.x, position.y);
+}
 
 int Grid3D::height_at(const Vector2& position) const
 {
@@ -87,7 +96,10 @@ void Grid3D::set(const uint32_t id, const int x, const int y, const int z)
   values[m_index(x, y, z)].terrain = id;
 }
 
-void Grid3D::set(const uint32_t id, const Vector3i& position) { set(id, position.x, position.y, position.z); }
+void Grid3D::set(const uint32_t id, const Vector3i& position)
+{
+  set(id, position.x, position.y, position.z);
+}
 
 void Grid3D::set(const uint32_t id, const Vector3& position)
 {
@@ -281,7 +293,10 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
   return false;
 }
 
-bool Grid3D::is_bottom_empty(const int x, const int y, const int z) const { return terrain_at(x, y + 1, z) == 0; }
+bool Grid3D::is_bottom_empty(const int x, const int y, const int z) const
+{
+  return terrain_at(x, y + 1, z) == 0;
+}
 
 bool Grid3D::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
 {
@@ -315,7 +330,10 @@ bool Grid3D::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& s
   return found_pattern;
 }
 
-uint32_t Grid3D::m_index(const int x, const int y, const int z) const { return x + y * size.x + z * size.y * size.x; }
+uint32_t Grid3D::m_index(const int x, const int y, const int z) const
+{
+  return x + y * size.x + z * size.y * size.x;
+}
 
 bool Grid3D::m_in_bounds(const int x, const int y, const int z) const
 {

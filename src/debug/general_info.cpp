@@ -150,7 +150,10 @@ GeneralInfo::GeneralInfo(GameContext& context) : m_game_context(context)
   colors[ImPlotCol_LegendBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.40f);
 }
 
-GeneralInfo::~GeneralInfo() { ImPlot::DestroyContext(); }
+GeneralInfo::~GeneralInfo()
+{
+  ImPlot::DestroyContext();
+}
 
 void GeneralInfo::update()
 {

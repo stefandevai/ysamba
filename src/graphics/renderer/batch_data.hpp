@@ -28,8 +28,8 @@ struct BatchData
     // Create vertex buffer
     vertices.resize(max_vertex_size);
     WGPUBufferDescriptor buffer_descriptor = {
-        .size = max_vertex_size * sizeof(T),
         .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
+        .size = max_vertex_size * sizeof(T),
         .mappedAtCreation = false,
     };
     vertex_buffer = wgpuDeviceCreateBuffer(device, &buffer_descriptor);
@@ -38,8 +38,8 @@ struct BatchData
     // Create index buffer
     indices.resize(max_index_size);
     WGPUBufferDescriptor index_buffer_descriptor = {
-        .size = max_index_size * sizeof(uint32_t),
         .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Index,
+        .size = max_index_size * sizeof(uint32_t),
         .mappedAtCreation = false,
     };
     index_buffer = wgpuDeviceCreateBuffer(device, &index_buffer_descriptor);

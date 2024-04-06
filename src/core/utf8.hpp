@@ -23,19 +23,25 @@ class UTF8Iterator
 
   UTF8Iterator(const UTF8Iterator& other) : string_iterator(other.string_iterator) {}
 
+  UTF8Iterator(UTF8Iterator&& other) noexcept : string_iterator(other.string_iterator) {}
+
+  ~UTF8Iterator() = default;
+
   UTF8Iterator& operator=(const UTF8Iterator& rhs);
+
+  UTF8Iterator& operator=(UTF8Iterator&& rhs) noexcept;
 
   char32_t operator*();
 
   UTF8Iterator& operator++();
 
-  UTF8Iterator operator++(int);
+  const UTF8Iterator operator++(int);
 
   UTF8Iterator operator+=(int quantity);
 
   UTF8Iterator& operator--();
 
-  UTF8Iterator operator--(int);
+  const UTF8Iterator operator--(int);
 
   UTF8Iterator operator-=(int quantity);
 
@@ -59,8 +65,8 @@ class UTF8Iterator
   bool m_dirty = true;
   uint32_t m_code_point = 0;
 
-  uint8_t m_get_code_point() const;
-  uint8_t m_get_code_point_size() const;
+  [[nodiscard]] uint8_t m_get_code_point() const;
+  [[nodiscard]] uint8_t m_get_code_point_size() const;
 };
 
 }  // namespace dl

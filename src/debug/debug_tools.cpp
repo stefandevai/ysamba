@@ -159,7 +159,10 @@ void DebugTools::init_camera_inspector(Camera& camera)
   m_camera_inspector = std::make_unique<CameraInspector>(camera);
 }
 
-void DebugTools::init_render_editor(RenderSystem& render) { m_render_editor = std::make_unique<RenderEditor>(render); }
+void DebugTools::init_render_editor(RenderSystem& render)
+{
+  m_render_editor = std::make_unique<RenderEditor>(render);
+}
 
 void DebugTools::init_chunk_debugger(Gameplay& gameplay)
 {

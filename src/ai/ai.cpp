@@ -2,13 +2,17 @@
 
 #include <spdlog/spdlog.h>
 
+#include "ai/action_manager.hpp"
 #include "core/game_context.hpp"
 #include "ecs/components/society_agent.hpp"
 #include "world/world.hpp"
 
 namespace dl::ai
 {
-System::System(GameContext& game_context, World& world) : m_game_context(game_context), m_world(world) {}
+System::System(GameContext& game_context, World& world, ActionManager& action_manager)
+    : m_game_context(game_context), m_world(world), m_action_manager(action_manager)
+{
+}
 
 void System::update(entt::registry& registry)
 {

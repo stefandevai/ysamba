@@ -38,6 +38,11 @@ extern uint32_t max_steps;
 extern uint32_t tries_after_collision;
 }  // namespace pathfinding
 
+namespace ai
+{
+extern int default_job_priority;
+}
+
 namespace gameplay
 {
 extern double default_zoom;

@@ -10,7 +10,10 @@ namespace dl
 {
 SpatialHash::SpatialHash() : m_cell_dimension(0) {}
 
-SpatialHash::SpatialHash(const uint32_t cell_dimension) { load(cell_dimension); }
+SpatialHash::SpatialHash(const uint32_t cell_dimension)
+{
+  load(cell_dimension);
+}
 
 void SpatialHash::load(const uint32_t cell_dimension)
 {
@@ -58,14 +61,12 @@ std::vector<entt::entity> SpatialHash::get(const int x, const int y, const int z
   std::vector<entt::entity> objects{};
   const auto key = m_get_key(x, y, z);
 
-  // for (const auto key : search_keys)
-  // {
   auto range = m_hash.equal_range(key);
+
   for (auto i = range.first; i != range.second; ++i)
   {
     objects.push_back(i->second);
   }
-  // }
 
   return objects;
 }
