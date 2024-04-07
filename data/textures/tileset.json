@@ -2014,6 +2014,15 @@
             "faces": {
                 "front": 813
             }
+        },
+        {
+            "type": "item",
+            "sprite_type": "single",
+            "game_id": 14,
+            "default_face": "front",
+            "faces": {
+                "front": 15
+            }
         }
     ]
 }

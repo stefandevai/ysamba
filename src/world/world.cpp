@@ -491,7 +491,7 @@ std::unordered_map<uint32_t, Action> World::m_load_actions()
     action.type = json_action["type"].get<JobType>();
 
     json::assign_if_contains<std::string>(json_action, "label", action.label);
-    json::assign_if_contains<uint32_t>(json_action, "turns_into", action.turns_into);
+    json::assign_if_contains<int>(json_action, "turns_into", action.turns_into);
     json::assign_if_contains<std::vector<std::string>>(json_action, "qualities_required", action.qualities_required);
 
     if (json_action.contains("consumes"))
@@ -514,8 +514,8 @@ std::unordered_map<uint32_t, Action> World::m_load_actions()
         assert(item.contains("quantity") && "Consumed item must have a quantity");
 
         const auto item_id = item["item_id"].get<uint32_t>();
-        const auto quantity = item["quantity"].get<std::pair<uint32_t, uint32_t>>();
-        action.gives[item_id] = quantity;
+        const auto quantity = item["quantity"].get<uint32_t>();
+        action.gives.push_back({item_id, quantity});
       }
 
       json::assign_if_contains<bool>(json_action, "gives_in_place", action.gives_in_place);
@@ -542,6 +542,15 @@ void World::m_load_item_data()
 
     item_data.id = item["id"].get<uint32_t>();
     item_data.name = item["name"].get<std::string>();
+
+    if (item.contains("matter_state"))
+    {
+      item_data.matter_state = item["matter_state"].get<MatterState>();
+    }
+    else
+    {
+      item_data.matter_state = MatterState::Solid;
+    }
 
     if (item.contains("weight"))
     {
@@ -575,11 +584,11 @@ void World::m_load_item_data()
     {
       const auto& container = item["container"];
 
-      assert(container.contains("materials") && "Container must have materials");
+      assert(container.contains("matter_states") && "Container must have matter states");
       assert(container.contains("weight_capacity") && "Container must have weight capacity");
       assert(container.contains("volume_capacity") && "Container must have volume capacity");
 
-      json::assign_if_contains<std::vector<uint32_t>>(container, "materials", item_data.container.materials);
+      json::assign_if_contains<std::vector<MatterState>>(container, "matter_states", item_data.container.matter_states);
 
       if (container.contains("weight_capacity"))
       {

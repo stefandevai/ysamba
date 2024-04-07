@@ -8,6 +8,7 @@
 #include "ai/actions/generic_tile.hpp"
 #include "ai/actions/utils.hpp"
 #include "ai/actions/walk.hpp"
+// #include "ai/actions/pickup_liquid.hpp"
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
@@ -172,6 +173,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     }
 
     const auto mouse_tile = m_world.mouse_to_world(camera);
+    const auto& tile_data = m_world.get(mouse_tile.x, mouse_tile.y, mouse_tile.z);
     const auto selected_entity
         = m_world.spatial_hash.get_by_component<Item>(mouse_tile.x, mouse_tile.y, mouse_tile.z, registry);
 
@@ -195,18 +197,16 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
       {
         m_actions.push_back({JobType::Wield, "wield"});
       }
+      if (tile_data.flags.contains("WALKABLE"))
+      {
+        m_actions.push_back({JobType::Walk, "walk to location"});
+      }
 
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select(
           [this, mouse_tile, selected_entity, &registry](const JobType job_type)
           {
-            action::generic_item::job({
-                .registry = registry,
-                .position = mouse_tile,
-                .job_type = job_type,
-                .entities = m_selected_entities,
-                .item = selected_entity,
-            });
+            m_dispatch_action(registry, job_type, mouse_tile, selected_entity);
             m_dispose();
           });
       m_input_manager.push_context("action_menu"_hs);
@@ -215,7 +215,6 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
     else
     {
       // Get tile actions
-      const auto& tile_data = m_world.get(mouse_tile.x, mouse_tile.y, mouse_tile.z);
       m_actions.clear();
 
       for (const auto& action : tile_data.actions)
@@ -223,17 +222,16 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
         m_actions.push_back({action.first, action.second.label});
       }
 
+      if (tile_data.flags.contains("WALKABLE"))
+      {
+        m_actions.push_back({JobType::Walk, "walk to location"});
+      }
+
       m_action_menu->set_actions(m_actions);
       m_action_menu->set_on_select(
           [this, mouse_tile, &registry](const JobType job_type)
           {
-            action::generic_tile::job({
-                .world = m_world,
-                .registry = registry,
-                .position = mouse_tile,
-                .job_type = job_type,
-                .entities = m_selected_entities,
-            });
+            m_dispatch_action(registry, job_type, mouse_tile);
             m_dispose();
           });
       m_input_manager.push_context("action_menu"_hs);
@@ -548,6 +546,76 @@ std::vector<entt::entity> ActionSystem::m_select_available_entities(entt::regist
   }
 
   return free_entities;
+}
+
+void ActionSystem::m_dispatch_action(entt::registry& registry,
+                                     JobType job_type,
+                                     const Vector3i& position,
+                                     entt::entity item)
+{
+  switch (job_type)
+  {
+  // Generic tile actions
+  case JobType::Harvest:
+  case JobType::Break:
+  case JobType::Dig:
+  case JobType::PrepareFirecamp:
+  case JobType::StartFire:
+  case JobType::PlaceHutExterior:
+  case JobType::ConstructEntrance:
+  case JobType::PickupLiquid:
+  {
+    action::generic_tile::job({
+        .world = m_world,
+        .registry = registry,
+        .position = position,
+        .job_type = job_type,
+        .entities = m_selected_entities,
+    });
+    break;
+  }
+
+  // Generic item actions
+  case JobType::Pickup:
+  case JobType::Wear:
+  case JobType::Wield:
+  case JobType::Drop:
+  {
+    if (item == entt::null)
+    {
+      spdlog::critical("No item selected for action");
+      break;
+    }
+
+    action::generic_item::job({
+        .registry = registry,
+        .position = position,
+        .job_type = job_type,
+        .entities = m_selected_entities,
+        .item = item,
+    });
+    break;
+  }
+
+  // Specific actions
+  case JobType::Walk:
+  {
+    for (const auto entity : m_selected_entities)
+    {
+      action::walk::job({
+          .registry = registry,
+          .agent_entity = entity,
+          .position = position,
+      });
+    }
+  }
+
+  default:
+  {
+    spdlog::critical("Unknown job: {}", static_cast<int>(job_type));
+    break;
+  }
+  }
 }
 
 }  // namespace dl

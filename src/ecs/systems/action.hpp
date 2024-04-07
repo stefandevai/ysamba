@@ -80,5 +80,9 @@ class ActionSystem
                      std::function<void(entt::registry&, const Vector3i&, const Vector3i&)> on_select);
   void m_preview_area(entt::registry& registry, const Vector3i& begin, const Vector3i& end);
   std::vector<entt::entity> m_select_available_entities(entt::registry& registry);
+  void m_dispatch_action(entt::registry& registry,
+                         JobType job_type,
+                         const Vector3i& position,
+                         entt::entity item = entt::null);
 };
 }  // namespace dl

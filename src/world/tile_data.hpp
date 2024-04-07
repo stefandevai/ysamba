@@ -10,16 +10,22 @@ namespace dl
 {
 enum class Direction;
 
+struct ActionItemResult
+{
+  uint32_t id{};
+  uint32_t quantity{};
+};
+
 struct Action
 {
   uint32_t id{};
   JobType type{};
   std::string label{};
-  uint32_t turns_into{};
+  int turns_into = -1;
   bool gives_in_place = true;
   std::vector<std::string> qualities_required{};
   std::map<uint32_t, uint32_t> consumes{};
-  std::map<uint32_t, std::pair<uint32_t, uint32_t>> gives{};
+  std::vector<ActionItemResult> gives{};
 };
 
 struct TileData

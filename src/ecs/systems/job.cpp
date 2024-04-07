@@ -69,6 +69,7 @@ void JobSystem::update(entt::registry& registry)
         check_component<ActionWalk>(registry, entity, current_job.entity);
         break;
       case JobType::Pickup:
+      case JobType::PickupLiquid:
         check_component<ActionPickup>(registry, entity, current_job.entity);
         break;
       case JobType::Wear:
@@ -195,7 +196,11 @@ void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity age
   const auto& action = tile_data.actions.at(job_data.type);
   const auto& target_position = target.position;
 
-  m_world.replace(tile.id, action.turns_into, target_position.x, target_position.y, target_position.z);
+  if (action.turns_into >= 0)
+  {
+    m_world.replace(
+        tile.id, static_cast<uint32_t>(action.turns_into), target_position.x, target_position.y, target_position.z);
+  }
 
   if (action.gives.empty())
   {
@@ -210,11 +215,11 @@ void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity age
 
     if (action.gives_in_place)
     {
-      drop = m_world.create_item(registry, item.first, target_position.x, target_position.y, target_position.z);
+      drop = m_world.create_item(registry, item.id, target_position.x, target_position.y, target_position.z);
     }
     else
     {
-      drop = m_world.create_item(registry, item.first, position.x, position.y, position.z);
+      drop = m_world.create_item(registry, item.id, position.x, position.y, position.z);
     }
 
     // TODO: Add storable flag to JSON item

@@ -100,7 +100,7 @@
         "weight": "300g",
         "volume": "100ml",
         "container": {
-          "materials": [1],
+          "matter_states": [1],
           "weight_capacity": "20kg",
           "volume_capacity": "3L"
         },
@@ -119,5 +119,25 @@
         "name": "plant fiber",
         "weight": "10g",
         "volume": "5ml"
+    },
+    {
+        "id": 14,
+        "name": "ceramic jar",
+        "flags": ["PICKABLE", "WIELDABLE", "CONTAINER"],
+        "weight": "1kg",
+        "volume": "1.3L",
+        "container": {
+          "matter_states": [1, 2],
+          "weight_capacity": "100kg",
+          "volume_capacity": "1L"
+        }
+    },
+    {
+        "id": 15,
+        "flags": ["LIQUID", "STACKABLE"],
+        "name": "water",
+        "weight": "1g",
+        "volume": "1ml",
+        "matter_state": 2
     }
 ]

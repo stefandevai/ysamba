@@ -7,11 +7,20 @@
 
 namespace dl
 {
+enum class MatterState
+{
+  None,
+  Solid,
+  Liquid,
+  Gas,
+  Plasma,
+};
+
 struct ItemContainer
 {
   double weight_capacity;
   double volume_capacity;
-  std::vector<uint32_t> materials;
+  std::vector<MatterState> matter_states;
 };
 
 struct ItemData
@@ -26,5 +35,6 @@ struct ItemData
   std::unordered_set<std::string> flags{};
   std::vector<uint32_t> weared_on{};
   ItemContainer container;
+  MatterState matter_state{};
 };
 }  // namespace dl

@@ -18,6 +18,7 @@ enum class JobType
   PlaceHutExterior,
   ConstructEntrance,
   SelectStorageArea,
+  PickupLiquid,
   None,
 };
 }

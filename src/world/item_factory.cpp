@@ -42,7 +42,7 @@ entt::entity create(const ItemData& item_data, entt::registry& registry)
                                 item_data.container.volume_capacity,
                                 0.0,
                                 0.0,
-                                item_data.container.materials);
+                                item_data.container.matter_states);
   }
   if (item_data.flags.contains("STACKABLE"))
   {

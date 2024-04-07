@@ -60,16 +60,13 @@ static bool job(CreateJobParams params)
     params.registry.emplace<JobData>(job, params.job_type);
 
     // TODO: Create walk job if needed on the respective action system
-    if (params.job_type != JobType::Walk)
-    {
-      walk::job({
-          .registry = params.registry,
-          .agent_entity = entity,
-          .agent = &agent,
-          .position = params.position,
-          .offset = 1,
-      });
-    }
+    walk::job({
+        .registry = params.registry,
+        .agent_entity = entity,
+        .agent = &agent,
+        .position = params.position,
+        .offset = 1,
+    });
 
     agent.push_job(Job{config::ai::default_job_priority, job});
     job_assigned = true;
