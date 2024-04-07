@@ -21,6 +21,7 @@
 #include "ui/compositions/item_selection.hpp"
 #include "ui/compositions/notification.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/item_factory.hpp"
 #include "world/target.hpp"
 #include "world/world.hpp"
 
@@ -233,15 +234,11 @@ void DropSystem::m_update_closed_menu(entt::registry& registry)
 
         if (registry.valid(left_hand))
         {
-          const auto& item_component = registry.get<Item>(left_hand);
-          const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({{entity, left_hand}, item.name});
+          m_items.push_back({{entity, left_hand}, item_factory::get_item_label(m_world, registry, left_hand)});
         }
         if (registry.valid(right_hand) && right_hand != left_hand)
         {
-          const auto& item_component = registry.get<Item>(right_hand);
-          const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({{entity, right_hand}, item.name});
+          m_items.push_back({{entity, right_hand}, item_factory::get_item_label(m_world, registry, right_hand)});
         }
       }
       if (registry.all_of<WearedItems>(entity))
@@ -250,9 +247,7 @@ void DropSystem::m_update_closed_menu(entt::registry& registry)
 
         for (auto item_entity : items.items)
         {
-          const auto& item_component = registry.get<Item>(item_entity);
-          const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({{entity, item_entity}, item.name});
+          m_items.push_back({{entity, item_entity}, item_factory::get_item_label(m_world, registry, item_entity)});
         }
       }
       if (registry.all_of<CarriedItems>(entity))
@@ -261,9 +256,7 @@ void DropSystem::m_update_closed_menu(entt::registry& registry)
 
         for (auto item_entity : items.items)
         {
-          const auto& item_component = registry.get<Item>(item_entity);
-          const auto& item = m_world.get_item_data(item_component.id);
-          m_items.push_back({{entity, item_entity}, item.name});
+          m_items.push_back({{entity, item_entity}, item_factory::get_item_label(m_world, registry, item_entity)});
         }
       }
     }

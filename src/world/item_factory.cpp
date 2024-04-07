@@ -9,6 +9,7 @@
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/item_stack.hpp"
+#include "world/world.hpp"
 
 namespace dl::item_factory
 {
@@ -114,5 +115,26 @@ std::string volume_to_string(const double volume)
   }
 
   return std::to_string(volume_number) + "ml";
+}
+
+// Gets a formatted item label for inventory
+std::string get_item_label(World& world, entt::registry& registry, entt::entity entity)
+{
+  const auto& item = registry.get<Item>(entity);
+  const auto& item_data = world.get_item_data(item.id);
+  uint32_t quantity = 1;
+
+  if (registry.all_of<ItemStack>(entity))
+  {
+    const auto& item_stack = registry.get<ItemStack>(entity);
+    quantity = item_stack.quantity;
+  }
+
+  if (quantity > 1)
+  {
+    return fmt::format("{} ({})", item_data.name, quantity);
+  }
+
+  return item_data.name;
 }
 }  // namespace dl::item_factory

@@ -14,6 +14,7 @@
 #include "graphics/camera.hpp"
 #include "ui/compositions/inspector.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/item_factory.hpp"
 #include "world/tile_data.hpp"
 #include "world/world.hpp"
 
@@ -122,19 +123,23 @@ bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
   else if (registry.all_of<Item, Sprite>(entity))
   {
     const auto& item = registry.get<Item>(entity);
+
     if (item.id <= 0)
     {
       return false;
     }
 
+    const auto item_label = item_factory::get_item_label(m_world, registry, entity);
     const auto& item_data = m_world.get_item_data(item.id);
-    m_inspector->set_content(fmt::format("({}, {}, {})\n{}\nWeight: {}\nVolume: {}",
-                                         mouse_position.x,
-                                         mouse_position.y,
-                                         mouse_position.z,
-                                         item_data.name,
-                                         item_data.weight_string,
-                                         item_data.volume_string));
+    const std::string inspector_content = fmt::format("({}, {}, {})\n{}\nWeight: {}\nVolume: {}",
+                                                      mouse_position.x,
+                                                      mouse_position.y,
+                                                      mouse_position.z,
+                                                      item_label,
+                                                      item_data.weight_string,
+                                                      item_data.volume_string);
+
+    m_inspector->set_content(inspector_content);
     updated_inspector_content = true;
   }
   return updated_inspector_content;

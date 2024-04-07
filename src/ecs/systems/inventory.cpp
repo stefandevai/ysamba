@@ -7,6 +7,7 @@
 
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/item_stack.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/society_agent.hpp"
@@ -16,6 +17,7 @@
 #include "ui/compositions/inventory.hpp"
 #include "ui/compositions/society_inventory.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/item_factory.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -137,9 +139,8 @@ void InventorySystem::m_open_selected_inventory(entt::registry& registry,
       continue;
     }
 
-    const auto& item = registry.get<Item>(entity);
-    const auto& item_data = m_world.get_item_data(item.id);
-    m_weared_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+    const auto item_label = item_factory::get_item_label(m_world, registry, entity);
+    m_weared_items_names.push_back({static_cast<uint32_t>(entity), item_label});
   }
 
   for (const auto entity : carried_items)
@@ -149,9 +150,8 @@ void InventorySystem::m_open_selected_inventory(entt::registry& registry,
       continue;
     }
 
-    const auto& item = registry.get<Item>(entity);
-    const auto& item_data = m_world.get_item_data(item.id);
-    m_carried_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+    const auto item_label = item_factory::get_item_label(m_world, registry, entity);
+    m_carried_items_names.push_back({static_cast<uint32_t>(entity), item_label});
   }
 
   m_selected_inventory->set_weared_items(m_weared_items_names);
@@ -179,9 +179,8 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
       continue;
     }
 
-    const auto& item = registry.get<Item>(entity);
-    const auto& item_data = m_world.get_item_data(item.id);
-    m_society_items_names.push_back({static_cast<uint32_t>(entity), item_data.name});
+    const auto item_label = item_factory::get_item_label(m_world, registry, entity);
+    m_society_items_names.push_back({static_cast<uint32_t>(entity), item_label});
   }
 
   m_society_inventory->set_items(m_society_items_names);
@@ -360,5 +359,4 @@ std::vector<entt::entity> InventorySystem::m_get_society_items(entt::registry& r
 
   return items;
 }
-
 }  // namespace dl
