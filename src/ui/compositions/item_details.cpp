@@ -20,7 +20,6 @@ ItemDetails::ItemDetails(UIContext& context) : UIComponent(context)
 
 void ItemDetails::show()
 {
-  spdlog::debug("hereeeeeeeeeeeeeee");
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 

@@ -26,7 +26,7 @@ class ButtonList : public UIComponent
   Color button_text_color = Color{0xFFFFFFFF};
   std::function<void(const T)> on_select;
 
-  ButtonList(UIContext& context) : UIComponent(context) {}
+  ButtonList(UIContext& context) : UIComponent(context, "ButtonList") {}
 
   void init() { m_create_buttons(); }
 

@@ -7,9 +7,15 @@
 
 namespace dl::ui
 {
-Label::Label(UIContext& context) : UIComponent(context) {}
+Label::Label(UIContext& context) : UIComponent(context, "Label")
+{
+  is_renderable = true;
+}
 
-Label::Label(UIContext& context, const std::string_view value) : UIComponent(context), value(value) {}
+Label::Label(UIContext& context, const std::string_view value) : UIComponent(context), value(value)
+{
+  is_renderable = true;
+}
 
 void Label::init()
 {
@@ -40,6 +46,7 @@ void Label::render()
   {
     text.color.opacity_factor = opacity;
   }
+  // spdlog::info("Label::render() {}", absolute_position.z);
 
   m_context.renderer->ui_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z);
 }

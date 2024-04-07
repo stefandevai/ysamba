@@ -10,7 +10,10 @@
 
 namespace dl::ui
 {
-WindowFrame::WindowFrame(UIContext& context) : UIComponent(context) {}
+WindowFrame::WindowFrame(UIContext& context) : UIComponent(context)
+{
+  is_renderable = true;
+}
 
 void WindowFrame::init()
 {

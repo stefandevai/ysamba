@@ -5,13 +5,16 @@
 
 namespace dl::ui
 {
-Container::Container(UIContext& context) : UIComponent(context), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff}))
+Container::Container(UIContext& context)
+    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff}))
 {
+  is_renderable = true;
 }
 
 Container::Container(UIContext& context, const Vector2i& size, const uint32_t color)
     : UIComponent(context), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
 {
+  is_renderable = true;
   this->size = size;
 }
 
@@ -26,6 +29,8 @@ void Container::render()
   {
     quad->color.opacity_factor = opacity;
   }
+
+  // spdlog::info("Container::render() {}", absolute_position.z);
 
   m_context.renderer->ui_pass.batch.quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
 

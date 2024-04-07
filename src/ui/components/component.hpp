@@ -52,6 +52,11 @@ class UIComponent
 
   bool has_initialized = false;
   bool dirty = true;
+
+  // Indicates that the component will be batched and rendered
+  bool is_renderable = false;
+
+  // Component name for debug purposes
   State state = State::Visible;
   Vector3i position{};
   Vector3i absolute_position{};
@@ -66,7 +71,7 @@ class UIComponent
   UIComponent* parent = nullptr;
   std::vector<std::unique_ptr<UIComponent>> children;
 
-  UIComponent(UIContext& context) : m_context(context) {}
+  UIComponent(UIContext& context, const std::string name = "") : m_context(context), m_name(std::move(name)) {}
   virtual ~UIComponent() = default;
 
   UIComponent(UIComponent const&) = delete;
@@ -75,7 +80,6 @@ class UIComponent
   UIComponent& operator=(UIComponent&&) = delete;
 
   virtual void init() {}
-  virtual void update_geometry() {}
   virtual void update() {}
   virtual void render();
   virtual void show();
@@ -126,6 +130,7 @@ class UIComponent
 
  protected:
   UIContext& m_context;
+  std::string m_name = "";
   InputManager& m_input_manager = InputManager::get_instance();
   glm::mat4 m_transform_matrix{};
 

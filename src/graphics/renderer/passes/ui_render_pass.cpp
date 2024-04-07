@@ -16,27 +16,30 @@
 
 namespace dl
 {
-// Create a flat view matrix to use instead of the camera's
-constexpr std::array<float, 16> values{
-    1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    -1.0f,
-    1.0f,
-};
+// // Create a flat view matrix to use instead of the camera's
+// constexpr std::array<float, 16> values{
+//     1.0f,
+//     0.0f,
+//     0.0f,
+//     0.0f,
+//     0.0f,
+//     1.0f,
+//     0.0f,
+//     0.0f,
+//     0.0f,
+//     0.0f,
+//     1.0f,
+//     0.0f,
+//     0.0f,
+//     0.0f,
+//     -1.0f,
+//     1.0f,
+// };
+//
+// const glm::mat4 default_view_matrix = glm::make_mat4(values.data());
 
-const glm::mat4 default_view_matrix = glm::make_mat4(values.data());
+const glm::mat4 default_view_matrix
+    = glm::lookAt(glm::vec3{0.0f, 0.0f, 1000.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
 UIRenderPass::UIRenderPass(GameContext& game_context)
     : m_game_context(game_context), m_context(m_game_context.display->wgpu_context)
