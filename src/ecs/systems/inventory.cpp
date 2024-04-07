@@ -26,14 +26,6 @@ namespace dl
 InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals)
     : m_world(world), m_ui_manager(ui_manager), m_gameplay_modals(gameplay_modals)
 {
-  // auto on_select = [](const int i)
-  // {
-  //   // TODO: Open item details menu
-  //   (void)i;
-  // };
-  //
-  // m_selected_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
-  // m_society_inventory = m_ui_manager.emplace<ui::SocietyInventory>(on_select);
 }
 
 void InventorySystem::update(entt::registry& registry)
@@ -55,32 +47,18 @@ void InventorySystem::update(entt::registry& registry)
 // Updates inventory for selected entities
 void InventorySystem::m_update_selected_inventory()
 {
-  using namespace entt::literals;
-
-  if (!m_input_manager.is_context("inventory"_hs))
+  if (m_gameplay_modals.selected_inventory->is_hidden())
   {
-    return;
-  }
-
-  if (m_input_manager.poll_action("close_inventory"_hs))
-  {
-    m_dispose();
+    m_state = State::Closed;
   }
 }
 
 // Updates inventory for all society agents and storage area
 void InventorySystem::m_update_society_inventory()
 {
-  using namespace entt::literals;
-
-  if (!m_input_manager.is_context("inventory"_hs))
+  if (m_gameplay_modals.society_inventory->is_hidden())
   {
-    return;
-  }
-
-  if (m_input_manager.poll_action("close_inventory"_hs))
-  {
-    m_dispose();
+    m_state = State::Closed;
   }
 }
 
@@ -89,9 +67,7 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 {
   using namespace entt::literals;
 
-  const auto& current_context = m_input_manager.get_current_context();
-
-  if (current_context == nullptr || current_context->key != "gameplay"_hs)
+  if (!m_input_manager.is_context("gameplay"_hs))
   {
     return;
   }
@@ -110,8 +86,6 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
       m_open_selected_inventory(registry, entities);
       m_state = State::OpenSelected;
     }
-
-    m_input_manager.push_context("inventory"_hs);
   }
 }
 
@@ -121,7 +95,7 @@ void InventorySystem::m_open_selected_inventory(entt::registry& registry,
 {
   assert(m_gameplay_modals.selected_inventory != nullptr);
 
-  if (m_gameplay_modals.selected_inventory->state != ui::UIComponent::State::Hidden)
+  if (!m_gameplay_modals.selected_inventory->is_hidden())
   {
     return;
   }
@@ -166,7 +140,7 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
 {
   assert(m_gameplay_modals.society_inventory != nullptr);
 
-  if (m_gameplay_modals.society_inventory->state != ui::UIComponent::State::Hidden)
+  if (!m_gameplay_modals.society_inventory->is_hidden())
   {
     return;
   }
@@ -187,36 +161,6 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
 
   m_gameplay_modals.society_inventory->set_items(m_society_items_names);
   m_gameplay_modals.society_inventory->show();
-}
-
-// Closes any inventory open
-void InventorySystem::m_close_inventory()
-{
-  switch (m_state)
-  {
-  case State::OpenSelected:
-  {
-    m_gameplay_modals.selected_inventory->hide();
-    break;
-  }
-  case State::OpenSociety:
-  {
-    m_gameplay_modals.society_inventory->hide();
-    break;
-  }
-  default:
-  {
-    break;
-  }
-  }
-}
-
-// Removes UI elements and pops input context
-void InventorySystem::m_dispose()
-{
-  m_close_inventory();
-  m_state = State::Closed;
-  m_input_manager.pop_context();
 }
 
 std::vector<entt::entity> InventorySystem::m_get_selected_entities(entt::registry& registry)

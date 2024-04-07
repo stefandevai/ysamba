@@ -72,12 +72,6 @@ class InventorySystem
   // Opens inventory for all society agents and storage area
   void m_open_society_inventory(entt::registry& registry);
 
-  // Closes any inventory open
-  void m_close_inventory();
-
-  // Removes UI elements and pops input context
-  void m_dispose();
-
   std::vector<entt::entity> m_get_selected_entities(entt::registry& registry);
 
   // Gets weared items by society agents. If selected_entities is empty, all society agents are considered

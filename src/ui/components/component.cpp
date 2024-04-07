@@ -74,6 +74,9 @@ void UIComponent::m_update_geometry()
     absolute_position.y = top_left.y;
     absolute_position.z = top_left.z;
   }
+
+  m_context.min_z_index = std::min(m_context.min_z_index, absolute_position.z);
+  m_context.max_z_index = std::max(m_context.min_z_index, absolute_position.z);
 }
 
 void UIComponent::m_update()
@@ -150,6 +153,16 @@ void UIComponent::propagate_state()
 bool UIComponent::is_active()
 {
   return state != State::Hidden && has_initialized;
+}
+
+bool UIComponent::is_hidden()
+{
+  return state == State::Hidden;
+}
+
+bool UIComponent::is_visible()
+{
+  return state == State::Visible;
 }
 
 bool UIComponent::m_is_positioned()

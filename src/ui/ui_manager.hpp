@@ -51,8 +51,15 @@ class UIManager
 
   void update();
   void render();
+
+  // Displays a notification with a message
   Notification* notify(const std::string& notification);
+
+  // Hides all components without triggering animations (if any)
   void force_hide_all();
+
+  // Utility to bring a component to the front of all the others
+  void bring_to_front(UIComponent* component);
 
  private:
   AssetManager* m_asset_manager = nullptr;
@@ -60,10 +67,12 @@ class UIManager
   std::vector<std::unique_ptr<UIComponent>> m_components{};
   std::vector<std::unique_ptr<Notification>> m_notifications{};
   std::vector<glm::mat4> m_matrix_stack{};
+  std::vector<UIComponent*> m_focused_stack{};
   AnimationManager m_animation_manager{};
   Clock m_clock{};
 
-  UIContext m_context{m_asset_manager, m_renderer, &m_clock, &m_animation_manager.registry, &m_matrix_stack};
+  UIContext m_context{
+      this, m_asset_manager, m_renderer, &m_clock, &m_animation_manager.registry, &m_matrix_stack, &m_focused_stack};
 };
 
 }  // namespace dl::ui

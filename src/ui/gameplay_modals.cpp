@@ -20,6 +20,7 @@ GameplayModals::GameplayModals(UIManager& ui_manager) : m_ui_manager(ui_manager)
     // TODO: Open item details menu
     (void)entity;
     item_details->show();
+    // m_ui_manager.bring_to_front(item_details);
   };
 
   selected_inventory = m_ui_manager.emplace<Inventory>(on_select_item);

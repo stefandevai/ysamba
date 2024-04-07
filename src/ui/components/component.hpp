@@ -80,6 +80,7 @@ class UIComponent
   UIComponent& operator=(UIComponent&&) = delete;
 
   virtual void init() {}
+  virtual void process_input() {}
   virtual void update() {}
   virtual void render();
   virtual void show();
@@ -127,6 +128,12 @@ class UIComponent
 
   // Returns true if state is not Hidden and has been initialized
   bool is_active();
+
+  // Returns true if state is Hidden
+  bool is_hidden();
+
+  // Returns true if state is Visible
+  bool is_visible();
 
  protected:
   UIContext& m_context;

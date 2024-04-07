@@ -16,6 +16,7 @@ class SocietyInventory : public UIComponent
  public:
   SocietyInventory(UIContext& context, const std::function<void(entt::entity)>& on_select);
 
+  void process_input();
   void set_items(const ItemList<entt::entity>& items);
   void show();
   void hide();

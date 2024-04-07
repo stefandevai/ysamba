@@ -24,6 +24,25 @@ void UIManager::update()
 {
   m_clock.tick();
   m_animation_manager.update(m_clock.delta);
+  m_context.min_z_index = 0;
+  m_context.max_z_index = 0;
+
+  if (m_focused_stack.empty())
+  {
+    for (auto& component : m_components)
+    {
+      if (component->state == UIComponent::State::Hidden)
+      {
+        continue;
+      }
+
+      component->process_input();
+    }
+  }
+  else
+  {
+    m_focused_stack.back()->process_input();
+  }
 
   for (auto& component : m_components)
   {
@@ -89,6 +108,13 @@ void UIManager::force_hide_all()
       component->state = UIComponent::State::Hidden;
     }
   }
+}
+
+void UIManager::bring_to_front(UIComponent* component)
+{
+  ++m_context.max_z_index;
+  component->position.z = m_context.max_z_index;
+  component->dirty = true;
 }
 
 }  // namespace dl::ui

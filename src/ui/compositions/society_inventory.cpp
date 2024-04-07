@@ -2,10 +2,13 @@
 
 #include <spdlog/spdlog.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/scrollable_list.hpp"
 #include "ui/components/window_frame.hpp"
+#include "ui/ui_manager.hpp"
 
 namespace dl::ui
 {
@@ -26,6 +29,21 @@ SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(
   m_items->set_on_select(on_select);
 }
 
+void SocietyInventory::process_input()
+{
+  using namespace entt::literals;
+
+  if (!m_input_manager.is_context("inventory"_hs))
+  {
+    return;
+  }
+
+  if (m_input_manager.poll_action("close_inventory"_hs))
+  {
+    hide();
+  }
+}
+
 void SocietyInventory::set_items(const ItemList<entt::entity>& items)
 {
   m_items->set_items(items);
@@ -34,12 +52,19 @@ void SocietyInventory::set_items(const ItemList<entt::entity>& items)
 
 void SocietyInventory::show()
 {
+  using namespace entt::literals;
+
+  m_input_manager.push_context("inventory"_hs);
+  m_context.ui_manager->bring_to_front(this);
+  m_context.focused_stack->push_back(this);
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 
 void SocietyInventory::hide()
 {
   animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+  m_context.focused_stack->pop_back();
+  m_input_manager.pop_context();
 }
 
 }  // namespace dl::ui

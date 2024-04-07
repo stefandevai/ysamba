@@ -12,6 +12,7 @@ class ItemDetails : public UIComponent
  public:
   ItemDetails(UIContext& context);
 
+  void process_input();
   void show();
   void hide();
 
