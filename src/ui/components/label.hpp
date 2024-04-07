@@ -19,8 +19,7 @@ class Label : public UIComponent
   void render();
 
   void set_text(const std::string_view value);
-
- private:
+  void set_color(uint32_t color);
 };
 
 }  // namespace dl::ui

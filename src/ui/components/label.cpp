@@ -54,4 +54,15 @@ void Label::set_text(const std::string_view value)
   this->value = value;
   has_initialized = false;
 }
+
+void Label::set_color(uint32_t color)
+{
+  if (color == text.color.int_color)
+  {
+    return;
+  }
+
+  text.color.set(color);
+  has_initialized = false;
+}
 }  // namespace dl::ui

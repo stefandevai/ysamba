@@ -33,6 +33,11 @@ void Button::update()
   if (m_input_manager.mouse_hover_aabb(absolute_position.xy(), size))
   {
     m_input_manager.set_mouse_cursor(MouseCursor::Hand);
+    label->set_color(hover_color);
+  }
+  else
+  {
+    label->set_color(color);
   }
 
   if (m_input_manager.has_clicked_aabb(InputManager::MouseButton::Left, absolute_position.xy(), size))
