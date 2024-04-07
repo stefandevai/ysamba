@@ -4,8 +4,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "./maths/vector.hpp"
-#include "./sdl_input_wrapper.hpp"
+#include "core/maths/vector.hpp"
+#include "core/mouse_cursor.hpp"
+#include "core/sdl_input_wrapper.hpp"
 
 namespace dl
 {
@@ -50,7 +51,8 @@ class InputManager
   [[nodiscard]] bool is_key_up(uint32_t key) const;
   [[nodiscard]] bool is_clicking(MouseButton button) const;
   [[nodiscard]] bool has_clicked(MouseButton button) const;
-  [[nodiscard]] bool has_clicked_bounds(MouseButton button, const Vector2i& position, const Vector2i& size) const;
+  [[nodiscard]] bool has_clicked_aabb(MouseButton button, const Vector2i& position, const Vector2i& size) const;
+  [[nodiscard]] bool mouse_hover_aabb(const Vector2i& position, const Vector2i& size) const;
   [[nodiscard]] static bool is_scrolling_y() { return m_sdl_input_wrapper.get_scroll().y != 0; }
   [[nodiscard]] static bool is_scrolling_x() { return m_sdl_input_wrapper.get_scroll().x != 0; }
   [[nodiscard]] bool is_dragging() const;
@@ -65,6 +67,7 @@ class InputManager
   [[nodiscard]] const std::string& get_text_input() const;
   [[nodiscard]] int get_text_input_cursor_index() const;
   void reset_drag();
+  void set_mouse_cursor(MouseCursor cursor);
 
   [[nodiscard]] bool should_quit() const;
   void quit();

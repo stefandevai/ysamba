@@ -4,17 +4,20 @@
 #include <string>
 #include <unordered_map>
 
-#include "./maths/vector.hpp"
+#include "core/maths/vector.hpp"
+#include "core/mouse_cursor.hpp"
 #include "core/timer.hpp"
 #include "core/utf8.hpp"
+
+struct SDL_Cursor;
 
 namespace dl
 {
 class SDLInputWrapper
 {
  public:
-  SDLInputWrapper();
-  ~SDLInputWrapper() = default;
+  SDLInputWrapper() = default;
+  ~SDLInputWrapper();
 
   // Remove copy/move constructors and assignment operators
   SDLInputWrapper(SDLInputWrapper const&) = delete;
@@ -42,6 +45,7 @@ class SDLInputWrapper
   void text_input_start();
   void text_input_stop();
   void reset_drag() { m_has_dragged = false; }
+  void set_mouse_cursor(MouseCursor cursor);
 
   void set_text_input(const std::string& text);
 
@@ -62,5 +66,8 @@ class SDLInputWrapper
   std::string m_text_input{};
   UTF8Iterator m_cursor{m_text_input.begin()};
   Timer m_mouse_down_timer{};
+  MouseCursor m_mouse_cursor = MouseCursor::Arrow;
+  MouseCursor m_last_mouse_cursor = MouseCursor::Arrow;
+  SDL_Cursor* m_sdl_cursor = nullptr;
 };
 }  // namespace dl

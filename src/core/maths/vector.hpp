@@ -91,6 +91,8 @@ struct Vector3
   Vector3(const Vector3i& other) noexcept;
   Vector3(Vector3&& other) noexcept;
 
+  Vector2 xy() const;
+
   Vector3& operator=(const Vector3& rhs) noexcept;
   Vector3& operator=(const Vector3i& rhs) noexcept;
   Vector3& operator=(Vector3&& rhs) noexcept;
@@ -126,6 +128,8 @@ struct Vector3i
   Vector3i(const Vector3i& other) noexcept;
   Vector3i(const Vector3& other) noexcept;
   Vector3i(Vector3i&& other) noexcept;
+
+  Vector2i xy() const;
 
   Vector3i& operator=(const Vector3i& rhs) noexcept;
   Vector3i& operator=(const Vector3& rhs) noexcept;

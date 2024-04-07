@@ -254,6 +254,11 @@ Vector3i& Vector3i::operator=(const Vector3i& rhs) noexcept
   return *this;
 }
 
+Vector2i Vector3i::xy() const
+{
+  return Vector2i{x, y};
+}
+
 Vector3i& Vector3i::operator=(const Vector3& rhs) noexcept
 {
   x = rhs.x;
@@ -360,6 +365,11 @@ Vector3::Vector3(Vector3&& other) noexcept
   std::swap(x, other.x);
   std::swap(y, other.y);
   std::swap(z, other.z);
+}
+
+Vector2 Vector3::xy() const
+{
+  return Vector2{x, y};
 }
 
 Vector3& Vector3::operator=(const Vector3& rhs) noexcept

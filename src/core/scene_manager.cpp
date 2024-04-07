@@ -4,8 +4,6 @@
 
 #include <memory>
 
-#include "core/input_manager.hpp"
-
 namespace dl
 {
 void SceneManager::pop_scene()
@@ -26,6 +24,9 @@ void SceneManager::update()
   {
     return;
   }
+
+  // Set arrow cursor by default each frame and update during loop if necessary
+  InputManager::get_instance().set_mouse_cursor(MouseCursor::Arrow);
 
   auto& current_scene = m_scenes.back();
 

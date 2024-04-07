@@ -148,7 +148,7 @@ bool InputManager::has_clicked(const MouseButton button) const
   return false;
 }
 
-bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& position, const Vector2i& size) const
+bool InputManager::has_clicked_aabb(const MouseButton button, const Vector2i& position, const Vector2i& size) const
 {
   if (has_clicked(button))
   {
@@ -159,6 +159,19 @@ bool InputManager::has_clicked_bounds(const MouseButton button, const Vector2i& 
     {
       return true;
     }
+  }
+
+  return false;
+}
+
+bool InputManager::mouse_hover_aabb(const Vector2i& position, const Vector2i& size) const
+{
+  const auto& mouse_position = get_mouse_position();
+
+  if (mouse_position.x > position.x && mouse_position.x < position.x + size.x && mouse_position.y > position.y
+      && mouse_position.y < position.y + size.y)
+  {
+    return true;
   }
 
   return false;
@@ -238,6 +251,11 @@ void InputManager::set_text_input(const std::string& text)
 void InputManager::reset_drag()
 {
   m_sdl_input_wrapper.reset_drag();
+}
+
+void InputManager::set_mouse_cursor(MouseCursor cursor)
+{
+  m_sdl_input_wrapper.set_mouse_cursor(cursor);
 }
 
 void InputManager::m_parse_input()

@@ -1,6 +1,5 @@
 #include "./scene.hpp"
 
-#include <SDL.h>
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
 

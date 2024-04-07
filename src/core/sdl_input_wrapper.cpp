@@ -17,6 +17,23 @@ namespace
 auto& debug_tools = dl::DebugTools::get_instance();
 #endif
 
+SDL_SystemCursor mouse_cursor_to_sdl_cursor(dl::MouseCursor game_cursor)
+{
+  switch (game_cursor)
+  {
+  case dl::MouseCursor::Arrow:
+    return SDL_SYSTEM_CURSOR_ARROW;
+  case dl::MouseCursor::Hand:
+    return SDL_SYSTEM_CURSOR_HAND;
+  case dl::MouseCursor::Crosshair:
+    return SDL_SYSTEM_CURSOR_CROSSHAIR;
+  case dl::MouseCursor::Wait:
+    return SDL_SYSTEM_CURSOR_WAIT;
+  default:
+    return SDL_SYSTEM_CURSOR_ARROW;
+  }
+}
+
 using namespace entt::literals;
 const std::unordered_map<uint32_t, int> key_map = {
     {"k_backspace"_hs, SDLK_BACKSPACE},
@@ -259,7 +276,13 @@ const std::unordered_map<uint32_t, int> key_map = {
 
 namespace dl
 {
-SDLInputWrapper::SDLInputWrapper() {}
+SDLInputWrapper::~SDLInputWrapper()
+{
+  if (m_sdl_cursor != nullptr)
+  {
+    SDL_FreeCursor(m_sdl_cursor);
+  }
+}
 
 void SDLInputWrapper::update()
 {
@@ -277,6 +300,7 @@ void SDLInputWrapper::update()
     it.second = false;
   }
 
+  // Reset input state
   m_window_size_changed = false;
 
   m_any_key_down = false;
@@ -484,9 +508,20 @@ void SDLInputWrapper::update()
     }
   }
 
-#ifdef DL_BUILD_DEBUG_TOOLS
-  // debug_tools.update();
-#endif
+  // Update mouse cursor
+
+  if (m_mouse_cursor != m_last_mouse_cursor)
+  {
+    if (m_sdl_cursor != nullptr)
+    {
+      SDL_FreeCursor(m_sdl_cursor);
+    }
+
+    const auto cursor = mouse_cursor_to_sdl_cursor(m_mouse_cursor);
+    m_sdl_cursor = SDL_CreateSystemCursor(cursor);
+    SDL_SetCursor(m_sdl_cursor);
+    m_last_mouse_cursor = m_mouse_cursor;
+  }
 }
 
 bool SDLInputWrapper::is_any_key_down() const
@@ -527,6 +562,11 @@ void SDLInputWrapper::text_input_stop()
   SDL_StopTextInput();
   m_text_input.clear();
   m_cursor = m_text_input.end();
+}
+
+void SDLInputWrapper::set_mouse_cursor(MouseCursor cursor)
+{
+  m_mouse_cursor = cursor;
 }
 
 const std::string& SDLInputWrapper::get_text_input() const

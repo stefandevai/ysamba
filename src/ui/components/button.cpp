@@ -30,8 +30,12 @@ void Button::update()
     return;
   }
 
-  if (m_input_manager.has_clicked_bounds(
-          InputManager::MouseButton::Left, {absolute_position.x, absolute_position.y}, size))
+  if (m_input_manager.mouse_hover_aabb(absolute_position.xy(), size))
+  {
+    m_input_manager.set_mouse_cursor(MouseCursor::Hand);
+  }
+
+  if (m_input_manager.has_clicked_aabb(InputManager::MouseButton::Left, absolute_position.xy(), size))
   {
     on_click();
   }

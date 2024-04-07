@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "core/asset_manager.hpp"
+#include "core/input_manager.hpp"
 #include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
