@@ -8,6 +8,7 @@
 
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/item_stack.hpp"
 
 namespace dl::item_factory
 {
@@ -41,6 +42,10 @@ entt::entity create(const ItemData& item_data, entt::registry& registry)
                                 0.0,
                                 0.0,
                                 item_data.container.materials);
+  }
+  if (item_data.flags.contains("STACKABLE"))
+  {
+    registry.emplace<ItemStack>(item);
   }
 
   registry.emplace<Item>(item, item_data.id);

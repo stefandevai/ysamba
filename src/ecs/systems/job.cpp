@@ -206,30 +206,19 @@ void JobSystem::m_update_tile_job(const entt::entity job, const entt::entity age
 
   for (const auto& item : action.gives)
   {
-    const auto drop = registry.create();
-
-    registry.emplace<entt::tag<"storable"_hs>>(drop);
+    entt::entity drop;
 
     if (action.gives_in_place)
     {
-      registry.emplace<Position>(drop,
-                                 static_cast<double>(target_position.x),
-                                 static_cast<double>(target_position.y),
-                                 static_cast<double>(target_position.z));
+      drop = m_world.create_item(registry, item.first, target_position.x, target_position.y, target_position.z);
     }
     else
     {
-      registry.emplace<Position>(drop, position.x, position.y, position.z);
+      drop = m_world.create_item(registry, item.first, position.x, position.y, position.z);
     }
 
-    registry.emplace<Sprite>(drop,
-                             Sprite{
-                                 .resource_id = m_world.get_spritesheet_id(),
-                                 .id = item.first,
-                                 .category = frame_data_type::item,
-                                 .layer_z = renderer::layer_z_offset_items,
-                             });
-    registry.emplace<Item>(drop, item.first);
+    // TODO: Add storable flag to JSON item
+    registry.emplace<entt::tag<"storable"_hs>>(drop);
   }
 }
 

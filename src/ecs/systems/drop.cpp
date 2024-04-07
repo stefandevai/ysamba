@@ -9,6 +9,7 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/item_stack.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
@@ -120,6 +121,34 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     if (removed)
     {
       auto& item_component = registry.get<Item>(item);
+
+      if (registry.all_of<ItemStack>(item))
+      {
+        // Check if an item with the same id is already in the position
+        const auto items_on_ground = m_world.spatial_hash.get_all_by_component<Item>(
+            target.position.x, target.position.y, target.position.z, registry);
+
+        auto ground_item = std::find_if(items_on_ground.begin(),
+                                        items_on_ground.end(),
+                                        [&item_component, &registry](const auto& other)
+                                        {
+                                          const auto& other_item = registry.get<Item>(other);
+                                          return other_item.id == item_component.id;
+                                        });
+
+        // Increase item stack
+        if (ground_item != items_on_ground.end())
+        {
+          const auto& item_stack = registry.get<ItemStack>(item);
+          auto& ground_item_stack = registry.get<ItemStack>(*ground_item);
+          ground_item_stack.quantity += item_stack.quantity;
+          registry.destroy(item);
+          stop_drop(registry, entity, action_drop.job);
+          continue;
+        }
+      }
+
+      // Add item to the ground
       registry.emplace<Position>(item,
                                  static_cast<double>(target.position.x),
                                  static_cast<double>(target.position.y),

@@ -108,7 +108,7 @@
     },
     {
         "id": 12,
-        "flags": ["PICKABLE", "WIELDABLE"],
+        "flags": ["PICKABLE", "WIELDABLE", "STACKABLE"],
         "name": "quinoa panicle",
         "weight": "150g",
         "volume": "100ml"
