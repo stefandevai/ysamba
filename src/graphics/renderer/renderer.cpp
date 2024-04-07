@@ -58,10 +58,9 @@ void Renderer::load()
   };
 
   m_load_depth_buffer(context.device, depth_texture, depth_texture_view);
-  m_load_depth_buffer(context.device, ui_depth_texture, ui_depth_texture_view);
 
   main_pass.load(main_shader, depth_texture_view);
-  ui_pass.load(ui_shader, ui_depth_texture_view);
+  ui_pass.load(ui_shader);
 
   m_has_loaded = true;
 }
@@ -69,9 +68,7 @@ void Renderer::load()
 void Renderer::resize()
 {
   m_load_depth_buffer(context.device, depth_texture, depth_texture_view);
-  m_load_depth_buffer(context.device, ui_depth_texture, ui_depth_texture_view);
   main_pass.resize(depth_texture_view);
-  ui_pass.resize(ui_depth_texture_view);
 }
 
 void Renderer::m_load_depth_buffer(WGPUDevice device, WGPUTexture& texture, WGPUTextureView& texture_view)

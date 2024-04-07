@@ -19,7 +19,6 @@ class UIRenderPass
  public:
   Batch batch{m_game_context};
   WGPUColor clear_color{0.0, 0.0, 0.0, 1.0};
-  WGPURenderPassDepthStencilAttachment depth_stencil_attachment;
   WGPURenderPassColorAttachment render_pass_color_attachment;
   WGPURenderPassDescriptor render_pass_descriptor;
 
@@ -32,9 +31,8 @@ class UIRenderPass
   UIRenderPass&& operator=(UIRenderPass&& rhs) = delete;
   UIRenderPass(UIRenderPass&& rhs) = delete;
 
-  void load(const Shader& shader, WGPUTextureView depth_texture_view);
+  void load(const Shader& shader);
   void render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera);
-  void resize(WGPUTextureView depth_texture_view);
 
  private:
   enum BindGroupType

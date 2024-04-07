@@ -70,6 +70,11 @@ void UIManager::update()
 
 void UIManager::render()
 {
+  // Sort top level components by z-index
+  std::sort(m_components.begin(),
+            m_components.end(),
+            [](const auto& a, const auto& b) { return a->position.z < b->position.z; });
+
   for (auto& component : m_components)
   {
     if (component->state == UIComponent::State::Hidden)
