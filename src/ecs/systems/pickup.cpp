@@ -6,6 +6,7 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/item_stack.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/sprite.hpp"
@@ -47,8 +48,9 @@ void PickupSystem::update(entt::registry& registry)
       continue;
     }
 
-    // Check if we still have the capacity to pickup
     auto& item_component = registry.get<Item>(item);
+
+    // Check if we still have the capacity to pickup
     const auto& item_data = m_world.get_item_data(item_component.id);
     const auto container_entity = get_container_with_enough_capacity(registry, entity, item_data);
 
@@ -62,7 +64,39 @@ void PickupSystem::update(entt::registry& registry)
     if (registry.all_of<WieldedItems>(container_entity))
     {
       auto& wielded = registry.get<WieldedItems>(entity);
+      entt::entity existing_item = entt::null;
 
+      // Add to stack if item is already in wield slot
+      if (registry.valid(wielded.left_hand) && registry.all_of<ItemStack, Item>(wielded.left_hand))
+      {
+        const auto left_item = registry.get<Item>(wielded.left_hand);
+
+        if (left_item.id == item_data.id)
+        {
+          existing_item = wielded.left_hand;
+        }
+      }
+      else if (registry.valid(wielded.right_hand) && registry.all_of<ItemStack, Item>(wielded.right_hand))
+      {
+        const auto right_item = registry.get<Item>(wielded.right_hand);
+
+        if (right_item.id == item_data.id)
+        {
+          existing_item = wielded.right_hand;
+        }
+      }
+
+      if (existing_item != entt::null)
+      {
+        auto& item_stack = registry.get<ItemStack>(item);
+        auto& existing_stack = registry.get<ItemStack>(existing_item);
+        existing_stack.quantity += item_stack.quantity;
+        registry.destroy(item);
+        stop_pickup(registry, entity, action_pickup.job);
+        continue;
+      }
+
+      // Wield item in free hand
       // TODO: Take into consideration if agent is left or right handed
       if (!registry.valid(wielded.left_hand))
       {
@@ -86,6 +120,27 @@ void PickupSystem::update(entt::registry& registry)
       auto& container = registry.get<Container>(container_entity);
       container.weight_occupied += item_data.weight;
       container.volume_occupied += item_data.volume;
+
+      // Check if item already exists in container and add to stack if it does
+      if (registry.all_of<ItemStack>(item))
+      {
+        auto existing_item = std::find_if(container.items.begin(),
+                                          container.items.end(),
+                                          [&registry, &item_component](const auto& item)
+                                          { return registry.get<Item>(item).id == item_component.id; });
+
+        if (existing_item != container.items.end())
+        {
+          const auto& item_stack = registry.get<ItemStack>(item);
+          auto& existing_item_stack = registry.get<ItemStack>(*existing_item);
+          existing_item_stack.quantity += item_stack.quantity;
+          registry.destroy(item);
+          stop_pickup(registry, entity, action_pickup.job);
+          continue;
+        }
+      }
+
+      // Add new item to container
       container.items.push_back(item);
 
       item_component.container = container_entity;
@@ -204,10 +259,31 @@ entt::entity PickupSystem::get_container_with_enough_capacity(entt::registry& re
     {
       return entity;
     }
+    // Check if stackable item is already in left hand
+    else if (registry.all_of<ItemStack, Item>(wielded.left_hand))
+    {
+      const auto left_item = registry.get<Item>(wielded.left_hand);
+
+      if (left_item.id == item_data.id)
+      {
+        return entity;
+      }
+    }
+
     // Right hand is empty
-    else if (!registry.valid(wielded.right_hand))
+    if (!registry.valid(wielded.right_hand))
     {
       return entity;
+    }
+    // Check if stackable item is already in right hand
+    else if (registry.all_of<ItemStack, Item>(wielded.right_hand))
+    {
+      const auto right_item = registry.get<Item>(wielded.right_hand);
+
+      if (right_item.id == item_data.id)
+      {
+        return entity;
+      }
     }
   }
 
