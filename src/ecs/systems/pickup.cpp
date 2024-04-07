@@ -321,6 +321,19 @@ void PickupSystem::m_pickup(entt::registry& registry, entt::entity entity)
     return;
   }
 
+  // Add container items to agent CarriedItems
+  auto& carried_items = registry.get<CarriedItems>(entity);
+
+  if (registry.all_of<Container>(item))
+  {
+    auto& container = registry.get<Container>(item);
+
+    for (const auto container_item : container.items)
+    {
+      carried_items.items.push_back(container_item);
+    }
+  }
+
   // Wield item
   if (registry.all_of<WieldedItems>(container_entity))
   {
@@ -409,7 +422,6 @@ void PickupSystem::m_pickup(entt::registry& registry, entt::entity entity)
     // Duplicate item entity in CarriedItems component to
     // make item lookup easier
     // TODO: Implement binary tree with item id as index
-    auto& carried_items = registry.get<CarriedItems>(entity);
     carried_items.items.push_back(item);
   }
   else

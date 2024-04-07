@@ -123,6 +123,17 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     {
       auto& item_component = registry.get<Item>(item);
 
+      // Remove container items from agent CarriedItems
+      if (registry.all_of<Container>(item))
+      {
+        auto& container = registry.get<Container>(item);
+
+        for (const auto container_item : container.items)
+        {
+          carried.items.erase(std::find(carried.items.begin(), carried.items.end(), container_item));
+        }
+      }
+
       if (registry.all_of<ItemStack>(item))
       {
         // Check if an item with the same id is already in the position
