@@ -1,8 +1,6 @@
 #pragma once
 
-#include <entt/core/hashed_string.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <map>
 
 #include "./animation_manager.hpp"
 #include "./components/component.hpp"
@@ -18,8 +16,6 @@ class Renderer;
 
 namespace dl::ui
 {
-using namespace entt::literals;
-
 class UIManager
 {
  public:

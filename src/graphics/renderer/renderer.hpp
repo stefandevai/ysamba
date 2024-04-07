@@ -38,14 +38,16 @@ class Renderer
 
  private:
   bool m_has_loaded = false;
-  WGPUTextureView depth_texture_view;
   WGPUTexture depth_texture;
+  WGPUTexture ui_depth_texture;
+  WGPUTextureView depth_texture_view;
+  WGPUTextureView ui_depth_texture_view;
 
   // Descriptors used during rendering
   WGPUTextureViewDescriptor target_view_descriptor;
   WGPUCommandEncoderDescriptor command_encoder_descriptor;
 
-  void m_load_depth_buffer(WGPUDevice device);
+  void m_load_depth_buffer(WGPUDevice device, WGPUTexture& texture, WGPUTextureView& texture_view);
 };
 
 }  // namespace dl

@@ -22,6 +22,7 @@
 #include "ecs/systems/walk.hpp"
 #include "ecs/systems/wear.hpp"
 #include "ecs/systems/wield.hpp"
+#include "ui/gameplay_modals.hpp"
 #include "world/world.hpp"
 
 namespace dl
@@ -60,6 +61,8 @@ class Gameplay : public Scene
   entt::entity m_player;
   double m_turn_delay = 0.0;
 
+  ui::GameplayModals m_gameplay_modals{m_ui_manager};
+
   ai::System m_ai_system{m_game_context, m_world};
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};
@@ -71,7 +74,7 @@ class Gameplay : public Scene
   StorageAreaSystem m_storage_area_system{m_world, m_event_emitter, m_ui_manager};
   WalkSystem m_walk_system{m_world, m_registry};
   JobSystem m_job_system{m_world};
-  InventorySystem m_inventory_system{m_world, m_ui_manager};
+  InventorySystem m_inventory_system{m_world, m_ui_manager, m_gameplay_modals};
   WearSystem m_wear_system{m_world};
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager};

@@ -11,7 +11,7 @@
 
 namespace dl::ui
 {
-Inventory::Inventory(UIContext& context, const std::function<void(const int i)>& on_select) : UIComponent(context)
+Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select) : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
 
@@ -20,26 +20,26 @@ Inventory::Inventory(UIContext& context, const std::function<void(const int i)>&
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_weared_items = m_window_frame->emplace<ScrollableList<uint32_t>>();
+  m_weared_items = m_window_frame->emplace<ScrollableList<entt::entity>>();
   m_weared_items->title = "Weared Items";
   m_weared_items->size = Vector2i{452, 352};
   m_weared_items->position = Vector3i{24, 24, 0};
   m_weared_items->set_on_select(on_select);
 
-  m_carried_items = m_window_frame->emplace<ScrollableList<uint32_t>>();
+  m_carried_items = m_window_frame->emplace<ScrollableList<entt::entity>>();
   m_carried_items->title = "Carried Items";
   m_carried_items->size = Vector2i{452, 352};
   m_carried_items->position = Vector3i{224, 24, 0};
   m_carried_items->set_on_select(on_select);
 }
 
-void Inventory::set_weared_items(const ItemList<uint32_t>& items)
+void Inventory::set_weared_items(const ItemList<entt::entity>& items)
 {
   m_weared_items->set_items(items);
   dirty = true;
 }
 
-void Inventory::set_carried_items(const ItemList<uint32_t>& items)
+void Inventory::set_carried_items(const ItemList<entt::entity>& items)
 {
   m_carried_items->set_items(items);
   dirty = true;

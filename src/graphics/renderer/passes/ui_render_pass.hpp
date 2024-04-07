@@ -32,8 +32,9 @@ class UIRenderPass
   UIRenderPass&& operator=(UIRenderPass&& rhs) = delete;
   UIRenderPass(UIRenderPass&& rhs) = delete;
 
-  void load(const Shader& shader);
+  void load(const Shader& shader, WGPUTextureView depth_texture_view);
   void render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera);
+  void resize(WGPUTextureView depth_texture_view);
 
  private:
   enum BindGroupType

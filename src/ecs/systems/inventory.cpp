@@ -16,22 +16,24 @@
 #include "ecs/components/wielded_items.hpp"
 #include "ui/compositions/inventory.hpp"
 #include "ui/compositions/society_inventory.hpp"
+#include "ui/gameplay_modals.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/item_factory.hpp"
 #include "world/world.hpp"
 
 namespace dl
 {
-InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
+InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals)
+    : m_world(world), m_ui_manager(ui_manager), m_gameplay_modals(gameplay_modals)
 {
-  auto on_select = [](const int i)
-  {
-    // TODO: Open item details menu
-    (void)i;
-  };
-
-  m_selected_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
-  m_society_inventory = m_ui_manager.emplace<ui::SocietyInventory>(on_select);
+  // auto on_select = [](const int i)
+  // {
+  //   // TODO: Open item details menu
+  //   (void)i;
+  // };
+  //
+  // m_selected_inventory = m_ui_manager.emplace<ui::Inventory>(on_select);
+  // m_society_inventory = m_ui_manager.emplace<ui::SocietyInventory>(on_select);
 }
 
 void InventorySystem::update(entt::registry& registry)
@@ -117,9 +119,9 @@ void InventorySystem::m_update_closed_inventory(entt::registry& registry)
 void InventorySystem::m_open_selected_inventory(entt::registry& registry,
                                                 const std::vector<entt::entity>& selected_entities)
 {
-  assert(m_selected_inventory != nullptr);
+  assert(m_gameplay_modals.selected_inventory != nullptr);
 
-  if (m_selected_inventory->state != ui::UIComponent::State::Hidden)
+  if (m_gameplay_modals.selected_inventory->state != ui::UIComponent::State::Hidden)
   {
     return;
   }
@@ -140,7 +142,7 @@ void InventorySystem::m_open_selected_inventory(entt::registry& registry,
     }
 
     const auto item_label = item_factory::get_item_label(m_world, registry, entity);
-    m_weared_items_names.push_back({static_cast<uint32_t>(entity), item_label});
+    m_weared_items_names.push_back({entity, item_label});
   }
 
   for (const auto entity : carried_items)
@@ -151,20 +153,20 @@ void InventorySystem::m_open_selected_inventory(entt::registry& registry,
     }
 
     const auto item_label = item_factory::get_item_label(m_world, registry, entity);
-    m_carried_items_names.push_back({static_cast<uint32_t>(entity), item_label});
+    m_carried_items_names.push_back({entity, item_label});
   }
 
-  m_selected_inventory->set_weared_items(m_weared_items_names);
-  m_selected_inventory->set_carried_items(m_carried_items_names);
-  m_selected_inventory->show();
+  m_gameplay_modals.selected_inventory->set_weared_items(m_weared_items_names);
+  m_gameplay_modals.selected_inventory->set_carried_items(m_carried_items_names);
+  m_gameplay_modals.selected_inventory->show();
 }
 
 // Opens inventory for all society agents and storage area
 void InventorySystem::m_open_society_inventory(entt::registry& registry)
 {
-  assert(m_society_inventory != nullptr);
+  assert(m_gameplay_modals.society_inventory != nullptr);
 
-  if (m_society_inventory->state != ui::UIComponent::State::Hidden)
+  if (m_gameplay_modals.society_inventory->state != ui::UIComponent::State::Hidden)
   {
     return;
   }
@@ -180,11 +182,11 @@ void InventorySystem::m_open_society_inventory(entt::registry& registry)
     }
 
     const auto item_label = item_factory::get_item_label(m_world, registry, entity);
-    m_society_items_names.push_back({static_cast<uint32_t>(entity), item_label});
+    m_society_items_names.push_back({entity, item_label});
   }
 
-  m_society_inventory->set_items(m_society_items_names);
-  m_society_inventory->show();
+  m_gameplay_modals.society_inventory->set_items(m_society_items_names);
+  m_gameplay_modals.society_inventory->show();
 }
 
 // Closes any inventory open
@@ -194,12 +196,12 @@ void InventorySystem::m_close_inventory()
   {
   case State::OpenSelected:
   {
-    m_selected_inventory->hide();
+    m_gameplay_modals.selected_inventory->hide();
     break;
   }
   case State::OpenSociety:
   {
-    m_society_inventory->hide();
+    m_gameplay_modals.society_inventory->hide();
     break;
   }
   default:

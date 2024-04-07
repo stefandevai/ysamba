@@ -8,6 +8,7 @@
 namespace dl::ui
 {
 class UIManager;
+class GameplayModals;
 class Inventory;
 class SocietyInventory;
 }  // namespace dl::ui
@@ -21,7 +22,7 @@ struct Vector2i;
 class InventorySystem
 {
  public:
-  InventorySystem(World& world, ui::UIManager& ui_manager);
+  InventorySystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals);
 
   void update(entt::registry& registry);
 
@@ -40,21 +41,16 @@ class InventorySystem
   World& m_world;
 
   ui::UIManager& m_ui_manager;
+  ui::GameplayModals& m_gameplay_modals;
 
   // Caches names of items carried by society agents
-  ui::ItemList<uint32_t> m_carried_items_names{};
+  ui::ItemList<entt::entity> m_carried_items_names{};
 
   // Caches names of items weared and wielded by society agents
-  ui::ItemList<uint32_t> m_weared_items_names{};
+  ui::ItemList<entt::entity> m_weared_items_names{};
 
   // Caches storage items and carried items by all society agents
-  ui::ItemList<uint32_t> m_society_items_names{};
-
-  // Inventory UI composition for selected entities only
-  ui::Inventory* m_selected_inventory = nullptr;
-
-  // Inventory UI composition that displays storage items and carried items by all society agents
-  ui::SocietyInventory* m_society_inventory = nullptr;
+  ui::ItemList<entt::entity> m_society_items_names{};
 
   // Main inventory state
   State m_state = State::Closed;

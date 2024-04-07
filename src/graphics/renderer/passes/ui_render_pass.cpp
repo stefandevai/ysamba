@@ -68,7 +68,7 @@ UIRenderPass::~UIRenderPass()
   wgpuRenderPipelineRelease(batch.pipeline.pipeline);
 }
 
-void UIRenderPass::load(const Shader& shader)
+void UIRenderPass::load(const Shader& shader, WGPUTextureView depth_texture_view)
 {
   using namespace entt::literals;
 
@@ -262,6 +262,16 @@ void UIRenderPass::load(const Shader& shader)
     .multisample.count = 1,
   };
 
+  WGPUDepthStencilState stencil_state;
+  stencil_state = utils::default_depth_stencil_state();
+  stencil_state.depthCompare = WGPUCompareFunction_Less;
+  stencil_state.depthWriteEnabled = true;
+  stencil_state.format = WGPUTextureFormat_Depth24Plus;
+  stencil_state.stencilReadMask = 0;
+  stencil_state.stencilWriteMask = 0;
+
+  pipeline_descriptor.depthStencil = &stencil_state;
+
   pipeline.pipeline = wgpuDeviceCreateRenderPipeline(m_context.device, &pipeline_descriptor);
   assert(pipeline.pipeline != nullptr);
 
@@ -272,13 +282,30 @@ void UIRenderPass::load(const Shader& shader)
       .storeOp = WGPUStoreOp_Store,
   };
 
+  depth_stencil_attachment = {
+      .view = depth_texture_view,
+      .depthClearValue = 1.0f,
+      .depthLoadOp = WGPULoadOp_Clear,
+      .depthStoreOp = WGPUStoreOp_Store,
+      .depthReadOnly = false,
+      .stencilClearValue = 0,
+      .stencilLoadOp = WGPULoadOp_Clear,
+      .stencilStoreOp = WGPUStoreOp_Store,
+      .stencilReadOnly = true,
+  };
+
   render_pass_descriptor = {
       .timestampWrites = nullptr,
-      .depthStencilAttachment = nullptr,
+      .depthStencilAttachment = &depth_stencil_attachment,
       .colorAttachmentCount = 1,
   };
 
   m_has_loaded = true;
+}
+
+void UIRenderPass::resize(WGPUTextureView depth_texture_view)
+{
+  depth_stencil_attachment.view = depth_texture_view;
 }
 
 void UIRenderPass::render(WGPUTextureView target_view, WGPUCommandEncoder encoder, const Camera& camera)

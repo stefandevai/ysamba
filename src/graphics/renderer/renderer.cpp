@@ -57,27 +57,30 @@ void Renderer::load()
       .label = "Command Encoder",
   };
 
-  m_load_depth_buffer(context.device);
+  m_load_depth_buffer(context.device, depth_texture, depth_texture_view);
+  m_load_depth_buffer(context.device, ui_depth_texture, ui_depth_texture_view);
 
   main_pass.load(main_shader, depth_texture_view);
-  ui_pass.load(ui_shader);
+  ui_pass.load(ui_shader, ui_depth_texture_view);
 
   m_has_loaded = true;
 }
 
 void Renderer::resize()
 {
-  m_load_depth_buffer(context.device);
+  m_load_depth_buffer(context.device, depth_texture, depth_texture_view);
+  m_load_depth_buffer(context.device, ui_depth_texture, ui_depth_texture_view);
   main_pass.resize(depth_texture_view);
+  ui_pass.resize(ui_depth_texture_view);
 }
 
-void Renderer::m_load_depth_buffer(WGPUDevice device)
+void Renderer::m_load_depth_buffer(WGPUDevice device, WGPUTexture& texture, WGPUTextureView& texture_view)
 {
   if (m_has_loaded)
   {
-    wgpuTextureViewRelease(depth_texture_view);
-    wgpuTextureDestroy(depth_texture);
-    wgpuTextureRelease(depth_texture);
+    wgpuTextureViewRelease(texture_view);
+    wgpuTextureDestroy(texture);
+    wgpuTextureRelease(texture);
   }
 
   const auto& display_size = Display::get_physical_size();
@@ -95,8 +98,8 @@ void Renderer::m_load_depth_buffer(WGPUDevice device)
       .viewFormats = &depth_texture_format,
   };
 
-  depth_texture = wgpuDeviceCreateTexture(device, &depthTextureDesc);
-  assert(depth_texture != nullptr);
+  texture = wgpuDeviceCreateTexture(device, &depthTextureDesc);
+  assert(texture != nullptr);
 
   WGPUTextureViewDescriptor depthTextureViewDesc = {
       .aspect = WGPUTextureAspect_DepthOnly,
@@ -108,8 +111,8 @@ void Renderer::m_load_depth_buffer(WGPUDevice device)
       .format = depth_texture_format,
   };
 
-  depth_texture_view = wgpuTextureCreateView(depth_texture, &depthTextureViewDesc);
-  assert(depth_texture_view != nullptr);
+  texture_view = wgpuTextureCreateView(texture, &depthTextureViewDesc);
+  assert(texture_view != nullptr);
 }
 
 void Renderer::render(const Camera& camera)
