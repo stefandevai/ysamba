@@ -14,19 +14,22 @@ namespace dl
 {
 struct NinePatchData
 {
-  const uint32_t top{};
   const uint32_t left{};
-  const uint32_t bottom{};
+  const uint32_t top{};
   const uint32_t right{};
+  const uint32_t bottom{};
   const uint32_t border{};
 };
 
-struct SliceData
+struct TextureSliceData
 {
-  std::array<glm::vec2, 4> uv_coordinates{};
+  const uint32_t left{};
+  const uint32_t top{};
+  const uint32_t right{};
+  const uint32_t bottom{};
 };
 
-using FreeformFrameData = std::variant<NinePatchData, SliceData>;
+using FreeformFrameData = std::variant<NinePatchData, TextureSliceData>;
 
 class TextureAtlas
 {

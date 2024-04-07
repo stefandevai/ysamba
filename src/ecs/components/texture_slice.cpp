@@ -1,6 +1,7 @@
 #include "./texture_slice.hpp"
 
 #include "graphics/renderer/texture.hpp"
+#include "graphics/renderer/texture_atlas.hpp"
 
 namespace dl
 {
@@ -33,5 +34,29 @@ void TextureSlice::set_uv_with_size(const float top, const float left, const flo
 
   size.x = width;
   size.y = height;
+}
+
+void TextureSlice::load_from_texture_atlas(TextureAtlas* texture_atlas)
+{
+  assert(texture_atlas != nullptr && "Texture atlas is null when loading TextureSlice");
+
+  texture = texture_atlas->texture.get();
+  const auto& texture_size = texture_atlas->texture->size;
+  const auto& data = texture_atlas->get_metadata<TextureSliceData>(id);
+
+  const auto uv_left = data.left / static_cast<float>(texture_size.x);
+  const auto uv_top = data.top / static_cast<float>(texture_size.y);
+  const auto uv_right = data.right / static_cast<float>(texture_size.x);
+  const auto uv_bottom = data.bottom / static_cast<float>(texture_size.y);
+
+  uv_coordinates = std::array<glm::vec2, 4>{
+      glm::vec2{uv_left, uv_top},
+      glm::vec2{uv_right, uv_top},
+      glm::vec2{uv_right, uv_bottom},
+      glm::vec2{uv_left, uv_bottom},
+  };
+
+  size.x = data.right - data.left;
+  size.y = data.bottom - data.top;
 }
 }  // namespace dl

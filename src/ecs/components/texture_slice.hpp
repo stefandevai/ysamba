@@ -8,6 +8,7 @@
 namespace dl
 {
 class Texture;
+class TextureAtlas;
 
 struct TextureSlice
 {
@@ -20,6 +21,7 @@ struct TextureSlice
 
   void set_uv(const float top, const float left, const float bottom, const float right);
   void set_uv_with_size(const float top, const float left, const float width, const float height);
+  void load_from_texture_atlas(TextureAtlas* texture_atlas);
 };
 
 template <typename Archive>

@@ -17,14 +17,14 @@ WorldList::WorldList(UIContext& context) : UIComponent(context)
   state = UIComponent::State::Hidden;
 
   m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = Vector2i{200, 300};
+  m_window_frame->size = Vector2i{300, 485};
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
   m_scrollable_list = m_window_frame->emplace<ScrollableList<WorldMetadata>>();
-  m_scrollable_list->size = Vector2i{152, 252};
-  m_scrollable_list->position = Vector3i{24, 24, 0};
-  m_scrollable_list->list->line_spacing = 15;
+  m_scrollable_list->size = Vector2i{252, 437};
+  m_scrollable_list->position = Vector3i{40, 40, 0};
+  m_scrollable_list->list->line_spacing = 20;
 }
 
 void WorldList::update()

@@ -109,6 +109,12 @@ void Batch::sprite(Sprite& sprite, const double x, const double y, const double 
 
 void Batch::texture_slice(TextureSlice& slice, const double x, const double y, const double z)
 {
+  if (slice.texture == nullptr)
+  {
+    const auto texture_atlas = m_game_context.asset_manager->get<TextureAtlas>(slice.resource_id);
+    slice.load_from_texture_atlas(texture_atlas);
+  }
+
   assert(slice.texture != nullptr);
   assert(slice.size.x != 0 && slice.size.y != 0);
 

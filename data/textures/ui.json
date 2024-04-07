@@ -5,11 +5,19 @@
         {
             "game_id": 0,
             "type": "nine_patch",
-            "top": 0,
             "left": 0,
-            "bottom": 33,
+            "top": 0,
             "right": 33,
+            "bottom": 33,
             "border": 16
+        },
+        {
+            "game_id": 1,
+            "type": "slice",
+            "left": 0,
+            "top": 48,
+            "right": 17,
+            "bottom": 65
         }
     ]
 }

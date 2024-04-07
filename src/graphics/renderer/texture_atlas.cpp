@@ -37,13 +37,22 @@ void TextureAtlas::m_load_metadata(const std::string& filepath)
 
     if (type == "nine_patch")
     {
-      const auto top = item["top"].get<uint32_t>();
       const auto left = item["left"].get<uint32_t>();
-      const auto bottom = item["bottom"].get<uint32_t>();
+      const auto top = item["top"].get<uint32_t>();
       const auto right = item["right"].get<uint32_t>();
+      const auto bottom = item["bottom"].get<uint32_t>();
       const auto border = item["border"].get<uint32_t>();
 
-      m_frame_data.emplace(game_id, NinePatchData{top, left, bottom, right, border});
+      m_frame_data.emplace(game_id, NinePatchData{left, top, right, bottom, border});
+    }
+    else if (type == "slice")
+    {
+      const auto left = item["left"].get<uint32_t>();
+      const auto top = item["top"].get<uint32_t>();
+      const auto right = item["right"].get<uint32_t>();
+      const auto bottom = item["bottom"].get<uint32_t>();
+
+      m_frame_data.emplace(game_id, TextureSliceData{left, top, right, bottom});
     }
   }
 
