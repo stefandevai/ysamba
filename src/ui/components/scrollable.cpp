@@ -12,7 +12,7 @@ namespace dl::ui
 {
 Scrollable::Scrollable(UIContext& context) : UIComponent(context) {}
 
-void Scrollable::update()
+void Scrollable::process_input()
 {
   if (children.empty())
   {
@@ -26,8 +26,9 @@ void Scrollable::update()
     if (mouse_position.x > absolute_position.x && mouse_position.x < absolute_position.x + size.x
         && mouse_position.y > absolute_position.y && mouse_position.y < absolute_position.y + size.y)
     {
-      assert(children.size() == 1 && "Updating scroll with a number of children different than 1");
+      assert(children.size() == 1 && "Scrollable UI component must have only one child");
       const auto& child = children[0];
+
       m_scroll_y += m_input_manager.get_scroll().y * 4;
 
       // Set lower and upper bounds for scrolling
@@ -44,10 +45,19 @@ void Scrollable::update()
       {
         m_scroll_y = 0;
       }
-
-      child->position.y = m_scroll_y;
-      dirty = true;
     }
+  }
+}
+
+void Scrollable::update()
+{
+  assert(children.size() == 1 && "Scrollable UI component must have only one child");
+  const auto& child = children[0];
+
+  if (child->position.y != m_scroll_y)
+  {
+    child->position.y = m_scroll_y;
+    dirty = true;
   }
 }
 

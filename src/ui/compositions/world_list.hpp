@@ -14,7 +14,7 @@ class WorldList : public UIComponent
 {
  public:
   WorldList(UIContext& context);
-  void update();
+  void process_input();
   void show();
   void hide();
   void set_actions(const ItemList<WorldMetadata>& actions);

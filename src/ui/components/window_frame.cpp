@@ -27,11 +27,6 @@ void WindowFrame::init()
       .image = TextureSlice{.id = 1, .resource_id = "ui"_hs},
       .on_left_click = [this]() { hide(); },
   });
-
-  // close_button = emplace<Image>(TextureSlice{.id = 1, .resource_id = "ui"_hs});
-  // close_button->x_alignment = XAlignement::Right;
-  // close_button->size = Vector2i{17, 17};
-  // close_button->margin = Vector2i{1, 1};
 }
 
 void WindowFrame::render()
@@ -53,5 +48,18 @@ void WindowFrame::render()
   {
     child->render();
   }
+}
+
+void WindowFrame::hide()
+{
+  // Hide topmost component instead of the current one
+  UIComponent* current_component = this;
+
+  while (current_component->parent != nullptr)
+  {
+    current_component = current_component->parent;
+  }
+
+  current_component->hide();
 }
 }  // namespace dl::ui

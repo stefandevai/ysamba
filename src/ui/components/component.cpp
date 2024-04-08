@@ -37,6 +37,11 @@ void UIComponent::m_after_init()
 
 void UIComponent::m_process_input()
 {
+  if (state != State::Visible)
+  {
+    return;
+  }
+
   process_input();
 
   for (const auto& child : children)

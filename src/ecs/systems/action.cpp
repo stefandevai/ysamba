@@ -8,7 +8,6 @@
 #include "ai/actions/generic_tile.hpp"
 #include "ai/actions/utils.hpp"
 #include "ai/actions/walk.hpp"
-// #include "ai/actions/pickup_liquid.hpp"
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"

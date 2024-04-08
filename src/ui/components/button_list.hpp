@@ -4,12 +4,12 @@
 
 #include <entt/entity/entity.hpp>
 
-#include "./button.hpp"
 #include "./component.hpp"
-#include "./container.hpp"
-#include "./label.hpp"
 #include "core/maths/vector.hpp"
 #include "graphics/color.hpp"
+#include "ui/components/button.hpp"
+#include "ui/components/container.hpp"
+#include "ui/components/label.hpp"
 #include "ui/types.hpp"
 #include "world/metadata.hpp"
 

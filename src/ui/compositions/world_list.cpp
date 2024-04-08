@@ -27,7 +27,7 @@ WorldList::WorldList(UIContext& context) : UIComponent(context)
   m_scrollable_list->list->line_spacing = 20;
 }
 
-void WorldList::update()
+void WorldList::process_input()
 {
   using namespace entt::literals;
 

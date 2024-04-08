@@ -31,11 +31,6 @@ void UIManager::update()
   {
     for (auto& component : m_components)
     {
-      if (component->state == UIComponent::State::Hidden)
-      {
-        continue;
-      }
-
       component->m_process_input();
     }
   }

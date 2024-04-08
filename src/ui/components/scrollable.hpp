@@ -13,6 +13,7 @@ class Scrollable : public UIComponent
  public:
   Scrollable(UIContext& context);
 
+  void process_input();
   void update();
   void render();
   void reset_scroll();

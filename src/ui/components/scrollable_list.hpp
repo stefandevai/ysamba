@@ -23,7 +23,7 @@ class ScrollableList : public UIComponent
   ButtonList<T>* list = nullptr;
   Scrollable* scrollable = nullptr;
 
-  ScrollableList(UIContext& context) : UIComponent(context)
+  ScrollableList(UIContext& context) : UIComponent(context, "ScrollableList")
   {
     scrollable = emplace<Scrollable>();
     list = scrollable->emplace<ButtonList<T>>();

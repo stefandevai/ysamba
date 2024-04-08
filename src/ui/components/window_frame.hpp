@@ -17,6 +17,7 @@ class WindowFrame : public UIComponent
 
   void init();
   void render();
+  void hide();
 };
 
 }  // namespace dl::ui

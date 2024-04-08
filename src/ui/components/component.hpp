@@ -50,6 +50,7 @@ class UIComponent
     Animating,
   };
 
+  std::string name = "";
   bool has_initialized = false;
   bool dirty = true;
 
@@ -71,7 +72,7 @@ class UIComponent
   UIComponent* parent = nullptr;
   std::vector<std::unique_ptr<UIComponent>> children;
 
-  UIComponent(UIContext& context, const std::string name = "") : m_context(context), m_name(std::move(name)) {}
+  UIComponent(UIContext& context, const std::string name = "") : name(std::move(name)), m_context(context) {}
   virtual ~UIComponent() = default;
 
   UIComponent(UIComponent const&) = delete;
@@ -138,7 +139,6 @@ class UIComponent
 
  protected:
   UIContext& m_context;
-  std::string m_name = "";
   InputManager& m_input_manager = InputManager::get_instance();
   glm::mat4 m_transform_matrix{};
 
