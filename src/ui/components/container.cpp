@@ -6,7 +6,7 @@
 namespace dl::ui
 {
 Container::Container(UIContext& context)
-    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(0, 0, Color{0xffffffff}))
+    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(0, 0, Color{0x00000000}))
 {
   is_renderable = true;
 }

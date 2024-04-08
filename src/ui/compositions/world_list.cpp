@@ -25,6 +25,7 @@ WorldList::WorldList(UIContext& context) : UIComponent(context, "WorldList")
   m_list = m_window_frame->emplace<TextButtonList<WorldMetadata>>(TextButtonList<WorldMetadata>::Params{
       .size = m_window_frame->get_safe_area_size(),
       .button_size = {0, 48},
+      .title = "Select World",
   });
 
   const auto position_offset = m_window_frame->get_position_offset();

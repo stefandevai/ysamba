@@ -11,7 +11,8 @@ ImageButton::ImageButton(UIContext& context, ImageButtonParams params) : UICompo
   auto mouse_region = emplace<MouseRegion>(MouseRegionParams{
       .on_left_click = std::move(params.on_left_click),
       .on_right_click = std::move(params.on_right_click),
-      .on_hover = std::move(params.on_hover),
+      .on_mouse_over = std::move(params.on_mouse_over),
+      .on_mouse_out = std::move(params.on_mouse_out),
   });
 
   mouse_region->emplace<Image>(std::move(params.image));

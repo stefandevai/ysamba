@@ -27,6 +27,7 @@ ActionMenu::ActionMenu(UIContext& context,
       .size = m_window_frame->get_safe_area_size(),
       .on_left_click = on_select,
       .items = items,
+      .title = "Select Action",
   });
 
   const auto position_offset = m_window_frame->get_position_offset();

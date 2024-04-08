@@ -8,7 +8,8 @@ MouseRegion::MouseRegion(UIContext& context, MouseRegionParams params)
     : UIComponent(context, "MouseRegion"),
       on_left_click(std::move(params.on_left_click)),
       on_right_click(std::move(params.on_right_click)),
-      on_hover(std::move(params.on_hover))
+      on_mouse_over(std::move(params.on_mouse_over)),
+      on_mouse_out(std::move(params.on_mouse_out))
 {
 }
 
@@ -25,6 +26,7 @@ void MouseRegion::process_input()
 {
   if (m_input_manager.mouse_hover_aabb(absolute_position.xy(), size))
   {
+    m_last_mouse_over = true;
     m_input_manager.set_mouse_cursor(MouseCursor::Hand);
 
     if (on_left_click && m_input_manager.has_clicked(InputManager::MouseButton::Left))
@@ -35,10 +37,19 @@ void MouseRegion::process_input()
     {
       on_right_click();
     }
-    else if (on_hover)
+    else if (on_mouse_over)
     {
-      on_hover();
+      on_mouse_over();
     }
+  }
+  else if (m_last_mouse_over)
+  {
+    if (on_mouse_out)
+    {
+      on_mouse_out();
+    }
+
+    m_last_mouse_over = false;
   }
 }
 }  // namespace dl::ui

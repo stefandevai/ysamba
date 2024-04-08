@@ -23,24 +23,30 @@ class TextButtonList : public UIComponent
     ItemList<T> items{};
     std::function<void(const T&)> on_left_click{};
     std::function<void(const T&)> on_right_click{};
-    std::function<void(const T&)> on_hover{};
+    std::function<void(const T&)> on_mouse_over{};
+    std::function<void(const T&)> on_mouse_out{};
     Vector2i size{300, 485};
     Vector2i margin{10, 10};
-    uint32_t line_spacing = 10;
+    int line_spacing = 10;
     Vector2i button_size{0, 0};
     Vector2i button_margin{0, 0};
-    uint32_t button_text_color = 0xFFFFFFFF;
+    uint32_t button_text_color = 0xCEE2DFFF;
+    uint32_t button_text_hover_color = 0xA1B9B6FF;
+    uint32_t title_color = 0xC5B75BFF;
     std::string title{};
   };
 
   ItemList<T> items{};
   std::function<void(const T&)> on_left_click{};
   std::function<void(const T&)> on_right_click{};
-  std::function<void(const T&)> on_hover{};
-  uint32_t line_spacing{};
+  std::function<void(const T&)> on_mouse_over{};
+  std::function<void(const T&)> on_mouse_out{};
+  int line_spacing{};
   Vector2i button_size{};
   Vector2i button_margin{};
   uint32_t button_text_color{};
+  uint32_t button_text_hover_color{};
+  uint32_t title_color{};
   std::string title{};
   Scrollable* scrollable = nullptr;
   Container* container = nullptr;
@@ -50,9 +56,12 @@ class TextButtonList : public UIComponent
         items(std::move(params.items)),
         on_left_click(std::move(params.on_left_click)),
         on_right_click(std::move(params.on_right_click)),
-        on_hover(std::move(params.on_hover)),
+        on_mouse_over(std::move(params.on_mouse_over)),
+        on_mouse_out(std::move(params.on_mouse_out)),
         line_spacing(params.line_spacing),
         button_text_color(params.button_text_color),
+        button_text_hover_color(params.button_text_hover_color),
+        title_color(params.title_color),
         title(std::move(params.title))
   {
     size = params.size - params.margin * 2;
@@ -77,16 +86,20 @@ class TextButtonList : public UIComponent
     container = scrollable->emplace<Container>();
 
     scrollable->size = size;
-    container->size = size;
+    container->set_size(size);
 
     if (!title.empty())
     {
-      emplace<Label>(LabelParams{.value = title});
+      emplace<Label>(LabelParams{
+          .value = title,
+          .color = title_color,
+      });
 
       // TODO: Calculate the height of the title label on initialization
+      size.y -= 16 + line_spacing;
       scrollable->position.y += 16 + line_spacing;
       scrollable->size.y -= 16 + line_spacing;
-      container->size.y -= 16 + line_spacing;
+      container->set_size({container->size.x, container->size.y - 16 - line_spacing});
     }
 
     create_buttons();
@@ -127,18 +140,27 @@ class TextButtonList : public UIComponent
               on_right_click(item.first);
             }
           },
-          .on_hover =
+          .on_mouse_over =
               [this, &item]()
           {
-            if (on_hover)
+            if (on_mouse_over)
             {
-              on_hover(item.first);
+              on_mouse_over(item.first);
             }
           },
+          .on_mouse_out =
+              [this, &item]()
+          {
+            if (on_mouse_out)
+            {
+              on_mouse_out(item.first);
+            }
+          },
+          .text_color = button_text_color,
+          .text_hover_color = button_text_hover_color,
       });
 
       button->size = Vector2i{button_size.x - 2 * button_margin.x, button_size.y};
-      button->label->text.color = button_text_color;
       button->label->x_alignment = XAlignement::Left;
       button->label->y_alignment = YAlignement::Center;
       button->position.x = button_margin.x;
@@ -147,7 +169,7 @@ class TextButtonList : public UIComponent
 
     const auto height
         = static_cast<int>(items_size * button_size.y + (items_size - 1) * line_spacing + 2 * button_margin.y);
-    container->size = Vector2i{button_size.x, height};
+    container->set_size(Vector2i{button_size.x, height});
   }
 };
 

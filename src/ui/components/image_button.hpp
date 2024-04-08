@@ -13,7 +13,8 @@ struct ImageButtonParams
   ImageType image;
   std::function<void()> on_left_click{};
   std::function<void()> on_right_click{};
-  std::function<void()> on_hover{};
+  std::function<void()> on_mouse_over{};
+  std::function<void()> on_mouse_out{};
 };
 
 class ImageButton : public UIComponent
