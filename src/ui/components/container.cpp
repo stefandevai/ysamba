@@ -18,6 +18,13 @@ Container::Container(UIContext& context, const Vector2i& size, const uint32_t co
   this->size = size;
 }
 
+Container::Container(UIContext& context, Params params)
+    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(params.size.x, params.size.y, Color{params.color}))
+{
+  is_renderable = true;
+  size = std::move(params.size);
+}
+
 void Container::render()
 {
   if (!is_active())

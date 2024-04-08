@@ -93,7 +93,7 @@ class TextButtonList : public UIComponent
     {
       const auto& item = items[i];
 
-      auto button = container->emplace<TextButton>(TextButtonParams{
+      auto button = container->emplace<TextButton>(TextButton::Params{
           .text = item.second,
           .on_left_click =
               [this, &item]()

@@ -13,10 +13,17 @@ namespace dl::ui
 class Container : public UIComponent
 {
  public:
+  struct Params
+  {
+    Vector2i size{};
+    uint32_t color = 0x00000000;
+  };
+
   std::unique_ptr<Quad> quad = nullptr;
 
   Container(UIContext& context);
   Container(UIContext& context, const Vector2i& size, const uint32_t color);
+  Container(UIContext& context, Params params);
 
   void render();
 

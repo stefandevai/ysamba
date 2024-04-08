@@ -5,8 +5,9 @@
 #include <i18n_keyval/i18n.hpp>
 
 #include "ui/animation.hpp"
-#include "ui/components/button.hpp"
+#include "ui/components/filled_button.hpp"
 #include "ui/components/label.hpp"
+#include "ui/components/mouse_region.hpp"
 #include "ui/components/text_input.hpp"
 
 namespace dl::ui
@@ -28,10 +29,20 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context
   m_text_input->position = Vector3i{0, 20, 0};
   m_text_input->placeholder = "enter_world_name"_t;
 
-  m_save_button = emplace<Button>();
-  m_save_button->size.x = 250;
+  m_save_button = emplace<FilledButton>(FilledButton::Params{
+      .text = "save"_t, .size = Vector2i{250, 32},
+      // .background_color = 0x33aa88aa,
+      // .background_hover_color = 0x33aa88aa,
+  });
+
+  // m_save_button->size.x = 250;
   m_save_button->position = Vector3i{0, 60, 0};
-  m_save_button->text = "save"_t;
+  // m_save_button->text = "save"_t;
+
+  // m_save_button = emplace<Button>();
+  // m_save_button->size.x = 250;
+  // m_save_button->position = Vector3i{0, 60, 0};
+  // m_save_button->text = "save"_t;
 }
 
 std::string& WorldCreationPanel::get_name()
@@ -41,7 +52,8 @@ std::string& WorldCreationPanel::get_name()
 
 void WorldCreationPanel::on_save(const std::function<void()>& on_save_fn)
 {
-  m_save_button->on_click = on_save_fn;
+  // m_save_button->on_click = on_save_fn;
+  m_save_button->mouse_region->on_left_click = on_save_fn;
 }
 
 bool WorldCreationPanel::validate()

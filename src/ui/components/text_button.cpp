@@ -7,7 +7,7 @@
 
 namespace dl::ui
 {
-TextButton::TextButton(UIContext& context, TextButtonParams params)
+TextButton::TextButton(UIContext& context, Params params)
     : UIComponent(context, "TextButton"), text_color(params.text_color), text_hover_color(params.text_hover_color)
 {
   auto& on_mouse_over = params.on_mouse_over;
