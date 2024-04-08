@@ -14,7 +14,8 @@
 
 namespace dl::ui
 {
-Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select) : UIComponent(context, "Inventory")
+Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select)
+    : UIComponent(context, "Inventory")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{500, 400};

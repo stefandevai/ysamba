@@ -4,8 +4,8 @@
 
 #include "core/asset_manager.hpp"
 #include "core/input_manager.hpp"
-#include "graphics/renderer/renderer.hpp"
 #include "graphics/display.hpp"
+#include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
@@ -88,7 +88,8 @@ void UIManager::render()
     if (component->state == UIComponent::State::Animating)
     {
       const auto window_size = Display::get_window_size();
-      m_context.renderer->ui_pass.batch.push_scissor({component->absolute_position.x, component->absolute_position.y, component->size.x, component->size.y});
+      m_context.renderer->ui_pass.batch.push_scissor(
+          {component->absolute_position.x, component->absolute_position.y, component->size.x, component->size.y});
     }
 
     component->render();
