@@ -8,7 +8,7 @@
 namespace dl::ui
 {
 template <class T>
-class TextButtonList;
+class ScrollableTextButtonList;
 class WindowFrame;
 
 using EntityPair = std::pair<entt::entity, entt::entity>;
@@ -23,7 +23,7 @@ class ItemSelection : public UIComponent
   void hide();
 
  private:
-  TextButtonList<EntityPair>* m_items = nullptr;
+  ScrollableTextButtonList<EntityPair>* m_items = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };
 

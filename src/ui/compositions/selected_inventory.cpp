@@ -7,7 +7,7 @@
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/text_button_list.hpp"
+#include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/text_input.hpp"
 #include "ui/components/window_frame.hpp"
 #include "ui/ui_manager.hpp"
@@ -29,7 +29,7 @@ SelectedInventory::SelectedInventory(UIContext& context, const std::function<voi
   const auto safe_area_size = m_window_frame->get_safe_area_size();
   const auto position_offset = m_window_frame->get_position_offset();
 
-  m_weared_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
+  m_weared_items = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
       .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
       .on_left_click = on_select,
       .title = "Weared Items",
@@ -38,7 +38,7 @@ SelectedInventory::SelectedInventory(UIContext& context, const std::function<voi
   m_weared_items->position.x = position_offset.x;
   m_weared_items->position.y = position_offset.y;
 
-  m_carried_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
+  m_carried_items = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
       .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
       .on_left_click = on_select,
       .title = "Carried Items",
@@ -65,14 +65,14 @@ void SelectedInventory::process_input()
 
 void SelectedInventory::set_weared_items(const ItemList<entt::entity>& items)
 {
-  m_weared_items->items = items;
-  m_weared_items->create_buttons();
+  m_weared_items->list->items = items;
+  m_weared_items->list->create_buttons();
 }
 
 void SelectedInventory::set_carried_items(const ItemList<entt::entity>& items)
 {
-  m_carried_items->items = items;
-  m_carried_items->create_buttons();
+  m_carried_items->list->items = items;
+  m_carried_items->list->create_buttons();
 }
 
 void SelectedInventory::show()

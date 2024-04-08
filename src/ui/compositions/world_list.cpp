@@ -6,7 +6,7 @@
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
-#include "ui/components/text_button_list.hpp"
+#include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 
 namespace dl::ui
@@ -22,7 +22,7 @@ WorldList::WorldList(UIContext& context) : UIComponent(context, "WorldList")
       .size = size,
   });
 
-  m_list = m_window_frame->emplace<TextButtonList<WorldMetadata>>(TextButtonList<WorldMetadata>::Params{
+  m_list = m_window_frame->emplace<ScrollableTextButtonList<WorldMetadata>>(ScrollableTextButtonList<WorldMetadata>::Params{
       .size = m_window_frame->get_safe_area_size(),
       .button_size = {0, 48},
       .title = "Select World",
@@ -65,13 +65,13 @@ void WorldList::hide()
 
 void WorldList::set_actions(const ItemList<WorldMetadata>& actions)
 {
-  m_list->items = actions;
-  m_list->create_buttons();
+  m_list->list->items = actions;
+  m_list->list->create_buttons();
 }
 
 void WorldList::set_on_select(const std::function<void(const WorldMetadata&)>& on_select)
 {
-  m_list->on_left_click = [this, on_select](const WorldMetadata& metadata)
+  m_list->list->on_left_click = [this, on_select](const WorldMetadata& metadata)
   {
     // Hide component before selecting a world so that the input context is correctly popped
     hide();

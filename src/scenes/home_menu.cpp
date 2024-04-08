@@ -16,6 +16,7 @@
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
 #include "ui/compositions/world_list.hpp"
+#include "ui/components/text_button_list.hpp"
 #include "world/society/name_generator.hpp"
 
 namespace dl
@@ -42,50 +43,20 @@ void HomeMenu::load()
   m_world_list->set_on_select(on_select_world);
   m_world_list->set_actions(m_worlds_metadata);
 
-  m_button_list = m_ui_manager.emplace<ui::ButtonList<MenuChoice>>();
-
-  m_button_list->set_items({
-      {MenuChoice::Play, "play"_t},
-      {MenuChoice::NewWorld, "new_world"_t},
-      {MenuChoice::Settings, "settings"_t},
-      {MenuChoice::Credits, "credits"_t},
+  m_button_list = m_ui_manager.emplace<ui::TextButtonList<MenuChoice>>(ui::TextButtonList<MenuChoice>::Params{
+      .items = {
+          {MenuChoice::Play, "play"_t},
+          {MenuChoice::NewWorld, "new_world"_t},
+          {MenuChoice::Settings, "settings"_t},
+          {MenuChoice::Credits, "credits"_t},
+      },
+      .on_left_click = [this](MenuChoice choice) { m_on_select_menu_option(choice); },
+      .line_spacing = 0,
+      .button_size = {200, 25},
+      .button_text_color = 0xCCC1AFFF,
   });
 
   m_button_list->position = Vector3i{75, 193, 0};
-  m_button_list->button_size = Vector2i{200, 25};
-  m_button_list->button_text_color.set(0xCCC1AFFF);
-
-  m_button_list->set_on_select(
-      [this](const MenuChoice choice)
-      {
-        switch (choice)
-        {
-        case MenuChoice::Play:
-        {
-          m_load_worlds_metadata();
-
-          if (m_worlds_metadata.empty())
-          {
-            m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
-            return;
-          }
-
-          m_world_list->set_actions(m_worlds_metadata);
-          m_world_list->show();
-          break;
-        }
-        case MenuChoice::NewWorld:
-        {
-          m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
-          break;
-        }
-        case MenuChoice::Settings:
-        case MenuChoice::Credits:
-        default:
-          break;
-        }
-      });
-
   m_has_loaded = true;
 }
 
@@ -175,5 +146,35 @@ void HomeMenu::m_load_worlds_metadata()
   std::sort(m_worlds_metadata.begin(),
             m_worlds_metadata.end(),
             [](const auto& lhs, const auto& rhs) { return lhs.first.updated_at > rhs.first.updated_at; });
+}
+
+void HomeMenu::m_on_select_menu_option(MenuChoice choice)
+{
+  switch (choice)
+  {
+  case MenuChoice::Play:
+  {
+    m_load_worlds_metadata();
+
+    if (m_worlds_metadata.empty())
+    {
+      m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
+      return;
+    }
+
+    m_world_list->set_actions(m_worlds_metadata);
+    m_world_list->show();
+    break;
+  }
+  case MenuChoice::NewWorld:
+  {
+    m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
+    break;
+  }
+  case MenuChoice::Settings:
+  case MenuChoice::Credits:
+  default:
+    break;
+  }
 }
 }  // namespace dl

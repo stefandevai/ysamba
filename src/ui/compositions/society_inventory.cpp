@@ -6,7 +6,7 @@
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
-#include "ui/components/text_button_list.hpp"
+#include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 #include "ui/ui_manager.hpp"
 
@@ -24,7 +24,7 @@ SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(
       .size = size,
   });
 
-  m_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
+  m_items = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
       .size = m_window_frame->get_safe_area_size(),
       .on_left_click = on_select,
       .title = "Items",
@@ -52,8 +52,8 @@ void SocietyInventory::process_input()
 
 void SocietyInventory::set_items(const ItemList<entt::entity>& items)
 {
-  m_items->items = items;
-  m_items->create_buttons();
+  m_items->list->items = items;
+  m_items->list->create_buttons();
 }
 
 void SocietyInventory::show()

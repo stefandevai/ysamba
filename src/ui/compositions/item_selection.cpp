@@ -5,7 +5,7 @@
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/text_button_list.hpp"
+#include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 
 namespace dl::ui
@@ -22,7 +22,7 @@ ItemSelection::ItemSelection(UIContext& context, const std::function<void(const 
       .size = size,
   });
 
-  m_items = m_window_frame->emplace<TextButtonList<EntityPair>>(TextButtonList<EntityPair>::Params{
+  m_items = m_window_frame->emplace<ScrollableTextButtonList<EntityPair>>(ScrollableTextButtonList<EntityPair>::Params{
       .size = m_window_frame->get_safe_area_size(),
       .on_left_click = on_select,
       .title = "Select Item",
@@ -35,8 +35,8 @@ ItemSelection::ItemSelection(UIContext& context, const std::function<void(const 
 
 void ItemSelection::set_items(const ItemList<EntityPair>& items)
 {
-  m_items->items = items;
-  m_items->create_buttons();
+  m_items->list->items = items;
+  m_items->list->create_buttons();
 }
 
 void ItemSelection::show()

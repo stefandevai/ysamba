@@ -4,7 +4,7 @@
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
-#include "ui/components/text_button_list.hpp"
+#include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 
 namespace dl::ui
@@ -23,7 +23,7 @@ ActionMenu::ActionMenu(UIContext& context,
       .size = size,
   });
 
-  m_list = m_window_frame->emplace<TextButtonList<JobType>>(TextButtonList<JobType>::Params{
+  m_list = m_window_frame->emplace<ScrollableTextButtonList<JobType>>(ScrollableTextButtonList<JobType>::Params{
       .size = m_window_frame->get_safe_area_size(),
       .on_left_click = on_select,
       .items = items,
@@ -37,13 +37,13 @@ ActionMenu::ActionMenu(UIContext& context,
 
 void ActionMenu::set_actions(const ItemList<JobType>& actions)
 {
-  m_list->items = actions;
-  m_list->create_buttons();
+  m_list->list->items = actions;
+  m_list->list->create_buttons();
 }
 
 void ActionMenu::set_on_select(const std::function<void(const JobType)>& on_select)
 {
-  m_list->on_left_click = on_select;
+  m_list->list->on_left_click = on_select;
 }
 
 void ActionMenu::show()

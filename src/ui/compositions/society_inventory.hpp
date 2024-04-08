@@ -8,7 +8,7 @@
 namespace dl::ui
 {
 template <class T>
-class TextButtonList;
+class ScrollableTextButtonList;
 class WindowFrame;
 
 class SocietyInventory : public UIComponent
@@ -22,7 +22,7 @@ class SocietyInventory : public UIComponent
   void hide();
 
  private:
-  TextButtonList<entt::entity>* m_items = nullptr;
+  ScrollableTextButtonList<entt::entity>* m_items = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };
 
