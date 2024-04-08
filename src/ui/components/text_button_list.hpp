@@ -4,12 +4,12 @@
 #include <string>
 
 #include "./component.hpp"
-#include "ui/types.hpp"
-#include "ui/components/text_button.hpp"
 #include "ui/components/button.hpp"
 #include "ui/components/container.hpp"
-#include "ui/components/scrollable.hpp"
 #include "ui/components/label.hpp"
+#include "ui/components/scrollable.hpp"
+#include "ui/components/text_button.hpp"
+#include "ui/types.hpp"
 
 namespace dl::ui
 {
@@ -24,9 +24,9 @@ class TextButtonList : public UIComponent
     std::function<void(const T&)> on_left_click{};
     std::function<void(const T&)> on_right_click{};
     std::function<void(const T&)> on_hover{};
-    Vector2i size{300, 400};
+    Vector2i size{300, 485};
     Vector2i margin{0, 0};
-    Vector2i button_size{200, 40};
+    Vector2i button_size{0, 0};
     uint32_t line_spacing = 0;
   };
 
@@ -34,21 +34,31 @@ class TextButtonList : public UIComponent
   std::function<void(const T&)> on_left_click{};
   std::function<void(const T&)> on_right_click{};
   std::function<void(const T&)> on_hover{};
-  Vector2i button_size{200, 40};
+  Vector2i button_size{0, 0};
   uint32_t line_spacing = 0;
   Scrollable* scrollable = nullptr;
   Container* container = nullptr;
 
   TextButtonList(UIContext& context, Params params)
-    : UIComponent(context, "TextButtonList"),
-      items(std::move(params.items)),
-      on_left_click(std::move(params.on_left_click)),
-      on_right_click(std::move(params.on_right_click)),
-      on_hover(std::move(params.on_hover))
+      : UIComponent(context, "TextButtonList"),
+        items(std::move(params.items)),
+        on_left_click(std::move(params.on_left_click)),
+        on_right_click(std::move(params.on_right_click)),
+        on_hover(std::move(params.on_hover))
   {
-    size = std::move(params.size);
+    size = params.size - params.margin * 2;
     margin = std::move(params.margin);
-    button_size = std::move(params.button_size);
+
+    if (params.button_size.x != 0 && params.button_size.y != 0)
+    {
+      button_size = std::move(params.button_size);
+    }
+    else
+    {
+      button_size.x = size.x;
+      button_size.y = 48;
+    }
+
     line_spacing = params.line_spacing;
 
     scrollable = emplace<Scrollable>();
@@ -79,21 +89,24 @@ class TextButtonList : public UIComponent
 
       auto button = container->emplace<TextButton>(TextButtonParams{
           .text = item.second,
-          .on_left_click = [this, &item]()
+          .on_left_click =
+              [this, &item]()
           {
             if (on_left_click)
             {
               on_left_click(item.first);
             }
           },
-          .on_right_click = [this, &item]()
+          .on_right_click =
+              [this, &item]()
           {
             if (on_right_click)
             {
               on_right_click(item.first);
             }
           },
-          .on_hover = [this, &item]()
+          .on_hover =
+              [this, &item]()
           {
             if (on_hover)
             {
@@ -107,19 +120,10 @@ class TextButtonList : public UIComponent
       button->label->y_alignment = YAlignement::Center;
       button->position.x = margin.x;
       button->position.y = i * (button_size.y + line_spacing) + margin.y + i;
-      spdlog::debug("Button pos: {} {}", button->position.x, button->position.y);
     }
 
     const auto height = static_cast<int>(items_size * button_size.y + (items_size - 1) * line_spacing + 2 * margin.y);
     container->size = Vector2i{button_size.x, height};
-    spdlog::debug("Container size: {} {}", container->size.x, container->size.y);
-    spdlog::debug("Height, items: {} {}", height, items_size);
-    spdlog::debug("POS: ({}, {}) ({}, {}) ({}, {})", absolute_position.x, absolute_position.y, container->absolute_position.x, container->absolute_position.y, scrollable->absolute_position.x, scrollable->absolute_position.y);
-  }
-
-  void update()
-  {
-    // spdlog::debug("POS: ({}, {}) ({}, {}) ({}, {})", absolute_position.x, absolute_position.y, container->absolute_position.x, container->absolute_position.y, scrollable->absolute_position.x, scrollable->absolute_position.y);
   }
 };
 

@@ -19,10 +19,9 @@ void Scrollable::process_input()
     return;
   }
 
-  bool can_process_scroll =
-    m_input_manager.is_scrolling_y() &&
-    m_input_manager.mouse_hover_aabb(absolute_position.xy(), size) &&
-    size.y < children[0]->size.y;
+  bool can_process_scroll = m_input_manager.is_scrolling_y()
+                            && m_input_manager.mouse_hover_aabb(absolute_position.xy(), size)
+                            && size.y < children[0]->size.y;
 
   if (can_process_scroll)
   {

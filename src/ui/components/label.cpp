@@ -18,7 +18,7 @@ Label::Label(UIContext& context, const std::string_view value) : UIComponent(con
 }
 
 Label::Label(UIContext& context, LabelParams params)
-  : UIComponent(context), value(std::move(params.value)), wrap(params.wrap)
+    : UIComponent(context), value(std::move(params.value)), wrap(params.wrap)
 {
   text.color.set(params.color);
   is_renderable = true;

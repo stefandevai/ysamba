@@ -7,8 +7,6 @@
 namespace dl::ui
 {
 template <class T>
-class ScrollableList;
-template <class T>
 class TextButtonList;
 class WindowFrame;
 
@@ -23,7 +21,6 @@ class WorldList : public UIComponent
   void set_on_select(const std::function<void(const WorldMetadata&)>& on_select);
 
  private:
-  ScrollableList<WorldMetadata>* m_scrollable_list = nullptr;
   TextButtonList<WorldMetadata>* m_list = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };

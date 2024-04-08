@@ -8,7 +8,7 @@ NinePatch::NinePatch(const uint32_t id, const uint32_t resource_id) : id(id), re
 
 void NinePatch::generate_patches()
 {
-  assert(texture_atlas != nullptr && "Texture is null while trying to generate 9 patches");
+  assert(texture_atlas != nullptr && "TextureAtlas is null while trying to generate 9 patches");
 
   const auto texture = texture_atlas->texture.get();
   const auto& texture_size = texture_atlas->texture->size;

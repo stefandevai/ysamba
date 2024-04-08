@@ -2,8 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ui/components/mouse_region.hpp"
 #include "ui/components/label.hpp"
+#include "ui/components/mouse_region.hpp"
 
 namespace dl::ui
 {
