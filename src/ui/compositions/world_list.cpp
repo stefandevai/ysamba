@@ -25,6 +25,7 @@ WorldList::WorldList(UIContext& context) : UIComponent(context, "WorldList")
   m_list = m_window_frame->emplace<ScrollableTextButtonList<WorldMetadata>>(
       ScrollableTextButtonList<WorldMetadata>::Params{
           .size = m_window_frame->get_safe_area_size(),
+          .line_spacing = 0,
           .button_size = {0, 48},
           .title = "Select World",
       });

@@ -52,15 +52,15 @@ class ScrollableTextButtonList : public UIComponent
 
     if (!title.empty())
     {
-      emplace<Label>(Label::Params{
+      auto title_label = emplace<Label>(Label::Params{
           .value = title,
           .color = title_color,
       });
 
-      // TODO: Calculate the height of the title label on initialization
-      size.y -= 16 + params.line_spacing;
-      scrollable->position.y += 16 + params.line_spacing;
-      scrollable->size.y -= 16 + params.line_spacing;
+      const auto offset = title_label->size.y + margin.y * 2;
+      size.y -= offset;
+      scrollable->position.y += offset;
+      scrollable->size.y -= offset;
     }
 
     list = scrollable->emplace<TextButtonList<T>>(typename TextButtonList<T>::Params{
