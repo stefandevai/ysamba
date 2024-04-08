@@ -51,7 +51,7 @@ FilledButton::FilledButton(UIContext& context, Params params)
       .color = background_color,
   });
 
-  label = background->emplace<Label>(LabelParams{
+  label = background->emplace<Label>(Label::Params{
       .value = std::move(params.text),
       .color = text_color,
   });

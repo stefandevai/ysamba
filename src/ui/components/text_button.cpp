@@ -38,7 +38,7 @@ TextButton::TextButton(UIContext& context, Params params)
       },
   });
 
-  label = mouse_region->emplace<Label>(LabelParams{
+  label = mouse_region->emplace<Label>(Label::Params{
       .value = std::move(params.text),
       .color = text_color,
   });

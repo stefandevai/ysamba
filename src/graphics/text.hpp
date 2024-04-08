@@ -35,7 +35,7 @@ class Text
   std::vector<Character> characters{};
   Color color{0xFFFFFFFF};
   double line_height = 1.2;
-  const Font* m_font = nullptr;
+  const Font* font = nullptr;
   bool has_initialized = false;
   uint32_t wrap_width = 0;
 

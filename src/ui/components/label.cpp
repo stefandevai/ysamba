@@ -2,7 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include "core/asset_manager.hpp"
 #include "graphics/display.hpp"
+#include "graphics/font.hpp"
 #include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
@@ -17,11 +19,29 @@ Label::Label(UIContext& context, const std::string_view value) : UIComponent(con
   is_renderable = true;
 }
 
-Label::Label(UIContext& context, LabelParams params)
+Label::Label(UIContext& context, Params params)
     : UIComponent(context, "Label"), value(std::move(params.value)), wrap(params.wrap)
 {
-  text.color.set(params.color);
   is_renderable = true;
+  text.font = m_context.asset_manager->get<Font>(text.typeface);
+  text.color.set(params.color);
+
+  if (wrap)
+  {
+    const auto& window_size = Display::get_window_size();
+    const auto wrap_width
+        = (parent == nullptr || parent->size.x == 0) ? window_size.x - 2 * margin.x : parent->size.x - 2 * margin.x;
+    text.set_text_wrapped(value, wrap_width);
+  }
+  else
+  {
+    text.set_text(value);
+  }
+
+  text.initialize(m_context.renderer->asset_manager);
+  size = text.get_size();
+
+  has_initialized = true;
 }
 
 void Label::init()

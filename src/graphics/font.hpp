@@ -30,6 +30,7 @@ class Font
   std::unique_ptr<Texture> texture = nullptr;
 
   Font(const std::string& path, std::size_t size = 16);
+
   void load(WGPUDevice device);
   [[nodiscard]] const CharacterData& get_char_data(char32_t c) const
   {

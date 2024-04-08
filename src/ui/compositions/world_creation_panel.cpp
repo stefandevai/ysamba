@@ -30,7 +30,8 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context
   m_text_input->placeholder = "enter_world_name"_t;
 
   m_save_button = emplace<FilledButton>(FilledButton::Params{
-      .text = "save"_t, .size = Vector2i{250, 32},
+      .text = "save"_t,
+      .size = Vector2i{250, 32},
   });
 
   m_save_button->position = Vector3i{0, 60, 0};

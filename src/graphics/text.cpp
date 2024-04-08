@@ -25,12 +25,12 @@ void Text::initialize(AssetManager& asset_manager)
 {
   assert(typeface != 0 && "Failed to initialize text, typeface is 0");
 
-  if (m_font == nullptr)
+  if (font == nullptr)
   {
-    m_font = asset_manager.get<Font>(typeface);
+    font = asset_manager.get<Font>(typeface);
   }
 
-  assert(m_font != nullptr && "Failed to initialize text, font is nullptr");
+  assert(font != nullptr && "Failed to initialize text, font is nullptr");
   update();
   has_initialized = true;
 }
@@ -50,11 +50,11 @@ void Text::update()
 void Text::update_wrapped()
 {
   characters.clear();
-  assert(m_font != nullptr);
-  const auto scale = font_size / static_cast<float>(m_font->get_size());
+  assert(font != nullptr);
+  const auto scale = font_size / static_cast<float>(font->get_size());
   float char_pos_x = 0.f;
   float char_pos_y = 0.f;
-  const auto max_character_top = m_font->get_max_character_top();
+  const auto max_character_top = font->get_max_character_top();
 
   auto last_word_index = characters.begin();
   Color character_color = color;
@@ -63,7 +63,7 @@ void Text::update_wrapped()
 
   for (UTF8Iterator it = value.begin(); it != value.end(); ++it)
   {
-    auto ch = m_font->get_char_data(*it);
+    auto ch = font->get_char_data(*it);
 
     // Break to new line if width is bigger than wrap_width
     if (char_pos_x > wrap_width)
@@ -108,7 +108,7 @@ void Text::update_wrapped()
     else if (*it == unicode_backslash)
     {
       ++it;
-      ch = m_font->get_char_data(*it);
+      ch = font->get_char_data(*it);
     }
     // Character is part of a command "["
     else if (*it == unicode_bracket_left)
@@ -126,14 +126,14 @@ void Text::update_wrapped()
 
     character.code = *it;
     character.slice = std::make_unique<TextureSlice>();
-    character.slice->texture = m_font->texture.get();
+    character.slice->texture = font->texture.get();
     character.slice->color = character_color;
     character.slice->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
 
     assert(typeface != 0);
     assert(character.slice->texture != nullptr);
 
-    // if (font_size != m_font->get_size())
+    // if (font_size != font->get_size())
     // {
     //   character.slice->transform = std::make_unique<Transform>();
     //   character.slice->transform->scale.x = scale;
@@ -156,11 +156,11 @@ void Text::update_wrapped()
 
 void Text::update_non_wrapped()
 {
-  assert(m_font != nullptr);
+  assert(font != nullptr);
 
   characters.clear();
 
-  const auto scale = font_size / static_cast<float>(m_font->get_size());
+  const auto scale = font_size / static_cast<float>(font->get_size());
   float char_pos_x = 0.f;
 
   if (value.empty())
@@ -170,9 +170,9 @@ void Text::update_non_wrapped()
 
   for (UTF8Iterator it = value.begin(); it != value.end(); ++it)
   {
-    const auto& ch = m_font->get_char_data(*it);
+    const auto& ch = font->get_char_data(*it);
     const float x = char_pos_x + ch.bl * scale;
-    const float y = (m_font->get_max_character_top() - ch.bt) * scale;
+    const float y = (font->get_max_character_top() - ch.bt) * scale;
     const float w = ch.bw * scale;
     const float h = ch.bh * scale;
 
@@ -190,7 +190,7 @@ void Text::update_non_wrapped()
     else
     {
       character.slice = std::make_unique<TextureSlice>();
-      character.slice->texture = m_font->texture.get();
+      character.slice->texture = font->texture.get();
       character.slice->color = color;
       character.slice->set_uv_with_size(ch.bh, ch.tx, ch.bw, ch.bh);
       character.w = w;
@@ -200,7 +200,7 @@ void Text::update_non_wrapped()
       assert(character.slice->texture != nullptr);
     }
 
-    // if (font_size != m_font->get_size())
+    // if (font_size != font->get_size())
     // {
     //   character.slice->transform = std::make_unique<Transform>();
     //   character.slice->transform->scale.x = scale;
@@ -216,7 +216,7 @@ void Text::update_non_wrapped()
   }
 
   m_size.x = char_pos_x;
-  m_size.y = m_font->get_max_character_top() * scale;
+  m_size.y = font->get_max_character_top() * scale;
 }
 
 Vector2i Text::get_position_at(const int index) const

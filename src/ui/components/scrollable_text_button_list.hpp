@@ -52,7 +52,7 @@ class ScrollableTextButtonList : public UIComponent
 
     if (!title.empty())
     {
-      emplace<Label>(LabelParams{
+      emplace<Label>(Label::Params{
           .value = title,
           .color = title_color,
       });
