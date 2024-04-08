@@ -24,11 +24,12 @@ SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(
       .size = size,
   });
 
-  m_items = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
-      .size = m_window_frame->get_safe_area_size(),
-      .on_left_click = on_select,
-      .title = "Items",
-  });
+  m_items
+      = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
+          .size = m_window_frame->get_safe_area_size(),
+          .on_left_click = on_select,
+          .title = "Items",
+      });
 
   const auto position_offset = m_window_frame->get_position_offset();
   m_items->position.x = position_offset.x;

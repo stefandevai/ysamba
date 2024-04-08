@@ -29,20 +29,22 @@ SelectedInventory::SelectedInventory(UIContext& context, const std::function<voi
   const auto safe_area_size = m_window_frame->get_safe_area_size();
   const auto position_offset = m_window_frame->get_position_offset();
 
-  m_weared_items = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
-      .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
-      .on_left_click = on_select,
-      .title = "Weared Items",
-  });
+  m_weared_items
+      = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
+          .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
+          .on_left_click = on_select,
+          .title = "Weared Items",
+      });
 
   m_weared_items->position.x = position_offset.x;
   m_weared_items->position.y = position_offset.y;
 
-  m_carried_items = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
-      .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
-      .on_left_click = on_select,
-      .title = "Carried Items",
-  });
+  m_carried_items
+      = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
+          .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
+          .on_left_click = on_select,
+          .title = "Carried Items",
+      });
 
   m_carried_items->position.x = position_offset.x + safe_area_size.x / 2;
   m_carried_items->position.y = position_offset.y;

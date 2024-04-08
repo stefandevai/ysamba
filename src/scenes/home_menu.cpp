@@ -5,7 +5,6 @@
 
 #include <chrono>
 #include <entt/core/hashed_string.hpp>
-#include <glm/glm.hpp>
 #include <i18n_keyval/i18n.hpp>
 
 #include "constants.hpp"
@@ -15,9 +14,8 @@
 #include "graphics/renderer/texture.hpp"
 #include "scenes/gameplay.hpp"
 #include "scenes/world_creation.hpp"
-#include "ui/compositions/world_list.hpp"
 #include "ui/components/text_button_list.hpp"
-#include "world/society/name_generator.hpp"
+#include "ui/compositions/world_list.hpp"
 
 namespace dl
 {

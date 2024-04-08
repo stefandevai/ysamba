@@ -22,11 +22,12 @@ WorldList::WorldList(UIContext& context) : UIComponent(context, "WorldList")
       .size = size,
   });
 
-  m_list = m_window_frame->emplace<ScrollableTextButtonList<WorldMetadata>>(ScrollableTextButtonList<WorldMetadata>::Params{
-      .size = m_window_frame->get_safe_area_size(),
-      .button_size = {0, 48},
-      .title = "Select World",
-  });
+  m_list = m_window_frame->emplace<ScrollableTextButtonList<WorldMetadata>>(
+      ScrollableTextButtonList<WorldMetadata>::Params{
+          .size = m_window_frame->get_safe_area_size(),
+          .button_size = {0, 48},
+          .title = "Select World",
+      });
 
   const auto position_offset = m_window_frame->get_position_offset();
   m_list->position.x = position_offset.x;

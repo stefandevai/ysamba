@@ -9,7 +9,7 @@ namespace dl::ui
 template <class T>
 class TextButtonList;
 class WorldList;
-}
+}  // namespace dl::ui
 
 namespace dl
 {
