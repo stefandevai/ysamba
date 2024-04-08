@@ -109,6 +109,18 @@ Vector2& Vector2::operator*=(const double rhs)
   return *this;
 }
 
+Vector2 Vector2::operator/(const double rhs) const
+{
+  return Vector2{x / rhs, y / rhs};
+}
+
+Vector2& Vector2::operator/=(const double rhs)
+{
+  x /= rhs;
+  y /= rhs;
+  return *this;
+}
+
 Vector2i::Vector2i(const int x, const int y) noexcept : x(x), y(y) {}
 
 Vector2i::Vector2i(const double x, const double y) noexcept : x(static_cast<int>(x)), y(static_cast<int>(y)) {}
@@ -215,6 +227,18 @@ Vector2i& Vector2i::operator*=(const int rhs)
 {
   x *= rhs;
   y *= rhs;
+  return *this;
+}
+
+Vector2i Vector2i::operator/(const int rhs) const
+{
+  return Vector2i{x / rhs, y / rhs};
+}
+
+Vector2i& Vector2i::operator/=(const int rhs)
+{
+  x /= rhs;
+  y /= rhs;
   return *this;
 }
 
@@ -339,6 +363,19 @@ Vector3i& Vector3i::operator*=(const int rhs)
   return *this;
 }
 
+Vector3i Vector3i::operator/(const int rhs) const
+{
+  return Vector3i{x / rhs, y / rhs, z / rhs};
+}
+
+Vector3i& Vector3i::operator/=(const int rhs)
+{
+  x /= rhs;
+  y /= rhs;
+  z /= rhs;
+  return *this;
+}
+
 Vector3::Vector3(const double x, const double y, const double z) noexcept : x(x), y(y), z(z) {}
 
 Vector3::Vector3(const int x, const int y, const int z) noexcept
@@ -460,6 +497,19 @@ Vector3& Vector3::operator*=(const double rhs)
   return *this;
 }
 
+Vector3 Vector3::operator/(const double rhs) const
+{
+  return Vector3{x / rhs, y / rhs, z / rhs};
+}
+
+Vector3& Vector3::operator/=(const double rhs)
+{
+  x /= rhs;
+  y /= rhs;
+  z /= rhs;
+  return *this;
+}
+
 Vector4d::Vector4d(const double x, const double y, const double z, const double w) noexcept : x(x), y(y), z(z), w(w) {}
 
 Vector4d::Vector4d(const int x, const int y, const int z, const int w) noexcept
@@ -576,6 +626,20 @@ Vector4d& Vector4d::operator*=(const double rhs)
   return *this;
 }
 
+Vector4d Vector4d::operator/(const double rhs) const
+{
+  return Vector4d{x / rhs, y / rhs, z / rhs, w / rhs};
+}
+
+Vector4d& Vector4d::operator/=(const double rhs)
+{
+  x /= rhs;
+  y /= rhs;
+  z /= rhs;
+  w /= rhs;
+  return *this;
+}
+
 Vector4i::Vector4i(const int x, const int y, const int z, const int w) noexcept : x(x), y(y), z(z), w(w) {}
 
 Vector4i::Vector4i(const double x, const double y, const double z, const double w) noexcept
@@ -689,6 +753,20 @@ Vector4i& Vector4i::operator*=(const int rhs)
   y *= rhs;
   z *= rhs;
   w *= rhs;
+  return *this;
+}
+
+Vector4i Vector4i::operator/(const int rhs) const
+{
+  return Vector4i{x / rhs, y / rhs, z / rhs, w / rhs};
+}
+
+Vector4i& Vector4i::operator/=(const int rhs)
+{
+  x /= rhs;
+  y /= rhs;
+  z /= rhs;
+  w /= rhs;
   return *this;
 }
 

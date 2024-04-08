@@ -25,17 +25,23 @@ class TextButtonList : public UIComponent
     std::function<void(const T&)> on_right_click{};
     std::function<void(const T&)> on_hover{};
     Vector2i size{300, 485};
-    Vector2i margin{0, 0};
+    Vector2i margin{10, 10};
+    uint32_t line_spacing = 10;
     Vector2i button_size{0, 0};
-    uint32_t line_spacing = 0;
+    Vector2i button_margin{0, 0};
+    uint32_t button_text_color = 0xFFFFFFFF;
+    std::string title{};
   };
 
   ItemList<T> items{};
   std::function<void(const T&)> on_left_click{};
   std::function<void(const T&)> on_right_click{};
   std::function<void(const T&)> on_hover{};
-  Vector2i button_size{0, 0};
-  uint32_t line_spacing = 0;
+  uint32_t line_spacing{};
+  Vector2i button_size{};
+  Vector2i button_margin{};
+  uint32_t button_text_color{};
+  std::string title{};
   Scrollable* scrollable = nullptr;
   Container* container = nullptr;
 
@@ -44,7 +50,10 @@ class TextButtonList : public UIComponent
         items(std::move(params.items)),
         on_left_click(std::move(params.on_left_click)),
         on_right_click(std::move(params.on_right_click)),
-        on_hover(std::move(params.on_hover))
+        on_hover(std::move(params.on_hover)),
+        line_spacing(params.line_spacing),
+        button_text_color(params.button_text_color),
+        title(std::move(params.title))
   {
     size = params.size - params.margin * 2;
     margin = std::move(params.margin);
@@ -53,19 +62,32 @@ class TextButtonList : public UIComponent
     {
       button_size = std::move(params.button_size);
     }
+    else if (params.button_size.x == 0 && params.button_size.y != 0)
+    {
+      button_size.x = size.x;
+      button_size.y = params.button_size.y;
+    }
     else
     {
       button_size.x = size.x;
-      button_size.y = 48;
+      button_size.y = 20;
     }
-
-    line_spacing = params.line_spacing;
 
     scrollable = emplace<Scrollable>();
     container = scrollable->emplace<Container>();
 
     scrollable->size = size;
     container->size = size;
+
+    if (!title.empty())
+    {
+      emplace<Label>(LabelParams{.value = title});
+
+      // TODO: Calculate the height of the title label on initialization
+      scrollable->position.y += 16 + line_spacing;
+      scrollable->size.y -= 16 + line_spacing;
+      container->size.y -= 16 + line_spacing;
+    }
 
     create_buttons();
   }
@@ -115,14 +137,16 @@ class TextButtonList : public UIComponent
           },
       });
 
-      button->size = Vector2i{button_size.x - 2 * margin.x, button_size.y};
+      button->size = Vector2i{button_size.x - 2 * button_margin.x, button_size.y};
+      button->label->text.color = button_text_color;
       button->label->x_alignment = XAlignement::Left;
       button->label->y_alignment = YAlignement::Center;
-      button->position.x = margin.x;
-      button->position.y = i * (button_size.y + line_spacing) + margin.y + i;
+      button->position.x = button_margin.x;
+      button->position.y = i * (button_size.y + line_spacing) + button_margin.y + i;
     }
 
-    const auto height = static_cast<int>(items_size * button_size.y + (items_size - 1) * line_spacing + 2 * margin.y);
+    const auto height
+        = static_cast<int>(items_size * button_size.y + (items_size - 1) * line_spacing + 2 * button_margin.y);
     container->size = Vector2i{button_size.x, height};
   }
 };

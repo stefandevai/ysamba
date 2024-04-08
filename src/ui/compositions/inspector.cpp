@@ -14,8 +14,9 @@ Inspector::Inspector(UIContext& context) : UIComponent(context)
   size = Vector2i{250, 100};
   position = Vector3i{30, 30, 0};
 
-  m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = size;
+  m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
+      .size = size,
+  });
 
   m_label = m_window_frame->emplace<Label>("");
   m_label->position = Vector3i{20, 20, 0};

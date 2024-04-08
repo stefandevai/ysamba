@@ -7,7 +7,7 @@
 namespace dl::ui
 {
 template <class T>
-class ScrollableList;
+class TextButtonList;
 class WindowFrame;
 
 class ActionMenu : public UIComponent
@@ -20,7 +20,7 @@ class ActionMenu : public UIComponent
   void hide();
 
  private:
-  ScrollableList<JobType>* m_scrollable_list = nullptr;
+  TextButtonList<JobType>* m_list = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };
 

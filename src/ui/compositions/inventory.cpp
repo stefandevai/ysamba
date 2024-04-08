@@ -7,7 +7,7 @@
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/scrollable_list.hpp"
+#include "ui/components/text_button_list.hpp"
 #include "ui/components/text_input.hpp"
 #include "ui/components/window_frame.hpp"
 #include "ui/ui_manager.hpp"
@@ -18,22 +18,32 @@ Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>
 {
   state = UIComponent::State::Hidden;
 
-  m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = Vector2i{500, 400};
+  m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
+      .size = {500, 400},
+  });
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_weared_items = m_window_frame->emplace<ScrollableList<entt::entity>>();
-  m_weared_items->title = "Weared Items";
-  m_weared_items->size = Vector2i{452, 352};
-  m_weared_items->position = Vector3i{24, 24, 0};
-  m_weared_items->set_on_select(on_select);
+  const auto safe_area_size = m_window_frame->get_safe_area_size();
+  const auto position_offset = m_window_frame->get_position_offset();
 
-  m_carried_items = m_window_frame->emplace<ScrollableList<entt::entity>>();
-  m_carried_items->title = "Carried Items";
-  m_carried_items->size = Vector2i{452, 352};
-  m_carried_items->position = Vector3i{224, 24, 0};
-  m_carried_items->set_on_select(on_select);
+  m_weared_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
+      .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
+      .on_left_click = on_select,
+      .title = "Weared Items",
+  });
+
+  m_weared_items->position.x = position_offset.x;
+  m_weared_items->position.y = position_offset.y;
+
+  m_carried_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
+      .size = Vector2i{safe_area_size.x / 2, safe_area_size.y},
+      .on_left_click = on_select,
+      .title = "Carried Items",
+  });
+
+  m_carried_items->position.x = position_offset.x + safe_area_size.x / 2;
+  m_carried_items->position.y = position_offset.y;
 }
 
 void Inventory::process_input()
@@ -53,14 +63,14 @@ void Inventory::process_input()
 
 void Inventory::set_weared_items(const ItemList<entt::entity>& items)
 {
-  m_weared_items->set_items(items);
-  dirty = true;
+  m_weared_items->items = items;
+  m_weared_items->create_buttons();
 }
 
 void Inventory::set_carried_items(const ItemList<entt::entity>& items)
 {
-  m_carried_items->set_items(items);
-  dirty = true;
+  m_carried_items->items = items;
+  m_carried_items->create_buttons();
 }
 
 void Inventory::show()

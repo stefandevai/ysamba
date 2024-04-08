@@ -11,11 +11,6 @@
 
 namespace dl::ui
 {
-WindowFrame::WindowFrame(UIContext& context) : UIComponent(context, "WindowFrame")
-{
-  is_renderable = true;
-}
-
 WindowFrame::WindowFrame(UIContext& context, Params params)
     : UIComponent(context, "WindowFrame"), m_has_close_button(params.has_close_button)
 {

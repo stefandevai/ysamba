@@ -6,7 +6,7 @@
 namespace dl::ui
 {
 template <class T>
-class ScrollableList;
+class TextButtonList;
 class WindowFrame;
 
 class Inventory : public UIComponent
@@ -21,8 +21,8 @@ class Inventory : public UIComponent
   void hide();
 
  private:
-  ScrollableList<entt::entity>* m_weared_items = nullptr;
-  ScrollableList<entt::entity>* m_carried_items = nullptr;
+  TextButtonList<entt::entity>* m_weared_items = nullptr;
+  TextButtonList<entt::entity>* m_carried_items = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };
 

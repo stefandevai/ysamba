@@ -5,7 +5,7 @@
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/scrollable_list.hpp"
+#include "ui/components/text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 
 namespace dl::ui
@@ -15,27 +15,32 @@ ItemSelection::ItemSelection(UIContext& context, const std::function<void(const 
 {
   state = UIComponent::State::Hidden;
 
-  m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = Vector2i{300, 400};
+  m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
+      .size = {300, 400},
+  });
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_items = m_window_frame->emplace<ScrollableList<EntityPair>>();
-  m_items->title = "Select Item";
-  m_items->size = Vector2i{252, 352};
-  m_items->position = Vector3i{24, 24, 0};
-  m_items->set_on_select(on_select);
+  m_items = m_window_frame->emplace<TextButtonList<EntityPair>>(TextButtonList<EntityPair>::Params{
+      .size = m_window_frame->get_safe_area_size(),
+      .on_left_click = on_select,
+      .title = "Select Item",
+  });
+
+  const auto position_offset = m_window_frame->get_position_offset();
+  m_items->position.x = position_offset.x;
+  m_items->position.y = position_offset.y;
 }
 
 void ItemSelection::set_items(const ItemList<EntityPair>& items)
 {
-  m_items->set_items(items);
-  dirty = true;
+  m_items->items = items;
+  m_items->create_buttons();
 }
 
 void ItemSelection::show()
 {
-  m_items->reset_scroll();
+  m_items->scrollable->reset_scroll();
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 

@@ -15,8 +15,9 @@ ItemDetails::ItemDetails(UIContext& context) : UIComponent(context)
 {
   state = UIComponent::State::Hidden;
 
-  m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = Vector2i{200, 200};
+  m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
+      .size = {200, 200},
+  });
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 }

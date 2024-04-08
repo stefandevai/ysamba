@@ -33,6 +33,8 @@ struct Vector2
   Vector2& operator-=(const Vector2& rhs);
   Vector2 operator*(double rhs) const;
   Vector2& operator*=(double rhs);
+  Vector2 operator/(double rhs) const;
+  Vector2& operator/=(double rhs);
 };
 
 template <typename Archive>
@@ -69,6 +71,8 @@ struct Vector2i
   Vector2i& operator-=(const Vector2i& rhs);
   Vector2i operator*(int rhs) const;
   Vector2i& operator*=(int rhs);
+  Vector2i operator/(int rhs) const;
+  Vector2i& operator/=(int rhs);
 };
 
 template <typename Archive>
@@ -107,6 +111,8 @@ struct Vector3
   Vector3& operator-=(const Vector3& rhs);
   Vector3 operator*(double rhs) const;
   Vector3& operator*=(double rhs);
+  Vector3 operator/(double rhs) const;
+  Vector3& operator/=(double rhs);
 };
 
 template <typename Archive>
@@ -145,6 +151,8 @@ struct Vector3i
   Vector3i& operator-=(const Vector3i& rhs);
   Vector3i operator*(int rhs) const;
   Vector3i& operator*=(int rhs);
+  Vector3i operator/(int rhs) const;
+  Vector3i& operator/=(int rhs);
 };
 
 template <typename Archive>
@@ -181,6 +189,8 @@ struct Vector4d
   Vector4d& operator-=(const Vector4d& rhs);
   Vector4d operator*(double rhs) const;
   Vector4d& operator*=(double rhs);
+  Vector4d operator/(double rhs) const;
+  Vector4d& operator/=(double rhs);
 };
 
 template <typename Archive>
@@ -217,6 +227,8 @@ struct Vector4i
   Vector4i& operator-=(const Vector4i& rhs);
   Vector4i operator*(int rhs) const;
   Vector4i& operator*=(int rhs);
+  Vector4i operator/(int rhs) const;
+  Vector4i& operator/=(int rhs);
 };
 
 template <typename Archive>

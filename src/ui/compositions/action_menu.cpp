@@ -4,7 +4,7 @@
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
-#include "ui/components/scrollable_list.hpp"
+#include "ui/components/text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 
 namespace dl::ui
@@ -16,36 +16,36 @@ ActionMenu::ActionMenu(UIContext& context,
 {
   state = UIComponent::State::Hidden;
 
-  m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = Vector2i{200, 300};
+  m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
+      .size = {200, 300},
+  });
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_scrollable_list = m_window_frame->emplace<ScrollableList<JobType>>();
-  m_scrollable_list->size = Vector2i{152, 252};
-  m_scrollable_list->position = Vector3i{24, 24, 0};
-  m_scrollable_list->set_on_select(on_select);
+  m_list = m_window_frame->emplace<TextButtonList<JobType>>(TextButtonList<JobType>::Params{
+      .size = m_window_frame->get_safe_area_size(),
+      .on_left_click = on_select,
+  });
 
-  if (items.size() > 0)
-  {
-    m_scrollable_list->set_items(items);
-  }
+  const auto position_offset = m_window_frame->get_position_offset();
+  m_list->position.x = position_offset.x;
+  m_list->position.y = position_offset.y;
 }
 
 void ActionMenu::set_actions(const ItemList<JobType>& actions)
 {
-  dirty = true;
-  m_scrollable_list->set_items(actions);
+  m_list->items = actions;
+  m_list->create_buttons();
 }
 
 void ActionMenu::set_on_select(const std::function<void(const JobType)>& on_select)
 {
-  m_scrollable_list->set_on_select(on_select);
+  m_list->on_left_click = on_select;
 }
 
 void ActionMenu::show()
 {
-  m_scrollable_list->reset_scroll();
+  m_list->scrollable->reset_scroll();
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 

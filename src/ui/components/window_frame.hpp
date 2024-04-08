@@ -20,7 +20,6 @@ class WindowFrame : public UIComponent
   NinePatch nine_patch{};
   Image* close_button = nullptr;
 
-  WindowFrame(UIContext& context);
   WindowFrame(UIContext& context, Params params);
 
   void render();

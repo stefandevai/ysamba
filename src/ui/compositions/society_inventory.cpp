@@ -6,7 +6,7 @@
 
 #include "core/maths/vector.hpp"
 #include "ui/animation.hpp"
-#include "ui/components/scrollable_list.hpp"
+#include "ui/components/text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
 #include "ui/ui_manager.hpp"
 
@@ -17,16 +17,21 @@ SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(
 {
   state = UIComponent::State::Hidden;
 
-  m_window_frame = emplace<WindowFrame>();
-  m_window_frame->size = Vector2i{500, 400};
+  m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
+      .size = {500, 400},
+  });
   m_window_frame->x_alignment = XAlignement::Center;
   m_window_frame->y_alignment = YAlignement::Center;
 
-  m_items = m_window_frame->emplace<ScrollableList<entt::entity>>();
-  m_items->title = "Items";
-  m_items->size = Vector2i{452, 352};
-  m_items->position = Vector3i{24, 24, 0};
-  m_items->set_on_select(on_select);
+  m_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
+      .size = m_window_frame->get_safe_area_size(),
+      .on_left_click = on_select,
+      .title = "Items",
+  });
+
+  const auto position_offset = m_window_frame->get_position_offset();
+  m_items->position.x = position_offset.x;
+  m_items->position.y = position_offset.y;
 }
 
 void SocietyInventory::process_input()
@@ -46,8 +51,8 @@ void SocietyInventory::process_input()
 
 void SocietyInventory::set_items(const ItemList<entt::entity>& items)
 {
-  m_items->set_items(items);
-  dirty = true;
+  m_items->items = items;
+  m_items->create_buttons();
 }
 
 void SocietyInventory::show()
