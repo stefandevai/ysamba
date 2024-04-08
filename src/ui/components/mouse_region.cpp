@@ -25,6 +25,8 @@ void MouseRegion::process_input()
 {
   if (m_input_manager.mouse_hover_aabb(absolute_position.xy(), size))
   {
+    m_input_manager.set_mouse_cursor(MouseCursor::Hand);
+
     if (on_left_click && m_input_manager.has_clicked(InputManager::MouseButton::Left))
     {
       on_left_click();
