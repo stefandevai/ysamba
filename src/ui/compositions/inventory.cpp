@@ -14,15 +14,16 @@
 
 namespace dl::ui
 {
-Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select) : UIComponent(context)
+Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select) : UIComponent(context, "Inventory")
 {
   state = UIComponent::State::Hidden;
+  size = Vector2i{500, 400};
+  x_alignment = XAlignement::Center;
+  y_alignment = YAlignement::Center;
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
-      .size = {500, 400},
+      .size = size,
   });
-  m_window_frame->x_alignment = XAlignement::Center;
-  m_window_frame->y_alignment = YAlignement::Center;
 
   const auto safe_area_size = m_window_frame->get_safe_area_size();
   const auto position_offset = m_window_frame->get_position_offset();

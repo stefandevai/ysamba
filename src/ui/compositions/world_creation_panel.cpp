@@ -11,7 +11,7 @@
 
 namespace dl::ui
 {
-WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context)
+WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context, "WorldCreationPanel")
 {
   using namespace i18n::literals;
 

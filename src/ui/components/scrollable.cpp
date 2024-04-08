@@ -5,12 +5,11 @@
 #include "./container.hpp"
 #include "./label.hpp"
 #include "core/maths/vector.hpp"
-#include "graphics/display.hpp"
 #include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
 {
-Scrollable::Scrollable(UIContext& context) : UIComponent(context) {}
+Scrollable::Scrollable(UIContext& context) : UIComponent(context, "Scrollable") {}
 
 void Scrollable::process_input()
 {

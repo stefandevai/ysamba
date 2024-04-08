@@ -12,13 +12,13 @@ Label::Label(UIContext& context) : UIComponent(context, "Label")
   is_renderable = true;
 }
 
-Label::Label(UIContext& context, const std::string_view value) : UIComponent(context), value(value)
+Label::Label(UIContext& context, const std::string_view value) : UIComponent(context, "Label"), value(value)
 {
   is_renderable = true;
 }
 
 Label::Label(UIContext& context, LabelParams params)
-    : UIComponent(context), value(std::move(params.value)), wrap(params.wrap)
+    : UIComponent(context, "Label"), value(std::move(params.value)), wrap(params.wrap)
 {
   text.color.set(params.color);
   is_renderable = true;
@@ -53,7 +53,6 @@ void Label::render()
   {
     text.color.opacity_factor = opacity;
   }
-  // spdlog::info("Label::render() {}", absolute_position.z);
 
   m_context.renderer->ui_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z);
 }

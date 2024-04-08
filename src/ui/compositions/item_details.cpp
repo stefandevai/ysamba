@@ -11,15 +11,16 @@
 
 namespace dl::ui
 {
-ItemDetails::ItemDetails(UIContext& context) : UIComponent(context)
+ItemDetails::ItemDetails(UIContext& context) : UIComponent(context, "ItemDetails")
 {
   state = UIComponent::State::Hidden;
+  size = Vector2i{600, 600};
+  x_alignment = XAlignement::Center;
+  y_alignment = YAlignement::Center;
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
-      .size = {200, 200},
+      .size = size,
   });
-  m_window_frame->x_alignment = XAlignement::Center;
-  m_window_frame->y_alignment = YAlignement::Center;
 }
 
 void ItemDetails::process_input()

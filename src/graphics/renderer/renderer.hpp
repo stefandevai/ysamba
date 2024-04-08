@@ -39,7 +39,9 @@ class Renderer
  private:
   bool m_has_loaded = false;
   WGPUTexture depth_texture;
+  WGPUTexture ui_depth_texture;
   WGPUTextureView depth_texture_view;
+  WGPUTextureView ui_depth_texture_view;
 
   // Descriptors used during rendering
   WGPUTextureViewDescriptor target_view_descriptor;

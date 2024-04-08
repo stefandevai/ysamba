@@ -12,19 +12,21 @@ namespace dl::ui
 ActionMenu::ActionMenu(UIContext& context,
                        const ItemList<JobType>& items,
                        const std::function<void(const JobType)>& on_select)
-    : UIComponent(context)
+    : UIComponent(context, "ActionMenu")
 {
   state = UIComponent::State::Hidden;
+  size = Vector2i{300, 485};
+  x_alignment = XAlignement::Center;
+  y_alignment = YAlignement::Center;
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
-      .size = {200, 300},
+      .size = size,
   });
-  m_window_frame->x_alignment = XAlignement::Center;
-  m_window_frame->y_alignment = YAlignement::Center;
 
   m_list = m_window_frame->emplace<TextButtonList<JobType>>(TextButtonList<JobType>::Params{
       .size = m_window_frame->get_safe_area_size(),
       .on_left_click = on_select,
+      .items = items,
   });
 
   const auto position_offset = m_window_frame->get_position_offset();

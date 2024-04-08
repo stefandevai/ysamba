@@ -11,15 +11,16 @@
 namespace dl::ui
 {
 ItemSelection::ItemSelection(UIContext& context, const std::function<void(const EntityPair&)>& on_select)
-    : UIComponent(context)
+    : UIComponent(context, "ItemSelection")
 {
   state = UIComponent::State::Hidden;
+  size = Vector2i{300, 400};
+  x_alignment = XAlignement::Center;
+  y_alignment = YAlignement::Center;
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
-      .size = {300, 400},
+      .size = size,
   });
-  m_window_frame->x_alignment = XAlignement::Center;
-  m_window_frame->y_alignment = YAlignement::Center;
 
   m_items = m_window_frame->emplace<TextButtonList<EntityPair>>(TextButtonList<EntityPair>::Params{
       .size = m_window_frame->get_safe_area_size(),

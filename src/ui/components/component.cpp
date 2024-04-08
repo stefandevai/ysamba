@@ -101,7 +101,7 @@ void UIComponent::m_update_geometry()
   }
 
   m_context.min_z_index = std::min(m_context.min_z_index, absolute_position.z);
-  m_context.max_z_index = std::max(m_context.min_z_index, absolute_position.z);
+  m_context.max_z_index = std::max(m_context.max_z_index, absolute_position.z);
 }
 
 void UIComponent::m_update()
@@ -124,9 +124,26 @@ void UIComponent::m_update()
     update();
   }
 
+  // // If dirty, propagate to parents
+  // if (dirty)
+  // {
+  //   auto current_parent = parent;
+  //
+  //   while (current_parent != nullptr)
+  //   {
+  //     current_parent->dirty = dirty;
+  //     current_parent = current_parent->parent;
+  //   }
+  // }
+
   for (const auto& child : children)
   {
-    child->dirty = dirty;
+    // If dirty, propagate to children
+    if (dirty)
+    {
+      child->dirty = dirty;
+    }
+
     child->opacity = opacity;
     child->m_update();
   }

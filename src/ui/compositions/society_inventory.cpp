@@ -13,15 +13,16 @@
 namespace dl::ui
 {
 SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(entt::entity)>& on_select)
-    : UIComponent(context)
+    : UIComponent(context, "SocietyInventory")
 {
   state = UIComponent::State::Hidden;
+  size = Vector2i{500, 400};
+  x_alignment = XAlignement::Center;
+  y_alignment = YAlignement::Center;
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
-      .size = {500, 400},
+      .size = size,
   });
-  m_window_frame->x_alignment = XAlignement::Center;
-  m_window_frame->y_alignment = YAlignement::Center;
 
   m_items = m_window_frame->emplace<TextButtonList<entt::entity>>(TextButtonList<entt::entity>::Params{
       .size = m_window_frame->get_safe_area_size(),

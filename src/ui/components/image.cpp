@@ -62,7 +62,7 @@ void ImageBatcher::operator()(Sprite& sprite)
   m_batch.sprite(sprite, m_position.x, m_position.y, m_position.z);
 }
 
-Image::Image(UIContext& context, ImageType image) : UIComponent(context), image(std::move(image))
+Image::Image(UIContext& context, ImageType image) : UIComponent(context, "Image"), image(std::move(image))
 {
   is_renderable = true;
 

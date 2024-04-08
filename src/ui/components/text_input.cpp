@@ -8,7 +8,7 @@
 
 namespace dl::ui
 {
-TextInput::TextInput(UIContext& context) : UIComponent(context)
+TextInput::TextInput(UIContext& context) : UIComponent(context, "TextInput")
 {
   size = Vector2i{160, 32};
   m_container = emplace<Container>(size, 0x2f4241ff);

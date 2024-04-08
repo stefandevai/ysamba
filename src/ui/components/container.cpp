@@ -12,7 +12,7 @@ Container::Container(UIContext& context)
 }
 
 Container::Container(UIContext& context, const Vector2i& size, const uint32_t color)
-    : UIComponent(context), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
+    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
 {
   is_renderable = true;
   this->size = size;

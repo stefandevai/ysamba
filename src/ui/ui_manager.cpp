@@ -5,6 +5,7 @@
 #include "core/asset_manager.hpp"
 #include "core/input_manager.hpp"
 #include "graphics/renderer/renderer.hpp"
+#include "graphics/display.hpp"
 
 namespace dl::ui
 {
@@ -23,10 +24,8 @@ UIManager::~UIManager()
 void UIManager::update()
 {
   m_clock.tick();
-  m_animation_manager.update(m_clock.delta);
-  m_context.min_z_index = 0;
-  m_context.max_z_index = 0;
 
+  // Process input
   if (m_focused_stack.empty())
   {
     for (auto& component : m_components)
@@ -39,6 +38,14 @@ void UIManager::update()
     m_focused_stack.back()->m_process_input();
   }
 
+  // Update animations
+  m_animation_manager.update(m_clock.delta);
+
+  // Update components
+  // Reset min/max z_index so that we get the updated values each frame
+  m_context.min_z_index = 0;
+  m_context.max_z_index = 0;
+
   for (auto& component : m_components)
   {
     if (component->state == UIComponent::State::Hidden)
@@ -49,6 +56,7 @@ void UIManager::update()
     component->m_update();
   }
 
+  // Update notifications
   for (auto& notification : m_notifications)
   {
     if (notification->state == UIComponent::State::Hidden)
@@ -68,7 +76,7 @@ void UIManager::render()
   // Sort top level components by z-index
   std::sort(m_components.begin(),
             m_components.end(),
-            [](const auto& a, const auto& b) { return a->position.z < b->position.z; });
+            [](const auto& a, const auto& b) { return a->absolute_position.z < b->absolute_position.z; });
 
   for (auto& component : m_components)
   {
@@ -77,7 +85,18 @@ void UIManager::render()
       continue;
     }
 
+    if (component->state == UIComponent::State::Animating)
+    {
+      const auto window_size = Display::get_window_size();
+      m_context.renderer->ui_pass.batch.push_scissor({component->absolute_position.x, component->absolute_position.y, component->size.x, component->size.y});
+    }
+
     component->render();
+
+    if (component->state == UIComponent::State::Animating)
+    {
+      m_context.renderer->ui_pass.batch.pop_scissor();
+    }
   }
 
   for (auto& notification : m_notifications)

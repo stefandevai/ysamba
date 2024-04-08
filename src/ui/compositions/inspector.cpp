@@ -8,11 +8,13 @@
 
 namespace dl::ui
 {
-Inspector::Inspector(UIContext& context) : UIComponent(context)
+Inspector::Inspector(UIContext& context) : UIComponent(context, "Inspector")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{250, 100};
   position = Vector3i{30, 30, 0};
+  placement = Placement::Absolute;
+  x_alignment = XAlignement::Right;
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
       .size = size,
@@ -20,9 +22,6 @@ Inspector::Inspector(UIContext& context) : UIComponent(context)
 
   m_label = m_window_frame->emplace<Label>("");
   m_label->position = Vector3i{20, 20, 0};
-
-  placement = Placement::Absolute;
-  x_alignment = XAlignement::Right;
 }
 
 void Inspector::set_content(const std::string& text)

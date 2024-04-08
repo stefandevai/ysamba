@@ -7,7 +7,7 @@
 
 namespace dl::ui
 {
-Button::Button(UIContext& context) : UIComponent(context)
+Button::Button(UIContext& context) : UIComponent(context, "Button")
 {
   size = Vector2i{160, 32};
   container = emplace<Container>();
