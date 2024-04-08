@@ -8,6 +8,8 @@ namespace dl::ui
 {
 template <class T>
 class ScrollableList;
+template <class T>
+class TextButtonList;
 class WindowFrame;
 
 class WorldList : public UIComponent
@@ -22,6 +24,7 @@ class WorldList : public UIComponent
 
  private:
   ScrollableList<WorldMetadata>* m_scrollable_list = nullptr;
+  TextButtonList<WorldMetadata>* m_list = nullptr;
   WindowFrame* m_window_frame = nullptr;
 };
 

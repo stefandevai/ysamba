@@ -5,6 +5,13 @@
 
 namespace dl::ui
 {
+struct LabelParams
+{
+  std::string value{};
+  bool wrap = true;
+  uint32_t color = 0xFFFFFFFF;
+};
+
 class Label : public UIComponent
 {
  public:
@@ -14,6 +21,7 @@ class Label : public UIComponent
 
   Label(UIContext& context);
   Label(UIContext& context, const std::string_view value);
+  Label(UIContext& context, LabelParams params);
 
   void init();
   void render();
