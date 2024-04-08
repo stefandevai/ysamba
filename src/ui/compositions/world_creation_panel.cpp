@@ -31,18 +31,9 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context
 
   m_save_button = emplace<FilledButton>(FilledButton::Params{
       .text = "save"_t, .size = Vector2i{250, 32},
-      // .background_color = 0x33aa88aa,
-      // .background_hover_color = 0x33aa88aa,
   });
 
-  // m_save_button->size.x = 250;
   m_save_button->position = Vector3i{0, 60, 0};
-  // m_save_button->text = "save"_t;
-
-  // m_save_button = emplace<Button>();
-  // m_save_button->size.x = 250;
-  // m_save_button->position = Vector3i{0, 60, 0};
-  // m_save_button->text = "save"_t;
 }
 
 std::string& WorldCreationPanel::get_name()
@@ -52,7 +43,6 @@ std::string& WorldCreationPanel::get_name()
 
 void WorldCreationPanel::on_save(const std::function<void()>& on_save_fn)
 {
-  // m_save_button->on_click = on_save_fn;
   m_save_button->mouse_region->on_left_click = on_save_fn;
 }
 

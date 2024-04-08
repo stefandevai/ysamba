@@ -19,10 +19,10 @@ TextInput::TextInput(UIContext& context) : UIComponent(context, "TextInput")
 
   const int cursor_height = m_label->text.font_size;
   const uint32_t cursor_color = m_label->text.color.int_color;
-  m_cursor = emplace<Container>(Vector2i{1, cursor_height}, cursor_color);
+  m_cursor = m_container->emplace<Container>(Vector2i{1, cursor_height}, cursor_color);
   m_cursor->margin = m_label->margin;
   m_cursor->y_alignment = YAlignement::Center;
-  m_cursor->position = Vector3i{-1, -1, -1};
+  m_cursor->position = Vector3i{-1, -1, 0};
 }
 
 void TextInput::init()
