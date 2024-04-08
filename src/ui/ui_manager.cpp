@@ -85,6 +85,8 @@ void UIManager::render()
       continue;
     }
 
+    // Push scissor during animation to resolve issues with components stacking on top of other components
+    // that contain a scissor
     if (component->state == UIComponent::State::Animating)
     {
       const auto window_size = Display::get_window_size();

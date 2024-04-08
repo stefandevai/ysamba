@@ -74,7 +74,7 @@ class Gameplay : public Scene
   StorageAreaSystem m_storage_area_system{m_world, m_event_emitter, m_ui_manager};
   WalkSystem m_walk_system{m_world, m_registry};
   JobSystem m_job_system{m_world};
-  InventorySystem m_inventory_system{m_world, m_ui_manager, m_gameplay_modals};
+  InventorySystem m_inventory_system{m_world, m_gameplay_modals};
   WearSystem m_wear_system{m_world};
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager};

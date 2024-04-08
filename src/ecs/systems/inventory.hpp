@@ -9,8 +9,6 @@ namespace dl::ui
 {
 class UIManager;
 class GameplayModals;
-class Inventory;
-class SocietyInventory;
 }  // namespace dl::ui
 
 namespace dl
@@ -22,7 +20,7 @@ struct Vector2i;
 class InventorySystem
 {
  public:
-  InventorySystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals);
+  InventorySystem(World& world, ui::GameplayModals& gameplay_modals);
 
   void update(entt::registry& registry);
 
@@ -40,7 +38,6 @@ class InventorySystem
 
   World& m_world;
 
-  ui::UIManager& m_ui_manager;
   ui::GameplayModals& m_gameplay_modals;
 
   // Caches names of items carried by society agents

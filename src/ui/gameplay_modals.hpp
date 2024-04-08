@@ -4,7 +4,7 @@ namespace dl::ui
 {
 class UIManager;
 class ItemDetails;
-class Inventory;
+class SelectedInventory;
 class SocietyInventory;
 
 class GameplayModals
@@ -14,7 +14,7 @@ class GameplayModals
   ItemDetails* item_details = nullptr;
 
   // Inventory UI composition for selected entities only
-  Inventory* selected_inventory = nullptr;
+  SelectedInventory* selected_inventory = nullptr;
 
   // Inventory UI composition that displays storage items and carried items by all society agents
   SocietyInventory* society_inventory = nullptr;

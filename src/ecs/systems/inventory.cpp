@@ -14,7 +14,7 @@
 #include "ecs/components/storage_area.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
-#include "ui/compositions/inventory.hpp"
+#include "ui/compositions/selected_inventory.hpp"
 #include "ui/compositions/society_inventory.hpp"
 #include "ui/gameplay_modals.hpp"
 #include "ui/ui_manager.hpp"
@@ -23,8 +23,8 @@
 
 namespace dl
 {
-InventorySystem::InventorySystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals)
-    : m_world(world), m_ui_manager(ui_manager), m_gameplay_modals(gameplay_modals)
+InventorySystem::InventorySystem(World& world, ui::GameplayModals& gameplay_modals)
+    : m_world(world), m_gameplay_modals(gameplay_modals)
 {
 }
 

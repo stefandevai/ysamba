@@ -1,4 +1,4 @@
-#include "./inventory.hpp"
+#include "./selected_inventory.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -14,8 +14,8 @@
 
 namespace dl::ui
 {
-Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select)
-    : UIComponent(context, "Inventory")
+SelectedInventory::SelectedInventory(UIContext& context, const std::function<void(entt::entity)>& on_select)
+    : UIComponent(context, "SelectedInventory")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{500, 400};
@@ -48,7 +48,7 @@ Inventory::Inventory(UIContext& context, const std::function<void(entt::entity)>
   m_carried_items->position.y = position_offset.y;
 }
 
-void Inventory::process_input()
+void SelectedInventory::process_input()
 {
   using namespace entt::literals;
 
@@ -63,19 +63,19 @@ void Inventory::process_input()
   }
 }
 
-void Inventory::set_weared_items(const ItemList<entt::entity>& items)
+void SelectedInventory::set_weared_items(const ItemList<entt::entity>& items)
 {
   m_weared_items->items = items;
   m_weared_items->create_buttons();
 }
 
-void Inventory::set_carried_items(const ItemList<entt::entity>& items)
+void SelectedInventory::set_carried_items(const ItemList<entt::entity>& items)
 {
   m_carried_items->items = items;
   m_carried_items->create_buttons();
 }
 
-void Inventory::show()
+void SelectedInventory::show()
 {
   using namespace entt::literals;
 
@@ -85,7 +85,7 @@ void Inventory::show()
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 
-void Inventory::hide()
+void SelectedInventory::hide()
 {
   animate<AnimationFadeOut>(0.3, Easing::OutQuart);
   m_context.focused_stack->pop_back();

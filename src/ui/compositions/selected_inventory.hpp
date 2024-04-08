@@ -9,10 +9,10 @@ template <class T>
 class TextButtonList;
 class WindowFrame;
 
-class Inventory : public UIComponent
+class SelectedInventory : public UIComponent
 {
  public:
-  Inventory(UIContext& context, const std::function<void(entt::entity)>& on_select);
+  SelectedInventory(UIContext& context, const std::function<void(entt::entity)>& on_select);
 
   void process_input();
   void set_weared_items(const ItemList<entt::entity>& items);
