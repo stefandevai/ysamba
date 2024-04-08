@@ -22,6 +22,8 @@ struct Sprite
   glm::vec2 anchor{};
   std::array<glm::vec2, 4> uv_coordinates{};
   std::string category{};
+
+  void load_from_spritesheet();
 };
 
 template <typename Archive>

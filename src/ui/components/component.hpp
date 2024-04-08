@@ -80,6 +80,7 @@ class UIComponent
   UIComponent& operator=(UIComponent&&) = delete;
 
   virtual void init() {}
+  virtual void after_init() {}
   virtual void process_input() {}
   virtual void update() {}
   virtual void render();
@@ -142,6 +143,8 @@ class UIComponent
   glm::mat4 m_transform_matrix{};
 
   void m_init();
+  void m_after_init();
+  void m_process_input();
   void m_update();
   void m_update_geometry();
   bool m_is_positioned();

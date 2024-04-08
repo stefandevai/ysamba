@@ -25,6 +25,26 @@ void UIComponent::m_init()
   dirty = true;
 }
 
+void UIComponent::m_after_init()
+{
+  after_init();
+
+  for (const auto& child : children)
+  {
+    child->m_after_init();
+  }
+}
+
+void UIComponent::m_process_input()
+{
+  process_input();
+
+  for (const auto& child : children)
+  {
+    child->m_process_input();
+  }
+}
+
 void UIComponent::m_update_geometry()
 {
   if (!is_active())
@@ -84,6 +104,7 @@ void UIComponent::m_update()
   if (!has_initialized)
   {
     m_init();
+    m_after_init();
   }
 
   m_update_geometry();

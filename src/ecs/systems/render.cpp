@@ -306,18 +306,13 @@ void RenderSystem::m_create_sprite(entt::registry& registry, entt::entity entity
 
   assert(sprite_data.resource_id != 0 && "Resource ID not found while creating sprite");
 
-  // Load texture and render data
+  // Load spritesheet and render data
   const auto spritesheet = m_game_context.asset_manager->get<Spritesheet>(sprite_data.resource_id);
   sprite_data.spritesheet = spritesheet;
 
   assert(spritesheet->has_metadata && "Spritesheet metadata not found");
 
-  const auto& frame_data = spritesheet->id_to_frame(sprite_data.id, sprite_data.category);
-  const auto& frame_size = spritesheet->get_frame_size();
-  sprite_data.frame_data = &frame_data;
-  sprite_data.uv_coordinates = spritesheet->get_uv_coordinates(frame_data.faces[frame_data.default_face]);
-  sprite_data.size = glm::vec2{frame_size.x * frame_data.width, frame_size.y * frame_data.height};
-  sprite_data.anchor = glm::vec2{frame_size.x * frame_data.anchor_x, frame_size.y * frame_data.anchor_y};
+  sprite_data.load_from_spritesheet();
 }
 
 }  // namespace dl

@@ -5,7 +5,7 @@
 #include <entt/core/hashed_string.hpp>
 
 #include "graphics/renderer/renderer.hpp"
-#include "ui/components/image.hpp"
+#include "ui/components/image_button.hpp"
 
 namespace dl::ui
 {
@@ -23,9 +23,14 @@ void WindowFrame::init()
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;
 
-  close_button = emplace<Image>(TextureSlice{.id = 1, .resource_id = "ui"_hs});
+  emplace<ImageButton>(ImageButtonParams{
+      .image = TextureSlice{.id = 1, .resource_id = "ui"_hs},
+      .on_left_click = [this]() { hide(); },
+  });
+
+  // close_button = emplace<Image>(TextureSlice{.id = 1, .resource_id = "ui"_hs});
   // close_button->x_alignment = XAlignement::Right;
-  close_button->size = Vector2i{17, 17};
+  // close_button->size = Vector2i{17, 17};
   // close_button->margin = Vector2i{1, 1};
 }
 

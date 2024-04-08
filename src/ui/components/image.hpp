@@ -3,6 +3,7 @@
 #include <variant>
 
 #include "./component.hpp"
+#include "core/asset_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/sprite.hpp"
 #include "ecs/components/texture_slice.hpp"
@@ -13,6 +14,32 @@
 namespace dl::ui
 {
 using ImageType = std::variant<TextureSlice, Sprite>;
+
+struct ImageLoader
+{
+  ImageLoader(AssetManager& asset_manager) : m_asset_manager(asset_manager) {}
+
+  void operator()(TextureSlice& slice)
+  {
+    if (slice.texture == nullptr)
+    {
+      const auto texture_atlas = m_asset_manager.get<TextureAtlas>(slice.resource_id);
+      slice.load_from_texture_atlas(texture_atlas);
+    }
+  }
+
+  void operator()(Sprite& sprite)
+  {
+    if (sprite.spritesheet == nullptr)
+    {
+      sprite.spritesheet = m_asset_manager.get<Spritesheet>(sprite.resource_id);
+      sprite.load_from_spritesheet();
+    }
+  }
+
+ private:
+  AssetManager& m_asset_manager;
+};
 
 struct ImageBatcher
 {
@@ -54,7 +81,6 @@ class Image : public UIComponent
 
   Image(UIContext& context, ImageType image);
 
-  void init();
   void render();
 };
 

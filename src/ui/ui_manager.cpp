@@ -36,12 +36,12 @@ void UIManager::update()
         continue;
       }
 
-      component->process_input();
+      component->m_process_input();
     }
   }
   else
   {
-    m_focused_stack.back()->process_input();
+    m_focused_stack.back()->m_process_input();
   }
 
   for (auto& component : m_components)
