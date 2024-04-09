@@ -32,6 +32,8 @@ class ScrollableTextButtonList : public UIComponent
     uint32_t button_text_hover_color = 0xA1B9B6FF;
     uint32_t title_color = 0xC5B75BFF;
     std::string title{};
+    bool enumerate = false;
+    EnumerationType enumeration_type = EnumerationType::Alphabetical;
   };
 
   uint32_t title_color{};
@@ -75,6 +77,8 @@ class ScrollableTextButtonList : public UIComponent
         .button_margin = std::move(params.button_margin),
         .button_text_color = params.button_text_color,
         .button_text_hover_color = params.button_text_hover_color,
+        .enumerate = params.enumerate,
+        .enumeration_type = params.enumeration_type,
     });
   }
 };

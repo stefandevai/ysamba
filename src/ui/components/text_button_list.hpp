@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/format.h>
+
 #include <functional>
 
 #include "./component.hpp"
@@ -7,9 +9,16 @@
 #include "ui/components/label.hpp"
 #include "ui/components/text_button.hpp"
 #include "ui/types.hpp"
+#include "ui/utils.hpp"
 
 namespace dl::ui
 {
+enum class EnumerationType
+{
+  None,
+  Alphabetical,
+  Numerical,
+};
 
 template <class T>
 class TextButtonList : public UIComponent
@@ -28,6 +37,8 @@ class TextButtonList : public UIComponent
     Vector2i button_margin{0, 0};
     uint32_t button_text_color = 0xCEE2DFFF;
     uint32_t button_text_hover_color = 0xA1B9B6FF;
+    bool enumerate = false;
+    EnumerationType enumeration_type = EnumerationType::Alphabetical;
   };
 
   ItemList<T> items{};
@@ -40,6 +51,8 @@ class TextButtonList : public UIComponent
   Vector2i button_margin{};
   uint32_t button_text_color{};
   uint32_t button_text_hover_color{};
+  bool enumerate{};
+  EnumerationType enumeration_type{};
   Container* container = nullptr;
 
   TextButtonList(UIContext& context, Params params)
@@ -51,7 +64,9 @@ class TextButtonList : public UIComponent
         on_mouse_out(std::move(params.on_mouse_out)),
         line_spacing(params.line_spacing),
         button_text_color(params.button_text_color),
-        button_text_hover_color(params.button_text_hover_color)
+        button_text_hover_color(params.button_text_hover_color),
+        enumerate(params.enumerate),
+        enumeration_type(params.enumeration_type)
   {
     size = std::move(params.size);
 
@@ -90,12 +105,12 @@ class TextButtonList : public UIComponent
 
     container->children.reserve(items_size);
 
-    for (size_t i = 0; i < items_size; ++i)
+    for (uint32_t i = 0; i < items_size; ++i)
     {
       const auto& item = items[i];
 
       auto button = container->emplace<TextButton>(TextButton::Params{
-          .text = item.second,
+          .text = enumerate ? m_get_enumerated_content(item.second, i, enumeration_type) : item.second,
           .on_left_click =
               [this, &item]()
           {
@@ -144,6 +159,38 @@ class TextButtonList : public UIComponent
 
     size = Vector2i{button_size.x, height};
     container->set_size(size);
+  }
+
+ private:
+  std::string m_get_enumerated_content(const std::string_view item, const uint32_t index, const EnumerationType type)
+  {
+    switch (type)
+    {
+    case EnumerationType::Alphabetical:
+    {
+      if (index < 52)
+      {
+        return fmt::format("[#687c82]\\[{}\\][/#] {}", get_character_by_index(index), item);
+      }
+      break;
+    }
+    case EnumerationType::Numerical:
+    {
+      if (index < 9)
+      {
+        return fmt::format("[#687c82]\\[{}\\][/#] {}", index + 1, item);
+      }
+      else if (index == 9)
+      {
+        return fmt::format("[#687c82]\\[{}\\][/#] {}", 0, item);
+      }
+      break;
+    }
+    default:
+      return std::string(item);
+    }
+
+    return std::string(item);
   }
 };
 

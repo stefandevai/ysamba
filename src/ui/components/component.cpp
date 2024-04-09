@@ -124,18 +124,6 @@ void UIComponent::m_update()
     update();
   }
 
-  // // If dirty, propagate to parents
-  // if (dirty)
-  // {
-  //   auto current_parent = parent;
-  //
-  //   while (current_parent != nullptr)
-  //   {
-  //     current_parent->dirty = dirty;
-  //     current_parent = current_parent->parent;
-  //   }
-  // }
-
   for (const auto& child : children)
   {
     // If dirty, propagate to children

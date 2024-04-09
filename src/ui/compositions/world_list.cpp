@@ -30,6 +30,8 @@ WorldList::WorldList(UIContext& context, Params params) : UIComponent(context, "
           .line_spacing = 0,
           .button_size = {0, 48},
           .title = "Select World",
+          .enumerate = true,
+          .enumeration_type = EnumerationType::Alphabetical,
       });
 
   const auto position_offset = m_window_frame->get_position_offset();
