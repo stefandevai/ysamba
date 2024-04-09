@@ -20,6 +20,7 @@
 #include "graphics/camera.hpp"
 #include "ui/compositions/item_selection.hpp"
 #include "ui/compositions/notification.hpp"
+#include "ui/gameplay_modals.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/item_factory.hpp"
 #include "world/target.hpp"
@@ -34,7 +35,8 @@ const auto stop_drop = [](entt::registry& registry, const entt::entity entity, c
   registry.remove<ActionDrop>(entity);
 };
 
-DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
+DropSystem::DropSystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals)
+    : m_world(world), m_gameplay_modals(gameplay_modals), m_ui_manager(ui_manager)
 {
   const auto on_select = [this](const ui::EntityPair entities)
   {
@@ -43,9 +45,7 @@ DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world)
     m_ui_state = UIState::SelectingTarget;
   };
 
-  m_drop_menu = m_ui_manager.emplace<ui::ItemSelection>(ui::ItemSelection::Params{
-      .on_select = std::move(on_select),
-  });
+  m_gameplay_modals.item_selection->set_on_select(std::move(on_select));
 }
 
 void DropSystem::update(entt::registry& registry, const Camera& camera)
@@ -258,8 +258,8 @@ void DropSystem::m_process_input(entt::registry& registry)
       }
     }
 
-    m_drop_menu->set_items(m_items);
-    m_drop_menu->show();
+    m_gameplay_modals.item_selection->set_items(m_items);
+    m_gameplay_modals.item_selection->show();
   }
 }
 
@@ -275,7 +275,7 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
 
   if (m_notification == nullptr)
   {
-    m_drop_menu->hide();
+    m_gameplay_modals.item_selection->hide();
     m_notification = m_ui_manager.notify("Drop where?");
     m_input_manager.push_context("notification"_hs);
   }
@@ -309,9 +309,9 @@ void DropSystem::m_dispose()
     m_input_manager.pop_context();
   }
 
-  if (m_drop_menu->is_visible())
+  if (m_gameplay_modals.item_selection->is_visible())
   {
-    m_drop_menu->hide();
+    m_gameplay_modals.item_selection->hide();
   }
 
   m_ui_state = UIState::None;

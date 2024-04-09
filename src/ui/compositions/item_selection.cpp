@@ -52,7 +52,7 @@ void ItemSelection::show()
 {
   using namespace entt::literals;
 
-  m_input_manager.push_context("selection_list"_hs);
+  m_input_manager.push_context("list_selection"_hs);
   m_items->scrollable->reset_scroll();
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
@@ -63,10 +63,14 @@ void ItemSelection::hide()
   animate<AnimationFadeOut>(0.3, Easing::OutQuart);
 }
 
-void ItemSelection::set_items(const ItemList<EntityPair>& items)
+void ItemSelection::set_items(const ItemList<EntityPair> items)
 {
-  m_items->list->items = items;
+  m_items->list->items = std::move(items);
   m_items->list->create_buttons();
+}
+void ItemSelection::set_on_select(const std::function<void(const EntityPair&)> on_select)
+{
+  m_items->list->on_left_click = std::move(on_select);
 }
 
 }  // namespace dl::ui

@@ -16,8 +16,8 @@ class ActionManager;
 
 namespace dl::ui
 {
+class GameplayModals;
 class UIManager;
-class ActionMenu;
 class Notification;
 }  // namespace dl::ui
 
@@ -31,7 +31,10 @@ struct EventEmitter;
 class ActionSystem
 {
  public:
-  ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter);
+  ActionSystem(World& world,
+               ui::UIManager& ui_manager,
+               EventEmitter& event_emitter,
+               ui::GameplayModals& gameplay_modals);
   void update(entt::registry& registry, const Camera& camera);
 
  private:
@@ -42,11 +45,11 @@ class ActionSystem
   };
 
   World& m_world;
+  ui::GameplayModals& m_gameplay_modals;
   ui::UIManager& m_ui_manager;
 
   static const ui::ItemList<JobType> m_menu_items;
   ui::ItemList<JobType> m_actions{};
-  ui::ActionMenu* m_action_menu = nullptr;
   ui::Notification* m_notification = nullptr;
   EventEmitter& m_event_emitter;
 

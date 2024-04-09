@@ -7,8 +7,8 @@
 
 namespace dl::ui
 {
+class GameplayModals;
 class UIManager;
-class ItemSelection;
 class Notification;
 }  // namespace dl::ui
 
@@ -21,7 +21,7 @@ struct Vector2i;
 class DropSystem
 {
  public:
-  DropSystem(World& world, ui::UIManager& ui_manager);
+  DropSystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals);
   void update(entt::registry& registry, const Camera& camera);
 
  private:
@@ -32,11 +32,11 @@ class DropSystem
   };
 
   World& m_world;
+  ui::GameplayModals& m_gameplay_modals;
   ui::UIManager& m_ui_manager;
 
   static const ui::ItemList<uint32_t> m_menu_items;
   ui::ItemList<std::pair<entt::entity, entt::entity>> m_items{};
-  ui::ItemSelection* m_drop_menu = nullptr;
   ui::Notification* m_notification = nullptr;
   entt::entity m_selected_entity = entt::null;
   entt::entity m_target_item = entt::null;

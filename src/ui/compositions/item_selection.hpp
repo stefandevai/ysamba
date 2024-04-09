@@ -27,7 +27,8 @@ class ItemSelection : public UIComponent
   void process_input();
   void show();
   void hide();
-  void set_items(const ItemList<EntityPair>& items);
+  void set_items(const ItemList<EntityPair> items);
+  void set_on_select(const std::function<void(const EntityPair&)> on_select);
 
  private:
   ScrollableTextButtonList<EntityPair>* m_items = nullptr;

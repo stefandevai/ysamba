@@ -68,7 +68,7 @@ class Gameplay : public Scene
   PhysicsSystem m_physics_system{m_world};
   RenderSystem m_render_system{m_game_context, m_world};
   InspectorSystem m_inspector_system{m_world, m_ui_manager};
-  ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter};
+  ActionSystem m_action_system{m_world, m_ui_manager, m_event_emitter, m_gameplay_modals};
   PickupSystem m_pickup_system{m_world};
   BuildHutSystem m_build_hut_system{m_world, m_event_emitter, m_ui_manager};
   StorageAreaSystem m_storage_area_system{m_world, m_event_emitter, m_ui_manager};
@@ -77,7 +77,7 @@ class Gameplay : public Scene
   InventorySystem m_inventory_system{m_world, m_gameplay_modals};
   WearSystem m_wear_system{m_world};
   WieldSystem m_wield_system{m_world};
-  DropSystem m_drop_system{m_world, m_ui_manager};
+  DropSystem m_drop_system{m_world, m_ui_manager, m_gameplay_modals};
   PlayerControlsSystem m_player_controls_system{m_event_emitter};
 
   bool m_update_paused();

@@ -6,6 +6,8 @@ class UIManager;
 class ItemDetails;
 class SelectedInventory;
 class SocietyInventory;
+class ItemSelection;
+class ActionMenu;
 
 class GameplayModals
 {
@@ -18,6 +20,12 @@ class GameplayModals
 
   // Inventory UI composition that displays storage items and carried items by all society agents
   SocietyInventory* society_inventory = nullptr;
+
+  // Generic item list that allows selecting items
+  ItemSelection* item_selection = nullptr;
+
+  // Displays a list of actions that can be performed by an society agent in a determined context
+  ActionMenu* action_menu = nullptr;
 
   GameplayModals(UIManager& ui_manager);
 

@@ -21,6 +21,7 @@
 #include "graphics/quad.hpp"
 #include "ui/compositions/action_menu.hpp"
 #include "ui/compositions/notification.hpp"
+#include "ui/gameplay_modals.hpp"
 #include "ui/ui_manager.hpp"
 #include "world/world.hpp"
 
@@ -34,13 +35,14 @@ const ui::ItemList<JobType> ActionSystem::m_menu_items = {
     {JobType::SelectStorageArea, "Select storage area"},
 };
 
-ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
-    : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
+ActionSystem::ActionSystem(World& world,
+                           ui::UIManager& ui_manager,
+                           EventEmitter& event_emitter,
+                           ui::GameplayModals& gameplay_modals)
+    : m_world(world), m_gameplay_modals(gameplay_modals), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
 {
-  m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(ui::ActionMenu::Params{
-      .on_select = [this](JobType job_type) { m_on_select_generic_action(job_type); },
-      .actions = m_menu_items,
-  });
+  m_gameplay_modals.action_menu->set_on_select([this](JobType job_type) { m_on_select_generic_action(job_type); });
+  m_gameplay_modals.action_menu->set_actions(m_menu_items);
 }
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)
@@ -73,9 +75,9 @@ void ActionSystem::m_process_input(entt::registry& registry, const Camera& camer
 
   if (m_input_manager.poll_action("open_action_menu"_hs))
   {
-    m_action_menu->set_actions(m_menu_items);
-    m_action_menu->set_on_select([this](JobType job_type) { m_on_select_generic_action(job_type); });
-    m_action_menu->show();
+    m_gameplay_modals.action_menu->set_actions(m_menu_items);
+    m_gameplay_modals.action_menu->set_on_select([this](JobType job_type) { m_on_select_generic_action(job_type); });
+    m_gameplay_modals.action_menu->show();
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
@@ -131,7 +133,7 @@ void ActionSystem::m_process_input(entt::registry& registry, const Camera& camer
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Right))
   {
-    assert(m_action_menu != nullptr);
+    assert(m_gameplay_modals.action_menu != nullptr);
 
     if (m_selected_entities.empty())
     {
@@ -168,14 +170,14 @@ void ActionSystem::m_process_input(entt::registry& registry, const Camera& camer
         m_actions.push_back({JobType::Walk, "walk to location"});
       }
 
-      m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select(
+      m_gameplay_modals.action_menu->set_actions(m_actions);
+      m_gameplay_modals.action_menu->set_on_select(
           [this, mouse_tile, selected_entity, &registry](const JobType job_type)
           {
             m_dispatch_action(registry, job_type, mouse_tile, selected_entity);
             m_dispose();
           });
-      m_action_menu->show();
+      m_gameplay_modals.action_menu->show();
     }
     else
     {
@@ -192,14 +194,14 @@ void ActionSystem::m_process_input(entt::registry& registry, const Camera& camer
         m_actions.push_back({JobType::Walk, "walk to location"});
       }
 
-      m_action_menu->set_actions(m_actions);
-      m_action_menu->set_on_select(
+      m_gameplay_modals.action_menu->set_actions(m_actions);
+      m_gameplay_modals.action_menu->set_on_select(
           [this, mouse_tile, &registry](const JobType job_type)
           {
             m_dispatch_action(registry, job_type, mouse_tile);
             m_dispose();
           });
-      m_action_menu->show();
+      m_gameplay_modals.action_menu->show();
     }
   }
 }
@@ -208,7 +210,7 @@ void ActionSystem::m_on_select_generic_action(JobType job_type)
 {
   m_selected_job_type = job_type;
   m_ui_state = UIState::SelectingTarget;
-  m_action_menu->hide();
+  m_gameplay_modals.action_menu->hide();
 }
 
 void ActionSystem::m_update_selecting_target(entt::registry& registry, const Camera& camera)
@@ -261,9 +263,9 @@ void ActionSystem::m_dispose()
     m_input_manager.pop_context();
   }
 
-  if (m_action_menu->is_visible())
+  if (m_gameplay_modals.action_menu->is_visible())
   {
-    m_action_menu->hide();
+    m_gameplay_modals.action_menu->hide();
   }
 
   m_ui_state = UIState::None;
