@@ -62,16 +62,17 @@ class InputManager
   [[nodiscard]] const Vector4i& get_drag_bounds() const;
   [[nodiscard]] const std::shared_ptr<InputContext> get_current_context() const;
   [[nodiscard]] bool window_size_changed() const;
-  void text_input_start();
-  void text_input_stop();
   [[nodiscard]] const std::string& get_text_input() const;
   [[nodiscard]] int get_text_input_cursor_index() const;
+  [[nodiscard]] bool should_quit() const;
+  [[nodiscard]] int get_letter_key_down_index();
+  [[nodiscard]] int get_number_key_down();
+  void text_input_start();
+  void text_input_stop();
+  void set_text_input(const std::string& text);
   void reset_drag();
   void set_mouse_cursor(MouseCursor cursor);
-
-  [[nodiscard]] bool should_quit() const;
   void quit();
-  void set_text_input(const std::string& text);
 
  private:
   static std::unique_ptr<InputManager> m_instance;

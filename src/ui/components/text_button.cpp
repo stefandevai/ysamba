@@ -13,7 +13,7 @@ TextButton::TextButton(UIContext& context, Params params)
   auto& on_mouse_over = params.on_mouse_over;
   auto& on_mouse_out = params.on_mouse_out;
 
-  auto mouse_region = emplace<MouseRegion>(MouseRegion::Params{
+  mouse_region = emplace<MouseRegion>(MouseRegion::Params{
       .on_left_click = std::move(params.on_left_click),
       .on_right_click = std::move(params.on_right_click),
       .on_mouse_over =

@@ -213,6 +213,273 @@ bool InputManager::should_quit() const
   return m_sdl_input_wrapper.should_quit();
 }
 
+int InputManager::get_letter_key_down_index()
+{
+  using namespace entt::literals;
+
+  if (is_key_down("k_a"_hs))
+  {
+    return 0;
+  }
+  if (is_key_down("k_b"_hs))
+  {
+    return 1;
+  }
+  if (is_key_down("k_c"_hs))
+  {
+    return 2;
+  }
+  if (is_key_down("k_d"_hs))
+  {
+    return 3;
+  }
+  if (is_key_down("k_e"_hs))
+  {
+    return 4;
+  }
+  if (is_key_down("k_f"_hs))
+  {
+    return 5;
+  }
+  if (is_key_down("k_g"_hs))
+  {
+    return 6;
+  }
+  if (is_key_down("k_h"_hs))
+  {
+    return 7;
+  }
+  if (is_key_down("k_i"_hs))
+  {
+    return 8;
+  }
+  if (is_key_down("k_j"_hs))
+  {
+    return 9;
+  }
+  if (is_key_down("k_k"_hs))
+  {
+    return 10;
+  }
+  if (is_key_down("k_l"_hs))
+  {
+    return 11;
+  }
+  if (is_key_down("k_m"_hs))
+  {
+    return 12;
+  }
+  if (is_key_down("k_n"_hs))
+  {
+    return 13;
+  }
+  if (is_key_down("k_o"_hs))
+  {
+    return 14;
+  }
+  if (is_key_down("k_p"_hs))
+  {
+    return 15;
+  }
+  if (is_key_down("k_q"_hs))
+  {
+    return 16;
+  }
+  if (is_key_down("k_r"_hs))
+  {
+    return 17;
+  }
+  if (is_key_down("k_s"_hs))
+  {
+    return 18;
+  }
+  if (is_key_down("k_t"_hs))
+  {
+    return 19;
+  }
+  if (is_key_down("k_u"_hs))
+  {
+    return 20;
+  }
+  if (is_key_down("k_v"_hs))
+  {
+    return 21;
+  }
+  if (is_key_down("k_w"_hs))
+  {
+    return 22;
+  }
+  if (is_key_down("k_x"_hs))
+  {
+    return 23;
+  }
+  if (is_key_down("k_y"_hs))
+  {
+    return 24;
+  }
+  if (is_key_down("k_z"_hs))
+  {
+    return 25;
+  }
+
+  if (m_sdl_input_wrapper.has_key_modifier(DL_KEY_MODIFIER_UPPERCASE))
+  {
+    if (is_key_down("k_a"_hs))
+    {
+      return 26;
+    }
+    if (is_key_down("k_b"_hs))
+    {
+      return 27;
+    }
+    if (is_key_down("k_c"_hs))
+    {
+      return 28;
+    }
+    if (is_key_down("k_d"_hs))
+    {
+      return 29;
+    }
+    if (is_key_down("k_e"_hs))
+    {
+      return 30;
+    }
+    if (is_key_down("k_f"_hs))
+    {
+      return 31;
+    }
+    if (is_key_down("k_g"_hs))
+    {
+      return 32;
+    }
+    if (is_key_down("k_h"_hs))
+    {
+      return 33;
+    }
+    if (is_key_down("k_i"_hs))
+    {
+      return 34;
+    }
+    if (is_key_down("k_j"_hs))
+    {
+      return 35;
+    }
+    if (is_key_down("k_k"_hs))
+    {
+      return 36;
+    }
+    if (is_key_down("k_l"_hs))
+    {
+      return 37;
+    }
+    if (is_key_down("k_m"_hs))
+    {
+      return 38;
+    }
+    if (is_key_down("k_n"_hs))
+    {
+      return 39;
+    }
+    if (is_key_down("k_o"_hs))
+    {
+      return 40;
+    }
+    if (is_key_down("k_p"_hs))
+    {
+      return 41;
+    }
+    if (is_key_down("k_q"_hs))
+    {
+      return 42;
+    }
+    if (is_key_down("k_r"_hs))
+    {
+      return 43;
+    }
+    if (is_key_down("k_s"_hs))
+    {
+      return 44;
+    }
+    if (is_key_down("k_t"_hs))
+    {
+      return 45;
+    }
+    if (is_key_down("k_u"_hs))
+    {
+      return 46;
+    }
+    if (is_key_down("k_v"_hs))
+    {
+      return 47;
+    }
+    if (is_key_down("k_w"_hs))
+    {
+      return 48;
+    }
+    if (is_key_down("k_x"_hs))
+    {
+      return 49;
+    }
+    if (is_key_down("k_y"_hs))
+    {
+      return 50;
+    }
+    if (is_key_down("k_z"_hs))
+    {
+      return 51;
+    }
+  }
+  return -1;
+}
+
+int InputManager::get_number_key_down()
+{
+  using namespace entt::literals;
+
+  if (is_key_down("k_1"_hs))
+  {
+    return 1;
+  }
+  if (is_key_down("k_2"_hs))
+  {
+    return 2;
+  }
+  if (is_key_down("k_3"_hs))
+  {
+    return 3;
+  }
+  if (is_key_down("k_4"_hs))
+  {
+    return 4;
+  }
+  if (is_key_down("k_5"_hs))
+  {
+    return 5;
+  }
+  if (is_key_down("k_6"_hs))
+  {
+    return 6;
+  }
+  if (is_key_down("k_7"_hs))
+  {
+    return 7;
+  }
+  if (is_key_down("k_8"_hs))
+  {
+    return 8;
+  }
+  if (is_key_down("k_9"_hs))
+  {
+    return 9;
+  }
+  if (is_key_down("k_0"_hs))
+  {
+    return 0;
+  }
+
+  return -1;
+}
+
 void InputManager::quit()
 {
   m_sdl_input_wrapper.quit();

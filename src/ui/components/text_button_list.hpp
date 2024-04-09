@@ -7,6 +7,7 @@
 #include "./component.hpp"
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
+#include "ui/components/mouse_region.hpp"
 #include "ui/components/text_button.hpp"
 #include "ui/types.hpp"
 #include "ui/utils.hpp"
@@ -54,6 +55,7 @@ class TextButtonList : public UIComponent
   bool enumerate{};
   EnumerationType enumeration_type{};
   Container* container = nullptr;
+  std::vector<TextButton*> buttons{};
 
   TextButtonList(UIContext& context, Params params)
       : UIComponent(context, "TextButtonList"),
@@ -92,9 +94,52 @@ class TextButtonList : public UIComponent
     create_buttons();
   }
 
+  void process_input()
+  {
+    if (!enumerate)
+    {
+      return;
+    }
+
+    switch (enumeration_type)
+    {
+    case EnumerationType::Alphabetical:
+    {
+      const int index = m_input_manager.get_letter_key_down_index();
+
+      if (index < 0 || static_cast<uint32_t>(index) >= buttons.size())
+      {
+        return;
+      }
+
+      buttons[index]->mouse_region->on_left_click();
+      break;
+    }
+    case EnumerationType::Numerical:
+    {
+      const int number = m_input_manager.get_number_key_down();
+
+      if (number < 0 || static_cast<uint32_t>(number) >= buttons.size() - 1)
+      {
+        return;
+      }
+      else if (number == 0 && buttons.size() >= 10)
+      {
+        buttons[9]->mouse_region->on_left_click();
+        break;
+      }
+      buttons[number - 1]->mouse_region->on_left_click();
+      break;
+    }
+    default:
+      break;
+    }
+  }
+
   void create_buttons()
   {
     container->children.clear();
+    buttons.clear();
 
     if (items.empty())
     {
@@ -104,6 +149,7 @@ class TextButtonList : public UIComponent
     const auto items_size = items.size();
 
     container->children.reserve(items_size);
+    buttons.reserve(items_size);
 
     for (uint32_t i = 0; i < items_size; ++i)
     {
@@ -152,6 +198,7 @@ class TextButtonList : public UIComponent
       button->label->y_alignment = YAlignement::Center;
       button->position.x = button_margin.x;
       button->position.y = i * (button_size.y + line_spacing) + button_margin.y + i;
+      buttons.push_back(button);
     }
 
     const auto height

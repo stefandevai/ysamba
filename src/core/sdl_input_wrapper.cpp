@@ -312,6 +312,8 @@ void SDLInputWrapper::update()
   m_mouse_state_up.second = false;
   m_has_dragged = false;
 
+  key_modifier_state = static_cast<KeyModifier>(SDL_GetModState());
+
   SDL_Event event;
 
   while (SDL_PollEvent(&event))
@@ -481,7 +483,7 @@ void SDLInputWrapper::update()
         m_cursor = m_text_input.begin() + index;
       }
     }
-    else if (m_key_down[SDLK_v] && SDL_GetModState() & KMOD_CTRL)
+    else if (m_key_down[SDLK_v] && has_key_modifier(DL_KEY_MODIFIER_CTRL))
     {
       char* clipboard_text = SDL_GetClipboardText();
       const std::string clipboard_string{clipboard_text};
@@ -582,6 +584,11 @@ int SDLInputWrapper::get_text_input_cursor_index() const
   }
 
   return std::distance(UTF8Iterator(m_text_input.begin()), m_cursor);
+}
+
+bool SDLInputWrapper::has_key_modifier(int key_modifier) const
+{
+  return key_modifier_state & key_modifier;
 }
 
 void SDLInputWrapper::set_text_input(const std::string& text)

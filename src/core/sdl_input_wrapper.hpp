@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "core/key_modifier.hpp"
 #include "core/maths/vector.hpp"
 #include "core/mouse_cursor.hpp"
 #include "core/timer.hpp"
@@ -16,6 +17,8 @@ namespace dl
 class SDLInputWrapper
 {
  public:
+  KeyModifier key_modifier_state = DL_KEY_MODIFIER_NONE;
+
   SDLInputWrapper() = default;
   ~SDLInputWrapper();
 
@@ -42,6 +45,7 @@ class SDLInputWrapper
   [[nodiscard]] bool should_quit() const;
   [[nodiscard]] const std::string& get_text_input() const;
   [[nodiscard]] int get_text_input_cursor_index() const;
+  [[nodiscard]] bool has_key_modifier(int key_modifier) const;
   void text_input_start();
   void text_input_stop();
   void reset_drag() { m_has_dragged = false; }

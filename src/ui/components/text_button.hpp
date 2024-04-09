@@ -8,6 +8,7 @@
 namespace dl::ui
 {
 class Label;
+class MouseRegion;
 
 class TextButton : public UIComponent
 {
@@ -24,6 +25,7 @@ class TextButton : public UIComponent
   };
 
   Label* label = nullptr;
+  MouseRegion* mouse_region = nullptr;
   uint32_t text_color{};
   uint32_t text_hover_color{};
 
