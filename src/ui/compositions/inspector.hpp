@@ -10,6 +10,11 @@ class WindowFrame;
 class Inspector : public UIComponent
 {
  public:
+  struct Params
+  {
+    const std::string content{};
+  };
+
   Inspector(UIContext& context);
 
   void set_content(const std::string& text);

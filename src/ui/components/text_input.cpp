@@ -11,7 +11,12 @@ namespace dl::ui
 TextInput::TextInput(UIContext& context) : UIComponent(context, "TextInput")
 {
   size = Vector2i{160, 32};
-  m_container = emplace<Container>(size, 0x2f4241ff);
+
+  m_container = emplace<Container>(Container::Params{
+      .size = size,
+      .color = 0x2f4241ff,
+  });
+
   m_label = m_container->emplace<Label>("");
   m_label->wrap = false;
   m_label->margin = Vector2i{8, 0};
@@ -19,7 +24,11 @@ TextInput::TextInput(UIContext& context) : UIComponent(context, "TextInput")
 
   const int cursor_height = m_label->text.font_size;
   const uint32_t cursor_color = m_label->text.color.int_color;
-  m_cursor = m_container->emplace<Container>(Vector2i{1, cursor_height}, cursor_color);
+
+  m_cursor = m_container->emplace<Container>(Container::Params{
+      .size = Vector2i{1, cursor_height},
+      .color = cursor_color,
+  });
   m_cursor->margin = m_label->margin;
   m_cursor->y_alignment = YAlignement::Center;
   m_cursor->position = Vector3i{-1, -1, 0};

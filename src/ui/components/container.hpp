@@ -21,8 +21,6 @@ class Container : public UIComponent
 
   std::unique_ptr<Quad> quad = nullptr;
 
-  Container(UIContext& context);
-  Container(UIContext& context, const Vector2i& size, const uint32_t color);
   Container(UIContext& context, Params params);
 
   void render();

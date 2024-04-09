@@ -70,8 +70,9 @@ class TextButtonList : public UIComponent
       button_size.y = 20;
     }
 
-    container = emplace<Container>();
-    container->set_size(size);
+    container = emplace<Container>(Container::Params{
+        .size = size,
+    });
 
     create_buttons();
   }

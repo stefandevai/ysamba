@@ -14,6 +14,12 @@ class WindowFrame;
 class SocietyInventory : public UIComponent
 {
  public:
+  struct Params
+  {
+    const ItemList<entt::entity> items{};
+    const std::function<void(entt::entity)> on_select{};
+  };
+
   SocietyInventory(UIContext& context, const std::function<void(entt::entity)>& on_select);
 
   void process_input();

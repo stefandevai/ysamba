@@ -5,19 +5,6 @@
 
 namespace dl::ui
 {
-Container::Container(UIContext& context)
-    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(0, 0, Color{0x00000000}))
-{
-  is_renderable = true;
-}
-
-Container::Container(UIContext& context, const Vector2i& size, const uint32_t color)
-    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(size.x, size.y, Color{color}))
-{
-  is_renderable = true;
-  this->size = size;
-}
-
 Container::Container(UIContext& context, Params params)
     : UIComponent(context, "Container"), quad(std::make_unique<Quad>(params.size.x, params.size.y, Color{params.color}))
 {

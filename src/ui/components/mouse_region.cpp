@@ -4,7 +4,7 @@
 
 namespace dl::ui
 {
-MouseRegion::MouseRegion(UIContext& context, MouseRegionParams params)
+MouseRegion::MouseRegion(UIContext& context, Params params)
     : UIComponent(context, "MouseRegion"),
       on_left_click(std::move(params.on_left_click)),
       on_right_click(std::move(params.on_right_click)),

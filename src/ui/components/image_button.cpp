@@ -6,9 +6,9 @@
 
 namespace dl::ui
 {
-ImageButton::ImageButton(UIContext& context, ImageButtonParams params) : UIComponent(context, "ImageButton")
+ImageButton::ImageButton(UIContext& context, Params params) : UIComponent(context, "ImageButton")
 {
-  auto mouse_region = emplace<MouseRegion>(MouseRegionParams{
+  auto mouse_region = emplace<MouseRegion>(MouseRegion::Params{
       .on_left_click = std::move(params.on_left_click),
       .on_right_click = std::move(params.on_right_click),
       .on_mouse_over = std::move(params.on_mouse_over),

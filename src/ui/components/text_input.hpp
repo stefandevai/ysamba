@@ -12,6 +12,12 @@ class Container;
 class TextInput : public UIComponent
 {
  public:
+  struct Params
+  {
+    const std::string text{};
+    const std::string placeholder{};
+  };
+
   std::string text = "";
   std::string placeholder = "";
   int cursor_index{};

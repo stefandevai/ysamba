@@ -12,6 +12,13 @@ class WindowFrame;
 class SelectedInventory : public UIComponent
 {
  public:
+  struct Params
+  {
+    const ItemList<entt::entity> weared_items{};
+    const ItemList<entt::entity> carried_items{};
+    const std::function<void(entt::entity)> on_select{};
+  };
+
   SelectedInventory(UIContext& context, const std::function<void(entt::entity)>& on_select);
 
   void process_input();

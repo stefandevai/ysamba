@@ -28,7 +28,7 @@ WindowFrame::WindowFrame(UIContext& context, Params params)
 
   if (m_has_close_button)
   {
-    emplace<ImageButton>(ImageButtonParams{
+    emplace<ImageButton>(ImageButton::Params{
         .image = TextureSlice{.id = 1, .resource_id = "ui"_hs},
         .on_left_click = [this]() { hide(); },
     });

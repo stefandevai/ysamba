@@ -11,6 +11,11 @@ class FilledButton;
 class WorldCreationPanel : public UIComponent
 {
  public:
+  struct Params
+  {
+    const std::function<void()> on_save{};
+  };
+
   size_t min_world_name_length = 2;
   size_t max_world_name_length = 24;
 

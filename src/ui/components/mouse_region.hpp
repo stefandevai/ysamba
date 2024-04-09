@@ -7,23 +7,23 @@
 namespace dl::ui
 {
 
-struct MouseRegionParams
-{
-  std::function<void()> on_left_click;
-  std::function<void()> on_right_click;
-  std::function<void()> on_mouse_over{};
-  std::function<void()> on_mouse_out{};
-};
-
 class MouseRegion : public UIComponent
 {
  public:
+  struct Params
+  {
+    std::function<void()> on_left_click;
+    std::function<void()> on_right_click;
+    std::function<void()> on_mouse_over{};
+    std::function<void()> on_mouse_out{};
+  };
+
   std::function<void()> on_left_click;
   std::function<void()> on_right_click;
   std::function<void()> on_mouse_over{};
   std::function<void()> on_mouse_out{};
 
-  MouseRegion(UIContext& context, MouseRegionParams params);
+  MouseRegion(UIContext& context, Params params);
 
   void after_init();
   void process_input();

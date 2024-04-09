@@ -13,6 +13,12 @@ class WindowFrame;
 class WorldList : public UIComponent
 {
  public:
+  struct Params
+  {
+    ItemList<WorldMetadata> actions{};
+    std::function<void(const WorldMetadata&)> on_select{};
+  };
+
   WorldList(UIContext& context);
   void process_input();
   void show();
