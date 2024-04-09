@@ -18,6 +18,7 @@ Inspector::Inspector(UIContext& context) : UIComponent(context, "Inspector")
 
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
       .size = size,
+      .has_close_button = false,
   });
 
   m_label = m_window_frame->emplace<Label>("");
