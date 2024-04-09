@@ -35,11 +35,10 @@ class ActionSystem
   void update(entt::registry& registry, const Camera& camera);
 
  private:
-  enum class ActionMenuState
+  enum class UIState
   {
-    SelectTarget,
-    Closed,
-    Open,
+    None,
+    SelectingTarget,
   };
 
   World& m_world;
@@ -52,7 +51,7 @@ class ActionSystem
   EventEmitter& m_event_emitter;
 
   std::vector<entt::entity> m_selected_entities{};
-  ActionMenuState m_state = ActionMenuState::Closed;
+  UIState m_ui_state = UIState::None;
   JobType m_selected_job_type = JobType::None;
   InputManager& m_input_manager = InputManager::get_instance();
 
@@ -60,17 +59,10 @@ class ActionSystem
   Vector3i m_last_begin{};
   Vector3i m_last_end{};
 
-  void m_update_action_menu();
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);
-  void m_update_closed_menu(entt::registry& registry, const Camera& camera);
-  void m_open_action_menu();
-  void m_close_action_menu();
+  void m_process_input(entt::registry& registry, const Camera& camera);
+  void m_on_select_generic_action(JobType job_type);
   void m_dispose();
-  std::function<void(const JobType)> m_on_select_generic_action = [this](const JobType job_type)
-  {
-    m_selected_job_type = job_type;
-    m_state = ActionMenuState::SelectTarget;
-  };
 
   void m_select_harvest_target(const Camera& camera, entt::registry& registry);
   void m_select_break_target(const Camera& camera, entt::registry& registry);

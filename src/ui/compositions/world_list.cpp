@@ -44,7 +44,7 @@ void WorldList::process_input()
     return;
   }
 
-  if (m_input_manager.poll_action("quit"_hs))
+  if (m_input_manager.poll_action("close"_hs))
   {
     hide();
   }

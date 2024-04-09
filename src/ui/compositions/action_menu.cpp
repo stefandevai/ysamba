@@ -35,6 +35,36 @@ ActionMenu::ActionMenu(UIContext& context,
   m_list->position.y = position_offset.y;
 }
 
+void ActionMenu::process_input()
+{
+  using namespace entt::literals;
+
+  if (!m_input_manager.is_context("list_selection"_hs))
+  {
+    return;
+  }
+
+  if (m_input_manager.poll_action("close"_hs))
+  {
+    hide();
+  }
+}
+
+void ActionMenu::show()
+{
+  using namespace entt::literals;
+
+  m_input_manager.push_context("list_selection"_hs);
+  m_list->scrollable->reset_scroll();
+  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+}
+
+void ActionMenu::hide()
+{
+  m_input_manager.pop_context();
+  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
+}
+
 void ActionMenu::set_actions(const ItemList<JobType>& actions)
 {
   m_list->list->items = actions;
@@ -44,17 +74,6 @@ void ActionMenu::set_actions(const ItemList<JobType>& actions)
 void ActionMenu::set_on_select(const std::function<void(const JobType)>& on_select)
 {
   m_list->list->on_left_click = on_select;
-}
-
-void ActionMenu::show()
-{
-  m_list->scrollable->reset_scroll();
-  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
-}
-
-void ActionMenu::hide()
-{
-  animate<AnimationFadeOut>(0.3, Easing::OutQuart);
 }
 
 }  // namespace dl::ui

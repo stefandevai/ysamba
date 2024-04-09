@@ -36,7 +36,7 @@ void ItemSelection::process_input()
 {
   using namespace entt::literals;
 
-  if (!m_input_manager.is_context("selection_list"_hs))
+  if (!m_input_manager.is_context("list_selection"_hs))
   {
     return;
   }

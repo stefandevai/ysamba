@@ -37,64 +37,30 @@ const ui::ItemList<JobType> ActionSystem::m_menu_items = {
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
     : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
 {
-  m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(m_menu_items, m_on_select_generic_action);
+  m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(
+      m_menu_items, [this](JobType job_type) { m_on_select_generic_action(job_type); });
 }
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)
 {
-  switch (m_state)
+  switch (m_ui_state)
   {
-  case ActionMenuState::Open:
+  case UIState::None:
   {
-    m_update_action_menu();
+    m_process_input(registry, camera);
     break;
   }
-  case ActionMenuState::Closed:
-  {
-    m_update_closed_menu(registry, camera);
-    break;
-  }
-  case ActionMenuState::SelectTarget:
+  case UIState::SelectingTarget:
   {
     m_update_selecting_target(registry, camera);
     break;
   }
+  default:
+    break;
   }
 }
 
-void ActionSystem::m_update_action_menu()
-{
-  using namespace entt::literals;
-
-  m_open_action_menu();
-
-  if (m_action_menu->state != ui::UIComponent::State::Visible)
-  {
-    return;
-  }
-
-  if (m_input_manager.poll_action("close_menu"_hs))
-  {
-    m_dispose();
-  }
-  else if (m_input_manager.poll_action("harvest"_hs))
-  {
-    m_selected_job_type = JobType::Harvest;
-    m_state = ActionMenuState::SelectTarget;
-  }
-  else if (m_input_manager.poll_action("break"_hs))
-  {
-    m_selected_job_type = JobType::Break;
-    m_state = ActionMenuState::SelectTarget;
-  }
-  else if (m_input_manager.poll_action("dig"_hs))
-  {
-    m_selected_job_type = JobType::Dig;
-    m_state = ActionMenuState::SelectTarget;
-  }
-}
-
-void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& camera)
+void ActionSystem::m_process_input(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
 
@@ -106,9 +72,8 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
   if (m_input_manager.poll_action("open_action_menu"_hs))
   {
     m_action_menu->set_actions(m_menu_items);
-    m_action_menu->set_on_select(m_on_select_generic_action);
-    m_input_manager.push_context("action_menu"_hs);
-    m_state = ActionMenuState::Open;
+    m_action_menu->set_on_select([this](JobType job_type) { m_on_select_generic_action(job_type); });
+    m_action_menu->show();
   }
   else if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {
@@ -208,8 +173,7 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
             m_dispatch_action(registry, job_type, mouse_tile, selected_entity);
             m_dispose();
           });
-      m_input_manager.push_context("action_menu"_hs);
-      m_state = ActionMenuState::Open;
+      m_action_menu->show();
     }
     else
     {
@@ -233,23 +197,21 @@ void ActionSystem::m_update_closed_menu(entt::registry& registry, const Camera& 
             m_dispatch_action(registry, job_type, mouse_tile);
             m_dispose();
           });
-      m_input_manager.push_context("action_menu"_hs);
-      m_state = ActionMenuState::Open;
+      m_action_menu->show();
     }
   }
+}
+
+void ActionSystem::m_on_select_generic_action(JobType job_type)
+{
+  m_selected_job_type = job_type;
+  m_ui_state = UIState::SelectingTarget;
+  m_action_menu->hide();
 }
 
 void ActionSystem::m_update_selecting_target(entt::registry& registry, const Camera& camera)
 {
   using namespace entt::literals;
-
-  m_close_action_menu();
-
-  if (m_input_manager.poll_action("close_menu"_hs))
-  {
-    m_dispose();
-    return;
-  }
 
   switch (m_selected_job_type)
   {
@@ -288,44 +250,39 @@ void ActionSystem::m_update_selecting_target(entt::registry& registry, const Cam
   }
 }
 
-void ActionSystem::m_open_action_menu()
-{
-  assert(m_action_menu != nullptr);
-
-  if (m_action_menu->state == ui::UIComponent::State::Hidden)
-  {
-    m_action_menu->show();
-  }
-}
-
-void ActionSystem::m_close_action_menu()
-{
-  if (m_action_menu->state == ui::UIComponent::State::Visible)
-  {
-    m_action_menu->hide();
-  }
-}
-
 void ActionSystem::m_dispose()
 {
   if (m_notification != nullptr)
   {
     m_notification->hide();
     m_notification = nullptr;
+    m_input_manager.pop_context();
   }
 
-  m_close_action_menu();
+  if (m_action_menu->is_visible())
+  {
+    m_action_menu->hide();
+  }
 
-  m_state = ActionMenuState::Closed;
+  m_ui_state = UIState::None;
   m_selected_job_type = JobType::None;
-  m_input_manager.pop_context();
 }
 
 void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry& registry)
 {
+  using namespace entt::literals;
+
   if (m_notification == nullptr)
   {
     m_notification = m_ui_manager.notify("Harvest where?");
+    m_input_manager.push_context("notification"_hs);
+  }
+
+  // Process input for selecting target notification
+  if (m_input_manager.poll_action("close"_hs))
+  {
+    m_dispose();
+    return;
   }
 
   if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
@@ -389,9 +346,19 @@ void ActionSystem::m_select_harvest_target(const Camera& camera, entt::registry&
 
 void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& registry)
 {
+  using namespace entt::literals;
+
   if (m_notification == nullptr)
   {
     m_notification = m_ui_manager.notify("Break where?");
+    m_input_manager.push_context("notification"_hs);
+  }
+
+  // Process input for selecting target notification
+  if (m_input_manager.poll_action("close"_hs))
+  {
+    m_dispose();
+    return;
   }
 
   if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
@@ -411,14 +378,25 @@ void ActionSystem::m_select_break_target(const Camera& camera, entt::registry& r
   if (created)
   {
     m_dispose();
+    return;
   }
 }
 
 void ActionSystem::m_select_dig_target(const Camera& camera, entt::registry& registry)
 {
+  using namespace entt::literals;
+
   if (m_notification == nullptr)
   {
     m_notification = m_ui_manager.notify("Dig where?");
+    m_input_manager.push_context("notification"_hs);
+  }
+
+  // Process input for selecting target notification
+  if (m_input_manager.poll_action("close"_hs))
+  {
+    m_dispose();
+    return;
   }
 
   if (!m_input_manager.has_clicked(InputManager::MouseButton::Left))
@@ -607,6 +585,7 @@ void ActionSystem::m_dispatch_action(entt::registry& registry,
           .position = position,
       });
     }
+    break;
   }
 
   default:

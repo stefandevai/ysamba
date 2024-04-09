@@ -25,11 +25,10 @@ class DropSystem
   void update(entt::registry& registry, const Camera& camera);
 
  private:
-  enum class DropMenuState
+  enum class UIState
   {
+    None,
     SelectingTarget,
-    Closed,
-    Open,
   };
 
   World& m_world;
@@ -42,11 +41,11 @@ class DropSystem
   entt::entity m_selected_entity = entt::null;
   entt::entity m_target_item = entt::null;
 
-  DropMenuState m_state = DropMenuState::Closed;
+  UIState m_ui_state = UIState::None;
   InputManager& m_input_manager = InputManager::get_instance();
 
   void m_update_selecting_target(entt::registry& registry, const Camera& camera);
-  void m_update_closed_menu(entt::registry& registry);
+  void m_process_input(entt::registry& registry);
   void m_dispose();
 };
 }  // namespace dl

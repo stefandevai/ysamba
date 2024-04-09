@@ -40,12 +40,12 @@ void SocietyInventory::process_input()
 {
   using namespace entt::literals;
 
-  if (!m_input_manager.is_context("inventory"_hs))
+  if (!m_input_manager.is_context("list_selection"_hs))
   {
     return;
   }
 
-  if (m_input_manager.poll_action("close_inventory"_hs))
+  if (m_input_manager.poll_action("close"_hs))
   {
     hide();
   }
@@ -61,7 +61,7 @@ void SocietyInventory::show()
 {
   using namespace entt::literals;
 
-  m_input_manager.push_context("inventory"_hs);
+  m_input_manager.push_context("list_selection"_hs);
   m_context.ui_manager->bring_to_front(this);
   m_context.focused_stack->push_back(this);
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);

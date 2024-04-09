@@ -40,7 +40,7 @@ DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world)
   {
     m_selected_entity = entities.first;
     m_target_item = entities.second;
-    m_state = DropMenuState::SelectingTarget;
+    m_ui_state = UIState::SelectingTarget;
   };
 
   m_drop_menu = m_ui_manager.emplace<ui::ItemSelection>(ui::ItemSelection::Params{
@@ -179,17 +179,17 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     stop_drop(registry, entity, action_drop.job);
   }
 
-  if (m_state == DropMenuState::Closed)
+  if (m_ui_state == UIState::None)
   {
-    m_update_closed_menu(registry);
+    m_process_input(registry);
   }
-  else if (m_state == DropMenuState::SelectingTarget)
+  else if (m_ui_state == UIState::SelectingTarget)
   {
     m_update_selecting_target(registry, camera);
   }
 }
 
-void DropSystem::m_update_closed_menu(entt::registry& registry)
+void DropSystem::m_process_input(entt::registry& registry)
 {
   using namespace entt::literals;
 
@@ -314,7 +314,7 @@ void DropSystem::m_dispose()
     m_drop_menu->hide();
   }
 
-  m_state = DropMenuState::Closed;
+  m_ui_state = UIState::None;
   m_target_item = entt::null;
   m_selected_entity = entt::null;
 }
