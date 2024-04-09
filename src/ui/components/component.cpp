@@ -181,6 +181,7 @@ void UIComponent::hide()
 
 void UIComponent::force_hide()
 {
+  hide();
   state = State::Hidden;
 }
 

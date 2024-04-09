@@ -8,7 +8,7 @@
 
 namespace dl::ui
 {
-Inspector::Inspector(UIContext& context) : UIComponent(context, "Inspector")
+Inspector::Inspector(UIContext& context, Params params) : UIComponent(context, "Inspector")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{250, 100};
@@ -21,14 +21,14 @@ Inspector::Inspector(UIContext& context) : UIComponent(context, "Inspector")
       .has_close_button = false,
   });
 
-  m_label = m_window_frame->emplace<Label>("");
+  m_label = m_window_frame->emplace<Label>(std::move(params.content));
   m_label->position = Vector3i{20, 20, 0};
 }
 
-void Inspector::set_content(const std::string& text)
+void Inspector::set_content(const std::string text)
 {
+  m_label->set_text(std::move(text));
   dirty = true;
-  m_label->set_text(text);
 }
 
 void Inspector::show()

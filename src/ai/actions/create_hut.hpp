@@ -57,7 +57,6 @@ static bool job(CreateJobParams params)
     // Assign the progress entity to the job
     auto& job_data = params.registry.emplace<JobData>(build_hut_job, JobType::BuildHut);
     job_data.progress_entity = job_progress_entity;
-    spdlog::debug("assign progress");
 
     auto& agent = params.registry.get<SocietyAgent>(entity);
     agent.push_job(Job{params.priority, walk_job});

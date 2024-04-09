@@ -19,9 +19,9 @@ class WorldCreationPanel : public UIComponent
   size_t min_world_name_length = 2;
   size_t max_world_name_length = 24;
 
-  WorldCreationPanel(UIContext& context);
+  WorldCreationPanel(UIContext& context, Params params);
 
-  void on_save(const std::function<void()>& on_save_fn);
+  void set_on_save(const std::function<void()> on_save);
   std::string& get_name();
   bool validate();
 

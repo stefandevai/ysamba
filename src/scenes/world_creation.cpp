@@ -31,8 +31,9 @@ void WorldCreation::load()
   world_size.y = config::world_creation::world_height;
   world_size.z = config::world_creation::world_depth;
 
-  m_panel = m_ui_manager.emplace<ui::WorldCreationPanel>();
-  m_panel->on_save([this]() { save(); });
+  m_panel = m_ui_manager.emplace<ui::WorldCreationPanel>(ui::WorldCreationPanel::Params{
+      .on_save = [this]() { save(); },
+  });
 
   m_generate_map();
   m_generate_world();

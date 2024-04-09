@@ -7,11 +7,11 @@
 
 namespace dl::ui
 {
-Notification::Notification(UIContext& context, const std::string& text) : UIComponent(context, "Notification")
+Notification::Notification(UIContext& context, const std::string text) : UIComponent(context, "Notification")
 {
   state = UIComponent::State::Hidden;
 
-  m_label = emplace<Label>(text);
+  m_label = emplace<Label>(std::move(text));
 
   size = m_label->size;
   x_alignment = ui::XAlignement::Center;

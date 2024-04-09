@@ -12,8 +12,7 @@
 
 namespace dl::ui
 {
-SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(entt::entity)>& on_select)
-    : UIComponent(context, "SocietyInventory")
+SocietyInventory::SocietyInventory(UIContext& context, Params params) : UIComponent(context, "SocietyInventory")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{500, 400};
@@ -26,8 +25,9 @@ SocietyInventory::SocietyInventory(UIContext& context, const std::function<void(
 
   m_items
       = m_window_frame->emplace<ScrollableTextButtonList<entt::entity>>(ScrollableTextButtonList<entt::entity>::Params{
+          .items = std::move(params.items),
           .size = m_window_frame->get_safe_area_size(),
-          .on_left_click = on_select,
+          .on_left_click = std::move(params.on_select),
           .title = "Items",
       });
 

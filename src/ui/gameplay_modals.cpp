@@ -22,8 +22,12 @@ GameplayModals::GameplayModals(UIManager& ui_manager) : m_ui_manager(ui_manager)
     item_details->show();
   };
 
-  selected_inventory = m_ui_manager.emplace<SelectedInventory>(on_select_item);
-  society_inventory = m_ui_manager.emplace<SocietyInventory>(on_select_item);
+  selected_inventory = m_ui_manager.emplace<SelectedInventory>(SelectedInventory::Params{
+      .on_select = on_select_item,
+  });
+  society_inventory = m_ui_manager.emplace<SocietyInventory>(SocietyInventory::Params{
+      .on_select = on_select_item,
+  });
   item_details = m_ui_manager.emplace<ItemDetails>();
   item_selection = m_ui_manager.emplace<ItemSelection>(ItemSelection::Params{});
   action_menu = m_ui_manager.emplace<ActionMenu>(ActionMenu::Params{});

@@ -37,9 +37,10 @@ void HomeMenu::load()
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
   };
 
-  m_world_list = m_ui_manager.emplace<ui::WorldList>();
-  m_world_list->set_on_select(on_select_world);
-  m_world_list->set_actions(m_worlds_metadata);
+  m_world_list = m_ui_manager.emplace<ui::WorldList>(ui::WorldList::Params{
+      .items = m_worlds_metadata,
+      .on_select = on_select_world,
+  });
 
   m_button_list = m_ui_manager.emplace<ui::TextButtonList<MenuChoice>>(ui::TextButtonList<MenuChoice>::Params{
       .items = {
@@ -81,7 +82,7 @@ void HomeMenu::process_input()
       return;
     }
 
-    m_world_list->set_actions(m_worlds_metadata);
+    m_world_list->set_items(m_worlds_metadata);
     m_world_list->show();
   }
   else if (m_input_manager.poll_action("create_world"_hs))
@@ -160,7 +161,7 @@ void HomeMenu::m_on_select_menu_option(MenuChoice choice)
       return;
     }
 
-    m_world_list->set_actions(m_worlds_metadata);
+    m_world_list->set_items(m_worlds_metadata);
     m_world_list->show();
     break;
   }

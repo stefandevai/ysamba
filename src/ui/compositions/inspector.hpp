@@ -15,9 +15,9 @@ class Inspector : public UIComponent
     const std::string content{};
   };
 
-  Inspector(UIContext& context);
+  Inspector(UIContext& context, Params params);
 
-  void set_content(const std::string& text);
+  void set_content(const std::string text);
   void show();
   void hide();
 

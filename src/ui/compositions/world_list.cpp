@@ -11,7 +11,7 @@
 
 namespace dl::ui
 {
-WorldList::WorldList(UIContext& context) : UIComponent(context, "WorldList")
+WorldList::WorldList(UIContext& context, Params params) : UIComponent(context, "WorldList")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{300, 485};
@@ -24,6 +24,8 @@ WorldList::WorldList(UIContext& context) : UIComponent(context, "WorldList")
 
   m_list = m_window_frame->emplace<ScrollableTextButtonList<WorldMetadata>>(
       ScrollableTextButtonList<WorldMetadata>::Params{
+          .items = std::move(params.items),
+          .on_left_click = std::move(params.on_select),
           .size = m_window_frame->get_safe_area_size(),
           .line_spacing = 0,
           .button_size = {0, 48},
@@ -65,9 +67,9 @@ void WorldList::hide()
   animate<AnimationFadeOut>(0.3, Easing::OutQuart);
 }
 
-void WorldList::set_actions(const ItemList<WorldMetadata>& actions)
+void WorldList::set_items(const ItemList<WorldMetadata> items)
 {
-  m_list->list->items = actions;
+  m_list->list->items = std::move(items);
   m_list->list->create_buttons();
 }
 

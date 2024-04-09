@@ -20,7 +20,7 @@ class SocietyInventory : public UIComponent
     const std::function<void(entt::entity)> on_select{};
   };
 
-  SocietyInventory(UIContext& context, const std::function<void(entt::entity)>& on_select);
+  SocietyInventory(UIContext& context, Params params);
 
   void process_input();
   void set_items(const ItemList<entt::entity>& items);

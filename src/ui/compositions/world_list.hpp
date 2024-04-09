@@ -15,15 +15,15 @@ class WorldList : public UIComponent
  public:
   struct Params
   {
-    ItemList<WorldMetadata> actions{};
+    ItemList<WorldMetadata> items{};
     std::function<void(const WorldMetadata&)> on_select{};
   };
 
-  WorldList(UIContext& context);
+  WorldList(UIContext& context, Params params);
   void process_input();
   void show();
   void hide();
-  void set_actions(const ItemList<WorldMetadata>& actions);
+  void set_items(const ItemList<WorldMetadata> items);
   void set_on_select(const std::function<void(const WorldMetadata&)>& on_select);
 
  private:

@@ -23,7 +23,7 @@ namespace dl
 InspectorSystem::InspectorSystem(World& world, ui::UIManager& ui_manager) : m_world(world), m_ui_manager(ui_manager)
 
 {
-  m_inspector = m_ui_manager.emplace<ui::Inspector>();
+  m_inspector = m_ui_manager.emplace<ui::Inspector>(ui::Inspector::Params{});
 }
 
 void InspectorSystem::update(entt::registry& registry, const Camera& camera)

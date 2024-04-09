@@ -12,7 +12,7 @@
 
 namespace dl::ui
 {
-WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context, "WorldCreationPanel")
+WorldCreationPanel::WorldCreationPanel(UIContext& context, Params params) : UIComponent(context, "WorldCreationPanel")
 {
   using namespace i18n::literals;
 
@@ -34,6 +34,7 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context
   m_save_button = emplace<FilledButton>(FilledButton::Params{
       .text = "save"_t,
       .size = Vector2i{250, 32},
+      .on_left_click = std::move(params.on_save),
   });
 
   m_save_button->position = Vector3i{0, 60, 0};
@@ -44,9 +45,9 @@ std::string& WorldCreationPanel::get_name()
   return m_text_input->text;
 }
 
-void WorldCreationPanel::on_save(const std::function<void()>& on_save_fn)
+void WorldCreationPanel::set_on_save(const std::function<void()> on_save)
 {
-  m_save_button->mouse_region->on_left_click = on_save_fn;
+  m_save_button->mouse_region->on_left_click = std::move(on_save);
 }
 
 bool WorldCreationPanel::validate()
