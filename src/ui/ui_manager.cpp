@@ -80,7 +80,7 @@ void UIManager::render()
 
   for (auto& component : m_components)
   {
-    if (component->state == UIComponent::State::Hidden)
+    if (component->is_hidden())
     {
       continue;
     }
@@ -104,12 +104,28 @@ void UIManager::render()
 
   for (auto& notification : m_notifications)
   {
-    if (notification->state == UIComponent::State::Hidden)
+    if (notification->is_hidden())
     {
       continue;
     }
 
+    // Push scissor during animation to resolve issues with components stacking on top of other components
+    // that contain a scissor
+    if (notification->state == UIComponent::State::Animating)
+    {
+      const auto window_size = Display::get_window_size();
+      m_context.renderer->ui_pass.batch.push_scissor({notification->absolute_position.x,
+                                                      notification->absolute_position.y,
+                                                      notification->size.x,
+                                                      notification->size.y});
+    }
+
     notification->render();
+
+    if (notification->state == UIComponent::State::Animating)
+    {
+      m_context.renderer->ui_pass.batch.pop_scissor();
+    }
   }
 }
 

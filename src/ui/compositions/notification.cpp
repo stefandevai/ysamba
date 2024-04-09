@@ -9,11 +9,13 @@ namespace dl::ui
 {
 Notification::Notification(UIContext& context, const std::string& text) : UIComponent(context, "Notification")
 {
-  // TODO: Calculate size based on text
   state = UIComponent::State::Hidden;
+
   m_label = emplace<Label>(text);
-  m_label->x_alignment = ui::XAlignement::Center;
-  m_label->position.y = 30;
+
+  size = m_label->size;
+  x_alignment = ui::XAlignement::Center;
+  position.y = 30;
 }
 
 void Notification::show()

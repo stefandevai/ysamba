@@ -34,8 +34,6 @@ const auto stop_build_hut = [](entt::registry& registry, const entt::entity enti
   if (registry.valid(job))
   {
     auto& job_data = registry.get<JobData>(job);
-    auto& progress = registry.get<JobProgress>(job_data.progress_entity);
-    progress.agents.erase(std::remove(progress.agents.begin(), progress.agents.end(), entity));
     job_data.status = JobStatus::Finished;
   }
   registry.remove<ActionBuildHut>(entity);
@@ -323,8 +321,14 @@ void BuildHutSystem::update(entt::registry& registry)
       }
     }
 
+    // for (const auto progress_agent : job_progress.agents)
+    // {
+    //   stop_build_hut(registry, progress_agent, action_build_hut.job);
+    // }
+
     stop_build_hut(registry, entity, action_build_hut.job);
     registry.destroy(job_data.progress_entity);
+    break;
   }
 
   auto place_hut_view = registry.view<ActionPlaceHutExterior, Biology, const Position>();

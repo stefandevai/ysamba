@@ -16,11 +16,10 @@ class Label : public UIComponent
   };
 
   Text text{};
-  std::string value;
+  std::string value{};
   bool wrap = true;
 
-  Label(UIContext& context);
-  Label(UIContext& context, const std::string_view value);
+  Label(UIContext& context, const std::string value);
   Label(UIContext& context, Params params);
 
   void init();

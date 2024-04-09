@@ -9,15 +9,7 @@
 
 namespace dl::ui
 {
-Label::Label(UIContext& context) : UIComponent(context, "Label")
-{
-  is_renderable = true;
-}
-
-Label::Label(UIContext& context, const std::string_view value) : UIComponent(context, "Label"), value(value)
-{
-  is_renderable = true;
-}
+Label::Label(UIContext& context, const std::string value) : Label(context, Params{.value = std::move(value)}) {}
 
 Label::Label(UIContext& context, Params params)
     : UIComponent(context, "Label"), value(std::move(params.value)), wrap(params.wrap)
