@@ -24,10 +24,12 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context) : UIComponent(context
   m_label = emplace<Label>("name_label"_t);
   m_label->position = Vector3i{0, 0, 0};
 
-  m_text_input = emplace<TextInput>();
+  m_text_input = emplace<TextInput>(TextInput::Params{
+      .placeholder = "enter_world_name"_t,
+      .size = Vector2i{250, 32},
+  });
   m_text_input->size.x = 250;
   m_text_input->position = Vector3i{0, 20, 0};
-  m_text_input->placeholder = "enter_world_name"_t;
 
   m_save_button = emplace<FilledButton>(FilledButton::Params{
       .text = "save"_t,

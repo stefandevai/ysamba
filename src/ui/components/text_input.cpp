@@ -8,17 +8,20 @@
 
 namespace dl::ui
 {
-TextInput::TextInput(UIContext& context) : UIComponent(context, "TextInput")
+TextInput::TextInput(UIContext& context, Params params)
+    : UIComponent(context, "TextInput"), text(std::move(params.text)), placeholder(std::move(params.placeholder))
 {
-  size = Vector2i{160, 32};
+  size = std::move(params.size);
 
   m_container = emplace<Container>(Container::Params{
       .size = size,
       .color = 0x2f4241ff,
   });
 
-  m_label = m_container->emplace<Label>("");
-  m_label->wrap = false;
+  m_label = m_container->emplace<Label>(Label::Params{
+      .value = text.empty() ? placeholder : text,
+      .wrap = false,
+  });
   m_label->margin = Vector2i{8, 0};
   m_label->y_alignment = YAlignement::Center;
 
@@ -32,20 +35,6 @@ TextInput::TextInput(UIContext& context) : UIComponent(context, "TextInput")
   m_cursor->margin = m_label->margin;
   m_cursor->y_alignment = YAlignement::Center;
   m_cursor->position = Vector3i{-1, -1, 0};
-}
-
-void TextInput::init()
-{
-  m_container->set_size(size);
-
-  if (text.empty())
-  {
-    m_label->set_text(placeholder);
-  }
-  else
-  {
-    m_label->set_text(text);
-  }
 }
 
 void TextInput::update()

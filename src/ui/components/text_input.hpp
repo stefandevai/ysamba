@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./component.hpp"
+#include "core/maths/vector.hpp"
 #include "core/timer.hpp"
 #include "graphics/quad.hpp"
 
@@ -14,17 +15,17 @@ class TextInput : public UIComponent
  public:
   struct Params
   {
-    const std::string text{};
-    const std::string placeholder{};
+    std::string text{};
+    std::string placeholder{};
+    Vector2i size{250, 32};
   };
 
-  std::string text = "";
-  std::string placeholder = "";
+  std::string text{};
+  std::string placeholder{};
   int cursor_index{};
 
-  TextInput(UIContext& context);
+  TextInput(UIContext& context, Params params);
 
-  void init();
   void update();
 
  private:

@@ -69,14 +69,14 @@ void Label::render()
   m_context.renderer->ui_pass.batch.text(text, absolute_position.x, absolute_position.y, absolute_position.z);
 }
 
-void Label::set_text(const std::string_view value)
+void Label::set_text(const std::string value)
 {
   if (this->value == value)
   {
     return;
   }
 
-  this->value = value;
+  this->value = std::move(value);
   has_initialized = false;
 }
 

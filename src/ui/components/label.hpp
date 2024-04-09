@@ -25,7 +25,7 @@ class Label : public UIComponent
   void init();
   void render();
 
-  void set_text(const std::string_view value);
+  void set_text(const std::string value);
   void set_color(uint32_t color);
 };
 
