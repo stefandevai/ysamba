@@ -43,7 +43,9 @@ DropSystem::DropSystem(World& world, ui::UIManager& ui_manager) : m_world(world)
     m_state = DropMenuState::SelectingTarget;
   };
 
-  m_drop_menu = m_ui_manager.emplace<ui::ItemSelection>(std::move(on_select));
+  m_drop_menu = m_ui_manager.emplace<ui::ItemSelection>(ui::ItemSelection::Params{
+      .on_select = std::move(on_select),
+  });
 }
 
 void DropSystem::update(entt::registry& registry, const Camera& camera)
@@ -177,29 +179,13 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
     stop_drop(registry, entity, action_drop.job);
   }
 
-  if (m_state == DropMenuState::Open)
-  {
-    m_update_drop_menu();
-  }
-  else if (m_state == DropMenuState::Closed)
+  if (m_state == DropMenuState::Closed)
   {
     m_update_closed_menu(registry);
   }
   else if (m_state == DropMenuState::SelectingTarget)
   {
     m_update_selecting_target(registry, camera);
-  }
-}
-
-void DropSystem::m_update_drop_menu()
-{
-  using namespace entt::literals;
-
-  m_open_drop_menu();
-
-  if (m_input_manager.poll_action("close_menu"_hs))
-  {
-    m_dispose();
   }
 }
 
@@ -273,8 +259,7 @@ void DropSystem::m_update_closed_menu(entt::registry& registry)
     }
 
     m_drop_menu->set_items(m_items);
-    m_state = DropMenuState::Open;
-    m_input_manager.push_context("item_selection_menu"_hs);
+    m_drop_menu->show();
   }
 }
 
@@ -288,14 +273,14 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
     return;
   }
 
-  m_close_drop_menu();
-
   if (m_notification == nullptr)
   {
+    m_drop_menu->hide();
     m_notification = m_ui_manager.notify("Drop where?");
+    m_input_manager.push_context("notification"_hs);
   }
 
-  if (m_input_manager.poll_action("close_menu"_hs))
+  if (m_input_manager.poll_action("close"_hs))
   {
     m_dispose();
   }
@@ -315,37 +300,22 @@ void DropSystem::m_update_selecting_target(entt::registry& registry, const Camer
   }
 }
 
-void DropSystem::m_open_drop_menu()
-{
-  assert(m_drop_menu != nullptr);
-
-  if (m_drop_menu->state == ui::UIComponent::State::Hidden)
-  {
-    m_drop_menu->show();
-  }
-}
-
-void DropSystem::m_close_drop_menu()
-{
-  if (m_drop_menu->state == ui::UIComponent::State::Visible)
-  {
-    m_drop_menu->hide();
-  }
-}
-
 void DropSystem::m_dispose()
 {
   if (m_notification != nullptr)
   {
     m_notification->hide();
     m_notification = nullptr;
+    m_input_manager.pop_context();
   }
 
-  m_close_drop_menu();
+  if (m_drop_menu->is_visible())
+  {
+    m_drop_menu->hide();
+  }
 
   m_state = DropMenuState::Closed;
   m_target_item = entt::null;
   m_selected_entity = entt::null;
-  m_input_manager.pop_context();
 }
 }  // namespace dl

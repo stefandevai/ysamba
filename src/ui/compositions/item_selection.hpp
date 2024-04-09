@@ -16,11 +16,17 @@ using EntityPair = std::pair<entt::entity, entt::entity>;
 class ItemSelection : public UIComponent
 {
  public:
-  ItemSelection(UIContext& context, const std::function<void(const EntityPair& i)>& on_select);
+  struct Params
+  {
+    std::function<void(const EntityPair& i)> on_select{};
+  };
 
-  void set_items(const ItemList<EntityPair>& items);
+  ItemSelection(UIContext& context, Params params);
+
+  void process_input();
   void show();
   void hide();
+  void set_items(const ItemList<EntityPair>& items);
 
  private:
   ScrollableTextButtonList<EntityPair>* m_items = nullptr;

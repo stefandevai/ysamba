@@ -67,5 +67,11 @@
     },
     "list_selection": {
         "quit": ["k_escape"]
+    },
+    "selection_list": {
+        "close": ["k_escape"]
+    },
+    "notification": {
+        "close": ["k_escape"]
     }
 }
