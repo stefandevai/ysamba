@@ -9,10 +9,7 @@
 
 namespace dl::ui
 {
-ActionMenu::ActionMenu(UIContext& context,
-                       const ItemList<JobType>& items,
-                       const std::function<void(const JobType)>& on_select)
-    : UIComponent(context, "ActionMenu")
+ActionMenu::ActionMenu(UIContext& context, Params params) : UIComponent(context, "ActionMenu")
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{300, 485};
@@ -24,9 +21,9 @@ ActionMenu::ActionMenu(UIContext& context,
   });
 
   m_list = m_window_frame->emplace<ScrollableTextButtonList<JobType>>(ScrollableTextButtonList<JobType>::Params{
+      .items = std::move(params.actions),
+      .on_left_click = std::move(params.on_select),
       .size = m_window_frame->get_safe_area_size(),
-      .on_left_click = on_select,
-      .items = items,
       .title = "Select Action",
   });
 
@@ -65,15 +62,15 @@ void ActionMenu::hide()
   animate<AnimationFadeOut>(0.3, Easing::OutQuart);
 }
 
-void ActionMenu::set_actions(const ItemList<JobType>& actions)
+void ActionMenu::set_actions(const ItemList<JobType> actions)
 {
-  m_list->list->items = actions;
+  m_list->list->items = std::move(actions);
   m_list->list->create_buttons();
 }
 
-void ActionMenu::set_on_select(const std::function<void(const JobType)>& on_select)
+void ActionMenu::set_on_select(const std::function<void(JobType)> on_select)
 {
-  m_list->list->on_left_click = on_select;
+  m_list->list->on_left_click = std::move(on_select);
 }
 
 }  // namespace dl::ui

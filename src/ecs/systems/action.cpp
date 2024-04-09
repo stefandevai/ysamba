@@ -37,8 +37,10 @@ const ui::ItemList<JobType> ActionSystem::m_menu_items = {
 ActionSystem::ActionSystem(World& world, ui::UIManager& ui_manager, EventEmitter& event_emitter)
     : m_world(world), m_ui_manager(ui_manager), m_event_emitter(event_emitter)
 {
-  m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(
-      m_menu_items, [this](JobType job_type) { m_on_select_generic_action(job_type); });
+  m_action_menu = m_ui_manager.emplace<ui::ActionMenu>(ui::ActionMenu::Params{
+      .on_select = [this](JobType job_type) { m_on_select_generic_action(job_type); },
+      .actions = m_menu_items,
+  });
 }
 
 void ActionSystem::update(entt::registry& registry, const Camera& camera)

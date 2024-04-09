@@ -22,8 +22,9 @@ ItemSelection::ItemSelection(UIContext& context, Params params) : UIComponent(co
   });
 
   m_items = m_window_frame->emplace<ScrollableTextButtonList<EntityPair>>(ScrollableTextButtonList<EntityPair>::Params{
-      .size = m_window_frame->get_safe_area_size(),
+      .items = std::move(params.items),
       .on_left_click = std::move(params.on_select),
+      .size = m_window_frame->get_safe_area_size(),
       .title = "Select Item",
   });
 

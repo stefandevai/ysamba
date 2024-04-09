@@ -13,12 +13,18 @@ class WindowFrame;
 class ActionMenu : public UIComponent
 {
  public:
-  ActionMenu(UIContext& context, const ItemList<JobType>& items, const std::function<void(const JobType)>& on_select);
+  struct Params
+  {
+    const ItemList<JobType> actions{};
+    const std::function<void(JobType)> on_select{};
+  };
+
+  ActionMenu(UIContext& context, Params params);
   void process_input();
   void show();
   void hide();
-  void set_actions(const ItemList<JobType>& actions);
-  void set_on_select(const std::function<void(const JobType)>& on_select);
+  void set_actions(const ItemList<JobType> actions);
+  void set_on_select(const std::function<void(JobType)> on_select);
 
  private:
   ScrollableTextButtonList<JobType>* m_list = nullptr;

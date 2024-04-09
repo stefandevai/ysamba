@@ -18,7 +18,8 @@ class ItemSelection : public UIComponent
  public:
   struct Params
   {
-    std::function<void(const EntityPair& i)> on_select{};
+    const ItemList<EntityPair> items{};
+    const std::function<void(const EntityPair&)> on_select{};
   };
 
   ItemSelection(UIContext& context, Params params);
