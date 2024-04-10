@@ -108,7 +108,7 @@ bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
 {
   bool updated_inspector_content = false;
 
-  if (!m_inspector->is_visible())
+  if (m_inspector->is_hidden())
   {
     m_inspector->show();
   }
@@ -147,7 +147,7 @@ bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
 
 void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, const TileData& tile_data)
 {
-  if (!m_inspector->is_visible())
+  if (m_inspector->is_hidden())
   {
     m_inspector->show();
   }

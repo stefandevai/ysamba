@@ -120,6 +120,11 @@ class UIComponent
       m_context.animator->emplace<AnimationTarget>(animations, this);
     }
 
+    if (m_context.animator->all_of<T>(animations))
+    {
+      m_context.animator->remove<T>(animations);
+    }
+
     m_context.animator->emplace<T>(animations, std::forward<Args>(args)...);
 
     if (state != State::Animating)
