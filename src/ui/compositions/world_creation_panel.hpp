@@ -6,7 +6,7 @@ namespace dl::ui
 {
 class Label;
 class TextInput;
-class FilledButton;
+class SpriteButton;
 
 class WorldCreationPanel : public UIComponent
 {
@@ -28,7 +28,7 @@ class WorldCreationPanel : public UIComponent
  private:
   Label* m_label = nullptr;
   TextInput* m_text_input = nullptr;
-  FilledButton* m_save_button = nullptr;
+  SpriteButton* m_save_button = nullptr;
 };
 
 }  // namespace dl::ui

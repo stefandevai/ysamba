@@ -46,5 +46,7 @@ struct NinePatch
 
   // (Re)generate patches
   void generate_patches();
+
+  void set_color(uint32_t color);
 };
 }  // namespace dl

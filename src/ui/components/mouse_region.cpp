@@ -16,7 +16,7 @@ MouseRegion::MouseRegion(UIContext& context, Params params)
 void MouseRegion::after_init()
 {
   // TODO: Compute size occupied by all children
-  if (!children.empty())
+  if (!children.empty() && size == Vector2i{0, 0})
   {
     size = children[0]->size;
   }

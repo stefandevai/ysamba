@@ -4,6 +4,7 @@
 
 #include "./container.hpp"
 #include "./label.hpp"
+#include "core/asset_manager.hpp"
 #include "graphics/renderer/renderer.hpp"
 
 namespace dl::ui
@@ -11,24 +12,31 @@ namespace dl::ui
 TextInput::TextInput(UIContext& context, Params params)
     : UIComponent(context, "TextInput"), text(std::move(params.text)), placeholder(std::move(params.placeholder))
 {
+  is_renderable = true;
   size = std::move(params.size);
 
-  m_container = emplace<Container>(Container::Params{
-      .size = size,
-      .color = 0x2f4241ff,
-  });
+  // m_container = emplace<Container>(Container::Params{
+  //     .size = size,
+  //     .color = 0x2f4241ff,
+  // });
 
-  m_label = m_container->emplace<Label>(Label::Params{
+  nine_patch.id = 3;
+  nine_patch.resource_id = "ui"_hs;
+  nine_patch.size.x = size.x;
+  nine_patch.size.y = size.y;
+  nine_patch.set_color(0x33AA88AA);
+
+  m_label = emplace<Label>(Label::Params{
       .value = text.empty() ? placeholder : text,
       .wrap = false,
   });
-  m_label->margin = Vector2i{8, 0};
+  m_label->margin = Vector2i{12, 0};
   m_label->y_alignment = YAlignement::Center;
 
   const int cursor_height = m_label->text.font_size;
   const uint32_t cursor_color = m_label->text.color.int_color;
 
-  m_cursor = m_container->emplace<Container>(Container::Params{
+  m_cursor = emplace<Container>(Container::Params{
       .size = Vector2i{1, cursor_height},
       .color = cursor_color,
   });
@@ -138,6 +146,12 @@ void TextInput::update()
     {
       m_input_manager.text_input_stop();
       m_input_manager.pop_context();
+
+      if (text.empty())
+      {
+        m_label->set_text(placeholder);
+      }
+
       m_state = InputState::Display;
     }
   }
@@ -145,7 +159,34 @@ void TextInput::update()
   {
     m_input_manager.text_input_stop();
     m_input_manager.pop_context();
+
+    if (text.empty())
+    {
+      m_label->set_text(placeholder);
+    }
+
     m_state = InputState::Display;
+  }
+}
+
+void TextInput::render()
+{
+  if (!is_active())
+  {
+    return;
+  }
+
+  if (nine_patch.color.opacity_factor != opacity)
+  {
+    nine_patch.color.opacity_factor = opacity;
+  }
+
+  m_context.renderer->ui_pass.batch.nine_patch(
+      nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
+
+  for (auto& child : children)
+  {
+    child->render();
   }
 }
 

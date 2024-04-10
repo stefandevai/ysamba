@@ -5,19 +5,46 @@
         {
             "game_id": 0,
             "type": "nine_patch",
-            "left": 0,
             "top": 0,
-            "right": 33,
-            "bottom": 33,
+            "left": 0,
+            "bottom": 32,
+            "right": 32,
             "border": 16
         },
         {
             "game_id": 1,
             "type": "slice",
-            "left": 0,
             "top": 48,
-            "right": 17,
-            "bottom": 65
+            "left": 0,
+            "bottom": 65,
+            "right": 17
+        },
+        {
+            "game_id": 2,
+            "type": "nine_patch",
+            "top": 0,
+            "left": 32,
+            "bottom": 30,
+            "right": 62,
+            "border": 16
+        },
+        {
+            "game_id": 3,
+            "type": "nine_patch",
+            "top": 0,
+            "left": 62,
+            "bottom": 12,
+            "right": 74,
+            "border": 5
+        },
+        {
+            "game_id": 4,
+            "type": "nine_patch",
+            "top": 0,
+            "left": 74,
+            "bottom": 12,
+            "right": 86,
+            "border": 5
         }
     ]
 }

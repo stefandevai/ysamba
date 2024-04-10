@@ -3,6 +3,7 @@
 #include "./component.hpp"
 #include "core/maths/vector.hpp"
 #include "core/timer.hpp"
+#include "graphics/nine_patch.hpp"
 #include "graphics/quad.hpp"
 
 namespace dl::ui
@@ -17,7 +18,7 @@ class TextInput : public UIComponent
   {
     std::string text{};
     std::string placeholder{};
-    Vector2i size{250, 32};
+    Vector2i size{250, 36};
   };
 
   std::string text{};
@@ -27,6 +28,7 @@ class TextInput : public UIComponent
   TextInput(UIContext& context, Params params);
 
   void update();
+  void render();
 
  private:
   enum class InputState
@@ -41,7 +43,7 @@ class TextInput : public UIComponent
     Hide,
   };
 
-  Container* m_container = nullptr;
+  NinePatch nine_patch{};
   Label* m_label = nullptr;
   InputState m_state = InputState::Display;
   CursorState m_cursor_state = CursorState::Display;

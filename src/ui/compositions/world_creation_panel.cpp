@@ -5,9 +5,9 @@
 #include <i18n_keyval/i18n.hpp>
 
 #include "ui/animation.hpp"
-#include "ui/components/filled_button.hpp"
 #include "ui/components/label.hpp"
 #include "ui/components/mouse_region.hpp"
+#include "ui/components/sprite_button.hpp"
 #include "ui/components/text_input.hpp"
 
 namespace dl::ui
@@ -26,18 +26,18 @@ WorldCreationPanel::WorldCreationPanel(UIContext& context, Params params) : UICo
 
   m_text_input = emplace<TextInput>(TextInput::Params{
       .placeholder = "enter_world_name"_t,
-      .size = Vector2i{250, 32},
+      .size = Vector2i{250, 36},
   });
   m_text_input->size.x = 250;
   m_text_input->position = Vector3i{0, 20, 0};
 
-  m_save_button = emplace<FilledButton>(FilledButton::Params{
+  m_save_button = emplace<SpriteButton>(SpriteButton::Params{
       .text = "save"_t,
       .size = Vector2i{250, 32},
       .on_left_click = std::move(params.on_save),
   });
 
-  m_save_button->position = Vector3i{0, 60, 0};
+  m_save_button->position = Vector3i{0, 64, 0};
 }
 
 std::string& WorldCreationPanel::get_name()

@@ -114,4 +114,15 @@ void NinePatch::generate_patches()
 
   dirty = false;
 }
+
+void NinePatch::set_color(const uint32_t color)
+{
+  this->color.set(color);
+
+  for (auto& patch : border_patches)
+  {
+    patch.color.set(color);
+  }
+  center_patch.color.set(color);
+}
 }  // namespace dl
