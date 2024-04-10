@@ -562,7 +562,7 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
 
   auto add_hut_part
       = [&registry, texture_id](
-            const uint32_t id, const int x, const int y, const int z, const Color& color = Color{0xFFFFFF99})
+            const uint32_t id, const int x, const int y, const int z, const Color& color = Color{0xFFFFFF77})
   {
     const auto entity = registry.create();
     registry.emplace<entt::tag<"hut_preview"_hs>>(entity);
@@ -577,20 +577,20 @@ void BuildHutSystem::m_preview_hut_target(const Vector3i& position, const uint32
     registry.emplace<Position>(entity, x, y, z);
   };
 
-  Color preview_tile_color{0x66EEAA77};
+  // Color preview_tile_color{0x66EEAA77};
+  //
+  // if (!m_can_build_hut(hut_size, position))
+  // {
+  //   preview_tile_color = Color{0xEE664477};
+  // }
 
-  if (!m_can_build_hut(hut_size, position))
-  {
-    preview_tile_color = Color{0xEE664477};
-  }
-
-  for (uint32_t j = 0; j < hut_size; ++j)
-  {
-    for (uint32_t i = 0; i < hut_size; ++i)
-    {
-      add_hut_part(2, position.x + i, position.y + j, position.z, preview_tile_color);
-    }
-  }
+  // for (uint32_t j = 0; j < hut_size; ++j)
+  // {
+  //   for (uint32_t i = 0; i < hut_size; ++i)
+  //   {
+  //     add_hut_part(2, position.x + i, position.y + j, position.z, preview_tile_color);
+  //   }
+  // }
 
   // TODO: Use bitmasks to represent huts
   if (hut_size == 3)

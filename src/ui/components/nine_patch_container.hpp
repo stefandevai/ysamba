@@ -1,27 +1,25 @@
 #pragma once
 
 #include "./component.hpp"
+#include "core/maths/vector.hpp"
+#include "graphics/nine_patch.hpp"
 #include "graphics/quad.hpp"
-
-namespace dl
-{
-struct Vector2i;
-}
 
 namespace dl::ui
 {
-class Container : public UIComponent
+class NinePatchContainer : public UIComponent
 {
  public:
   struct Params
   {
+    uint32_t id = 0;
     Vector2i size{};
-    uint32_t color = 0x00000000;
+    uint32_t color = 0xFFFFFFFF;
   };
 
-  Quad quad;
+  NinePatch nine_patch{};
 
-  Container(UIContext& context, Params params);
+  NinePatchContainer(UIContext& context, Params params);
 
   void render();
 

@@ -2,47 +2,42 @@
 
 #include <spdlog/spdlog.h>
 
-#include "./container.hpp"
-#include "./label.hpp"
 #include "core/asset_manager.hpp"
 #include "graphics/renderer/renderer.hpp"
+#include "ui/components/container.hpp"
+#include "ui/components/label.hpp"
+#include "ui/components/nine_patch_container.hpp"
 
 namespace dl::ui
 {
 TextInput::TextInput(UIContext& context, Params params)
     : UIComponent(context, "TextInput"), text(std::move(params.text)), placeholder(std::move(params.placeholder))
 {
-  is_renderable = true;
   size = std::move(params.size);
 
-  // m_container = emplace<Container>(Container::Params{
-  //     .size = size,
-  //     .color = 0x2f4241ff,
-  // });
+  container = emplace<NinePatchContainer>(NinePatchContainer::Params{
+      .id = 3,
+      .size = size,
+      .color = 0x7EB1A1FF,
+  });
 
-  nine_patch.id = 3;
-  nine_patch.resource_id = "ui"_hs;
-  nine_patch.size.x = size.x;
-  nine_patch.size.y = size.y;
-  nine_patch.set_color(0x7eb1a1FF);
-
-  m_label = emplace<Label>(Label::Params{
+  label = container->emplace<Label>(Label::Params{
       .value = text.empty() ? placeholder : text,
       .wrap = false,
   });
-  m_label->margin = Vector2i{12, 0};
-  m_label->y_alignment = YAlignement::Center;
+  label->margin = Vector2i{12, 0};
+  label->y_alignment = YAlignement::Center;
 
-  const int cursor_height = m_label->text.font_size;
-  const uint32_t cursor_color = m_label->text.color.int_color;
+  const int cursor_height = label->text.font_size;
+  const uint32_t cursor_color = label->text.color.int_color;
 
-  m_cursor = emplace<Container>(Container::Params{
+  cursor = container->emplace<Container>(Container::Params{
       .size = Vector2i{1, cursor_height},
       .color = cursor_color,
   });
-  m_cursor->margin = m_label->margin;
-  m_cursor->y_alignment = YAlignement::Center;
-  m_cursor->position = Vector3i{-1, -1, 0};
+  cursor->margin = label->margin;
+  cursor->y_alignment = YAlignement::Center;
+  cursor->position = Vector3i{-1, -1, 0};
 }
 
 void TextInput::update()
@@ -57,8 +52,8 @@ void TextInput::update()
     {
       // Restart label and compute new characters in place so we can correctly get the new cursor position
       // if it's at the end of the string.
-      m_label->set_text(text_input);
-      m_label->init();
+      label->set_text(text_input);
+      label->init();
       text = text_input;
       m_cursor_timer.start();
       m_cursor_state = CursorState::Display;
@@ -75,7 +70,7 @@ void TextInput::update()
     }
 
     // Update cursor position
-    auto cursor_position = m_label->text.get_position_at(cursor_index);
+    auto cursor_position = label->text.get_position_at(cursor_index);
 
     if (cursor_position.x == -1 && cursor_position.y == -1)
     {
@@ -83,10 +78,10 @@ void TextInput::update()
       cursor_position.y = 0;
     }
 
-    if (cursor_position.x != m_cursor->position.x || cursor_position.y != m_cursor->position.y)
+    if (cursor_position.x != cursor->position.x || cursor_position.y != cursor->position.y)
     {
-      m_cursor->position.x = cursor_position.x;
-      m_cursor->position.y = cursor_position.y;
+      cursor->position.x = cursor_position.x;
+      cursor->position.y = cursor_position.y;
       dirty = true;
     }
 
@@ -98,20 +93,20 @@ void TextInput::update()
     }
 
     // Blink cursor
-    if (m_cursor_state == CursorState::Hide && m_cursor->state != State::Hidden)
+    if (m_cursor_state == CursorState::Hide && cursor->state != State::Hidden)
     {
-      m_cursor->hide();
+      cursor->hide();
     }
-    else if (m_cursor_state == CursorState::Display && m_cursor->state != State::Visible)
+    else if (m_cursor_state == CursorState::Display && cursor->state != State::Visible)
     {
-      m_cursor->show();
+      cursor->show();
     }
   }
 
   // Hide cursor when not focused
-  if (m_state != InputState::Focus && m_cursor->state == State::Visible)
+  if (m_state != InputState::Focus && cursor->state == State::Visible)
   {
-    m_cursor->hide();
+    cursor->hide();
   }
 
   // Show hand cursor when not focused and mouse is hovering
@@ -130,9 +125,9 @@ void TextInput::update()
       m_cursor_timer.start();
 
       // Replace placeholder with actual text value
-      if (text != m_label->value)
+      if (text != label->value)
       {
-        m_label->set_text(text);
+        label->set_text(text);
       }
 
       m_input_manager.push_context("text_input"_hs);
@@ -149,7 +144,7 @@ void TextInput::update()
 
       if (text.empty())
       {
-        m_label->set_text(placeholder);
+        label->set_text(placeholder);
       }
 
       m_state = InputState::Display;
@@ -162,31 +157,10 @@ void TextInput::update()
 
     if (text.empty())
     {
-      m_label->set_text(placeholder);
+      label->set_text(placeholder);
     }
 
     m_state = InputState::Display;
-  }
-}
-
-void TextInput::render()
-{
-  if (!is_active())
-  {
-    return;
-  }
-
-  if (nine_patch.color.opacity_factor != opacity)
-  {
-    nine_patch.color.opacity_factor = opacity;
-  }
-
-  m_context.renderer->ui_pass.batch.nine_patch(
-      nine_patch, absolute_position.x, absolute_position.y, absolute_position.z);
-
-  for (auto& child : children)
-  {
-    child->render();
   }
 }
 

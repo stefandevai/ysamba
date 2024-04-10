@@ -6,7 +6,7 @@
 namespace dl::ui
 {
 Container::Container(UIContext& context, Params params)
-    : UIComponent(context, "Container"), quad(std::make_unique<Quad>(params.size.x, params.size.y, Color{params.color}))
+    : UIComponent(context, "Container"), quad(Quad{params.size.x, params.size.y, Color{params.color}})
 {
   is_renderable = true;
   size = std::move(params.size);
@@ -19,12 +19,12 @@ void Container::render()
     return;
   }
 
-  if (quad->color.opacity_factor != opacity)
+  if (quad.color.opacity_factor != opacity)
   {
-    quad->color.opacity_factor = opacity;
+    quad.color.opacity_factor = opacity;
   }
 
-  m_context.renderer->ui_pass.batch.quad(quad.get(), absolute_position.x, absolute_position.y, absolute_position.z);
+  m_context.renderer->ui_pass.batch.quad(&quad, absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {
@@ -32,15 +32,15 @@ void Container::render()
   }
 }
 
-void Container::set_size(const Vector2i& size)
+void Container::set_size(const Vector2i size)
 {
-  this->size = size;
-  quad->w = size.x;
-  quad->h = size.y;
+  this->size = std::move(size);
+  quad.w = size.x;
+  quad.h = size.y;
 }
 
 void Container::set_color(const uint32_t color)
 {
-  quad->color = Color{color};
+  quad.color.set(color);
 }
 }  // namespace dl::ui

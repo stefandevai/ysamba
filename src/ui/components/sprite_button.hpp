@@ -9,8 +9,8 @@
 namespace dl::ui
 {
 class Label;
-class Container;
 class MouseRegion;
+class NinePatchContainer;
 
 class SpriteButton : public UIComponent
 {
@@ -29,17 +29,15 @@ class SpriteButton : public UIComponent
     uint32_t background_hover_color = 0x33AA88CB;
   };
 
+  NinePatchContainer* container = nullptr;
   Label* label = nullptr;
   MouseRegion* mouse_region = nullptr;
-  NinePatch nine_patch{};
   uint32_t text_color{};
   uint32_t text_hover_color{};
   uint32_t background_color{};
   uint32_t background_hover_color{};
 
   SpriteButton(UIContext& context, Params params);
-
-  void render();
 };
 
 }  // namespace dl::ui

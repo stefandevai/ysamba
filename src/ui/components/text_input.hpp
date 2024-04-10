@@ -4,12 +4,12 @@
 #include "core/maths/vector.hpp"
 #include "core/timer.hpp"
 #include "graphics/nine_patch.hpp"
-#include "graphics/quad.hpp"
 
 namespace dl::ui
 {
 class Label;
 class Container;
+class NinePatchContainer;
 
 class TextInput : public UIComponent
 {
@@ -25,10 +25,13 @@ class TextInput : public UIComponent
   std::string placeholder{};
   int cursor_index{};
 
+  NinePatchContainer* container = nullptr;
+  Label* label = nullptr;
+  Container* cursor = nullptr;
+
   TextInput(UIContext& context, Params params);
 
   void update();
-  void render();
 
  private:
   enum class InputState
@@ -43,11 +46,8 @@ class TextInput : public UIComponent
     Hide,
   };
 
-  NinePatch nine_patch{};
-  Label* m_label = nullptr;
   InputState m_state = InputState::Display;
   CursorState m_cursor_state = CursorState::Display;
-  Container* m_cursor = nullptr;
   Timer m_cursor_timer{};
 };
 

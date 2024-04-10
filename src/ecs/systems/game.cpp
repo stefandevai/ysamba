@@ -9,10 +9,6 @@
 #include "ecs/components/position.hpp"
 #include "world/world.hpp"
 
-// TEMP
-#include "ecs/components/job_progress.hpp"
-// TEMP
-
 namespace dl
 {
 GameSystem::GameSystem(entt::registry& registry, World& world) : m_world(world)

@@ -134,10 +134,12 @@
     },
     {
         "id": 15,
-        "flags": ["LIQUID", "STACKABLE"],
+        "flags": ["LIQUID", "STACKABLE", "EDIBLE"],
         "name": "water",
         "weight": "1g",
         "volume": "1ml",
-        "matter_state": 2
+        "matter_state": 2,
+        "on_consume": [
+        ]
     }
 ]
