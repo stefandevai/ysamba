@@ -85,7 +85,7 @@ class Batch
   void texture_slice(TextureSlice& slice, double x, double y, double z);
   void tile(const Tile& tile, double x, double y, double z, RenderFace face = DL_RENDER_FACE_TOP);
   void texture(const Texture& texture, double x, double y, double z);
-  void quad(const Quad* quad, double x, double y, double z);
+  void quad(const Quad& quad, double x, double y, double z);
   void text(Text& text, double x, double y, double z);
   void nine_patch(NinePatch& nine_patch, double x, double y, double z);
 

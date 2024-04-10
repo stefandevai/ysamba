@@ -83,7 +83,7 @@ void RenderSystem::render(entt::registry& registry, const Camera& camera)
       const auto position_x = std::round(position.x) * m_tile_size.x;
       const auto position_y = std::round(position.y) * m_tile_size.y;
 
-      m_batch.quad(&quad,
+      m_batch.quad(quad,
                    position_x,
                    position_y + quad.z_index * m_z_index_increment,
                    position_z + quad.z_index * m_z_index_increment);

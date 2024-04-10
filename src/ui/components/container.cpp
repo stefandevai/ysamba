@@ -24,7 +24,7 @@ void Container::render()
     quad.color.opacity_factor = opacity;
   }
 
-  m_context.renderer->ui_pass.batch.quad(&quad, absolute_position.x, absolute_position.y, absolute_position.z);
+  m_context.renderer->ui_pass.batch.quad(quad, absolute_position.x, absolute_position.y, absolute_position.z);
 
   for (auto& child : children)
   {

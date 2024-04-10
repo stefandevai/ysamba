@@ -191,30 +191,30 @@ void Batch::texture(const Texture& texture, const double x, const double y, cons
   m_current_vb->index_buffer_count += 6;
 }
 
-void Batch::quad(const Quad* quad, const double x, const double y, const double z)
+void Batch::quad(const Quad& quad, const double x, const double y, const double z)
 {
   assert(m_current_vb != nullptr);
 
-  uint32_t color = quad->color.int_color;
+  uint32_t color = quad.color.int_color;
 
-  if (quad->color.opacity_factor < 1.0)
+  if (quad.color.opacity_factor < 1.0)
   {
-    const auto& quad_color = quad->color.rgba_color;
+    const auto& quad_color = quad.color.rgba_color;
     color = Color::rgba_to_int(
-        quad_color.r, quad_color.g, quad_color.b, static_cast<uint8_t>(quad_color.a * quad->color.opacity_factor));
+        quad_color.r, quad_color.g, quad_color.b, static_cast<uint8_t>(quad_color.a * quad.color.opacity_factor));
   }
 
   // Top left vertex
   m_current_vb->emplace(glm::vec3{x, y, z}, glm::vec2{0}, -1.0f, color);
 
   // Top right vertex
-  m_current_vb->emplace(glm::vec3{x + quad->w, y, z}, glm::vec2{0}, -1.0f, color);
+  m_current_vb->emplace(glm::vec3{x + quad.w, y, z}, glm::vec2{0}, -1.0f, color);
 
   // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{x, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
+  m_current_vb->emplace(glm::vec3{x, y + quad.h, z}, glm::vec2{0}, -1.0f, color);
 
   // Bottom right vertex
-  m_current_vb->emplace(glm::vec3{x + quad->w, y + quad->h, z}, glm::vec2{0}, -1.0f, color);
+  m_current_vb->emplace(glm::vec3{x + quad.w, y + quad.h, z}, glm::vec2{0}, -1.0f, color);
 
   m_current_vb->index_buffer_count += 6;
 }
