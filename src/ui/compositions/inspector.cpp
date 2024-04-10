@@ -33,7 +33,8 @@ void Inspector::set_content(const std::string text)
 
 void Inspector::show()
 {
-  animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+  animate<AnimationFadeIn>(0.3, Easing::OutCirc);
+  animate<AnimationAppear>(0.3, Easing::OutQuart, AnimationMovePosition::Right);
 }
 
 void Inspector::hide()

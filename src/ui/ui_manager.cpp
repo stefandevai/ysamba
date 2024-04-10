@@ -89,9 +89,22 @@ void UIManager::render()
     // that contain a scissor
     if (component->state == UIComponent::State::Animating)
     {
-      const auto window_size = Display::get_window_size();
-      m_context.renderer->ui_pass.batch.push_scissor(
-          {component->absolute_position.x, component->absolute_position.y, component->size.x, component->size.y});
+      const auto& window_size = Display::get_window_size();
+      const int scissor_x = std::clamp(component->absolute_position.x, 0, window_size.x);
+      const int scissor_y = std::clamp(component->absolute_position.y, 0, window_size.y);
+      int scissor_width = component->size.x;
+      int scissor_height = component->size.y;
+
+      if (scissor_x + scissor_width > window_size.x)
+      {
+        scissor_width = window_size.x - scissor_x;
+      }
+      if (scissor_y + scissor_height > window_size.y)
+      {
+        scissor_height = window_size.y - scissor_y;
+      }
+
+      m_context.renderer->ui_pass.batch.push_scissor({scissor_x, scissor_y, scissor_width, scissor_height});
     }
 
     component->render();
@@ -113,11 +126,22 @@ void UIManager::render()
     // that contain a scissor
     if (notification->state == UIComponent::State::Animating)
     {
-      const auto window_size = Display::get_window_size();
-      m_context.renderer->ui_pass.batch.push_scissor({notification->absolute_position.x,
-                                                      notification->absolute_position.y,
-                                                      notification->size.x,
-                                                      notification->size.y});
+      const auto& window_size = Display::get_window_size();
+      const int scissor_x = std::clamp(notification->absolute_position.x, 0, window_size.x);
+      const int scissor_y = std::clamp(notification->absolute_position.y, 0, window_size.y);
+      int scissor_width = notification->size.x;
+      int scissor_height = notification->size.y;
+
+      if (scissor_x + scissor_width > window_size.x)
+      {
+        scissor_width = window_size.x - scissor_x;
+      }
+      if (scissor_y + scissor_height > window_size.y)
+      {
+        scissor_height = window_size.y - scissor_y;
+      }
+
+      m_context.renderer->ui_pass.batch.push_scissor({scissor_x, scissor_y, scissor_width, scissor_height});
     }
 
     notification->render();

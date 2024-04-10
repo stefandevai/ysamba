@@ -2,6 +2,8 @@
 
 #include <entt/entity/registry.hpp>
 
+#include "core/maths/vector.hpp"
+
 namespace dl::ui
 {
 class UIComponent;
@@ -41,6 +43,16 @@ enum class Easing
   InOutBounce,
 };
 
+enum class AnimationMovePosition
+{
+  Top,
+  Bottom,
+  Left,
+  Right,
+};
+
+static const Vector3i AnimationNullPosition = Vector3i{-99999, -99999, -99999};
+
 struct AnimationTarget
 {
   UIComponent* value = nullptr;
@@ -63,6 +75,23 @@ struct AnimationFadeIn : public Animation
 struct AnimationFadeOut : public Animation
 {
   AnimationFadeOut(const double duration, const Easing easing) : Animation(duration, easing) {}
+};
+
+struct AnimationAppear : public Animation
+{
+  AnimationMovePosition from = AnimationMovePosition::Top;
+  Vector3i start_position = AnimationNullPosition;
+  Vector3i original_position{};
+  Vector3i position_variation{};
+
+  AnimationAppear(const double duration, const Easing easing, AnimationMovePosition from)
+      : Animation(duration, easing), from(from)
+  {
+  }
+  AnimationAppear(const double duration, const Easing easing, AnimationMovePosition from, Vector3i start_position)
+      : Animation(duration, easing), from(from), start_position(std::move(start_position))
+  {
+  }
 };
 
 namespace animation

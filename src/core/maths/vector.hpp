@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/format.h>
+
 namespace dl
 {
 struct Vector2i;
@@ -71,6 +73,8 @@ struct Vector2i
   Vector2i& operator-=(const Vector2i& rhs);
   Vector2i operator*(int rhs) const;
   Vector2i& operator*=(int rhs);
+  Vector2i operator*(double rhs) const;
+  Vector2i& operator*=(double rhs);
   Vector2i operator/(int rhs) const;
   Vector2i& operator/=(int rhs);
 };
@@ -151,6 +155,8 @@ struct Vector3i
   Vector3i& operator-=(const Vector3i& rhs);
   Vector3i operator*(int rhs) const;
   Vector3i& operator*=(int rhs);
+  Vector3i operator*(double rhs) const;
+  Vector3i& operator*=(double rhs);
   Vector3i operator/(int rhs) const;
   Vector3i& operator/=(int rhs);
 };
@@ -227,6 +233,8 @@ struct Vector4i
   Vector4i& operator-=(const Vector4i& rhs);
   Vector4i operator*(int rhs) const;
   Vector4i& operator*=(int rhs);
+  Vector4i operator*(double rhs) const;
+  Vector4i& operator*=(double rhs);
   Vector4i operator/(int rhs) const;
   Vector4i& operator/=(int rhs);
 };
@@ -238,3 +246,76 @@ void serialize(Archive& archive, Vector4i& v)
 }
 
 }  // namespace dl
+
+// Specialize fmt formatters
+template <>
+struct fmt::formatter<dl::Vector2>
+{
+  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+  template <typename Context>
+  auto format(const dl::Vector2& v, Context& ctx)
+  {
+    return format_to(ctx.out(), "({}, {})", v.x, v.y);
+  }
+};
+
+template <>
+struct fmt::formatter<dl::Vector2i>
+{
+  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+  template <typename Context>
+  auto format(const dl::Vector2i& v, Context& ctx)
+  {
+    return format_to(ctx.out(), "({}, {})", v.x, v.y);
+  }
+};
+
+template <>
+struct fmt::formatter<dl::Vector3>
+{
+  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+  template <typename Context>
+  auto format(const dl::Vector3& v, Context& ctx)
+  {
+    return format_to(ctx.out(), "({}, {}, {})", v.x, v.y, v.z);
+  }
+};
+
+template <>
+struct fmt::formatter<dl::Vector3i>
+{
+  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+  template <typename Context>
+  auto format(const dl::Vector3i& v, Context& ctx)
+  {
+    return format_to(ctx.out(), "({}, {}, {})", v.x, v.y, v.z);
+  }
+};
+
+template <>
+struct fmt::formatter<dl::Vector4d>
+{
+  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+  template <typename Context>
+  auto format(const dl::Vector4d& v, Context& ctx)
+  {
+    return format_to(ctx.out(), "({}, {}, {}, {})", v.x, v.y, v.z, v.w);
+  }
+};
+
+template <>
+struct fmt::formatter<dl::Vector4i>
+{
+  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+  template <typename Context>
+  auto format(const dl::Vector4i& v, Context& ctx)
+  {
+    return format_to(ctx.out(), "({}, {}, {}, {})", v.x, v.y, v.z, v.w);
+  }
+};

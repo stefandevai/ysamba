@@ -230,6 +230,18 @@ Vector2i& Vector2i::operator*=(const int rhs)
   return *this;
 }
 
+Vector2i Vector2i::operator*(const double rhs) const
+{
+  return Vector2i{x * rhs, y * rhs};
+}
+
+Vector2i& Vector2i::operator*=(const double rhs)
+{
+  x *= rhs;
+  y *= rhs;
+  return *this;
+}
+
 Vector2i Vector2i::operator/(const int rhs) const
 {
   return Vector2i{x / rhs, y / rhs};
@@ -356,6 +368,19 @@ Vector3i Vector3i::operator*(const int rhs) const
 }
 
 Vector3i& Vector3i::operator*=(const int rhs)
+{
+  x *= rhs;
+  y *= rhs;
+  z *= rhs;
+  return *this;
+}
+
+Vector3i Vector3i::operator*(const double rhs) const
+{
+  return Vector3i{x * rhs, y * rhs, z * rhs};
+}
+
+Vector3i& Vector3i::operator*=(const double rhs)
 {
   x *= rhs;
   y *= rhs;
@@ -748,6 +773,20 @@ Vector4i Vector4i::operator*(const int rhs) const
 }
 
 Vector4i& Vector4i::operator*=(const int rhs)
+{
+  x *= rhs;
+  y *= rhs;
+  z *= rhs;
+  w *= rhs;
+  return *this;
+}
+
+Vector4i Vector4i::operator*(const double rhs) const
+{
+  return Vector4i{x * rhs, y * rhs, z * rhs, w * rhs};
+}
+
+Vector4i& Vector4i::operator*=(const double rhs)
 {
   x *= rhs;
   y *= rhs;
