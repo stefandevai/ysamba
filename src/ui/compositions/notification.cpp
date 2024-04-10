@@ -21,6 +21,7 @@ Notification::Notification(UIContext& context, const std::string text) : UICompo
 void Notification::show()
 {
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
+  animate<AnimationMoveFrom>(0.3, Easing::OutQuart, AnimationMovePosition::Top);
 }
 
 void Notification::hide()

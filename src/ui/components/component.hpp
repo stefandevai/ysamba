@@ -114,19 +114,34 @@ class UIComponent
   template <typename T, typename... Args>
   void animate(Args&&... args)
   {
+    // Set own component as target for the animation
     if (!m_context.animator->valid(animations))
     {
       animations = m_context.animator->create();
       m_context.animator->emplace<AnimationTarget>(animations, this);
     }
 
+    // Remove past animation if one exists
     if (m_context.animator->all_of<T>(animations))
     {
       m_context.animator->remove<T>(animations);
     }
 
+    // Add a counter to keep track of the number of animations
+    if (m_context.animator->all_of<AnimationCounter>(animations))
+    {
+      auto& counter = m_context.animator->get<AnimationCounter>(animations);
+      ++counter.count;
+    }
+    else
+    {
+      m_context.animator->emplace<AnimationCounter>(animations);
+    }
+
+    // Add the new animation
     m_context.animator->emplace<T>(animations, std::forward<Args>(args)...);
 
+    // Update state
     if (state != State::Animating)
     {
       state = State::Animating;
