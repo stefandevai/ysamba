@@ -194,6 +194,11 @@ void WorldCreation::m_create_map_representation()
   m_texture = std::make_unique<Texture>(
       m_game_context.display->wgpu_context.device, pixel_data.data(), Vector2i{world_size.x, world_size.y});
 
+  // TODO: Find a better way to override texture size
+  const auto& window_size = Display::get_window_size();
+  const int texture_size = std::min(window_size.x, window_size.y) - 30;
+  m_texture->size = Vector2i{texture_size, texture_size};
+
   m_renderer.ui_pass.batch.clear_textures();
 }
 

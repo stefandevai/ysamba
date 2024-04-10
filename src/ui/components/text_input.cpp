@@ -24,7 +24,7 @@ TextInput::TextInput(UIContext& context, Params params)
   nine_patch.resource_id = "ui"_hs;
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;
-  nine_patch.set_color(0x33AA88AA);
+  nine_patch.set_color(0x7eb1a1FF);
 
   m_label = emplace<Label>(Label::Params{
       .value = text.empty() ? placeholder : text,
