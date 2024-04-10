@@ -96,7 +96,7 @@ void InspectorSystem::update(entt::registry& registry, const Camera& camera)
     }
   }
 
-  if (!updated_inspector_content && m_inspector->state == ui::UIComponent::State::Visible)
+  if (!updated_inspector_content && !m_inspector->is_hidden())
   {
     m_destroy_inspector();
   }
@@ -108,7 +108,7 @@ bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
 {
   bool updated_inspector_content = false;
 
-  if (m_inspector->state == ui::UIComponent::State::Hidden)
+  if (!m_inspector->is_visible())
   {
     m_inspector->show();
   }
@@ -147,7 +147,7 @@ bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
 
 void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, const TileData& tile_data)
 {
-  if (m_inspector->state == ui::UIComponent::State::Hidden)
+  if (!m_inspector->is_visible())
   {
     m_inspector->show();
   }
@@ -158,6 +158,7 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, 
 
 void InspectorSystem::m_destroy_inspector()
 {
+  m_last_mouse_position = Vector3i{-9999, -9999, -9999};
   m_inspector->hide();
 }
 
@@ -167,9 +168,7 @@ void InspectorSystem::m_update_input(entt::registry& registry)
 
   if (m_state == State::Inactive)
   {
-    const auto& current_context = m_input_manager.get_current_context();
-
-    if (current_context == nullptr || current_context->key != "gameplay"_hs)
+    if (!m_input_manager.is_context("gameplay"_hs))
     {
       return;
     }

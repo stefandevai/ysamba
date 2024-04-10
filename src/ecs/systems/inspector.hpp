@@ -36,7 +36,7 @@ class InspectorSystem
   ui::UIManager& m_ui_manager;
   ui::Inspector* m_inspector = nullptr;
   InputManager& m_input_manager = InputManager::get_instance();
-  Vector3i m_last_mouse_position{0, 0, 0};
+  Vector3i m_last_mouse_position{-9999, -9999, -9999};
   Vector3 m_last_camera_position{0.0, 0.0, 0.0};
   entt::entity m_target_quad = entt::null;
 

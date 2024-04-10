@@ -25,6 +25,8 @@ ActionMenu::ActionMenu(UIContext& context, Params params) : UIComponent(context,
       .on_left_click = std::move(params.on_select),
       .size = m_window_frame->get_safe_area_size(),
       .title = "Select Action",
+      .enumerate = true,
+      .enumeration_type = EnumerationType::Alphabetical,
   });
 
   const auto position_offset = m_window_frame->get_position_offset();
