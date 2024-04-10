@@ -23,6 +23,8 @@ class NinePatchContainer : public UIComponent
 
   void render();
 
+  Vector2i get_safe_area_size();
+  Vector2i get_position_offset();
   void set_size(const Vector2i size);
   void set_color(const uint32_t color);
 };

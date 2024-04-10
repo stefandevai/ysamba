@@ -2,8 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "core/asset_manager.hpp"
-#include "graphics/renderer/renderer.hpp"
 #include "ui/components/container.hpp"
 #include "ui/components/label.hpp"
 #include "ui/components/mouse_region.hpp"

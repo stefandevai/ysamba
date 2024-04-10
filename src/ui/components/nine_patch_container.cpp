@@ -42,6 +42,22 @@ void NinePatchContainer::render()
   }
 }
 
+Vector2i NinePatchContainer::get_safe_area_size()
+{
+  return Vector2i{
+      static_cast<int>(size.x - nine_patch.border * 2),
+      static_cast<int>(size.y - nine_patch.border * 2),
+  };
+}
+
+Vector2i NinePatchContainer::get_position_offset()
+{
+  return Vector2i{
+      static_cast<int>(nine_patch.border),
+      static_cast<int>(nine_patch.border),
+  };
+}
+
 void NinePatchContainer::set_size(const Vector2i size)
 {
   this->size = std::move(size);
