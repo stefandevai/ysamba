@@ -132,7 +132,8 @@ void EatSystem::m_process_input(entt::registry& registry)
 
     m_gameplay_modals.item_selection->set_title("Consume what?");
     m_gameplay_modals.item_selection->set_on_select(std::move(on_select));
-    m_gameplay_modals.item_selection->set_items_from_entity_with_components<entt::tag<"edible"_hs>>(registry, selected_entities[0]);
+    m_gameplay_modals.item_selection->set_items_from_entity_with_components<entt::tag<"edible"_hs>>(
+        registry, selected_entities[0]);
     m_gameplay_modals.item_selection->show();
   }
 }

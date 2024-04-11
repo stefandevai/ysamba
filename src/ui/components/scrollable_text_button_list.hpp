@@ -42,8 +42,7 @@ class ScrollableTextButtonList : public UIComponent
   Label* title_label = nullptr;
 
   ScrollableTextButtonList(UIContext& context, Params params)
-      : UIComponent(context, "ScrollableTextButtonList"),
-        title_color(params.title_color)
+      : UIComponent(context, "ScrollableTextButtonList"), title_color(params.title_color)
   {
     size = params.size - params.margin * 2;
     margin = std::move(params.margin);

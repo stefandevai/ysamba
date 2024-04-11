@@ -97,5 +97,4 @@ void ItemSelection::set_title(const std::string title)
   m_items->title_label->set_text(std::move(title));
 }
 
-
 }  // namespace dl::ui

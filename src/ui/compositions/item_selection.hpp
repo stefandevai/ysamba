@@ -2,12 +2,12 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "ui/components/component.hpp"
-#include "ui/types.hpp"
 #include "ecs/utils.hpp"
+#include "ui/components/component.hpp"
+#include "ui/components/scrollable_text_button_list.hpp"
+#include "ui/types.hpp"
 #include "world/item_factory.hpp"
 #include "world/world.hpp"
-#include "ui/components/scrollable_text_button_list.hpp"
 
 namespace dl
 {
@@ -62,7 +62,6 @@ class ItemSelection : public UIComponent
 
     m_items->list->create_buttons();
   }
-
 
  private:
   World& m_world;
