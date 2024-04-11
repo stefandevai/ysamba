@@ -48,6 +48,10 @@ entt::entity create(const ItemData& item_data, entt::registry& registry)
   {
     registry.emplace<ItemStack>(item);
   }
+  if (item_data.flags.contains("EDIBLE"))
+  {
+    registry.emplace<entt::tag<"edible"_hs>>(item);
+  }
 
   registry.emplace<Item>(item, item_data.id);
   return item;

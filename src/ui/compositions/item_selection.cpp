@@ -3,13 +3,9 @@
 #include <spdlog/spdlog.h>
 
 #include "core/maths/vector.hpp"
-#include "ecs/utils.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
-#include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
-#include "world/item_factory.hpp"
-#include "world/world.hpp"
 
 namespace dl::ui
 {
@@ -29,7 +25,9 @@ ItemSelection::ItemSelection(UIContext& context, Params params)
       .items = std::move(params.items),
       .on_left_click = std::move(params.on_select),
       .size = m_window_frame->get_safe_area_size(),
-      .title = "Select Item",
+      .title = std::move(params.title),
+      .enumerate = true,
+      .enumeration_type = EnumerationType::Alphabetical,
   });
 
   const auto position_offset = m_window_frame->get_position_offset();
@@ -93,5 +91,11 @@ void ItemSelection::set_items_from_entity(entt::registry& registry, entt::entity
 
   m_items->list->create_buttons();
 }
+
+void ItemSelection::set_title(const std::string title)
+{
+  m_items->title_label->set_text(std::move(title));
+}
+
 
 }  // namespace dl::ui

@@ -6,6 +6,7 @@
 #include <entt/core/hashed_string.hpp>
 
 #include "constants.hpp"
+#include "ecs/components/biology.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"
@@ -112,11 +113,13 @@ bool InspectorSystem::m_update_inspector_content(const Vector3i mouse_position,
     m_inspector->show();
   }
 
-  if (registry.all_of<SocietyAgent>(entity))
+  if (registry.all_of<SocietyAgent, Biology>(entity))
   {
     const auto& agent = registry.get<SocietyAgent>(entity);
+    const auto& biology = registry.get<Biology>(entity);
+
     m_inspector->set_content(
-        fmt::format("({}, {}, {})\n{}", mouse_position.x, mouse_position.y, mouse_position.z, agent.name));
+        fmt::format("{}\n{}\nHunger: {}\nHydration: {}", mouse_position, agent.name, biology.hunger, biology.hydration));
     updated_inspector_content = true;
   }
   else if (registry.all_of<Item, Sprite>(entity))

@@ -161,8 +161,10 @@ bool remove_item_from_entity(entt::registry& registry, entt::entity entity, entt
   return false;
 }
 
-void decrease_container_weight_and_volume_by_item(
-    World& world, entt::registry& registry, entt::entity entity, entt::entity item, const int quantity)
+void decrease_container_weight_and_volume_by_item(World& world,
+                                                  entt::registry& registry,
+                                                  entt::entity item,
+                                                  const int quantity)
 {
   assert(registry.valid(item) && "Invalid item entity");
 

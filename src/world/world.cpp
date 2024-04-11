@@ -602,6 +602,33 @@ void World::m_load_item_data()
             = item_factory::parse_volume(item["container"]["volume_capacity"].get<std::string>());
       }
     }
+    if (item.contains("on_consume_effects"))
+    {
+      const auto& raw_effects = item["on_consume_effects"].get<std::vector<nlohmann::json>>();
+
+      for (const auto& raw_effect : raw_effects)
+      {
+        Effect effect{};
+
+        assert(raw_effect.contains("type") && "Effect must have a type");
+
+        const auto type_string = raw_effect["type"].get<std::string>();
+
+        // TODO: Replace with unordered map
+        if (type_string == "hydration")
+        {
+          const auto value = raw_effect["value"].get<int>();
+          effect = HydrationEffect{value};
+        }
+        else if (type_string == "hunger")
+        {
+          const auto value = raw_effect["value"].get<int>();
+          effect = HungerEffect{value};
+        }
+
+        item_data.on_consume_effects.push_back(effect);
+      }
+    }
 
     this->item_data[item_data.id] = item_data;
   }

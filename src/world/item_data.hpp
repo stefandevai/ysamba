@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "world/society/effect.hpp"
+
 namespace dl
 {
 enum class MatterState
@@ -26,15 +28,16 @@ struct ItemContainer
 struct ItemData
 {
   uint32_t id{};
-  std::string name{};
+  MatterState matter_state{};
   double weight{};
-  std::string weight_string{};
   double volume{};
+  std::string name{};
+  std::string weight_string{};
   std::string volume_string{};
+  std::vector<uint32_t> weared_on{};
   std::unordered_map<std::string, int> qualities{};
   std::unordered_set<std::string> flags{};
-  std::vector<uint32_t> weared_on{};
   ItemContainer container;
-  MatterState matter_state{};
+  std::vector<Effect> on_consume_effects{};
 };
 }  // namespace dl

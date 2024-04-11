@@ -59,7 +59,7 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
       continue;
     }
 
-    utils::decrease_container_weight_and_volume_by_item(m_world, registry, entity, item, 1);
+    utils::decrease_container_weight_and_volume_by_item(m_world, registry, item, 1);
     utils::remove_item_from_entity(registry, entity, item);
 
     auto& item_component = registry.get<Item>(item);
@@ -143,6 +143,7 @@ void DropSystem::m_process_input(entt::registry& registry)
       m_ui_state = UIState::SelectingTarget;
     };
 
+    m_gameplay_modals.item_selection->set_title("Select Item");
     m_gameplay_modals.item_selection->set_on_select(std::move(on_select));
     m_gameplay_modals.item_selection->set_items_from_entity(registry, selected_entities[0]);
     m_gameplay_modals.item_selection->show();

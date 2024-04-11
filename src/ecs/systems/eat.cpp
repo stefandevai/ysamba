@@ -3,8 +3,11 @@
 #include <spdlog/spdlog.h>
 
 #include <entt/core/hashed_string.hpp>
+#include <entt/entity/registry.hpp>
 
 #include "ecs/components/action_eat.hpp"
+#include "ecs/components/biology.hpp"
+#include "ecs/components/item.hpp"
 #include "ecs/components/item_stack.hpp"
 #include "ecs/components/item_target.hpp"
 #include "ecs/components/job_data.hpp"
@@ -30,7 +33,9 @@ EatSystem::EatSystem(World& world, ui::GameplayModals& gameplay_modals)
 
 void EatSystem::update(entt::registry& registry)
 {
-  auto view = registry.view<ActionEat>();
+  using namespace entt::literals;
+
+  auto view = registry.view<ActionEat, Biology>();
 
   for (const auto entity : view)
   {
@@ -52,7 +57,24 @@ void EatSystem::update(entt::registry& registry)
       continue;
     }
 
-    utils::decrease_container_weight_and_volume_by_item(m_world, registry, entity, item, 1);
+    // Check if we can eat
+    if (!registry.all_of<entt::tag<"edible"_hs>>(item))
+    {
+      stop_eat(registry, entity, action_eat.job);
+      continue;
+    }
+
+    // Apply item on consume effects
+    const auto& item_component = registry.get<Item>(item);
+    const auto& item_data = m_world.get_item_data(item_component.id);
+
+    for (const auto& effect : item_data.on_consume_effects)
+    {
+      std::visit(EffectApplier{registry, entity}, effect);
+    }
+
+    // Consume item
+    utils::decrease_container_weight_and_volume_by_item(m_world, registry, item, 1);
 
     if (registry.all_of<ItemStack>(item))
     {
@@ -108,8 +130,9 @@ void EatSystem::m_process_input(entt::registry& registry)
       m_gameplay_modals.item_selection->hide();
     };
 
+    m_gameplay_modals.item_selection->set_title("Consume what?");
     m_gameplay_modals.item_selection->set_on_select(std::move(on_select));
-    m_gameplay_modals.item_selection->set_items_from_entity(registry, selected_entities[0]);
+    m_gameplay_modals.item_selection->set_items_from_entity_with_components<entt::tag<"edible"_hs>>(registry, selected_entities[0]);
     m_gameplay_modals.item_selection->show();
   }
 }

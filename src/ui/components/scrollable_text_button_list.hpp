@@ -37,14 +37,13 @@ class ScrollableTextButtonList : public UIComponent
   };
 
   uint32_t title_color{};
-  std::string title{};
   Scrollable* scrollable = nullptr;
   TextButtonList<T>* list = nullptr;
+  Label* title_label = nullptr;
 
   ScrollableTextButtonList(UIContext& context, Params params)
       : UIComponent(context, "ScrollableTextButtonList"),
-        title_color(params.title_color),
-        title(std::move(params.title))
+        title_color(params.title_color)
   {
     size = params.size - params.margin * 2;
     margin = std::move(params.margin);
@@ -52,10 +51,10 @@ class ScrollableTextButtonList : public UIComponent
     scrollable = emplace<Scrollable>();
     scrollable->size = size;
 
-    if (!title.empty())
+    if (!params.title.empty())
     {
-      auto title_label = emplace<Label>(Label::Params{
-          .value = title,
+      title_label = emplace<Label>(Label::Params{
+          .value = std::move(params.title),
           .color = title_color,
       });
 

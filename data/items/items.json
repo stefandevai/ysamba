@@ -139,9 +139,15 @@
         "weight": "1g",
         "volume": "1ml",
         "matter_state": 2,
-        "on_consume": [
-            {"thirst": 100},
-            {"hunger": 10}
+        "on_consume_effects": [
+            {
+                "type": "hydration",
+                "value": 10
+            },
+            {
+                "type": "hunger",
+                "value": -2
+            }
         ]
     }
 ]

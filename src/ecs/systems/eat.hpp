@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entity/registry.hpp>
+#include <entt/fwd.hpp>
 
 #include "core/input_manager.hpp"
 
