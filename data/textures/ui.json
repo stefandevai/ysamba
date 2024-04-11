@@ -14,10 +14,10 @@
         {
             "game_id": 1,
             "type": "slice",
-            "top": 48,
-            "left": 0,
-            "bottom": 65,
-            "right": 17
+            "top": 12,
+            "left": 62,
+            "bottom": 29,
+            "right": 79
         },
         {
             "game_id": 2,

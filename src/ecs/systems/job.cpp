@@ -5,6 +5,7 @@
 #include "constants.hpp"
 #include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/action_drop.hpp"
+#include "ecs/components/action_eat.hpp"
 #include "ecs/components/action_pickup.hpp"
 #include "ecs/components/action_place_hut_exterior.hpp"
 #include "ecs/components/action_walk.hpp"
@@ -87,6 +88,9 @@ void JobSystem::update(entt::registry& registry)
       case JobType::PlaceHutExterior:
         check_component<ActionPlaceHutExterior>(registry, entity, current_job.entity);
         break;
+      case JobType::Eat:
+        check_component<ActionEat>(registry, entity, current_job.entity);
+        break;
       case JobType::Harvest:
       case JobType::Break:
       case JobType::Dig:
@@ -125,6 +129,9 @@ void JobSystem::update(entt::registry& registry)
       case JobType::PlaceHutExterior:
         check_component<ActionPlaceHutExterior>(registry, entity, current_job.entity);
         break;
+      case JobType::Eat:
+        check_component<ActionEat>(registry, entity, current_job.entity);
+        break;
       case JobType::Harvest:
       case JobType::Break:
       case JobType::Dig:
@@ -140,6 +147,7 @@ void JobSystem::update(entt::registry& registry)
     }
     if (job_data.status == JobStatus::Finished)
     {
+      registry.destroy(current_job.entity);
       agent.pop_job();
     }
   }

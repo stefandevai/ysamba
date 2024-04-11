@@ -140,6 +140,8 @@
         "volume": "1ml",
         "matter_state": 2,
         "on_consume": [
+            {"thirst": 100},
+            {"hunger": 10}
         ]
     }
 ]

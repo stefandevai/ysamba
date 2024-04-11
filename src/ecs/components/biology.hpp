@@ -26,6 +26,8 @@ struct Biology
   uint32_t work_cost{};
   std::vector<uint32_t> body_parts{};
   uint32_t energy = 0;
+  uint32_t thirst = 0;
+  uint32_t hunger = 0;
 };
 
 template <typename Archive>

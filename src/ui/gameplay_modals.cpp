@@ -10,10 +10,11 @@
 #include "ui/compositions/selected_inventory.hpp"
 #include "ui/compositions/society_inventory.hpp"
 #include "ui/ui_manager.hpp"
+#include "world/world.hpp"
 
 namespace dl::ui
 {
-GameplayModals::GameplayModals(UIManager& ui_manager) : m_ui_manager(ui_manager)
+GameplayModals::GameplayModals(UIManager& ui_manager, World& world) : m_ui_manager(ui_manager)
 {
   auto on_select_item = [this](entt::entity entity)
   {
@@ -29,7 +30,9 @@ GameplayModals::GameplayModals(UIManager& ui_manager) : m_ui_manager(ui_manager)
       .on_select = on_select_item,
   });
   item_details = m_ui_manager.emplace<ItemDetails>();
-  item_selection = m_ui_manager.emplace<ItemSelection>(ItemSelection::Params{});
+  item_selection = m_ui_manager.emplace<ItemSelection>(ItemSelection::Params{
+      .world = world,
+  });
   action_menu = m_ui_manager.emplace<ActionMenu>(ActionMenu::Params{});
 }
 }  // namespace dl::ui

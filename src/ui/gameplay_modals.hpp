@@ -1,5 +1,10 @@
 #pragma once
 
+namespace dl
+{
+class World;
+}
+
 namespace dl::ui
 {
 class UIManager;
@@ -27,7 +32,7 @@ class GameplayModals
   // Displays a list of actions that can be performed by an society agent in a determined context
   ActionMenu* action_menu = nullptr;
 
-  GameplayModals(UIManager& ui_manager);
+  GameplayModals(UIManager& ui_manager, World& world);
 
   // Remove copy/move constructors and assignment operators
   GameplayModals(GameplayModals const&) = delete;

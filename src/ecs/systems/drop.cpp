@@ -17,6 +17,7 @@
 #include "ecs/components/sprite.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
+#include "ecs/utils.hpp"
 #include "graphics/camera.hpp"
 #include "ui/compositions/item_selection.hpp"
 #include "ui/compositions/notification.hpp"
@@ -38,7 +39,7 @@ const auto stop_drop = [](entt::registry& registry, const entt::entity entity, c
 DropSystem::DropSystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals)
     : m_world(world), m_gameplay_modals(gameplay_modals), m_ui_manager(ui_manager)
 {
-  const auto on_select = [this](const ui::EntityPair entities)
+  const auto on_select = [this](const ui::EntityPair& entities)
   {
     m_selected_entity = entities.first;
     m_target_item = entities.second;
@@ -200,65 +201,14 @@ void DropSystem::m_process_input(entt::registry& registry)
 
   if (m_input_manager.poll_action("drop_item"_hs))
   {
-    m_items.clear();
-    std::vector<entt::entity> selected_entities{};
-    auto view = registry.view<Selectable>();
+    const auto selected_entities = utils::get_selected_entities(registry);
 
-    for (const auto entity : view)
-    {
-      const auto& selectable = registry.get<Selectable>(entity);
-
-      if (!selectable.selected)
-      {
-        continue;
-      }
-
-      selected_entities.push_back(entity);
-    }
-
-    if (selected_entities.empty())
+    if (selected_entities.empty() || selected_entities.size() > 1)
     {
       return;
     }
 
-    for (const auto entity : selected_entities)
-    {
-      if (registry.all_of<WieldedItems>(entity))
-      {
-        const auto& items = registry.get<WieldedItems>(entity);
-        const auto left_hand = items.left_hand;
-        const auto right_hand = items.right_hand;
-
-        if (registry.valid(left_hand))
-        {
-          m_items.push_back({{entity, left_hand}, item_factory::get_item_label(m_world, registry, left_hand)});
-        }
-        if (registry.valid(right_hand) && right_hand != left_hand)
-        {
-          m_items.push_back({{entity, right_hand}, item_factory::get_item_label(m_world, registry, right_hand)});
-        }
-      }
-      if (registry.all_of<WearedItems>(entity))
-      {
-        const auto& items = registry.get<WearedItems>(entity);
-
-        for (auto item_entity : items.items)
-        {
-          m_items.push_back({{entity, item_entity}, item_factory::get_item_label(m_world, registry, item_entity)});
-        }
-      }
-      if (registry.all_of<CarriedItems>(entity))
-      {
-        const auto& items = registry.get<CarriedItems>(entity);
-
-        for (auto item_entity : items.items)
-        {
-          m_items.push_back({{entity, item_entity}, item_factory::get_item_label(m_world, registry, item_entity)});
-        }
-      }
-    }
-
-    m_gameplay_modals.item_selection->set_items(m_items);
+    m_gameplay_modals.item_selection->set_items_from_entity(registry, selected_entities[0]);
     m_gameplay_modals.item_selection->show();
   }
 }

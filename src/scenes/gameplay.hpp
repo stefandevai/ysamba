@@ -10,6 +10,7 @@
 #include "ecs/systems/action.hpp"
 #include "ecs/systems/build_hut.hpp"
 #include "ecs/systems/drop.hpp"
+#include "ecs/systems/eat.hpp"
 #include "ecs/systems/game.hpp"
 #include "ecs/systems/inspector.hpp"
 #include "ecs/systems/inventory.hpp"
@@ -61,7 +62,7 @@ class Gameplay : public Scene
   entt::entity m_player;
   double m_turn_delay = 0.0;
 
-  ui::GameplayModals m_gameplay_modals{m_ui_manager};
+  ui::GameplayModals m_gameplay_modals{m_ui_manager, m_world};
 
   ai::System m_ai_system{m_game_context, m_world};
   GameSystem m_game_system{m_registry, m_world};
@@ -78,6 +79,7 @@ class Gameplay : public Scene
   WearSystem m_wear_system{m_world};
   WieldSystem m_wield_system{m_world};
   DropSystem m_drop_system{m_world, m_ui_manager, m_gameplay_modals};
+  EatSystem m_eat_system{m_world, m_registry, m_gameplay_modals};
   PlayerControlsSystem m_player_controls_system{m_event_emitter};
 
   bool m_update_paused();

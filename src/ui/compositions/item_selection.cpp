@@ -3,14 +3,18 @@
 #include <spdlog/spdlog.h>
 
 #include "core/maths/vector.hpp"
+#include "ecs/utils.hpp"
 #include "ui/animation.hpp"
 #include "ui/components/label.hpp"
 #include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
+#include "world/item_factory.hpp"
+#include "world/world.hpp"
 
 namespace dl::ui
 {
-ItemSelection::ItemSelection(UIContext& context, Params params) : UIComponent(context, "ItemSelection")
+ItemSelection::ItemSelection(UIContext& context, Params params)
+    : UIComponent(context, "ItemSelection"), m_world(params.world)
 {
   state = UIComponent::State::Hidden;
   size = Vector2i{300, 400};
@@ -68,9 +72,26 @@ void ItemSelection::set_items(const ItemList<EntityPair> items)
   m_items->list->items = std::move(items);
   m_items->list->create_buttons();
 }
+
 void ItemSelection::set_on_select(const std::function<void(const EntityPair&)> on_select)
 {
   m_items->list->on_left_click = std::move(on_select);
+}
+
+void ItemSelection::set_items_from_entity(entt::registry& registry, entt::entity entity)
+{
+  auto& all_items = m_items->list->items;
+
+  all_items.clear();
+
+  const auto entity_items = utils::get_entity_items(registry, entity);
+
+  for (const auto item_entity : entity_items)
+  {
+    all_items.push_back({{entity, item_entity}, item_factory::get_item_label(m_world, registry, item_entity)});
+  }
+
+  m_items->list->create_buttons();
 }
 
 }  // namespace dl::ui

@@ -19,7 +19,7 @@ enum class JobType
   ConstructEntrance,
   SelectStorageArea,
   PickupLiquid,
-  Drink,
+  Eat,
   None,
 };
 }
