@@ -16,7 +16,6 @@ namespace dl
 {
 class World;
 class Camera;
-struct Vector2i;
 
 class DropSystem
 {

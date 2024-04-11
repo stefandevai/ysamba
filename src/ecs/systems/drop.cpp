@@ -6,17 +6,11 @@
 
 #include "ai/actions/generic_item.hpp"
 #include "ecs/components/action_drop.hpp"
-#include "ecs/components/carried_items.hpp"
-#include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/item_stack.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
-#include "ecs/components/selectable.hpp"
-#include "ecs/components/society_agent.hpp"
 #include "ecs/components/sprite.hpp"
-#include "ecs/components/weared_items.hpp"
-#include "ecs/components/wielded_items.hpp"
 #include "ecs/utils.hpp"
 #include "graphics/camera.hpp"
 #include "ui/compositions/item_selection.hpp"
@@ -39,14 +33,6 @@ const auto stop_drop = [](entt::registry& registry, const entt::entity entity, c
 DropSystem::DropSystem(World& world, ui::UIManager& ui_manager, ui::GameplayModals& gameplay_modals)
     : m_world(world), m_gameplay_modals(gameplay_modals), m_ui_manager(ui_manager)
 {
-  const auto on_select = [this](const ui::EntityPair& entities)
-  {
-    m_selected_entity = entities.first;
-    m_target_item = entities.second;
-    m_ui_state = UIState::SelectingTarget;
-  };
-
-  m_gameplay_modals.item_selection->set_on_select(std::move(on_select));
 }
 
 void DropSystem::update(entt::registry& registry, const Camera& camera)
@@ -65,117 +51,59 @@ void DropSystem::update(entt::registry& registry, const Camera& camera)
       continue;
     }
 
-    auto& wielded = registry.get<WieldedItems>(entity);
-    auto& weared = registry.get<WearedItems>(entity);
-    auto& carried = registry.get<CarriedItems>(entity);
+    bool has_item = utils::has_item(registry, entity, item);
 
-    bool removed = false;
-
-    if (wielded.left_hand == item)
+    if (!has_item)
     {
-      wielded.left_hand = entt::null;
-      removed = true;
-    }
-    else if (wielded.right_hand == item)
-    {
-      wielded.right_hand = entt::null;
-      removed = true;
+      stop_drop(registry, entity, action_drop.job);
+      continue;
     }
 
-    if (!removed)
+    utils::decrease_container_weight_and_volume_by_item(m_world, registry, entity, item, 1);
+    utils::remove_item_from_entity(registry, entity, item);
+
+    auto& item_component = registry.get<Item>(item);
+
+    // Add item to a stack on the ground if it is stackable and there is an item with the same id on the ground
+    if (registry.all_of<ItemStack>(item))
     {
-      for (auto it = carried.items.begin(); it != carried.items.end(); ++it)
+      // Check if an item with the same id is already in the position
+      const auto items_on_ground = m_world.spatial_hash.get_all_by_component<Item>(
+          target.position.x, target.position.y, target.position.z, registry);
+
+      auto ground_item = std::find_if(items_on_ground.begin(),
+                                      items_on_ground.end(),
+                                      [&item_component, &registry](const auto& other)
+                                      {
+                                        const auto& other_item = registry.get<Item>(other);
+                                        return other_item.id == item_component.id;
+                                      });
+
+      // Increase item stack
+      if (ground_item != items_on_ground.end())
       {
-        if (*it != item)
-        {
-          continue;
-        }
-
-        auto& item_component = registry.get<Item>(*it);
-        const auto& item_data = m_world.get_item_data(item_component.id);
-
-        assert(registry.valid(item_component.container) && "Encountered carried item without container");
-
-        auto& container = registry.get<Container>(item_component.container);
-        container.weight_occupied -= item_data.weight;
-        container.volume_occupied -= item_data.volume;
-
-        item_component.container = entt::null;
-        container.items.erase(std::find(container.items.begin(), container.items.end(), *it));
-        carried.items.erase(it);
-        removed = true;
-        break;
+        const auto& item_stack = registry.get<ItemStack>(item);
+        auto& ground_item_stack = registry.get<ItemStack>(*ground_item);
+        ground_item_stack.quantity += item_stack.quantity;
+        registry.destroy(item);
+        stop_drop(registry, entity, action_drop.job);
+        continue;
       }
     }
 
-    if (!removed)
-    {
-      for (auto it = weared.items.begin(); it != weared.items.end(); ++it)
-      {
-        if (*it == item)
-        {
-          weared.items.erase(it);
-          removed = true;
-          break;
-        }
-      }
-    }
-
-    // Only update item components if we were able to find the item in the agent inventory
-    if (removed)
-    {
-      auto& item_component = registry.get<Item>(item);
-
-      // Remove container items from agent CarriedItems
-      if (registry.all_of<Container>(item))
-      {
-        auto& container = registry.get<Container>(item);
-
-        for (const auto container_item : container.items)
-        {
-          carried.items.erase(std::find(carried.items.begin(), carried.items.end(), container_item));
-        }
-      }
-
-      if (registry.all_of<ItemStack>(item))
-      {
-        // Check if an item with the same id is already in the position
-        const auto items_on_ground = m_world.spatial_hash.get_all_by_component<Item>(
-            target.position.x, target.position.y, target.position.z, registry);
-
-        auto ground_item = std::find_if(items_on_ground.begin(),
-                                        items_on_ground.end(),
-                                        [&item_component, &registry](const auto& other)
-                                        {
-                                          const auto& other_item = registry.get<Item>(other);
-                                          return other_item.id == item_component.id;
-                                        });
-
-        // Increase item stack
-        if (ground_item != items_on_ground.end())
-        {
-          const auto& item_stack = registry.get<ItemStack>(item);
-          auto& ground_item_stack = registry.get<ItemStack>(*ground_item);
-          ground_item_stack.quantity += item_stack.quantity;
-          registry.destroy(item);
-          stop_drop(registry, entity, action_drop.job);
-          continue;
-        }
-      }
-
-      // Add item to the ground
-      registry.emplace<Position>(item,
-                                 static_cast<double>(target.position.x),
-                                 static_cast<double>(target.position.y),
-                                 static_cast<double>(target.position.z));
-      registry.emplace<Sprite>(item,
-                               Sprite{
-                                   .resource_id = m_world.get_spritesheet_id(),
-                                   .id = item_component.id,
-                                   .category = "item",
-                                   .layer_z = 2,
-                               });
-    }
+    // Item is not stackable or there is no item with the same id on the ground.
+    // Add item to the ground.
+    registry.emplace<Position>(item,
+                               static_cast<double>(target.position.x),
+                               static_cast<double>(target.position.y),
+                               static_cast<double>(target.position.z));
+    registry.emplace<Sprite>(item,
+                             Sprite{
+                                 .resource_id = m_world.get_spritesheet_id(),
+                                 .id = item_component.id,
+                                 .category = "item",
+                                 .layer_z = 2,
+                             });
 
     stop_drop(registry, entity, action_drop.job);
   }
@@ -208,6 +136,14 @@ void DropSystem::m_process_input(entt::registry& registry)
       return;
     }
 
+    const auto on_select = [this](const ui::EntityPair& entities)
+    {
+      m_selected_entity = entities.first;
+      m_target_item = entities.second;
+      m_ui_state = UIState::SelectingTarget;
+    };
+
+    m_gameplay_modals.item_selection->set_on_select(std::move(on_select));
     m_gameplay_modals.item_selection->set_items_from_entity(registry, selected_entities[0]);
     m_gameplay_modals.item_selection->show();
   }

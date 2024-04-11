@@ -102,6 +102,19 @@ bool has_item(entt::registry& registry, entt::entity entity, entt::entity item)
 
 bool remove_item_from_entity(entt::registry& registry, entt::entity entity, entt::entity item)
 {
+  auto& carried = registry.get<CarriedItems>(entity);
+
+  // Remove container items from agent CarriedItems
+  if (registry.all_of<Container>(item))
+  {
+    auto& container = registry.get<Container>(item);
+
+    for (const auto container_item : container.items)
+    {
+      carried.items.erase(std::find(carried.items.begin(), carried.items.end(), container_item));
+    }
+  }
+
   auto& wielded = registry.get<WieldedItems>(entity);
 
   if (wielded.left_hand == item)
@@ -115,8 +128,6 @@ bool remove_item_from_entity(entt::registry& registry, entt::entity entity, entt
     return true;
   }
 
-  auto& carried = registry.get<CarriedItems>(entity);
-
   for (auto it = carried.items.begin(); it != carried.items.end(); ++it)
   {
     if (*it != item)
@@ -125,14 +136,10 @@ bool remove_item_from_entity(entt::registry& registry, entt::entity entity, entt
     }
 
     auto& item_component = registry.get<Item>(*it);
-    // const auto& item_data = m_world.get_item_data(item_component.id);
 
     assert(registry.valid(item_component.container) && "Encountered carried item without container");
 
-    // // TODO: Separate container weight and volume calculations to another function
     auto& container = registry.get<Container>(item_component.container);
-    // container.weight_occupied -= item_data.weight;
-    // container.volume_occupied -= item_data.volume;
 
     item_component.container = entt::null;
     container.items.erase(std::find(container.items.begin(), container.items.end(), *it));
@@ -154,7 +161,8 @@ bool remove_item_from_entity(entt::registry& registry, entt::entity entity, entt
   return false;
 }
 
-void decrease_container_weight_and_volume_by_item(World& world, entt::registry& registry, entt::entity entity, entt::entity item, const int quantity)
+void decrease_container_weight_and_volume_by_item(
+    World& world, entt::registry& registry, entt::entity entity, entt::entity item, const int quantity)
 {
   assert(registry.valid(item) && "Invalid item entity");
 
@@ -179,13 +187,15 @@ void decrease_container_weight_and_volume_by_item(World& world, entt::registry& 
 
   const auto& item_data = world.get_item_data(item_component.id);
 
-  const auto current_container = item_component.container;
+  auto current_container = item_component.container;
 
   while (current_container != entt::null && registry.valid(current_container))
   {
     auto& container = registry.get<Container>(current_container);
+    auto& container_item_component = registry.get<Item>(current_container);
     container.weight_occupied -= item_data.weight * quantity_to_remove;
     container.volume_occupied -= item_data.volume * quantity_to_remove;
+    current_container = container_item_component.container;
   }
 }
 }  // namespace dl::utils
