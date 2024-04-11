@@ -71,31 +71,32 @@ void EatSystem::update(entt::registry& registry, const Camera& camera)
       continue;
     }
 
+    bool has_item = utils::has_item(registry, entity, item);
+
+    if (!has_item)
+    {
+      stop_eat(registry, entity, action_eat.job);
+      continue;
+    }
+
+    utils::decrease_container_weight_and_volume_by_item(m_world, registry, entity, item, 1);
+
     if (registry.all_of<ItemStack>(item))
     {
-      bool has_item = utils::has_item(registry, entity, item);
+      auto& item_stack = registry.get<ItemStack>(item);
+      --item_stack.quantity;
 
-      if (has_item)
+      // Item stack is empty, destroy item
+      if (item_stack.quantity <= 0)
       {
-        auto& item_stack = registry.get<ItemStack>(item);
-        --item_stack.quantity;
-
-        // Item stack is empty, destroy item
-        if (item_stack.quantity <= 0)
-        {
-          utils::remove_item_from_entity(registry, entity, item);
-          registry.destroy(item);
-        }
+        utils::remove_item_from_entity(registry, entity, item);
+        registry.destroy(item);
       }
     }
     else
     {
-      bool removed = utils::remove_item_from_entity(registry, entity, item);
-
-      if (removed)
-      {
-        registry.destroy(item);
-      }
+      utils::remove_item_from_entity(registry, entity, item);
+      registry.destroy(item);
     }
 
     stop_eat(registry, entity, action_eat.job);

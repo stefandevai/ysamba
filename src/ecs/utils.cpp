@@ -3,9 +3,11 @@
 #include "ecs/components/carried_items.hpp"
 #include "ecs/components/container.hpp"
 #include "ecs/components/item.hpp"
+#include "ecs/components/item_stack.hpp"
 #include "ecs/components/selectable.hpp"
 #include "ecs/components/weared_items.hpp"
 #include "ecs/components/wielded_items.hpp"
+#include "world/world.hpp"
 
 namespace dl::utils
 {
@@ -150,5 +152,40 @@ bool remove_item_from_entity(entt::registry& registry, entt::entity entity, entt
   }
 
   return false;
+}
+
+void decrease_container_weight_and_volume_by_item(World& world, entt::registry& registry, entt::entity entity, entt::entity item, const int quantity)
+{
+  assert(registry.valid(item) && "Invalid item entity");
+
+  auto& item_component = registry.get<Item>(item);
+
+  if (!registry.valid(item_component.container))
+  {
+    return;
+  }
+
+  int quantity_to_remove = quantity;
+
+  if (quantity_to_remove == -1 && registry.all_of<ItemStack>(item))
+  {
+    auto& item_stack = registry.get<ItemStack>(item);
+    quantity_to_remove = item_stack.quantity;
+  }
+  else if (quantity_to_remove == -1)
+  {
+    quantity_to_remove = 1;
+  }
+
+  const auto& item_data = world.get_item_data(item_component.id);
+
+  const auto current_container = item_component.container;
+
+  while (current_container != entt::null && registry.valid(current_container))
+  {
+    auto& container = registry.get<Container>(current_container);
+    container.weight_occupied -= item_data.weight * quantity_to_remove;
+    container.volume_occupied -= item_data.volume * quantity_to_remove;
+  }
 }
 }  // namespace dl::utils
