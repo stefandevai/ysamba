@@ -12,13 +12,15 @@
 #include "core/timer.hpp"
 #include "world/point.hpp"
 
-namespace dl
-{
-IslandGenerator::IslandGenerator() {}
-
+namespace {
 double interpolate(double start_1, double end_1, double start_2, const double end_2, double value) {
   return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
 }
+}
+
+namespace dl
+{
+IslandGenerator::IslandGenerator() {}
 
 IslandGenerator::IslandGenerator(const Vector3i& size) : size(size)
 {
@@ -94,56 +96,59 @@ void IslandGenerator::m_get_height_map(const int seed)
   // const auto generator = utils::get_island_noise_generator(island_params);
 
   // Silhouette noise map
-  {
-    const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-    const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
-    fractal->SetSource(simplex);
-    fractal->SetOctaveCount(4);
-    fractal->SetLacunarity(2.52f);
-    fractal->SetGain(0.68f);
-    fractal->SetWeightedStrength(0.6f);
+  utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
+  utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
 
-    // // fractal->GenUniformGrid2D(
-    // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-    //
-    // const auto distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
-    // distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
-    //
-    // // distance_to_point->GenUniformGrid2D(
-    // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-    //
-    // const auto subtract = FastNoise::New<FastNoise::Subtract>();
-    // subtract->SetLHS(fractal);
-    // subtract->SetRHS(distance_to_point);
-    //
-    // // subtract->GenUniformGrid2D(
-    // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-
-    const auto remap = FastNoise::New<FastNoise::Remap>();
-    remap->SetSource(fractal);
-    remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
-
-    remap->GenUniformGrid2D(
-        silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  }
-
-  // Mountains height map
-  {
-    const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-    const auto fractal = FastNoise::New<FastNoise::FractalRidged>();
-    fractal->SetSource(simplex);
-    fractal->SetOctaveCount(3);
-    fractal->SetLacunarity(1.54f);
-    fractal->SetGain(1.18f);
-    fractal->SetWeightedStrength(0.4f);
-
-    const auto remap = FastNoise::New<FastNoise::Remap>();
-    remap->SetSource(fractal);
-    remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
-
-    remap->GenUniformGrid2D(
-        mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  }
+  // {
+  //   const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  //   const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+  //   fractal->SetSource(simplex);
+  //   fractal->SetOctaveCount(4);
+  //   fractal->SetLacunarity(2.52f);
+  //   fractal->SetGain(0.68f);
+  //   fractal->SetWeightedStrength(0.6f);
+  //
+  //   // // fractal->GenUniformGrid2D(
+  //   // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  //   //
+  //   // const auto distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
+  //   // distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
+  //   //
+  //   // // distance_to_point->GenUniformGrid2D(
+  //   // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  //   //
+  //   // const auto subtract = FastNoise::New<FastNoise::Subtract>();
+  //   // subtract->SetLHS(fractal);
+  //   // subtract->SetRHS(distance_to_point);
+  //   //
+  //   // // subtract->GenUniformGrid2D(
+  //   // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  //
+  //   const auto remap = FastNoise::New<FastNoise::Remap>();
+  //   remap->SetSource(fractal);
+  //   remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+  //
+  //   remap->GenUniformGrid2D(
+  //       silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  // }
+  //
+  // // Mountains height map
+  // {
+  //   const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  //   const auto fractal = FastNoise::New<FastNoise::FractalRidged>();
+  //   fractal->SetSource(simplex);
+  //   fractal->SetOctaveCount(3);
+  //   fractal->SetLacunarity(1.54f);
+  //   fractal->SetGain(1.18f);
+  //   fractal->SetWeightedStrength(0.4f);
+  //
+  //   const auto remap = FastNoise::New<FastNoise::Remap>();
+  //   remap->SetSource(fractal);
+  //   remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+  //
+  //   remap->GenUniformGrid2D(
+  //       mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  // }
 
 
   // float maxv = 0.0f, minv = 0.0f;

@@ -14,6 +14,12 @@
 #include "core/timer.hpp"
 #include "world/chunk.hpp"
 
+namespace {
+double interpolate(double start_1, double end_1, double start_2, const double end_2, double value) {
+  return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
+}
+}
+
 namespace dl
 {
 GameChunkGenerator::GameChunkGenerator() : GameChunkGenerator(world::chunk_size) {}
@@ -21,7 +27,7 @@ GameChunkGenerator::GameChunkGenerator() : GameChunkGenerator(world::chunk_size)
 GameChunkGenerator::GameChunkGenerator(const Vector3i& size) : size(size)
 {
   // map_to_tiles = static_cast<float>(world::chunk_size.x);
-  const float frequency = 0.020f / map_to_tiles;
+  const float frequency = 0.016f / map_to_tiles;
 
   island_params.layer_1_octaves = 4;
   island_params.frequency = frequency;
@@ -64,12 +70,94 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   // spdlog::info("Setting terrain...");
 
+  // for (int j = 0; j < m_padded_size.y; ++j)
+  // {
+  //   for (int i = 0; i < m_padded_size.x; ++i)
+  //   {
+  //     const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
+  //     const int k = static_cast<int>(map_value * (size.z - 1));
+  //     bool inside_chunk = false;
+  //
+  //     if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
+  //         && i < m_padded_size.y - m_generation_padding)
+  //     {
+  //       inside_chunk = true;
+  //     }
+  //
+  //     int terrain_id = 0;
+  //     int resolved_z = k;
+  //
+  //     if (k < 1)
+  //     {
+  //       terrain_id = 1;
+  //       ++resolved_z;
+  //     }
+  //     else
+  //     {
+  //       terrain_id = 2;
+  //     }
+  //
+  //     if (inside_chunk)
+  //     {
+  //       chunk->tiles.height_map[(j - 1) * size.x + (i - 1)] = resolved_z;
+  //       chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
+  //     }
+  //
+  //     terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
+  //
+  //     for (int z = 0; z < resolved_z; ++z)
+  //     {
+  //       terrain[z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
+  //
+  //       if (inside_chunk)
+  //       {
+  //         chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
+  //       }
+  //     }
+  //   }
+  // }
+
+  const float gradient_diameter = 160.0f * map_to_tiles;
+  const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
+
   for (int j = 0; j < m_padded_size.y; ++j)
   {
     for (int i = 0; i < m_padded_size.x; ++i)
     {
-      const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
-      const int k = static_cast<int>(map_value * (size.z - 1));
+      const auto array_index = j * m_padded_size.x + i;
+
+      const float distance_x_squared = (i + offset.x) * (i + offset.x);
+      const float distance_y_squared = (j + offset.y) * (j + offset.y);
+      float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
+      silhouette_map[array_index] -= gradient;
+      silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
+      // silhouette_map[array_index] = std::clamp(gradient, 0.0f, 1.0f);
+
+      const double noise_value = silhouette_map[array_index];
+      // const double max_z = size.z - 1.0;
+      //
+      // double map_value;
+      //
+      // if (noise_value < 0.4f)
+      // {
+      //   map_value = interpolate(0.0, 0.4, 0.0, max_z * 0.31, noise_value);
+      // }
+      // else if (noise_value < 0.7f)
+      // {
+      //   map_value = interpolate(0.4, 0.7, max_z * 0.31, max_z * 0.71, noise_value);
+      // }
+      // else
+      // {
+      //   map_value = interpolate(0.7, 1.0, max_z * 0.71, max_z, noise_value);
+      // }
+      //
+      // const double mountain_value = mountain_map[array_index];
+      // map_value *= mountain_value * 2.0;
+      // map_value = std::clamp(map_value, 0.0, max_z);
+
+      // const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
+      // const int k = static_cast<int>(map_value);
+      const int k = static_cast<int>(silhouette_map[j * m_padded_size.x + i] * (size.z - 1));
       bool inside_chunk = false;
 
       if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
@@ -140,26 +228,45 @@ void GameChunkGenerator::set_size(const Vector3i& size)
 
 void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 {
-  raw_height_map.resize(m_padded_size.x * m_padded_size.y);
+  // height_map.resize(size.x * size.y);
+  silhouette_map.resize(m_padded_size.x * m_padded_size.y);
+  mountain_map.resize(m_padded_size.x * m_padded_size.y);
+  // raw_height_map.resize(m_padded_size.x * m_padded_size.y);
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
 
-  const auto generator = utils::get_island_noise_generator(island_params);
+  // const auto generator = utils::get_island_noise_generator(island_params);
   // FastNoise::SmartNode<> generator
   //
   // return generator;
   //     =
   //     FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAL8AAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
 
-  generator->GenUniformGrid2D(raw_height_map.data(),
-                              offset.x - m_generation_padding,
-                              offset.y + m_generation_padding,
-                              // offset.x - m_generation_padding - 256 / 2 * map_to_tiles,
-                              // offset.y + m_generation_padding - 256 / 2 * map_to_tiles,
-                              size.x + m_generation_padding * 2,
-                              size.y + m_generation_padding * 2,
-                              island_params.frequency,
-                              seed);
+  // generator->GenUniformGrid2D(raw_height_map.data(),
+  //                             offset.x - m_generation_padding,
+  //                             offset.y + m_generation_padding,
+  //                             // offset.x - m_generation_padding - 256 / 2 * map_to_tiles,
+  //                             // offset.y + m_generation_padding - 256 / 2 * map_to_tiles,
+  //                             size.x + m_generation_padding * 2,
+  //                             size.y + m_generation_padding * 2,
+  //                             island_params.frequency,
+  //                             seed);
+
+  utils::generate_silhouette_map(silhouette_map.data(),
+                                 offset.x - m_generation_padding,
+                                 offset.y + m_generation_padding,
+                                 size.x + m_generation_padding * 2,
+                                 size.y + m_generation_padding * 2,
+                                 island_params,
+                                 seed);
+
+  utils::generate_mountain_map(mountain_map.data(),
+                               offset.x - m_generation_padding,
+                               offset.y + m_generation_padding,
+                               size.x + m_generation_padding * 2,
+                               size.y + m_generation_padding * 2,
+                               island_params,
+                               seed);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise

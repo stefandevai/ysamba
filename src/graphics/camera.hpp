@@ -78,8 +78,8 @@ class Camera
   float m_frustum_bottom = 0.0f;
   float m_frustum_top = 0.0f;
   float m_near = 1.0f;
-  float m_far = 3000.0f;
-  double m_camera_z = 2000.0;
+  float m_far = 24000.0f;
+  double m_camera_z = 12000.0;
   glm::vec3 m_position{0.0, m_camera_z, m_camera_z};
   glm::vec3 m_center
       = m_position

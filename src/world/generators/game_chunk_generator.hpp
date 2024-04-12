@@ -15,14 +15,17 @@ class GameChunkGenerator
 {
  public:
   Vector3i size{1, 1, 1};
-  std::vector<float> raw_height_map;
+  std::vector<float> silhouette_map;
+  std::vector<float> mountain_map;
+  // std::vector<uint8_t> height_map;
+  // std::vector<float> raw_height_map;
   std::vector<float> vegetation_type;
   std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;
   IslandNoiseParams island_params{};
 
   // Quantity of tiles per map texture pixel
-  float map_to_tiles = 10.0f;
+  float map_to_tiles = 20.0f;
 
   GameChunkGenerator();
   GameChunkGenerator(const Vector3i& size);
@@ -44,7 +47,7 @@ class GameChunkGenerator
     DL_EDGE_BOTTOM_LEFT = 128,
   };
 
-  JSON m_json{"./data/world/tile_rules.json"};
+  // JSON m_json{"./data/world/tile_rules.json"};
   int m_generation_padding = 1;
   Vector3i m_padded_size{size.x + m_generation_padding * 2, size.y + m_generation_padding * 2, 1};
   void m_get_height_map(const int seed, const Vector3i& offset);

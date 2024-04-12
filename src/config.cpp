@@ -50,7 +50,7 @@ namespace world_creation
 {
 uint32_t world_width = 256;
 uint32_t world_height = 256;
-uint32_t world_depth = 30;
+uint32_t world_depth = 256;
 }  // namespace world_creation
 
 void load(const std::filesystem::path& filepath)

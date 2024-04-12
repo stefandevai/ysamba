@@ -92,4 +92,38 @@ const FastNoise::SmartNode<> get_island_noise_generator(const IslandNoiseParams&
   //
   // return remap2;
 }
+
+void generate_silhouette_map(float* data, int x, int y, int width, int height, const IslandNoiseParams& params, int seed)
+{
+  const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+  fractal->SetSource(simplex);
+  fractal->SetOctaveCount(4);
+  fractal->SetLacunarity(2.52f);
+  fractal->SetGain(0.68f);
+  fractal->SetWeightedStrength(0.6f);
+
+  const auto remap = FastNoise::New<FastNoise::Remap>();
+  remap->SetSource(fractal);
+  remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+
+  remap->GenUniformGrid2D(data, x, y, width, height, params.frequency, seed);
+}
+
+void generate_mountain_map(float* data, int x, int y, int width, int height, const IslandNoiseParams& params, int seed)
+{
+  const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto fractal = FastNoise::New<FastNoise::FractalRidged>();
+  fractal->SetSource(simplex);
+  fractal->SetOctaveCount(3);
+  fractal->SetLacunarity(1.54f);
+  fractal->SetGain(1.18f);
+  fractal->SetWeightedStrength(0.4f);
+
+  const auto remap = FastNoise::New<FastNoise::Remap>();
+  remap->SetSource(fractal);
+  remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+
+  remap->GenUniformGrid2D(data, x, y, width, height, params.frequency, seed);
+}
 }  // namespace dl::utils
