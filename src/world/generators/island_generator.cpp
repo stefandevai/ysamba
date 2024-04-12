@@ -87,11 +87,13 @@ void IslandGenerator::m_get_height_map(const int seed)
 {
   height_map.resize(size.x * size.y);
   silhouette_map.resize(size.x * size.y);
+  mountain_map.resize(size.x * size.y);
   // raw_height_map.resize(size.x * size.y);
   // island_mask.resize(size.x * size.y);
 
   // const auto generator = utils::get_island_noise_generator(island_params);
 
+  // Silhouette noise map
   {
     const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
     const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
@@ -125,13 +127,31 @@ void IslandGenerator::m_get_height_map(const int seed)
         silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
   }
 
+  // Mountains height map
+  {
+    const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+    const auto fractal = FastNoise::New<FastNoise::FractalRidged>();
+    fractal->SetSource(simplex);
+    fractal->SetOctaveCount(3);
+    fractal->SetLacunarity(1.54f);
+    fractal->SetGain(1.18f);
+    fractal->SetWeightedStrength(0.4f);
+
+    const auto remap = FastNoise::New<FastNoise::Remap>();
+    remap->SetSource(fractal);
+    remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+
+    remap->GenUniformGrid2D(
+        mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  }
+
 
   // float maxv = 0.0f, minv = 0.0f;
 
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
 
-  const float gradient_diameter = 128.0f;
+  const float gradient_diameter = 160.0f;
   const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
   for (int j = 0; j < size.y; ++j)
@@ -162,7 +182,31 @@ void IslandGenerator::m_get_height_map(const int seed)
     for (int i = 0; i < size.x; ++i)
     {
       const auto array_index = j * size.x + i;
-      const auto map_value = interpolate(0.0, 1.0, 0.0, 255.0, silhouette_map[array_index]);
+      const double noise_value = silhouette_map[array_index];
+
+      double map_value;
+
+      if (noise_value < 0.4f)
+      {
+        map_value = interpolate(0.0, 0.4, 0.0, 80.0, noise_value);
+      }
+      else if (noise_value < 0.7f)
+      {
+        map_value = interpolate(0.4, 0.7, 80.0, 180.0, noise_value);
+      }
+      else
+      {
+        map_value = interpolate(0.7, 1.0, 180.0, 255.0, noise_value);
+      }
+
+      // double map_value = interpolate(0.0, 1.0, 0.0, 255.0, mountain_map[array_index]);
+      
+      double mountain_value = mountain_map[array_index];
+      map_value *= mountain_value * 2.0;
+
+      map_value = std::clamp(map_value, 0.0, 255.0);
+
+      // const auto map_value = interpolate(0.0, 1.0, 0.0, 255.0, silhouette_map[array_index]);
       // maxvv = std::max(maxvv, map_value);
       // minvv = std::min(minvv, map_value);
       height_map[array_index] = static_cast<uint8_t>(map_value);

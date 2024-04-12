@@ -21,6 +21,7 @@ class IslandGenerator
  public:
   Vector3i size{1, 1, 1};
   std::vector<float> silhouette_map;
+  std::vector<float> mountain_map;
   std::vector<float> raw_height_map;
   std::vector<int> island_mask;
   std::vector<uint8_t> height_map;
