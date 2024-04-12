@@ -8,10 +8,29 @@ const FastNoise::SmartNode<> get_island_noise_generator(const IslandNoiseParams&
 {
   // FastNoise::SmartNode<> generator = FastNoise::NewFromEncodedNodeTree(
   //     "FwAAAIC/AACAPwAAAL8AAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
-  FastNoise::SmartNode<> generator = FastNoise::NewFromEncodedNodeTree(
-      "FwAAAIC/AACAPwAAAAAAAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
+  // FastNoise::SmartNode<> generator = FastNoise::NewFromEncodedNodeTree(
+  //     "FwAAAIC/AACAPwAAAAAAAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
 
-  return generator;
+  const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+  fractal->SetSource(simplex);
+  fractal->SetOctaveCount(4);
+  fractal->SetLacunarity(2.52f);
+  fractal->SetGain(0.68f);
+  fractal->SetWeightedStrength(0.6f);
+
+  const auto distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
+  distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
+
+  const auto subtract = FastNoise::New<FastNoise::Subtract>();
+  subtract->SetLHS(fractal);
+  subtract->SetRHS(distance_to_point);
+
+  const auto remap = FastNoise::New<FastNoise::Remap>();
+  remap->SetSource(subtract);
+  remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+
+  return remap;
 
   // // First noise layer
   // const auto& simplex = FastNoise::New<FastNoise::OpenSimplex2S>();

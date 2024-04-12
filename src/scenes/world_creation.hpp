@@ -45,7 +45,7 @@ class WorldCreation : public Scene
   World m_world{m_game_context};
   std::unique_ptr<Texture> m_texture = nullptr;
   int m_seed = 0;
-  std::vector<float> m_height_map{};
+  std::vector<uint8_t> m_height_map{};
   InputManager& m_input_manager = InputManager::get_instance();
   ui::WorldCreationPanel* m_panel = nullptr;
 

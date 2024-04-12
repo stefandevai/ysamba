@@ -161,7 +161,7 @@ void WorldCreation::m_generate_map()
   m_height_map.clear();
   m_height_map.reserve(world_size.x * world_size.y);
   generator.generate(m_seed);
-  m_height_map = std::move(generator.raw_height_map);
+  m_height_map = std::move(generator.height_map);
 }
 
 void WorldCreation::m_generate_world()
@@ -180,12 +180,12 @@ void WorldCreation::m_create_map_representation()
     {
       // const auto map_value = m_height_map[j * world_size.x + i] * 0.5f + 0.5f;
       const auto map_value = m_height_map[j * world_size.x + i];
-      const int z = static_cast<int>(map_value * z_levels);
-      const uint8_t value = z * 255 / z_levels;
+      // const int z = static_cast<int>(map_value * z_levels);
+      // const uint8_t value = z * 255 / z_levels;
       // const uint8_t value = map_value * 255;
 
       pixel_data[j * world_size.x * 4 + i * 4] = 0;
-      pixel_data[j * world_size.x * 4 + i * 4 + 1] = value;
+      pixel_data[j * world_size.x * 4 + i * 4 + 1] = m_height_map[j * world_size.x + i];
       pixel_data[j * world_size.x * 4 + i * 4 + 2] = 50;
       pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
     }

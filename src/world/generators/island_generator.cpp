@@ -16,6 +16,10 @@ namespace dl
 {
 IslandGenerator::IslandGenerator() {}
 
+double interpolate(double start_1, double end_1, double start_2, const double end_2, double value) {
+  return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
+}
+
 IslandGenerator::IslandGenerator(const Vector3i& size) : size(size)
 {
   m_load_params(m_default_params_filepath);
@@ -35,30 +39,27 @@ void IslandGenerator::generate(const int seed)
 
   spdlog::info("Generating height map...");
 
-  raw_height_map.resize(size.x * size.y);
-  island_mask.resize(size.x * size.y);
-
   m_get_height_map(seed);
 
   spdlog::info("Adjusting islands...");
 
-  auto islands = m_get_islands(island_mask, 1);
-  auto& main_island = islands.back();
+  // auto islands = m_get_islands(island_mask, 1);
+  // auto& main_island = islands.back();
 
   timer.stop();
   timer.print("Island generation");
 
   // TEMP Visualize island mask
-  if (island_params.display_mask)
-  {
-    for (auto i = 0; i < size.x * size.y; ++i)
-    {
-      if (main_island.mask[i] != TerrainType::Land)
-      {
-        raw_height_map[i] = 0.0f;
-      }
-    }
-  }
+  // if (island_params.display_mask)
+  // {
+  //   for (auto i = 0; i < size.x * size.y; ++i)
+  //   {
+  //     if (main_island.mask[i] != TerrainType::Land)
+  //     {
+  //       raw_height_map[i] = 0.0f;
+  //     }
+  //   }
+  // }
   // TEMP Visualize island mask
 }
 
@@ -84,10 +85,54 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 
 void IslandGenerator::m_get_height_map(const int seed)
 {
-  const auto generator = utils::get_island_noise_generator(island_params);
+  height_map.resize(size.x * size.y);
+  silhouette_map.resize(size.x * size.y);
+  // raw_height_map.resize(size.x * size.y);
+  // island_mask.resize(size.x * size.y);
 
-  generator->GenUniformGrid2D(
-      raw_height_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  // const auto generator = utils::get_island_noise_generator(island_params);
+
+  {
+    const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+    const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+    fractal->SetSource(simplex);
+    fractal->SetOctaveCount(4);
+    fractal->SetLacunarity(2.52f);
+    fractal->SetGain(0.68f);
+    fractal->SetWeightedStrength(0.6f);
+
+    // // fractal->GenUniformGrid2D(
+    // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+    //
+    // const auto distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
+    // distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
+    //
+    // // distance_to_point->GenUniformGrid2D(
+    // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+    //
+    // const auto subtract = FastNoise::New<FastNoise::Subtract>();
+    // subtract->SetLHS(fractal);
+    // subtract->SetRHS(distance_to_point);
+    //
+    // // subtract->GenUniformGrid2D(
+    // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+
+    const auto remap = FastNoise::New<FastNoise::Remap>();
+    remap->SetSource(fractal);
+    remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+
+    remap->GenUniformGrid2D(
+        silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
+  }
+
+
+  // float maxv = 0.0f, minv = 0.0f;
+
+  const float half_size_x = size.x / 2.0f;
+  const float half_size_y = size.y / 2.0f;
+
+  const float gradient_diameter = 128.0f;
+  const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
   for (int j = 0; j < size.y; ++j)
   {
@@ -95,56 +140,37 @@ void IslandGenerator::m_get_height_map(const int seed)
     {
       const auto array_index = j * size.x + i;
 
-      raw_height_map[array_index] = std::min(raw_height_map[array_index], 1.0f);
-      raw_height_map[array_index] = std::max(raw_height_map[array_index], 0.0f);
+      const float distance_x_squared = (half_size_x - i) * (half_size_x - i);
+      const float distance_y_squared = (half_size_y - j) * (half_size_y - j);
 
-      if (raw_height_map[array_index] > island_params.tier_land)
-      {
-        island_mask[array_index] = 2;
-      }
-      else
-      {
-        island_mask[array_index] = 0;
-      }
+      float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
+
+      silhouette_map[array_index] -= gradient;
+      // maxv = std::max(maxv, silhouette_map[array_index]);
+      // minv = std::min(minv, silhouette_map[array_index]);
+      silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
     }
   }
 
-  // Remove lakes
-  bool has_flooded_ocean = false;
+  // spdlog::warn("Max: {}", maxv);
+  // spdlog::warn("Min: {}", minv);
 
-  for (int j = 0; j < size.y && !has_flooded_ocean; ++j)
-  {
-    for (int i = 0; i < size.x && !has_flooded_ocean; ++i)
-    {
-      if (i != 0 && j != 0)
-      {
-        continue;
-      }
+  // double maxvv = 0.0, minvv = 0.0;
 
-      const auto value = island_mask[j * size.x + i];
-
-      if (value == 0)
-      {
-        if (j == 0 || i == 0)
-        {
-          m_flood_fill(1, i, j, island_mask);
-          has_flooded_ocean = true;
-        }
-      }
-    }
-  }
-
-  // Replace inland water with grass
   for (int j = 0; j < size.y; ++j)
   {
     for (int i = 0; i < size.x; ++i)
     {
-      if (island_mask[j * size.x + i] == 0)
-      {
-        island_mask[j * size.x + i] = 2;
-      }
+      const auto array_index = j * size.x + i;
+      const auto map_value = interpolate(0.0, 1.0, 0.0, 255.0, silhouette_map[array_index]);
+      // maxvv = std::max(maxvv, map_value);
+      // minvv = std::min(minvv, map_value);
+      height_map[array_index] = static_cast<uint8_t>(map_value);
     }
   }
+
+  // spdlog::warn("Max2: {}", maxvv);
+  // spdlog::warn("Min2: {}", minvv);
 }
 
 void IslandGenerator::m_flood_fill(const int value, const int x, const int y, std::vector<int>& tiles)
