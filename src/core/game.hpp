@@ -8,9 +8,9 @@
 #include "./input_manager.hpp"
 #include "./json.hpp"
 #include "./scene_manager.hpp"
+#include "audio/audio_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/display.hpp"
-#include "audio/audio_manager.hpp"
 
 namespace dl
 {

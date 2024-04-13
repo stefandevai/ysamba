@@ -1,255 +1,227 @@
 #include "./ogg_stream.hpp"
 
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace
 {
-void checkErrors()
+void check_al_error()
 {
-  int error = alGetError();
+  const int error = alGetError();
+
   if (error != AL_NO_ERROR)
-    std::cout << "OpenAL error." << std::endl;
+  {
+    spdlog::critical("OpenAL error:");
+    switch (error)
+    {
+    case AL_INVALID_NAME:
+      spdlog::critical("AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function");
+      break;
+    case AL_INVALID_ENUM:
+      spdlog::critical("AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function");
+      break;
+    case AL_INVALID_VALUE:
+      spdlog::critical("AL_INVALID_VALUE: an invalid value was passed to an OpenAL function");
+      break;
+    case AL_INVALID_OPERATION:
+      spdlog::critical("AL_INVALID_OPERATION: the requested operation is not valid");
+      break;
+    case AL_OUT_OF_MEMORY:
+      spdlog::critical("AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory");
+      break;
+    default:
+      spdlog::critical("UNKNOWN AL ERROR: {}", error);
+      break;
+    }
+  }
 }
 
-std::string errorToString (int code)
+std::string ogg_error_to_string(const int code)
 {
   switch (code)
   {
-    case OV_EREAD:
-      return "Read from media.";
-    case OV_ENOTVORBIS:
-      return "Not vorbis data.";
-    case OV_EVERSION:
-      return "Vorbis version mismatch";
-    case OV_EBADHEADER:
-      return "Invalid vorbis header.";
-    case OV_EFAULT:
-      return "Internal logic fault";
-    default:
-      return "Unknown Ogg error.";
+  case OV_EREAD:
+    return "Read from media.";
+  case OV_ENOTVORBIS:
+    return "Not vorbis data.";
+  case OV_EVERSION:
+    return "Vorbis version mismatch";
+  case OV_EBADHEADER:
+    return "Invalid vorbis header.";
+  case OV_EFAULT:
+    return "Internal logic fault";
+  default:
+    return "Unknown Ogg error.";
   }
 }
-} // namespace
+}  // namespace
 
 namespace dl::audio
 {
-  OggStream::OggStream (const char* filepath) : FilePath (filepath)
-  {
-    this->StreamOpened = false;
-    this->Reseted      = true;
-  }
+OggStream::OggStream(const std::string& filepath) : m_ogg(OggData{filepath})
+{
+  m_reseted = true;
 
-  OggStream::~OggStream()
-  {
-    if (this->StreamOpened)
-    {
-      this->clean();
-    }
-  }
+  alGenBuffers(STREAM_BUFFERSS, m_buffers);
+  check_al_error();
+  alGenSources(1, &m_source);
+  check_al_error();
 
-  void OggStream::Play (const bool& loop)
-  {
-    if (IsPlaying())
-      return;
-    this->Loop = loop;
-    if (!this->StreamOpened)
-      this->openFile (this->FilePath);
-    for (int i = 0; i < STREAM_BUFFERS; ++i)
-      if (!streamBuffer (this->Buffers[i]))
-        return;
+  alSource3f(m_source, AL_POSITION, 0.0, 0.0, 0.0);
+  alSource3f(m_source, AL_VELOCITY, 0.0, 0.0, 0.0);
+  alSource3f(m_source, AL_DIRECTION, 0.0, 0.0, 0.0);
+  alSourcef(m_source, AL_ROLLOFF_FACTOR, 0.0);
+  alSourcei(m_source, AL_SOURCE_RELATIVE, AL_TRUE);
+}
 
-    alSourceQueueBuffers (this->Source, STREAM_BUFFERS, this->Buffers);
-    alSourcePlay (this->Source);
-    this->Reseted = false;
-  }
-
-  void OggStream::Pause (const bool& fadeOut)
-  {
-    if (IsPlaying())
-    {
-      alSourcePause (this->Source);
-    }
-  }
-
-  void OggStream::Resume (const bool& fadeOut)
-  {
-    if (IsPaused())
-    {
-      alSourcePlay (this->Source);
-    }
-  }
-
-  void OggStream::Stop (const bool& fadeOut)
-  {
-    if (IsPlaying() || IsPaused())
-    {
-      alSourceStop (this->Source);
-      ov_raw_seek (&this->StreamData, 0);
-      this->Reseted      = true;
-      this->StreamOpened = false;
-      this->emptyQueue();
-    }
-  }
-
-  void OggStream::Update()
-  {
-    ALenum state;
-    alGetSourcei (this->Source, AL_SOURCE_STATE, &state);
-    if (state == AL_PAUSED)
+void OggStream::play(const bool loop)
+{
+  if (is_playing())
+    return;
+  m_loop = loop;
+  for (int i = 0; i < STREAM_BUFFERSS; ++i)
+    if (!m_stream_buffer(m_buffers[i]))
       return;
 
-    int processed;
-    // bool active = true;
-    alGetSourcei (this->Source, AL_BUFFERS_PROCESSED, &processed);
-    while (processed--)
-    {
-      ALuint buffer;
-      alSourceUnqueueBuffers (this->Source, 1, &buffer);
-      checkErrors();
+  alSourceQueueBuffers(m_source, STREAM_BUFFERSS, m_buffers);
+  alSourcePlay(m_source);
+  m_reseted = false;
+}
 
-      bool active = this->streamBuffer (buffer);
-      if (active)
-      {
-        alSourceQueueBuffers (this->Source, 1, &buffer);
-        checkErrors();
-      }
-    }
+void OggStream::pause()
+{
+  if (is_playing())
+  {
+    alSourcePause(m_source);
+  }
+}
 
-    if (state == AL_STOPPED)
+void OggStream::resume()
+{
+  if (is_paused())
+  {
+    alSourcePlay(m_source);
+  }
+}
+
+void OggStream::stop()
+{
+  if (is_playing() || is_paused())
+  {
+    alSourceStop(m_source);
+    ov_raw_seek(&m_ogg.file_data, 0);
+    m_reseted = true;
+    m_empty_queue();
+  }
+}
+
+void OggStream::update()
+{
+  alGetSourcei(m_source, AL_SOURCE_STATE, &m_state);
+
+  if (m_state == AL_PAUSED)
+  {
+    return;
+  }
+
+  int processed;
+  // bool active = true;
+  alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
+  while (processed--)
+  {
+    ALuint buffer;
+    alSourceUnqueueBuffers(m_source, 1, &buffer);
+    check_al_error();
+
+    bool active = m_stream_buffer(buffer);
+    if (active)
     {
-      if (this->Loop)
-      {
-        ov_raw_seek (&this->StreamData, 0);
-        this->Play (this->Loop);
-      }
-      else if (!this->Reseted)
-      {
-        this->Reseted = true;
-        ov_raw_seek (&this->StreamData, 0);
-      }
-      // active = this->Loop;
+      alSourceQueueBuffers(m_source, 1, &buffer);
+      check_al_error();
     }
   }
 
-  // bool OggStream::IsInitialized() const { return this->StreamOpened; }
-  //
-  bool OggStream::IsPaused()
+  if (m_state == AL_STOPPED)
   {
-    if (!this->StreamOpened)
+    if (m_loop)
     {
+      ov_raw_seek(&m_ogg.file_data, 0);
+      play(m_loop);
+    }
+    else if (!m_reseted)
+    {
+      m_reseted = true;
+      ov_raw_seek(&m_ogg.file_data, 0);
+    }
+  }
+}
+
+bool OggStream::is_paused()
+{
+  return (m_state == AL_PAUSED);
+}
+
+bool OggStream::is_stopped()
+{
+  return (m_state == AL_STOPPED || m_state == AL_INITIAL);
+}
+
+bool OggStream::is_playing()
+{
+  return (m_state == AL_PLAYING);
+}
+
+void OggStream::destroy()
+{
+  alSourceStop(m_source);
+  m_empty_queue();
+  alDeleteSources(1, &m_source);
+  alDeleteBuffers(STREAM_BUFFERSS, m_buffers);
+}
+
+bool OggStream::m_stream_buffer(ALuint buffer)
+{
+  char data[AUDIO_BUFFER_SIZE];
+  int size = 0;
+  int section;
+
+  while (size < AUDIO_BUFFER_SIZE)
+  {
+    const int result = ov_read(&m_ogg.file_data, data + size, AUDIO_BUFFER_SIZE - size, 0, 2, 1, &section);
+
+    if (result > 0)
+    {
+      size += result;
+    }
+    else if (result < 0)
+    {
+      spdlog::critical(ogg_error_to_string(result));
       return false;
     }
-    ALenum state;
-    alGetSourcei (this->Source, AL_SOURCE_STATE, &state);
-    return (state == AL_PAUSED);
-  }
-
-  bool OggStream::IsStoped()
-  {
-    if (!this->StreamOpened)
-    {
-      return true;
-    }
-    ALenum state;
-    alGetSourcei (this->Source, AL_SOURCE_STATE, &state);
-    return (state == AL_STOPPED || state == AL_INITIAL);
-  }
-
-  bool OggStream::IsPlaying()
-  {
-    if (!this->StreamOpened)
-      return false;
-    ALenum state;
-    alGetSourcei (this->Source, AL_SOURCE_STATE, &state);
-    return (state == AL_PLAYING);
-  }
-
-  void OggStream::openFile (const char* filepath)
-  {
-    int result;
-    FILE* file;
-    if (!(file = fopen (filepath, "rb")))
-      std::cout << "Could not open ogg file." << std::endl;
-    if ((result = ov_open (file, &this->StreamData, NULL, 0)) < 0)
-    {
-      fclose (file);
-      std::cout << "Could not open ogg stream." << errorToString (result) << std::endl;
-    }
-    this->StreamOpened  = true;
-    this->VorbisInfo    = ov_info (&this->StreamData, -1);
-    this->VorbisComment = ov_comment (&this->StreamData, -1);
-    if (this->VorbisInfo->channels == 1)
-      this->Format = AL_FORMAT_MONO16;
     else
-      this->Format = AL_FORMAT_STEREO16;
-
-    alGenBuffers (STREAM_BUFFERS, this->Buffers);
-    checkErrors();
-    alGenSources (1, &this->Source);
-    checkErrors();
-
-    alSource3f (this->Source, AL_POSITION, 0.0, 0.0, 0.0);
-    alSource3f (this->Source, AL_VELOCITY, 0.0, 0.0, 0.0);
-    alSource3f (this->Source, AL_DIRECTION, 0.0, 0.0, 0.0);
-    alSourcef (this->Source, AL_ROLLOFF_FACTOR, 0.0);
-    alSourcei (this->Source, AL_SOURCE_RELATIVE, AL_TRUE);
-
-    // this->displayInfo();
-  }
-
-  // const void OggStream::displayInfo() const {
-  // std::cout << "version: " << this->VorbisInfo->version
-  //<< "channels: " << this->VorbisInfo->channels << "rate (hz) "
-  //<< this->VorbisInfo->rate << std::endl;
-  // for (int i = 0; i < this->VorbisComment->comments; i++)
-  // std::cout << this->VorbisComment->user_comments[i] << std::endl;
-  //}
-
-  bool OggStream::streamBuffer (ALuint buffer)
-  {
-    char data[AUDIO_BUFFER_SIZE];
-    int size = 0;
-    int section;
-    while (size < AUDIO_BUFFER_SIZE)
     {
-      const int result = ov_read (&this->StreamData, data + size, AUDIO_BUFFER_SIZE - size, 0, 2, 1, &section);
-      if (result > 0)
-        size += result;
-      else if (result < 0)
-        std::cout << errorToString (result) << std::endl;
-      else
-        break;
-    }
-    if (size == 0)
-      return false;
-    alBufferData (buffer, this->Format, data, size, this->VorbisInfo->rate);
-    checkErrors();
-
-    return true;
-  }
-
-  void OggStream::emptyQueue()
-  {
-    int queued;
-    alGetSourcei (this->Source, AL_BUFFERS_QUEUED, &queued);
-
-    while (queued--)
-    {
-      ALuint buffer;
-      alSourceUnqueueBuffers (this->Source, 1, &buffer);
-      checkErrors();
+      break;
     }
   }
-
-  void OggStream::clean()
+  if (size == 0)
   {
-    this->StreamOpened = false;
-    alSourceStop (this->Source);
-    this->emptyQueue();
-    alDeleteSources (1, &this->Source);
-    checkErrors();
-    alDeleteBuffers (STREAM_BUFFERS, this->Buffers);
-    checkErrors();
-    ov_clear (&this->StreamData);
+    return false;
   }
-} // namespace dl
+
+  alBufferData(buffer, m_ogg.format, data, size, m_ogg.metadata->rate);
+  check_al_error();
+  return true;
+}
+
+void OggStream::m_empty_queue()
+{
+  int queued;
+  alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
+
+  while (queued--)
+  {
+    ALuint buffer;
+    alSourceUnqueueBuffers(m_source, 1, &buffer);
+    check_al_error();
+  }
+}
+}  // namespace dl::audio

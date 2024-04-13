@@ -12,11 +12,13 @@
 #include "core/timer.hpp"
 #include "world/point.hpp"
 
-namespace {
-double interpolate(double start_1, double end_1, double start_2, const double end_2, double value) {
+namespace
+{
+double interpolate(double start_1, double end_1, double start_2, const double end_2, double value)
+{
   return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
 }
-}
+}  // namespace
 
 namespace dl
 {
@@ -150,7 +152,6 @@ void IslandGenerator::m_get_height_map(const int seed)
   //       mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
   // }
 
-
   // float maxv = 0.0f, minv = 0.0f;
 
   const float half_size_x = size.x / 2.0f;
@@ -205,7 +206,7 @@ void IslandGenerator::m_get_height_map(const int seed)
       }
 
       // double map_value = interpolate(0.0, 1.0, 0.0, 255.0, mountain_map[array_index]);
-      
+
       double mountain_value = mountain_map[array_index];
       map_value *= mountain_value * 2.0;
 

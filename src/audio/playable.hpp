@@ -8,24 +8,24 @@ namespace dl
 {
 namespace audio
 {
-  class Playable
-  {
-  public:
-    inline virtual ~Playable() {}
-    virtual void Play (const bool& loop = false)      = 0;
-    virtual void Pause (const bool& fadeOut = false)  = 0;
-    virtual void Resume (const bool& fadeOut = false) = 0;
-    virtual void Stop (const bool& fadeOut = false)   = 0;
-    virtual void Update()                             = 0;
-    virtual bool IsInitialized()                      = 0;
+class Playable
+{
+ public:
+  inline virtual ~Playable() {}
+  virtual void Play(const bool& loop = false) = 0;
+  virtual void Pause(const bool& fadeOut = false) = 0;
+  virtual void Resume(const bool& fadeOut = false) = 0;
+  virtual void Stop(const bool& fadeOut = false) = 0;
+  virtual void Update() = 0;
+  virtual bool IsInitialized() = 0;
 
-  protected:
-    ALuint Source;
-    ALenum Format;
-    ALint State;
-    bool Loop = false;
+ protected:
+  ALuint Source;
+  ALenum Format;
+  ALint State;
+  bool Loop = false;
 
-    inline Playable() {}
-  };
-} // namespace audio
-} // namespace stella
+  inline Playable() {}
+};
+}  // namespace audio
+}  // namespace dl

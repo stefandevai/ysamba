@@ -93,7 +93,8 @@ const FastNoise::SmartNode<> get_island_noise_generator(const IslandNoiseParams&
   // return remap2;
 }
 
-void generate_silhouette_map(float* data, int x, int y, int width, int height, const IslandNoiseParams& params, int seed)
+void generate_silhouette_map(
+    float* data, int x, int y, int width, int height, const IslandNoiseParams& params, int seed)
 {
   const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
   const auto fractal = FastNoise::New<FastNoise::FractalFBm>();

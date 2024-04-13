@@ -1,47 +1,43 @@
 #pragma once
 
-#include <string>
-
+#include <AL/al.h>
 #include <ogg/ogg.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#include "playable.hpp"
+#include <string>
 
-#define STREAM_BUFFERS 4
+#include "audio/ogg_data.hpp"
+
+#define AUDIO_BUFFER_SIZE (4096 * 8)
+#define STREAM_BUFFERSS 4
 
 namespace dl::audio
 {
-  class OggStream : public Playable
-  {
-  public:
-    explicit OggStream (const char* filepath);
-    ~OggStream();
+class OggStream
+{
+ public:
+  explicit OggStream(const std::string& filepath);
 
-    void Play (const bool& loop) override;
-    void Pause (const bool& fadeOut = false) override;
-    void Resume (const bool& fadeOut = false) override;
-    void Stop (const bool& fadeOut = false) override;
-    void Update() override;
-    bool IsPlaying();
-    bool IsStoped();
-    bool IsPaused();
-    // virtual bool IsInitialized() const override;
-    inline bool IsInitialized() override { return this->StreamOpened; }
+  void play(const bool loop);
+  void pause();
+  void resume();
+  void stop();
+  void update();
+  bool is_playing();
+  bool is_stopped();
+  bool is_paused();
+  void destroy();
 
-  private:
-    const char* FilePath;
-    bool StreamOpened, Reseted;
-    // FILE *OggFile;
-    OggVorbis_File StreamData;
-    vorbis_info* VorbisInfo       = nullptr;
-    vorbis_comment* VorbisComment = nullptr;
-    ALuint Buffers[STREAM_BUFFERS];
+ private:
+  ALenum m_state = AL_STOPPED;
+  bool m_loop = false;
+  bool m_reseted;
+  OggData m_ogg;
+  ALuint m_buffers[STREAM_BUFFERSS];
+  ALuint m_source;
 
-    void openFile (const char* filepath);
-    // const void displayInfo() const;
-    bool streamBuffer (ALuint buffer);
-    void emptyQueue();
-    void clean();
-  };
-} // namespace dl
+  bool m_stream_buffer(ALuint buffer);
+  void m_empty_queue();
+};
+}  // namespace dl::audio

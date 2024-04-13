@@ -14,11 +14,13 @@
 #include "core/timer.hpp"
 #include "world/chunk.hpp"
 
-namespace {
-double interpolate(double start_1, double end_1, double start_2, const double end_2, double value) {
+namespace
+{
+double interpolate(double start_1, double end_1, double start_2, const double end_2, double value)
+{
   return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
 }
-}
+}  // namespace
 
 namespace dl
 {

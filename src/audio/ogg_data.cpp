@@ -6,60 +6,84 @@
 
 namespace
 {
-std::string error_to_string (int code)
+std::string error_to_string(int code)
 {
   switch (code)
   {
-    case OV_EREAD:
-      return "Read from media.";
-    case OV_ENOTVORBIS:
-      return "Not vorbis data.";
-    case OV_EVERSION:
-      return "Vorbis version mismatch";
-    case OV_EBADHEADER:
-      return "Invalid vorbis header.";
-    case OV_EFAULT:
-      return "Internal logic fault";
-    default:
-      return "Unknown Ogg error.";
+  case OV_EREAD:
+    return "Read from media.";
+  case OV_ENOTVORBIS:
+    return "Not vorbis data.";
+  case OV_EVERSION:
+    return "Vorbis version mismatch";
+  case OV_EBADHEADER:
+    return "Invalid vorbis header.";
+  case OV_EFAULT:
+    return "Internal logic fault";
+  default:
+    return "Unknown Ogg error.";
   }
 }
-} // namespace
+}  // namespace
 
 namespace dl::audio
 {
-    FILE* file = nullptr;
-  OggData::OggData(std::string filepath)
+OggData::OggData(const std::string& filepath)
+{
+  if (!(file = fopen(filepath.c_str(), "rb")))
   {
-    if (!(file = fopen(filepath.c_str(), "rb")))
-    {
-      spdlog::critical("Failed to open ogg file");
-      return;
-    }
-
-    int result = ov_open(file, &data, NULL, 0);
-    if (result < 0)
-    {
-      spdlog::critical("Failed to open ogg stream: {}", error_to_string(result));
-      fclose (file);
-      return;
-    }
-
-
-    metadata = ov_info(&data, -1);
-    // if (this->VorbisInfo->channels == 1)
-    // {
-    //   this->Format = AL_FORMAT_MONO16;
-    // }
-    // else
-    // {
-    //   this->Format = AL_FORMAT_STEREO16;
-    // }
+    spdlog::critical("Failed to open ogg file");
+    return;
   }
 
-  OggData::~OggData()
+  int result = ov_open(file, &file_data, NULL, 0);
+
+  if (result < 0)
   {
+    spdlog::critical("Failed to open ogg stream: {}", error_to_string(result));
     fclose(file);
-    ov_clear(&data);
+    return;
   }
-} // namespace dl
+
+  metadata = ov_info(&file_data, -1);
+  size = ov_pcm_total(&file_data, -1) * metadata->channels * 2;
+
+  if (metadata->channels == 1)
+  {
+    format = AL_FORMAT_MONO16;
+  }
+  else
+  {
+    format = AL_FORMAT_STEREO16;
+  }
+
+  // buffer = (char*)malloc(size);
+  //
+  // size_t bytes_read = -1, offset = 0;
+  // int sel = 0;
+  //
+  // while (bytes_read != 0)
+  // {
+  //   bytes_read = ov_read(&file_data, buffer + offset, 4096, 0, 2, 1, &sel);
+  //
+  //   if(bytes_read < 0)
+  //   {
+  //     spdlog::critical("Error reading OGG file");
+  //     return;
+  //   }
+  //
+  //   offset += bytes_read;
+  // }
+}
+
+OggData::~OggData()
+{
+  // if (size > 0)
+  // {
+  //   free(buffer);
+  // }
+
+  fclose(file);
+  ov_clear(&file_data);
+}
+}  // namespace dl::audio
