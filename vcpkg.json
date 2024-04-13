@@ -21,6 +21,9 @@
     "imgui",
     "implot",
     "spdlog",
-    "date"
+    "date",
+    "openal-soft",
+    "libogg",
+    "libvorbis"
   ]
 }

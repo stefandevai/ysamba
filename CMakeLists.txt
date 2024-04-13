@@ -73,6 +73,9 @@ find_package(freetype CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(implot CONFIG REQUIRED)
+find_package(OpenAL CONFIG REQUIRED)
+find_package(Ogg CONFIG REQUIRED)
+find_package(Vorbis CONFIG REQUIRED)
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -96,6 +99,8 @@ SET(
     implot::implot
     FastNoise
     i18n_keyval::i18n_keyval
+    OpenAL::OpenAL
+    Vorbis::vorbisfile
 )
 
 # Allow objective-c for SDL2 C file on Apple platforms
