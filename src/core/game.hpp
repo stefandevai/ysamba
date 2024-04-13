@@ -27,8 +27,8 @@ class Game
   Camera m_camera{};
   Clock m_clock{};
   InputManager& m_input_manager = InputManager::get_instance();
-  audio::AudioManager m_audio_manager{};
+  audio::AudioManager m_audio_manager{m_asset_manager};
 
-  GameContext m_context{&m_display, &m_asset_manager, &m_camera, &m_scene_manager, &m_clock, {}, nullptr, nullptr};
+  GameContext m_context{&m_display, &m_asset_manager, &m_audio_manager, &m_camera, &m_scene_manager, &m_clock, {}, nullptr, nullptr};
 };
 }  // namespace dl

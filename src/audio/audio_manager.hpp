@@ -2,27 +2,32 @@
 
 #include <memory>
 
-#include "audio/ogg_data.hpp"
-#include "audio/ogg_stream.hpp"
-#include "audio/sound.hpp"
+#include "audio/sound_stream_buffer.hpp"
+#include "audio/sound_buffer.hpp"
 
 struct ALCdevice;
 struct ALCcontext;
+
+namespace dl
+{
+class AssetManager;
+}
 
 namespace dl::audio
 {
 class AudioManager
 {
  public:
-  AudioManager();
+  AudioManager(AssetManager& asset_manager);
   ~AudioManager();
 
   void update();
 
  private:
+  AssetManager& m_asset_manager;
   ALCdevice* m_device = nullptr;
   ALCcontext* m_context = nullptr;
-  std::unique_ptr<OggStream> m_stream = nullptr;
-  std::unique_ptr<Sound> m_sound = nullptr;
+  std::unique_ptr<SoundStreamBuffer> m_stream = nullptr;
+  std::unique_ptr<SoundBuffer> m_sound = nullptr;
 };
 }  // namespace dl::audio

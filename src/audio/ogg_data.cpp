@@ -60,11 +60,6 @@ OggData::OggData(const std::string& filepath)
 
 OggData::~OggData()
 {
-  // if (size > 0)
-  // {
-  //   free(buffer);
-  // }
-
   fclose(file);
   ov_clear(&file_data);
 }

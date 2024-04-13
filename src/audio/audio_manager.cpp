@@ -4,11 +4,12 @@
 #include <AL/alc.h>
 #include <spdlog/spdlog.h>
 
+#include "core/asset_manager.hpp"
 #include "audio/utils.hpp"
 
 namespace dl::audio
 {
-AudioManager::AudioManager()
+AudioManager::AudioManager(AssetManager& asset_manager) : m_asset_manager(asset_manager)
 {
   ALCdevice* m_device = alcOpenDevice(nullptr);
 
@@ -31,15 +32,15 @@ AudioManager::AudioManager()
   alcMakeContextCurrent(m_context);
   check_alc_error(m_device);
 
-  // m_stream = std::make_unique<OggStream>("data/audio/theme.ogg");
-  // m_stream->play(false);
-  m_sound = std::make_unique<Sound>("data/audio/theme.ogg");
-  m_sound->play(false);
+  m_stream = std::make_unique<SoundStreamBuffer>("data/audio/theme.ogg");
+  m_stream->play();
+  // m_sound = std::make_unique<SoundBuffer>("data/audio/click.ogg");
+  // m_sound->play(true);
 }
 
 AudioManager::~AudioManager()
 {
-  m_sound->destroy();
+  // m_sound->destroy();
   m_stream->destroy();
   alcMakeContextCurrent(nullptr);
   alcDestroyContext(m_context);
@@ -48,7 +49,6 @@ AudioManager::~AudioManager()
 
 void AudioManager::update()
 {
-  // m_stream->update();
-  m_sound->update();
+  m_stream->update();
 }
 }  // namespace dl::audio
