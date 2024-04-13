@@ -134,30 +134,30 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
       // silhouette_map[array_index] = std::clamp(gradient, 0.0f, 1.0f);
 
       const double noise_value = silhouette_map[array_index];
-      // const double max_z = size.z - 1.0;
-      //
-      // double map_value;
-      //
-      // if (noise_value < 0.4f)
-      // {
-      //   map_value = interpolate(0.0, 0.4, 0.0, max_z * 0.31, noise_value);
-      // }
-      // else if (noise_value < 0.7f)
-      // {
-      //   map_value = interpolate(0.4, 0.7, max_z * 0.31, max_z * 0.71, noise_value);
-      // }
-      // else
-      // {
-      //   map_value = interpolate(0.7, 1.0, max_z * 0.71, max_z, noise_value);
-      // }
-      //
-      // const double mountain_value = mountain_map[array_index];
-      // map_value *= mountain_value * 2.0;
-      // map_value = std::clamp(map_value, 0.0, max_z);
+      const double max_z = size.z - 1.0;
+
+      double map_value;
+
+      if (noise_value < 0.4f)
+      {
+        map_value = interpolate(0.0, 0.4, 0.0, max_z * 0.31, noise_value);
+      }
+      else if (noise_value < 0.7f)
+      {
+        map_value = interpolate(0.4, 0.7, max_z * 0.31, max_z * 0.71, noise_value);
+      }
+      else
+      {
+        map_value = interpolate(0.7, 1.0, max_z * 0.71, max_z, noise_value);
+      }
+
+      const double mountain_value = mountain_map[array_index];
+      map_value *= mountain_value * 2.0;
+      map_value = std::clamp(map_value, 0.0, max_z);
 
       // const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
-      // const int k = static_cast<int>(map_value);
-      const int k = static_cast<int>(silhouette_map[j * m_padded_size.x + i] * (size.z - 1));
+      const int k = static_cast<int>(map_value);
+      // const int k = static_cast<int>(silhouette_map[j * m_padded_size.x + i] * (size.z - 1));
       bool inside_chunk = false;
 
       if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding

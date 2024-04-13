@@ -1,5 +1,5 @@
 {
-  "initial_scene": "world_creation",
+  "initial_scene": "home_menu",
 
   "path": {
     "assets": "data/assets.json",
@@ -38,6 +38,6 @@
   "world_creation": {
     "world_width": 256,
     "world_height": 256,
-    "world_depth": 256
+    "world_depth": 64
   }
 }
