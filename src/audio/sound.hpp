@@ -1,5 +1,3 @@
-#pragma once
-
 #include <AL/al.h>
 
 #include <string>
@@ -8,13 +6,10 @@
 
 namespace dl::audio
 {
-constexpr int64_t AUDIO_BUFFER_SIZE = 65536;  // 32kb
-constexpr int32_t STREAM_BUFFERS = 4;
-
-class OggStream
+class Sound
 {
  public:
-  explicit OggStream(const std::string& filepath);
+  explicit Sound(const std::string& filepath);
 
   void play(bool loop);
   void pause();
@@ -30,11 +25,7 @@ class OggStream
   ALenum m_state = AL_STOPPED;
   bool m_loop = false;
   bool m_reseted;
-  OggData m_ogg;
-  ALuint m_buffers[STREAM_BUFFERS];
+  ALuint m_buffer;
   ALuint m_source;
-
-  bool m_stream_buffer(ALuint buffer);
-  void m_empty_queue();
 };
 }  // namespace dl::audio

@@ -19,8 +19,6 @@ void Game::load()
 
   config::load();
 
-  m_audio_manager.test();
-
   i18n::set_locale("es");
   i18n::initialize_translator<i18n::translators::nlohmann_json>(config::path::translations);
 

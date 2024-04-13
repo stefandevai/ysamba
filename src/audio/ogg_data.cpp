@@ -56,24 +56,6 @@ OggData::OggData(const std::string& filepath)
   {
     format = AL_FORMAT_STEREO16;
   }
-
-  // buffer = (char*)malloc(size);
-  //
-  // size_t bytes_read = -1, offset = 0;
-  // int sel = 0;
-  //
-  // while (bytes_read != 0)
-  // {
-  //   bytes_read = ov_read(&file_data, buffer + offset, 4096, 0, 2, 1, &sel);
-  //
-  //   if(bytes_read < 0)
-  //   {
-  //     spdlog::critical("Error reading OGG file");
-  //     return;
-  //   }
-  //
-  //   offset += bytes_read;
-  // }
 }
 
 OggData::~OggData()

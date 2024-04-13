@@ -4,6 +4,7 @@
 
 #include "audio/ogg_data.hpp"
 #include "audio/ogg_stream.hpp"
+#include "audio/sound.hpp"
 
 struct ALCdevice;
 struct ALCcontext;
@@ -16,13 +17,12 @@ class AudioManager
   AudioManager();
   ~AudioManager();
 
-  void test();
   void update();
 
  private:
   ALCdevice* m_device = nullptr;
   ALCcontext* m_context = nullptr;
-  // std::unique_ptr<OggData> m_stream = nullptr;
   std::unique_ptr<OggStream> m_stream = nullptr;
+  std::unique_ptr<Sound> m_sound = nullptr;
 };
 }  // namespace dl::audio

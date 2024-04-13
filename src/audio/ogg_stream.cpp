@@ -2,58 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace
-{
-void check_al_error()
-{
-  const int error = alGetError();
-
-  if (error != AL_NO_ERROR)
-  {
-    spdlog::critical("OpenAL error:");
-    switch (error)
-    {
-    case AL_INVALID_NAME:
-      spdlog::critical("AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function");
-      break;
-    case AL_INVALID_ENUM:
-      spdlog::critical("AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function");
-      break;
-    case AL_INVALID_VALUE:
-      spdlog::critical("AL_INVALID_VALUE: an invalid value was passed to an OpenAL function");
-      break;
-    case AL_INVALID_OPERATION:
-      spdlog::critical("AL_INVALID_OPERATION: the requested operation is not valid");
-      break;
-    case AL_OUT_OF_MEMORY:
-      spdlog::critical("AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory");
-      break;
-    default:
-      spdlog::critical("UNKNOWN AL ERROR: {}", error);
-      break;
-    }
-  }
-}
-
-std::string ogg_error_to_string(const int code)
-{
-  switch (code)
-  {
-  case OV_EREAD:
-    return "Read from media.";
-  case OV_ENOTVORBIS:
-    return "Not vorbis data.";
-  case OV_EVERSION:
-    return "Vorbis version mismatch";
-  case OV_EBADHEADER:
-    return "Invalid vorbis header.";
-  case OV_EFAULT:
-    return "Internal logic fault";
-  default:
-    return "Unknown Ogg error.";
-  }
-}
-}  // namespace
+#include "audio/utils.hpp"
 
 namespace dl::audio
 {
@@ -61,7 +10,7 @@ OggStream::OggStream(const std::string& filepath) : m_ogg(OggData{filepath})
 {
   m_reseted = true;
 
-  alGenBuffers(STREAM_BUFFERSS, m_buffers);
+  alGenBuffers(STREAM_BUFFERS, m_buffers);
   check_al_error();
   alGenSources(1, &m_source);
   check_al_error();
@@ -76,13 +25,21 @@ OggStream::OggStream(const std::string& filepath) : m_ogg(OggData{filepath})
 void OggStream::play(const bool loop)
 {
   if (is_playing())
+  {
     return;
-  m_loop = loop;
-  for (int i = 0; i < STREAM_BUFFERSS; ++i)
-    if (!m_stream_buffer(m_buffers[i]))
-      return;
+  }
 
-  alSourceQueueBuffers(m_source, STREAM_BUFFERSS, m_buffers);
+  m_loop = loop;
+
+  for (int i = 0; i < STREAM_BUFFERS; ++i)
+  {
+    if (!m_stream_buffer(m_buffers[i]))
+    {
+      return;
+    }
+  }
+
+  alSourceQueueBuffers(m_source, STREAM_BUFFERS, m_buffers);
   alSourcePlay(m_source);
   m_reseted = false;
 }
@@ -124,20 +81,22 @@ void OggStream::update()
   }
 
   int processed;
-  // bool active = true;
   alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
-  while (processed--)
+
+  while (processed > 0)
   {
     ALuint buffer;
     alSourceUnqueueBuffers(m_source, 1, &buffer);
     check_al_error();
 
     bool active = m_stream_buffer(buffer);
+
     if (active)
     {
       alSourceQueueBuffers(m_source, 1, &buffer);
-      check_al_error();
     }
+
+    --processed;
   }
 
   if (m_state == AL_STOPPED)
@@ -175,7 +134,7 @@ void OggStream::destroy()
   alSourceStop(m_source);
   m_empty_queue();
   alDeleteSources(1, &m_source);
-  alDeleteBuffers(STREAM_BUFFERSS, m_buffers);
+  alDeleteBuffers(STREAM_BUFFERS, m_buffers);
 }
 
 bool OggStream::m_stream_buffer(ALuint buffer)
@@ -194,7 +153,7 @@ bool OggStream::m_stream_buffer(ALuint buffer)
     }
     else if (result < 0)
     {
-      spdlog::critical(ogg_error_to_string(result));
+      check_ogg_error(result);
       return false;
     }
     else
