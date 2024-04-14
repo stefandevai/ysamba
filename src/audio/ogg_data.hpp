@@ -17,8 +17,11 @@ class OggData
   vorbis_info* metadata = nullptr;
   ALenum format;
   size_t size = -1;
+  bool has_loaded = false;
 
-  OggData(const std::string& filepath);
+  OggData();
   ~OggData();
+
+  void load(const std::string& filepath);
 };
 }  // namespace dl::audio

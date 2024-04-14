@@ -7,6 +7,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <i18n_keyval/i18n.hpp>
 
+#include "audio/audio_manager.hpp"
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
@@ -49,13 +50,23 @@ void HomeMenu::load()
           {MenuChoice::Settings, "settings"_t},
           {MenuChoice::Credits, "credits"_t},
       },
-      .on_left_click = [this](MenuChoice choice) { m_on_select_menu_option(choice); },
+      .on_left_click = [this](MenuChoice choice)
+      {
+        m_game_context.audio_manager->sound_effect("sound-effect-click"_hs);
+        m_on_select_menu_option(choice);
+      },
       .line_spacing = 0,
       .button_size = {200, 25},
       .button_text_color = 0xCCC1AFFF,
   });
 
   m_button_list->position = Vector3i{75, 193, 0};
+
+  // m_music_theme.resource_id = "music-theme"_hs;
+  // m_game_context.audio_manager->play(m_music_theme);
+
+  m_game_context.audio_manager->music("music-theme"_hs);
+
   m_has_loaded = true;
 }
 

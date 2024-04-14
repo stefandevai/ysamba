@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./scene.hpp"
+#include "audio/sound_source.hpp"
 #include "core/input_manager.hpp"
 #include "ui/types.hpp"
 
@@ -40,6 +41,7 @@ class HomeMenu : public Scene
   ui::WorldList* m_world_list = nullptr;
   ui::TextButtonList<MenuChoice>* m_button_list = nullptr;
   Texture* m_typography = nullptr;
+  audio::SoundSource m_music_theme{};
 
   void m_load_worlds_metadata();
   void m_on_select_menu_option(MenuChoice choice);

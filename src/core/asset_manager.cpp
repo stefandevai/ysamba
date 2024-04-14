@@ -74,6 +74,24 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       break;
     }
 
+    case AssetType::Music:
+    {
+      assert(asset_info.contains("path") && "Font path not specified");
+
+      const auto filepath = asset_info["path"].get<std::string>();
+      add<audio::SoundStreamBuffer>(hashed_id, filepath);
+      break;
+    }
+
+    case AssetType::SoundEffect:
+    {
+      assert(asset_info.contains("path") && "Font path not specified");
+
+      const auto filepath = asset_info["path"].get<std::string>();
+      add<audio::SoundBuffer>(hashed_id, filepath);
+      break;
+    }
+
     default:
     {
       spdlog::warn("Asset type {} not supported", static_cast<int>(type));

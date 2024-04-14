@@ -37,6 +37,18 @@
             "type": "font",
             "path": "data/fonts/unscii.ttf",
             "size": 16
+        },
+
+        {
+            "id": "music-theme",
+            "type": "music",
+            "path": "data/audio/theme.ogg"
+        },
+
+        {
+            "id": "sound-effect-click",
+            "type": "sound_effect",
+            "path": "data/audio/click.ogg"
         }
     ]
 }

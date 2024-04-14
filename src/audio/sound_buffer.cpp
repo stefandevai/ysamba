@@ -7,10 +7,13 @@
 
 namespace dl::audio
 {
-SoundBuffer::SoundBuffer(const std::string& filepath)
+SoundBuffer::SoundBuffer(const std::string& filepath) : m_filepath(filepath) {}
+
+void SoundBuffer::load()
 {
   {
-    OggData ogg{filepath};
+    OggData ogg{};
+    ogg.load(m_filepath);
 
     char ogg_buffer[ogg.size];
 
@@ -23,7 +26,8 @@ SoundBuffer::SoundBuffer(const std::string& filepath)
 
     while (bytes_decoded != 0)
     {
-      bytes_decoded = ov_read(&ogg.file_data, &ogg_buffer[offset], length, is_bigendian, word_size, is_signed_data, &bitstream);
+      bytes_decoded
+          = ov_read(&ogg.file_data, &ogg_buffer[offset], length, is_bigendian, word_size, is_signed_data, &bitstream);
 
       if (bytes_decoded < 0)
       {
@@ -34,17 +38,21 @@ SoundBuffer::SoundBuffer(const std::string& filepath)
       offset += bytes_decoded;
     }
 
-    alGenBuffers(1, &m_buffer);
-    alBufferData(m_buffer, ogg.format, ogg_buffer, ogg.size, ogg.metadata->rate);
+    alGenBuffers(1, &id);
+    alBufferData(id, ogg.format, ogg_buffer, ogg.size, ogg.metadata->rate);
     check_al_error();
   }
 
   alGenSources(1, &m_source);
-  alSourcef(m_source, AL_PITCH, 1);
+  alSourcef(m_source, AL_PITCH, 1.0f);
   alSourcef(m_source, AL_GAIN, 1.0f);
-  alSource3f(m_source, AL_POSITION, 0, 0, 0);
-  alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
-  alSourcei(m_source, AL_BUFFER, m_buffer);
+  alSource3f(m_source, AL_POSITION, 0.0f, 0.0f, 0.0f);
+  alSource3f(m_source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+  alSource3f(m_source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
+  alSourcei(m_source, AL_SOURCE_RELATIVE, AL_TRUE);
+  alSourcei(m_source, AL_BUFFER, id);
+
+  has_loaded = true;
 }
 
 void SoundBuffer::play(const bool loop)
@@ -54,7 +62,6 @@ void SoundBuffer::play(const bool loop)
     return;
   }
 
-  m_loop = loop;
   alSourcei(m_source, AL_LOOPING, loop);
   alSourcePlay(m_source);
 }
@@ -105,6 +112,6 @@ void SoundBuffer::destroy()
 {
   alSourceStop(m_source);
   alDeleteSources(1, &m_source);
-  alDeleteBuffers(1, &m_buffer);
+  alDeleteBuffers(1, &id);
 }
 }  // namespace dl::audio

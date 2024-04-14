@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <variant>
 
+#include "audio/sound_buffer.hpp"
+#include "audio/sound_stream_buffer.hpp"
 #include "graphics/display.hpp"
 #include "graphics/font.hpp"
 #include "graphics/renderer/spritesheet.hpp"
@@ -19,7 +21,9 @@ namespace dl
 using Asset = std::variant<std::unique_ptr<Texture>,
                            std::unique_ptr<TextureAtlas>,
                            std::unique_ptr<Spritesheet>,
-                           std::unique_ptr<Font>>;
+                           std::unique_ptr<Font>,
+                           std::unique_ptr<audio::SoundBuffer>,
+                           std::unique_ptr<audio::SoundStreamBuffer>>;
 
 struct AssetLoader
 {
@@ -33,6 +37,10 @@ struct AssetLoader
 
   void operator()(const std::unique_ptr<Font>& font) { font->load(m_device); }
 
+  void operator()(const std::unique_ptr<audio::SoundBuffer>& buffer) { buffer->load(); }
+
+  void operator()(const std::unique_ptr<audio::SoundStreamBuffer>& buffer) { buffer->load(); }
+
  private:
   const WGPUDevice& m_device;
 };
@@ -44,6 +52,8 @@ enum class AssetType
   TextureAtlas,
   Spritesheet,
   Font,
+  Music,
+  SoundEffect,
 };
 
 class AssetManager
@@ -87,6 +97,8 @@ class AssetManager
       {"texture_atlas", AssetType::TextureAtlas},
       {"spritesheet", AssetType::Spritesheet},
       {"font", AssetType::Font},
+      {"music", AssetType::Music},
+      {"sound_effect", AssetType::SoundEffect},
   };
   const Display& m_display;
 };

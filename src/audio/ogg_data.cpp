@@ -28,7 +28,18 @@ std::string error_to_string(int code)
 
 namespace dl::audio
 {
-OggData::OggData(const std::string& filepath)
+OggData::OggData() {}
+
+OggData::~OggData()
+{
+  if (has_loaded)
+  {
+    fclose(file);
+    ov_clear(&file_data);
+  }
+}
+
+void OggData::load(const std::string& filepath)
 {
   if (!(file = fopen(filepath.c_str(), "rb")))
   {
@@ -56,11 +67,7 @@ OggData::OggData(const std::string& filepath)
   {
     format = AL_FORMAT_STEREO16;
   }
-}
 
-OggData::~OggData()
-{
-  fclose(file);
-  ov_clear(&file_data);
+  has_loaded = true;
 }
 }  // namespace dl::audio

@@ -6,23 +6,28 @@
 
 namespace dl::audio
 {
-SoundStreamBuffer::SoundStreamBuffer(const std::string& filepath) : m_ogg(OggData{filepath})
+SoundStreamBuffer::SoundStreamBuffer(const std::string filepath) : m_filepath(std::move(filepath)) {}
+
+void SoundStreamBuffer::load()
 {
-  m_reseted = true;
+  m_ogg.load(m_filepath);
 
   alGenBuffers(STREAM_BUFFERS, m_buffers);
   check_al_error();
-  alGenSources(1, &m_source);
-  check_al_error();
+  // alGenSources(1, &source);
+  // check_al_error();
 
-  alSource3f(m_source, AL_POSITION, 0.0, 0.0, 0.0);
-  alSource3f(m_source, AL_VELOCITY, 0.0, 0.0, 0.0);
-  alSource3f(m_source, AL_DIRECTION, 0.0, 0.0, 0.0);
-  alSourcef(m_source, AL_ROLLOFF_FACTOR, 0.0);
-  alSourcei(m_source, AL_SOURCE_RELATIVE, AL_TRUE);
+  // alSourcef(source, AL_PITCH, 1.0f);
+  // alSourcef(source, AL_GAIN, 1.0f);
+  // alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
+  // alSource3f(source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+  // alSource3f(source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
+  // alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
+
+  has_loaded = true;
 }
 
-void SoundStreamBuffer::play(const bool loop)
+void SoundStreamBuffer::play(ALuint source, const bool loop)
 {
   if (is_playing())
   {
@@ -33,47 +38,47 @@ void SoundStreamBuffer::play(const bool loop)
 
   for (int i = 0; i < STREAM_BUFFERS; ++i)
   {
-    if (!m_stream_buffer(m_buffers[i]))
+    if (!fill_buffer(m_buffers[i]))
     {
       return;
     }
   }
 
-  alSourceQueueBuffers(m_source, STREAM_BUFFERS, m_buffers);
-  alSourcePlay(m_source);
+  alSourceQueueBuffers(source, STREAM_BUFFERS, m_buffers);
+  alSourcePlay(source);
   m_reseted = false;
 }
 
-void SoundStreamBuffer::pause()
+void SoundStreamBuffer::pause(ALuint source)
 {
   if (is_playing())
   {
-    alSourcePause(m_source);
+    alSourcePause(source);
   }
 }
 
-void SoundStreamBuffer::resume()
+void SoundStreamBuffer::resume(ALuint source)
 {
   if (is_paused())
   {
-    alSourcePlay(m_source);
+    alSourcePlay(source);
   }
 }
 
-void SoundStreamBuffer::stop()
+void SoundStreamBuffer::stop(ALuint source)
 {
   if (is_playing() || is_paused())
   {
-    alSourceStop(m_source);
+    alSourceStop(source);
     ov_raw_seek(&m_ogg.file_data, 0);
     m_reseted = true;
-    m_empty_queue();
+    m_empty_queue(source);
   }
 }
 
-void SoundStreamBuffer::update()
+void SoundStreamBuffer::update(ALuint source)
 {
-  alGetSourcei(m_source, AL_SOURCE_STATE, &m_state);
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
 
   if (m_state == AL_PAUSED)
   {
@@ -81,19 +86,19 @@ void SoundStreamBuffer::update()
   }
 
   int processed;
-  alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
+  alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
 
   while (processed > 0)
   {
     ALuint buffer;
-    alSourceUnqueueBuffers(m_source, 1, &buffer);
+    alSourceUnqueueBuffers(source, 1, &buffer);
     check_al_error();
 
-    bool active = m_stream_buffer(buffer);
+    bool active = fill_buffer(buffer);
 
     if (active)
     {
-      alSourceQueueBuffers(m_source, 1, &buffer);
+      alSourceQueueBuffers(source, 1, &buffer);
     }
 
     --processed;
@@ -131,13 +136,13 @@ bool SoundStreamBuffer::is_playing()
 
 void SoundStreamBuffer::destroy()
 {
-  alSourceStop(m_source);
-  m_empty_queue();
-  alDeleteSources(1, &m_source);
+  // alSourceStop(source);
+  // m_empty_queue();
+  // alDeleteSources(1, &source);
   alDeleteBuffers(STREAM_BUFFERS, m_buffers);
 }
 
-bool SoundStreamBuffer::m_stream_buffer(ALuint buffer)
+bool SoundStreamBuffer::fill_buffer(ALuint buffer)
 {
   char data[AUDIO_BUFFER_SIZE];
   int size = 0;
@@ -171,15 +176,15 @@ bool SoundStreamBuffer::m_stream_buffer(ALuint buffer)
   return true;
 }
 
-void SoundStreamBuffer::m_empty_queue()
+void SoundStreamBuffer::m_empty_queue(ALuint source)
 {
   int queued;
-  alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
+  alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
 
   while (queued--)
   {
     ALuint buffer;
-    alSourceUnqueueBuffers(m_source, 1, &buffer);
+    alSourceUnqueueBuffers(source, 1, &buffer);
     check_al_error();
   }
 }

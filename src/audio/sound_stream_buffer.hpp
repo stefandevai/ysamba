@@ -14,27 +14,31 @@ constexpr int32_t STREAM_BUFFERS = 4;
 class SoundStreamBuffer
 {
  public:
-  explicit SoundStreamBuffer(const std::string& filepath);
+  bool has_loaded = false;
 
-  void play(bool loop = false);
-  void pause();
-  void resume();
-  void stop();
-  void update();
+  explicit SoundStreamBuffer(const std::string filepath);
+
+  void load();
+  void play(ALuint source, bool loop = false);
+  void pause(ALuint source);
+  void resume(ALuint source);
+  void stop(ALuint source);
+  void update(ALuint source);
   bool is_playing();
   bool is_stopped();
   bool is_paused();
   void destroy();
+  bool fill_buffer(ALuint buffer);
 
  private:
+  std::string m_filepath;
   ALenum m_state = AL_STOPPED;
   bool m_loop = false;
-  bool m_reseted;
-  OggData m_ogg;
+  bool m_reseted = true;
+  OggData m_ogg{};
   ALuint m_buffers[STREAM_BUFFERS];
-  ALuint m_source;
+  // ALuint source;
 
-  bool m_stream_buffer(ALuint buffer);
-  void m_empty_queue();
+  void m_empty_queue(ALuint source);
 };
 }  // namespace dl::audio
