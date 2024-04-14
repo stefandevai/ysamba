@@ -16,6 +16,12 @@ void SceneManager::pop_scene()
 
   InputManager::get_instance().pop_context();
   m_scenes.pop_back();
+
+  if (!m_scenes.empty())
+  {
+    auto& current_scene = m_scenes.back();
+    current_scene->init();
+  }
 }
 
 void SceneManager::update()
@@ -33,6 +39,7 @@ void SceneManager::update()
   if (!current_scene->has_loaded())
   {
     current_scene->load();
+    current_scene->init();
   }
 
   current_scene->update();

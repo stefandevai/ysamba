@@ -19,12 +19,25 @@ class Scene
   Scene(const std::string& scene_key, GameContext& game_context);
   virtual ~Scene() = default;
 
+  // Called only once when the scene is pushed to the stack
   virtual void load() = 0;
+
+  // Called once when the scene is added to the stack and during scene transitions
+  virtual void init() {}
+
+  // Called every frame while the scene is active
   virtual void update() = 0;
+
+  // Called every frame while the scene is active
   virtual void render() = 0;
+
+  // Handle window resize events
   void resize();
-  void check_window_size();
+
+  // Check if the scene has been loaded
   [[nodiscard]] bool has_loaded() const { return m_has_loaded; }
+
+  // Gets the scene key
   [[nodiscard]] uint32_t get_key() const { return m_scene_key; }
 
  protected:

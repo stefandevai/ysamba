@@ -34,11 +34,8 @@ void HomeMenu::load()
 
   const auto on_select_world = [this](const WorldMetadata& world_metadata)
   {
-    if (m_background_music != nullptr)
-    {
-      m_game_context.audio_manager->stop(*m_background_music);
-      m_background_music = nullptr;
-    }
+    assert(m_background_music != nullptr);
+    m_game_context.audio_manager->stop(*m_background_music);
 
     m_world_list->force_hide();
     m_game_context.world_metadata = world_metadata;
@@ -70,6 +67,14 @@ void HomeMenu::load()
   m_button_list->position = Vector3i{75, 193, 0};
 
   m_has_loaded = true;
+}
+
+void HomeMenu::init()
+{
+  if (m_background_music == nullptr || m_background_music->state != audio::SoundState::Playing)
+  {
+    m_background_music = &m_game_context.audio_manager->music("music-theme"_hs);
+  }
 }
 
 void HomeMenu::process_input()
@@ -112,11 +117,6 @@ void HomeMenu::update()
   }
 
   process_input();
-
-  if (m_background_music == nullptr)
-  {
-    m_background_music = &m_game_context.audio_manager->music("music-theme"_hs);
-  }
 
   const auto delta = m_game_context.clock->delta;
 
