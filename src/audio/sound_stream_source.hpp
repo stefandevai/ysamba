@@ -12,14 +12,14 @@ struct SoundStreamSource
 {
   uint32_t resource_id;
   bool loop = false;
-  bool fade_in = false;
+  bool fade = false;
+  float gain = 1.0f;
   uint32_t source = 0;
   SoundState state = SoundState::Initial;
   SoundStreamBuffer* buffer = nullptr;
-  float gain = 1.0f;
 
-  SoundStreamSource(uint32_t resource_id, bool loop, bool fade_in)
-    : resource_id(resource_id), loop(loop), fade_in(fade_in)
+  SoundStreamSource(uint32_t resource_id, bool loop, bool fade)
+    : resource_id(resource_id), loop(loop), fade(fade)
   {}
 };
 }  // namespace dl::audio

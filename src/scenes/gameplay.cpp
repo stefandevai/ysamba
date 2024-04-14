@@ -99,7 +99,7 @@ void Gameplay::load()
 
 void Gameplay::init()
 {
-  if (m_background_music == nullptr || m_background_music->state != audio::SoundState::Playing)
+  if (m_background_music == nullptr)
   {
     m_background_music = m_game_context.audio_manager->music("music-gameplay-1"_hs, true, true);
   }
@@ -294,8 +294,7 @@ bool Gameplay::m_update_input_real_time()
 
   if (m_input_manager.poll_action("quit"_hs))
   {
-    m_game_context.audio_manager->stop(*m_background_music);
-    m_background_music = nullptr;
+    m_game_context.audio_manager->stop(m_background_music);
 
     m_game_context.scene_manager->pop_scene();
     will_quit = true;
@@ -372,9 +371,7 @@ bool Gameplay::m_update_input_turn_based()
 
   if (m_input_manager.poll_action("quit"_hs))
   {
-    m_game_context.audio_manager->stop(*m_background_music);
-    m_background_music = nullptr;
-
+    m_game_context.audio_manager->stop(m_background_music);
     m_game_context.scene_manager->pop_scene();
     will_quit = true;
 
