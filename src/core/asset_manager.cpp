@@ -29,13 +29,15 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
     const auto type = m_asset_types.at(type_tag);
 
+    m_asset_ids.push_back({hashed_id, type});
+
     switch (type)
     {
     case AssetType::Texture:
     {
       assert(asset_info.contains("path") && "Texture path not specified");
       const auto& filepath = asset_info["path"].get<std::string>();
-      add<Texture>(hashed_id, filepath);
+      m_add<Texture>(hashed_id, filepath);
       break;
     }
 
@@ -47,7 +49,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       const auto& filepath = asset_info["path"].get<std::string>();
       const auto data_filepath = asset_info["data_path"].get<std::string>();
 
-      add<TextureAtlas>(hashed_id, filepath, data_filepath);
+      m_add<TextureAtlas>(hashed_id, filepath, data_filepath);
       break;
     }
 
@@ -59,7 +61,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       const auto& filepath = asset_info["path"].get<std::string>();
       const auto data_filepath = asset_info["data_path"].get<std::string>();
 
-      add<Spritesheet>(hashed_id, filepath, data_filepath);
+      m_add<Spritesheet>(hashed_id, filepath, data_filepath);
       break;
     }
 
@@ -70,7 +72,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
 
       const auto filepath = asset_info["path"].get<std::string>();
       const auto size = asset_info["size"].get<std::size_t>();
-      add<Font>(hashed_id, filepath, size);
+      m_add<Font>(hashed_id, filepath, size);
       break;
     }
 
@@ -79,7 +81,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       assert(asset_info.contains("path") && "Font path not specified");
 
       const auto filepath = asset_info["path"].get<std::string>();
-      add<audio::SoundStreamBuffer>(hashed_id, filepath);
+      m_add<audio::SoundStreamBuffer>(hashed_id, filepath);
       break;
     }
 
@@ -88,7 +90,7 @@ void AssetManager::load_assets(const std::filesystem::path& filepath)
       assert(asset_info.contains("path") && "Font path not specified");
 
       const auto filepath = asset_info["path"].get<std::string>();
-      add<audio::SoundBuffer>(hashed_id, filepath);
+      m_add<audio::SoundBuffer>(hashed_id, filepath);
       break;
     }
 

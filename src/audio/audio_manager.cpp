@@ -21,7 +21,7 @@ AudioManager::AudioManager(AssetManager& asset_manager) : m_asset_manager(asset_
   }
 
   m_context = alcCreateContext(m_device, nullptr);
-  check_alc_error(m_device);
+  utils::check_alc_error(m_device);
 
   if (m_context == nullptr)
   {
@@ -31,30 +31,42 @@ AudioManager::AudioManager(AssetManager& asset_manager) : m_asset_manager(asset_
   }
 
   alcMakeContextCurrent(m_context);
-  check_alc_error(m_device);
+  utils::check_alc_error(m_device);
 }
 
 AudioManager::~AudioManager()
 {
+  // Delete existing sources
   for (auto& source : m_sound_sources)
   {
     alSourceStop(source.source);
     alDeleteSources(1, &source.source);
-  }
-  for (auto& source : m_sound_sources)
-  {
-    source.buffer->destroy();
   }
 
   for (auto& source : m_sound_stream_sources)
   {
-    alSourceStop(source.source);
     source.buffer->stop(source.source);
     alDeleteSources(1, &source.source);
-    source.buffer->destroy();
   }
 
-  check_al_error();
+  // Destroy actual audio buffers before closing the device
+  const auto& asset_ids = m_asset_manager.get_ids();
+
+  for (const auto& handle : asset_ids)
+  {
+    if (handle.second == AssetType::Music)
+    {
+      auto buffer = m_asset_manager.get<SoundStreamBuffer>(handle.first);
+      buffer->destroy();
+    }
+    else if (handle.second == AssetType::SoundEffect)
+    {
+      auto buffer = m_asset_manager.get<SoundBuffer>(handle.first);
+      buffer->destroy();
+    }
+  }
+
+  utils::check_al_error();
 
   alcMakeContextCurrent(nullptr);
   alcDestroyContext(m_context);
@@ -68,7 +80,7 @@ SoundSource& AudioManager::sound_effect(const uint32_t resource_id, const bool l
   const auto& buffer = m_asset_manager.get<SoundBuffer>(source.resource_id);
 
   alGenSources(1, &source.source);
-  check_al_error();
+  utils::check_al_error();
   alSourcef(source.source, AL_PITCH, 1.0f);
   alSourcef(source.source, AL_GAIN, 1.0f);
   alSource3f(source.source, AL_POSITION, 0.0f, 0.0f, 0.0f);
@@ -78,7 +90,7 @@ SoundSource& AudioManager::sound_effect(const uint32_t resource_id, const bool l
   alSourcei(source.source, AL_BUFFER, buffer->id);
   alSourcei(source.source, AL_LOOPING, source.loop);
   alSourcePlay(source.source);
-  check_al_error();
+  utils::check_al_error();
 
   source.buffer = buffer;
   source.state = SoundState::Playing;
@@ -95,7 +107,7 @@ SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool lo
   const auto& buffer = m_asset_manager.get<SoundStreamBuffer>(source.resource_id);
 
   alGenSources(1, &source.source);
-  check_al_error();
+  utils::check_al_error();
   alSourcef(source.source, AL_PITCH, 1.0f);
   alSourcef(source.source, AL_GAIN, 1.0f);
   alSource3f(source.source, AL_POSITION, 0.0f, 0.0f, 0.0f);
@@ -104,7 +116,7 @@ SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool lo
   alSourcei(source.source, AL_SOURCE_RELATIVE, AL_TRUE);
   alSourcei(source.source, AL_LOOPING, source.loop);
   alSourcePlay(source.source);
-  check_al_error();
+  utils::check_al_error();
 
   source.buffer = buffer;
   buffer->play(source.source, source.loop);
@@ -115,35 +127,35 @@ SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool lo
   return m_sound_stream_sources.back();
 }
 
-void AudioManager::play(SoundSource& source)
-{
-  if (source.state == SoundState::Initial)
-  {
-    const auto& buffer = m_asset_manager.get<SoundBuffer>(source.resource_id);
-
-    alGenSources(1, &source.source);
-    check_al_error();
-    alSourcef(source.source, AL_PITCH, 1.0f);
-    alSourcef(source.source, AL_GAIN, 1.0f);
-    alSource3f(source.source, AL_POSITION, 0.0f, 0.0f, 0.0f);
-    alSource3f(source.source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-    alSource3f(source.source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
-    alSourcei(source.source, AL_SOURCE_RELATIVE, AL_TRUE);
-    alSourcei(source.source, AL_BUFFER, buffer->id);
-  }
-
-  ALenum state;
-  alGetSourcei(source.source, AL_SOURCE_STATE, &state);
-
-  if (state == AL_PLAYING)
-  {
-    return;
-  }
-
-  source.state = SoundState::Playing;
-  alSourcei(source.source, AL_LOOPING, source.loop);
-  alSourcePlay(source.source);
-}
+// void AudioManager::play(SoundSource& source)
+// {
+//   if (source.state == SoundState::Initial)
+//   {
+//     const auto& buffer = m_asset_manager.get<SoundBuffer>(source.resource_id);
+//
+//     alGenSources(1, &source.source);
+//     utils::check_al_error();
+//     alSourcef(source.source, AL_PITCH, 1.0f);
+//     alSourcef(source.source, AL_GAIN, 1.0f);
+//     alSource3f(source.source, AL_POSITION, 0.0f, 0.0f, 0.0f);
+//     alSource3f(source.source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+//     alSource3f(source.source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
+//     alSourcei(source.source, AL_SOURCE_RELATIVE, AL_TRUE);
+//     alSourcei(source.source, AL_BUFFER, buffer->id);
+//   }
+//
+//   ALenum state;
+//   alGetSourcei(source.source, AL_SOURCE_STATE, &state);
+//
+//   if (state == AL_PLAYING)
+//   {
+//     return;
+//   }
+//
+//   source.state = SoundState::Playing;
+//   alSourcei(source.source, AL_LOOPING, source.loop);
+//   alSourcePlay(source.source);
+// }
 
 void AudioManager::pause(SoundSource& source)
 {
@@ -168,11 +180,53 @@ void AudioManager::destroy(SoundSource& source)
   source.state = SoundState::Initial;
 }
 
+void AudioManager::pause(SoundStreamSource& source)
+{
+  assert(source.buffer != nullptr);
+  source.buffer->pause(source.source);
+}
+
+void AudioManager::resume(SoundStreamSource& source)
+{
+  assert(source.buffer != nullptr);
+  source.buffer->resume(source.source);
+}
+
+void AudioManager::stop(SoundStreamSource& source)
+{
+  assert(source.buffer != nullptr);
+  source.buffer->stop(source.source);
+}
+
 void AudioManager::update()
 {
+  for (auto& source : m_sound_sources)
+  {
+    ALenum al_state;
+    alGetSourcei(source.source, AL_SOURCE_STATE, &al_state);
+    source.state = utils::al_state_to_sound_state(al_state);
+
+    if (source.state == SoundState::Stopped)
+    {
+      alDeleteSources(1, &source.source);
+    }
+  }
+
   for (auto& source : m_sound_stream_sources)
   {
     source.buffer->update(source.source);
+
+    ALenum al_state;
+    alGetSourcei(source.source, AL_SOURCE_STATE, &al_state);
+    source.state = utils::al_state_to_sound_state(al_state);
+
+    if (source.state == SoundState::Stopped)
+    {
+      alDeleteSources(1, &source.source);
+    }
   }
+
+  std::erase_if(m_sound_sources, [](const auto& source) { return source.state == SoundState::Stopped; });
+  std::erase_if(m_sound_stream_sources, [](const auto& source) { return source.state == SoundState::Stopped; });
 }
 }  // namespace dl::audio

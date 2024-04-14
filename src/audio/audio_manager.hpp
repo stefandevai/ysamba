@@ -27,11 +27,16 @@ class AudioManager
   SoundSource& sound_effect(uint32_t resource_id, bool loop = false);
   SoundStreamSource& music(uint32_t resource_id, bool loop = false);
   void update();
-  void play(SoundSource& source);
+
+  // void play(SoundSource& source);
   void pause(SoundSource& source);
   void resume(SoundSource& source);
   void stop(SoundSource& source);
   void destroy(SoundSource& source);
+
+  void pause(SoundStreamSource& source);
+  void resume(SoundStreamSource& source);
+  void stop(SoundStreamSource& source);
 
  private:
   AssetManager& m_asset_manager;

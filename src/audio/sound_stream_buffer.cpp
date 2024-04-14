@@ -13,7 +13,7 @@ void SoundStreamBuffer::load()
   m_ogg.load(m_filepath);
 
   alGenBuffers(STREAM_BUFFERS, m_buffers);
-  check_al_error();
+  utils::check_al_error();
 
   has_loaded = true;
 }
@@ -58,12 +58,10 @@ void SoundStreamBuffer::resume(ALuint source)
 
 void SoundStreamBuffer::stop(ALuint source)
 {
-  if (is_playing() || is_paused())
-  {
-    ov_raw_seek(&m_ogg.file_data, 0);
-    m_empty_queue(source);
-    m_reseted = true;
-  }
+  alSourceStop(source);
+  ov_raw_seek(&m_ogg.file_data, 0);
+  m_empty_queue(source);
+  m_reseted = true;
 }
 
 void SoundStreamBuffer::update(ALuint source)
@@ -82,7 +80,7 @@ void SoundStreamBuffer::update(ALuint source)
   {
     ALuint buffer;
     alSourceUnqueueBuffers(source, 1, &buffer);
-    check_al_error();
+    utils::check_al_error();
 
     bool active = fill_buffer(buffer);
 
@@ -148,7 +146,7 @@ bool SoundStreamBuffer::fill_buffer(ALuint buffer)
     }
     else if (result < 0)
     {
-      check_ogg_error(result);
+      utils::check_ogg_error(result);
       return false;
     }
     else
@@ -162,7 +160,7 @@ bool SoundStreamBuffer::fill_buffer(ALuint buffer)
   }
 
   alBufferData(buffer, m_ogg.format, data, size, m_ogg.metadata->rate);
-  check_al_error();
+  utils::check_al_error();
   return true;
 }
 
@@ -175,7 +173,7 @@ void SoundStreamBuffer::m_empty_queue(ALuint source)
   {
     ALuint buffer;
     alSourceUnqueueBuffers(source, 1, &buffer);
-    check_al_error();
+    utils::check_al_error();
   }
 }
 }  // namespace dl::audio

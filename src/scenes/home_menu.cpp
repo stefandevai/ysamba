@@ -8,6 +8,7 @@
 #include <i18n_keyval/i18n.hpp>
 
 #include "audio/audio_manager.hpp"
+#include "audio/sound_stream_source.hpp"
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/scene_manager.hpp"
@@ -33,6 +34,12 @@ void HomeMenu::load()
 
   const auto on_select_world = [this](const WorldMetadata& world_metadata)
   {
+    if (m_background_music != nullptr)
+    {
+      m_game_context.audio_manager->stop(*m_background_music);
+      m_background_music = nullptr;
+    }
+
     m_world_list->force_hide();
     m_game_context.world_metadata = world_metadata;
     m_game_context.scene_manager->push_scene<Gameplay>(m_game_context);
@@ -61,11 +68,6 @@ void HomeMenu::load()
   });
 
   m_button_list->position = Vector3i{75, 193, 0};
-
-  // m_music_theme.resource_id = "music-theme"_hs;
-  // m_game_context.audio_manager->play(m_music_theme);
-
-  m_game_context.audio_manager->music("music-theme"_hs);
 
   m_has_loaded = true;
 }
@@ -110,6 +112,11 @@ void HomeMenu::update()
   }
 
   process_input();
+
+  if (m_background_music == nullptr)
+  {
+    m_background_music = &m_game_context.audio_manager->music("music-theme"_hs);
+  }
 
   const auto delta = m_game_context.clock->delta;
 

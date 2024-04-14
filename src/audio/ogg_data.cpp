@@ -2,29 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-// #include <iostream>
-
-namespace
-{
-std::string error_to_string(int code)
-{
-  switch (code)
-  {
-  case OV_EREAD:
-    return "Read from media.";
-  case OV_ENOTVORBIS:
-    return "Not vorbis data.";
-  case OV_EVERSION:
-    return "Vorbis version mismatch";
-  case OV_EBADHEADER:
-    return "Invalid vorbis header.";
-  case OV_EFAULT:
-    return "Internal logic fault";
-  default:
-    return "Unknown Ogg error.";
-  }
-}
-}  // namespace
+#include "audio/utils.hpp"
 
 namespace dl::audio
 {
@@ -51,7 +29,7 @@ void OggData::load(const std::string& filepath)
 
   if (result < 0)
   {
-    spdlog::critical("Failed to open ogg stream: {}", error_to_string(result));
+    utils::check_ogg_error(result);
     fclose(file);
     return;
   }

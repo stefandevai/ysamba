@@ -40,7 +40,7 @@ void SoundBuffer::load()
 
     alGenBuffers(1, &id);
     alBufferData(id, ogg.format, ogg_buffer, ogg.size, ogg.metadata->rate);
-    check_al_error();
+    utils::check_al_error();
   }
 
   has_loaded = true;

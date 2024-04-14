@@ -1,13 +1,12 @@
 #include "./utils.hpp"
 
-#include <AL/al.h>
 #include <AL/alc.h>
 #include <ogg/ogg.h>
 #include <spdlog/spdlog.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-namespace dl::audio
+namespace dl::utils
 {
 void check_alc_error(ALCdevice* device)
 {
@@ -96,4 +95,23 @@ void check_ogg_error(const int code)
     break;
   }
 }
-}  // namespace dl::audio
+
+audio::SoundState al_state_to_sound_state(ALenum state)
+{
+  switch (state)
+  {
+  case AL_INITIAL:
+    return audio::SoundState::Initial;
+  case AL_PLAYING:
+    return audio::SoundState::Playing;
+  case AL_PAUSED:
+    return audio::SoundState::Paused;
+  case AL_STOPPED:
+    return audio::SoundState::Stopped;
+  default:
+    return audio::SoundState::Initial;
+  }
+
+  return audio::SoundState::Initial;
+}
+}  // namespace dl::utils
