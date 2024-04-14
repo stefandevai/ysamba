@@ -18,8 +18,6 @@ struct SoundSource
   SoundState state = SoundState::Initial;
   SoundBuffer* buffer = nullptr;
 
-  SoundSource(uint32_t resource_id, bool loop, bool fade)
-    : resource_id(resource_id), loop(loop), fade(fade)
-  {}
+  SoundSource(uint32_t resource_id, bool loop, bool fade) : resource_id(resource_id), loop(loop), fade(fade) {}
 };
 }  // namespace dl::audio
