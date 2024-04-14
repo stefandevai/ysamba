@@ -25,7 +25,7 @@ class AudioManager
   ~AudioManager();
 
   SoundSource& sound_effect(uint32_t resource_id, bool loop = false);
-  SoundStreamSource& music(uint32_t resource_id, bool loop = false);
+  SoundStreamSource& music(uint32_t resource_id, bool loop = false, bool fade_in = false);
   void update();
 
   // void play(SoundSource& source);

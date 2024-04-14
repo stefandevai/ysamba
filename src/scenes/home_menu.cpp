@@ -74,7 +74,7 @@ void HomeMenu::init()
 {
   if (m_background_music == nullptr || m_background_music->state != audio::SoundState::Playing)
   {
-    m_background_music = &m_game_context.audio_manager->music("music-home-menu"_hs);
+    m_background_music = &m_game_context.audio_manager->music("music-home-menu"_hs, true, true);
   }
 }
 

@@ -68,7 +68,7 @@ void SoundStreamBuffer::update(ALuint source)
 {
   alGetSourcei(source, AL_SOURCE_STATE, &m_state);
 
-  if (m_state == AL_PAUSED)
+  if (m_state == AL_PAUSED || m_state == AL_STOPPED || m_state == AL_INITIAL)
   {
     return;
   }

@@ -100,27 +100,40 @@ SoundSource& AudioManager::sound_effect(const uint32_t resource_id, const bool l
   return m_sound_sources.back();
 }
 
-SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool loop)
+SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool loop, const bool fade_in)
 {
-  SoundStreamSource source{resource_id, loop};
+  SoundStreamSource source{resource_id, loop, fade_in};
 
   const auto& buffer = m_asset_manager.get<SoundStreamBuffer>(source.resource_id);
 
   alGenSources(1, &source.source);
   utils::check_al_error();
   alSourcef(source.source, AL_PITCH, 1.0f);
-  alSourcef(source.source, AL_GAIN, 1.0f);
+
   alSource3f(source.source, AL_POSITION, 0.0f, 0.0f, 0.0f);
   alSource3f(source.source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
   alSource3f(source.source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
   alSourcei(source.source, AL_SOURCE_RELATIVE, AL_TRUE);
-  alSourcei(source.source, AL_LOOPING, source.loop);
+  alSourcei(source.source, AL_LOOPING, false);
+
+  if (source.fade_in)
+  {
+    alSourcef(source.source, AL_GAIN, 0.0f);
+    source.gain = 0.0f;
+    source.state = SoundState::FadingIn;
+  }
+  else
+  {
+    alSourcef(source.source, AL_GAIN, 1.0f);
+    source.gain = 1.0f;
+    source.state = SoundState::Playing;
+  }
+
   alSourcePlay(source.source);
   utils::check_al_error();
 
   source.buffer = buffer;
   buffer->play(source.source, source.loop);
-  source.state = SoundState::Playing;
 
   m_sound_stream_sources.push_back(std::move(source));
 
@@ -216,9 +229,24 @@ void AudioManager::update()
   {
     source.buffer->update(source.source);
 
-    ALenum al_state;
-    alGetSourcei(source.source, AL_SOURCE_STATE, &al_state);
-    source.state = utils::al_state_to_sound_state(al_state);
+    if (source.state == SoundState::FadingIn)
+    {
+      source.gain += 0.01f;
+
+      if (source.gain >= 1.0f)
+      {
+        source.gain = 1.0f;
+        source.state = SoundState::Playing;
+      }
+
+      alSourcef(source.source, AL_GAIN, source.gain);
+    }
+    else
+    {
+      ALenum al_state;
+      alGetSourcei(source.source, AL_SOURCE_STATE, &al_state);
+      source.state = utils::al_state_to_sound_state(al_state);
+    }
 
     if (source.state == SoundState::Stopped)
     {
