@@ -7,10 +7,12 @@
 #include "ai/actions/walk.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
+#include "core/random.hpp"
 #include "ecs/components/action_walk.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/society_agent.hpp"
+#include "ecs/components/sound_effect.hpp"
 #include "world/society/job.hpp"
 #include "world/target.hpp"
 
@@ -30,6 +32,15 @@ void walk(entt::registry& registry, SocietyAgent& agent, const Vector3 target)
       .position = target,
   });
 }
+
+using namespace entt::literals;
+
+const std::vector<uint32_t> footstep_sounds_ids{
+    "sound_effect_footstep_dirt_00"_hs,
+    "sound_effect_footstep_dirt_01"_hs,
+    "sound_effect_footstep_dirt_02"_hs,
+    "sound_effect_footstep_dirt_03"_hs,
+};
 
 PlayerControlsSystem::PlayerControlsSystem(EventEmitter& event_emitter) : m_event_emitter(event_emitter) {}
 
@@ -90,6 +101,10 @@ void PlayerControlsSystem::update(entt::registry& registry, const entt::entity p
   // Update game until all jobs are done
   if (walked)
   {
+    const auto sound_id = random::select<uint32_t>(footstep_sounds_ids);
+    auto footsteps_sound = registry.create();
+    registry.emplace<SoundEffect>(footsteps_sound, sound_id);
+
     while (!agent.jobs.empty())
     {
       m_event_emitter.publish(UpdateGameEvent{});

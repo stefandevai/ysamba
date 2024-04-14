@@ -55,6 +55,30 @@
             "id": "sound-effect-click",
             "type": "sound_effect",
             "path": "data/audio/click.ogg"
+        },
+
+        {
+            "id": "sound_effect_footstep_dirt_00",
+            "type": "sound_effect",
+            "path": "data/audio/footstep_dirt_00.ogg"
+        },
+
+        {
+            "id": "sound_effect_footstep_dirt_01",
+            "type": "sound_effect",
+            "path": "data/audio/footstep_dirt_01.ogg"
+        },
+        
+        {
+            "id": "sound_effect_footstep_dirt_02",
+            "type": "sound_effect",
+            "path": "data/audio/footstep_dirt_02.ogg"
+        },
+
+        {
+            "id": "sound_effect_footstep_dirt_03",
+            "type": "sound_effect",
+            "path": "data/audio/footstep_dirt_03.ogg"
         }
     ]
 }

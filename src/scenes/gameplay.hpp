@@ -8,6 +8,7 @@
 #include "core/events/emitter.hpp"
 #include "core/input_manager.hpp"
 #include "ecs/systems/action.hpp"
+#include "ecs/systems/audio.hpp"
 #include "ecs/systems/build_hut.hpp"
 #include "ecs/systems/drop.hpp"
 #include "ecs/systems/eat.hpp"
@@ -70,6 +71,7 @@ class Gameplay : public Scene
 
   ui::GameplayModals m_gameplay_modals{m_ui_manager, m_world};
 
+  AudioSystem m_audio_system{m_registry, m_game_context};
   ai::System m_ai_system{m_game_context, m_world};
   GameSystem m_game_system{m_registry, m_world};
   PhysicsSystem m_physics_system{m_world};

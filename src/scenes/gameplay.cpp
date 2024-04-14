@@ -209,6 +209,7 @@ void Gameplay::m_update_turn_systems()
 
 void Gameplay::m_update_action_systems()
 {
+  m_audio_system.update(m_registry);
   m_action_system.update(m_registry, m_camera);
   m_pickup_system.update(m_registry);
   m_wear_system.update(m_registry);
