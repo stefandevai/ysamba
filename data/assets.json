@@ -40,9 +40,15 @@
         },
 
         {
-            "id": "music-theme",
+            "id": "music-home-menu",
             "type": "music",
-            "path": "data/audio/theme.ogg"
+            "path": "data/audio/home_menu.ogg"
+        },
+
+        {
+            "id": "music-gameplay-1",
+            "type": "music",
+            "path": "data/audio/gameplay_1.ogg"
         },
 
         {

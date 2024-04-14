@@ -4,6 +4,8 @@
 
 #include <entt/core/hashed_string.hpp>
 
+#include "audio/audio_manager.hpp"
+#include "audio/sound_stream_source.hpp"
 #include "config.hpp"
 #include "core/events/camera.hpp"
 #include "core/events/game.hpp"
@@ -93,6 +95,14 @@ void Gameplay::load()
 #endif
 
   m_has_loaded = true;
+}
+
+void Gameplay::init()
+{
+  if (m_background_music == nullptr || m_background_music->state != audio::SoundState::Playing)
+  {
+    m_background_music = &m_game_context.audio_manager->music("music-gameplay-1"_hs);
+  }
 }
 
 void Gameplay::update()
@@ -284,6 +294,9 @@ bool Gameplay::m_update_input_real_time()
 
   if (m_input_manager.poll_action("quit"_hs))
   {
+    m_game_context.audio_manager->stop(*m_background_music);
+    m_background_music = nullptr;
+
     m_game_context.scene_manager->pop_scene();
     will_quit = true;
 
@@ -359,6 +372,9 @@ bool Gameplay::m_update_input_turn_based()
 
   if (m_input_manager.poll_action("quit"_hs))
   {
+    m_game_context.audio_manager->stop(*m_background_music);
+    m_background_music = nullptr;
+
     m_game_context.scene_manager->pop_scene();
     will_quit = true;
 

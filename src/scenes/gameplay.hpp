@@ -26,6 +26,11 @@
 #include "ui/gameplay_modals.hpp"
 #include "world/world.hpp"
 
+namespace dl::audio
+{
+struct SoundStreamSource;
+}  // namespace dl::audio
+
 namespace dl
 {
 struct GameContext;
@@ -36,6 +41,7 @@ class Gameplay : public Scene
   Gameplay(GameContext& game_context);
 
   void load() override;
+  void init() override;
   void update() override;
   void render() override;
 
@@ -81,6 +87,8 @@ class Gameplay : public Scene
   DropSystem m_drop_system{m_world, m_ui_manager, m_gameplay_modals};
   EatSystem m_eat_system{m_world, m_gameplay_modals};
   PlayerControlsSystem m_player_controls_system{m_event_emitter};
+
+  audio::SoundStreamSource* m_background_music = nullptr;
 
   bool m_update_paused();
   bool m_update_real_time();
