@@ -101,7 +101,7 @@ void Gameplay::init()
 {
   if (m_background_music == nullptr || m_background_music->state != audio::SoundState::Playing)
   {
-    m_background_music = &m_game_context.audio_manager->music("music-gameplay-1"_hs, true, true);
+    m_background_music = m_game_context.audio_manager->music("music-gameplay-1"_hs, true, true);
   }
 }
 

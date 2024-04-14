@@ -25,7 +25,7 @@ class AudioManager
   ~AudioManager();
 
   SoundSource& sound_effect(uint32_t resource_id, bool loop = false);
-  SoundStreamSource& music(uint32_t resource_id, bool loop = false, bool fade_in = false);
+  SoundStreamSource* music(uint32_t resource_id, bool loop = false, bool fade_in = false);
   void update();
 
   // void play(SoundSource& source);
@@ -43,6 +43,6 @@ class AudioManager
   ALCdevice* m_device = nullptr;
   ALCcontext* m_context = nullptr;
   std::vector<SoundSource> m_sound_sources{};
-  std::vector<SoundStreamSource> m_sound_stream_sources{};
+  std::vector<std::unique_ptr<SoundStreamSource>> m_sound_stream_sources{};
 };
 }  // namespace dl::audio

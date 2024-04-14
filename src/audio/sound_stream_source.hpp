@@ -17,5 +17,9 @@ struct SoundStreamSource
   SoundState state = SoundState::Initial;
   SoundStreamBuffer* buffer = nullptr;
   float gain = 1.0f;
+
+  SoundStreamSource(uint32_t resource_id, bool loop, bool fade_in)
+    : resource_id(resource_id), loop(loop), fade_in(fade_in)
+  {}
 };
 }  // namespace dl::audio

@@ -20,7 +20,7 @@ void SoundStreamBuffer::load()
 
 void SoundStreamBuffer::play(ALuint source, const bool loop)
 {
-  if (is_playing())
+  if (is_playing(source))
   {
     return;
   }
@@ -42,7 +42,7 @@ void SoundStreamBuffer::play(ALuint source, const bool loop)
 
 void SoundStreamBuffer::pause(ALuint source)
 {
-  if (is_playing())
+  if (is_playing(source))
   {
     alSourcePause(source);
   }
@@ -50,7 +50,7 @@ void SoundStreamBuffer::pause(ALuint source)
 
 void SoundStreamBuffer::resume(ALuint source)
 {
-  if (is_paused())
+  if (is_paused(source))
   {
     alSourcePlay(source);
   }
@@ -66,9 +66,10 @@ void SoundStreamBuffer::stop(ALuint source)
 
 void SoundStreamBuffer::update(ALuint source)
 {
+  ALenum m_state;
   alGetSourcei(source, AL_SOURCE_STATE, &m_state);
 
-  if (m_state == AL_PAUSED || m_state == AL_STOPPED || m_state == AL_INITIAL)
+  if (m_state == AL_PAUSED || m_state == AL_INITIAL)
   {
     return;
   }
@@ -97,7 +98,7 @@ void SoundStreamBuffer::update(ALuint source)
     if (m_loop)
     {
       ov_raw_seek(&m_ogg.file_data, 0);
-      play(m_loop);
+      play(source, m_loop);
     }
     else if (!m_reseted)
     {
@@ -107,18 +108,24 @@ void SoundStreamBuffer::update(ALuint source)
   }
 }
 
-bool SoundStreamBuffer::is_paused()
+bool SoundStreamBuffer::is_paused(ALuint source)
 {
+  ALenum m_state;
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
   return (m_state == AL_PAUSED);
 }
 
-bool SoundStreamBuffer::is_stopped()
+bool SoundStreamBuffer::is_stopped(ALuint source)
 {
+  ALenum m_state;
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
   return (m_state == AL_STOPPED || m_state == AL_INITIAL);
 }
 
-bool SoundStreamBuffer::is_playing()
+bool SoundStreamBuffer::is_playing(ALuint source)
 {
+  ALenum m_state;
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
   return (m_state == AL_PLAYING);
 }
 

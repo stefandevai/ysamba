@@ -24,15 +24,15 @@ class SoundStreamBuffer
   void resume(ALuint source);
   void stop(ALuint source);
   void update(ALuint source);
-  bool is_playing();
-  bool is_stopped();
-  bool is_paused();
+  bool is_playing(ALuint source);
+  bool is_stopped(ALuint source);
+  bool is_paused(ALuint source);
   void destroy();
   bool fill_buffer(ALuint buffer);
 
  private:
   std::string m_filepath;
-  ALenum m_state = AL_STOPPED;
+  // ALenum m_state = AL_STOPPED;
   bool m_loop = false;
   bool m_reseted = true;
   OggData m_ogg{};

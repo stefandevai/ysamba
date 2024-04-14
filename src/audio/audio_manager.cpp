@@ -45,8 +45,8 @@ AudioManager::~AudioManager()
 
   for (auto& source : m_sound_stream_sources)
   {
-    source.buffer->stop(source.source);
-    alDeleteSources(1, &source.source);
+    source->buffer->stop(source->source);
+    alDeleteSources(1, &source->source);
   }
 
   // Destroy actual audio buffers before closing the device
@@ -100,9 +100,10 @@ SoundSource& AudioManager::sound_effect(const uint32_t resource_id, const bool l
   return m_sound_sources.back();
 }
 
-SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool loop, const bool fade_in)
+SoundStreamSource* AudioManager::music(const uint32_t resource_id, const bool loop, const bool fade_in)
 {
-  SoundStreamSource source{resource_id, loop, fade_in};
+  auto source_ptr = std::make_unique<SoundStreamSource>(resource_id, loop, fade_in);
+  auto& source = *source_ptr;
 
   const auto& buffer = m_asset_manager.get<SoundStreamBuffer>(source.resource_id);
 
@@ -135,9 +136,9 @@ SoundStreamSource& AudioManager::music(const uint32_t resource_id, const bool lo
   source.buffer = buffer;
   buffer->play(source.source, source.loop);
 
-  m_sound_stream_sources.push_back(std::move(source));
+  m_sound_stream_sources.push_back(std::move(source_ptr));
 
-  return m_sound_stream_sources.back();
+  return m_sound_stream_sources.back().get();
 }
 
 // void AudioManager::play(SoundSource& source)
@@ -207,8 +208,9 @@ void AudioManager::resume(SoundStreamSource& source)
 
 void AudioManager::stop(SoundStreamSource& source)
 {
-  assert(source.buffer != nullptr);
-  source.buffer->stop(source.source);
+  source.state = SoundState::FadingOut;
+  // assert(source.buffer != nullptr);
+  // source.buffer->stop(source.source);
 }
 
 void AudioManager::update()
@@ -225,8 +227,9 @@ void AudioManager::update()
     }
   }
 
-  for (auto& source : m_sound_stream_sources)
+  for (auto& source_ptr : m_sound_stream_sources)
   {
+    auto& source = *source_ptr;
     source.buffer->update(source.source);
 
     if (source.state == SoundState::FadingIn)
@@ -237,6 +240,19 @@ void AudioManager::update()
       {
         source.gain = 1.0f;
         source.state = SoundState::Playing;
+      }
+
+      alSourcef(source.source, AL_GAIN, source.gain);
+    }
+    else if (source.state == SoundState::FadingOut)
+    {
+      source.gain -= 0.01f;
+
+      if (source.gain <= 0.0f)
+      {
+        source.gain = 0.0f;
+        source.buffer->stop(source.source);
+        source.state = SoundState::Stopped;
       }
 
       alSourcef(source.source, AL_GAIN, source.gain);
@@ -255,6 +271,6 @@ void AudioManager::update()
   }
 
   std::erase_if(m_sound_sources, [](const auto& source) { return source.state == SoundState::Stopped; });
-  std::erase_if(m_sound_stream_sources, [](const auto& source) { return source.state == SoundState::Stopped; });
+  std::erase_if(m_sound_stream_sources, [](const auto& source) { return source->state == SoundState::Stopped; });
 }
 }  // namespace dl::audio
