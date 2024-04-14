@@ -14,15 +14,6 @@ void SoundStreamBuffer::load()
 
   alGenBuffers(STREAM_BUFFERS, m_buffers);
   check_al_error();
-  // alGenSources(1, &source);
-  // check_al_error();
-
-  // alSourcef(source, AL_PITCH, 1.0f);
-  // alSourcef(source, AL_GAIN, 1.0f);
-  // alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
-  // alSource3f(source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-  // alSource3f(source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
-  // alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
 
   has_loaded = true;
 }
@@ -69,10 +60,9 @@ void SoundStreamBuffer::stop(ALuint source)
 {
   if (is_playing() || is_paused())
   {
-    alSourceStop(source);
     ov_raw_seek(&m_ogg.file_data, 0);
-    m_reseted = true;
     m_empty_queue(source);
+    m_reseted = true;
   }
 }
 

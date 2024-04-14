@@ -37,8 +37,6 @@ class AudioManager
   AssetManager& m_asset_manager;
   ALCdevice* m_device = nullptr;
   ALCcontext* m_context = nullptr;
-  std::unique_ptr<SoundStreamBuffer> m_stream = nullptr;
-  std::unique_ptr<SoundBuffer> m_sound = nullptr;
   std::vector<SoundSource> m_sound_sources{};
   std::vector<SoundStreamSource> m_sound_stream_sources{};
 };

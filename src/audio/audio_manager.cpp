@@ -32,13 +32,6 @@ AudioManager::AudioManager(AssetManager& asset_manager) : m_asset_manager(asset_
 
   alcMakeContextCurrent(m_context);
   check_alc_error(m_device);
-
-  // m_stream = std::make_unique<SoundStreamBuffer>("data/audio/theme.ogg");
-  // m_stream->load();
-  // m_stream->play();
-  // m_sound = std::make_unique<SoundBuffer>("data/audio/click.ogg");
-  // m_sound->load();
-  // m_sound->play(true);
 }
 
 AudioManager::~AudioManager()
@@ -48,15 +41,21 @@ AudioManager::~AudioManager()
     alSourceStop(source.source);
     alDeleteSources(1, &source.source);
   }
+  for (auto& source : m_sound_sources)
+  {
+    source.buffer->destroy();
+  }
 
   for (auto& source : m_sound_stream_sources)
   {
-    source.buffer->stop(source.source);
     alSourceStop(source.source);
+    source.buffer->stop(source.source);
     alDeleteSources(1, &source.source);
+    source.buffer->destroy();
   }
-  // m_sound->destroy();
-  // m_stream->destroy();
+
+  check_al_error();
+
   alcMakeContextCurrent(nullptr);
   alcDestroyContext(m_context);
   alcCloseDevice(m_device);
@@ -81,6 +80,7 @@ SoundSource& AudioManager::sound_effect(const uint32_t resource_id, const bool l
   alSourcePlay(source.source);
   check_al_error();
 
+  source.buffer = buffer;
   source.state = SoundState::Playing;
 
   m_sound_sources.push_back(std::move(source));
@@ -174,6 +174,5 @@ void AudioManager::update()
   {
     source.buffer->update(source.source);
   }
-  // m_stream->update();
 }
 }  // namespace dl::audio

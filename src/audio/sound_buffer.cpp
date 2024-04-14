@@ -43,75 +43,68 @@ void SoundBuffer::load()
     check_al_error();
   }
 
-  alGenSources(1, &m_source);
-  alSourcef(m_source, AL_PITCH, 1.0f);
-  alSourcef(m_source, AL_GAIN, 1.0f);
-  alSource3f(m_source, AL_POSITION, 0.0f, 0.0f, 0.0f);
-  alSource3f(m_source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-  alSource3f(m_source, AL_DIRECTION, 0.0f, 0.0f, 0.0f);
-  alSourcei(m_source, AL_SOURCE_RELATIVE, AL_TRUE);
-  alSourcei(m_source, AL_BUFFER, id);
-
   has_loaded = true;
 }
 
-void SoundBuffer::play(const bool loop)
+void SoundBuffer::play(ALuint source, const bool loop)
 {
-  if (is_playing())
+  if (is_playing(source))
   {
     return;
   }
 
-  alSourcei(m_source, AL_LOOPING, loop);
-  alSourcePlay(m_source);
+  alSourcei(source, AL_LOOPING, loop);
+  alSourcePlay(source);
 }
 
-void SoundBuffer::pause()
+void SoundBuffer::pause(ALuint source)
 {
-  if (is_playing())
+  if (is_playing(source))
   {
-    alSourcePause(m_source);
+    alSourcePause(source);
   }
 }
 
-void SoundBuffer::resume()
+void SoundBuffer::resume(ALuint source)
 {
-  if (is_paused())
+  if (is_paused(source))
   {
-    alSourcePlay(m_source);
+    alSourcePlay(source);
   }
 }
 
-void SoundBuffer::stop()
+void SoundBuffer::stop(ALuint source)
 {
-  if (is_playing() || is_paused())
+  if (is_playing(source) || is_paused(source))
   {
-    alSourceStop(m_source);
+    alSourceStop(source);
   }
 }
 
-bool SoundBuffer::is_paused()
+bool SoundBuffer::is_paused(ALuint source)
 {
-  alGetSourcei(m_source, AL_SOURCE_STATE, &m_state);
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
   return (m_state == AL_PAUSED);
 }
 
-bool SoundBuffer::is_stopped()
+bool SoundBuffer::is_stopped(ALuint source)
 {
-  alGetSourcei(m_source, AL_SOURCE_STATE, &m_state);
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
   return (m_state == AL_STOPPED || m_state == AL_INITIAL);
 }
 
-bool SoundBuffer::is_playing()
+bool SoundBuffer::is_playing(ALuint source)
 {
-  alGetSourcei(m_source, AL_SOURCE_STATE, &m_state);
+  alGetSourcei(source, AL_SOURCE_STATE, &m_state);
   return (m_state == AL_PLAYING);
 }
 
 void SoundBuffer::destroy()
 {
-  alSourceStop(m_source);
-  alDeleteSources(1, &m_source);
-  alDeleteBuffers(1, &id);
+  if (has_loaded)
+  {
+    alDeleteBuffers(1, &id);
+    has_loaded = false;
+  }
 }
 }  // namespace dl::audio
