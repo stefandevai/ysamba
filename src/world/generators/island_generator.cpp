@@ -54,22 +54,52 @@ void IslandGenerator::generate(const int seed)
   timer.stop();
   timer.print("Island generation");
 
+  // Generate an Unsigned Distance Field relative to the distance to the sea
+  sea_distance_map.resize(size.x * size.y);
+
+  auto source_image = heman_image_create(size.x, size.y, 1);
+  auto source_image_data = heman_image_data(source_image);
+
+  for (auto i = 0; i < size.x * size.y; ++i)
+  {
+    if (main_island.mask[i] != TerrainType::Land)
+    {
+      source_image_data[i] = 1.0f;
+    }
+    else
+    {
+      source_image_data[i] = 0.0f;
+    }
+  }
+
+  auto distance_field = heman_distance_create_df(source_image);
+
+  memcpy(sea_distance_map.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
+
+  heman_image_destroy(distance_field);
+  heman_image_destroy(source_image);
+
   // TEMP Visualize island mask
   if (island_params.display_mask)
   {
     for (auto i = 0; i < size.x * size.y; ++i)
     {
-      if (main_island.mask[i] != TerrainType::Land)
+      height_map[i] = static_cast<uint8_t>(sea_distance_map[i] * 255.0f);
+
+      if(sea_distance_map[i] >= 1.0f)
       {
-        height_map[i] = 0;
+        spdlog::debug("dat {}", sea_distance_map[i]);
       }
-      else
-      {
-        height_map[i] = 100;
-      }
+      // if (main_island.mask[i] != TerrainType::Land)
+      // {
+      //   height_map[i] = 0;
+      // }
+      // else
+      // {
+      //   height_map[i] = 100;
+      // }
     }
   }
-  spdlog::debug("Island mask displayed");
   // TEMP Visualize island mask
 }
 
