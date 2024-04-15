@@ -57,6 +57,7 @@ FetchContent_MakeAvailable(webgpu)
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build Noise Tool" FORCE)
 add_subdirectory("lib/FastNoise2")
 add_subdirectory("lib/i18n_keyval")
+add_subdirectory("lib/heman")
 
 # Force an optimized build of FastNoise2
 if (MSVC)
@@ -101,11 +102,12 @@ SET(
     i18n_keyval::i18n_keyval
     OpenAL::OpenAL
     Vorbis::vorbisfile
+    heman
 )
 
 # Allow objective-c for SDL2 C file on Apple platforms
 if(APPLE)
-  set_source_files_properties("src/graphics/renderer/sdl2_webgpu.c" PROPERTIES COMPILE_FLAGS "-x objective-c" LANGUAGE C)
+    set_source_files_properties("src/graphics/renderer/sdl2_webgpu.c" PROPERTIES COMPILE_FLAGS "-x objective-c" LANGUAGE C)
   target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE

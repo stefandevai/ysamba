@@ -7,3 +7,6 @@
 [submodule "lib/vcpkg"]
 	path = lib/vcpkg
 	url = https://github.com/microsoft/vcpkg.git
+[submodule "lib/heman"]
+	path = lib/heman
+	url = https://github.com/prideout/heman.git

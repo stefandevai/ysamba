@@ -1,6 +1,7 @@
 #include "./island_generator.hpp"
 
 #include <FastNoise/FastNoise.h>
+#include <heman.h>
 #include <spdlog/spdlog.h>
 
 #include <chrono>
@@ -47,23 +48,28 @@ void IslandGenerator::generate(const int seed)
 
   spdlog::info("Adjusting islands...");
 
-  // auto islands = m_get_islands(island_mask, 1);
-  // auto& main_island = islands.back();
+  auto islands = m_get_islands(island_mask, 1);
+  auto& main_island = islands.back();
 
   timer.stop();
   timer.print("Island generation");
 
   // TEMP Visualize island mask
-  // if (island_params.display_mask)
-  // {
-  //   for (auto i = 0; i < size.x * size.y; ++i)
-  //   {
-  //     if (main_island.mask[i] != TerrainType::Land)
-  //     {
-  //       raw_height_map[i] = 0.0f;
-  //     }
-  //   }
-  // }
+  if (island_params.display_mask)
+  {
+    for (auto i = 0; i < size.x * size.y; ++i)
+    {
+      if (main_island.mask[i] != TerrainType::Land)
+      {
+        height_map[i] = 0;
+      }
+      else
+      {
+        height_map[i] = 100;
+      }
+    }
+  }
+  spdlog::debug("Island mask displayed");
   // TEMP Visualize island mask
 }
 
@@ -92,8 +98,8 @@ void IslandGenerator::m_get_height_map(const int seed)
   height_map.resize(size.x * size.y);
   silhouette_map.resize(size.x * size.y);
   mountain_map.resize(size.x * size.y);
+  island_mask.resize(size.x * size.y);
   // raw_height_map.resize(size.x * size.y);
-  // island_mask.resize(size.x * size.y);
 
   // const auto generator = utils::get_island_noise_generator(island_params);
 
@@ -216,11 +222,56 @@ void IslandGenerator::m_get_height_map(const int seed)
       // maxvv = std::max(maxvv, map_value);
       // minvv = std::min(minvv, map_value);
       height_map[array_index] = static_cast<uint8_t>(map_value);
+
+      if (map_value > 0)
+      {
+        island_mask[array_index] = TerrainType::Land;
+      }
+      else
+      {
+        island_mask[array_index] = TerrainType::None;
+      }
     }
   }
 
   // spdlog::warn("Max2: {}", maxvv);
   // spdlog::warn("Min2: {}", minvv);
+  // Remove lakes
+  bool has_flooded_ocean = false;
+
+  for (int j = 0; j < size.y && !has_flooded_ocean; ++j)
+  {
+    for (int i = 0; i < size.x && !has_flooded_ocean; ++i)
+    {
+      if (i != 0 && j != 0)
+      {
+        continue;
+      }
+
+      const auto value = island_mask[j * size.x + i];
+
+      if (value == 0)
+      {
+        if (j == 0 || i == 0)
+        {
+          m_flood_fill(1, i, j, island_mask);
+          has_flooded_ocean = true;
+        }
+      }
+    }
+  }
+
+  // Replace inland water with grass
+  for (int j = 0; j < size.y; ++j)
+  {
+    for (int i = 0; i < size.x; ++i)
+    {
+      if (island_mask[j * size.x + i] == TerrainType::None)
+      {
+        island_mask[j * size.x + i] = 2;
+      }
+    }
+  }
 }
 
 void IslandGenerator::m_flood_fill(const int value, const int x, const int y, std::vector<int>& tiles)
