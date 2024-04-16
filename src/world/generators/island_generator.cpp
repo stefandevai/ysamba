@@ -57,7 +57,7 @@ void IslandGenerator::generate(const int seed)
   {
     for (auto i = 0; i < size.x * size.y; ++i)
     {
-      height_map[i] = static_cast<uint8_t>(sea_distance_map[i] * 255.0f);
+      height_map[i] = static_cast<uint8_t>(sea_distance_field[i] * 255.0f);
 
       // if (main_island.mask[i] != TerrainType::Land)
       // {
@@ -94,12 +94,13 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 
 void IslandGenerator::m_get_height_map(const int seed)
 {
-  silhouette_map.resize(size.x * size.y);
-  island_mask.resize(size.x * size.y);
-  mountain_map.resize(size.x * size.y);
-  control_map.resize(size.x * size.y);
   height_map.resize(size.x * size.y);
-  sea_distance_map.resize(size.x * size.y);
+  sea_distance_field.resize(size.x * size.y);
+
+  std::vector<float> silhouette_map(size.x * size.y);
+  std::vector<float> mountain_map(size.x * size.y);
+  std::vector<float> control_map(size.x * size.y);
+  std::vector<int> island_mask(size.x * size.y);
 
   utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
@@ -213,12 +214,12 @@ void IslandGenerator::m_get_height_map(const int seed)
   // Generate a mask with only the islands we are interested
   auto islands = m_get_islands(island_mask, 2);
 
-  auto island_mask_hi = heman_image_create(size.x, size.y, 1);
-  auto island_mask_h = heman_image_data(island_mask_hi);
+  auto heman_island_mask_image = heman_image_create(size.x, size.y, 1);
+  auto heman_island_mask = heman_image_data(heman_island_mask_image);
 
   for (auto i = 0; i < size.x * size.y; ++i)
   {
-    island_mask_h[i] = 1.0f;
+    heman_island_mask[i] = 1.0f;
   }
 
   for (const auto& island : islands)
@@ -227,7 +228,7 @@ void IslandGenerator::m_get_height_map(const int seed)
     {
       if (island.mask[i] == TerrainType::Land)
       {
-        island_mask_h[i] = 0.0f;
+        heman_island_mask[i] = 0.0f;
       }
     }
   }
@@ -235,17 +236,17 @@ void IslandGenerator::m_get_height_map(const int seed)
   // Remove smaller islands from the height map
   for (auto i = 0; i < size.x * size.y; ++i)
   {
-    if (island_mask_h[i] == 1.0f)
+    if (heman_island_mask[i] == 1.0f)
     {
       height_map[i] = 0;
     }
   }
 
   // Generate an Unsigned Distance Field relative to the distance to the sea
-  auto distance_field = heman_distance_create_df(island_mask_hi);
-  memcpy(sea_distance_map.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
+  auto distance_field = heman_distance_create_df(heman_island_mask_image);
+  memcpy(sea_distance_field.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
   heman_image_destroy(distance_field);
-  heman_image_destroy(island_mask_hi);
+  heman_image_destroy(heman_island_mask_image);
 }
 
 void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const int y, const int value_to_fill)
