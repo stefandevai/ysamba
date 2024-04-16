@@ -17,6 +17,7 @@ class GameChunkGenerator
   Vector3i size{1, 1, 1};
   std::vector<float> silhouette_map;
   std::vector<float> mountain_map;
+  std::vector<float> control_map;
   // std::vector<uint8_t> height_map;
   // std::vector<float> raw_height_map;
   std::vector<float> vegetation_type;
@@ -25,7 +26,7 @@ class GameChunkGenerator
   IslandNoiseParams island_params{};
 
   // Quantity of tiles per map texture pixel
-  float map_to_tiles = 2.0f;
+  float map_to_tiles = 8.0f;
 
   GameChunkGenerator();
   GameChunkGenerator(const Vector3i& size);

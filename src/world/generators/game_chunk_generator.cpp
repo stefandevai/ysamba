@@ -153,7 +153,14 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
         map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
       }
 
-      // const double mountain_value = mountain_map[array_index];
+      const double mountain_value = mountain_map[array_index];
+      double control_value = control_map[array_index];
+
+      if (map_value >= 1.0)
+      {
+        auto noise_influence = std::min(1.0, noise_value + 0.5);
+        map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
+      }
 
       // if (mountain_value > noise_value)
       // {
@@ -176,10 +183,10 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
       int terrain_id = 0;
       int resolved_z = k;
 
-      if (k < 6)
+      if (k < 1)
       {
         terrain_id = 1;
-        resolved_z = 6;
+        resolved_z = 1;
       }
       else
       {
@@ -238,6 +245,7 @@ void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset
   // height_map.resize(size.x * size.y);
   silhouette_map.resize(m_padded_size.x * m_padded_size.y);
   mountain_map.resize(m_padded_size.x * m_padded_size.y);
+  control_map.resize(m_padded_size.x * m_padded_size.y);
   // raw_height_map.resize(m_padded_size.x * m_padded_size.y);
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
@@ -274,6 +282,13 @@ void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset
                                size.y + m_generation_padding * 2,
                                island_params,
                                seed + 47);
+  utils::generate_control_map(control_map.data(),
+                               offset.x - m_generation_padding,
+                               offset.y + m_generation_padding,
+                               size.x + m_generation_padding * 2,
+                               size.y + m_generation_padding * 2,
+                               island_params,
+                               seed + 13);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise

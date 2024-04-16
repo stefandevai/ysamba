@@ -38,6 +38,6 @@
   "world_creation": {
     "world_width": 256,
     "world_height": 256,
-    "world_depth": 30
+    "world_depth": 64
   }
 }

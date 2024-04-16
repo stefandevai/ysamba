@@ -216,7 +216,7 @@ void IslandGenerator::m_get_height_map(const int seed)
 
       if (map_value >= 1.0)
       {
-        auto noise_influence = std::min(1.0, noise_value + 0.2);
+        auto noise_influence = std::min(1.0, noise_value + 0.5);
         map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
       }
 
