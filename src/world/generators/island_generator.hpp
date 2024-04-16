@@ -9,13 +9,6 @@
 
 namespace dl
 {
-struct CompareVectorSizes
-{
-  bool operator()(const IslandData& a, const IslandData& b) const { return a.points.size() > b.points.size(); }
-};
-
-using IslandQueue = std::priority_queue<IslandData, std::vector<IslandData>, CompareVectorSizes>;
-
 class IslandGenerator
 {
  public:
@@ -39,10 +32,9 @@ class IslandGenerator
 
   void m_load_params(const std::string& filepath);
   void m_get_height_map(const int seed);
-  void m_flood_fill(const int value, const int x, const int y, std::vector<int>& tiles);
-  bool m_valid_coord(const int x, const int y);
-  std::vector<IslandData> m_get_islands(std::vector<int>& tiles, const uint32_t islands_to_keep);
-  IslandQueue m_get_island_queue(const std::vector<int>& tiles);
-  IslandData m_get_island(const std::vector<int>& tiles, std::vector<int>& mask, const int x, const int y);
+  void m_flood_fill(std::vector<int>& grid, int x, int y, int value_to_fill);
+  bool m_valid_coordinate(int x, int y);
+  std::vector<IslandData> m_get_islands(std::vector<int>& grid, uint32_t islands_to_keep);
+  IslandData m_get_island(const std::vector<int>& grid, std::vector<int>& mask, int x, int y);
 };
 }  // namespace dl

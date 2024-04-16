@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <cmath>
+#include <limits>
 
 #include "./terrain_type.hpp"
 #include "./utils.hpp"
@@ -48,36 +49,8 @@ void IslandGenerator::generate(const int seed)
 
   spdlog::info("Adjusting islands...");
 
-  auto islands = m_get_islands(island_mask, 1);
-  auto& main_island = islands.back();
-
   timer.stop();
   timer.print("Island generation");
-
-  // Generate an Unsigned Distance Field relative to the distance to the sea
-  sea_distance_map.resize(size.x * size.y);
-
-  auto source_image = heman_image_create(size.x, size.y, 1);
-  auto source_image_data = heman_image_data(source_image);
-
-  for (auto i = 0; i < size.x * size.y; ++i)
-  {
-    if (main_island.mask[i] != TerrainType::Land)
-    {
-      source_image_data[i] = 1.0f;
-    }
-    else
-    {
-      source_image_data[i] = 0.0f;
-    }
-  }
-
-  auto distance_field = heman_distance_create_df(source_image);
-
-  memcpy(sea_distance_map.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
-
-  heman_image_destroy(distance_field);
-  heman_image_destroy(source_image);
 
   // TEMP Visualize island mask
   if (island_params.display_mask)
@@ -86,10 +59,6 @@ void IslandGenerator::generate(const int seed)
     {
       height_map[i] = static_cast<uint8_t>(sea_distance_map[i] * 255.0f);
 
-      if(sea_distance_map[i] >= 1.0f)
-      {
-        spdlog::debug("dat {}", sea_distance_map[i]);
-      }
       // if (main_island.mask[i] != TerrainType::Land)
       // {
       //   height_map[i] = 0;
@@ -130,12 +99,13 @@ void IslandGenerator::m_get_height_map(const int seed)
   mountain_map.resize(size.x * size.y);
   control_map.resize(size.x * size.y);
   height_map.resize(size.x * size.y);
+  sea_distance_map.resize(size.x * size.y);
 
-  // Silhouette noise map
   utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
   utils::generate_control_map(control_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 13);
 
+  const double max_z = size.z - 1.0;
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
 
@@ -148,33 +118,16 @@ void IslandGenerator::m_get_height_map(const int seed)
     {
       const auto array_index = j * size.x + i;
 
+      // Apply falloff to the silhouette
       const float distance_x_squared = (half_size_x - i) * (half_size_x - i);
       const float distance_y_squared = (half_size_y - j) * (half_size_y - j);
 
       float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
 
       silhouette_map[array_index] -= gradient;
-      // maxv = std::max(maxv, silhouette_map[array_index]);
-      // minv = std::min(minv, silhouette_map[array_index]);
       silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
-    }
-  }
 
-  // spdlog::warn("Max: {}", maxv);
-  // spdlog::warn("Min: {}", minv);
-
-  // double maxvv = 0.0, minvv = 0.0;
-
-  for (int j = 0; j < size.y; ++j)
-  {
-    for (int i = 0; i < size.x; ++i)
-    {
-      const auto array_index = j * size.x + i;
       double noise_value = silhouette_map[array_index];
-      double mountain_value = mountain_map[array_index];
-      double control_value = control_map[array_index];
-      const double max_z = size.z - 1.0;
-
       double map_value;
 
       if (noise_value < 0.3f)
@@ -190,51 +143,26 @@ void IslandGenerator::m_get_height_map(const int seed)
         map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
       }
 
-      // Vizualize map
-      // map_value = interpolate(-1.0, 1.0, 0.0, 255.0, std::abs(mountain_map[array_index]) * control_map[array_index]);
-
-      // if (mountain_value > noise_value)
-      // {
-      //   map_value = map_value * (mountain_value * 2.0);
-      // }
-
-      // if (control_value > 0.5 && mountain_value > 0.5)
-      // {
-      //   map_value = map_value * (mountain_value * 2.0) * control_value;
-      // }
-
-      // map_value = map_value * (mountain_value * 2.0) * (control_value + 1.0);
-      // map_value = map_value * ((1.0 - control_value) * noise_value + control_value * mountain_value) * 2.0;
-      
-      // final
-      // map_value = std::max(map_value * (mountain_value * 2.0) * (control_value + 1.0), map_value);
-      // map_value = std::max(map_value * (mountain_value * 2.0) * (control_value + 0.7), map_value);
-      // if (control_value > 0.0)
-      // {
-      //   map_value = std::max(map_value, map_value * mountain_value * control_value * 8.0);
-      // }
-
+      // Apply mountain map via control map
       if (map_value >= 1.0)
       {
+        double mountain_value = mountain_map[array_index];
+        double control_value = control_map[array_index];
         auto noise_influence = std::min(1.0, noise_value + 0.5);
         map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
       }
 
-      //Naive terrace
+      // Naive terrace for vizualization
       if (static_cast<int>(map_value) > 0)
       {
         map_value = interpolate(0.0, max_z, 0.0, 255.0, static_cast<int>(map_value));
-        // map_value = interpolate(0.0, max_z, 0.0, 255.0, map_value);
       }
 
       map_value = std::clamp(map_value, 0.0, 255.0);
-
-      // const auto map_value = interpolate(0.0, 1.0, 0.0, 255.0, silhouette_map[array_index]);
-      // maxvv = std::max(maxvv, map_value);
-      // minvv = std::min(minvv, map_value);
       height_map[array_index] = static_cast<uint8_t>(map_value);
 
-      if (map_value > 0)
+      // Create land mask
+      if (height_map[array_index] > 1)
       {
         island_mask[array_index] = TerrainType::Land;
       }
@@ -245,9 +173,7 @@ void IslandGenerator::m_get_height_map(const int seed)
     }
   }
 
-  // spdlog::warn("Max2: {}", maxvv);
-  // spdlog::warn("Min2: {}", minvv);
-  // Remove lakes
+  // Floodfill from the borders in order to get a mask of the sea
   bool has_flooded_ocean = false;
 
   for (int j = 0; j < size.y && !has_flooded_ocean; ++j)
@@ -261,11 +187,11 @@ void IslandGenerator::m_get_height_map(const int seed)
 
       const auto value = island_mask[j * size.x + i];
 
-      if (value == 0)
+      if (value == TerrainType::None)
       {
         if (j == 0 || i == 0)
         {
-          m_flood_fill(1, i, j, island_mask);
+          m_flood_fill(island_mask, i, j, static_cast<int>(TerrainType::Water));
           has_flooded_ocean = true;
         }
       }
@@ -279,139 +205,151 @@ void IslandGenerator::m_get_height_map(const int seed)
     {
       if (island_mask[j * size.x + i] == TerrainType::None)
       {
-        island_mask[j * size.x + i] = 2;
+        island_mask[j * size.x + i] = TerrainType::Land;
       }
     }
   }
+
+  // Generate a mask with only the islands we are interested
+  auto islands = m_get_islands(island_mask, 2);
+
+  auto island_mask_hi = heman_image_create(size.x, size.y, 1);
+  auto island_mask_h = heman_image_data(island_mask_hi);
+
+  for (auto i = 0; i < size.x * size.y; ++i)
+  {
+    island_mask_h[i] = 1.0f;
+  }
+
+  for (const auto& island : islands)
+  {
+    for (auto i = 0; i < size.x * size.y; ++i)
+    {
+      if (island.mask[i] == TerrainType::Land)
+      {
+        island_mask_h[i] = 0.0f;
+      }
+    }
+  }
+
+  // Remove smaller islands from the height map
+  for (auto i = 0; i < size.x * size.y; ++i)
+  {
+    if (island_mask_h[i] == 1.0f)
+    {
+      height_map[i] = 0;
+    }
+  }
+
+  // Generate an Unsigned Distance Field relative to the distance to the sea
+  auto distance_field = heman_distance_create_df(island_mask_hi);
+  memcpy(sea_distance_map.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
+  heman_image_destroy(distance_field);
+  heman_image_destroy(island_mask_hi);
 }
 
-void IslandGenerator::m_flood_fill(const int value, const int x, const int y, std::vector<int>& tiles)
+void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const int y, const int value_to_fill)
 {
-  assert(m_valid_coord(x, y));
+  assert(m_valid_coordinate(x, y));
 
-  const int original_value = tiles[y * size.x + x];
-  std::queue<Point<int>> coord_queue;
-  std::vector<int> mask(size.x * size.y, value);
+  const int original_value = grid[y * size.x + x];
+  std::queue<Point<int>> coordinate_queue;
+  std::vector<int> visited(size.x * size.y, value_to_fill);
 
-  coord_queue.push(Point<int>(x, y));
-  tiles[y * size.x + x] = value;
+  coordinate_queue.push(Point<int>(x, y));
+  grid[y * size.x + x] = value_to_fill;
 
-  while (!coord_queue.empty())
+  while (!coordinate_queue.empty())
   {
-    auto coord = coord_queue.front();
-    const int x0 = coord.x;
-    const int y0 = coord.y;
+    auto coordinate = coordinate_queue.front();
+    const int x0 = coordinate.x;
+    const int y0 = coordinate.y;
 
-    coord_queue.pop();
+    coordinate_queue.pop();
 
-    // Top coord
+    // Top coordinate
     const auto yt = y0 + 1;
-    const auto top_coord = yt * size.x + x0;
-    if (m_valid_coord(x0, yt) && tiles[top_coord] == original_value && mask[top_coord] == value)
+    const auto top_coordinate = yt * size.x + x0;
+    if (m_valid_coordinate(x0, yt) && grid[top_coordinate] == original_value && visited[top_coordinate] == value_to_fill)
     {
-      mask[top_coord] = 9999;
-      tiles[top_coord] = value;
-      coord_queue.push(Point<int>(x0, yt));
+      visited[top_coordinate] = std::numeric_limits<int>::max();
+      grid[top_coordinate] = value_to_fill;
+      coordinate_queue.push(Point<int>(x0, yt));
     }
 
-    // Bottom coord
+    // Bottom coordinate
     const auto yb = y0 - 1;
-    const auto bottom_coord = yb * size.x + x0;
-    if (m_valid_coord(x0, yb) && tiles[bottom_coord] == original_value && mask[bottom_coord] == value)
+    const auto bottom_coordinate = yb * size.x + x0;
+    if (m_valid_coordinate(x0, yb) && grid[bottom_coordinate] == original_value && visited[bottom_coordinate] == value_to_fill)
     {
-      mask[bottom_coord] = 9999;
-      tiles[bottom_coord] = value;
-      coord_queue.push(Point<int>(x0, yb));
+      visited[bottom_coordinate] = std::numeric_limits<int>::max();
+      grid[bottom_coordinate] = value_to_fill;
+      coordinate_queue.push(Point<int>(x0, yb));
     }
 
-    // Left coord
+    // Left coordinate
     const auto xl = x0 - 1;
-    const auto left_coord = y0 * size.x + xl;
-    if (m_valid_coord(xl, y0) && tiles[left_coord] == original_value && mask[left_coord] == value)
+    const auto left_coordinate = y0 * size.x + xl;
+    if (m_valid_coordinate(xl, y0) && grid[left_coordinate] == original_value && visited[left_coordinate] == value_to_fill)
     {
-      mask[left_coord] = 9999;
-      tiles[left_coord] = value;
-      coord_queue.push(Point<int>(xl, y0));
+      visited[left_coordinate] = std::numeric_limits<int>::max();
+      grid[left_coordinate] = value_to_fill;
+      coordinate_queue.push(Point<int>(xl, y0));
     }
 
-    // Right coord
+    // Right coordinate
     const auto xr = x0 + 1;
-    const auto right_coord = y0 * size.x + xr;
-    if (m_valid_coord(xr, y0) && tiles[right_coord] == original_value && mask[right_coord] == value)
+    const auto right_coordinate = y0 * size.x + xr;
+    if (m_valid_coordinate(xr, y0) && grid[right_coordinate] == original_value && visited[right_coordinate] == value_to_fill)
     {
-      mask[right_coord] = 9999;
-      tiles[right_coord] = value;
-      coord_queue.push(Point<int>(xr, y0));
+      visited[right_coordinate] = std::numeric_limits<int>::max();
+      grid[right_coordinate] = value_to_fill;
+      coordinate_queue.push(Point<int>(xr, y0));
     }
   }
 }
 
-bool IslandGenerator::m_valid_coord(const int x, const int y)
+bool IslandGenerator::m_valid_coordinate(const int x, const int y)
 {
   return !(x < 0 || y < 0 || x >= size.x || y >= size.y);
 }
 
-std::vector<IslandData> IslandGenerator::m_get_islands(std::vector<int>& tiles, const uint32_t islands_to_keep)
-{
-  auto all_islands = m_get_island_queue(tiles);
-
-  while (all_islands.size() > islands_to_keep)
-  {
-    const auto& current_island = all_islands.top();
-
-    for (const auto& coord : current_island.points)
-    {
-      // Set island values to water to erase them
-      tiles[coord.y * size.x + coord.x] = TerrainType::Water;
-    }
-
-    all_islands.pop();
-  }
-
-  // Keep remaining islands in a vector
-  // As we ordered the priority queue in crescent order, the last
-  // island will be the main island
-  std::vector<IslandData> islands(all_islands.size());
-
-  while (!all_islands.empty())
-  {
-    islands.push_back(std::move(const_cast<IslandData&>(all_islands.top())));
-    all_islands.pop();
-  }
-
-  return islands;
-}
-
-IslandQueue IslandGenerator::m_get_island_queue(const std::vector<int>& tiles)
+std::vector<IslandData> IslandGenerator::m_get_islands(std::vector<int>& grid, const uint32_t islands_to_keep)
 {
   std::vector<int> mask(size.x * size.y, TerrainType::Water);
-  IslandQueue islands{};
+  std::vector<IslandData> islands{};
 
   for (int j = 0; j < size.y; ++j)
   {
     for (int i = 0; i < size.x; ++i)
     {
-      const auto tile_value = tiles[j * size.x + i];
+      const auto tile_value = grid[j * size.x + i];
       const auto mask_value = mask[j * size.x + i];
 
       // Not water and not masked
       if (tile_value != TerrainType::Water && mask_value == TerrainType::Water)
       {
-        const auto island_data = m_get_island(tiles, mask, i, j);
-        islands.push(island_data);
+        const auto island_data = m_get_island(grid, mask, i, j);
+        islands.push_back(island_data);
+        std::push_heap(islands.begin(), islands.end());
       }
     }
+  }
+
+  if (islands.size() > islands_to_keep)
+  {
+    islands.resize(islands_to_keep);
   }
 
   return islands;
 }
 
-IslandData IslandGenerator::m_get_island(const std::vector<int>& tiles,
+IslandData IslandGenerator::m_get_island(const std::vector<int>& grid,
                                          std::vector<int>& mask,
                                          const int x,
                                          const int y)
 {
-  assert(m_valid_coord(x, y) && "Island coordinates are not valid");
+  assert(m_valid_coordinate(x, y) && "Island coordinates are not valid");
 
   IslandData island_data;
   island_data.mask.resize(size.x * size.y, TerrainType::Water);
@@ -443,7 +381,7 @@ IslandData IslandGenerator::m_get_island(const std::vector<int>& tiles,
     // Top coord
     const auto yt = y0 + 1;
     const auto top_coord = yt * size.x + x0;
-    if (m_valid_coord(x0, yt) && tiles[top_coord] != TerrainType::Water && mask[top_coord] == TerrainType::Water)
+    if (m_valid_coordinate(x0, yt) && grid[top_coord] != TerrainType::Water && mask[top_coord] == TerrainType::Water)
     {
       mask[top_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yt));
@@ -452,7 +390,7 @@ IslandData IslandGenerator::m_get_island(const std::vector<int>& tiles,
     // Bottom coord
     const auto yb = y0 - 1;
     const auto bottom_coord = yb * size.x + x0;
-    if (m_valid_coord(x0, yb) && tiles[bottom_coord] != TerrainType::Water && mask[bottom_coord] == TerrainType::Water)
+    if (m_valid_coordinate(x0, yb) && grid[bottom_coord] != TerrainType::Water && mask[bottom_coord] == TerrainType::Water)
     {
       mask[bottom_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yb));
@@ -461,7 +399,7 @@ IslandData IslandGenerator::m_get_island(const std::vector<int>& tiles,
     // Left coord
     const auto xl = x0 - 1;
     const auto left_coord = y0 * size.x + xl;
-    if (m_valid_coord(xl, y0) && tiles[left_coord] != TerrainType::Water && mask[left_coord] == TerrainType::Water)
+    if (m_valid_coordinate(xl, y0) && grid[left_coord] != TerrainType::Water && mask[left_coord] == TerrainType::Water)
     {
       mask[left_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xl, y0));
@@ -470,7 +408,7 @@ IslandData IslandGenerator::m_get_island(const std::vector<int>& tiles,
     // Right coord
     const auto xr = x0 + 1;
     const auto right_coord = y0 * size.x + xr;
-    if (m_valid_coord(xr, y0) && tiles[right_coord] != TerrainType::Water && mask[right_coord] == TerrainType::Water)
+    if (m_valid_coordinate(xr, y0) && grid[right_coord] != TerrainType::Water && mask[right_coord] == TerrainType::Water)
     {
       mask[right_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xr, y0));
