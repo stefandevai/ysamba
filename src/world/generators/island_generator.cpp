@@ -125,70 +125,16 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 
 void IslandGenerator::m_get_height_map(const int seed)
 {
-  height_map.resize(size.x * size.y);
   silhouette_map.resize(size.x * size.y);
-  mountain_map.resize(size.x * size.y);
   island_mask.resize(size.x * size.y);
-  // raw_height_map.resize(size.x * size.y);
-
-  // const auto generator = utils::get_island_noise_generator(island_params);
+  mountain_map.resize(size.x * size.y);
+  control_map.resize(size.x * size.y);
+  height_map.resize(size.x * size.y);
 
   // Silhouette noise map
   utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
-  utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
-
-  // {
-  //   const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-  //   const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
-  //   fractal->SetSource(simplex);
-  //   fractal->SetOctaveCount(4);
-  //   fractal->SetLacunarity(2.52f);
-  //   fractal->SetGain(0.68f);
-  //   fractal->SetWeightedStrength(0.6f);
-  //
-  //   // // fractal->GenUniformGrid2D(
-  //   // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  //   //
-  //   // const auto distance_to_point = FastNoise::New<FastNoise::DistanceToPoint>();
-  //   // distance_to_point->SetDistanceFunction(FastNoise::DistanceFunction::EuclideanSquared);
-  //   //
-  //   // // distance_to_point->GenUniformGrid2D(
-  //   // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  //   //
-  //   // const auto subtract = FastNoise::New<FastNoise::Subtract>();
-  //   // subtract->SetLHS(fractal);
-  //   // subtract->SetRHS(distance_to_point);
-  //   //
-  //   // // subtract->GenUniformGrid2D(
-  //   // //     silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  //
-  //   const auto remap = FastNoise::New<FastNoise::Remap>();
-  //   remap->SetSource(fractal);
-  //   remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
-  //
-  //   remap->GenUniformGrid2D(
-  //       silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  // }
-  //
-  // // Mountains height map
-  // {
-  //   const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
-  //   const auto fractal = FastNoise::New<FastNoise::FractalRidged>();
-  //   fractal->SetSource(simplex);
-  //   fractal->SetOctaveCount(3);
-  //   fractal->SetLacunarity(1.54f);
-  //   fractal->SetGain(1.18f);
-  //   fractal->SetWeightedStrength(0.4f);
-  //
-  //   const auto remap = FastNoise::New<FastNoise::Remap>();
-  //   remap->SetSource(fractal);
-  //   remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
-  //
-  //   remap->GenUniformGrid2D(
-  //       mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params.frequency, seed);
-  // }
-
-  // float maxv = 0.0f, minv = 0.0f;
+  utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
+  utils::generate_control_map(control_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 13);
 
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
@@ -224,27 +170,62 @@ void IslandGenerator::m_get_height_map(const int seed)
     for (int i = 0; i < size.x; ++i)
     {
       const auto array_index = j * size.x + i;
-      const double noise_value = silhouette_map[array_index];
+      double noise_value = silhouette_map[array_index];
+      double mountain_value = mountain_map[array_index];
+      double control_value = control_map[array_index];
+      const double max_z = size.z - 1.0;
 
       double map_value;
 
-      if (noise_value < 0.4f)
+      if (noise_value < 0.3f)
       {
-        map_value = interpolate(0.0, 0.4, 0.0, 80.0, noise_value);
+        map_value = interpolate(0.0, 0.3, 0.0, max_z * 0.16, noise_value);
       }
-      else if (noise_value < 0.7f)
+      else if (noise_value < 0.5f)
       {
-        map_value = interpolate(0.4, 0.7, 80.0, 180.0, noise_value);
+        map_value = interpolate(0.3, 0.5, max_z * 0.16, max_z * 0.35, noise_value);
       }
       else
       {
-        map_value = interpolate(0.7, 1.0, 180.0, 255.0, noise_value);
+        map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
       }
 
-      // double map_value = interpolate(0.0, 1.0, 0.0, 255.0, mountain_map[array_index]);
+      // Vizualize map
+      // map_value = interpolate(-1.0, 1.0, 0.0, 255.0, std::abs(mountain_map[array_index]) * control_map[array_index]);
 
-      double mountain_value = mountain_map[array_index];
-      map_value *= mountain_value * 2.0;
+      // if (mountain_value > noise_value)
+      // {
+      //   map_value = map_value * (mountain_value * 2.0);
+      // }
+
+      // if (control_value > 0.5 && mountain_value > 0.5)
+      // {
+      //   map_value = map_value * (mountain_value * 2.0) * control_value;
+      // }
+
+      // map_value = map_value * (mountain_value * 2.0) * (control_value + 1.0);
+      // map_value = map_value * ((1.0 - control_value) * noise_value + control_value * mountain_value) * 2.0;
+      
+      // final
+      // map_value = std::max(map_value * (mountain_value * 2.0) * (control_value + 1.0), map_value);
+      // map_value = std::max(map_value * (mountain_value * 2.0) * (control_value + 0.7), map_value);
+      // if (control_value > 0.0)
+      // {
+      //   map_value = std::max(map_value, map_value * mountain_value * control_value * 8.0);
+      // }
+
+      if (map_value >= 1.0)
+      {
+        auto noise_influence = std::min(1.0, noise_value + 0.2);
+        map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
+      }
+
+      //Naive terrace
+      if (static_cast<int>(map_value) > 0)
+      {
+        map_value = interpolate(0.0, max_z, 0.0, 255.0, static_cast<int>(map_value));
+        // map_value = interpolate(0.0, max_z, 0.0, 255.0, map_value);
+      }
 
       map_value = std::clamp(map_value, 0.0, 255.0);
 

@@ -23,8 +23,8 @@ class IslandGenerator
   std::vector<uint8_t> height_map;
   std::vector<float> silhouette_map;
   std::vector<float> mountain_map;
+  std::vector<float> control_map;
   std::vector<float> sea_distance_map;
-  std::vector<float> raw_height_map;
   std::vector<int> island_mask;
   IslandNoiseParams island_params{};
 

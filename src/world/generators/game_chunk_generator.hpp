@@ -25,7 +25,7 @@ class GameChunkGenerator
   IslandNoiseParams island_params{};
 
   // Quantity of tiles per map texture pixel
-  float map_to_tiles = 16.0f;
+  float map_to_tiles = 2.0f;
 
   GameChunkGenerator();
   GameChunkGenerator(const Vector3i& size);

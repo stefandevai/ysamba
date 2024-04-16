@@ -140,21 +140,26 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 
       double map_value;
 
-      if (noise_value < 0.4f)
+      if (noise_value < 0.3f)
       {
-        map_value = interpolate(0.0, 0.4, 0.0, max_z * 0.31, noise_value);
+        map_value = interpolate(0.0, 0.3, 0.0, max_z * 0.16, noise_value);
       }
-      else if (noise_value < 0.7f)
+      else if (noise_value < 0.5f)
       {
-        map_value = interpolate(0.4, 0.7, max_z * 0.31, max_z * 0.71, noise_value);
+        map_value = interpolate(0.3, 0.5, max_z * 0.16, max_z * 0.35, noise_value);
       }
       else
       {
-        map_value = interpolate(0.7, 1.0, max_z * 0.71, max_z, noise_value);
+        map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
       }
 
-      const double mountain_value = mountain_map[array_index];
-      map_value *= mountain_value * 2.0;
+      // const double mountain_value = mountain_map[array_index];
+
+      // if (mountain_value > noise_value)
+      // {
+      //   map_value = map_value * (mountain_value * 2.0);
+      // }
+
       map_value = std::clamp(map_value, 0.0, max_z);
 
       // const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
@@ -171,10 +176,10 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
       int terrain_id = 0;
       int resolved_z = k;
 
-      if (k < 1)
+      if (k < 6)
       {
         terrain_id = 1;
-        ++resolved_z;
+        resolved_z = 6;
       }
       else
       {
@@ -268,7 +273,7 @@ void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset
                                size.x + m_generation_padding * 2,
                                size.y + m_generation_padding * 2,
                                island_params,
-                               seed);
+                               seed + 47);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise
