@@ -283,12 +283,12 @@ void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset
                                island_params,
                                seed + 47);
   utils::generate_control_map(control_map.data(),
-                               offset.x - m_generation_padding,
-                               offset.y + m_generation_padding,
-                               size.x + m_generation_padding * 2,
-                               size.y + m_generation_padding * 2,
-                               island_params,
-                               seed + 13);
+                              offset.x - m_generation_padding,
+                              offset.y + m_generation_padding,
+                              size.x + m_generation_padding * 2,
+                              size.y + m_generation_padding * 2,
+                              island_params,
+                              seed + 13);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise

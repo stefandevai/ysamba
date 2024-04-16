@@ -271,7 +271,8 @@ void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const in
     // Top coordinate
     const auto yt = y0 + 1;
     const auto top_coordinate = yt * size.x + x0;
-    if (m_valid_coordinate(x0, yt) && grid[top_coordinate] == original_value && visited[top_coordinate] == value_to_fill)
+    if (m_valid_coordinate(x0, yt) && grid[top_coordinate] == original_value
+        && visited[top_coordinate] == value_to_fill)
     {
       visited[top_coordinate] = std::numeric_limits<int>::max();
       grid[top_coordinate] = value_to_fill;
@@ -281,7 +282,8 @@ void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const in
     // Bottom coordinate
     const auto yb = y0 - 1;
     const auto bottom_coordinate = yb * size.x + x0;
-    if (m_valid_coordinate(x0, yb) && grid[bottom_coordinate] == original_value && visited[bottom_coordinate] == value_to_fill)
+    if (m_valid_coordinate(x0, yb) && grid[bottom_coordinate] == original_value
+        && visited[bottom_coordinate] == value_to_fill)
     {
       visited[bottom_coordinate] = std::numeric_limits<int>::max();
       grid[bottom_coordinate] = value_to_fill;
@@ -291,7 +293,8 @@ void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const in
     // Left coordinate
     const auto xl = x0 - 1;
     const auto left_coordinate = y0 * size.x + xl;
-    if (m_valid_coordinate(xl, y0) && grid[left_coordinate] == original_value && visited[left_coordinate] == value_to_fill)
+    if (m_valid_coordinate(xl, y0) && grid[left_coordinate] == original_value
+        && visited[left_coordinate] == value_to_fill)
     {
       visited[left_coordinate] = std::numeric_limits<int>::max();
       grid[left_coordinate] = value_to_fill;
@@ -301,7 +304,8 @@ void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const in
     // Right coordinate
     const auto xr = x0 + 1;
     const auto right_coordinate = y0 * size.x + xr;
-    if (m_valid_coordinate(xr, y0) && grid[right_coordinate] == original_value && visited[right_coordinate] == value_to_fill)
+    if (m_valid_coordinate(xr, y0) && grid[right_coordinate] == original_value
+        && visited[right_coordinate] == value_to_fill)
     {
       visited[right_coordinate] = std::numeric_limits<int>::max();
       grid[right_coordinate] = value_to_fill;
@@ -345,10 +349,7 @@ std::vector<IslandData> IslandGenerator::m_get_islands(std::vector<int>& grid, c
   return islands;
 }
 
-IslandData IslandGenerator::m_get_island(const std::vector<int>& grid,
-                                         std::vector<int>& mask,
-                                         const int x,
-                                         const int y)
+IslandData IslandGenerator::m_get_island(const std::vector<int>& grid, std::vector<int>& mask, const int x, const int y)
 {
   assert(m_valid_coordinate(x, y) && "Island coordinates are not valid");
 
@@ -391,7 +392,8 @@ IslandData IslandGenerator::m_get_island(const std::vector<int>& grid,
     // Bottom coord
     const auto yb = y0 - 1;
     const auto bottom_coord = yb * size.x + x0;
-    if (m_valid_coordinate(x0, yb) && grid[bottom_coord] != TerrainType::Water && mask[bottom_coord] == TerrainType::Water)
+    if (m_valid_coordinate(x0, yb) && grid[bottom_coord] != TerrainType::Water
+        && mask[bottom_coord] == TerrainType::Water)
     {
       mask[bottom_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(x0, yb));
@@ -409,7 +411,8 @@ IslandData IslandGenerator::m_get_island(const std::vector<int>& grid,
     // Right coord
     const auto xr = x0 + 1;
     const auto right_coord = y0 * size.x + xr;
-    if (m_valid_coordinate(xr, y0) && grid[right_coord] != TerrainType::Water && mask[right_coord] == TerrainType::Water)
+    if (m_valid_coordinate(xr, y0) && grid[right_coord] != TerrainType::Water
+        && mask[right_coord] == TerrainType::Water)
     {
       mask[right_coord] = TerrainType::Land;
       coord_queue.push(Point<int>(xr, y0));

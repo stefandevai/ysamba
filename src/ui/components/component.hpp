@@ -63,6 +63,7 @@ class UIComponent
   Vector3i absolute_position{};
   Vector2i size{};
   Vector2i margin{};
+  Vector4i bounding_box{};
   XAlignement x_alignment = XAlignement::Left;
   YAlignement y_alignment = YAlignement::Top;
   Placement placement = Placement::Relative;
@@ -87,6 +88,7 @@ class UIComponent
   virtual void render();
   virtual void show();
   virtual void hide();
+  virtual void compute_bounding_box();
 
   // Hides the component without triggering animations (if any)
   void force_hide();

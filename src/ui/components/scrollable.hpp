@@ -1,13 +1,9 @@
 #pragma once
 
-#include <entt/core/hashed_string.hpp>
-
 #include "./component.hpp"
 
 namespace dl::ui
 {
-using namespace entt::literals;
-
 class Scrollable : public UIComponent
 {
  public:

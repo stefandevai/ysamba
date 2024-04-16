@@ -59,6 +59,12 @@ void UIComponent::m_update_geometry()
 
   if (dirty)
   {
+    // Call method only for root components, the children bounding boxes will be computed recursively
+    if (parent == nullptr)
+    {
+      compute_bounding_box();
+    }
+
     const auto& window_size = Display::get_window_size();
     const auto& matrix = m_context.matrix_stack->back();
 
@@ -165,6 +171,27 @@ void UIComponent::show()
 void UIComponent::hide()
 {
   state = State::Hidden;
+}
+
+void UIComponent::compute_bounding_box()
+{
+  bounding_box.x = absolute_position.x;
+  bounding_box.y = absolute_position.y;
+  bounding_box.z = absolute_position.x + size.x;
+  bounding_box.w = absolute_position.y + size.y;
+
+  for (auto& child : children)
+  {
+    child->compute_bounding_box();
+
+    bounding_box.x = std::min(bounding_box.x, child->bounding_box.x);
+    bounding_box.y = std::min(bounding_box.y, child->bounding_box.y);
+    bounding_box.z = std::max(bounding_box.z, child->bounding_box.z);
+    bounding_box.w = std::max(bounding_box.w, child->bounding_box.w);
+
+    size.x = bounding_box.z - bounding_box.x;
+    size.y = bounding_box.w - bounding_box.y;
+  }
 }
 
 void UIComponent::force_hide()

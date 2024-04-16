@@ -29,10 +29,7 @@ struct IslandData
   Point<int> top_left;
   Point<int> bottom_right;
 
-  bool operator<(const IslandData& rhs) const
-  {
-    return points.size() < rhs.points.size();
-  }
+  bool operator<(const IslandData& rhs) const { return points.size() < rhs.points.size(); }
 };
 
 struct IslandNoiseParams
