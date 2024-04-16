@@ -6,6 +6,8 @@
 #include "ui/animation.hpp"
 #include "ui/components/scrollable_text_button_list.hpp"
 #include "ui/components/window_frame.hpp"
+#include "ui/components/flex.hpp"
+#include "ui/components/container.hpp"
 
 namespace dl::ui
 {
@@ -20,17 +22,22 @@ DemoWindow::DemoWindow(UIContext& context) : UIComponent(context, "DemoWindow")
       .size = size,
   });
 
-  m_list = m_window_frame->emplace<ScrollableTextButtonList<uint32_t>>(ScrollableTextButtonList<uint32_t>::Params{
-      .items = {{0, "Item0"}},
-      .size = m_window_frame->get_safe_area_size(),
-      .title = "Select Action",
-      .enumerate = true,
-      .enumeration_type = EnumerationType::Alphabetical,
-  });
+  auto flex = m_window_frame->emplace<Flex>(Flex::Params{});
+  flex->emplace<Container>(Container::Params{.size = {100, 100}, .color = 0xFF8844FF});
+  flex->emplace<Container>(Container::Params{.size = {200, 100}, .color = 0x99FF44FF});
+
+
+  // m_list = m_window_frame->emplace<ScrollableTextButtonList<uint32_t>>(ScrollableTextButtonList<uint32_t>::Params{
+  //     .items = {{0, "Item0"}},
+  //     .size = m_window_frame->get_safe_area_size(),
+  //     .title = "Select Action",
+  //     .enumerate = true,
+  //     .enumeration_type = EnumerationType::Alphabetical,
+  // });
 
   const auto position_offset = m_window_frame->get_position_offset();
-  m_list->position.x = position_offset.x;
-  m_list->position.y = position_offset.y;
+  flex->position.x = position_offset.x;
+  flex->position.y = position_offset.y;
 }
 
 void DemoWindow::show()
@@ -38,7 +45,7 @@ void DemoWindow::show()
   using namespace entt::literals;
 
   m_input_manager.push_context("list_selection"_hs);
-  m_list->scrollable->reset_scroll();
+  // m_list->scrollable->reset_scroll();
   animate<AnimationFadeIn>(0.3, Easing::OutQuart);
 }
 

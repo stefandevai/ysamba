@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./scene.hpp"
+#include "definitions.hpp"
 #include "core/input_manager.hpp"
 #include "ui/types.hpp"
 
@@ -9,6 +10,10 @@ namespace dl::ui
 template <class T>
 class TextButtonList;
 class WorldList;
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+class DemoWindow;
+#endif
 }  // namespace dl::ui
 
 namespace dl::audio
@@ -50,5 +55,9 @@ class HomeMenu : public Scene
 
   void m_load_worlds_metadata();
   void m_on_select_menu_option(MenuChoice choice);
+
+#ifdef DL_BUILD_DEBUG_TOOLS
+  ui::DemoWindow* m_ui_demo_window = nullptr;
+#endif
 };
 }  // namespace dl

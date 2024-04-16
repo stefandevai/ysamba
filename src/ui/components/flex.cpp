@@ -8,10 +8,12 @@ Flex::Flex(UIContext& context, Params params) : UIComponent(context, "Flex"), di
 
 void Flex::update()
 {
-  if (children.empty() || !dirty)
+  if (children.empty())
   {
     return;
   }
+
+  // compute_bounding_box();
 
   if (direction == FlexDirection::Row)
   {
@@ -21,9 +23,7 @@ void Flex::update()
     {
       child->position.x = anchor.x;
       child->position.y = anchor.y;
-      child->dirty = true;
-
-      anchor += child->size;
+      anchor.x += child->size.x;
     }
   }
 }

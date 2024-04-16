@@ -19,6 +19,10 @@
 #include "ui/components/text_button_list.hpp"
 #include "ui/compositions/world_list.hpp"
 
+#ifdef DL_BUILD_DEBUG_TOOLS
+#include "ui/compositions/demo_window.hpp"
+#endif
+
 namespace dl
 {
 HomeMenu::HomeMenu(GameContext& game_context) : Scene("home_menu", game_context) {}
@@ -66,6 +70,10 @@ void HomeMenu::load()
 
   m_button_list->position = Vector3i{75, 193, 0};
 
+#ifdef DL_BUILD_DEBUG_TOOLS
+  m_ui_demo_window = m_ui_manager.emplace<ui::DemoWindow>();
+#endif
+
   m_has_loaded = true;
 }
 
@@ -107,6 +115,12 @@ void HomeMenu::process_input()
   {
     m_game_context.scene_manager->push_scene<WorldCreation>(m_game_context);
   }
+#ifdef DL_BUILD_DEBUG_TOOLS
+  else if (m_input_manager.poll_action("ui_demo"_hs))
+  {
+    m_ui_demo_window->show();
+  }
+#endif
 }
 
 void HomeMenu::update()
