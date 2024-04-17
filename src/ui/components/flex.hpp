@@ -37,6 +37,10 @@ class Flex : public UIComponent
   Flex(UIContext& context, Params params);
 
   void update() override;
+
+ private:
+  void m_place_as_row();
+  void m_place_as_column();
 };
 
 }  // namespace dl::ui
