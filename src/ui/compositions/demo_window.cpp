@@ -24,34 +24,31 @@ DemoWindow::DemoWindow(UIContext& context) : UIComponent(context, "DemoWindow")
 
   auto safe_area = m_window_frame->get_safe_area_size();
 
-  auto flex1 = m_window_frame->emplace<Flex>(Flex::Params{
-      .size = safe_area,
-      .vertical_placement = FlexPlacement::Center,
-      .horizontal_placement = FlexPlacement::SpaceBetween,
-  });
-
-  flex1->emplace<Container>(Container::Params{.size = {100, 100}, .color = 0xFF8844FF});
-  flex1->emplace<Container>(Container::Params{.size = {30, 130}, .color = 0x6688FFFF});
-  flex1->emplace<Container>(Container::Params{.size = {200, 80}, .color = 0x99FF44FF});
-
-  // auto flex2 = m_window_frame->emplace<Flex>(Flex::Params{.direction = FlexDirection::Column});
-  // flex2->emplace<Container>(Container::Params{.size = {100, 100}, .color = 0xFF8844FF});
-  // flex2->emplace<Container>(Container::Params{.size = {30, 130}, .color = 0x6688FFFF});
-  // flex2->emplace<Container>(Container::Params{.size = {200, 80}, .color = 0x99FF44FF});
-
-  // m_list = m_window_frame->emplace<ScrollableTextButtonList<uint32_t>>(ScrollableTextButtonList<uint32_t>::Params{
-  //     .items = {{0, "Item0"}},
-  //     .size = m_window_frame->get_safe_area_size(),
-  //     .title = "Select Action",
-  //     .enumerate = true,
-  //     .enumeration_type = EnumerationType::Alphabetical,
+  // auto flex1 = m_window_frame->emplace<Flex>(Flex::Params{
+  //     .size = safe_area,
+  //     .vertical_placement = FlexPlacement::Center,
+  //     .horizontal_placement = FlexPlacement::SpaceBetween,
   // });
+  //
+  // flex1->emplace<Container>(Container::Params{.size = {100, 100}, .color = 0xFF8844FF});
+  // flex1->emplace<Container>(Container::Params{.size = {30, 130}, .color = 0x6688FFFF});
+  // flex1->emplace<Container>(Container::Params{.size = {200, 80}, .color = 0x99FF44FF});
+
+  auto flex2 = m_window_frame->emplace<Flex>(Flex::Params{
+      .size = safe_area,
+      .direction = FlexDirection::Column,
+      // .vertical_placement = FlexPlacement::SpaceEvenly,
+      // .horizontal_placement = FlexPlacement::SpaceBetween,
+  });
+  flex2->emplace<Container>(Container::Params{.size = {100, 100}, .color = 0xFF8844FF});
+  flex2->emplace<Container>(Container::Params{.size = {30, 130}, .color = 0x6688FFFF});
+  flex2->emplace<Container>(Container::Params{.size = {200, 80}, .color = 0x99FF44FF});
 
   const auto position_offset = m_window_frame->get_position_offset();
-  flex1->position.x = position_offset.x;
-  flex1->position.y = position_offset.y;
-  // flex2->position.x = position_offset.x;
-  // flex2->position.y = position_offset.y + 100;
+  // flex1->position.x = position_offset.x;
+  // flex1->position.y = position_offset.y;
+  flex2->position.x = position_offset.x;
+  flex2->position.y = position_offset.y;
 }
 
 void DemoWindow::process_input()

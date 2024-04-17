@@ -155,13 +155,134 @@ void Flex::update()
   }
   else if (direction == FlexDirection::Column)
   {
-    Vector2i anchor = Vector2i{};
-
-    for (auto& child : children)
+    // Handle vertical placement
+    if (vertical_placement == FlexPlacement::Start)
     {
-      child->position.x = anchor.x;
-      child->position.y = anchor.y;
-      anchor.y += child->size.y;
+      int anchor_y = 0;
+
+      for (auto& child : children)
+      {
+        child->position.y = anchor_y;
+        anchor_y += child->size.y;
+      }
+    }
+    else if (vertical_placement == FlexPlacement::End)
+    {
+      int anchor_y = size.y;
+
+      for (auto it = children.rbegin(); it != children.rend(); ++it)
+      {
+        auto& child = *it;
+        anchor_y -= child->size.y;
+        child->position.y = anchor_y;
+      }
+    }
+    else if (vertical_placement == FlexPlacement::Center)
+    {
+      int children_height = 0;
+
+      for (auto& child : children)
+      {
+        children_height += child->size.y;
+      }
+
+      int anchor_y = (size.y - children_height) / 2;
+
+      for (auto& child : children)
+      {
+        child->position.y = anchor_y;
+        anchor_y += child->size.y;
+      }
+    }
+    else if (vertical_placement == FlexPlacement::SpaceBetween && children.size() > 1)
+    {
+      int children_height = 0;
+
+      for (auto& child : children)
+      {
+        children_height += child->size.y;
+      }
+
+      int spacing = (size.y - children_height) / (children.size() - 1);
+
+      int anchor_y = 0;
+
+      for (auto& child : children)
+      {
+        child->position.y = anchor_y;
+        anchor_y += child->size.y + spacing;
+      }
+    }
+    else if (vertical_placement == FlexPlacement::SpaceEvenly)
+    {
+      int children_height = 0;
+
+      for (auto& child : children)
+      {
+        children_height += child->size.y;
+      }
+
+      int spacing = (size.y - children_height) / (children.size() + 1);
+
+      int anchor_y = spacing;
+
+      for (auto& child : children)
+      {
+        child->position.y = anchor_y;
+        anchor_y += child->size.y + spacing;
+      }
+    }
+
+    // Handle horizontal placement
+    if (horizontal_placement == FlexPlacement::End)
+    {
+      for (auto& child : children)
+      {
+        child->position.x = size.x - child->size.x;
+      }
+    }
+    else if (horizontal_placement == FlexPlacement::Center)
+    {
+      for (auto& child : children)
+      {
+        child->position.x = (size.x - child->size.x) / 2;
+      }
+    }
+    else if (horizontal_placement == FlexPlacement::SpaceEvenly)
+    {
+      int children_width = 0;
+
+      for (auto& child : children)
+      {
+        children_width += child->size.x;
+      }
+
+      const int spacing = (size.x - children_width) / (children.size() + 1);
+      int anchor_x = spacing;
+
+      for (auto& child : children)
+      {
+        child->position.x = anchor_x;
+        anchor_x += child->size.x + spacing;
+      }
+    }
+    else if (horizontal_placement == FlexPlacement::SpaceBetween && children.size() > 1)
+    {
+      int children_width = 0;
+
+      for (auto& child : children)
+      {
+        children_width += child->size.x;
+      }
+
+      const int spacing = (size.x - children_width) / (children.size() - 1);
+      int anchor_x = 0;
+
+      for (auto& child : children)
+      {
+        child->position.x = anchor_x;
+        anchor_x += child->size.x + spacing;
+      }
     }
   }
 }
