@@ -1,8 +1,8 @@
 #pragma once
 
 #include "./scene.hpp"
-#include "definitions.hpp"
 #include "core/input_manager.hpp"
+#include "definitions.hpp"
 #include "ui/types.hpp"
 
 namespace dl::ui

@@ -106,7 +106,7 @@ void IslandGenerator::m_get_height_map(const int seed)
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
   utils::generate_control_map(control_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 13);
 
-  const double max_z = size.z - 1.0;
+  const double max_z = 32.0;
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
 
@@ -149,7 +149,7 @@ void IslandGenerator::m_get_height_map(const int seed)
       {
         double mountain_value = mountain_map[array_index];
         double control_value = control_map[array_index];
-        auto noise_influence = std::min(1.0, noise_value + 0.5);
+        const auto noise_influence = std::min(1.0, noise_value + 0.5);
         map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
       }
 

@@ -13,8 +13,9 @@ class DemoWindow : public UIComponent
 {
  public:
   DemoWindow(UIContext& context);
-  void show();
-  void hide();
+  void process_input() override;
+  void show() override;
+  void hide() override;
 
  private:
   ScrollableTextButtonList<uint32_t>* m_list = nullptr;

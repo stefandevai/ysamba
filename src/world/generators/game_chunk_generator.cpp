@@ -50,75 +50,14 @@ GameChunkGenerator::GameChunkGenerator(const Vector3i& size) : size(size)
 
 void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
 {
-  // spdlog::info("====================");
-  // spdlog::info("= GENERATING CHUNK =");
-  // spdlog::info("====================\n");
-  // spdlog::info("SEED: {}", seed);
-  // spdlog::info("WIDTH: {}", width);
-  // spdlog::info("HEIGHT: {}\n", size.y);
-
-  // Timer timer{};
-
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(size);
 
   auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
 
-  // timer.start();
-
-  // spdlog::info("Generating height maps...");
-
   m_get_height_map(seed, offset);
 
-  // spdlog::info("Setting terrain...");
-
-  // for (int j = 0; j < m_padded_size.y; ++j)
-  // {
-  //   for (int i = 0; i < m_padded_size.x; ++i)
-  //   {
-  //     const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
-  //     const int k = static_cast<int>(map_value * (size.z - 1));
-  //     bool inside_chunk = false;
-  //
-  //     if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
-  //         && i < m_padded_size.y - m_generation_padding)
-  //     {
-  //       inside_chunk = true;
-  //     }
-  //
-  //     int terrain_id = 0;
-  //     int resolved_z = k;
-  //
-  //     if (k < 1)
-  //     {
-  //       terrain_id = 1;
-  //       ++resolved_z;
-  //     }
-  //     else
-  //     {
-  //       terrain_id = 2;
-  //     }
-  //
-  //     if (inside_chunk)
-  //     {
-  //       chunk->tiles.height_map[(j - 1) * size.x + (i - 1)] = resolved_z;
-  //       chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
-  //     }
-  //
-  //     terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
-  //
-  //     for (int z = 0; z < resolved_z; ++z)
-  //     {
-  //       terrain[z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
-  //
-  //       if (inside_chunk)
-  //       {
-  //         chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
-  //       }
-  //     }
-  //   }
-  // }
-
+  const double max_z = size.z - 1.0;
   const float gradient_diameter = 160.0f * map_to_tiles;
   const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
@@ -136,8 +75,6 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
       // silhouette_map[array_index] = std::clamp(gradient, 0.0f, 1.0f);
 
       const double noise_value = silhouette_map[array_index];
-      const double max_z = size.z - 1.0;
-
       double map_value;
 
       if (noise_value < 0.3f)
@@ -153,25 +90,17 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
         map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
       }
 
-      const double mountain_value = mountain_map[array_index];
-      double control_value = control_map[array_index];
-
       if (map_value >= 1.0)
       {
-        auto noise_influence = std::min(1.0, noise_value + 0.5);
+        const double mountain_value = mountain_map[array_index];
+        double control_value = control_map[array_index];
+        const auto noise_influence = std::min(1.0, noise_value + 0.5);
         map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
       }
 
-      // if (mountain_value > noise_value)
-      // {
-      //   map_value = map_value * (mountain_value * 2.0);
-      // }
-
       map_value = std::clamp(map_value, 0.0, max_z);
 
-      // const auto map_value = std::clamp(raw_height_map[j * m_padded_size.x + i], 0.0f, 1.0f);
       const int k = static_cast<int>(map_value);
-      // const int k = static_cast<int>(silhouette_map[j * m_padded_size.x + i] * (size.z - 1));
       bool inside_chunk = false;
 
       if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
@@ -213,11 +142,7 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
     }
   }
 
-  // spdlog::info("Computing visibility...");
-
   chunk->tiles.compute_visibility();
-
-  // spdlog::info("Selecting tiles...");
 
   for (int k = 0; k < size.z; ++k)
   {
@@ -229,9 +154,6 @@ void GameChunkGenerator::generate(const int seed, const Vector3i& offset)
       }
     }
   }
-
-  // timer.stop();
-  // timer.print("Chunk generation");
 }
 
 void GameChunkGenerator::set_size(const Vector3i& size)
@@ -242,30 +164,11 @@ void GameChunkGenerator::set_size(const Vector3i& size)
 
 void GameChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 {
-  // height_map.resize(size.x * size.y);
   silhouette_map.resize(m_padded_size.x * m_padded_size.y);
   mountain_map.resize(m_padded_size.x * m_padded_size.y);
   control_map.resize(m_padded_size.x * m_padded_size.y);
-  // raw_height_map.resize(m_padded_size.x * m_padded_size.y);
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
-
-  // const auto generator = utils::get_island_noise_generator(island_params);
-  // FastNoise::SmartNode<> generator
-  //
-  // return generator;
-  //     =
-  //     FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAL8AAIA/GgABDQAFAAAArkchQCkAAHsULj8AmpkZPwEFAAEAAAAAAAAAAAAAAAAAAAAAAAAA");
-
-  // generator->GenUniformGrid2D(raw_height_map.data(),
-  //                             offset.x - m_generation_padding,
-  //                             offset.y + m_generation_padding,
-  //                             // offset.x - m_generation_padding - 256 / 2 * map_to_tiles,
-  //                             // offset.y + m_generation_padding - 256 / 2 * map_to_tiles,
-  //                             size.x + m_generation_padding * 2,
-  //                             size.y + m_generation_padding * 2,
-  //                             island_params.frequency,
-  //                             seed);
 
   utils::generate_silhouette_map(silhouette_map.data(),
                                  offset.x - m_generation_padding,
