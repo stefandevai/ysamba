@@ -59,12 +59,6 @@ void UIComponent::m_update_geometry()
 
   if (dirty)
   {
-    // Call method only for root components, the children bounding boxes will be computed recursively
-    if (parent == nullptr)
-    {
-      compute_bounding_box();
-    }
-
     const auto& window_size = Display::get_window_size();
     const auto& matrix = m_context.matrix_stack->back();
 
@@ -120,12 +114,18 @@ void UIComponent::m_update()
 
   m_update_geometry();
 
+  // // Call method only for root components, the children bounding boxes will be computed recursively
+  // if (dirty && parent == nullptr)
+  // {
+  //   compute_bounding_box();
+  // }
+
   if (m_is_positioned())
   {
     m_context.matrix_stack->push_back(m_transform_matrix);
   }
 
-  if (state == State::Visible)
+  if (state == State::Visible || state == State::Animating)
   {
     update();
   }
