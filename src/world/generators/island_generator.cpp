@@ -8,10 +8,10 @@
 #include <cmath>
 #include <limits>
 
-#include "./terrain_type.hpp"
-#include "./utils.hpp"
 #include "core/json.hpp"
 #include "core/timer.hpp"
+#include "world/generators/terrain_type.hpp"
+#include "world/generators/utils.hpp"
 #include "world/point.hpp"
 
 namespace
@@ -45,7 +45,8 @@ void IslandGenerator::generate(const int seed)
 
   spdlog::info("Generating height map...");
 
-  m_get_height_map(seed);
+  m_compute_maps(seed);
+  m_generate_biomes();
 
   spdlog::info("Adjusting islands...");
 
@@ -92,7 +93,7 @@ void IslandGenerator::m_load_params(const std::string& filepath)
   island_params.layer_1_terrace_multiplier = mask_params["terrace_multiplier"].get<float>();
 }
 
-void IslandGenerator::m_get_height_map(const int seed)
+void IslandGenerator::m_compute_maps(const int seed)
 {
   height_map.resize(size.x * size.y);
   sea_distance_field.resize(size.x * size.y);
@@ -247,6 +248,46 @@ void IslandGenerator::m_get_height_map(const int seed)
   memcpy(sea_distance_field.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
   heman_image_destroy(distance_field);
   heman_image_destroy(heman_island_mask_image);
+}
+
+void IslandGenerator::m_generate_biomes()
+{
+  biome_map.resize(size.x * size.y);
+
+  for (int j = 0; j < size.y; ++j)
+  {
+    for (int i = 0; i < size.x; ++i)
+    {
+      const auto height_value = height_map[j * size.x + i];
+      const auto sea_distance_value = sea_distance_field[j * size.x + i];
+
+      if (height_value == 0 && sea_distance_value <= 0.0f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Sea;
+        continue;
+      }
+      if (height_value == 0 && sea_distance_value > 0.0f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Lake;
+        continue;
+      }
+      if (height_value < 9 && sea_distance_value < 0.01f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Beach;
+        continue;
+      }
+      if (height_value >= 20 && sea_distance_value < 0.02f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Rocks;
+        continue;
+      }
+      if (height_value > 3)
+      {
+        biome_map[j * size.x + i] = BiomeType::Grass;
+        continue;
+      }
+    }
+  }
 }
 
 void IslandGenerator::m_flood_fill(std::vector<int>& grid, const int x, const int y, const int value_to_fill)

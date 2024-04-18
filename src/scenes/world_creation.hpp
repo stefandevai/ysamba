@@ -7,6 +7,7 @@
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/sprite.hpp"
+#include "world/generators/biome_type.hpp"
 #include "world/world.hpp"
 
 namespace dl::ui
@@ -44,14 +45,18 @@ class WorldCreation : public Scene
   SceneState m_scene_state = SceneState::Normal;
   World m_world{m_game_context};
   std::unique_ptr<Texture> m_texture = nullptr;
+  std::unique_ptr<Texture> m_biome_texture = nullptr;
   int m_seed = 0;
   std::vector<uint8_t> m_height_map{};
+  std::vector<float> m_sea_distance_field{};
+  std::vector<BiomeType> m_biome_map{};
   InputManager& m_input_manager = InputManager::get_instance();
   ui::WorldCreationPanel* m_panel = nullptr;
 
   void m_generate_map();
   void m_generate_world();
   void m_create_map_representation();
+  void m_create_biome_representation();
   bool m_update_input();
 };
 }  // namespace dl

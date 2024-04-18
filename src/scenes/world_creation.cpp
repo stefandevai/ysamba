@@ -38,6 +38,7 @@ void WorldCreation::load()
   m_generate_map();
   m_generate_world();
   m_create_map_representation();
+  m_create_biome_representation();
   m_has_loaded = true;
 }
 
@@ -71,9 +72,15 @@ void WorldCreation::render()
     return;
   }
 
-  assert(m_texture != nullptr);
+  if (m_texture != nullptr)
+  {
+    m_renderer.ui_pass.batch.texture(*m_texture, 15, 15, 0);
+  }
+  if (m_biome_texture != nullptr)
+  {
+    m_renderer.ui_pass.batch.texture(*m_biome_texture, 15, 15, 1);
+  }
 
-  m_renderer.ui_pass.batch.texture(*m_texture, 15, 15, 0);
   m_ui_manager.render();
   m_renderer.render(m_camera);
 }
@@ -92,6 +99,7 @@ bool WorldCreation::m_update_input()
   {
     m_generate_map();
     m_create_map_representation();
+    m_create_biome_representation();
   }
   else if (m_input_manager.poll_action("save"_hs))
   {
@@ -118,13 +126,16 @@ void WorldCreation::save()
   const auto now = std::chrono::system_clock::now();
   const auto now_seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
 
-  WorldMetadata metadata{};
-  metadata.id = utils::generate_id();
-  metadata.name = m_panel->get_name();
-  metadata.seed = m_seed;
-  metadata.world_size = world_size;
-  metadata.created_at = now_seconds;
-  metadata.updated_at = now_seconds;
+  WorldMetadata metadata{
+      .id = utils::generate_id(),
+      .name = m_panel->get_name(),
+      .seed = m_seed,
+      .world_size = world_size,
+      .created_at = now_seconds,
+      .updated_at = now_seconds,
+      .height_map = std::move(m_height_map),
+      .sea_distance_field = std::move(m_sea_distance_field),
+  };
 
   serialization::save_world_metadata(metadata);
   serialization::save_world(m_world, metadata);
@@ -158,10 +169,11 @@ void WorldCreation::m_generate_map()
   }
 
   auto generator = IslandGenerator(world_size);
-  m_height_map.clear();
-  m_height_map.reserve(world_size.x * world_size.y);
   generator.generate(m_seed);
+
   m_height_map = std::move(generator.height_map);
+  m_sea_distance_field = std::move(generator.sea_distance_field);
+  m_biome_map = std::move(generator.biome_map);
 }
 
 void WorldCreation::m_generate_world()
@@ -184,9 +196,9 @@ void WorldCreation::m_create_map_representation()
       // const uint8_t value = z * 255 / z_levels;
       // const uint8_t value = map_value * 255;
 
-      pixel_data[j * world_size.x * 4 + i * 4] = 0;
-      pixel_data[j * world_size.x * 4 + i * 4 + 1] = m_height_map[j * world_size.x + i];
-      pixel_data[j * world_size.x * 4 + i * 4 + 2] = 50;
+      pixel_data[j * world_size.x * 4 + i * 4] = map_value;
+      pixel_data[j * world_size.x * 4 + i * 4 + 1] = map_value;
+      pixel_data[j * world_size.x * 4 + i * 4 + 2] = map_value;
       pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
     }
   }
@@ -198,6 +210,58 @@ void WorldCreation::m_create_map_representation()
   const auto& window_size = Display::get_window_size();
   const int texture_size = std::min(window_size.x, window_size.y) - 30;
   m_texture->size = Vector2i{texture_size, texture_size};
+
+  m_renderer.ui_pass.batch.clear_textures();
+}
+
+void WorldCreation::m_create_biome_representation()
+{
+  std::vector<unsigned char> pixel_data((world_size.x * world_size.y) * 4);
+  const int z_levels = world_size.z;
+  Color color{0xFFFFFFFF};
+
+  for (auto i = 0; i < world_size.x; ++i)
+  {
+    for (auto j = 0; j < world_size.y; ++j)
+    {
+      const auto biome_type = m_biome_map[j * world_size.x + i];
+
+      switch (biome_type)
+      {
+      case BiomeType::Grass:
+        color.set(0x22CC66FF);
+        break;
+      case BiomeType::Beach:
+        color.set(0xF2CB5EFF);
+        break;
+      case BiomeType::Sea:
+        color.set(0x2277EEFF);
+        break;
+      case BiomeType::Lake:
+        color.set(0x22BBEEFF);
+        break;
+      case BiomeType::Rocks:
+        color.set(0x3E4B59FF);
+        break;
+      default:
+        color.set(0xFF00FFFF);
+        break;
+      }
+
+      pixel_data[j * world_size.x * 4 + i * 4] = color.rgba_color.r;
+      pixel_data[j * world_size.x * 4 + i * 4 + 1] = color.rgba_color.g;
+      pixel_data[j * world_size.x * 4 + i * 4 + 2] = color.rgba_color.b;
+      pixel_data[j * world_size.x * 4 + i * 4 + 3] = 128;
+    }
+  }
+
+  m_biome_texture = std::make_unique<Texture>(
+      m_game_context.display->wgpu_context.device, pixel_data.data(), Vector2i{world_size.x, world_size.y});
+
+  // TODO: Find a better way to override texture size
+  const auto& window_size = Display::get_window_size();
+  const int texture_size = std::min(window_size.x, window_size.y) - 30;
+  m_biome_texture->size = Vector2i{texture_size, texture_size};
 
   m_renderer.ui_pass.batch.clear_textures();
 }
