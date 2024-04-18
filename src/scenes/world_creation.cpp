@@ -228,20 +228,41 @@ void WorldCreation::m_create_biome_representation()
 
       switch (biome_type)
       {
-      case BiomeType::Grass:
-        color.set(0x22CC66FF);
+      case BiomeType::Rainforest:
+        color.set(0x178565FF);
+        break;
+      case BiomeType::TemperateForest:
+        color.set(0x1fc46aFF);
         break;
       case BiomeType::Beach:
-        color.set(0xF2CB5EFF);
+        color.set(0xeddb80FF);
+        break;
+      case BiomeType::Mangrove:
+        color.set(0x03fca1FF);
         break;
       case BiomeType::Sea:
-        color.set(0x2277EEFF);
+        color.set(0x0d486eFF);
         break;
       case BiomeType::Lake:
         color.set(0x22BBEEFF);
         break;
       case BiomeType::Rocks:
-        color.set(0x3E4B59FF);
+        color.set(0x355e87FF);
+        break;
+      case BiomeType::RockMountains:
+        color.set(0x2f5454FF);
+        break;
+      case BiomeType::PineForestMountains:
+        color.set(0x0f4021FF);
+        break;
+      case BiomeType::DryPlains:
+        color.set(0x9dc272FF);
+        break;
+      case BiomeType::Meadows:
+        color.set(0x8bd48aFF);
+        break;
+      case BiomeType::Swamp:
+        color.set(0x9c854fFF);
         break;
       default:
         color.set(0xFF00FFFF);
@@ -251,7 +272,7 @@ void WorldCreation::m_create_biome_representation()
       pixel_data[j * world_size.x * 4 + i * 4] = color.rgba_color.r;
       pixel_data[j * world_size.x * 4 + i * 4 + 1] = color.rgba_color.g;
       pixel_data[j * world_size.x * 4 + i * 4 + 2] = color.rgba_color.b;
-      pixel_data[j * world_size.x * 4 + i * 4 + 3] = 128;
+      pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
     }
   }
 

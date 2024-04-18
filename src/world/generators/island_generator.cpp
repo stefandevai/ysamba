@@ -58,7 +58,9 @@ void IslandGenerator::generate(const int seed)
   {
     for (auto i = 0; i < size.x * size.y; ++i)
     {
-      height_map[i] = static_cast<uint8_t>(sea_distance_field[i] * 255.0f);
+      // height_map[i] = static_cast<uint8_t>(sea_distance_field[i] * 255.0f);
+
+      height_map[i] = static_cast<uint8_t>(humidity_map[i] * 255.0f);
 
       // if (main_island.mask[i] != TerrainType::Land)
       // {
@@ -96,6 +98,8 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 void IslandGenerator::m_compute_maps(const int seed)
 {
   height_map.resize(size.x * size.y);
+  humidity_map.resize(size.x * size.y);
+  temperature_map.resize(size.x * size.y);
   sea_distance_field.resize(size.x * size.y);
 
   std::vector<float> silhouette_map(size.x * size.y);
@@ -106,6 +110,8 @@ void IslandGenerator::m_compute_maps(const int seed)
   utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
   utils::generate_control_map(control_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 13);
+  utils::generate_humidity_map(humidity_map.data(), size.x, size.y, island_params, seed + 470);
+  utils::generate_temperature_map(temperature_map.data(), size.x, size.y, island_params, seed + 130);
 
   const double max_z = 32.0;
   const float half_size_x = size.x / 2.0f;
@@ -248,6 +254,13 @@ void IslandGenerator::m_compute_maps(const int seed)
   memcpy(sea_distance_field.data(), heman_image_data(distance_field), size.x * size.y * sizeof(float));
   heman_image_destroy(distance_field);
   heman_image_destroy(heman_island_mask_image);
+
+  // Combine distance field with humidity map (less humidity the further from the sea)
+  for (auto i = 0; i < size.x * size.y; ++i)
+  {
+    humidity_map[i] = humidity_map[i] - sea_distance_field[i];
+    humidity_map[i] = std::clamp(humidity_map[i], 0.0f, 1.0f);
+  }
 }
 
 void IslandGenerator::m_generate_biomes()
@@ -260,6 +273,8 @@ void IslandGenerator::m_generate_biomes()
     {
       const auto height_value = height_map[j * size.x + i];
       const auto sea_distance_value = sea_distance_field[j * size.x + i];
+      const auto humidity_value = humidity_map[j * size.x + i];
+      const auto temperature_value = temperature_map[j * size.x + i];
 
       if (height_value == 0 && sea_distance_value <= 0.0f)
       {
@@ -271,19 +286,54 @@ void IslandGenerator::m_generate_biomes()
         biome_map[j * size.x + i] = BiomeType::Lake;
         continue;
       }
+      if (height_value < 14 && sea_distance_value < 0.02f && humidity_value > 0.5f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Mangrove;
+        continue;
+      }
       if (height_value < 9 && sea_distance_value < 0.01f)
       {
         biome_map[j * size.x + i] = BiomeType::Beach;
         continue;
       }
-      if (height_value >= 20 && sea_distance_value < 0.02f)
+      if (sea_distance_value < 0.02f && humidity_value < 0.4f)
       {
         biome_map[j * size.x + i] = BiomeType::Rocks;
         continue;
       }
+      if (height_value > 90 && temperature_value >= 0.6f)
+      {
+        biome_map[j * size.x + i] = BiomeType::RockMountains;
+        continue;
+      }
+      if (height_value > 85 && temperature_value < 0.6f)
+      {
+        biome_map[j * size.x + i] = BiomeType::PineForestMountains;
+        continue;
+      }
+      if (height_value > 3 && height_value < 50 && humidity_value < 0.1f)
+      {
+        biome_map[j * size.x + i] = BiomeType::DryPlains;
+        continue;
+      }
+      if (height_value > 35 && height_value < 50 && humidity_value >= 0.1f && humidity_value < 0.4f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Meadows;
+        continue;
+      }
+      if (height_value >= 50 && humidity_value < 0.37f)
+      {
+        biome_map[j * size.x + i] = BiomeType::TemperateForest;
+        continue;
+      }
+      if (height_value > 30 && humidity_value > 0.7f)
+      {
+        biome_map[j * size.x + i] = BiomeType::Swamp;
+        continue;
+      }
       if (height_value > 3)
       {
-        biome_map[j * size.x + i] = BiomeType::Grass;
+        biome_map[j * size.x + i] = BiomeType::Rainforest;
         continue;
       }
     }

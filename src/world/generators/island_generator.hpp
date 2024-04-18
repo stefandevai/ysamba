@@ -16,6 +16,8 @@ class IslandGenerator
   Vector3i size{1, 1, 1};
   std::vector<BiomeType> biome_map;
   std::vector<uint8_t> height_map;
+  std::vector<float> humidity_map;
+  std::vector<float> temperature_map;
   std::vector<float> sea_distance_field;
   IslandNoiseParams island_params{};
 
