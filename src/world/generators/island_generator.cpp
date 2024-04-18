@@ -301,7 +301,7 @@ void IslandGenerator::m_generate_biomes()
         biome_map[j * size.x + i] = BiomeType::Rocks;
         continue;
       }
-      if (height_value > 90 && temperature_value >= 0.6f)
+      if (height_value > 90 && temperature_value >= 0.5f)
       {
         biome_map[j * size.x + i] = BiomeType::RockMountains;
         continue;
@@ -311,7 +311,7 @@ void IslandGenerator::m_generate_biomes()
         biome_map[j * size.x + i] = BiomeType::PineForestMountains;
         continue;
       }
-      if (height_value > 3 && height_value < 50 && humidity_value < 0.1f)
+      if (height_value > 3 && height_value < 70 && humidity_value < 0.18f)
       {
         biome_map[j * size.x + i] = BiomeType::DryPlains;
         continue;
