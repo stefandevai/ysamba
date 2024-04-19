@@ -22,7 +22,7 @@ class ChunkGenerator
   IslandNoiseParams island_params{};
 
   // Quantity of tiles per map texture pixel
-  float map_to_tiles = 128.0f;
+  float map_to_tiles = 1.0f;
 
   ChunkGenerator(const WorldMetadata& world_metadata);
 
@@ -55,5 +55,7 @@ class ChunkGenerator
   uint32_t m_get_bitmask_8_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
   bool m_has_neighbor(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
+  int m_height_map_at(int x, int y);
+  int m_biome_at(int x, int y);
 };
 }  // namespace dl

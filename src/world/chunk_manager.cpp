@@ -24,12 +24,12 @@ Chunk ChunkManager::null = Chunk{};
 std::mutex ChunkManager::m_chunks_to_add_mutex = std::mutex{};
 
 ChunkManager::ChunkManager(GameContext& game_context)
-  : m_game_context(game_context), m_world_metadata(game_context.world_metadata)
+    : m_game_context(game_context), m_world_metadata(game_context.world_metadata)
 {
-// #ifdef DL_BUILD_DEBUG_TOOLS
-//   ChunkGenerator generator{};
-//   island_params = generator.island_params;
-// #endif
+  // #ifdef DL_BUILD_DEBUG_TOOLS
+  //   ChunkGenerator generator{};
+  //   island_params = generator.island_params;
+  // #endif
 
   m_seed = m_game_context.world_metadata.seed;
   m_thread_pool.initialize();

@@ -26,7 +26,7 @@ double interpolate(double start_1, double end_1, double start_2, const double en
 namespace dl
 {
 ChunkGenerator::ChunkGenerator(const WorldMetadata& world_metadata)
-  : size(world::chunk_size), m_world_metadata(world_metadata)
+    : size(world::chunk_size), m_world_metadata(world_metadata)
 {
   // map_to_tiles = static_cast<float>(world::chunk_size.x);
   const float frequency = 0.016f / map_to_tiles;
@@ -57,11 +57,97 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
 
+  Vector2i height_map_position{
+      offset.x / world::chunk_size.x + m_world_metadata.world_size.x / 3,
+      offset.y / world::chunk_size.y + m_world_metadata.world_size.y / 3,
+  };
+
+  spdlog::debug("Generating chunk at offset {}", offset);
+  spdlog::debug("Height map position {}", height_map_position);
+  spdlog::debug("Chunk size {}", world::chunk_size);
+  spdlog::debug("World size {}", m_world_metadata.world_size);
+
+  int terrain_id;
+
+  const int height = m_height_map_at(height_map_position.x, height_map_position.y);
+  const int height_left = m_height_map_at(height_map_position.x - 1, height_map_position.y);
+  const int height_right = m_height_map_at(height_map_position.x + 1, height_map_position.y);
+  const int height_top = m_height_map_at(height_map_position.x, height_map_position.y - 1);
+  const int height_bottom = m_height_map_at(height_map_position.x, height_map_position.y + 1);
+
+  const int height_top_left = m_height_map_at(height_map_position.x - 1, height_map_position.y - 1);
+  const int height_top_right = m_height_map_at(height_map_position.x + 1, height_map_position.y - 1);
+  const int height_bottom_right = m_height_map_at(height_map_position.x + 1, height_map_position.y + 1);
+  const int height_bottom_left = m_height_map_at(height_map_position.x - 1, height_map_position.y + 1);
+
+  const int biome = m_biome_at(height_map_position.x, height_map_position.y);
+  const int biome_left = m_biome_at(height_map_position.x - 1, height_map_position.y);
+  const int biome_right = m_biome_at(height_map_position.x + 1, height_map_position.y);
+  const int biome_top = m_biome_at(height_map_position.x, height_map_position.y - 1);
+  const int biome_bottom = m_biome_at(height_map_position.x, height_map_position.y + 1);
+
+  const int biome_top_left = m_biome_at(height_map_position.x - 1, height_map_position.y - 1);
+  const int biome_top_right = m_biome_at(height_map_position.x + 1, height_map_position.y - 1);
+  const int biome_bottom_right = m_biome_at(height_map_position.x + 1, height_map_position.y + 1);
+  const int biome_bottom_left = m_biome_at(height_map_position.x - 1, height_map_position.y + 1);
+
   for (int j = 0; j < m_padded_size.y; ++j)
   {
     for (int i = 0; i < m_padded_size.x; ++i)
     {
-      terrain[3 * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = 2;
+      // Top left
+      if (i == 0 && j == 0)
+      {
+        const int array_index = height_top_left * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_top_left;
+      }
+      // Bottom right
+      else if (i == m_padded_size.x - 1 && j == m_padded_size.y - 1)
+      {
+        const int array_index = height_bottom_right * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_bottom_right;
+      }
+      // Top right
+      else if (i == m_padded_size.x - 1 && j == 0)
+      {
+        const int array_index = height_top_right * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_top_right;
+      }
+      // Bottom left
+      else if (i == 0 && j == m_padded_size.y - 1)
+      {
+        const int array_index = height_bottom_left * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_bottom_left;
+      }
+      // Left
+      else if (i == 0)
+      {
+        const int array_index = height_left * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_left;
+      }
+      // Top
+      else if (j == 0)
+      {
+        const int array_index = height_top * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_top;
+      }
+      // Right
+      else if (i == m_padded_size.x - 1)
+      {
+        const int array_index = height_right * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_right;
+      }
+      // Bottom
+      else if (j == m_padded_size.y - 1)
+      {
+        const int array_index = height_bottom * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome_bottom;
+      }
+      else
+      {
+        const int array_index = height * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
+        terrain[array_index] = biome;
+      }
     }
   }
 
@@ -69,8 +155,8 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
   {
     for (int j = 0; j < size.y; ++j)
     {
-      chunk->tiles.height_map[j * size.x + i] = 3;
-      chunk->tiles.values[3 * size.x * size.y + j * size.x + i].terrain = 2;
+      chunk->tiles.height_map[j * size.x + i] = height;
+      chunk->tiles.values[height * size.x * size.y + j * size.x + i].terrain = biome;
     }
   }
 
@@ -574,6 +660,42 @@ bool ChunkGenerator::m_has_neighbor(
   }
 
   return false;
+}
+
+int ChunkGenerator::m_height_map_at(const int x, const int y)
+{
+  if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
+  {
+    return 0;
+  }
+  else
+  {
+    return m_world_metadata.height_map[y * m_world_metadata.world_size.x + x];
+  }
+}
+
+int ChunkGenerator::m_biome_at(const int x, const int y)
+{
+  // TODO: Replace with a biome lookup
+  int height;
+
+  if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
+  {
+    height = 0;
+  }
+  else
+  {
+    height = m_world_metadata.height_map[y * m_world_metadata.world_size.x + x];
+  }
+
+  if (height < 2)
+  {
+    return 1;
+  }
+  else
+  {
+    return 2;
+  }
 }
 
 }  // namespace dl
