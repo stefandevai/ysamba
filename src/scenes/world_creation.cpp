@@ -133,6 +133,7 @@ void WorldCreation::save()
       .world_size = world_size,
       .created_at = now_seconds,
       .updated_at = now_seconds,
+      .biome_map = std::move(m_biome_map),
       .height_map = std::move(m_height_map),
       .sea_distance_field = std::move(m_sea_distance_field),
   };

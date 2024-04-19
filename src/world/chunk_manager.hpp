@@ -16,6 +16,7 @@
 namespace dl
 {
 struct GameContext;
+struct WorldMetadata;
 
 class ChunkManager
 {
@@ -72,6 +73,7 @@ class ChunkManager
 
  private:
   GameContext& m_game_context;
+  const WorldMetadata& m_world_metadata;
   std::vector<Vector3i> m_chunks_loading{};
   std::vector<std::unique_ptr<Chunk>> m_chunks_to_add{};
   static std::mutex m_chunks_to_add_mutex;

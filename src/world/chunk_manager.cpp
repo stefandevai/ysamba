@@ -5,12 +5,14 @@
 #include <cmath>
 #include <thread>
 
-#include "./generators/game_chunk_generator.hpp"
+// #include "./generators/game_chunk_generator.hpp"
+#include "./generators/chunk_generator.hpp"
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/neighbor_iterator.hpp"
 #include "core/random.hpp"
 #include "core/serialization.hpp"
+#include "world/metadata.hpp"
 
 // TEMP
 #include <chrono>
@@ -21,12 +23,13 @@ namespace dl
 Chunk ChunkManager::null = Chunk{};
 std::mutex ChunkManager::m_chunks_to_add_mutex = std::mutex{};
 
-ChunkManager::ChunkManager(GameContext& game_context) : m_game_context(game_context)
+ChunkManager::ChunkManager(GameContext& game_context)
+  : m_game_context(game_context), m_world_metadata(game_context.world_metadata)
 {
-#ifdef DL_BUILD_DEBUG_TOOLS
-  GameChunkGenerator generator{};
-  island_params = generator.island_params;
-#endif
+// #ifdef DL_BUILD_DEBUG_TOOLS
+//   ChunkGenerator generator{};
+//   island_params = generator.island_params;
+// #endif
 
   m_seed = m_game_context.world_metadata.seed;
   m_thread_pool.initialize();
@@ -201,7 +204,7 @@ void ChunkManager::load_async(const Vector3i& position)
 
 void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size, std::mutex& mutex)
 {
-  GameChunkGenerator generator{};
+  ChunkGenerator generator{m_world_metadata};
   generator.set_size(size);
   generator.generate(m_seed, position);
   // auto chunk = std::make_unique<Chunk>(position, true);
@@ -240,7 +243,7 @@ void ChunkManager::load_sync(const Vector3i& position)
 
 void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
 {
-  GameChunkGenerator generator{};
+  ChunkGenerator generator{m_world_metadata};
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   generator.island_params = island_params;

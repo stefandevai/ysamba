@@ -1,0 +1,579 @@
+#include "./chunk_generator.hpp"
+
+#include <FastNoise/FastNoise.h>
+#include <spdlog/spdlog.h>
+
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+
+#include "./tile_rules.hpp"
+#include "./utils.hpp"
+#include "constants.hpp"
+#include "core/random.hpp"
+#include "core/timer.hpp"
+#include "world/chunk.hpp"
+#include "world/metadata.hpp"
+
+namespace
+{
+double interpolate(double start_1, double end_1, double start_2, const double end_2, double value)
+{
+  return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
+}
+}  // namespace
+
+namespace dl
+{
+ChunkGenerator::ChunkGenerator(const WorldMetadata& world_metadata)
+  : size(world::chunk_size), m_world_metadata(world_metadata)
+{
+  // map_to_tiles = static_cast<float>(world::chunk_size.x);
+  const float frequency = 0.016f / map_to_tiles;
+
+  island_params.layer_1_octaves = 5;
+  island_params.frequency = frequency;
+  island_params.layer_1_lacunarity = 3.2f;
+  island_params.layer_1_gain = 0.32f;
+  island_params.layer_1_weighted_strength = 0.25f;
+  island_params.layer_1_terrace_multiplier = 0.14f;
+
+  island_params.layer_2_seed_offset = 7;
+  island_params.layer_2_octave_count = 4;
+  island_params.layer_2_lacunarity = 1.42f;
+  island_params.layer_2_gain = 1.1f;
+  island_params.layer_2_weighted_strength = 0.42f;
+  island_params.layer_2_fade = 0.62f;
+  island_params.layer_2_smooth_rhs = -0.68f;
+  island_params.layer_2_smoothness = 1.76f;
+}
+
+void ChunkGenerator::generate(const int seed, const Vector3i& offset)
+{
+  chunk = std::make_unique<Chunk>(offset, true);
+  chunk->tiles.set_size(size);
+
+  m_get_height_map(seed, offset);
+
+  auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
+
+  for (int j = 0; j < m_padded_size.y; ++j)
+  {
+    for (int i = 0; i < m_padded_size.x; ++i)
+    {
+      terrain[3 * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = 2;
+    }
+  }
+
+  for (int i = 0; i < size.x; ++i)
+  {
+    for (int j = 0; j < size.y; ++j)
+    {
+      chunk->tiles.height_map[j * size.x + i] = 3;
+      chunk->tiles.values[3 * size.x * size.y + j * size.x + i].terrain = 2;
+    }
+  }
+
+  chunk->tiles.compute_visibility();
+
+  for (int k = 0; k < size.z; ++k)
+  {
+    for (int j = 0; j < size.y; ++j)
+    {
+      for (int i = 0; i < size.x; ++i)
+      {
+        m_select_tile(terrain, i, j, k);
+      }
+    }
+  }
+}
+
+void ChunkGenerator::set_size(const Vector3i& size)
+{
+  this->size = size;
+  m_padded_size = Vector3i{size.x + m_generation_padding * 2, size.y + m_generation_padding * 2, 1};
+}
+
+void ChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
+{
+  vegetation_type.resize(size.x * size.y);
+  vegetation_density.resize(size.x * size.y);
+
+  // Vegetation type lookup
+  FastNoise::SmartNode<> vegetation_type_noise
+      = FastNoise::NewFromEncodedNodeTree("DAADAAAA7FG4Pw0AAwAAAAAAAEApAAAAAAA/AAAAAAAAAAAgQA==");
+  vegetation_type_noise->GenUniformGrid2D(vegetation_type.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 30);
+
+  // Vegetation density lookup
+  FastNoise::SmartNode<> vegetation_density_noise
+      = FastNoise::NewFromEncodedNodeTree("DQACAAAAexROQCkAAFK4Hj8AmpkZPw==");
+  vegetation_density_noise->GenUniformGrid2D(
+      vegetation_density.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 50);
+}
+
+void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
+{
+  const int transposed_x = x + m_generation_padding;
+  const int transposed_y = y + m_generation_padding;
+
+  const auto terrain_id
+      = terrain[z * m_padded_size.x * m_padded_size.y + transposed_y * m_padded_size.x + transposed_x];
+
+  if (terrain_id == 0)
+  {
+    return;
+  }
+
+  // TODO: Set non walkable block tile if not visible
+  if (!chunk->tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  {
+    chunk->tiles.values[z * size.x * size.y + y * size.x + x].terrain = 1;
+    return;
+  }
+
+  TileValues old_values{terrain_id, 0};
+  TileValues new_values{terrain_id, 0};
+
+  do
+  {
+    old_values.terrain = new_values.terrain;
+    old_values.decoration = new_values.decoration;
+
+    const auto& rule_object = TileRules::get(old_values.terrain);
+    const auto index = rule_object.index();
+
+    switch (index)
+    {
+    case 0:
+      break;
+
+    case 1:
+    {
+      const auto& rule = std::get<AutoTile4SidesRule>(rule_object);
+      const auto bitmask = m_get_bitmask_4_sided(terrain, transposed_x, transposed_y, z, rule.neighbor);
+      new_values.terrain = rule.output[bitmask].value;
+      break;
+    }
+
+    case 3:
+    {
+      const auto& rule = std::get<UniformDistributionRule>(rule_object);
+      const auto prob = random::get_real();
+      double cumulative_probability = 0.0;
+
+      for (const auto& transform : rule.output)
+      {
+        cumulative_probability += transform.probability;
+
+        if (prob < cumulative_probability)
+        {
+          if (transform.placement == PlacementType::Terrain)
+          {
+            new_values.terrain = transform.value;
+          }
+          else
+          {
+            new_values.decoration = transform.value;
+          }
+          break;
+        }
+      }
+      break;
+    }
+
+    case 2:
+    {
+      const auto& rule = std::get<AutoTile8SidesRule>(rule_object);
+      const auto bitmask = m_get_bitmask_8_sided(terrain, transposed_x, transposed_y, z, rule.neighbor, rule.input);
+      int new_terrain_id = 0;
+
+      switch (bitmask)
+      {
+      case DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[0].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[1].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[2].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[3].value;
+        break;
+      case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
+          | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[4].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[5].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[6].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[7].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
+        new_terrain_id = rule.output[8].value;
+        break;
+      case DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[9].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[10].value;
+        break;
+      case DL_EDGE_LEFT:
+        new_terrain_id = rule.output[11].value;
+        break;
+      case DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[12].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[13].value;
+        break;
+      case DL_EDGE_TOP:
+        new_terrain_id = rule.output[14].value;
+        break;
+      case DL_EDGE_NONE:
+        new_terrain_id = rule.output[15].value;
+        break;
+      case DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[16].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[17].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[18].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[19].value;
+        break;
+      case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
+        new_terrain_id = rule.output[20].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+          | DL_EDGE_TOP_LEFT:
+        new_terrain_id = rule.output[21].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+          | DL_EDGE_TOP_LEFT:
+        new_terrain_id = rule.output[22].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[23].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[24].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
+          | DL_EDGE_TOP_LEFT:
+        new_terrain_id = rule.output[25].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
+          | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[26].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[27].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[28].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
+        new_terrain_id = rule.output[29].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[30].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[31].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[32].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
+        new_terrain_id = rule.output[33].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[34].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[35].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[36].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[37].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[38].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT:
+        new_terrain_id = rule.output[39].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[40].value;
+        break;
+      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+        new_terrain_id = rule.output[41].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[42].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[43].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[44].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+        new_terrain_id = rule.output[45].value;
+        break;
+      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
+        new_terrain_id = rule.output[46].value;
+        break;
+      }
+
+      if (new_terrain_id == 0)
+      {
+        spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
+      }
+
+      new_values.terrain = new_terrain_id;
+      break;
+    }
+    default:
+      break;
+    }
+
+  } while (old_values.terrain != new_values.terrain);
+
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].terrain = new_values.terrain;
+
+  // Select vegetation
+  if (new_values.decoration == 0)
+  {
+    new_values.decoration = m_select_decoration(terrain_id, x, y, z);
+  }
+
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].decoration = new_values.decoration;
+}
+
+int ChunkGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
+{
+  (void)z;
+  int decoration = 0;
+
+  // TODO: Integrate to the rule system for any terrain
+  // Only select decoration for grass terrain (2)
+  if (terrain_id != 2)
+  {
+    return decoration;
+  }
+
+  // Place bigger plants on the center and smaller ones on the edges
+  const auto density = vegetation_density[y * size.x + x];
+
+  if (density < 0.3f)
+  {
+    return decoration;
+  }
+
+  const auto prob = random::get_real();
+
+  if (prob < 0.4f)
+  {
+    return decoration;
+  }
+
+  int plant_small = 0;
+  int plant_big = 0;
+
+  const auto type_threshold = vegetation_type[y * size.x + x];
+
+  if (type_threshold < 0.0f)
+  {
+    plant_small = 54;
+    plant_big = 53;
+  }
+  else
+  {
+    plant_small = 49;
+    plant_big = 48;
+  }
+
+  if (density < 0.4f)
+  {
+    decoration = plant_small;
+  }
+  else
+  {
+    decoration = plant_big;
+  }
+
+  return decoration;
+}
+
+uint32_t ChunkGenerator::m_get_bitmask_4_sided(
+    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
+{
+  uint32_t bitmask = 0;
+
+  // Top
+  if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == neighbor)
+  {
+    bitmask |= DL_EDGE_TOP;
+  }
+  // Right
+  if (x < m_padded_size.x - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
+  {
+    bitmask |= DL_EDGE_RIGHT;
+  }
+  // Bottom
+  if (y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
+  {
+    bitmask |= DL_EDGE_BOTTOM;
+  }
+  // Left
+  if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == neighbor)
+  {
+    bitmask |= DL_EDGE_LEFT;
+  }
+
+  return bitmask;
+}
+
+uint32_t ChunkGenerator::m_get_bitmask_8_sided(
+    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source)
+{
+  if (!m_has_neighbor(terrain, x, y, z, neighbor))
+  {
+    return DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP_RIGHT
+           | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM_LEFT;
+  }
+
+  uint32_t bitmask = 0;
+
+  // Top
+  if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == source)
+  {
+    bitmask |= DL_EDGE_TOP;
+  }
+  // Right
+  if (x < m_padded_size.x - 1 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == source)
+  {
+    bitmask |= DL_EDGE_RIGHT;
+  }
+  // Bottom
+  if (y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == source)
+  {
+    bitmask |= DL_EDGE_BOTTOM;
+  }
+  // Left
+  if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == source)
+  {
+    bitmask |= DL_EDGE_LEFT;
+  }
+  // Top Left
+  if (x > 0 && y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x - 1] == source)
+  {
+    bitmask |= DL_EDGE_TOP_LEFT;
+  }
+  // Top Right
+  if (x < m_padded_size.x - 1 && y > 0
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == source)
+  {
+    bitmask |= DL_EDGE_TOP_RIGHT;
+  }
+  // Bottom Right
+  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == source)
+  {
+    bitmask |= DL_EDGE_BOTTOM_RIGHT;
+  }
+  // Bottom Left
+  if (x > 0 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == source)
+  {
+    bitmask |= DL_EDGE_BOTTOM_LEFT;
+  }
+
+  if (!(bitmask & DL_EDGE_LEFT) || !(bitmask & DL_EDGE_TOP))
+  {
+    bitmask &= ~DL_EDGE_TOP_LEFT;
+  }
+  if (!(bitmask & DL_EDGE_LEFT) || !(bitmask & DL_EDGE_BOTTOM))
+  {
+    bitmask &= ~DL_EDGE_BOTTOM_LEFT;
+  }
+  if (!(bitmask & DL_EDGE_RIGHT) || !(bitmask & DL_EDGE_TOP))
+  {
+    bitmask &= ~DL_EDGE_TOP_RIGHT;
+  }
+  if (!(bitmask & DL_EDGE_RIGHT) || !(bitmask & DL_EDGE_BOTTOM))
+  {
+    bitmask &= ~DL_EDGE_BOTTOM_RIGHT;
+  }
+
+  return bitmask;
+}
+
+bool ChunkGenerator::m_has_neighbor(
+    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
+{
+  // Top
+  if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == neighbor)
+  {
+    return true;
+  }
+  // Right
+  if (x < m_padded_size.x - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == neighbor)
+  {
+    return true;
+  }
+  // Bottom
+  if (y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == neighbor)
+  {
+    return true;
+  }
+  // Left
+  if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == neighbor)
+  {
+    return true;
+  }
+  // Top Left
+  if (x > 0 && y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x - 1] == neighbor)
+  {
+    return true;
+  }
+  // Top Right
+  if (x < m_padded_size.x - 1 && y > 0
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == neighbor)
+  {
+    return true;
+  }
+  // Bottom Right
+  if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == neighbor)
+  {
+    return true;
+  }
+  // Bottom Left
+  if (x > 0 && y < m_padded_size.y - 1
+      && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == neighbor)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+}  // namespace dl
