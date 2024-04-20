@@ -12,7 +12,6 @@
 
 #include "./a_star.hpp"
 #include "./cell.hpp"
-#include "./generators/game_chunk_generator.hpp"
 #include "./generators/tile_rules.hpp"
 #include "./item_factory.hpp"
 #include "./society/job_type.hpp"

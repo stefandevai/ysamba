@@ -5,8 +5,8 @@
 #include <cmath>
 #include <thread>
 
-// #include "./generators/game_chunk_generator.hpp"
-#include "./generators/chunk_generator.hpp"
+#include "./generators/game_chunk_generator.hpp"
+// #include "./generators/chunk_generator.hpp"
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/neighbor_iterator.hpp"
@@ -204,7 +204,8 @@ void ChunkManager::load_async(const Vector3i& position)
 
 void ChunkManager::generate_async(const Vector3i& position, const Vector3i& size, std::mutex& mutex)
 {
-  ChunkGenerator generator{m_world_metadata};
+  // ChunkGenerator generator{m_world_metadata};
+  GameChunkGenerator generator{};
   generator.set_size(size);
   generator.generate(m_seed, position);
   // auto chunk = std::make_unique<Chunk>(position, true);
@@ -243,7 +244,8 @@ void ChunkManager::load_sync(const Vector3i& position)
 
 void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
 {
-  ChunkGenerator generator{m_world_metadata};
+  // ChunkGenerator generator{m_world_metadata};
+  GameChunkGenerator generator{};
 
 #ifdef DL_BUILD_DEBUG_TOOLS
   generator.island_params = island_params;

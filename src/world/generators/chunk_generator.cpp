@@ -69,16 +69,16 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   int terrain_id;
 
-  const int height = m_height_map_at(height_map_position.x, height_map_position.y);
-  const int height_left = m_height_map_at(height_map_position.x - 1, height_map_position.y);
-  const int height_right = m_height_map_at(height_map_position.x + 1, height_map_position.y);
-  const int height_top = m_height_map_at(height_map_position.x, height_map_position.y - 1);
-  const int height_bottom = m_height_map_at(height_map_position.x, height_map_position.y + 1);
+  const double height = m_height_map_at(height_map_position.x, height_map_position.y);
+  const double height_left = m_height_map_at(height_map_position.x - 1, height_map_position.y);
+  const double height_right = m_height_map_at(height_map_position.x + 1, height_map_position.y);
+  const double height_top = m_height_map_at(height_map_position.x, height_map_position.y - 1);
+  const double height_bottom = m_height_map_at(height_map_position.x, height_map_position.y + 1);
 
-  const int height_top_left = m_height_map_at(height_map_position.x - 1, height_map_position.y - 1);
-  const int height_top_right = m_height_map_at(height_map_position.x + 1, height_map_position.y - 1);
-  const int height_bottom_right = m_height_map_at(height_map_position.x + 1, height_map_position.y + 1);
-  const int height_bottom_left = m_height_map_at(height_map_position.x - 1, height_map_position.y + 1);
+  const double height_top_left = m_height_map_at(height_map_position.x - 1, height_map_position.y - 1);
+  const double height_top_right = m_height_map_at(height_map_position.x + 1, height_map_position.y - 1);
+  const double height_bottom_right = m_height_map_at(height_map_position.x + 1, height_map_position.y + 1);
+  const double height_bottom_left = m_height_map_at(height_map_position.x - 1, height_map_position.y + 1);
 
   const int biome = m_biome_at(height_map_position.x, height_map_position.y);
   const int biome_left = m_biome_at(height_map_position.x - 1, height_map_position.y);
