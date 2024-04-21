@@ -20,7 +20,7 @@ struct WorldMetadata
   std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> created_at{};
   std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> updated_at{};
   std::vector<BiomeType> biome_map{};
-  std::vector<uint8_t> height_map{};
+  std::vector<float> height_map{};
   std::vector<float> sea_distance_field{};
 };
 

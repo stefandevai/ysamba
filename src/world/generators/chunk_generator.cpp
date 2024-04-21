@@ -62,34 +62,42 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
       offset.y / world::chunk_size.y + m_world_metadata.world_size.y / 3,
   };
 
-  spdlog::debug("Generating chunk at offset {}", offset);
-  spdlog::debug("Height map position {}", height_map_position);
-  spdlog::debug("Chunk size {}", world::chunk_size);
-  spdlog::debug("World size {}", m_world_metadata.world_size);
+  // spdlog::debug("Generating chunk at offset {}", offset);
+  // spdlog::debug("Height map position {}", height_map_position);
+  // spdlog::debug("Chunk size {}", world::chunk_size);
+  // spdlog::debug("World size {}", m_world_metadata.world_size);
 
   int terrain_id;
 
-  const int height = m_height_map_at(height_map_position.x, height_map_position.y);
-  const int height_left = m_height_map_at(height_map_position.x - 1, height_map_position.y);
-  const int height_right = m_height_map_at(height_map_position.x + 1, height_map_position.y);
-  const int height_top = m_height_map_at(height_map_position.x, height_map_position.y - 1);
-  const int height_bottom = m_height_map_at(height_map_position.x, height_map_position.y + 1);
+  const double normalized_height = m_height_map_at(height_map_position.x, height_map_position.y);
+  const double normalized_height_left = m_height_map_at(height_map_position.x - 1, height_map_position.y);
+  const double normalized_height_right = m_height_map_at(height_map_position.x + 1, height_map_position.y);
+  const double normalized_height_top = m_height_map_at(height_map_position.x, height_map_position.y - 1);
+  const double normalized_height_bottom = m_height_map_at(height_map_position.x, height_map_position.y + 1);
+  const double normalized_height_top_left = m_height_map_at(height_map_position.x - 1, height_map_position.y - 1);
+  const double normalized_height_top_right = m_height_map_at(height_map_position.x + 1, height_map_position.y - 1);
+  const double normalized_height_bottom_right = m_height_map_at(height_map_position.x + 1, height_map_position.y + 1);
+  const double normalized_height_bottom_left = m_height_map_at(height_map_position.x - 1, height_map_position.y + 1);
 
-  const int height_top_left = m_height_map_at(height_map_position.x - 1, height_map_position.y - 1);
-  const int height_top_right = m_height_map_at(height_map_position.x + 1, height_map_position.y - 1);
-  const int height_bottom_right = m_height_map_at(height_map_position.x + 1, height_map_position.y + 1);
-  const int height_bottom_left = m_height_map_at(height_map_position.x - 1, height_map_position.y + 1);
+  const int height = m_height_at(height_map_position.x, height_map_position.y);
+  const int height_left = m_height_at(height_map_position.x - 1, height_map_position.y);
+  const int height_right = m_height_at(height_map_position.x + 1, height_map_position.y);
+  const int height_top = m_height_at(height_map_position.x, height_map_position.y - 1);
+  const int height_bottom = m_height_at(height_map_position.x, height_map_position.y + 1);
+  const int height_top_left = m_height_at(height_map_position.x - 1, height_map_position.y - 1);
+  const int height_top_right = m_height_at(height_map_position.x + 1, height_map_position.y - 1);
+  const int height_bottom_right = m_height_at(height_map_position.x + 1, height_map_position.y + 1);
+  const int height_bottom_left = m_height_at(height_map_position.x - 1, height_map_position.y + 1);
 
-  const int biome = m_biome_at(height_map_position.x, height_map_position.y);
-  const int biome_left = m_biome_at(height_map_position.x - 1, height_map_position.y);
-  const int biome_right = m_biome_at(height_map_position.x + 1, height_map_position.y);
-  const int biome_top = m_biome_at(height_map_position.x, height_map_position.y - 1);
-  const int biome_bottom = m_biome_at(height_map_position.x, height_map_position.y + 1);
-
-  const int biome_top_left = m_biome_at(height_map_position.x - 1, height_map_position.y - 1);
-  const int biome_top_right = m_biome_at(height_map_position.x + 1, height_map_position.y - 1);
-  const int biome_bottom_right = m_biome_at(height_map_position.x + 1, height_map_position.y + 1);
-  const int biome_bottom_left = m_biome_at(height_map_position.x - 1, height_map_position.y + 1);
+  const double biome = m_biome_at(height_map_position.x, height_map_position.y);
+  const double biome_left = m_biome_at(height_map_position.x - 1, height_map_position.y);
+  const double biome_right = m_biome_at(height_map_position.x + 1, height_map_position.y);
+  const double biome_top = m_biome_at(height_map_position.x, height_map_position.y - 1);
+  const double biome_bottom = m_biome_at(height_map_position.x, height_map_position.y + 1);
+  const double biome_top_left = m_biome_at(height_map_position.x - 1, height_map_position.y - 1);
+  const double biome_top_right = m_biome_at(height_map_position.x + 1, height_map_position.y - 1);
+  const double biome_bottom_right = m_biome_at(height_map_position.x + 1, height_map_position.y + 1);
+  const double biome_bottom_left = m_biome_at(height_map_position.x - 1, height_map_position.y + 1);
 
   for (int j = 0; j < m_padded_size.y; ++j)
   {
@@ -662,7 +670,19 @@ bool ChunkGenerator::m_has_neighbor(
   return false;
 }
 
-int ChunkGenerator::m_height_map_at(const int x, const int y)
+double ChunkGenerator::m_height_map_at(const int x, const int y)
+{
+  if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
+  {
+    return 0.0;
+  }
+  else
+  {
+    return m_world_metadata.height_map[y * m_world_metadata.world_size.x + x];
+  }
+}
+
+int ChunkGenerator::m_height_at(const int x, const int y)
 {
   if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
   {
@@ -670,7 +690,7 @@ int ChunkGenerator::m_height_map_at(const int x, const int y)
   }
   else
   {
-    return m_world_metadata.height_map[y * m_world_metadata.world_size.x + x];
+    return static_cast<int>((m_world_metadata.height_map[y * m_world_metadata.world_size.x + x] * 32.0f));
   }
 }
 
@@ -685,10 +705,10 @@ int ChunkGenerator::m_biome_at(const int x, const int y)
   }
   else
   {
-    height = m_world_metadata.height_map[y * m_world_metadata.world_size.x + x];
+    height = m_height_at(x, y);
   }
 
-  if (height < 2)
+  if (height < 1)
   {
     return 1;
   }
