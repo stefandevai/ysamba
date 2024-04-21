@@ -18,7 +18,7 @@
 #include "graphics/color.hpp"
 #include "graphics/renderer/texture.hpp"
 #include "ui/compositions/world_creation_panel.hpp"
-#include "world/generators/island_generator.hpp"
+#include "world/generators/temp_generator.hpp"
 #include "world/metadata.hpp"
 
 namespace dl
@@ -169,7 +169,7 @@ void WorldCreation::m_generate_map()
     m_seed = random::get_integer(1, INT_MAX);
   }
 
-  auto generator = IslandGenerator(world_size);
+  auto generator = TempGenerator(world_size);
   generator.generate(m_seed);
 
   m_height_map = std::move(generator.height_map);

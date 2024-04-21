@@ -47,7 +47,7 @@ class WorldCreation : public Scene
   std::unique_ptr<Texture> m_texture = nullptr;
   std::unique_ptr<Texture> m_biome_texture = nullptr;
   int m_seed = 0;
-  std::vector<uint8_t> m_height_map{};
+  std::vector<float> m_height_map{};
   std::vector<float> m_sea_distance_field{};
   std::vector<BiomeType> m_biome_map{};
   InputManager& m_input_manager = InputManager::get_instance();

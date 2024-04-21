@@ -55,7 +55,8 @@ class ChunkGenerator
   uint32_t m_get_bitmask_8_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
   bool m_has_neighbor(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
-  int m_height_map_at(int x, int y);
+  double m_height_map_at(int x, int y);
+  int m_height_at(int x, int y);
   int m_biome_at(int x, int y);
 };
 }  // namespace dl
