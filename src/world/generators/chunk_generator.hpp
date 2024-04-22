@@ -23,7 +23,7 @@ class ChunkGenerator
   IslandNoiseParams island_params{};
 
   // Quantity of tiles per map texture pixel
-  float map_to_tiles = 1.0f;
+  float map_to_tiles = 4.0f;
 
   ChunkGenerator(const WorldMetadata& world_metadata);
 

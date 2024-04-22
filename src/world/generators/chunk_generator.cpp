@@ -30,7 +30,7 @@ ChunkGenerator::ChunkGenerator(const WorldMetadata& world_metadata)
 {
   const float frequency = 0.016f / map_to_tiles;
 
-  island_params.layer_1_octaves = 4;
+  island_params.layer_1_octaves = 7;
   island_params.frequency = frequency;
   island_params.layer_1_lacunarity = 3.2f;
   island_params.layer_1_gain = 0.32f;
@@ -95,8 +95,8 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
       if (k < 1)
       {
-        terrain_id = 3;
-        // resolved_z = 1;
+        terrain_id = 1;
+        resolved_z = 1;
       }
       else
       {

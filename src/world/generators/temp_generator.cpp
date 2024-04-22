@@ -135,7 +135,7 @@ void TempGenerator::m_compute_maps(const int seed)
       const float distance_x_squared = (half_size_x - i) * (half_size_x - i);
       const float distance_y_squared = (half_size_y - j) * (half_size_y - j);
 
-      float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
+      const float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
 
       height_map[array_index] -= gradient;
       height_map[array_index] = std::clamp(height_map[array_index], 0.0f, 1.0f);

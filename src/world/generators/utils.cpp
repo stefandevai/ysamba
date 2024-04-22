@@ -99,7 +99,7 @@ void generate_silhouette_map(
   const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
   const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
   fractal->SetSource(simplex);
-  fractal->SetOctaveCount(4);
+  fractal->SetOctaveCount(params.layer_1_octaves);
   fractal->SetLacunarity(2.52f);
   fractal->SetGain(0.68f);
   fractal->SetWeightedStrength(0.6f);
