@@ -60,28 +60,21 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
   const float gradient_diameter = 160.0f * map_to_tiles;
   const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
-  float maxv = 0.0f;
-  float minv = 1.0f;
-
   for (int j = 0; j < m_padded_size.y; ++j)
   {
     for (int i = 0; i < m_padded_size.x; ++i)
     {
-      const auto array_index = j * m_padded_size.x + i;
+      const auto height_map_i = offset.x + i;
+      const auto height_map_j = offset.y + j;
 
-      maxv = std::max(maxv, silhouette_map[array_index]);
-      minv = std::min(minv, silhouette_map[array_index]);
+      int k = 0;
 
-      const float distance_x_squared = (i + offset.x) * (i + offset.x);
-      const float distance_y_squared = (j + offset.y) * (j + offset.y);
-      float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
+      if (height_map_i >= 0 && height_map_i < m_world_metadata.world_size.x && height_map_j >= 0 && height_map_j < m_world_metadata.world_size.y)
+      {
+        const auto height_map_index = height_map_j * m_world_metadata.world_size.x + height_map_i;
+        k = static_cast<int>(m_world_metadata.height_map[height_map_index] * max_z);
+      }
 
-      silhouette_map[array_index] -= gradient;
-      silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
-
-      const double map_value = std::floor(silhouette_map[array_index] * max_z);
-
-      const int k = static_cast<int>(map_value);
       bool inside_chunk = false;
 
       if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
