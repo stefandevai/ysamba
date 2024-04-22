@@ -27,7 +27,7 @@ ChunkManager::ChunkManager(GameContext& game_context)
     : m_game_context(game_context), m_world_metadata(game_context.world_metadata)
 {
   // #ifdef DL_BUILD_DEBUG_TOOLS
-  //   ChunkGenerator generator{};
+  //   GameChunkGenerator generator{};
   //   island_params = generator.island_params;
   // #endif
 
@@ -248,7 +248,7 @@ void ChunkManager::generate_sync(const Vector3i& position, const Vector3i& size)
   // GameChunkGenerator generator{};
 
 #ifdef DL_BUILD_DEBUG_TOOLS
-  generator.island_params = island_params;
+  // generator.island_params = island_params;
 #endif
 
   generator.set_size(size);

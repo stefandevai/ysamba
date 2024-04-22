@@ -25,7 +25,7 @@ const std::filesystem::path metadata{".metadata"};
 
 namespace dl::world
 {
-const Vector3i chunk_size{4, 4, 64};
+const Vector3i chunk_size{64, 64, 64};
 }  // namespace dl::world
 
 namespace dl::pathfinding

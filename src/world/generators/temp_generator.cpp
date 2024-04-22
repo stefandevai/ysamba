@@ -112,18 +112,24 @@ void TempGenerator::m_compute_maps(const int seed)
   utils::generate_humidity_map(humidity_map.data(), size.x, size.y, island_params, seed + 470);
   utils::generate_temperature_map(temperature_map.data(), size.x, size.y, island_params, seed + 130);
 
-  const double max_z = 32.0;
+  // const double max_z = 32.0;
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
 
   const float gradient_diameter = 160.0f;
   const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
+  float maxv = 0.0f;
+  float minv = 1.0f;
+
   for (int j = 0; j < size.y; ++j)
   {
     for (int i = 0; i < size.x; ++i)
     {
       const auto array_index = j * size.x + i;
+
+      maxv = std::max(maxv, height_map[array_index]);
+      minv = std::min(minv, height_map[array_index]);
 
       // Apply falloff to the silhouette
       const float distance_x_squared = (half_size_x - i) * (half_size_x - i);
@@ -134,43 +140,8 @@ void TempGenerator::m_compute_maps(const int seed)
       height_map[array_index] -= gradient;
       height_map[array_index] = std::clamp(height_map[array_index], 0.0f, 1.0f);
 
-      // double noise_value = silhouette_map[array_index];
-      // double map_value;
-      //
-      // if (noise_value < 0.3f)
-      // {
-      //   map_value = interpolate(0.0, 0.3, 0.0, max_z * 0.16, noise_value);
-      // }
-      // else if (noise_value < 0.5f)
-      // {
-      //   map_value = interpolate(0.3, 0.5, max_z * 0.16, max_z * 0.35, noise_value);
-      // }
-      // else
-      // {
-      //   map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
-      // }
-      //
-      // // Apply mountain map via control map
-      // if (map_value >= 1.0)
-      // {
-      //   double mountain_value = mountain_map[array_index];
-      //   double control_value = control_map[array_index];
-      //   const auto noise_influence = std::min(1.0, noise_value + 0.5);
-      //   map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
-      // }
-
-      // // Naive terrace for vizualization
-      // if (static_cast<int>(map_value) > 0)
-      // {
-      //   map_value = interpolate(0.0, max_z, 0.0, 255.0, static_cast<int>(map_value));
-      // }
-
-      // map_value = std::clamp(map_value, 0.0, 255.0);
-      // map_value = std::clamp(map_value, 0.0, max_z);
-      // height_map[array_index] = (map_value);
-
       // Create land mask
-      if (height_map[array_index] > 1)
+      if (height_map[array_index] > 0.0f)
       {
         island_mask[array_index] = TerrainType::Land;
       }

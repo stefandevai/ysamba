@@ -16,6 +16,7 @@ class ChunkGenerator
 {
  public:
   Vector3i size{1, 1, 1};
+  std::vector<float> silhouette_map;
   std::vector<float> vegetation_type;
   std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;
@@ -44,9 +45,9 @@ class ChunkGenerator
   };
 
   // JSON m_json{"./data/world/tile_rules.json"};
-  const WorldMetadata& m_world_metadata;
   int m_generation_padding = 1;
   Vector3i m_padded_size{size.x + m_generation_padding * 2, size.y + m_generation_padding * 2, 1};
+  const WorldMetadata& m_world_metadata;
   void m_get_height_map(const int seed, const Vector3i& offset);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
   int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
@@ -55,8 +56,5 @@ class ChunkGenerator
   uint32_t m_get_bitmask_8_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
   bool m_has_neighbor(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
-  double m_height_map_at(int x, int y);
-  int m_height_at(int x, int y);
-  int m_biome_at(int x, int y);
 };
 }  // namespace dl

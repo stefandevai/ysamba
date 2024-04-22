@@ -109,6 +109,7 @@ void generate_silhouette_map(
   remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
 
   remap->GenUniformGrid2D(data, x, y, width, height, params.frequency, seed);
+  // remap->GenUniformGrid2D(data, x, y, width, height, 0.016f, seed);
 }
 
 void generate_mountain_map(float* data, int x, int y, int width, int height, const IslandNoiseParams& params, int seed)

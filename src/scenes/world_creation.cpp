@@ -76,10 +76,10 @@ void WorldCreation::render()
   {
     m_renderer.ui_pass.batch.texture(*m_texture, 15, 15, 0);
   }
-  if (m_biome_texture != nullptr)
-  {
-    m_renderer.ui_pass.batch.texture(*m_biome_texture, 15, 15, 1);
-  }
+  // if (m_biome_texture != nullptr)
+  // {
+  //   m_renderer.ui_pass.batch.texture(*m_biome_texture, 15, 15, 1);
+  // }
 
   m_ui_manager.render();
   m_renderer.render(m_camera);
@@ -190,7 +190,13 @@ void WorldCreation::m_create_map_representation()
   {
     for (auto j = 0; j < world_size.y; ++j)
     {
-      const auto map_value = m_height_map[j * world_size.x + i];
+      auto map_value = std::floor(m_height_map[j * world_size.x + i] * 63.0f);
+      map_value = std::clamp(map_value, 0.0f, 255.0f);
+
+      if (map_value == 0.0f)
+      {
+        map_value = 100.0f;
+      }
 
       pixel_data[j * world_size.x * 4 + i * 4] = map_value;
       pixel_data[j * world_size.x * 4 + i * 4 + 1] = map_value;

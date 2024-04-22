@@ -28,10 +28,9 @@ namespace dl
 ChunkGenerator::ChunkGenerator(const WorldMetadata& world_metadata)
     : size(world::chunk_size), m_world_metadata(world_metadata)
 {
-  // map_to_tiles = static_cast<float>(world::chunk_size.x);
   const float frequency = 0.016f / map_to_tiles;
 
-  island_params.layer_1_octaves = 5;
+  island_params.layer_1_octaves = 4;
   island_params.frequency = frequency;
   island_params.layer_1_lacunarity = 3.2f;
   island_params.layer_1_gain = 0.32f;
@@ -53,118 +52,74 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(size);
 
-  m_get_height_map(seed, offset);
-
   auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
 
-  Vector2i height_map_position{
-      offset.x / world::chunk_size.x + m_world_metadata.world_size.x / 3,
-      offset.y / world::chunk_size.y + m_world_metadata.world_size.y / 3,
-  };
+  m_get_height_map(seed, offset);
 
-  // spdlog::debug("Generating chunk at offset {}", offset);
-  // spdlog::debug("Height map position {}", height_map_position);
-  // spdlog::debug("Chunk size {}", world::chunk_size);
-  // spdlog::debug("World size {}", m_world_metadata.world_size);
+  const double max_z = 63.0;
+  const float gradient_diameter = 160.0f * map_to_tiles;
+  const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
-  int terrain_id;
-
-  const double normalized_height = m_height_map_at(height_map_position.x, height_map_position.y);
-  const double normalized_height_left = m_height_map_at(height_map_position.x - 1, height_map_position.y);
-  const double normalized_height_right = m_height_map_at(height_map_position.x + 1, height_map_position.y);
-  const double normalized_height_top = m_height_map_at(height_map_position.x, height_map_position.y - 1);
-  const double normalized_height_bottom = m_height_map_at(height_map_position.x, height_map_position.y + 1);
-  const double normalized_height_top_left = m_height_map_at(height_map_position.x - 1, height_map_position.y - 1);
-  const double normalized_height_top_right = m_height_map_at(height_map_position.x + 1, height_map_position.y - 1);
-  const double normalized_height_bottom_right = m_height_map_at(height_map_position.x + 1, height_map_position.y + 1);
-  const double normalized_height_bottom_left = m_height_map_at(height_map_position.x - 1, height_map_position.y + 1);
-
-  const int height = m_height_at(height_map_position.x, height_map_position.y);
-  const int height_left = m_height_at(height_map_position.x - 1, height_map_position.y);
-  const int height_right = m_height_at(height_map_position.x + 1, height_map_position.y);
-  const int height_top = m_height_at(height_map_position.x, height_map_position.y - 1);
-  const int height_bottom = m_height_at(height_map_position.x, height_map_position.y + 1);
-  const int height_top_left = m_height_at(height_map_position.x - 1, height_map_position.y - 1);
-  const int height_top_right = m_height_at(height_map_position.x + 1, height_map_position.y - 1);
-  const int height_bottom_right = m_height_at(height_map_position.x + 1, height_map_position.y + 1);
-  const int height_bottom_left = m_height_at(height_map_position.x - 1, height_map_position.y + 1);
-
-  const double biome = m_biome_at(height_map_position.x, height_map_position.y);
-  const double biome_left = m_biome_at(height_map_position.x - 1, height_map_position.y);
-  const double biome_right = m_biome_at(height_map_position.x + 1, height_map_position.y);
-  const double biome_top = m_biome_at(height_map_position.x, height_map_position.y - 1);
-  const double biome_bottom = m_biome_at(height_map_position.x, height_map_position.y + 1);
-  const double biome_top_left = m_biome_at(height_map_position.x - 1, height_map_position.y - 1);
-  const double biome_top_right = m_biome_at(height_map_position.x + 1, height_map_position.y - 1);
-  const double biome_bottom_right = m_biome_at(height_map_position.x + 1, height_map_position.y + 1);
-  const double biome_bottom_left = m_biome_at(height_map_position.x - 1, height_map_position.y + 1);
+  float maxv = 0.0f;
+  float minv = 1.0f;
 
   for (int j = 0; j < m_padded_size.y; ++j)
   {
     for (int i = 0; i < m_padded_size.x; ++i)
     {
-      // Top left
-      if (i == 0 && j == 0)
+      const auto array_index = j * m_padded_size.x + i;
+
+      maxv = std::max(maxv, silhouette_map[array_index]);
+      minv = std::min(minv, silhouette_map[array_index]);
+
+      const float distance_x_squared = (i + offset.x) * (i + offset.x);
+      const float distance_y_squared = (j + offset.y) * (j + offset.y);
+      float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
+
+      silhouette_map[array_index] -= gradient;
+      silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
+
+      const double map_value = std::floor(silhouette_map[array_index] * max_z);
+
+      const int k = static_cast<int>(map_value);
+      bool inside_chunk = false;
+
+      if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
+          && i < m_padded_size.y - m_generation_padding)
       {
-        const int array_index = height_top_left * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_top_left;
+        inside_chunk = true;
       }
-      // Bottom right
-      else if (i == m_padded_size.x - 1 && j == m_padded_size.y - 1)
+
+      int terrain_id = 0;
+      int resolved_z = k;
+
+      if (k < 1)
       {
-        const int array_index = height_bottom_right * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_bottom_right;
-      }
-      // Top right
-      else if (i == m_padded_size.x - 1 && j == 0)
-      {
-        const int array_index = height_top_right * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_top_right;
-      }
-      // Bottom left
-      else if (i == 0 && j == m_padded_size.y - 1)
-      {
-        const int array_index = height_bottom_left * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_bottom_left;
-      }
-      // Left
-      else if (i == 0)
-      {
-        const int array_index = height_left * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_left;
-      }
-      // Top
-      else if (j == 0)
-      {
-        const int array_index = height_top * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_top;
-      }
-      // Right
-      else if (i == m_padded_size.x - 1)
-      {
-        const int array_index = height_right * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_right;
-      }
-      // Bottom
-      else if (j == m_padded_size.y - 1)
-      {
-        const int array_index = height_bottom * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome_bottom;
+        terrain_id = 3;
+        // resolved_z = 1;
       }
       else
       {
-        const int array_index = height * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i;
-        terrain[array_index] = biome;
+        terrain_id = 2;
       }
-    }
-  }
 
-  for (int i = 0; i < size.x; ++i)
-  {
-    for (int j = 0; j < size.y; ++j)
-    {
-      chunk->tiles.height_map[j * size.x + i] = height;
-      chunk->tiles.values[height * size.x * size.y + j * size.x + i].terrain = biome;
+      if (inside_chunk)
+      {
+        chunk->tiles.height_map[(j - 1) * size.x + (i - 1)] = resolved_z;
+        chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
+      }
+
+      terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
+
+      for (int z = 0; z < resolved_z; ++z)
+      {
+        terrain[z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
+
+        if (inside_chunk)
+        {
+          chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
+        }
+      }
     }
   }
 
@@ -190,8 +145,17 @@ void ChunkGenerator::set_size(const Vector3i& size)
 
 void ChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 {
+  silhouette_map.resize(m_padded_size.x * m_padded_size.y);
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
+
+  utils::generate_silhouette_map(silhouette_map.data(),
+                                 offset.x - m_generation_padding,
+                                 offset.y - m_generation_padding,
+                                 size.x + m_generation_padding * 2,
+                                 size.y + m_generation_padding * 2,
+                                 island_params,
+                                 seed);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise
@@ -668,54 +632,6 @@ bool ChunkGenerator::m_has_neighbor(
   }
 
   return false;
-}
-
-double ChunkGenerator::m_height_map_at(const int x, const int y)
-{
-  if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
-  {
-    return 0.0;
-  }
-  else
-  {
-    return m_world_metadata.height_map[y * m_world_metadata.world_size.x + x];
-  }
-}
-
-int ChunkGenerator::m_height_at(const int x, const int y)
-{
-  if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
-  {
-    return 0;
-  }
-  else
-  {
-    return static_cast<int>((m_world_metadata.height_map[y * m_world_metadata.world_size.x + x] * 32.0f));
-  }
-}
-
-int ChunkGenerator::m_biome_at(const int x, const int y)
-{
-  // TODO: Replace with a biome lookup
-  int height;
-
-  if (x < 0 || y < 0 || x >= m_world_metadata.world_size.x || y >= m_world_metadata.world_size.y)
-  {
-    height = 0;
-  }
-  else
-  {
-    height = m_height_at(x, y);
-  }
-
-  if (height < 1)
-  {
-    return 1;
-  }
-  else
-  {
-    return 2;
-  }
 }
 
 }  // namespace dl
