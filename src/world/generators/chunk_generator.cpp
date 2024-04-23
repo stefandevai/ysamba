@@ -56,29 +56,17 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   m_get_height_map(seed, offset);
 
-  const double max_z = 63.0;
-  const float gradient_diameter = 160.0f * map_to_tiles;
-  const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
+  const double max_z = static_cast<double>(size.z - 1);
 
   for (int j = 0; j < m_padded_size.y; ++j)
   {
     for (int i = 0; i < m_padded_size.x; ++i)
     {
-      const auto height_map_i = offset.x + i;
-      const auto height_map_j = offset.y + j;
-
-      int k = 0;
-
-      if (height_map_i >= 0 && height_map_i < m_world_metadata.world_size.x && height_map_j >= 0 && height_map_j < m_world_metadata.world_size.y)
-      {
-        const auto height_map_index = height_map_j * m_world_metadata.world_size.x + height_map_i;
-        k = static_cast<int>(m_world_metadata.height_map[height_map_index] * max_z);
-      }
+      const int k = m_sample_height_map(offset + Vector3i{i, j, 0});
 
       bool inside_chunk = false;
 
-      if (j >= m_generation_padding && j < m_padded_size.x - m_generation_padding && i >= m_generation_padding
-          && i < m_padded_size.y - m_generation_padding)
+      if (j >= m_padding && j < m_padded_size.x - m_padding && i >= m_padding && i < m_padded_size.y - m_padding)
       {
         inside_chunk = true;
       }
@@ -133,7 +121,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 void ChunkGenerator::set_size(const Vector3i& size)
 {
   this->size = size;
-  m_padded_size = Vector3i{size.x + m_generation_padding * 2, size.y + m_generation_padding * 2, 1};
+  m_padded_size = Vector3i{size.x + m_padding * 2, size.y + m_padding * 2, 1};
 }
 
 void ChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
@@ -143,10 +131,10 @@ void ChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
   vegetation_density.resize(size.x * size.y);
 
   utils::generate_silhouette_map(silhouette_map.data(),
-                                 offset.x - m_generation_padding,
-                                 offset.y - m_generation_padding,
-                                 size.x + m_generation_padding * 2,
-                                 size.y + m_generation_padding * 2,
+                                 offset.x - m_padding,
+                                 offset.y - m_padding,
+                                 size.x + m_padding * 2,
+                                 size.y + m_padding * 2,
                                  island_params,
                                  seed);
 
@@ -164,8 +152,8 @@ void ChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
 
 void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
 {
-  const int transposed_x = x + m_generation_padding;
-  const int transposed_y = y + m_generation_padding;
+  const int transposed_x = x + m_padding;
+  const int transposed_y = y + m_padding;
 
   const auto terrain_id
       = terrain[z * m_padded_size.x * m_padded_size.y + transposed_y * m_padded_size.x + transposed_x];
@@ -627,4 +615,65 @@ bool ChunkGenerator::m_has_neighbor(
   return false;
 }
 
+Vector2 ChunkGenerator::m_world_to_height_map(const Vector3i& world_position)
+{
+  return Vector2{
+    world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
+    world_position.y / map_to_tiles + static_cast<double>(m_world_metadata.world_size.y / 2),
+  };
+}
+
+int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
+{
+  const Vector2 height_map_position = m_world_to_height_map(world_position);
+
+  if (height_map_position.x < 0.0 &&
+      height_map_position.x >= m_world_metadata.world_size.x &&
+      height_map_position.y < 0.0 &&
+      height_map_position.y >= m_world_metadata.world_size.y)
+  {
+    return 0;
+  }
+
+  switch(m_height_map_sampler)
+  {
+    case Sampler::Nearest:
+    {
+      const int height_map_index = static_cast<int>(height_map_position.y) * m_world_metadata.world_size.x + static_cast<int>(height_map_position.x);
+      return static_cast<int>(m_world_metadata.height_map[height_map_index] * (size.z - 1));
+    }
+    case Sampler::Bilinear:
+    {
+      const auto x = std::floor(height_map_position.x);
+      const auto y = std::floor(height_map_position.y);
+
+      const auto x_ratio = height_map_position.x - x;
+      const auto y_ratio = height_map_position.y - y;
+
+      const auto height = m_world_metadata.height_map[utils::array_index(x, y, m_world_metadata.world_size.x)];
+      const auto height_right = m_world_metadata.height_map[utils::array_index(x + 1, y, m_world_metadata.world_size.x)];
+      const auto height_bottom = m_world_metadata.height_map[utils::array_index(x, y + 1, m_world_metadata.world_size.x)];
+      const auto height_bottom_right = m_world_metadata.height_map[utils::array_index(x + 1, y + 1, m_world_metadata.world_size.x)];
+
+      const auto top = std::lerp(height, height_right, x_ratio);
+      const auto bottom = std::lerp(height_bottom, height_bottom_right, x_ratio);
+
+      return static_cast<int>(std::lerp(top, bottom, y_ratio) * (size.z - 1));
+    }
+    case Sampler::Bicubic:
+    {
+      return 0;
+    }
+    case Sampler::Trilinear:
+    {
+      return 0;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return 0;
+}
 }  // namespace dl
