@@ -90,17 +90,27 @@ void ChunkManager::regenerate_chunks()
 
 void ChunkManager::load_initial_chunks(const Vector3i& target)
 {
-  const auto top_left_position = world_to_chunk(target.x - frustum.x / 2, target.y - frustum.y / 2, target.z);
+  const int padding = 1;
 
-  for (int j = top_left_position.y; j < target.y + frustum.y / 2; j += world::chunk_size.y)
   {
-    for (int i = top_left_position.x; i < target.x + frustum.x / 2; i += world::chunk_size.y)
-    {
-      const auto& candidate = world_to_chunk(i, j, target.z);
+    // Load visible chunks
+    const auto top_left_position
+        = world_to_chunk(target.x - padding * world::chunk_size.x, target.y - padding * world::chunk_size.y, target.z);
 
-      if (!is_loaded(candidate))
+    const auto bottom_right_position = world_to_chunk(target.x + frustum.x + padding * world::chunk_size.x,
+                                                      target.y + frustum.y + padding * world::chunk_size.y,
+                                                      target.z);
+
+    for (int j = top_left_position.y; j <= bottom_right_position.y; j += world::chunk_size.y)
+    {
+      for (int i = top_left_position.x; i <= bottom_right_position.x; i += world::chunk_size.y)
       {
-        load_or_generate(candidate);
+        const auto& candidate = world_to_chunk(i, j, target.z);
+
+        if (!is_loaded(candidate))
+        {
+          load_or_generate(candidate);
+        }
       }
     }
   }
@@ -173,6 +183,7 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
 {
   const auto found = std::find_if(
       chunks.begin(), chunks.end(), [&position](const auto& chunk) { return chunk->position == position; });
+
 
   const auto found_generating
       = std::find_if(m_chunks_loading.begin(),

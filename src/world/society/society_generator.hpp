@@ -40,7 +40,8 @@ class SocietyGenerator
   static void place_members(std::vector<MemberComponents>& components,
                             const World& world,
                             const Camera& camera,
-                            entt::registry& registry);
+                            entt::registry& registry,
+                            const Vector2i& map_position);
 
  private:
   SocietyGenerator() = delete;
@@ -60,6 +61,6 @@ class SocietyGenerator
                                                                 const MemberParameters& parameters);
 
   // Search a viable position in the world to place a member
-  [[nodiscard]] static Position m_get_member_position(const World& world, const Camera& camera);
+  [[nodiscard]] static Position m_get_member_position(const World& world, const Camera& camera, const Vector2i& map_position);
 };
 }  // namespace dl

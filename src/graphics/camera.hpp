@@ -13,6 +13,7 @@ namespace dl
 {
 class Display;
 struct EventEmitter;
+struct WorldMetadata;
 
 constexpr float DEFAULT_ZOOM = 1.0f;
 
@@ -56,6 +57,7 @@ class Camera
   [[nodiscard]] const Vector2i& get_size_in_tiles() const { return m_size_in_tiles; }
   [[nodiscard]] const Vector2i& get_grid_size() const { return m_grid_size; }
   void set_position(const Vector2& position);
+  void set_map_position(const Vector2i& position);
   void set_size(const Vector2& size);
   void set_frustum(float left, float right, float bottom, float top);
   void set_tile_size(const Vector2i& size);

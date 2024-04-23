@@ -18,9 +18,6 @@ class ChunkGenerator
   std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;
 
-  // Quantity of tiles per map texture pixel
-  double map_to_tiles = 20.0;
-
   ChunkGenerator(const WorldMetadata& world_metadata);
 
   void generate(const int seed, const Vector3i& offset = Vector3i{});

@@ -55,10 +55,11 @@ class WorldCreation : public Scene
   InputManager& m_input_manager = InputManager::get_instance();
   ui::WorldCreationPanel* m_panel = nullptr;
 
-  Quad m_location_selector{0, 0, Color{0xFFFFFFFF}};
-  Quad m_location_selector_on_hover{0, 0, Color{0xFF22BBAA}};
+  Vector2i m_selected_cell{-1, -1};
   Vector2i m_location_selector_position{0, 0};
   Vector2i m_location_selector_on_hover_position{0, 0};
+  Quad m_location_selector{0, 0, Color{0xed6742EE}};
+  Quad m_location_selector_on_hover{0, 0, Color{0xFFFFFF66}};
   bool m_has_selected_location = false;
   bool m_is_hovering_map = false;
   static constexpr int m_texels_per_cell = 4;

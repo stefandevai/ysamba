@@ -53,18 +53,41 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
       {
       case BiomeType::Sea:
       {
-        resolved_z = 1;
-        terrain_id = 1;
+        if (k < 1)
+        {
+          resolved_z = 1;
+          terrain_id = 1;
+        }
+        else
+        {
+          terrain_id = 2;
+        }
         break;
       }
       case BiomeType::Beach:
       {
-        terrain_id = 3;
+        if (k < 1)
+        {
+          resolved_z = 1;
+          terrain_id = 1;
+        }
+        else
+        {
+          terrain_id = 3;
+        }
         break;
       }
       default:
       {
-        terrain_id = 2;
+        if (k < 1)
+        {
+          resolved_z = 1;
+          terrain_id = 1;
+        }
+        else
+        {
+          terrain_id = 2;
+        }
         break;
       }
       }
@@ -594,8 +617,8 @@ bool ChunkGenerator::m_has_neighbor(
 Vector2 ChunkGenerator::m_world_to_noise_map(const Vector3i& world_position)
 {
   return Vector2{
-      world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
-      world_position.y / map_to_tiles + static_cast<double>(m_world_metadata.world_size.y / 2),
+      world_position.x / static_cast<double>(world::map_to_tiles),
+      world_position.y / static_cast<double>(world::map_to_tiles),
   };
 }
 
@@ -603,8 +626,7 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 {
   Vector2 height_map_position = m_world_to_noise_map(world_position);
 
-  if (height_map_position.x < 0.0 && height_map_position.x >= m_world_metadata.world_size.x
-      && height_map_position.y < 0.0 && height_map_position.y >= m_world_metadata.world_size.y)
+  if(!utils::point_aabb(height_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
   {
     return 0;
   }
@@ -706,8 +728,7 @@ BiomeType ChunkGenerator::m_sample_biome(const Vector3i& world_position)
 {
   Vector2 biome_map_position = m_world_to_noise_map(world_position);
 
-  if (biome_map_position.x < 0.0 && biome_map_position.x >= m_world_metadata.world_size.x && biome_map_position.y < 0.0
-      && biome_map_position.y >= m_world_metadata.world_size.y)
+  if(!utils::point_aabb(biome_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
   {
     return BiomeType::Sea;
   }

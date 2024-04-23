@@ -96,7 +96,8 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
 void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
                                      const World& world,
                                      const Camera& camera,
-                                     entt::registry& registry)
+                                     entt::registry& registry,
+                                     const Vector2i& map_position)
 {
   using namespace entt::literals;
 
@@ -107,7 +108,7 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
     registry.emplace<Biology>(entity, member.biology);
     registry.emplace<entt::tag<"collidable"_hs>>(entity, member.biology);
 
-    const auto position = m_get_member_position(world, camera);
+    const auto position = m_get_member_position(world, camera, map_position);
     registry.emplace<Position>(entity, position);
 
     member.sprite.layer_z = renderer::layer_z_offset_characters;
@@ -120,7 +121,7 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
   }
 }
 
-Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera)
+Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera, const Vector2i& map_position)
 {
   auto position = Position{0., 0., 0.};
   const uint32_t max_tries = 50;

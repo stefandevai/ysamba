@@ -64,7 +64,7 @@ class World
   World(GameContext& game_context);
 
   // Generate elements for a new world
-  void initialize(entt::registry& registry, const Camera& camera);
+  void initialize(entt::registry& registry, const Camera& camera, const Vector2i& map_position);
 
   // Generate all societies for the world
   void generate_societies();

@@ -39,18 +39,19 @@ World::World(GameContext& game_context) : m_game_context(game_context)
   spdlog::debug("Loading world \"{}\"", m_game_context.world_metadata.name);
   spdlog::debug("Seed: {}", m_game_context.world_metadata.seed);
   spdlog::debug("Id: {}", m_game_context.world_metadata.id);
+  spdlog::debug("Initial position: {}", m_game_context.world_metadata.initial_position);
 
   TileRules::load();
   m_load_tile_data();
   m_load_item_data();
 }
 
-void World::initialize(entt::registry& registry, const Camera& camera)
+void World::initialize(entt::registry& registry, const Camera& camera, const Vector2i& map_position)
 {
   using namespace entt::literals;
   auto society_blueprint = get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, *this, camera, registry);
+  SocietyGenerator::place_members(components, *this, camera, registry, map_position);
 
   has_initialized = true;
 }

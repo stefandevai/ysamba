@@ -89,6 +89,14 @@ void WorldCreation::render()
         m_location_selector_on_hover,
         m_location_selector_on_hover_position.x,
         m_location_selector_on_hover_position.y,
+        2);
+  }
+  if (m_has_selected_location)
+  {
+    m_renderer.ui_pass.batch.quad(
+        m_location_selector,
+        m_location_selector_position.x,
+        m_location_selector_position.y,
         3);
   }
 
@@ -126,7 +134,7 @@ bool WorldCreation::m_update_input()
 
 void WorldCreation::save()
 {
-  bool is_valid = m_panel->validate();
+  bool is_valid = m_panel->validate() && m_selected_cell != Vector2i{-1, -1};
 
   if (!is_valid)
   {
@@ -144,6 +152,7 @@ void WorldCreation::save()
       .world_size = world_size,
       .created_at = now_seconds,
       .updated_at = now_seconds,
+      .initial_position = m_selected_cell,
       .biome_map = std::move(m_biome_map),
       .height_map = std::move(m_height_map),
       .sea_distance_field = std::move(m_sea_distance_field),
@@ -225,6 +234,8 @@ void WorldCreation::m_create_map_representation()
   m_texture->size = Vector2i{texture_size, texture_size};
 
   // Set location selector size based on texels per cell
+  m_has_selected_location = false;
+  m_selected_cell = Vector2i{-1, -1};
   m_location_selector.w = (texture_size / world_size.x) * m_texels_per_cell;
   m_location_selector.h = (texture_size / world_size.y) * m_texels_per_cell;
   m_location_selector_on_hover.w = (texture_size / world_size.x) * m_texels_per_cell;
@@ -322,7 +333,21 @@ void WorldCreation::m_update_world_location_selection()
   }
 
   m_is_hovering_map = true;
-  m_location_selector_on_hover_position = ((mouse_position - panel_margin) / m_location_selector_on_hover.w) * m_location_selector_on_hover.w + panel_margin;
+
+  const double texel_width = m_texture->size.x / static_cast<double>(world_size.x);
+  const double texel_height = m_texture->size.y / static_cast<double>(world_size.y);
+  const int cell_position_x = (mouse_position.x - panel_margin.x) / texel_width;
+  const int cell_position_y = (mouse_position.y - panel_margin.y) / texel_height;
+
+  // m_location_selector_on_hover_position = ((mouse_position - panel_margin) / m_location_selector_on_hover.w) * m_location_selector_on_hover.w + panel_margin;
+  m_location_selector_on_hover_position = Vector2i{cell_position_x * texel_width + panel_margin.x, cell_position_y * texel_height + panel_margin.y};
+
+  if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
+  {
+    m_selected_cell = Vector2i{cell_position_x, cell_position_y};
+    m_location_selector_position = m_location_selector_on_hover_position;
+    m_has_selected_location = true;
+  }
 }
 
 }  // namespace dl

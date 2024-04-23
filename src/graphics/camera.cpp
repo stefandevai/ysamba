@@ -5,9 +5,11 @@
 #include <cmath>
 #include <entt/entity/registry.hpp>
 
+#include "constants.hpp"
 #include "core/events/camera.hpp"
 #include "core/events/emitter.hpp"
 #include "graphics/display.hpp"
+#include "world/metadata.hpp"
 
 namespace
 {
@@ -114,6 +116,12 @@ void Camera::set_position(const Vector2& position)
   m_position.y = position.y * m_scaling_factor * (1.0 / zoom) + m_camera_z;
 
   dirty = true;
+}
+
+void Camera::set_map_position(const Vector2i& position)
+{
+  set_position({position.x * world::map_to_tiles * m_grid_size.x,
+                (position.y) * world::map_to_tiles * m_grid_size.y});
 }
 
 void Camera::set_size(const Vector2& size)

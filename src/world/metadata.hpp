@@ -15,6 +15,7 @@ struct WorldMetadata
   std::string name{};
   int seed{};
   Vector3i world_size{};
+  Vector2i initial_position{};
   std::string created_at_label{};
   std::string updated_at_label{};
   std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> created_at{};
@@ -31,6 +32,7 @@ void serialize(Archive& archive, WorldMetadata& data)
           data.name,
           data.seed,
           data.world_size,
+          data.initial_position,
           data.created_at_label,
           data.updated_at_label,
           data.biome_map,

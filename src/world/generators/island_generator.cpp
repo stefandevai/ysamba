@@ -102,7 +102,7 @@ void IslandGenerator::m_compute_maps(const int seed)
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
 
-  const float gradient_diameter = 160.0f;
+  const float gradient_diameter = size.x * 0.625f;
   const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
   for (int j = 0; j < size.y; ++j)

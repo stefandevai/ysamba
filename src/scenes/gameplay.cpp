@@ -39,6 +39,26 @@ void Gameplay::load()
   m_camera.set_zoom(config::gameplay::default_zoom);
   m_camera.set_event_emitter(&m_event_emitter);
 
+#ifndef DL_BUILD_DEBUG_TOOLS
+  load_game();
+#else
+  if (m_game_context.world_metadata.id.empty())
+  {
+    load_default_game();
+  }
+  else
+  {
+    load_game();
+  }
+
+  auto& debug_tools = DebugTools::get_instance();
+  debug_tools.init_general_info(m_game_context);
+  debug_tools.init_camera_inspector(m_camera);
+  // debug_tools.init_world_generation(m_world.chunk_manager);
+  /* debug_tools.init_chunk_debugger(*this); */
+  /* debug_tools.init_render_editor(m_render_system); */
+#endif
+
   m_event_emitter.on<CameraMovedEvent>(
       [this](const CameraMovedEvent& event, EventEmitter& emitter)
       {
@@ -74,25 +94,6 @@ void Gameplay::load()
         m_update_all_systems();
       });
 
-#ifndef DL_BUILD_DEBUG_TOOLS
-  load_game();
-#else
-  if (m_game_context.world_metadata.id.empty())
-  {
-    load_default_game();
-  }
-  else
-  {
-    load_game();
-  }
-
-  auto& debug_tools = DebugTools::get_instance();
-  debug_tools.init_general_info(m_game_context);
-  debug_tools.init_camera_inspector(m_camera);
-  // debug_tools.init_world_generation(m_world.chunk_manager);
-  /* debug_tools.init_chunk_debugger(*this); */
-  /* debug_tools.init_render_editor(m_render_system); */
-#endif
 
   m_has_loaded = true;
 }
@@ -249,16 +250,17 @@ void Gameplay::save_game()
 
 void Gameplay::load_game()
 {
-  m_camera.update_dirty();
-
-  m_world.chunk_manager.load_initial_chunks(m_camera.center_in_tiles);
-
   m_registry.clear();
   serialization::load_game(m_world, m_game_context.world_metadata, m_registry);
 
+  m_camera.update_dirty();
+  m_camera.set_map_position(m_game_context.world_metadata.initial_position);
+  m_camera.update_dirty();
+  m_world.chunk_manager.load_initial_chunks(m_camera.get_position_in_tiles());
+
   if (!m_world.has_initialized)
   {
-    m_world.initialize(m_registry, m_camera);
+    m_world.initialize(m_registry, m_camera, m_game_context.world_metadata.initial_position);
     serialization::save_game(m_world, m_game_context.world_metadata, m_registry);
   }
 
