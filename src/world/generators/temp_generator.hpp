@@ -19,6 +19,7 @@ class TempGenerator
   std::vector<float> humidity_map;
   std::vector<float> temperature_map;
   std::vector<float> sea_distance_field;
+  std::vector<int> island_mask;
   IslandNoiseParams island_params{};
 
   TempGenerator();

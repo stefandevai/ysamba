@@ -4,59 +4,30 @@
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
-#include <chrono>
 #include <cmath>
 
 #include "./tile_rules.hpp"
 #include "./utils.hpp"
 #include "constants.hpp"
 #include "core/random.hpp"
-#include "core/timer.hpp"
 #include "world/chunk.hpp"
 #include "world/metadata.hpp"
-
-namespace
-{
-double interpolate(double start_1, double end_1, double start_2, const double end_2, double value)
-{
-  return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
-}
-}  // namespace
 
 namespace dl
 {
 ChunkGenerator::ChunkGenerator(const WorldMetadata& world_metadata)
     : size(world::chunk_size), m_world_metadata(world_metadata)
 {
-  const float frequency = 0.016f / map_to_tiles;
-
-  island_params.layer_1_octaves = 7;
-  island_params.frequency = frequency;
-  island_params.layer_1_lacunarity = 3.2f;
-  island_params.layer_1_gain = 0.32f;
-  island_params.layer_1_weighted_strength = 0.25f;
-  island_params.layer_1_terrace_multiplier = 0.14f;
-
-  island_params.layer_2_seed_offset = 7;
-  island_params.layer_2_octave_count = 4;
-  island_params.layer_2_lacunarity = 1.42f;
-  island_params.layer_2_gain = 1.1f;
-  island_params.layer_2_weighted_strength = 0.42f;
-  island_params.layer_2_fade = 0.62f;
-  island_params.layer_2_smooth_rhs = -0.68f;
-  island_params.layer_2_smoothness = 1.76f;
 }
 
 void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 {
+  m_generate_noise_data(seed, offset);
+
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(size);
 
   auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
-
-  m_get_height_map(seed, offset);
-
-  const double max_z = static_cast<double>(size.z - 1);
 
   for (int j = 0; j < m_padded_size.y; ++j)
   {
@@ -124,19 +95,10 @@ void ChunkGenerator::set_size(const Vector3i& size)
   m_padded_size = Vector3i{size.x + m_padding * 2, size.y + m_padding * 2, 1};
 }
 
-void ChunkGenerator::m_get_height_map(const int seed, const Vector3i& offset)
+void ChunkGenerator::m_generate_noise_data(const int seed, const Vector3i& offset)
 {
-  silhouette_map.resize(m_padded_size.x * m_padded_size.y);
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
-
-  utils::generate_silhouette_map(silhouette_map.data(),
-                                 offset.x - m_padding,
-                                 offset.y - m_padding,
-                                 size.x + m_padding * 2,
-                                 size.y + m_padding * 2,
-                                 island_params,
-                                 seed);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise
@@ -618,10 +580,8 @@ bool ChunkGenerator::m_has_neighbor(
 Vector2 ChunkGenerator::m_world_to_height_map(const Vector3i& world_position)
 {
   return Vector2{
-    // world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
-    // world_position.y / map_to_tiles + static_cast<double>(m_world_metadata.world_size.y / 2),
-    world_position.x / map_to_tiles,
-    world_position.y / map_to_tiles,
+      world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
+      world_position.y / map_to_tiles + static_cast<double>(m_world_metadata.world_size.y / 2),
   };
 }
 
@@ -629,97 +589,100 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 {
   Vector2 height_map_position = m_world_to_height_map(world_position);
 
-  if (height_map_position.x < 0.0 &&
-      height_map_position.x >= m_world_metadata.world_size.x &&
-      height_map_position.y < 0.0 &&
-      height_map_position.y >= m_world_metadata.world_size.y)
+  if (height_map_position.x < 0.0 && height_map_position.x >= m_world_metadata.world_size.x
+      && height_map_position.y < 0.0 && height_map_position.y >= m_world_metadata.world_size.y)
   {
     return 0;
   }
 
-  switch(m_height_map_sampler)
+  switch (m_height_map_sampler)
   {
-    case Sampler::Nearest:
+  case Sampler::Nearest:
+  {
+    const int height_map_index = static_cast<int>(height_map_position.y) * m_world_metadata.world_size.x
+                                 + static_cast<int>(height_map_position.x);
+    return static_cast<int>(m_world_metadata.height_map[height_map_index] * (size.z - 1));
+  }
+  case Sampler::Bilinear:
+  {
+    // Subtract 0.5 to center the sample
+    height_map_position -= Vector2{0.5, 0.5};
+
+    const auto x = std::floor(height_map_position.x);
+    const auto y = std::floor(height_map_position.y);
+
+    const auto x_ratio = height_map_position.x - x;
+    const auto y_ratio = height_map_position.y - y;
+
+    // TODO: Handle edge cases
+    const auto height = m_world_metadata.height_map[utils::array_index(x, y, m_world_metadata.world_size.x)];
+    const auto height_right = m_world_metadata.height_map[utils::array_index(x + 1, y, m_world_metadata.world_size.x)];
+    const auto height_bottom = m_world_metadata.height_map[utils::array_index(x, y + 1, m_world_metadata.world_size.x)];
+    const auto height_bottom_right
+        = m_world_metadata.height_map[utils::array_index(x + 1, y + 1, m_world_metadata.world_size.x)];
+
+    const auto top = std::lerp(height, height_right, x_ratio);
+    const auto bottom = std::lerp(height_bottom, height_bottom_right, x_ratio);
+
+    return static_cast<int>(std::lerp(top, bottom, y_ratio) * (size.z - 1));
+  }
+  case Sampler::Bicubic:
+  {
+    // Subtract 0.5 to center the sample
+    height_map_position -= Vector2{0.5, 0.5};
+
+    const auto x = std::floor(height_map_position.x);
+    const auto y = std::floor(height_map_position.y);
+
+    const auto sample_ratio = Vector2{height_map_position.x - x, height_map_position.y - y};
+
+    std::array<float, 16> samples{};
+
+    for (int j = 0; j < 4; ++j)
     {
-      const int height_map_index = static_cast<int>(height_map_position.y) * m_world_metadata.world_size.x + static_cast<int>(height_map_position.x);
-      return static_cast<int>(m_world_metadata.height_map[height_map_index] * (size.z - 1));
-    }
-    case Sampler::Bilinear:
-    {
-      // Subtract 0.5 to center the sample
-      height_map_position -= Vector2{0.5, 0.5};
-
-      const auto x = std::floor(height_map_position.x);
-      const auto y = std::floor(height_map_position.y);
-
-      const auto x_ratio = height_map_position.x - x;
-      const auto y_ratio = height_map_position.y - y;
-
-      // TODO: Handle edge cases
-      const auto height = m_world_metadata.height_map[utils::array_index(x, y, m_world_metadata.world_size.x)];
-      const auto height_right = m_world_metadata.height_map[utils::array_index(x + 1, y, m_world_metadata.world_size.x)];
-      const auto height_bottom = m_world_metadata.height_map[utils::array_index(x, y + 1, m_world_metadata.world_size.x)];
-      const auto height_bottom_right = m_world_metadata.height_map[utils::array_index(x + 1, y + 1, m_world_metadata.world_size.x)];
-
-      const auto top = std::lerp(height, height_right, x_ratio);
-      const auto bottom = std::lerp(height_bottom, height_bottom_right, x_ratio);
-
-      return static_cast<int>(std::lerp(top, bottom, y_ratio) * (size.z - 1));
-    }
-    case Sampler::Bicubic:
-    {
-      // Subtract 0.5 to center the sample
-      height_map_position -= Vector2{0.5, 0.5};
-
-      const auto x = std::floor(height_map_position.x);
-      const auto y = std::floor(height_map_position.y);
-
-      const auto sample_ratio = Vector2{height_map_position.x - x, height_map_position.y - y};
-
-      std::array<float, 16> samples{};
-
-      for (int j = 0; j < 4; ++j)
+      for (int i = 0; i < 4; ++i)
       {
-        for (int i = 0; i < 4; ++i)
-        {
-          const auto sample_x = x + i - 1;
-          const auto sample_y = y + j - 1;
+        const auto sample_x = x + i - 1;
+        const auto sample_y = y + j - 1;
 
-          if (sample_x < 0 || sample_x >= m_world_metadata.world_size.x || sample_y < 0 || sample_y >= m_world_metadata.world_size.y)
-          {
-            samples[j * 4 + i] = 0.0f;
-          }
-          else
-          {
-            samples[j * 4 + i] = m_world_metadata.height_map[utils::array_index(sample_x, sample_y, m_world_metadata.world_size.x)];
-          }
+        if (sample_x < 0 || sample_x >= m_world_metadata.world_size.x || sample_y < 0
+            || sample_y >= m_world_metadata.world_size.y)
+        {
+          samples[j * 4 + i] = 0.0f;
+        }
+        else
+        {
+          samples[j * 4 + i]
+              = m_world_metadata.height_map[utils::array_index(sample_x, sample_y, m_world_metadata.world_size.x)];
         }
       }
-
-      const auto t = sample_ratio;
-      const auto t2 = sample_ratio * sample_ratio;
-      const auto t3 = t2 * sample_ratio;
-
-      const auto q1 = 0.5 * (-1.0 * t3 + 2.0 * t2 - t);
-      const auto q2 = 0.5 * (3.0 * t3  - 5.0 * t2 + Vector2{2.0, 2.0});
-      const auto q3 = 0.5 * (-3.0 * t3 + 4.0 * t2 + t);
-      const auto q4 = 0.5 * (t3 - t2);
-
-      std::array<float, 4> rows{};
-
-      for (int j = 0; j < 4; ++j)
-      {
-        rows[j] = q1.x * samples[j * 4] + q2.x * samples[j * 4 + 1] + q3.x * samples[j * 4 + 2] + q4.x * samples[j * 4 + 3];
-      }
-
-      const auto interpolated_value = q1.y * rows[0] + q2.y * rows[1] + q3.y * rows[2] + q4.y * rows[3];
-
-      return static_cast<int>(std::clamp(interpolated_value, 0.0, 1.0) * (size.z - 1));
     }
-    default:
+
+    const auto t = sample_ratio;
+    const auto t2 = sample_ratio * sample_ratio;
+    const auto t3 = t2 * sample_ratio;
+
+    const auto q1 = 0.5 * (-1.0 * t3 + 2.0 * t2 - t);
+    const auto q2 = 0.5 * (3.0 * t3 - 5.0 * t2 + Vector2{2.0, 2.0});
+    const auto q3 = 0.5 * (-3.0 * t3 + 4.0 * t2 + t);
+    const auto q4 = 0.5 * (t3 - t2);
+
+    std::array<float, 4> rows{};
+
+    for (int j = 0; j < 4; ++j)
     {
-      break;
+      rows[j]
+          = q1.x * samples[j * 4] + q2.x * samples[j * 4 + 1] + q3.x * samples[j * 4 + 2] + q4.x * samples[j * 4 + 3];
     }
+
+    const auto interpolated_value = q1.y * rows[0] + q2.y * rows[1] + q3.y * rows[2] + q4.y * rows[3];
+
+    return static_cast<int>(std::clamp(interpolated_value, 0.0, 1.0) * (size.z - 1));
+  }
+  default:
+  {
+    break;
+  }
   }
 
   return 0;

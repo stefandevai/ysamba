@@ -58,17 +58,17 @@ void TempGenerator::generate(const int seed)
   {
     for (auto i = 0; i < size.x * size.y; ++i)
     {
-      // height_map[i] = static_cast<uint8_t>(sea_distance_field[i] * 255.0f);
+      height_map[i] = sea_distance_field[i];
 
       // height_map[i] = static_cast<uint8_t>(humidity_map[i] * 255.0f);
 
-      // if (main_island.mask[i] != TerrainType::Land)
+      // if (island_mask[i] != TerrainType::Land)
       // {
-      //   height_map[i] = 0;
+      //   height_map[i] = 0.0f;
       // }
       // else
       // {
-      //   height_map[i] = 100;
+      //   height_map[i] = 1.0f;
       // }
     }
   }
@@ -101,10 +101,10 @@ void TempGenerator::m_compute_maps(const int seed)
   humidity_map.resize(size.x * size.y);
   temperature_map.resize(size.x * size.y);
   sea_distance_field.resize(size.x * size.y);
+  island_mask.resize(size.x * size.y);
 
   std::vector<float> mountain_map(size.x * size.y);
   std::vector<float> control_map(size.x * size.y);
-  std::vector<int> island_mask(size.x * size.y);
 
   utils::generate_silhouette_map(height_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
@@ -119,24 +119,11 @@ void TempGenerator::m_compute_maps(const int seed)
   const float gradient_diameter = 160.0f;
   const float gradient_diameter_squared = gradient_diameter * gradient_diameter;
 
-  float maxv = 0.0f;
-  float minv = 1.0f;
-
   for (int j = 0; j < size.y; ++j)
   {
     for (int i = 0; i < size.x; ++i)
     {
       const auto array_index = j * size.x + i;
-
-      // Generate square
-      // if (i >= 0 && i < 50 && j >= 0 && j < 50)
-      // {
-      //   height_map[array_index] = 0.04f;
-      // }
-      // else
-      // {
-      //   height_map[array_index] = 0.0f;
-      // }
 
       // Apply falloff to the silhouette
       const float distance_x_squared = (half_size_x - i) * (half_size_x - i);
@@ -148,7 +135,7 @@ void TempGenerator::m_compute_maps(const int seed)
       height_map[array_index] = std::clamp(height_map[array_index], 0.0f, 1.0f);
 
       // Create land mask
-      if (height_map[array_index] > 0.0f)
+      if (height_map[array_index] > 0.02f)
       {
         island_mask[array_index] = TerrainType::Land;
       }
@@ -218,14 +205,14 @@ void TempGenerator::m_compute_maps(const int seed)
     }
   }
 
-  // // Remove smaller islands from the height map
-  // for (auto i = 0; i < size.x * size.y; ++i)
-  // {
-  //   if (heman_island_mask[i] == 1.0f)
-  //   {
-  //     height_map[i] = 0;
-  //   }
-  // }
+  // Remove smaller islands from the height map
+  for (auto i = 0; i < size.x * size.y; ++i)
+  {
+    if (heman_island_mask[i] == 1.0f)
+    {
+      height_map[i] = 0.0f;
+    }
+  }
 
   // Generate an Unsigned Distance Field relative to the distance to the sea
   auto distance_field = heman_distance_create_df(heman_island_mask_image);
@@ -408,10 +395,14 @@ std::vector<IslandData> TempGenerator::m_get_islands(std::vector<int>& grid, con
       {
         const auto island_data = m_get_island(grid, mask, i, j);
         islands.push_back(island_data);
-        std::push_heap(islands.begin(), islands.end());
       }
     }
   }
+
+  // Sort islands by size
+  std::sort(islands.begin(),
+            islands.end(),
+            [](const IslandData& lhs, const IslandData& rhs) { return lhs.points.size() > rhs.points.size(); });
 
   if (islands.size() > islands_to_keep)
   {

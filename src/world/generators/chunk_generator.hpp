@@ -2,10 +2,7 @@
 
 #include <vector>
 
-#include "./island_data.hpp"
-#include "core/json.hpp"
 #include "core/maths/vector.hpp"
-#include "world/tilemap.hpp"
 
 namespace dl
 {
@@ -16,11 +13,9 @@ class ChunkGenerator
 {
  public:
   Vector3i size{1, 1, 1};
-  std::vector<float> silhouette_map;
   std::vector<float> vegetation_type;
   std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;
-  IslandNoiseParams island_params{};
 
   // Quantity of tiles per map texture pixel
   double map_to_tiles = 4.0;
@@ -51,21 +46,27 @@ class ChunkGenerator
     Bicubic,
   };
 
-  // JSON m_json{"./data/world/tile_rules.json"};
   int m_padding = 1;
   Vector3i m_padded_size{size.x + m_padding * 2, size.y + m_padding * 2, 1};
   const WorldMetadata& m_world_metadata;
   Sampler m_height_map_sampler = Sampler::Bicubic;
 
-  void m_get_height_map(const int seed, const Vector3i& offset);
+  void m_generate_noise_data(const int seed, const Vector3i& offset);
+
+  Vector2 m_world_to_height_map(const Vector3i& world_position);
+
+  int m_sample_height_map(const Vector3i& world_position);
+
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
+
   int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
+
   uint32_t m_get_bitmask_4_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
+
   uint32_t m_get_bitmask_8_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
+
   bool m_has_neighbor(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
-  Vector2 m_world_to_height_map(const Vector3i& world_position);
-  int m_sample_height_map(const Vector3i& world_position);
 };
 }  // namespace dl
