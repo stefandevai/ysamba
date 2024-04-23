@@ -11,7 +11,6 @@
 #include "core/events/game.hpp"
 #include "core/game_context.hpp"
 #include "core/json.hpp"
-#include "core/random.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
 #include "definitions.hpp"
@@ -93,7 +92,6 @@ void Gameplay::load()
         (void)emitter;
         m_update_all_systems();
       });
-
 
   m_has_loaded = true;
 }

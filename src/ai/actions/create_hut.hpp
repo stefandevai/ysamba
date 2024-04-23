@@ -3,8 +3,8 @@
 #include <entt/entity/registry.hpp>
 
 #include "config.hpp"
+#include "core/maths/random.hpp"
 #include "core/maths/vector.hpp"
-#include "core/random.hpp"
 #include "ecs/components/job_data.hpp"
 #include "ecs/components/job_data_build_hut.hpp"
 #include "ecs/components/job_progress.hpp"

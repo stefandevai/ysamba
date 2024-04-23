@@ -11,7 +11,7 @@
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/events/game.hpp"
-#include "core/random.hpp"
+#include "core/maths/random.hpp"
 #include "ecs/components/item.hpp"
 #include "ecs/components/position.hpp"
 #include "ecs/components/selectable.hpp"

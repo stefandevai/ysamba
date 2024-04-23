@@ -10,9 +10,9 @@
 #include "config.hpp"
 #include "core/game_context.hpp"
 #include "core/json.hpp"
-#include "core/maths/vector.hpp"
+#include "core/maths/random.hpp"
 #include "core/maths/utils.hpp"
-#include "core/random.hpp"
+#include "core/maths/vector.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
 #include "core/utils.hpp"
@@ -85,19 +85,15 @@ void WorldCreation::render()
   }
   if (m_is_hovering_map)
   {
-    m_renderer.ui_pass.batch.quad(
-        m_location_selector_on_hover,
-        m_location_selector_on_hover_position.x,
-        m_location_selector_on_hover_position.y,
-        2);
+    m_renderer.ui_pass.batch.quad(m_location_selector_on_hover,
+                                  m_location_selector_on_hover_position.x,
+                                  m_location_selector_on_hover_position.y,
+                                  2);
   }
   if (m_has_selected_location)
   {
     m_renderer.ui_pass.batch.quad(
-        m_location_selector,
-        m_location_selector_position.x,
-        m_location_selector_position.y,
-        3);
+        m_location_selector, m_location_selector_position.x, m_location_selector_position.y, 3);
   }
 
   m_ui_manager.render();
@@ -339,8 +335,10 @@ void WorldCreation::m_update_world_location_selection()
   const int cell_position_x = (mouse_position.x - panel_margin.x) / texel_width;
   const int cell_position_y = (mouse_position.y - panel_margin.y) / texel_height;
 
-  // m_location_selector_on_hover_position = ((mouse_position - panel_margin) / m_location_selector_on_hover.w) * m_location_selector_on_hover.w + panel_margin;
-  m_location_selector_on_hover_position = Vector2i{cell_position_x * texel_width + panel_margin.x, cell_position_y * texel_height + panel_margin.y};
+  // m_location_selector_on_hover_position = ((mouse_position - panel_margin) / m_location_selector_on_hover.w) *
+  // m_location_selector_on_hover.w + panel_margin;
+  m_location_selector_on_hover_position
+      = Vector2i{cell_position_x * texel_width + panel_margin.x, cell_position_y * texel_height + panel_margin.y};
 
   if (m_input_manager.has_clicked(InputManager::MouseButton::Left))
   {

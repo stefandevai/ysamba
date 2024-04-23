@@ -7,10 +7,10 @@
 
 #include "./name_generator.hpp"
 #include "constants.hpp"
-#include "core/random.hpp"
+#include "core/maths/random.hpp"
 #include "ecs/components/selectable.hpp"
-#include "world/world.hpp"
 #include "world/utils.hpp"
+#include "world/world.hpp"
 
 namespace dl
 {

@@ -9,7 +9,6 @@
 #include "constants.hpp"
 #include "core/game_context.hpp"
 #include "core/maths/neighbor_iterator.hpp"
-#include "core/random.hpp"
 #include "core/serialization.hpp"
 #include "world/metadata.hpp"
 
@@ -183,7 +182,6 @@ bool ChunkManager::is_loaded(const Vector3i& position) const
 {
   const auto found = std::find_if(
       chunks.begin(), chunks.end(), [&position](const auto& chunk) { return chunk->position == position; });
-
 
   const auto found_generating
       = std::find_if(m_chunks_loading.begin(),

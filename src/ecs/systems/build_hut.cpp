@@ -8,7 +8,7 @@
 #include "core/events/action.hpp"
 #include "core/events/emitter.hpp"
 #include "core/json.hpp"
-#include "core/random.hpp"
+#include "core/maths/random.hpp"
 #include "ecs/components/action_build_hut.hpp"
 #include "ecs/components/action_place_hut_exterior.hpp"
 #include "ecs/components/action_walk.hpp"

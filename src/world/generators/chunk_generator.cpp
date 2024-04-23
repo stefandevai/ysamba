@@ -7,8 +7,8 @@
 #include <cmath>
 
 #include "constants.hpp"
+#include "core/maths/random.hpp"
 #include "core/maths/utils.hpp"
-#include "core/random.hpp"
 #include "world/chunk.hpp"
 #include "world/generators/tile_rules.hpp"
 #include "world/generators/utils.hpp"
@@ -619,7 +619,7 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 {
   Vector2 height_map_position = utils::world_to_map(world_position);
 
-  if(!utils::point_aabb(height_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
+  if (!utils::point_aabb(height_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
   {
     return 0;
   }
@@ -721,7 +721,7 @@ BiomeType ChunkGenerator::m_sample_biome(const Vector3i& world_position)
 {
   Vector2 biome_map_position = utils::world_to_map(world_position);
 
-  if(!utils::point_aabb(biome_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
+  if (!utils::point_aabb(biome_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
   {
     return BiomeType::Sea;
   }

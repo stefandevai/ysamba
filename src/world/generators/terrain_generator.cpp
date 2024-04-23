@@ -13,7 +13,7 @@
 #include "./lib/gal/fortune_algorithm.hpp"
 #include "./lib/poisson_disk_sampling.hpp"
 #include "./terrain_type.hpp"
-#include "core/random.hpp"
+#include "core/maths/random.hpp"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
