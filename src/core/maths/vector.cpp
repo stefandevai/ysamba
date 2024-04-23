@@ -5,10 +5,6 @@
 
 namespace dl
 {
-Vector2::Vector2(const double x, const double y) noexcept : x(x), y(y) {}
-
-Vector2::Vector2(const int x, const int y) noexcept : x(static_cast<double>(x)), y(static_cast<double>(y)) {}
-
 Vector2::Vector2(const Vector2& other) noexcept
 {
   x = other.x;
@@ -154,10 +150,6 @@ Vector2 operator/(double lhs, const Vector2& rhs)
 {
   return rhs / lhs;
 }
-
-Vector2i::Vector2i(const int x, const int y) noexcept : x(x), y(y) {}
-
-Vector2i::Vector2i(const double x, const double y) noexcept : x(static_cast<int>(x)), y(static_cast<int>(y)) {}
 
 Vector2i::Vector2i(const Vector2i& other) noexcept
 {
@@ -320,13 +312,6 @@ Vector2i operator*(int lhs, const Vector2i& rhs)
 Vector2i operator/(int lhs, const Vector2i& rhs)
 {
   return rhs / lhs;
-}
-
-Vector3i::Vector3i(const int x, const int y, const int z) noexcept : x(x), y(y), z(z) {}
-
-Vector3i::Vector3i(const double x, const double y, const double z) noexcept
-    : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z))
-{
 }
 
 Vector3i::Vector3i(const Vector3i& other) noexcept
@@ -505,13 +490,6 @@ Vector3i operator/(int lhs, const Vector3i& rhs)
   return rhs / lhs;
 }
 
-Vector3::Vector3(const double x, const double y, const double z) noexcept : x(x), y(y), z(z) {}
-
-Vector3::Vector3(const int x, const int y, const int z) noexcept
-    : x(static_cast<double>(x)), y(static_cast<double>(y)), z(static_cast<double>(z))
-{
-}
-
 Vector3::Vector3(const Vector3& other) noexcept
 {
   x = other.x;
@@ -675,13 +653,6 @@ Vector3 operator/(double lhs, const Vector3& rhs)
   return rhs / lhs;
 }
 
-Vector4d::Vector4d(const double x, const double y, const double z, const double w) noexcept : x(x), y(y), z(z), w(w) {}
-
-Vector4d::Vector4d(const int x, const int y, const int z, const int w) noexcept
-    : x(static_cast<double>(x)), y(static_cast<double>(y)), z(static_cast<double>(z)), w(static_cast<double>(w))
-{
-}
-
 Vector4d::Vector4d(const Vector4d& other) noexcept
 {
   x = other.x;
@@ -841,13 +812,6 @@ Vector4d operator*(double lhs, const Vector4d& rhs)
 Vector4d operator/(double lhs, const Vector4d& rhs)
 {
   return rhs / lhs;
-}
-
-Vector4i::Vector4i(const int x, const int y, const int z, const int w) noexcept : x(x), y(y), z(z), w(w) {}
-
-Vector4i::Vector4i(const double x, const double y, const double z, const double w) noexcept
-    : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z)), w(static_cast<int>(w))
-{
 }
 
 Vector4i::Vector4i(const Vector4i& other) noexcept

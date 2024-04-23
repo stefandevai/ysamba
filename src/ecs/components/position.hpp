@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
 
 #include "core/maths/vector.hpp"
 
@@ -11,7 +12,7 @@ struct Position
   double x{};
   double y{};
   double z{};
-  uint32_t spatial_hash_index = 9999999;
+  uint32_t spatial_hash_index = std::numeric_limits<uint32_t>::infinity();
 
   Position() = default;
   Position(const double x, const double y, const double z) : x(x), y(y), z(z) {}

@@ -160,7 +160,7 @@ void InspectorSystem::m_update_inspector_content(const Vector3i mouse_position, 
 
 void InspectorSystem::m_destroy_inspector()
 {
-  m_last_mouse_position = Vector3i{-9999, -9999, -9999};
+  m_last_mouse_position = Vector3i::null();
   m_inspector->hide();
 }
 

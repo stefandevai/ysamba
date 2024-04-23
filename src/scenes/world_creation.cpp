@@ -4,8 +4,8 @@
 #include <spdlog/spdlog.h>
 
 #include <chrono>
-#include <climits>
 #include <entt/core/hashed_string.hpp>
+#include <limits>
 
 #include "config.hpp"
 #include "core/game_context.hpp"
@@ -182,7 +182,7 @@ void WorldCreation::m_generate_map()
   }
   else
   {
-    m_seed = random::get_integer(1, INT_MAX);
+    m_seed = random::get_integer(1, std::numeric_limits<int>::max());
   }
 
   auto generator = IslandGenerator(world_size);
