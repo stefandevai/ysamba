@@ -103,10 +103,11 @@ void TempGenerator::m_compute_maps(const int seed)
   sea_distance_field.resize(size.x * size.y);
   island_mask.resize(size.x * size.y);
 
+  std::vector<float> silhouette_map(size.x * size.y);
   std::vector<float> mountain_map(size.x * size.y);
   std::vector<float> control_map(size.x * size.y);
 
-  utils::generate_silhouette_map(height_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
+  utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
   utils::generate_control_map(control_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 13);
   utils::generate_humidity_map(humidity_map.data(), size.x, size.y, island_params, seed + 470);
@@ -131,11 +132,40 @@ void TempGenerator::m_compute_maps(const int seed)
 
       const float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
 
-      height_map[array_index] -= gradient;
-      height_map[array_index] = std::clamp(height_map[array_index], 0.0f, 1.0f);
+      silhouette_map[array_index] -= gradient;
+      silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
+
+      const double silhouette_value = silhouette_map[array_index];
+      double map_value;
+
+      if (silhouette_value < 0.3f)
+      {
+        map_value = interpolate(0.0, 0.3, 0.0, 0.16, silhouette_value);
+      }
+      else if (silhouette_value < 0.5f)
+      {
+        map_value = interpolate(0.3, 0.5, 0.16, 0.35, silhouette_value);
+      }
+      else
+      {
+        map_value = interpolate(0.5, 1.0, 0.35, 0.734, silhouette_value);
+      }
+
+      // Apply mountain map via control map
+      if (map_value > 0.02)
+      {
+        double mountain_value = mountain_map[array_index];
+        double control_value = control_map[array_index];
+        const auto noise_influence = std::min(1.0, silhouette_value + 0.5);
+        map_value = std::max(map_value, map_value + (mountain_value * control_value * 2.0 * noise_influence));
+      }
+
+      map_value = std::clamp(map_value, 0.0, 1.0);
+
+      height_map[array_index] = map_value;
 
       // Create land mask
-      if (height_map[array_index] > 0.02f)
+      if (map_value > 0.02)
       {
         island_mask[array_index] = TerrainType::Land;
       }
