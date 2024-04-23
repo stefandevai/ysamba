@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "core/maths/vector.hpp"
+#include "world/generators/biome_type.hpp"
 
 namespace dl
 {
@@ -53,9 +54,11 @@ class ChunkGenerator
 
   void m_generate_noise_data(const int seed, const Vector3i& offset);
 
-  Vector2 m_world_to_height_map(const Vector3i& world_position);
+  Vector2 m_world_to_noise_map(const Vector3i& world_position);
 
   int m_sample_height_map(const Vector3i& world_position);
+
+  BiomeType m_sample_biome(const Vector3i& world_position);
 
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
 

@@ -76,10 +76,10 @@ void WorldCreation::render()
   {
     m_renderer.ui_pass.batch.texture(*m_texture, 15, 15, 0);
   }
-  // if (m_biome_texture != nullptr)
-  // {
-  //   m_renderer.ui_pass.batch.texture(*m_biome_texture, 15, 15, 1);
-  // }
+  if (m_biome_texture != nullptr)
+  {
+    m_renderer.ui_pass.batch.texture(*m_biome_texture, 15, 15, 1);
+  }
 
   m_ui_manager.render();
   m_renderer.render(m_camera);
@@ -273,8 +273,8 @@ void WorldCreation::m_create_biome_representation()
       pixel_data[j * world_size.x * 4 + i * 4] = color.rgba_color.r;
       pixel_data[j * world_size.x * 4 + i * 4 + 1] = color.rgba_color.g;
       pixel_data[j * world_size.x * 4 + i * 4 + 2] = color.rgba_color.b;
-      pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
-      // pixel_data[j * world_size.x * 4 + i * 4 + 3] = 127;
+      // pixel_data[j * world_size.x * 4 + i * 4 + 3] = 255;
+      pixel_data[j * world_size.x * 4 + i * 4 + 3] = 127;
     }
   }
 

@@ -33,7 +33,10 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
   {
     for (int i = 0; i < m_padded_size.x; ++i)
     {
-      const int k = m_sample_height_map(offset + Vector3i{i, j, 0});
+      const auto world_position = offset + Vector3i{i, j, 0};
+
+      const int k = m_sample_height_map(world_position);
+      const auto biome = m_sample_biome(world_position);
 
       bool inside_chunk = false;
 
@@ -45,14 +48,24 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
       int terrain_id = 0;
       int resolved_z = k;
 
-      if (k < 1)
+      switch (biome)
       {
-        terrain_id = 1;
-        resolved_z = 1;
-      }
-      else
-      {
-        terrain_id = 2;
+        case BiomeType::Sea:
+        {
+          resolved_z = 1;
+          terrain_id = 1;
+          break;
+        }
+        case BiomeType::Beach:
+        {
+          terrain_id = 3;
+          break;
+        }
+        default:
+        {
+          terrain_id = 2;
+          break;
+        }
       }
 
       if (inside_chunk)
@@ -577,7 +590,7 @@ bool ChunkGenerator::m_has_neighbor(
   return false;
 }
 
-Vector2 ChunkGenerator::m_world_to_height_map(const Vector3i& world_position)
+Vector2 ChunkGenerator::m_world_to_noise_map(const Vector3i& world_position)
 {
   return Vector2{
       world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
@@ -587,7 +600,7 @@ Vector2 ChunkGenerator::m_world_to_height_map(const Vector3i& world_position)
 
 int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 {
-  Vector2 height_map_position = m_world_to_height_map(world_position);
+  Vector2 height_map_position = m_world_to_noise_map(world_position);
 
   if (height_map_position.x < 0.0 && height_map_position.x >= m_world_metadata.world_size.x
       && height_map_position.y < 0.0 && height_map_position.y >= m_world_metadata.world_size.y)
@@ -687,4 +700,19 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 
   return 0;
 }
+
+BiomeType ChunkGenerator::m_sample_biome(const Vector3i& world_position)
+{
+  Vector2 biome_map_position = m_world_to_noise_map(world_position);
+
+  if (biome_map_position.x < 0.0 && biome_map_position.x >= m_world_metadata.world_size.x
+      && biome_map_position.y < 0.0 && biome_map_position.y >= m_world_metadata.world_size.y)
+  {
+    return BiomeType::Sea;
+  }
+
+  return m_world_metadata.biome_map[utils::array_index(
+      static_cast<int>(biome_map_position.x), static_cast<int>(biome_map_position.y), m_world_metadata.world_size.x)];
+}
+
 }  // namespace dl
