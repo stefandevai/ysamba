@@ -11,6 +11,7 @@
 #include "core/game_context.hpp"
 #include "core/json.hpp"
 #include "core/maths/vector.hpp"
+#include "core/maths/utils.hpp"
 #include "core/random.hpp"
 #include "core/scene_manager.hpp"
 #include "core/serialization.hpp"
@@ -56,6 +57,8 @@ void WorldCreation::update()
     m_update_input();
   }
 
+  m_update_world_location_selection();
+
   m_camera.update(m_game_context.clock->delta);
   m_ui_manager.update();
 
@@ -79,6 +82,14 @@ void WorldCreation::render()
   if (m_biome_texture != nullptr)
   {
     m_renderer.ui_pass.batch.texture(*m_biome_texture, 15, 15, 1);
+  }
+  if (m_is_hovering_map)
+  {
+    m_renderer.ui_pass.batch.quad(
+        m_location_selector_on_hover,
+        m_location_selector_on_hover_position.x,
+        m_location_selector_on_hover_position.y,
+        3);
   }
 
   m_ui_manager.render();
@@ -213,6 +224,12 @@ void WorldCreation::m_create_map_representation()
   const int texture_size = std::min(window_size.x, window_size.y) - 30;
   m_texture->size = Vector2i{texture_size, texture_size};
 
+  // Set location selector size based on texels per cell
+  m_location_selector.w = (texture_size / world_size.x) * m_texels_per_cell;
+  m_location_selector.h = (texture_size / world_size.y) * m_texels_per_cell;
+  m_location_selector_on_hover.w = (texture_size / world_size.x) * m_texels_per_cell;
+  m_location_selector_on_hover.h = (texture_size / world_size.y) * m_texels_per_cell;
+
   m_renderer.ui_pass.batch.clear_textures();
 }
 
@@ -287,6 +304,25 @@ void WorldCreation::m_create_biome_representation()
   m_biome_texture->size = Vector2i{texture_size, texture_size};
 
   m_renderer.ui_pass.batch.clear_textures();
+}
+
+void WorldCreation::m_update_world_location_selection()
+{
+  if (m_texture == nullptr)
+  {
+    return;
+  }
+
+  const auto mouse_position = m_input_manager.get_mouse_position();
+
+  if (!utils::point_aabb(mouse_position, panel_margin, m_texture->size))
+  {
+    m_is_hovering_map = false;
+    return;
+  }
+
+  m_is_hovering_map = true;
+  m_location_selector_on_hover_position = ((mouse_position - panel_margin) / m_location_selector_on_hover.w) * m_location_selector_on_hover.w + panel_margin;
 }
 
 }  // namespace dl

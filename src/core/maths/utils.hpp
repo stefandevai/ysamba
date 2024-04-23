@@ -2,6 +2,11 @@
 
 #include <cmath>
 
+namespace dl
+{
+struct Vector2i;
+}
+
 namespace dl::utils
 {
 // Iterpolates value between two ranges
@@ -15,4 +20,6 @@ static constexpr int array_index(int x, int y, int width)
 {
   return y * width + x;
 }
+
+bool point_aabb(const Vector2i& point, const Vector2i& rect_position, const Vector2i& rect_size);
 }  // namespace dl::utils

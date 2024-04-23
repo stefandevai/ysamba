@@ -7,6 +7,7 @@
 #include "core/input_manager.hpp"
 #include "core/maths/vector.hpp"
 #include "ecs/components/sprite.hpp"
+#include "graphics/quad.hpp"
 #include "world/generators/biome_type.hpp"
 #include "world/world.hpp"
 
@@ -26,6 +27,7 @@ class WorldCreation : public Scene
 {
  public:
   Vector3i world_size{256, 256, 30};
+  Vector2i panel_margin{15, 15};
   WorldCreation(GameContext& game_context);
 
   void load() override;
@@ -53,10 +55,19 @@ class WorldCreation : public Scene
   InputManager& m_input_manager = InputManager::get_instance();
   ui::WorldCreationPanel* m_panel = nullptr;
 
+  Quad m_location_selector{0, 0, Color{0xFFFFFFFF}};
+  Quad m_location_selector_on_hover{0, 0, Color{0xFF22BBAA}};
+  Vector2i m_location_selector_position{0, 0};
+  Vector2i m_location_selector_on_hover_position{0, 0};
+  bool m_has_selected_location = false;
+  bool m_is_hovering_map = false;
+  static constexpr int m_texels_per_cell = 4;
+
   void m_generate_map();
   void m_generate_world();
   void m_create_map_representation();
   void m_create_biome_representation();
   bool m_update_input();
+  void m_update_world_location_selection();
 };
 }  // namespace dl

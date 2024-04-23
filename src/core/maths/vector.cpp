@@ -109,6 +109,18 @@ Vector2& Vector2::operator*=(const Vector2& rhs)
   return *this;
 }
 
+Vector2 Vector2::operator/(const Vector2& rhs) const
+{
+  return Vector2{x / rhs.x, y / rhs.y};
+}
+
+Vector2& Vector2::operator/=(const Vector2& rhs)
+{
+  x /= rhs.x;
+  y /= rhs.y;
+  return *this;
+}
+
 Vector2 Vector2::operator*(const double rhs) const
 {
   return Vector2{x * rhs, y * rhs};
@@ -136,6 +148,11 @@ Vector2& Vector2::operator/=(const double rhs)
 Vector2 operator*(double lhs, const Vector2& rhs)
 {
   return rhs * lhs;
+}
+
+Vector2 operator/(double lhs, const Vector2& rhs)
+{
+  return rhs / lhs;
 }
 
 Vector2i::Vector2i(const int x, const int y) noexcept : x(x), y(y) {}
@@ -247,6 +264,18 @@ Vector2i& Vector2i::operator*=(const Vector2i& rhs)
   return *this;
 }
 
+Vector2i Vector2i::operator/(const Vector2i& rhs) const
+{
+  return Vector2i{x / rhs.x, y / rhs.y};
+}
+
+Vector2i& Vector2i::operator/=(const Vector2i& rhs)
+{
+  x /= rhs.x;
+  y /= rhs.y;
+  return *this;
+}
+
 Vector2i Vector2i::operator*(const int rhs) const
 {
   return Vector2i{x * rhs, y * rhs};
@@ -286,6 +315,11 @@ Vector2i& Vector2i::operator/=(const int rhs)
 Vector2i operator*(int lhs, const Vector2i& rhs)
 {
   return rhs * lhs;
+}
+
+Vector2i operator/(int lhs, const Vector2i& rhs)
+{
+  return rhs / lhs;
 }
 
 Vector3i::Vector3i(const int x, const int y, const int z) noexcept : x(x), y(y), z(z) {}
@@ -409,6 +443,19 @@ Vector3i& Vector3i::operator*=(const Vector3i& rhs)
   return *this;
 }
 
+Vector3i Vector3i::operator/(const Vector3i& rhs) const
+{
+  return Vector3i{x / rhs.x, y / rhs.y, z / rhs.z};
+}
+
+Vector3i& Vector3i::operator/=(const Vector3i& rhs)
+{
+  x /= rhs.x;
+  y /= rhs.y;
+  z /= rhs.z;
+  return *this;
+}
+
 Vector3i Vector3i::operator*(const int rhs) const
 {
   return Vector3i{x * rhs, y * rhs, z * rhs};
@@ -451,6 +498,11 @@ Vector3i& Vector3i::operator/=(const int rhs)
 Vector3i operator*(int lhs, const Vector3i& rhs)
 {
   return rhs * lhs;
+}
+
+Vector3i operator/(int lhs, const Vector3i& rhs)
+{
+  return rhs / lhs;
 }
 
 Vector3::Vector3(const double x, const double y, const double z) noexcept : x(x), y(y), z(z) {}
@@ -574,6 +626,19 @@ Vector3& Vector3::operator*=(const Vector3& rhs)
   return *this;
 }
 
+Vector3 Vector3::operator/(const Vector3& rhs) const
+{
+  return Vector3{x / rhs.x, y / rhs.y, z / rhs.z};
+}
+
+Vector3& Vector3::operator/=(const Vector3& rhs)
+{
+  x /= rhs.x;
+  y /= rhs.y;
+  z /= rhs.z;
+  return *this;
+}
+
 Vector3 Vector3::operator*(const double rhs) const
 {
   return Vector3{x * rhs, y * rhs, z * rhs};
@@ -603,6 +668,11 @@ Vector3& Vector3::operator/=(const double rhs)
 Vector3 operator*(double lhs, const Vector3& rhs)
 {
   return rhs * lhs;
+}
+
+Vector3 operator/(double lhs, const Vector3& rhs)
+{
+  return rhs / lhs;
 }
 
 Vector4d::Vector4d(const double x, const double y, const double z, const double w) noexcept : x(x), y(y), z(z), w(w) {}
@@ -721,6 +791,20 @@ Vector4d& Vector4d::operator*=(const Vector4d& rhs)
   return *this;
 }
 
+Vector4d Vector4d::operator/(const Vector4d& rhs) const
+{
+  return Vector4d{x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w};
+}
+
+Vector4d& Vector4d::operator/=(const Vector4d& rhs)
+{
+  x /= rhs.x;
+  y /= rhs.y;
+  z /= rhs.z;
+  w /= rhs.w;
+  return *this;
+}
+
 Vector4d Vector4d::operator*(const double rhs) const
 {
   return Vector4d{x * rhs, y * rhs, z * rhs, w * rhs};
@@ -752,6 +836,11 @@ Vector4d& Vector4d::operator/=(const double rhs)
 Vector4d operator*(double lhs, const Vector4d& rhs)
 {
   return rhs * lhs;
+}
+
+Vector4d operator/(double lhs, const Vector4d& rhs)
+{
+  return rhs / lhs;
 }
 
 Vector4i::Vector4i(const int x, const int y, const int z, const int w) noexcept : x(x), y(y), z(z), w(w) {}
@@ -870,6 +959,20 @@ Vector4i& Vector4i::operator*=(const Vector4i& rhs)
   return *this;
 }
 
+Vector4i Vector4i::operator/(const Vector4i& rhs) const
+{
+  return Vector4i{x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w};
+}
+
+Vector4i& Vector4i::operator/=(const Vector4i& rhs)
+{
+  x /= rhs.x;
+  y /= rhs.y;
+  z /= rhs.z;
+  w /= rhs.w;
+  return *this;
+}
+
 Vector4i Vector4i::operator*(const int rhs) const
 {
   return Vector4i{x * rhs, y * rhs, z * rhs, w * rhs};
@@ -915,6 +1018,11 @@ Vector4i& Vector4i::operator/=(const int rhs)
 Vector4i operator*(int lhs, const Vector4i& rhs)
 {
   return rhs * lhs;
+}
+
+Vector4i operator/(int lhs, const Vector4i& rhs)
+{
+  return rhs / lhs;
 }
 
 }  // namespace dl

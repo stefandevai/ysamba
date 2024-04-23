@@ -19,7 +19,7 @@ class ChunkGenerator
   std::unique_ptr<Chunk> chunk = nullptr;
 
   // Quantity of tiles per map texture pixel
-  double map_to_tiles = 16.0;
+  double map_to_tiles = 20.0;
 
   ChunkGenerator(const WorldMetadata& world_metadata);
 
