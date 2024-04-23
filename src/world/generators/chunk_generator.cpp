@@ -13,6 +13,7 @@
 #include "world/generators/tile_rules.hpp"
 #include "world/generators/utils.hpp"
 #include "world/metadata.hpp"
+#include "world/utils.hpp"
 
 namespace dl
 {
@@ -614,17 +615,9 @@ bool ChunkGenerator::m_has_neighbor(
   return false;
 }
 
-Vector2 ChunkGenerator::m_world_to_noise_map(const Vector3i& world_position)
-{
-  return Vector2{
-      world_position.x / static_cast<double>(world::map_to_tiles),
-      world_position.y / static_cast<double>(world::map_to_tiles),
-  };
-}
-
 int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 {
-  Vector2 height_map_position = m_world_to_noise_map(world_position);
+  Vector2 height_map_position = utils::world_to_map(world_position);
 
   if(!utils::point_aabb(height_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
   {
@@ -726,7 +719,7 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 
 BiomeType ChunkGenerator::m_sample_biome(const Vector3i& world_position)
 {
-  Vector2 biome_map_position = m_world_to_noise_map(world_position);
+  Vector2 biome_map_position = utils::world_to_map(world_position);
 
   if(!utils::point_aabb(biome_map_position, Vector2i{0.0, 0.0}, m_world_metadata.world_size.xy()))
   {

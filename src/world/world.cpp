@@ -46,12 +46,12 @@ World::World(GameContext& game_context) : m_game_context(game_context)
   m_load_item_data();
 }
 
-void World::initialize(entt::registry& registry, const Camera& camera, const Vector2i& map_position)
+void World::initialize(entt::registry& registry)
 {
   using namespace entt::literals;
   auto society_blueprint = get_society("otomi"_hs);
   auto components = SocietyGenerator::generate_members(society_blueprint);
-  SocietyGenerator::place_members(components, *this, camera, registry, map_position);
+  SocietyGenerator::place_members(components, *this, registry, m_game_context.world_metadata.initial_position);
 
   has_initialized = true;
 }

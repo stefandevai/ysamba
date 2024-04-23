@@ -13,7 +13,6 @@
 
 namespace dl
 {
-class Camera;
 class World;
 
 class SocietyGenerator
@@ -39,9 +38,8 @@ class SocietyGenerator
   // Create actual members entities and add them to the world
   static void place_members(std::vector<MemberComponents>& components,
                             const World& world,
-                            const Camera& camera,
                             entt::registry& registry,
-                            const Vector2i& map_position);
+                            const Vector2i& world_position);
 
  private:
   SocietyGenerator() = delete;
@@ -61,6 +59,6 @@ class SocietyGenerator
                                                                 const MemberParameters& parameters);
 
   // Search a viable position in the world to place a member
-  [[nodiscard]] static Position m_get_member_position(const World& world, const Camera& camera, const Vector2i& map_position);
+  [[nodiscard]] static Position m_get_member_position(const World& world, const Vector2i& map_position);
 };
 }  // namespace dl

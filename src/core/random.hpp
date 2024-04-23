@@ -18,7 +18,9 @@ static inline double get_real()
 
 static inline int get_integer(const int from = 0, const int to = 100)
 {
-  return int_distribution(rng) % to + from;
+  assert(from < to && "From must be less than to");
+
+  return int_distribution(rng) % (to - from) + from;
 }
 
 template <typename T>

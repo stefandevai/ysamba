@@ -260,7 +260,7 @@ void Gameplay::load_game()
 
   if (!m_world.has_initialized)
   {
-    m_world.initialize(m_registry, m_camera, m_game_context.world_metadata.initial_position);
+    m_world.initialize(m_registry);
     serialization::save_game(m_world, m_game_context.world_metadata, m_registry);
   }
 

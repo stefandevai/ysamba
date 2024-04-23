@@ -9,8 +9,8 @@
 #include "constants.hpp"
 #include "core/random.hpp"
 #include "ecs/components/selectable.hpp"
-#include "graphics/camera.hpp"
 #include "world/world.hpp"
+#include "world/utils.hpp"
 
 namespace dl
 {
@@ -95,11 +95,12 @@ std::vector<SocietyGenerator::MemberComponents> SocietyGenerator::generate_membe
 
 void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
                                      const World& world,
-                                     const Camera& camera,
                                      entt::registry& registry,
                                      const Vector2i& map_position)
 {
   using namespace entt::literals;
+
+  const auto world_position = utils::map_to_world(map_position);
 
   for (auto& member : components)
   {
@@ -108,7 +109,7 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
     registry.emplace<Biology>(entity, member.biology);
     registry.emplace<entt::tag<"collidable"_hs>>(entity, member.biology);
 
-    const auto position = m_get_member_position(world, camera, map_position);
+    const auto position = m_get_member_position(world, world_position);
     registry.emplace<Position>(entity, position);
 
     member.sprite.layer_z = renderer::layer_z_offset_characters;
@@ -121,15 +122,15 @@ void SocietyGenerator::place_members(std::vector<MemberComponents>& components,
   }
 }
 
-Position SocietyGenerator::m_get_member_position(const World& world, const Camera& camera, const Vector2i& map_position)
+Position SocietyGenerator::m_get_member_position(const World& world, const Vector2i& world_position)
 {
   auto position = Position{0., 0., 0.};
   const uint32_t max_tries = 50;
 
   for (uint32_t tries = 0; tries < max_tries; ++tries)
   {
-    const auto x = camera.center_in_tiles.x + random::get_integer(-10, 10);
-    const auto y = 35 + camera.center_in_tiles.y + random::get_integer(-10, 10);
+    const auto x = world_position.x + random::get_integer(32, 52);
+    const auto y = world_position.y + random::get_integer(32, 52);
 
     const auto elevation = world.get_elevation(x, y);
 
