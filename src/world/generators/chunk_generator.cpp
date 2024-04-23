@@ -6,11 +6,12 @@
 #include <algorithm>
 #include <cmath>
 
-#include "./tile_rules.hpp"
-#include "./utils.hpp"
 #include "constants.hpp"
+#include "core/maths/utils.hpp"
 #include "core/random.hpp"
 #include "world/chunk.hpp"
+#include "world/generators/tile_rules.hpp"
+#include "world/generators/utils.hpp"
 #include "world/metadata.hpp"
 
 namespace dl
@@ -50,22 +51,22 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
       switch (biome)
       {
-        case BiomeType::Sea:
-        {
-          resolved_z = 1;
-          terrain_id = 1;
-          break;
-        }
-        case BiomeType::Beach:
-        {
-          terrain_id = 3;
-          break;
-        }
-        default:
-        {
-          terrain_id = 2;
-          break;
-        }
+      case BiomeType::Sea:
+      {
+        resolved_z = 1;
+        terrain_id = 1;
+        break;
+      }
+      case BiomeType::Beach:
+      {
+        terrain_id = 3;
+        break;
+      }
+      default:
+      {
+        terrain_id = 2;
+        break;
+      }
       }
 
       if (inside_chunk)
@@ -705,8 +706,8 @@ BiomeType ChunkGenerator::m_sample_biome(const Vector3i& world_position)
 {
   Vector2 biome_map_position = m_world_to_noise_map(world_position);
 
-  if (biome_map_position.x < 0.0 && biome_map_position.x >= m_world_metadata.world_size.x
-      && biome_map_position.y < 0.0 && biome_map_position.y >= m_world_metadata.world_size.y)
+  if (biome_map_position.x < 0.0 && biome_map_position.x >= m_world_metadata.world_size.x && biome_map_position.y < 0.0
+      && biome_map_position.y >= m_world_metadata.world_size.y)
   {
     return BiomeType::Sea;
   }

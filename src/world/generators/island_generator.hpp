@@ -1,12 +1,10 @@
 #pragma once
 
-#include <queue>
 #include <vector>
 
 #include "core/maths/vector.hpp"
 #include "world/generators/biome_type.hpp"
 #include "world/generators/island_data.hpp"
-#include "world/tilemap.hpp"
 
 namespace dl
 {
@@ -15,13 +13,13 @@ class IslandGenerator
  public:
   Vector3i size{1, 1, 1};
   std::vector<BiomeType> biome_map;
-  std::vector<uint8_t> height_map;
+  std::vector<float> height_map;
   std::vector<float> humidity_map;
   std::vector<float> temperature_map;
   std::vector<float> sea_distance_field;
+  std::vector<int> island_mask;
   IslandNoiseParams island_params{};
 
-  IslandGenerator();
   IslandGenerator(const Vector3i& size);
 
   void generate(const int seed);

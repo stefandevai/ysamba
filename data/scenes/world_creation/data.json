@@ -2,6 +2,6 @@
   "world_width": 256,
   "world_height": 256,
   "world_depth": 30,
-  "random_seed": false,
+  "random_seed": true,
   "seed": 340683964
 }

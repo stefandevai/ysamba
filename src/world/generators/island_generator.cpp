@@ -4,28 +4,18 @@
 #include <heman.h>
 #include <spdlog/spdlog.h>
 
-#include <chrono>
-#include <cmath>
 #include <limits>
+#include <queue>
 
 #include "core/json.hpp"
+#include "core/maths/utils.hpp"
 #include "core/timer.hpp"
 #include "world/generators/terrain_type.hpp"
 #include "world/generators/utils.hpp"
 #include "world/point.hpp"
 
-namespace
-{
-double interpolate(double start_1, double end_1, double start_2, const double end_2, double value)
-{
-  return std::lerp(start_2, end_2, (value - start_1) / (end_1 - start_1));
-}
-}  // namespace
-
 namespace dl
 {
-IslandGenerator::IslandGenerator() {}
-
 IslandGenerator::IslandGenerator(const Vector3i& size) : size(size)
 {
   m_load_params(m_default_params_filepath);
@@ -53,26 +43,23 @@ void IslandGenerator::generate(const int seed)
   timer.stop();
   timer.print("Island generation");
 
-  // TEMP Visualize island mask
-  if (island_params.display_mask)
-  {
-    for (auto i = 0; i < size.x * size.y; ++i)
-    {
-      // height_map[i] = static_cast<uint8_t>(sea_distance_field[i] * 255.0f);
-
-      height_map[i] = static_cast<uint8_t>(humidity_map[i] * 255.0f);
-
-      // if (main_island.mask[i] != TerrainType::Land)
-      // {
-      //   height_map[i] = 0;
-      // }
-      // else
-      // {
-      //   height_map[i] = 100;
-      // }
-    }
-  }
-  // TEMP Visualize island mask
+  // // TEMP Visualize island mask
+  // for (auto i = 0; i < size.x * size.y; ++i)
+  // {
+  //   height_map[i] = sea_distance_field[i];
+  //
+  //   // height_map[i] = static_cast<uint8_t>(humidity_map[i] * 255.0f);
+  //
+  //   // if (island_mask[i] != TerrainType::Land)
+  //   // {
+  //   //   height_map[i] = 0.0f;
+  //   // }
+  //   // else
+  //   // {
+  //   //   height_map[i] = 1.0f;
+  //   // }
+  // }
+  // // TEMP Visualize island mask
 }
 
 void IslandGenerator::set_size(const Vector3i& size)
@@ -87,7 +74,6 @@ void IslandGenerator::m_load_params(const std::string& filepath)
 
   island_params.frequency = mask_params["frequency"].get<float>();
   island_params.tier_land = mask_params["tier_land"].get<float>();
-  island_params.display_mask = mask_params["display_mask"].get<bool>();
   island_params.layer_1_octaves = mask_params["octaves"].get<int>();
   island_params.layer_1_lacunarity = mask_params["lacunarity"].get<float>();
   island_params.layer_1_gain = mask_params["gain"].get<float>();
@@ -101,11 +87,11 @@ void IslandGenerator::m_compute_maps(const int seed)
   humidity_map.resize(size.x * size.y);
   temperature_map.resize(size.x * size.y);
   sea_distance_field.resize(size.x * size.y);
+  island_mask.resize(size.x * size.y);
 
   std::vector<float> silhouette_map(size.x * size.y);
   std::vector<float> mountain_map(size.x * size.y);
   std::vector<float> control_map(size.x * size.y);
-  std::vector<int> island_mask(size.x * size.y);
 
   utils::generate_silhouette_map(silhouette_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed);
   utils::generate_mountain_map(mountain_map.data(), size.x / -2, size.y / -2, size.x, size.y, island_params, seed + 47);
@@ -113,7 +99,6 @@ void IslandGenerator::m_compute_maps(const int seed)
   utils::generate_humidity_map(humidity_map.data(), size.x, size.y, island_params, seed + 470);
   utils::generate_temperature_map(temperature_map.data(), size.x, size.y, island_params, seed + 130);
 
-  const double max_z = 32.0;
   const float half_size_x = size.x / 2.0f;
   const float half_size_y = size.y / 2.0f;
 
@@ -130,48 +115,42 @@ void IslandGenerator::m_compute_maps(const int seed)
       const float distance_x_squared = (half_size_x - i) * (half_size_x - i);
       const float distance_y_squared = (half_size_y - j) * (half_size_y - j);
 
-      float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
+      const float gradient = ((distance_x_squared + distance_y_squared) * 2.0f / gradient_diameter_squared);
 
       silhouette_map[array_index] -= gradient;
       silhouette_map[array_index] = std::clamp(silhouette_map[array_index], 0.0f, 1.0f);
 
-      double noise_value = silhouette_map[array_index];
+      const double silhouette_value = silhouette_map[array_index];
       double map_value;
 
-      if (noise_value < 0.3f)
+      if (silhouette_value < 0.3f)
       {
-        map_value = interpolate(0.0, 0.3, 0.0, max_z * 0.16, noise_value);
+        map_value = utils::interpolate<double>(0.0, 0.3, 0.0, 0.16, silhouette_value);
       }
-      else if (noise_value < 0.5f)
+      else if (silhouette_value < 0.5f)
       {
-        map_value = interpolate(0.3, 0.5, max_z * 0.16, max_z * 0.35, noise_value);
+        map_value = utils::interpolate<double>(0.3, 0.5, 0.16, 0.35, silhouette_value);
       }
       else
       {
-        map_value = interpolate(0.5, 1.0, max_z * 0.35, max_z * 0.734, noise_value);
+        map_value = utils::interpolate<double>(0.5, 1.0, 0.35, 0.734, silhouette_value);
       }
 
       // Apply mountain map via control map
-      if (map_value >= 1.0)
+      if (map_value > 0.02)
       {
         double mountain_value = mountain_map[array_index];
         double control_value = control_map[array_index];
-        const auto noise_influence = std::min(1.0, noise_value + 0.5);
-        map_value = std::max(map_value, map_value + (mountain_value * control_value * 28.0 * noise_influence));
+        const auto noise_influence = std::min(1.0, silhouette_value + 0.5);
+        map_value = std::max(map_value, map_value + (mountain_value * control_value * 2.0 * noise_influence));
       }
 
-      // // Naive terrace for vizualization
-      // if (static_cast<int>(map_value) > 0)
-      // {
-      //   map_value = interpolate(0.0, max_z, 0.0, 255.0, static_cast<int>(map_value));
-      // }
+      map_value = std::clamp(map_value, 0.0, 1.0);
 
-      // map_value = std::clamp(map_value, 0.0, 255.0);
-      map_value = std::clamp(map_value, 0.0, max_z);
-      height_map[array_index] = static_cast<uint8_t>(map_value);
+      height_map[array_index] = map_value;
 
       // Create land mask
-      if (height_map[array_index] > 1)
+      if (map_value > 0.02)
       {
         island_mask[array_index] = TerrainType::Land;
       }
@@ -246,7 +225,7 @@ void IslandGenerator::m_compute_maps(const int seed)
   {
     if (heman_island_mask[i] == 1.0f)
     {
-      height_map[i] = 0;
+      height_map[i] = 0.0f;
     }
   }
 
@@ -266,8 +245,6 @@ void IslandGenerator::m_compute_maps(const int seed)
 
 void IslandGenerator::m_generate_biomes()
 {
-  // TODO: Remove hardcoded max z
-  const double max_z = 32.0;
   biome_map.resize(size.x * size.y);
 
   for (int j = 0; j < size.y; ++j)
@@ -279,22 +256,22 @@ void IslandGenerator::m_generate_biomes()
       const auto humidity_value = humidity_map[j * size.x + i];
       const auto temperature_value = temperature_map[j * size.x + i];
 
-      if (height_value == 0 && sea_distance_value <= 0.0f)
+      if (height_value <= 0.02 && sea_distance_value <= 0.0f)
       {
         biome_map[j * size.x + i] = BiomeType::Sea;
         continue;
       }
-      if (height_value == 0 && sea_distance_value > 0.0f)
+      if (height_value <= 0.02 && sea_distance_value > 0.0f)
       {
         biome_map[j * size.x + i] = BiomeType::Lake;
         continue;
       }
-      if (height_value < 0.054 * max_z && sea_distance_value < 0.02f && humidity_value > 0.5f)
+      if (height_value < 0.054 && sea_distance_value < 0.02f && humidity_value > 0.5f)
       {
         biome_map[j * size.x + i] = BiomeType::Mangrove;
         continue;
       }
-      if (height_value < 0.035 * max_z && sea_distance_value < 0.01f)
+      if (height_value < 0.055 && sea_distance_value < 0.01f)
       {
         biome_map[j * size.x + i] = BiomeType::Beach;
         continue;
@@ -304,38 +281,37 @@ void IslandGenerator::m_generate_biomes()
         biome_map[j * size.x + i] = BiomeType::Rocks;
         continue;
       }
-      if (height_value > 0.35 * max_z && temperature_value >= 0.5f)
+      if (height_value > 0.35 && temperature_value >= 0.5f)
       {
         biome_map[j * size.x + i] = BiomeType::RockMountains;
         continue;
       }
-      if (height_value > 0.33 * max_z && temperature_value < 0.6f)
+      if (height_value > 0.33 && temperature_value < 0.6f)
       {
         biome_map[j * size.x + i] = BiomeType::PineForestMountains;
         continue;
       }
-      if (height_value > 0.012 * max_z && height_value < 0.275 * max_z && humidity_value < 0.18f)
+      if (height_value > 0.012 && height_value < 0.275 && humidity_value < 0.18f)
       {
         biome_map[j * size.x + i] = BiomeType::DryPlains;
         continue;
       }
-      if (height_value > 0.137 * max_z && height_value < 0.196 * max_z && humidity_value >= 0.1f
-          && humidity_value < 0.4f)
+      if (height_value > 0.137 && height_value < 0.196 && humidity_value >= 0.1f && humidity_value < 0.4f)
       {
         biome_map[j * size.x + i] = BiomeType::Meadows;
         continue;
       }
-      if (height_value >= 0.196 * max_z && humidity_value < 0.37f)
+      if (height_value >= 0.196 && humidity_value < 0.37f)
       {
         biome_map[j * size.x + i] = BiomeType::TemperateForest;
         continue;
       }
-      if (height_value > 0.118 * max_z && humidity_value > 0.7f)
+      if (height_value > 0.118 && humidity_value > 0.7f)
       {
         biome_map[j * size.x + i] = BiomeType::Swamp;
         continue;
       }
-      if (height_value > 0.0118 * max_z)
+      if (height_value > 0.0118)
       {
         biome_map[j * size.x + i] = BiomeType::Rainforest;
         continue;
@@ -431,10 +407,14 @@ std::vector<IslandData> IslandGenerator::m_get_islands(std::vector<int>& grid, c
       {
         const auto island_data = m_get_island(grid, mask, i, j);
         islands.push_back(island_data);
-        std::push_heap(islands.begin(), islands.end());
       }
     }
   }
+
+  // Sort islands by size
+  std::sort(islands.begin(),
+            islands.end(),
+            [](const IslandData& lhs, const IslandData& rhs) { return lhs.points.size() > rhs.points.size(); });
 
   if (islands.size() > islands_to_keep)
   {

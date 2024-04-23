@@ -5,7 +5,6 @@
 #include <cmath>
 #include <thread>
 
-// #include "./generators/game_chunk_generator.hpp"
 #include "./generators/chunk_generator.hpp"
 #include "constants.hpp"
 #include "core/game_context.hpp"
@@ -13,10 +12,6 @@
 #include "core/random.hpp"
 #include "core/serialization.hpp"
 #include "world/metadata.hpp"
-
-// TEMP
-#include <chrono>
-// TEMP
 
 namespace dl
 {
