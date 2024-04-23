@@ -33,11 +33,15 @@ struct Vector2
   Vector2& operator+=(const Vector2& rhs);
   Vector2 operator-(const Vector2& rhs) const;
   Vector2& operator-=(const Vector2& rhs);
+  Vector2 operator*(const Vector2& rhs) const;
+  Vector2& operator*=(const Vector2& rhs);
   Vector2 operator*(double rhs) const;
   Vector2& operator*=(double rhs);
   Vector2 operator/(double rhs) const;
   Vector2& operator/=(double rhs);
 };
+
+Vector2 operator*(double lhs, const Vector2& rhs);
 
 template <typename Archive>
 void serialize(Archive& archive, Vector2& v)
@@ -71,6 +75,8 @@ struct Vector2i
   Vector2i& operator+=(const Vector2i& rhs);
   Vector2i operator-(const Vector2i& rhs) const;
   Vector2i& operator-=(const Vector2i& rhs);
+  Vector2i operator*(const Vector2i& rhs) const;
+  Vector2i& operator*=(const Vector2i& rhs);
   Vector2i operator*(int rhs) const;
   Vector2i& operator*=(int rhs);
   Vector2i operator*(double rhs) const;
@@ -78,6 +84,8 @@ struct Vector2i
   Vector2i operator/(int rhs) const;
   Vector2i& operator/=(int rhs);
 };
+
+Vector2i operator*(int lhs, const Vector2i& rhs);
 
 template <typename Archive>
 void serialize(Archive& archive, Vector2i& v)
@@ -113,11 +121,15 @@ struct Vector3
   Vector3& operator+=(const Vector3& rhs);
   Vector3 operator-(const Vector3& rhs) const;
   Vector3& operator-=(const Vector3& rhs);
+  Vector3 operator*(const Vector3& rhs) const;
+  Vector3& operator*=(const Vector3& rhs);
   Vector3 operator*(double rhs) const;
   Vector3& operator*=(double rhs);
   Vector3 operator/(double rhs) const;
   Vector3& operator/=(double rhs);
 };
+
+Vector3 operator*(double lhs, const Vector3& rhs);
 
 template <typename Archive>
 void serialize(Archive& archive, Vector3& v)
@@ -153,6 +165,8 @@ struct Vector3i
   Vector3i& operator+=(const Vector3i& rhs);
   Vector3i operator-(const Vector3i& rhs) const;
   Vector3i& operator-=(const Vector3i& rhs);
+  Vector3i operator*(const Vector3i& rhs) const;
+  Vector3i& operator*=(const Vector3i& rhs);
   Vector3i operator*(int rhs) const;
   Vector3i& operator*=(int rhs);
   Vector3i operator*(double rhs) const;
@@ -160,6 +174,8 @@ struct Vector3i
   Vector3i operator/(int rhs) const;
   Vector3i& operator/=(int rhs);
 };
+
+Vector3i operator*(int lhs, const Vector3i& rhs);
 
 template <typename Archive>
 void serialize(Archive& archive, Vector3i& v)
@@ -193,11 +209,15 @@ struct Vector4d
   Vector4d& operator+=(const Vector4d& rhs);
   Vector4d operator-(const Vector4d& rhs) const;
   Vector4d& operator-=(const Vector4d& rhs);
+  Vector4d operator*(const Vector4d& rhs) const;
+  Vector4d& operator*=(const Vector4d& rhs);
   Vector4d operator*(double rhs) const;
   Vector4d& operator*=(double rhs);
   Vector4d operator/(double rhs) const;
   Vector4d& operator/=(double rhs);
 };
+
+Vector4d operator*(double lhs, const Vector4d& rhs);
 
 template <typename Archive>
 void serialize(Archive& archive, Vector4d& v)
@@ -231,6 +251,8 @@ struct Vector4i
   Vector4i& operator+=(const Vector4i& rhs);
   Vector4i operator-(const Vector4i& rhs) const;
   Vector4i& operator-=(const Vector4i& rhs);
+  Vector4i operator*(const Vector4i& rhs) const;
+  Vector4i& operator*=(const Vector4i& rhs);
   Vector4i operator*(int rhs) const;
   Vector4i& operator*=(int rhs);
   Vector4i operator*(double rhs) const;
@@ -238,6 +260,8 @@ struct Vector4i
   Vector4i operator/(int rhs) const;
   Vector4i& operator/=(int rhs);
 };
+
+Vector4i operator*(int lhs, const Vector4i& rhs);
 
 template <typename Archive>
 void serialize(Archive& archive, Vector4i& v)

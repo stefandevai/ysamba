@@ -128,8 +128,15 @@ void TempGenerator::m_compute_maps(const int seed)
     {
       const auto array_index = j * size.x + i;
 
-      maxv = std::max(maxv, height_map[array_index]);
-      minv = std::min(minv, height_map[array_index]);
+      // Generate square
+      // if (i >= 0 && i < 50 && j >= 0 && j < 50)
+      // {
+      //   height_map[array_index] = 0.04f;
+      // }
+      // else
+      // {
+      //   height_map[array_index] = 0.0f;
+      // }
 
       // Apply falloff to the silhouette
       const float distance_x_squared = (half_size_x - i) * (half_size_x - i);

@@ -49,14 +49,13 @@ class ChunkGenerator
     Nearest,
     Bilinear,
     Bicubic,
-    Trilinear,
   };
 
   // JSON m_json{"./data/world/tile_rules.json"};
   int m_padding = 1;
   Vector3i m_padded_size{size.x + m_padding * 2, size.y + m_padding * 2, 1};
   const WorldMetadata& m_world_metadata;
-  Sampler m_height_map_sampler = Sampler::Nearest;
+  Sampler m_height_map_sampler = Sampler::Bicubic;
 
   void m_get_height_map(const int seed, const Vector3i& offset);
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);

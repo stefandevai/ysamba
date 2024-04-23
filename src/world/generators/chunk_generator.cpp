@@ -618,14 +618,16 @@ bool ChunkGenerator::m_has_neighbor(
 Vector2 ChunkGenerator::m_world_to_height_map(const Vector3i& world_position)
 {
   return Vector2{
-    world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
-    world_position.y / map_to_tiles + static_cast<double>(m_world_metadata.world_size.y / 2),
+    // world_position.x / map_to_tiles + static_cast<double>(m_world_metadata.world_size.x / 2),
+    // world_position.y / map_to_tiles + static_cast<double>(m_world_metadata.world_size.y / 2),
+    world_position.x / map_to_tiles,
+    world_position.y / map_to_tiles,
   };
 }
 
 int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
 {
-  const Vector2 height_map_position = m_world_to_height_map(world_position);
+  Vector2 height_map_position = m_world_to_height_map(world_position);
 
   if (height_map_position.x < 0.0 &&
       height_map_position.x >= m_world_metadata.world_size.x &&
@@ -644,12 +646,16 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
     }
     case Sampler::Bilinear:
     {
+      // Subtract 0.5 to center the sample
+      height_map_position -= Vector2{0.5, 0.5};
+
       const auto x = std::floor(height_map_position.x);
       const auto y = std::floor(height_map_position.y);
 
       const auto x_ratio = height_map_position.x - x;
       const auto y_ratio = height_map_position.y - y;
 
+      // TODO: Handle edge cases
       const auto height = m_world_metadata.height_map[utils::array_index(x, y, m_world_metadata.world_size.x)];
       const auto height_right = m_world_metadata.height_map[utils::array_index(x + 1, y, m_world_metadata.world_size.x)];
       const auto height_bottom = m_world_metadata.height_map[utils::array_index(x, y + 1, m_world_metadata.world_size.x)];
@@ -662,11 +668,53 @@ int ChunkGenerator::m_sample_height_map(const Vector3i& world_position)
     }
     case Sampler::Bicubic:
     {
-      return 0;
-    }
-    case Sampler::Trilinear:
-    {
-      return 0;
+      // Subtract 0.5 to center the sample
+      height_map_position -= Vector2{0.5, 0.5};
+
+      const auto x = std::floor(height_map_position.x);
+      const auto y = std::floor(height_map_position.y);
+
+      const auto sample_ratio = Vector2{height_map_position.x - x, height_map_position.y - y};
+
+      std::array<float, 16> samples{};
+
+      for (int j = 0; j < 4; ++j)
+      {
+        for (int i = 0; i < 4; ++i)
+        {
+          const auto sample_x = x + i - 1;
+          const auto sample_y = y + j - 1;
+
+          if (sample_x < 0 || sample_x >= m_world_metadata.world_size.x || sample_y < 0 || sample_y >= m_world_metadata.world_size.y)
+          {
+            samples[j * 4 + i] = 0.0f;
+          }
+          else
+          {
+            samples[j * 4 + i] = m_world_metadata.height_map[utils::array_index(sample_x, sample_y, m_world_metadata.world_size.x)];
+          }
+        }
+      }
+
+      const auto t = sample_ratio;
+      const auto t2 = sample_ratio * sample_ratio;
+      const auto t3 = t2 * sample_ratio;
+
+      const auto q1 = 0.5 * (-1.0 * t3 + 2.0 * t2 - t);
+      const auto q2 = 0.5 * (3.0 * t3  - 5.0 * t2 + Vector2{2.0, 2.0});
+      const auto q3 = 0.5 * (-3.0 * t3 + 4.0 * t2 + t);
+      const auto q4 = 0.5 * (t3 - t2);
+
+      std::array<float, 4> rows{};
+
+      for (int j = 0; j < 4; ++j)
+      {
+        rows[j] = q1.x * samples[j * 4] + q2.x * samples[j * 4 + 1] + q3.x * samples[j * 4 + 2] + q4.x * samples[j * 4 + 3];
+      }
+
+      const auto interpolated_value = q1.y * rows[0] + q2.y * rows[1] + q3.y * rows[2] + q4.y * rows[3];
+
+      return static_cast<int>(std::clamp(interpolated_value, 0.0, 1.0) * (size.z - 1));
     }
     default:
     {
