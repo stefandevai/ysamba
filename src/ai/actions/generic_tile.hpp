@@ -56,7 +56,7 @@ static bool job(CreateJobParams params)
     auto& agent = params.registry.get<SocietyAgent>(entity);
     const auto job = params.registry.create();
 
-    params.registry.emplace<Target>(job, params.position, tile.id);
+    params.registry.emplace<Target>(job, static_cast<Vector3>(params.position), tile.id);
     params.registry.emplace<JobData>(job, params.job_type);
 
     // TODO: Create walk job if needed on the respective action system

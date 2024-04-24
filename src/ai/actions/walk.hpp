@@ -31,7 +31,7 @@ static void job(CreateJobParams params)
   }
 
   const auto job = params.registry.create();
-  params.registry.emplace<Target>(job, params.position, 0, params.offset);
+  params.registry.emplace<Target>(job, static_cast<Vector3>(params.position), 0, params.offset);
   params.registry.emplace<JobData>(job, JobType::Walk);
   params.agent->push_job(Job{params.priority, job});
 }

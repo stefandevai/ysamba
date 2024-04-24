@@ -43,7 +43,7 @@ static bool job(CreateJobParams params)
   {
     const auto offset_x = random::get_integer(0, params.hut_size);
     const auto offset_y = random::get_integer(0, params.hut_size);
-    const auto job_target = Vector3i{params.position.x + offset_x, params.position.y + offset_y, params.position.z};
+    const auto job_target = Vector3{params.position.x + offset_x, params.position.y + offset_y, params.position.z};
 
     // Create a walk job to walk until the target
     const auto walk_job = params.registry.create();

@@ -29,7 +29,7 @@ void walk(entt::registry& registry, SocietyAgent& agent, const Vector3 target)
   action::walk::job({
       .registry = registry,
       .agent = &agent,
-      .position = target,
+      .position = static_cast<Vector3i>(target),
   });
 }
 

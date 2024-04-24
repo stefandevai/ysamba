@@ -11,12 +11,6 @@ Vector2::Vector2(const Vector2& other) noexcept
   y = other.y;
 }
 
-Vector2::Vector2(const Vector2i& other) noexcept
-{
-  x = other.x;
-  y = other.y;
-}
-
 Vector2::Vector2(Vector2&& other) noexcept
 {
   std::swap(x, other.x);
@@ -24,13 +18,6 @@ Vector2::Vector2(Vector2&& other) noexcept
 }
 
 Vector2& Vector2::operator=(const Vector2& rhs) noexcept
-{
-  x = rhs.x;
-  y = rhs.y;
-  return *this;
-}
-
-Vector2& Vector2::operator=(const Vector2i& rhs) noexcept
 {
   x = rhs.x;
   y = rhs.y;
@@ -141,6 +128,31 @@ Vector2& Vector2::operator/=(const double rhs)
   return *this;
 }
 
+Vector2::operator Vector2i() const
+{
+  return Vector2i{static_cast<int>(x), static_cast<int>(y)};
+}
+
+Vector2::operator Vector3i() const
+{
+  return Vector3i{static_cast<int>(x), static_cast<int>(y), 0};
+}
+
+Vector2::operator Vector3() const
+{
+  return Vector3{x, y, 0.0};
+}
+
+Vector2::operator Vector4d() const
+{
+  return Vector4d{x, y, 0.0, 0.0};
+}
+
+Vector2::operator Vector4i() const
+{
+  return Vector4i{static_cast<int>(x), static_cast<int>(y), 0, 0};
+}
+
 Vector2 operator*(double lhs, const Vector2& rhs)
 {
   return rhs * lhs;
@@ -151,13 +163,22 @@ Vector2 operator/(double lhs, const Vector2& rhs)
   return rhs / lhs;
 }
 
-Vector2i::Vector2i(const Vector2i& other) noexcept
+Vector2 Vector2::floor() const
 {
-  x = other.x;
-  y = other.y;
+  return Vector2{std::floor(x), std::floor(y)};
 }
 
-Vector2i::Vector2i(const Vector2& other) noexcept
+Vector2 Vector2::ceil() const
+{
+  return Vector2{std::ceil(x), std::ceil(y)};
+}
+
+Vector2 Vector2::round() const
+{
+  return Vector2{std::round(x), std::round(y)};
+}
+
+Vector2i::Vector2i(const Vector2i& other) noexcept
 {
   x = other.x;
   y = other.y;
@@ -170,13 +191,6 @@ Vector2i::Vector2i(Vector2i&& other) noexcept
 }
 
 Vector2i& Vector2i::operator=(const Vector2i& rhs) noexcept
-{
-  x = rhs.x;
-  y = rhs.y;
-  return *this;
-}
-
-Vector2i& Vector2i::operator=(const Vector2& rhs) noexcept
 {
   x = rhs.x;
   y = rhs.y;
@@ -304,6 +318,31 @@ Vector2i& Vector2i::operator/=(const int rhs)
   return *this;
 }
 
+Vector2i::operator Vector2() const
+{
+  return Vector2{static_cast<double>(x), static_cast<double>(y)};
+}
+
+Vector2i::operator Vector3i() const
+{
+  return Vector3i{x, y, 0};
+}
+
+Vector2i::operator Vector3() const
+{
+  return Vector3{static_cast<double>(x), static_cast<double>(y), 0.0};
+}
+
+Vector2i::operator Vector4d() const
+{
+  return Vector4d{static_cast<double>(x), static_cast<double>(y), 0.0, 0.0};
+}
+
+Vector2i::operator Vector4i() const
+{
+  return Vector4i{x, y, 0, 0};
+}
+
 Vector2i operator*(int lhs, const Vector2i& rhs)
 {
   return rhs * lhs;
@@ -321,13 +360,6 @@ Vector3i::Vector3i(const Vector3i& other) noexcept
   z = other.z;
 }
 
-Vector3i::Vector3i(const Vector3& other) noexcept
-{
-  x = other.x;
-  y = other.y;
-  z = other.z;
-}
-
 Vector3i::Vector3i(Vector3i&& other) noexcept
 {
   std::swap(x, other.x);
@@ -336,19 +368,6 @@ Vector3i::Vector3i(Vector3i&& other) noexcept
 }
 
 Vector3i& Vector3i::operator=(const Vector3i& rhs) noexcept
-{
-  x = rhs.x;
-  y = rhs.y;
-  z = rhs.z;
-  return *this;
-}
-
-Vector2i Vector3i::xy() const
-{
-  return Vector2i{x, y};
-}
-
-Vector3i& Vector3i::operator=(const Vector3& rhs) noexcept
 {
   x = rhs.x;
   y = rhs.y;
@@ -480,6 +499,36 @@ Vector3i& Vector3i::operator/=(const int rhs)
   return *this;
 }
 
+Vector3i::operator Vector2() const
+{
+  return Vector2{static_cast<double>(x), static_cast<double>(y)};
+}
+
+Vector3i::operator Vector2i() const
+{
+  return Vector2i{x, y};
+}
+
+Vector3i::operator Vector3() const
+{
+  return Vector3{static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)};
+}
+
+Vector3i::operator Vector4d() const
+{
+  return Vector4d{static_cast<double>(x), static_cast<double>(y), static_cast<double>(z), 0.0};
+}
+
+Vector3i::operator Vector4i() const
+{
+  return Vector4i{x, y, z, 0};
+}
+
+Vector2i Vector3i::xy() const
+{
+  return Vector2i{x, y};
+}
+
 Vector3i operator*(int lhs, const Vector3i& rhs)
 {
   return rhs * lhs;
@@ -497,13 +546,6 @@ Vector3::Vector3(const Vector3& other) noexcept
   z = other.z;
 }
 
-Vector3::Vector3(const Vector3i& other) noexcept
-{
-  x = other.x;
-  y = other.y;
-  z = other.z;
-}
-
 Vector3::Vector3(Vector3&& other) noexcept
 {
   std::swap(x, other.x);
@@ -511,20 +553,7 @@ Vector3::Vector3(Vector3&& other) noexcept
   std::swap(z, other.z);
 }
 
-Vector2 Vector3::xy() const
-{
-  return Vector2{x, y};
-}
-
 Vector3& Vector3::operator=(const Vector3& rhs) noexcept
-{
-  x = rhs.x;
-  y = rhs.y;
-  z = rhs.z;
-  return *this;
-}
-
-Vector3& Vector3::operator=(const Vector3i& rhs) noexcept
 {
   x = rhs.x;
   y = rhs.y;
@@ -643,6 +672,31 @@ Vector3& Vector3::operator/=(const double rhs)
   return *this;
 }
 
+Vector3::operator Vector2() const
+{
+  return Vector2{x, y};
+}
+
+Vector3::operator Vector2i() const
+{
+  return Vector2i{static_cast<int>(x), static_cast<int>(y)};
+}
+
+Vector3::operator Vector3i() const
+{
+  return Vector3i{static_cast<int>(x), static_cast<int>(y), static_cast<int>(z)};
+}
+
+Vector3::operator Vector4d() const
+{
+  return Vector4d{x, y, z, 0.0};
+}
+
+Vector3::operator Vector4i() const
+{
+  return Vector4i{static_cast<int>(x), static_cast<int>(y), static_cast<int>(z), 0};
+}
+
 Vector3 operator*(double lhs, const Vector3& rhs)
 {
   return rhs * lhs;
@@ -653,20 +707,32 @@ Vector3 operator/(double lhs, const Vector3& rhs)
   return rhs / lhs;
 }
 
+Vector2 Vector3::xy() const
+{
+  return Vector2{x, y};
+}
+
+Vector3 Vector3::floor() const
+{
+  return Vector3{std::floor(x), std::floor(y), std::floor(z)};
+}
+
+Vector3 Vector3::ceil() const
+{
+  return Vector3{std::ceil(x), std::ceil(y), std::ceil(z)};
+}
+
+Vector3 Vector3::round() const
+{
+  return Vector3{std::round(x), std::round(y), std::round(z)};
+}
+
 Vector4d::Vector4d(const Vector4d& other) noexcept
 {
   x = other.x;
   y = other.y;
   z = other.z;
   w = other.w;
-}
-
-Vector4d::Vector4d(const Vector4i& other) noexcept
-{
-  x = static_cast<double>(other.x);
-  y = static_cast<double>(other.y);
-  z = static_cast<double>(other.z);
-  w = static_cast<double>(other.w);
 }
 
 Vector4d::Vector4d(Vector4d&& other) noexcept
@@ -693,6 +759,21 @@ Vector4d& Vector4d::operator=(Vector4d&& rhs) noexcept
   std::swap(z, rhs.z);
   std::swap(w, rhs.w);
   return *this;
+}
+
+Vector4d Vector4d::floor() const
+{
+  return Vector4d{std::floor(x), std::floor(y), std::floor(z), std::floor(w)};
+}
+
+Vector4d Vector4d::ceil() const
+{
+  return Vector4d{std::ceil(x), std::ceil(y), std::ceil(z), std::ceil(w)};
+}
+
+Vector4d Vector4d::round() const
+{
+  return Vector4d{std::round(x), std::round(y), std::round(z), std::round(w)};
 }
 
 bool Vector4d::operator==(const Vector4d& rhs) const
@@ -804,6 +885,31 @@ Vector4d& Vector4d::operator/=(const double rhs)
   return *this;
 }
 
+Vector4d::operator Vector2() const
+{
+  return Vector2{x, y};
+}
+
+Vector4d::operator Vector2i() const
+{
+  return Vector2i{static_cast<int>(x), static_cast<int>(y)};
+}
+
+Vector4d::operator Vector3() const
+{
+  return Vector3{x, y, z};
+}
+
+Vector4d::operator Vector3i() const
+{
+  return Vector3i{static_cast<int>(x), static_cast<int>(y), static_cast<int>(z)};
+}
+
+Vector4d::operator Vector4i() const
+{
+  return Vector4i{static_cast<int>(x), static_cast<int>(y), static_cast<int>(z), static_cast<int>(w)};
+}
+
 Vector4d operator*(double lhs, const Vector4d& rhs)
 {
   return rhs * lhs;
@@ -820,14 +926,6 @@ Vector4i::Vector4i(const Vector4i& other) noexcept
   y = other.y;
   z = other.z;
   w = other.w;
-}
-
-Vector4i::Vector4i(const Vector4d& other) noexcept
-{
-  x = static_cast<int>(other.x);
-  y = static_cast<int>(other.y);
-  z = static_cast<int>(other.z);
-  w = static_cast<int>(other.w);
 }
 
 Vector4i::Vector4i(Vector4i&& other) noexcept
@@ -977,6 +1075,31 @@ Vector4i& Vector4i::operator/=(const int rhs)
   z /= rhs;
   w /= rhs;
   return *this;
+}
+
+Vector4i::operator Vector2() const
+{
+  return Vector2{static_cast<double>(x), static_cast<double>(y)};
+}
+
+Vector4i::operator Vector2i() const
+{
+  return Vector2i{x, y};
+}
+
+Vector4i::operator Vector3() const
+{
+  return Vector3{static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)};
+}
+
+Vector4i::operator Vector3i() const
+{
+  return Vector3i{x, y, z};
+}
+
+Vector4i::operator Vector4d() const
+{
+  return Vector4d{static_cast<double>(x), static_cast<double>(y), static_cast<double>(z), static_cast<double>(w)};
 }
 
 Vector4i operator*(int lhs, const Vector4i& rhs)

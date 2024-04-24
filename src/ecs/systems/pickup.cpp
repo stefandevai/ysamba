@@ -441,7 +441,7 @@ void PickupSystem::m_pickup_liquid(entt::registry& registry, entt::entity entity
 {
   const auto& action_pickup = registry.get<ActionPickup>(entity);
   const auto& target = registry.get<Target>(action_pickup.job);
-  const auto& tile = m_world.get(target.position);
+  const auto& tile = m_world.get(static_cast<Vector3i>(target.position));
   const auto& action = tile.actions.at(JobType::PickupLiquid);
 
   assert(action.gives.size() == 1);

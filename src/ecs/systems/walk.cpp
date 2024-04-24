@@ -84,8 +84,9 @@ void WalkSystem::update(entt::registry& registry)
     if (!registry.all_of<WalkPath>(entity))
     {
       auto& walk_path = registry.emplace<WalkPath>(entity);
-      walk_path.steps = m_world.find_path(
-          Vector3i{std::round(position.x), std::round(position.y), std::round(position.z)}, target.position);
+      walk_path.steps
+          = m_world.find_path(Vector3i{std::round(position.x), std::round(position.y), std::round(position.z)},
+                              static_cast<Vector3i>(target.position));
     }
 
     auto& walk_path = registry.get<WalkPath>(entity);

@@ -7,7 +7,9 @@
 namespace dl
 {
 struct Vector2i;
+struct Vector3;
 struct Vector3i;
+struct Vector4d;
 struct Vector4i;
 
 struct Vector2
@@ -22,11 +24,9 @@ struct Vector2
 
   ~Vector2() = default;
   Vector2(const Vector2& other) noexcept;
-  Vector2(const Vector2i& other) noexcept;
   Vector2(Vector2&& other) noexcept;
 
   Vector2& operator=(const Vector2& rhs) noexcept;
-  Vector2& operator=(const Vector2i& rhs) noexcept;
   Vector2& operator=(Vector2&& rhs) noexcept;
   bool operator==(const Vector2& rhs) const;
   bool operator<(const Vector2& rhs) const;
@@ -45,6 +45,16 @@ struct Vector2
   Vector2& operator*=(double rhs);
   Vector2 operator/(double rhs) const;
   Vector2& operator/=(double rhs);
+
+  explicit operator Vector2i() const;
+  explicit operator Vector3i() const;
+  explicit operator Vector3() const;
+  explicit operator Vector4d() const;
+  explicit operator Vector4i() const;
+
+  Vector2 floor() const;
+  Vector2 ceil() const;
+  Vector2 round() const;
 
   static constexpr Vector2 null() { return Vector2{std::numeric_limits<double>::infinity()}; }
   static constexpr Vector2 zero() { return Vector2{0.0}; }
@@ -72,11 +82,9 @@ struct Vector2i
 
   ~Vector2i() = default;
   Vector2i(const Vector2i& other) noexcept;
-  Vector2i(const Vector2& other) noexcept;
   Vector2i(Vector2i&& other) noexcept;
 
   Vector2i& operator=(const Vector2i& rhs) noexcept;
-  Vector2i& operator=(const Vector2& rhs) noexcept;
   Vector2i& operator=(Vector2i&& rhs) noexcept;
   bool operator==(const Vector2i& rhs) const;
   bool operator!=(const Vector2i& rhs) const;
@@ -98,6 +106,12 @@ struct Vector2i
   Vector2i& operator*=(double rhs);
   Vector2i operator/(int rhs) const;
   Vector2i& operator/=(int rhs);
+
+  explicit operator Vector2() const;
+  explicit operator Vector3i() const;
+  explicit operator Vector3() const;
+  explicit operator Vector4d() const;
+  explicit operator Vector4i() const;
 
   static constexpr Vector2i null() { return Vector2i{std::numeric_limits<int>::infinity()}; }
   static constexpr Vector2i zero() { return Vector2i{0}; }
@@ -129,13 +143,9 @@ struct Vector3
 
   ~Vector3() = default;
   Vector3(const Vector3& other) noexcept;
-  Vector3(const Vector3i& other) noexcept;
   Vector3(Vector3&& other) noexcept;
 
-  Vector2 xy() const;
-
   Vector3& operator=(const Vector3& rhs) noexcept;
-  Vector3& operator=(const Vector3i& rhs) noexcept;
   Vector3& operator=(Vector3&& rhs) noexcept;
   bool operator==(const Vector3& rhs) const;
   bool operator<(const Vector3& rhs) const;
@@ -154,6 +164,17 @@ struct Vector3
   Vector3& operator*=(double rhs);
   Vector3 operator/(double rhs) const;
   Vector3& operator/=(double rhs);
+
+  explicit operator Vector2() const;
+  explicit operator Vector2i() const;
+  explicit operator Vector3i() const;
+  explicit operator Vector4d() const;
+  explicit operator Vector4i() const;
+
+  Vector2 xy() const;
+  Vector3 floor() const;
+  Vector3 ceil() const;
+  Vector3 round() const;
 
   static constexpr Vector3 null() { return Vector3{std::numeric_limits<double>::infinity()}; }
   static constexpr Vector3 zero() { return Vector3{0.0}; }
@@ -185,13 +206,9 @@ struct Vector3i
 
   ~Vector3i() = default;
   Vector3i(const Vector3i& other) noexcept;
-  Vector3i(const Vector3& other) noexcept;
   Vector3i(Vector3i&& other) noexcept;
 
-  Vector2i xy() const;
-
   Vector3i& operator=(const Vector3i& rhs) noexcept;
-  Vector3i& operator=(const Vector3& rhs) noexcept;
   Vector3i& operator=(Vector3i&& rhs) noexcept;
   bool operator==(const Vector3i& rhs) const;
   bool operator<(const Vector3i& rhs) const;
@@ -212,6 +229,14 @@ struct Vector3i
   Vector3i& operator*=(double rhs);
   Vector3i operator/(int rhs) const;
   Vector3i& operator/=(int rhs);
+
+  explicit operator Vector2() const;
+  explicit operator Vector2i() const;
+  explicit operator Vector3() const;
+  explicit operator Vector4d() const;
+  explicit operator Vector4i() const;
+
+  Vector2i xy() const;
 
   static constexpr Vector3i null() { return Vector3i{std::numeric_limits<int>::infinity()}; }
   static constexpr Vector3i zero() { return Vector3i{0}; }
@@ -244,7 +269,6 @@ struct Vector4d
 
   ~Vector4d() = default;
   Vector4d(const Vector4d& other) noexcept;
-  Vector4d(const Vector4i& other) noexcept;
   Vector4d(Vector4d&& other) noexcept;
 
   Vector4d& operator=(const Vector4d& rhs) noexcept;
@@ -266,6 +290,16 @@ struct Vector4d
   Vector4d& operator*=(double rhs);
   Vector4d operator/(double rhs) const;
   Vector4d& operator/=(double rhs);
+
+  explicit operator Vector2() const;
+  explicit operator Vector2i() const;
+  explicit operator Vector3() const;
+  explicit operator Vector3i() const;
+  explicit operator Vector4i() const;
+
+  Vector4d floor() const;
+  Vector4d ceil() const;
+  Vector4d round() const;
 
   static constexpr Vector4d null() { return Vector4d{std::numeric_limits<double>::infinity()}; }
   static constexpr Vector4d zero() { return Vector4d{0.0}; }
@@ -298,7 +332,6 @@ struct Vector4i
 
   ~Vector4i() = default;
   Vector4i(const Vector4i& other) noexcept;
-  Vector4i(const Vector4d& other) noexcept;
   Vector4i(Vector4i&& other) noexcept;
 
   Vector4i& operator=(const Vector4i& rhs) noexcept;
@@ -322,6 +355,12 @@ struct Vector4i
   Vector4i& operator*=(double rhs);
   Vector4i operator/(int rhs) const;
   Vector4i& operator/=(int rhs);
+
+  explicit operator Vector2() const;
+  explicit operator Vector2i() const;
+  explicit operator Vector3() const;
+  explicit operator Vector3i() const;
+  explicit operator Vector4d() const;
 
   static constexpr Vector4i null() { return Vector4i{std::numeric_limits<int>::infinity()}; }
   static constexpr Vector4i zero() { return Vector4i{0}; }

@@ -31,7 +31,7 @@ static bool job(CreateJobParams params)
   const auto assign_job = [&params, &job_assigned](const entt::entity entity)
   {
     const auto job = params.registry.create();
-    params.registry.emplace<Target>(job, params.position, static_cast<uint32_t>(params.item));
+    params.registry.emplace<Target>(job, static_cast<Vector3>(params.position), static_cast<uint32_t>(params.item));
     params.registry.emplace<JobData>(job, params.job_type);
 
     action::walk::job({
