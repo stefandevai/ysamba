@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-  "name": "dialetics",
+  "name": "ysamba",
   "version-semver": "0.0.0",
   "dependencies": [
     {

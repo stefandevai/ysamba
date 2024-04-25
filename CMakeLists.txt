@@ -10,7 +10,7 @@ endif()
 
 
 project(
-    dialectics
+    ysamba
     LANGUAGES C CXX
 )
 

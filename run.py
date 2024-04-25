@@ -6,14 +6,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-TARGET_NAME='dialectics'
+TARGET_NAME='ysamba'
 DATA_DIR_NAME='data'
 THIS_DIR = Path(__file__).parent  # Directory of this script
 
 parser = argparse.ArgumentParser(description=f'Utils for building and running {TARGET_NAME}.')
 parser.add_argument('--run', '-r', action='store_true', help='run an already built binary')
 parser.add_argument('--make', '-m', action='store_true', help='build the project')
-parser.add_argument('--build', '-b', action='store_true', help='configure/build dialectics')
+parser.add_argument('--build', '-b', action='store_true', help='configure/build ysamba')
 parser.add_argument('--format', '-f', action='store_true', help='format code')
 parser.add_argument('--check', '-c', action='store', help='run static analysis on a file')
 
