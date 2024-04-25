@@ -1,9 +1,10 @@
 #include "./camera.hpp"
 
 #include <spdlog/spdlog.h>
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <cmath>
 #include <entt/entity/registry.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "constants.hpp"
 #include "core/events/camera.hpp"
@@ -239,7 +240,8 @@ void Camera::m_calculate_center_vector()
   direction.y = std::sin(glm::radians(pitch));
   direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
 
-  m_center = m_position + glm::normalize(std::move(direction));
+  // Denormalizing the vector fixes a bug where lookAt would return wrong values after a certain y position. But why?
+  m_center = m_position + glm::normalize(std::move(direction)) * 10.0f;
 }
 
 void Camera::m_calculate_view_matrix()
@@ -249,14 +251,10 @@ void Camera::m_calculate_view_matrix()
     view_matrix = glm::lookAt(m_position, m_center, m_up);
     view_matrix = glm::scale(view_matrix, glm::vec3(1.0f, m_scaling_factor, m_scaling_factor));
     view_matrix = glm::translate(
-        view_matrix,
-        glm::vec3(
-            std::floor(movement_offset.x + m_size.x / 2.0f), std::floor(movement_offset.y + m_size.y / 2.0f), 0.0f));
+        view_matrix, glm::vec3(movement_offset.x + m_size.x / 2.0f, movement_offset.y + m_size.y / 2.0f, 0.0f));
     view_matrix = glm::scale(view_matrix, glm::vec3(zoom, zoom, zoom));
     view_matrix = glm::translate(
-        view_matrix,
-        glm::vec3(
-            std::floor(-movement_offset.x - m_size.x / 2.0f), std::floor(-movement_offset.y - m_size.y / 2.0f), 0.0f));
+        view_matrix, glm::vec3(-movement_offset.x - m_size.x / 2.0f, -movement_offset.y - m_size.y / 2.0f, 0.0f));
     return;
   }
 
@@ -265,10 +263,10 @@ void Camera::m_calculate_view_matrix()
 
 void Camera::m_calculate_position()
 {
-  glm::vec3 inverse_position = view_matrix * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
-  view_position.x = std::round(-inverse_position.x);
-  view_position.y = std::round(-inverse_position.y);
-  view_position.z = std::round(-inverse_position.z);
+  glm::vec3 inverse_position = view_matrix * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f);
+  view_position.x = -inverse_position.x;
+  view_position.y = -inverse_position.y;
+  view_position.z = -inverse_position.z;
 }
 
 void Camera::m_calculate_grid_size()
