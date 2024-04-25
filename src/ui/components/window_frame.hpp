@@ -15,6 +15,7 @@ class WindowFrame : public UIComponent
   {
     Vector2i size{};
     bool has_close_button = true;
+    uint32_t nine_patch_id = 5;
   };
 
   NinePatch nine_patch{};

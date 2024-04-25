@@ -19,7 +19,7 @@ WindowFrame::WindowFrame(UIContext& context, Params params)
   is_renderable = true;
   size = std::move(params.size);
 
-  nine_patch.id = 0;
+  nine_patch.id = params.nine_patch_id;
   nine_patch.resource_id = "ui"_hs;
   nine_patch.size.x = size.x;
   nine_patch.size.y = size.y;

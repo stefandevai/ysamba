@@ -19,6 +19,7 @@ Inspector::Inspector(UIContext& context, Params params) : UIComponent(context, "
   m_window_frame = emplace<WindowFrame>(WindowFrame::Params{
       .size = size,
       .has_close_button = false,
+      .nine_patch_id = 0,
   });
 
   m_label = m_window_frame->emplace<Label>(std::move(params.content));

@@ -45,6 +45,15 @@
             "bottom": 12,
             "right": 86,
             "border": 5
+        },
+        {
+            "game_id": 5,
+            "type": "nine_patch",
+            "top": 32,
+            "left": 0,
+            "bottom": 62,
+            "right": 30,
+            "border": 16
         }
     ]
 }
