@@ -220,7 +220,6 @@ Vector3i World::screen_to_world(const Vector2i& position, const Camera& camera) 
   auto world_position = Vector3i{std::floor((position.x + camera_position.x) / static_cast<double>(grid_size.x)),
                                  std::floor((position.y + camera_position.y) / static_cast<double>(grid_size.y)),
                                  0.0};
-
   for (int z = world::chunk_size.z - 1; z >= 0; --z)
   {
     const int queried_elevation = get_elevation(world_position.x, world_position.y + z);

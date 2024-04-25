@@ -2023,6 +2023,134 @@
             "faces": {
                 "front": 15
             }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 242,
+            "default_face": "top",
+            "faces": {
+                "top": 307,
+                "front": 343
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 243,
+            "default_face": "top",
+            "faces": {
+                "top": 308,
+                "front": 343
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 244,
+            "default_face": "top",
+            "faces": {
+                "top": 309,
+                "front": 375
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 245,
+            "default_face": "top",
+            "faces": {
+                "top": 310,
+                "front": 312
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 246,
+            "default_face": "top",
+            "faces": {
+                "top": 339,
+                "front": 407
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 247,
+            "default_face": "top",
+            "faces": {
+                "top": 340,
+                "front": 344
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 248,
+            "default_face": "top",
+            "faces": {
+                "top": 341,
+                "front": 311
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 249,
+            "default_face": "top",
+            "faces": {
+                "top": 342,
+                "front": 311
+            }
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 250,
+            "frame": 371
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 251,
+            "frame": 372
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 252,
+            "frame": 373
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 253,
+            "frame": 374
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 254,
+            "frame": 403
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 255,
+            "frame": 404
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 256,
+            "frame": 405
+        },
+        {
+            "type": "tile",
+            "sprite_type": "single",
+            "game_id": 257,
+            "frame": 406
         }
     ]
 }

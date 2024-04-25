@@ -78,6 +78,19 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
         }
         break;
       }
+      case BiomeType::RockMountains:
+      {
+        if (k < 1)
+        {
+          resolved_z = 1;
+          terrain_id = 1;
+        }
+        else
+        {
+          terrain_id = 4;
+        }
+        break;
+      }
       default:
       {
         if (k < 1)

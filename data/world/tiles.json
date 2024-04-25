@@ -1903,6 +1903,86 @@
       "id": 241,
       "name": "oca entrance",
       "flags": ["WALKABLE"]
+    },
+    {
+      "id": 242,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 243,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 244,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 245,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 246,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 247,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 248,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 249,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 250,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 251,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 252,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 253,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 254,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 255,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 256,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
+    },
+    {
+      "id": 257,
+      "name": "basalt",
+      "flags": ["WALKABLE"]
     }
   ]
 }

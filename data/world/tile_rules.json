@@ -106,10 +106,6 @@
           "value": 28
         },
         {
-          "bitmask": 12,
-          "value": 28
-        },
-        {
           "bitmask": 7,
           "value": 25
         },
@@ -324,6 +320,78 @@
           "probability": 0.1,
           "value": 135,
           "placement": "terrain"
+        }
+      ]
+    },
+    {
+      "label": "basalt autotile",
+      "input": 4,
+      "type": "autotile_4_sides",
+      "neighbor": 0,
+      "output": [
+        {
+          "bitmask": 0,
+          "value": 257
+        },
+        {
+          "bitmask": 1,
+          "value": 256
+        },
+        {
+          "bitmask": 2,
+          "value": 253
+        },
+        {
+          "bitmask": 4,
+          "value": 249
+        },
+        {
+          "bitmask": 8,
+          "value": 255
+        },
+        {
+          "bitmask": 3,
+          "value": 252
+        },
+        {
+          "bitmask": 5,
+          "value": 248
+        },
+        {
+          "bitmask": 9,
+          "value": 254
+        },
+        {
+          "bitmask": 6,
+          "value": 245
+        },
+        {
+          "bitmask": 10,
+          "value": 251
+        },
+        {
+          "bitmask": 12,
+          "value": 247
+        },
+        {
+          "bitmask": 7,
+          "value": 244
+        },
+        {
+          "bitmask": 11,
+          "value": 250
+        },
+        {
+          "bitmask": 13,
+          "value": 246
+        },
+        {
+          "bitmask": 14,
+          "value": 243
+        },
+        {
+          "bitmask": 15,
+          "value": 242
         }
       ]
     }
