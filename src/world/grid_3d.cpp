@@ -235,15 +235,17 @@ void Grid3D::compute_visibility()
           continue;
         }
 
-        const bool visible = m_is_any_neighbour_empty(x, y, z);
+        // const bool visible = m_is_any_neighbour_empty(x, y, z);
 
-        if (!visible)
+        // Set visibility flags
+        m_set_cell_flags(x, y, z);
+
+        if (!has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z))
         {
           continue;
         }
 
-        // Update visibility
-        set_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z);
+        // set_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z);
 
         // Update height map if needed
         if (height_at(x, y) < z)
@@ -292,6 +294,42 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
   /* } */
 
   return false;
+}
+
+void Grid3D::m_set_cell_flags(const int x, const int y, const int z)
+{
+  // Check visible tiles in 45deg top down view
+  // Top tile
+  if (top_face_at(x, y, z + 1) == 0 && top_face_decoration_at(x, y, z + 1) == 0)
+  {
+    set_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z);
+  }
+  if (top_face_at(x, y + 1, z) == 0)
+  {
+    set_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, x, y, z);
+  }
+
+  // TODO: After adding view rotation, check all the other directions
+  /* if (top_face_at(x, y + 1, z) == 0) */
+  /* { */
+  /*   return true; */
+  /* } */
+  /* if (top_face_at(x + 1, y, z) == 0) */
+  /* { */
+  /*   return true; */
+  /* } */
+  /* if (top_face_at(x - 1, y, z) == 0) */
+  /* { */
+  /*   return true; */
+  /* } */
+  /* if (top_face_at(x, y - 1, z) == 0) */
+  /* { */
+  /*   return true; */
+  /* } */
+  /* if (top_face_at(x, y, z - 1) == 0) */
+  /* { */
+  /*   return true; */
+  /* } */
 }
 
 bool Grid3D::is_bottom_empty(const int x, const int y, const int z) const

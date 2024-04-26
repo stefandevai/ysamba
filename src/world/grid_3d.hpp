@@ -57,6 +57,7 @@ class Grid3D
   uint32_t m_index(const int x, const int y, const int z) const;
   bool m_in_bounds(const int x, const int y, const int z = 0) const;
   bool m_is_any_neighbour_empty(const int x, const int y, const int z) const;
+  void m_set_cell_flags(const int x, const int y, const int z);
 };
 
 template <typename Archive>

@@ -75,14 +75,16 @@ struct TileValues
 class TileRules
 {
  public:
-  static std::unordered_map<int, Rule> rules;
+  static std::unordered_map<int, Rule> root_rules;
+  static std::unordered_map<int, Rule> terrain_rules;
   static Rule identity;
   static bool has_loaded;
 
   TileRules() = delete;
 
   static void load();
-  static const Rule& get(const int input);
+  static const Rule& get_root_rule(const int input);
+  static const Rule& get_terrain_rule(const int input);
 
   // private:
   // static Rule m_create_rule(const nlohmann::json& rule, const RuleType type);

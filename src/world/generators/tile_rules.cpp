@@ -7,7 +7,8 @@
 
 namespace dl
 {
-std::unordered_map<int, Rule> TileRules::rules{};
+std::unordered_map<int, Rule> TileRules::root_rules{};
+std::unordered_map<int, Rule> TileRules::terrain_rules{};
 Rule TileRules::identity = IdentityRule{0, "identity"};
 bool TileRules::has_loaded = false;
 
@@ -273,6 +274,9 @@ void TileRules::load()
   {
     RuleType type = RuleType::None;
 
+    assert(rule.contains("category") && "Rule category not specified");
+    assert(rule.contains("type") && "Rule type not specified");
+
     if (rule["type"] == "autotile_4_sides")
     {
       type = RuleType::Autotile4Sides;
@@ -291,20 +295,43 @@ void TileRules::load()
       continue;
     }
 
-    const auto input = rule["input"].get<int>();
     const auto rule_object = create_rule(rule, type);
 
-    rules.insert({input, rule_object});
+    const auto category = rule["category"].get<std::string>();
+    const auto input = rule["input"].get<int>();
+
+    if (category == "root")
+    {
+      spdlog::debug("Adding root rule: {}", input);
+      root_rules.insert({input, rule_object});
+    }
+    else if (category == "terrain")
+    {
+      spdlog::debug("Adding terrain rule: {}", input);
+      terrain_rules.insert({input, rule_object});
+    }
   }
 
   has_loaded = true;
 }
 
-const Rule& TileRules::get(const int input)
+const Rule& TileRules::get_root_rule(const int input)
 {
-  const auto& rule = rules.find(input);
+  const auto& rule = root_rules.find(input);
 
-  if (rule == rules.end())
+  if (rule == root_rules.end())
+  {
+    return identity;
+  }
+
+  return rule->second;
+}
+
+const Rule& TileRules::get_terrain_rule(const int input)
+{
+  const auto& rule = terrain_rules.find(input);
+
+  if (rule == terrain_rules.end())
   {
     return identity;
   }

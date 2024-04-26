@@ -2,6 +2,7 @@
   "rules": [
     {
       "label": "water autotile",
+      "category": "root",
       "input": 1,
       "type": "autotile_8_sides",
       "neighbor": 2,
@@ -57,6 +58,7 @@
     },
     {
       "label": "grass autotile",
+      "category": "root",
       "input": 2,
       "type": "autotile_4_sides",
       "neighbor": 0,
@@ -129,6 +131,7 @@
     },
     {
       "label": "grass variation",
+      "category": "terrain",
       "input": 38,
       "type": "uniform_distribution",
       "output": [
@@ -231,6 +234,7 @@
     },
     {
       "label": "lake elements",
+      "category": "terrain",
       "input": 66,
       "type": "uniform_distribution",
       "output": [
@@ -298,6 +302,7 @@
     },
     {
       "label": "lake border elements",
+      "category": "terrain",
       "input": 65,
       "type": "uniform_distribution",
       "output": [
@@ -325,6 +330,7 @@
     },
     {
       "label": "basalt autotile",
+      "category": "root",
       "input": 4,
       "type": "autotile_4_sides",
       "neighbor": 0,

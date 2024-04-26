@@ -10,7 +10,6 @@
 #include "core/maths/random.hpp"
 #include "core/maths/utils.hpp"
 #include "world/chunk.hpp"
-#include "world/generators/tile_rules.hpp"
 #include "world/generators/utils.hpp"
 #include "world/metadata.hpp"
 #include "world/utils.hpp"
@@ -197,235 +196,246 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
     return;
   }
 
+  const auto& root_rule = TileRules::get_root_rule(terrain_id);
+
   TileValues old_values{terrain_id, 0};
-  TileValues new_values{terrain_id, 0};
+  TileValues new_values = m_apply_rule(root_rule, terrain, transposed_x, transposed_y, z);
 
   do
   {
     old_values.top_face = new_values.top_face;
     old_values.top_face_decoration = new_values.top_face_decoration;
 
-    const auto& rule_object = TileRules::get(old_values.top_face);
-    const auto index = rule_object.index();
+    const auto& rule = TileRules::get_terrain_rule(old_values.top_face);
+    new_values = m_apply_rule(rule, terrain, transposed_x, transposed_y, z);
+  } while (new_values.top_face != 0);
 
-    switch (index)
-    {
-    case 0:
-      break;
-
-    case 1:
-    {
-      const auto& rule = std::get<AutoTile4SidesRule>(rule_object);
-      const auto bitmask = m_get_bitmask_4_sided(terrain, transposed_x, transposed_y, z, rule.neighbor);
-      new_values.top_face = rule.output[bitmask].value;
-      break;
-    }
-
-    case 3:
-    {
-      const auto& rule = std::get<UniformDistributionRule>(rule_object);
-      const auto prob = random::get_real();
-      double cumulative_probability = 0.0;
-
-      for (const auto& transform : rule.output)
-      {
-        cumulative_probability += transform.probability;
-
-        if (prob < cumulative_probability)
-        {
-          if (transform.placement == PlacementType::Terrain)
-          {
-            new_values.top_face = transform.value;
-          }
-          else
-          {
-            new_values.top_face_decoration = transform.value;
-          }
-          break;
-        }
-      }
-      break;
-    }
-
-    case 2:
-    {
-      const auto& rule = std::get<AutoTile8SidesRule>(rule_object);
-      const auto bitmask = m_get_bitmask_8_sided(terrain, transposed_x, transposed_y, z, rule.neighbor, rule.input);
-      int new_terrain_id = 0;
-
-      switch (bitmask)
-      {
-      case DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[0].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[1].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[2].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[3].value;
-        break;
-      case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
-          | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[4].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[5].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[6].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[7].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
-        new_terrain_id = rule.output[8].value;
-        break;
-      case DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[9].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[10].value;
-        break;
-      case DL_EDGE_LEFT:
-        new_terrain_id = rule.output[11].value;
-        break;
-      case DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[12].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[13].value;
-        break;
-      case DL_EDGE_TOP:
-        new_terrain_id = rule.output[14].value;
-        break;
-      case DL_EDGE_NONE:
-        new_terrain_id = rule.output[15].value;
-        break;
-      case DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[16].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[17].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[18].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[19].value;
-        break;
-      case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
-        new_terrain_id = rule.output[20].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
-          | DL_EDGE_TOP_LEFT:
-        new_terrain_id = rule.output[21].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
-          | DL_EDGE_TOP_LEFT:
-        new_terrain_id = rule.output[22].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[23].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[24].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
-          | DL_EDGE_TOP_LEFT:
-        new_terrain_id = rule.output[25].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
-          | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[26].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[27].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[28].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
-        new_terrain_id = rule.output[29].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[30].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[31].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[32].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
-        new_terrain_id = rule.output[33].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[34].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[35].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[36].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[37].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[38].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT:
-        new_terrain_id = rule.output[39].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[40].value;
-        break;
-      case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-        new_terrain_id = rule.output[41].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[42].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[43].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[44].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-        new_terrain_id = rule.output[45].value;
-        break;
-      case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
-        new_terrain_id = rule.output[46].value;
-        break;
-      }
-
-      if (new_terrain_id == 0)
-      {
-        spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
-      }
-
-      new_values.top_face = new_terrain_id;
-      break;
-    }
-    default:
-      break;
-    }
-
-  } while (old_values.top_face != new_values.top_face);
-
-  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = new_values.top_face;
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = old_values.top_face;
 
   // Select vegetation
-  if (new_values.top_face_decoration == 0)
+  if (old_values.top_face_decoration == 0)
   {
-    new_values.top_face_decoration = m_select_top_face_decoration(terrain_id, x, y, z);
+    old_values.top_face_decoration = m_select_top_face_decoration(terrain_id, x, y, z);
   }
 
-  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = new_values.top_face_decoration;
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = old_values.top_face_decoration;
+}
+
+TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vector<int>& terrain, const int x, const int y, const int z)
+{
+  const auto index = rule_variant.index();
+  TileValues new_values{0, 0};
+
+  switch (index)
+  {
+  case 0:
+  {
+    break;
+  }
+
+  case 1:
+  {
+    const auto& rule = std::get<AutoTile4SidesRule>(rule_variant);
+    const auto bitmask = m_get_bitmask_4_sided(terrain, x, y, z, rule.neighbor);
+    new_values.top_face = rule.output[bitmask].value;
+    break;
+  }
+
+  case 3:
+  {
+    const auto& rule = std::get<UniformDistributionRule>(rule_variant);
+    const auto prob = random::get_real();
+    double cumulative_probability = 0.0;
+
+    for (const auto& transform : rule.output)
+    {
+      cumulative_probability += transform.probability;
+
+      if (prob < cumulative_probability)
+      {
+        if (transform.placement == PlacementType::Terrain)
+        {
+          new_values.top_face = transform.value;
+        }
+        else
+        {
+          new_values.top_face_decoration = transform.value;
+        }
+        break;
+      }
+    }
+    break;
+  }
+
+  case 2:
+  {
+    const auto& rule = std::get<AutoTile8SidesRule>(rule_variant);
+    const auto bitmask = m_get_bitmask_8_sided(terrain, x, y, z, rule.neighbor, rule.input);
+    int new_terrain_id = 0;
+
+    switch (bitmask)
+    {
+    case DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[0].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[1].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[2].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[3].value;
+      break;
+    case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
+        | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[4].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[5].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[6].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[7].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
+      new_terrain_id = rule.output[8].value;
+      break;
+    case DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[9].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[10].value;
+      break;
+    case DL_EDGE_LEFT:
+      new_terrain_id = rule.output[11].value;
+      break;
+    case DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[12].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[13].value;
+      break;
+    case DL_EDGE_TOP:
+      new_terrain_id = rule.output[14].value;
+      break;
+    case DL_EDGE_NONE:
+      new_terrain_id = rule.output[15].value;
+      break;
+    case DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[16].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[17].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[18].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[19].value;
+      break;
+    case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
+      new_terrain_id = rule.output[20].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+        | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[21].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+        | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[22].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[23].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[24].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
+        | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[25].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
+        | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[26].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[27].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[28].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
+      new_terrain_id = rule.output[29].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[30].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[31].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[32].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[33].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[34].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[35].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[36].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[37].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[38].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[39].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[40].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[41].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[42].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[43].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[44].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[45].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[46].value;
+      break;
+    }
+
+    if (new_terrain_id == 0)
+    {
+      spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
+    }
+
+    new_values.top_face = new_terrain_id;
+    break;
+  }
+  default:
+    break;
+  }
+
+  return new_values;
 }
 
 int ChunkGenerator::m_select_top_face_decoration(const int terrain_id, const int x, const int y, const int z)

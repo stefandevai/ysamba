@@ -273,7 +273,7 @@ void RenderSystem::m_render_map_tile(const Chunk& chunk,
                  tile.frame_data->default_face);
 
     // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
-    if (chunk.tiles.is_bottom_empty(position.x, position.y, position.z))
+    if (chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, position.x, position.y, position.z))
     {
       m_batch.tile(tile,
                    world_position.x * m_tile_size.x,

@@ -4,6 +4,7 @@
 
 #include "core/maths/vector.hpp"
 #include "world/generators/biome_type.hpp"
+#include "world/generators/tile_rules.hpp"
 
 namespace dl
 {
@@ -57,6 +58,8 @@ class ChunkGenerator
   BiomeType m_sample_biome(const Vector3i& world_position);
 
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
+
+  TileValues m_apply_rule(const Rule& rule_variant, const std::vector<int>& terrain, int x, int y, int z);
 
   int m_select_top_face_decoration(const int terrain_id, const int x, const int y, const int z);
 
