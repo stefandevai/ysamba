@@ -72,7 +72,8 @@ struct RootAutoTile4SidesRule : public AutoTile4SidesRule
 };
 
 using IdentityRule = RuleBase;
-using Rule = std::variant<IdentityRule, AutoTile4SidesRule, AutoTile8SidesRule, UniformDistributionRule, RootAutoTile4SidesRule>;
+using Rule = std::
+    variant<IdentityRule, AutoTile4SidesRule, AutoTile8SidesRule, UniformDistributionRule, RootAutoTile4SidesRule>;
 
 struct TileValues
 {

@@ -14,9 +14,9 @@
             "height": 2,
             "anchor_x": 0,
             "anchor_y": 1,
-            "default_face": "front",
+            "default_face": "top_front",
             "faces": {
-                "front": 0
+                "top_front": 0
             }
         },
         {
@@ -27,9 +27,9 @@
             "height": 2,
             "anchor_x": 0,
             "anchor_y": 1,
-            "default_face": "front",
+            "default_face": "top_front",
             "faces": {
-                "front": 1
+                "top_front": 1
             }
         },
         {
@@ -40,9 +40,9 @@
             "height": 2,
             "anchor_x": 0,
             "anchor_y": 1,
-            "default_face": "front",
+            "default_face": "top_front",
             "faces": {
-                "front": 2
+                "top_front": 2
             }
         },
         {
@@ -53,27 +53,27 @@
             "height": 2,
             "anchor_x": 0,
             "anchor_y": 1,
-            "default_face": "front",
+            "default_face": "top_front",
             "faces": {
-                "front": 3
+                "top_front": 3
             }
         },
         {
             "game_id": 4,
             "type": "character",
             "sprite_type": "single",
-            "default_face": "front",
+            "default_face": "top_front",
             "faces": {
-                "front": 36
+                "top_front": 36
             }
         },
         {
             "game_id": 5,
             "type": "character",
             "sprite_type": "single",
-            "default_face": "front",
+            "default_face": "top_front",
             "faces": {
-                "front": 37
+                "top_front": 37
             }
         }
     ]

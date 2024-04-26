@@ -350,6 +350,9 @@ void Batch::m_emplace_sprite_face(const SpriteBatchData data)
   case DL_RENDER_FACE_BOTTOM:
     m_emplace_sprite_face_bottom(std::move(data));
     break;
+  case DL_RENDER_FACE_TOP_FRONT:
+    m_emplace_sprite_face_top_front(std::move(data));
+    break;
   case DL_RENDER_FACE_LEFT:
     // TODO
     break;
@@ -370,36 +373,37 @@ void Batch::m_emplace_sprite_face(const SpriteBatchData data)
   }
 }
 
-void Batch::m_emplace_sprite_face_top(const SpriteBatchData data)
+void Batch::m_emplace_sprite_face_bottom(const SpriteBatchData data)
 {
   // Top left vertex
-  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y, data.position.z + data.size.y},
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y, data.position.z - data.size.y},
                         data.texture_coordinates[0],
                         data.texture_index,
                         data.color);
 
   // Top right vertex
-  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y, data.position.z + data.size.y},
+  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y, data.position.z - data.size.y},
                         data.texture_coordinates[1],
                         data.texture_index,
                         data.color);
 
   // Bottom left vertex
-  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z + data.size.y},
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z - data.size.y},
                         data.texture_coordinates[3],
                         data.texture_index,
                         data.color);
 
   // Bottom right vertex
-  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z + data.size.y},
-                        data.texture_coordinates[2],
-                        data.texture_index,
-                        data.color);
+  m_current_vb->emplace(
+      glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z - data.size.y},
+      data.texture_coordinates[2],
+      data.texture_index,
+      data.color);
 
   m_current_vb->index_buffer_count += 6;
 }
 
-void Batch::m_emplace_sprite_face_bottom(const SpriteBatchData data)
+void Batch::m_emplace_sprite_face_top(const SpriteBatchData data)
 {
   // Top left vertex
   m_current_vb->emplace(data.position, data.texture_coordinates[0], data.texture_index, data.color);
@@ -426,6 +430,36 @@ void Batch::m_emplace_sprite_face_bottom(const SpriteBatchData data)
 }
 
 void Batch::m_emplace_sprite_face_front(const SpriteBatchData data)
+{
+  // Top left vertex
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z},
+                        data.texture_coordinates[0],
+                        data.texture_index,
+                        data.color);
+
+  // Top right vertex
+  m_current_vb->emplace(glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z},
+                        data.texture_coordinates[1],
+                        data.texture_index,
+                        data.color);
+
+  // Bottom left vertex
+  m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z - data.size.y},
+                        data.texture_coordinates[3],
+                        data.texture_index,
+                        data.color);
+
+  // Bottom right vertex
+  m_current_vb->emplace(
+      glm::vec3{data.position.x + data.size.x, data.position.y + data.size.y, data.position.z - data.size.y},
+      data.texture_coordinates[2],
+      data.texture_index,
+      data.color);
+
+  m_current_vb->index_buffer_count += 6;
+}
+
+void Batch::m_emplace_sprite_face_top_front(const SpriteBatchData data)
 {
   // Top left vertex
   m_current_vb->emplace(glm::vec3{data.position.x, data.position.y + data.size.y, data.position.z + data.size.y},

@@ -213,7 +213,6 @@ void Grid3D::compute_visibility()
           continue;
         }
 
-        // Set visibility flags
         m_set_cell_flags(x, y, z);
 
         if (!has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z))
@@ -231,47 +230,18 @@ void Grid3D::compute_visibility()
   }
 }
 
-bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) const
-{
-  // Check visible tiles in 45deg top down view
-  // Top tile
-  if (top_face_at(x, y, z + 1) == 0 && top_face_decoration_at(x, y, z + 1) == 0)
-  {
-    return true;
-  }
-  // Diagonal bottom tile
-  // if (top_face_at(x, y + 1, z + 1) == 0)
-  // {
-  //   return true;
-  // }
-
-  // TODO: After adding view rotation, check all the other directions
-  /* if (top_face_at(x, y + 1, z) == 0) */
-  /* { */
-  /*   return true; */
-  /* } */
-  /* if (top_face_at(x + 1, y, z) == 0) */
-  /* { */
-  /*   return true; */
-  /* } */
-  /* if (top_face_at(x - 1, y, z) == 0) */
-  /* { */
-  /*   return true; */
-  /* } */
-  /* if (top_face_at(x, y - 1, z) == 0) */
-  /* { */
-  /*   return true; */
-  /* } */
-  /* if (top_face_at(x, y, z - 1) == 0) */
-  /* { */
-  /*   return true; */
-  /* } */
-
-  return false;
-}
-
 void Grid3D::m_set_cell_flags(const int x, const int y, const int z)
 {
+  switch (block_type_at(x, y, z))
+  {
+  case BlockType::Decoration:
+  case BlockType::None:
+    break;
+  default:
+    set_flags(DL_CELL_FLAG_BLOCKS_MOVEMENT, x, y, z);
+    break;
+  }
+
   // Check visible tiles in 45deg top down view
   // Top tile
   if (block_type_at(x, y, z + 1) == BlockType::None)

@@ -214,7 +214,8 @@ void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const 
 
       const auto& rule = TileRules::get_terrain_rule(old_values.top_face);
       m_apply_rule(rule, new_values, terrain, transposed_x, transposed_y, z);
-    } while (new_values.top_face != old_values.top_face || new_values.top_face_decoration != old_values.top_face_decoration);
+    } while (new_values.top_face != old_values.top_face
+             || new_values.top_face_decoration != old_values.top_face_decoration);
 
     chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = old_values.top_face;
 
@@ -233,7 +234,12 @@ void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const 
   }
 }
 
-void ChunkGenerator::m_apply_rule(const Rule& rule_variant, Cell& values, const std::vector<BlockType>& terrain, const int x, const int y, const int z)
+void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
+                                  Cell& values,
+                                  const std::vector<BlockType>& terrain,
+                                  const int x,
+                                  const int y,
+                                  const int z)
 {
   const auto index = rule_variant.index();
 
@@ -290,7 +296,8 @@ void ChunkGenerator::m_apply_rule(const Rule& rule_variant, Cell& values, const 
   case 2:
   {
     const auto& rule = std::get<AutoTile8SidesRule>(rule_variant);
-    const auto bitmask = m_get_bitmask_8_sided_horizontal(terrain, x, y, z, rule.neighbor, static_cast<BlockType>(rule.input));
+    const auto bitmask
+        = m_get_bitmask_8_sided_horizontal(terrain, x, y, z, rule.neighbor, static_cast<BlockType>(rule.input));
     int new_terrain_id = 0;
 
     switch (bitmask)
@@ -542,8 +549,12 @@ uint32_t ChunkGenerator::m_get_bitmask_4_sided_horizontal(
   return bitmask;
 }
 
-uint32_t ChunkGenerator::m_get_bitmask_8_sided_horizontal(
-    const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor, const BlockType source)
+uint32_t ChunkGenerator::m_get_bitmask_8_sided_horizontal(const std::vector<BlockType>& terrain,
+                                                          const int x,
+                                                          const int y,
+                                                          const int z,
+                                                          const BlockType neighbor,
+                                                          const BlockType source)
 {
   if (!m_has_neighbor(terrain, x, y, z, neighbor))
   {

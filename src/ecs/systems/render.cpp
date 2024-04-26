@@ -157,8 +157,8 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
 
             for (int z = height; z >= 0; --z)
             {
-              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z) &&
-                  !chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
+              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z)
+                  && !chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
               {
                 continue;
               }
@@ -242,8 +242,8 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
 
             for (int z = height; z >= 0; --z)
             {
-              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z) &&
-                  !chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
+              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z)
+                  && !chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
               {
                 continue;
               }

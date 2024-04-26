@@ -150,6 +150,10 @@ void Spritesheet::m_load_metadata(const std::string& filepath)
       {
         frame_data.default_face = DL_RENDER_FACE_FRONT;
       }
+      else if (default_face == "top_front")
+      {
+        frame_data.default_face = DL_RENDER_FACE_TOP_FRONT;
+      }
       else if (default_face == "back")
       {
         frame_data.default_face = DL_RENDER_FACE_BACK;
@@ -187,6 +191,12 @@ void Spritesheet::m_load_metadata(const std::string& filepath)
       {
         const auto frame_id = faces["front"].get<uint32_t>();
         frame_data.faces[DL_RENDER_FACE_FRONT] = frame_id;
+        m_generate_uv_coordinate(frame_id, frame_data);
+      }
+      if (faces.contains("top_front"))
+      {
+        const auto frame_id = faces["top_front"].get<uint32_t>();
+        frame_data.faces[DL_RENDER_FACE_TOP_FRONT] = frame_id;
         m_generate_uv_coordinate(frame_id, frame_data);
       }
       if (faces.contains("back"))

@@ -117,6 +117,7 @@ class Batch
   void m_emplace_sprite_face_top(SpriteBatchData data);
   void m_emplace_sprite_face_front(SpriteBatchData data);
   void m_emplace_sprite_face_bottom(SpriteBatchData data);
+  void m_emplace_sprite_face_top_front(SpriteBatchData data);
 
   // Build vector of textures to bind when rendering
   // texture_index is the index in texture_views that will

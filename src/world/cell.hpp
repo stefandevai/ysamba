@@ -9,8 +9,7 @@ enum CellFlag
   DL_CELL_FLAG_NONE = 0,
   DL_CELL_FLAG_TOP_FACE_VISIBLE = 1,
   DL_CELL_FLAG_FRONT_FACE_VISIBLE = 2,
-  /* DL_CELL_FLAG_COLLIDABLE = 2, */
-  /* DL_CELL_FLAG_TRANSPARENT = 4, */
+  DL_CELL_FLAG_BLOCKS_MOVEMENT = 4,
 };
 
 enum class BlockType : uint8_t
@@ -20,6 +19,7 @@ enum class BlockType : uint8_t
   Grass = 2,
   Basalt = 3,
   Sand = 4,
+  Decoration = 5,
 };
 
 struct Cell
@@ -35,6 +35,11 @@ struct Cell
 template <typename Archive>
 void serialize(Archive& archive, Cell& cell)
 {
-  archive(cell.top_face, cell.front_face, cell.top_face_decoration, cell.front_face_decoration, cell.flags, cell.block_type);
+  archive(cell.top_face,
+          cell.front_face,
+          cell.top_face_decoration,
+          cell.front_face_decoration,
+          cell.flags,
+          cell.block_type);
 }
 };  // namespace dl

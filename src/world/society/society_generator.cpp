@@ -138,7 +138,7 @@ Position SocietyGenerator::m_get_member_position(const World& world, const Vecto
     {
       position.x = x;
       position.y = y;
-      position.z = elevation + 1;
+      position.z = elevation;
 
       return position;
     }

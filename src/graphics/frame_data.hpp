@@ -16,7 +16,7 @@ struct FrameData
   SpriteType sprite_type = SpriteType::Single;
   Vector2i pattern_size{};
   std::vector<uint32_t> pattern{};
-  std::array<uint32_t, 8> faces{};
+  std::array<uint32_t, 9> faces{};
 
   struct PairHash
   {

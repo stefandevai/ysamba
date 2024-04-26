@@ -66,9 +66,14 @@ class ChunkGenerator
   uint32_t m_get_bitmask_4_sided_horizontal(
       const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);
 
-  uint32_t m_get_bitmask_8_sided_horizontal(
-      const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor, const BlockType source);
+  uint32_t m_get_bitmask_8_sided_horizontal(const std::vector<BlockType>& terrain,
+                                            const int x,
+                                            const int y,
+                                            const int z,
+                                            const BlockType neighbor,
+                                            const BlockType source);
 
-  bool m_has_neighbor(const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);
+  bool m_has_neighbor(
+      const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);
 };
 }  // namespace dl
