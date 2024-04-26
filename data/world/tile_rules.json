@@ -332,7 +332,7 @@
     {
       "label": "basalt autotile",
       "category": "root",
-      "input": 4,
+      "input": 3,
       "type": "root_autotile_4_sides",
       "neighbor": 0,
       "front_face_id": 39,

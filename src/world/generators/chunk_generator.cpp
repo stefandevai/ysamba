@@ -43,7 +43,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
       if (height_modifier > 0.4f)
       {
-        k += 5;
+        k += 1;
       }
 
       k = std::clamp(k, 0, size.z - 1);
@@ -229,7 +229,6 @@ void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const 
   }
   if (front_face_visible)
   {
-    // spdlog::debug("FROOOONT {}", new_values.front_face);
     chunk->tiles.values[z * size.x * size.y + y * size.x + x].front_face = new_values.front_face;
   }
 }
