@@ -21,11 +21,6 @@ uint32_t Grid3D::top_face_at(const Vector3i& position) const
   return top_face_at(position.x, position.y, position.z);
 }
 
-uint32_t Grid3D::top_face_at(const Vector3& position) const
-{
-  return top_face_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
-}
-
 uint32_t Grid3D::top_face_decoration_at(const int x, const int y, const int z) const
 {
   if (!m_in_bounds(x, y, z))
@@ -39,12 +34,6 @@ uint32_t Grid3D::top_face_decoration_at(const int x, const int y, const int z) c
 uint32_t Grid3D::top_face_decoration_at(const Vector3i& position) const
 {
   return top_face_decoration_at(position.x, position.y, position.z);
-}
-
-uint32_t Grid3D::top_face_decoration_at(const Vector3& position) const
-{
-  return top_face_decoration_at(
-      static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
 }
 
 const Cell& Grid3D::cell_at(const int x, const int y, const int z) const
@@ -62,11 +51,6 @@ const Cell& Grid3D::cell_at(const Vector3i& position) const
   return cell_at(position.x, position.y, position.z);
 }
 
-const Cell& Grid3D::cell_at(const Vector3& position) const
-{
-  return cell_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
-}
-
 int Grid3D::height_at(const int x, const int y) const
 {
   if (!m_in_bounds(x, y))
@@ -82,9 +66,19 @@ int Grid3D::height_at(const Vector2i& position) const
   return height_at(position.x, position.y);
 }
 
-int Grid3D::height_at(const Vector2& position) const
+BlockType Grid3D::block_type_at(const int x, const int y, const int z) const
 {
-  return height_at(static_cast<int>(position.x), static_cast<int>(position.y));
+  if (!m_in_bounds(x, y, z))
+  {
+    return BlockType::None;
+  }
+
+  return cell_at(x, y, z).block_type;
+}
+
+BlockType Grid3D::block_type_at(const Vector3i& position) const
+{
+  return block_type_at(position.x, position.y, position.z);
 }
 
 void Grid3D::set(const uint32_t id, const int x, const int y, const int z)
@@ -102,11 +96,6 @@ void Grid3D::set(const uint32_t id, const Vector3i& position)
   set(id, position.x, position.y, position.z);
 }
 
-void Grid3D::set(const uint32_t id, const Vector3& position)
-{
-  set(id, static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
-}
-
 void Grid3D::set_top_face_decoration(const uint32_t id, const int x, const int y, const int z)
 {
   if (!m_in_bounds(x, y, z))
@@ -122,11 +111,6 @@ void Grid3D::set_top_face_decoration(const uint32_t id, const Vector3i& position
   set_top_face_decoration(id, position.x, position.y, position.z);
 }
 
-void Grid3D::set_top_face_decoration(const uint32_t id, const Vector3& position)
-{
-  set_top_face_decoration(id, static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
-}
-
 void Grid3D::set_height(const int height, const int x, const int y)
 {
   if (!m_in_bounds(x, y))
@@ -140,11 +124,6 @@ void Grid3D::set_height(const int height, const int x, const int y)
 void Grid3D::set_height(const int height, const Vector2i& position)
 {
   return set_height(height, position.x, position.y);
-}
-
-void Grid3D::set_height(const int height, const Vector2& position)
-{
-  return set_height(height, static_cast<int>(position.x), static_cast<int>(position.y));
 }
 
 void Grid3D::set_size(const int width, const int height, const int depth)
@@ -227,15 +206,12 @@ void Grid3D::compute_visibility()
     {
       for (int x = 0; x < size.x; ++x)
       {
-        const auto top_face = top_face_at(x, y, z);
-        const auto top_face_decoration = top_face_decoration_at(x, y, z);
+        const auto block_type = block_type_at(x, y, z);
 
-        if (top_face == 0 && top_face_decoration == 0)
+        if (block_type == BlockType::None)
         {
           continue;
         }
-
-        // const bool visible = m_is_any_neighbour_empty(x, y, z);
 
         // Set visibility flags
         m_set_cell_flags(x, y, z);
@@ -244,8 +220,6 @@ void Grid3D::compute_visibility()
         {
           continue;
         }
-
-        // set_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z);
 
         // Update height map if needed
         if (height_at(x, y) < z)

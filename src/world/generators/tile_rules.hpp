@@ -6,6 +6,8 @@
 #include <variant>
 #include <vector>
 
+#include "world/cell.hpp"
+
 namespace dl
 {
 enum class RuleType
@@ -36,7 +38,7 @@ struct AutoTile4SidesTransform
 
 struct AutoTile4SidesRule : public RuleBase
 {
-  int neighbor;
+  BlockType neighbor;
   std::array<AutoTile4SidesTransform, 16> output;
 };
 
@@ -47,7 +49,7 @@ struct AutoTile8SidesTransform
 
 struct AutoTile8SidesRule : public RuleBase
 {
-  int neighbor;
+  BlockType neighbor;
   std::array<AutoTile8SidesTransform, 47> output;
 };
 
@@ -75,7 +77,7 @@ struct TileValues
 class TileRules
 {
  public:
-  static std::unordered_map<int, Rule> root_rules;
+  static std::unordered_map<BlockType, Rule> root_rules;
   static std::unordered_map<int, Rule> terrain_rules;
   static Rule identity;
   static bool has_loaded;
@@ -83,8 +85,8 @@ class TileRules
   TileRules() = delete;
 
   static void load();
-  static const Rule& get_root_rule(const int input);
-  static const Rule& get_terrain_rule(const int input);
+  static const Rule& get_root_rule(BlockType block_type);
+  static const Rule& get_terrain_rule(int input);
 
   // private:
   // static Rule m_create_rule(const nlohmann::json& rule, const RuleType type);

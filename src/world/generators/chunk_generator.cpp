@@ -28,7 +28,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
   chunk = std::make_unique<Chunk>(offset, true);
   chunk->tiles.set_size(size);
 
-  auto terrain = std::vector<int>(m_padded_size.x * m_padded_size.y * size.z);
+  auto terrain = std::vector<BlockType>(m_padded_size.x * m_padded_size.y * size.z);
 
   for (int j = 0; j < m_padded_size.y; ++j)
   {
@@ -55,7 +55,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
         inside_chunk = true;
       }
 
-      int terrain_id = 0;
+      BlockType block_type = BlockType::None;
       int resolved_z = k;
 
       switch (biome)
@@ -65,11 +65,11 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
         if (k < 1)
         {
           resolved_z = 1;
-          terrain_id = 1;
+          block_type = BlockType::Water;
         }
         else
         {
-          terrain_id = 2;
+          block_type = BlockType::Grass;
         }
         break;
       }
@@ -78,11 +78,11 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
         if (k < 1)
         {
           resolved_z = 1;
-          terrain_id = 1;
+          block_type = BlockType::Water;
         }
         else
         {
-          terrain_id = 3;
+          block_type = BlockType::Sand;
         }
         break;
       }
@@ -91,11 +91,11 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
         if (k < 1)
         {
           resolved_z = 1;
-          terrain_id = 1;
+          block_type = BlockType::Water;
         }
         else
         {
-          terrain_id = 4;
+          block_type = BlockType::Basalt;
         }
         break;
       }
@@ -104,11 +104,11 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
         if (k < 1)
         {
           resolved_z = 1;
-          terrain_id = 1;
+          block_type = BlockType::Water;
         }
         else
         {
-          terrain_id = 2;
+          block_type = BlockType::Grass;
         }
         break;
       }
@@ -117,18 +117,18 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
       if (inside_chunk)
       {
         chunk->tiles.height_map[(j - 1) * size.x + (i - 1)] = resolved_z;
-        chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].top_face = terrain_id;
+        chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].block_type = block_type;
       }
 
-      terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
+      terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = block_type;
 
       for (int z = 0; z < resolved_z; ++z)
       {
-        terrain[z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
+        terrain[z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = block_type;
 
         if (inside_chunk)
         {
-          chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].top_face = terrain_id;
+          chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].block_type = block_type;
         }
       }
     }
@@ -176,15 +176,15 @@ void ChunkGenerator::m_generate_noise_data(const int seed, const Vector3i& offse
       vegetation_density.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 50);
 }
 
-void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z)
+void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const int x, const int y, const int z)
 {
   const int transposed_x = x + m_padding;
   const int transposed_y = y + m_padding;
 
-  const auto terrain_id
+  const auto block_type
       = terrain[z * m_padded_size.x * m_padded_size.y + transposed_y * m_padded_size.x + transposed_x];
 
-  if (terrain_id == 0)
+  if (block_type == BlockType::None)
   {
     return;
   }
@@ -196,9 +196,9 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
     return;
   }
 
-  const auto& root_rule = TileRules::get_root_rule(terrain_id);
+  const auto& root_rule = TileRules::get_root_rule(block_type);
 
-  TileValues old_values{terrain_id, 0};
+  TileValues old_values{0, 0};
   TileValues new_values = m_apply_rule(root_rule, terrain, transposed_x, transposed_y, z);
 
   do
@@ -215,13 +215,13 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
   // Select vegetation
   if (old_values.top_face_decoration == 0)
   {
-    old_values.top_face_decoration = m_select_top_face_decoration(terrain_id, x, y, z);
+    old_values.top_face_decoration = m_select_top_face_decoration(block_type, x, y, z);
   }
 
   chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = old_values.top_face_decoration;
 }
 
-TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vector<int>& terrain, const int x, const int y, const int z)
+TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vector<BlockType>& terrain, const int x, const int y, const int z)
 {
   const auto index = rule_variant.index();
   TileValues new_values{0, 0};
@@ -270,7 +270,7 @@ TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vec
   case 2:
   {
     const auto& rule = std::get<AutoTile8SidesRule>(rule_variant);
-    const auto bitmask = m_get_bitmask_8_sided(terrain, x, y, z, rule.neighbor, rule.input);
+    const auto bitmask = m_get_bitmask_8_sided(terrain, x, y, z, rule.neighbor, static_cast<BlockType>(rule.input));
     int new_terrain_id = 0;
 
     switch (bitmask)
@@ -438,14 +438,14 @@ TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vec
   return new_values;
 }
 
-int ChunkGenerator::m_select_top_face_decoration(const int terrain_id, const int x, const int y, const int z)
+int ChunkGenerator::m_select_top_face_decoration(const BlockType block_type, const int x, const int y, const int z)
 {
   (void)z;
   int top_face_decoration = 0;
 
   // TODO: Integrate to the rule system for any terrain
   // Only select top_face_decoration for grass terrain (2)
-  if (terrain_id != 2)
+  if (block_type != BlockType::Grass)
   {
     return top_face_decoration;
   }
@@ -494,7 +494,7 @@ int ChunkGenerator::m_select_top_face_decoration(const int terrain_id, const int
 }
 
 uint32_t ChunkGenerator::m_get_bitmask_4_sided(
-    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
+    const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor)
 {
   uint32_t bitmask = 0;
 
@@ -525,7 +525,7 @@ uint32_t ChunkGenerator::m_get_bitmask_4_sided(
 }
 
 uint32_t ChunkGenerator::m_get_bitmask_8_sided(
-    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source)
+    const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor, const BlockType source)
 {
   if (!m_has_neighbor(terrain, x, y, z, neighbor))
   {
@@ -601,7 +601,7 @@ uint32_t ChunkGenerator::m_get_bitmask_8_sided(
 }
 
 bool ChunkGenerator::m_has_neighbor(
-    const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor)
+    const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor)
 {
   // Top
   if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == neighbor)

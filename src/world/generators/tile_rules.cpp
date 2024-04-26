@@ -7,7 +7,7 @@
 
 namespace dl
 {
-std::unordered_map<int, Rule> TileRules::root_rules{};
+std::unordered_map<BlockType, Rule> TileRules::root_rules{};
 std::unordered_map<int, Rule> TileRules::terrain_rules{};
 Rule TileRules::identity = IdentityRule{0, "identity"};
 bool TileRules::has_loaded = false;
@@ -27,7 +27,7 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
 
     rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
-    rule_object.neighbor = rule["neighbor"].get<int>();
+    rule_object.neighbor = rule["neighbor"].get<BlockType>();
 
     const auto& output = rule["output"];
     for (const auto& transform : output)
@@ -53,7 +53,7 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
     AutoTile8SidesRule rule_object;
     rule_object.input = rule["input"].get<int>();
     rule_object.label = rule["label"].get<std::string>();
-    rule_object.neighbor = rule["neighbor"].get<int>();
+    rule_object.neighbor = rule["neighbor"].get<BlockType>();
 
     const auto& output = rule["output"];
     for (const auto& transform : output)
@@ -303,7 +303,7 @@ void TileRules::load()
     if (category == "root")
     {
       spdlog::debug("Adding root rule: {}", input);
-      root_rules.insert({input, rule_object});
+      root_rules.insert({static_cast<BlockType>(input), rule_object});
     }
     else if (category == "terrain")
     {
@@ -315,9 +315,9 @@ void TileRules::load()
   has_loaded = true;
 }
 
-const Rule& TileRules::get_root_rule(const int input)
+const Rule& TileRules::get_root_rule(const BlockType block_type)
 {
-  const auto& rule = root_rules.find(input);
+  const auto& rule = root_rules.find(block_type);
 
   if (rule == root_rules.end())
   {

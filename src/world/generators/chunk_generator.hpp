@@ -57,18 +57,18 @@ class ChunkGenerator
 
   BiomeType m_sample_biome(const Vector3i& world_position);
 
-  void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
+  void m_select_tile(const std::vector<BlockType>& terrain, const int x, const int y, const int z);
 
-  TileValues m_apply_rule(const Rule& rule_variant, const std::vector<int>& terrain, int x, int y, int z);
+  TileValues m_apply_rule(const Rule& rule_variant, const std::vector<BlockType>& terrain, int x, int y, int z);
 
-  int m_select_top_face_decoration(const int terrain_id, const int x, const int y, const int z);
+  int m_select_top_face_decoration(const BlockType block_type, const int x, const int y, const int z);
 
   uint32_t m_get_bitmask_4_sided(
-      const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
+      const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);
 
   uint32_t m_get_bitmask_8_sided(
-      const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor, const int source);
+      const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor, const BlockType source);
 
-  bool m_has_neighbor(const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
+  bool m_has_neighbor(const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);
 };
 }  // namespace dl

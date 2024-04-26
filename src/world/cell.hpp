@@ -13,13 +13,13 @@ enum CellFlag
   /* DL_CELL_FLAG_TRANSPARENT = 4, */
 };
 
-enum BlockType
+enum class BlockType : uint8_t
 {
-  DL_BLOCK_TYPE_NONE = 0,
-  DL_BLOCK_TYPE_WATER = 1,
-  DL_BLOCK_TYPE_GRASS = 2,
-  DL_BLOCK_TYPE_BASALT = 3,
-  DL_BLOCK_TYPE_SAND = 4,
+  None = 0,
+  Water = 1,
+  Grass = 2,
+  Basalt = 3,
+  Sand = 4,
 };
 
 struct Cell
@@ -29,7 +29,7 @@ struct Cell
   uint32_t top_face_decoration = 0;
   uint32_t front_face_decoration = 0;
   uint8_t flags = DL_CELL_FLAG_NONE;
-  uint8_t block_type = DL_BLOCK_TYPE_NONE;
+  BlockType block_type = BlockType::None;
 };
 
 template <typename Archive>
