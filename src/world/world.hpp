@@ -43,8 +43,8 @@ struct TileTarget
 
 struct WorldTile
 {
-  const TileData& terrain;
-  const TileData& decoration;
+  const TileData& top_face;
+  const TileData& top_face_decoration;
 };
 
 class World
@@ -70,8 +70,8 @@ class World
   void generate_societies();
 
   // Set tile by coordinates
-  void set_terrain(const uint32_t tile_id, const int x, const int y, const int z);
-  void set_decoration(const uint32_t tile_id, const int x, const int y, const int z);
+  void set_top_face(const uint32_t tile_id, const int x, const int y, const int z);
+  void set_top_face_decoration(const uint32_t tile_id, const int x, const int y, const int z);
 
   // Replace tile by coordinates
   void replace(const uint32_t from, const uint32_t to, const int x, const int y, const int z);
@@ -81,12 +81,12 @@ class World
   [[nodiscard]] const Cell& cell_at(const Vector3i& position) const;
 
   // Get tile id by coordinates
-  [[nodiscard]] uint32_t terrain_at(const int x, const int y, const int z) const;
-  [[nodiscard]] uint32_t terrain_at(const Vector3i& position) const;
+  [[nodiscard]] uint32_t top_face_at(const int x, const int y, const int z) const;
+  [[nodiscard]] uint32_t top_face_at(const Vector3i& position) const;
 
-  // Get tile decoration by coordinates
-  [[nodiscard]] uint32_t decoration_at(const int x, const int y, const int z) const;
-  [[nodiscard]] uint32_t decoration_at(const Vector3i& position) const;
+  // Get tile top_face_decoration by coordinates
+  [[nodiscard]] uint32_t top_face_decoration_at(const int x, const int y, const int z) const;
+  [[nodiscard]] uint32_t top_face_decoration_at(const Vector3i& position) const;
 
   // Get tile data by coordinates
   [[nodiscard]] const TileData& get(const int x, const int y, const int z) const;
@@ -96,13 +96,13 @@ class World
   [[nodiscard]] const WorldTile get_all(const int x, const int y, const int z) const;
   [[nodiscard]] const WorldTile get_all(const Vector3i& position) const;
 
-  // Get terrain tile in a tile map coordinate
-  [[nodiscard]] const TileData& get_terrain(const int x, const int y, const int z) const;
-  [[nodiscard]] const TileData& get_terrain(const Vector3i& position) const;
+  // Get top_face tile in a tile map coordinate
+  [[nodiscard]] const TileData& get_top_face(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get_top_face(const Vector3i& position) const;
 
-  // Get over terrain tile in a tile map coordinate
-  [[nodiscard]] const TileData& get_decoration(const int x, const int y, const int z) const;
-  [[nodiscard]] const TileData& get_decoration(const Vector3i& position) const;
+  // Get over top_face tile in a tile map coordinate
+  [[nodiscard]] const TileData& get_top_face_decoration(const int x, const int y, const int z) const;
+  [[nodiscard]] const TileData& get_top_face_decoration(const Vector3i& position) const;
 
   // Gets the z elevation for a given (x, z) position
   [[nodiscard]] int get_elevation(const int x, const int y) const;

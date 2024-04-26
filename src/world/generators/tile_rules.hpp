@@ -68,8 +68,8 @@ using Rule = std::variant<IdentityRule, AutoTile4SidesRule, AutoTile8SidesRule, 
 
 struct TileValues
 {
-  int terrain;
-  int decoration;
+  int top_face;
+  int top_face_decoration;
 };
 
 class TileRules

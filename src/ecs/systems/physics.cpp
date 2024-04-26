@@ -103,7 +103,7 @@ void PhysicsSystem::update(entt::registry& registry)
             else
             {
               const auto climb_position = m_get_climb_position(position, candidate_position);
-              const auto& tile_data = m_world.get_terrain(climb_position.x, climb_position.y, climb_position.z);
+              const auto& tile_data = m_world.get_top_face(climb_position.x, climb_position.y, climb_position.z);
 
               if (tile_data.flags.contains("WALKABLE"))
               {
@@ -116,7 +116,7 @@ void PhysicsSystem::update(entt::registry& registry)
                                                           std::round(candidate_position.z));
 
                 // Empty tile, fall down
-                if (target_tile.terrain.id == 0)
+                if (target_tile.top_face.id == 0)
                 {
                   candidate_position.z -= 1;
                   target_position = candidate_position;

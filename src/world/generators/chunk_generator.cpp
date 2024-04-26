@@ -118,7 +118,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
       if (inside_chunk)
       {
         chunk->tiles.height_map[(j - 1) * size.x + (i - 1)] = resolved_z;
-        chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
+        chunk->tiles.values[resolved_z * size.x * size.y + (j - 1) * size.x + (i - 1)].top_face = terrain_id;
       }
 
       terrain[resolved_z * m_padded_size.x * m_padded_size.y + j * m_padded_size.x + i] = terrain_id;
@@ -129,7 +129,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
         if (inside_chunk)
         {
-          chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].terrain = terrain_id;
+          chunk->tiles.values[z * size.x * size.y + (j - 1) * size.x + (i - 1)].top_face = terrain_id;
         }
       }
     }
@@ -162,7 +162,8 @@ void ChunkGenerator::m_generate_noise_data(const int seed, const Vector3i& offse
   vegetation_density.resize(size.x * size.y);
 
   // Height modifier
-  utils::generate_height_modifier_map(height_modifier_map.data(), offset.x - 1, offset.y - 1, m_padded_size.x, m_padded_size.y, seed + 94);
+  utils::generate_height_modifier_map(
+      height_modifier_map.data(), offset.x - 1, offset.y - 1, m_padded_size.x, m_padded_size.y, seed + 94);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise
@@ -190,9 +191,9 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
   }
 
   // TODO: Set non walkable block tile if not visible
-  if (!chunk->tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  if (!chunk->tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z))
   {
-    chunk->tiles.values[z * size.x * size.y + y * size.x + x].terrain = 1;
+    chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = 1;
     return;
   }
 
@@ -201,10 +202,10 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
 
   do
   {
-    old_values.terrain = new_values.terrain;
-    old_values.decoration = new_values.decoration;
+    old_values.top_face = new_values.top_face;
+    old_values.top_face_decoration = new_values.top_face_decoration;
 
-    const auto& rule_object = TileRules::get(old_values.terrain);
+    const auto& rule_object = TileRules::get(old_values.top_face);
     const auto index = rule_object.index();
 
     switch (index)
@@ -216,7 +217,7 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
     {
       const auto& rule = std::get<AutoTile4SidesRule>(rule_object);
       const auto bitmask = m_get_bitmask_4_sided(terrain, transposed_x, transposed_y, z, rule.neighbor);
-      new_values.terrain = rule.output[bitmask].value;
+      new_values.top_face = rule.output[bitmask].value;
       break;
     }
 
@@ -234,11 +235,11 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
         {
           if (transform.placement == PlacementType::Terrain)
           {
-            new_values.terrain = transform.value;
+            new_values.top_face = transform.value;
           }
           else
           {
-            new_values.decoration = transform.value;
+            new_values.top_face_decoration = transform.value;
           }
           break;
         }
@@ -407,36 +408,36 @@ void ChunkGenerator::m_select_tile(const std::vector<int>& terrain, const int x,
         spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
       }
 
-      new_values.terrain = new_terrain_id;
+      new_values.top_face = new_terrain_id;
       break;
     }
     default:
       break;
     }
 
-  } while (old_values.terrain != new_values.terrain);
+  } while (old_values.top_face != new_values.top_face);
 
-  chunk->tiles.values[z * size.x * size.y + y * size.x + x].terrain = new_values.terrain;
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = new_values.top_face;
 
   // Select vegetation
-  if (new_values.decoration == 0)
+  if (new_values.top_face_decoration == 0)
   {
-    new_values.decoration = m_select_decoration(terrain_id, x, y, z);
+    new_values.top_face_decoration = m_select_top_face_decoration(terrain_id, x, y, z);
   }
 
-  chunk->tiles.values[z * size.x * size.y + y * size.x + x].decoration = new_values.decoration;
+  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = new_values.top_face_decoration;
 }
 
-int ChunkGenerator::m_select_decoration(const int terrain_id, const int x, const int y, const int z)
+int ChunkGenerator::m_select_top_face_decoration(const int terrain_id, const int x, const int y, const int z)
 {
   (void)z;
-  int decoration = 0;
+  int top_face_decoration = 0;
 
   // TODO: Integrate to the rule system for any terrain
-  // Only select decoration for grass terrain (2)
+  // Only select top_face_decoration for grass terrain (2)
   if (terrain_id != 2)
   {
-    return decoration;
+    return top_face_decoration;
   }
 
   // Place bigger plants on the center and smaller ones on the edges
@@ -444,14 +445,14 @@ int ChunkGenerator::m_select_decoration(const int terrain_id, const int x, const
 
   if (density < 0.3f)
   {
-    return decoration;
+    return top_face_decoration;
   }
 
   const auto prob = random::get_real();
 
   if (prob < 0.4f)
   {
-    return decoration;
+    return top_face_decoration;
   }
 
   int plant_small = 0;
@@ -472,14 +473,14 @@ int ChunkGenerator::m_select_decoration(const int terrain_id, const int x, const
 
   if (density < 0.4f)
   {
-    decoration = plant_small;
+    top_face_decoration = plant_small;
   }
   else
   {
-    decoration = plant_big;
+    top_face_decoration = plant_big;
   }
 
-  return decoration;
+  return top_face_decoration;
 }
 
 uint32_t ChunkGenerator::m_get_bitmask_4_sided(

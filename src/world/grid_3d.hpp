@@ -18,12 +18,12 @@ class Grid3D
   Grid3D() = default;
   Grid3D(const Vector3i& size) : size(size) {}
 
-  uint32_t terrain_at(const int x, const int y, const int z) const;
-  uint32_t terrain_at(const Vector3i& position) const;
-  uint32_t terrain_at(const Vector3& position) const;
-  uint32_t decoration_at(const int x, const int y, const int z) const;
-  uint32_t decoration_at(const Vector3i& position) const;
-  uint32_t decoration_at(const Vector3& position) const;
+  uint32_t top_face_at(const int x, const int y, const int z) const;
+  uint32_t top_face_at(const Vector3i& position) const;
+  uint32_t top_face_at(const Vector3& position) const;
+  uint32_t top_face_decoration_at(const int x, const int y, const int z) const;
+  uint32_t top_face_decoration_at(const Vector3i& position) const;
+  uint32_t top_face_decoration_at(const Vector3& position) const;
   const Cell& cell_at(const int x, const int y, const int z) const;
   const Cell& cell_at(const Vector3i& position) const;
   const Cell& cell_at(const Vector3& position) const;
@@ -34,9 +34,9 @@ class Grid3D
   void set(const uint32_t id, const int x, const int y, const int z);
   void set(const uint32_t id, const Vector3i& position);
   void set(const uint32_t id, const Vector3& position);
-  void set_decoration(const uint32_t id, const int x, const int y, const int z);
-  void set_decoration(const uint32_t id, const Vector3i& position);
-  void set_decoration(const uint32_t id, const Vector3& position);
+  void set_top_face_decoration(const uint32_t id, const int x, const int y, const int z);
+  void set_top_face_decoration(const uint32_t id, const Vector3i& position);
+  void set_top_face_decoration(const uint32_t id, const Vector3& position);
   void set_height(const int height, const int x, const int y);
   void set_height(const int height, const Vector2i& position);
   void set_height(const int height, const Vector2& position);

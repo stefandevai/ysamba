@@ -157,7 +157,7 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
 
             for (int z = height; z >= 0; --z)
             {
-              if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, local_i, local_j, z))
+              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z))
               {
                 continue;
               }
@@ -165,8 +165,8 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
               const Vector3i local_position{local_i, local_j, z};
 
-              m_render_map_tile(chunk, cell.terrain, local_position);
-              m_render_map_tile(chunk, cell.decoration, local_position, 1);
+              m_render_map_tile(chunk, cell.top_face, local_position);
+              m_render_map_tile(chunk, cell.top_face_decoration, local_position, 1);
             }
           }
         }
@@ -233,7 +233,7 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
 
             for (int z = height; z >= 0; --z)
             {
-              if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, local_i, local_j, z))
+              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z))
               {
                 continue;
               }
@@ -241,8 +241,8 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
               const Vector3i local_position{local_i, local_j, z};
 
-              m_render_map_tile(chunk, cell.terrain, local_position);
-              m_render_map_tile(chunk, cell.decoration, local_position, 1);
+              m_render_map_tile(chunk, cell.top_face, local_position);
+              m_render_map_tile(chunk, cell.top_face_decoration, local_position, 1);
             }
           }
         }

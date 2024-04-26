@@ -51,7 +51,7 @@ constexpr uint8_t height_map_marker = 0x03;
 constexpr uint8_t end_marker = 0x04;
 
 constexpr size_t marker_size = sizeof(uint8_t);
-constexpr size_t cell_size = sizeof(uint32_t) * 3;
+constexpr size_t cell_size = sizeof(Cell);
 }  // namespace terrain_ext
 
 void initialize_directories()
@@ -256,8 +256,10 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 
   for (const auto& cell : tiles.values)
   {
-    outfile.write(reinterpret_cast<const char*>(&cell.terrain), sizeof(cell.terrain));
-    outfile.write(reinterpret_cast<const char*>(&cell.decoration), sizeof(cell.decoration));
+    outfile.write(reinterpret_cast<const char*>(&cell.top_face), sizeof(cell.top_face));
+    outfile.write(reinterpret_cast<const char*>(&cell.front_face), sizeof(cell.front_face));
+    outfile.write(reinterpret_cast<const char*>(&cell.top_face_decoration), sizeof(cell.top_face_decoration));
+    outfile.write(reinterpret_cast<const char*>(&cell.front_face_decoration), sizeof(cell.front_face_decoration));
     outfile.write(reinterpret_cast<const char*>(&cell.flags), sizeof(cell.flags));
   }
 
@@ -379,7 +381,7 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
       for (int x = 0; x < tiles.size.x; ++x)
       {
         auto& cell = tiles.values[x + y * tiles.size.x + z * tiles.size.x * tiles.size.y];
-        fread(&cell.terrain, sizeof(uint32_t), 3, file);
+        fread(&cell.top_face, sizeof(uint32_t), 5, file);
       }
     }
   }

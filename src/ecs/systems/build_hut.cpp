@@ -214,91 +214,91 @@ void BuildHutSystem::update(entt::registry& registry)
     if (hut_size == 3)
     {
       // Top
-      m_world.set_decoration(148, target.x + 1, target.y + 1, target.z + 1);
+      m_world.set_top_face_decoration(148, target.x + 1, target.y + 1, target.z + 1);
 
       // TODO: Add sprites for when top is not displayed
-      m_world.set_decoration(148, target.x + 1, target.y, target.z);
+      m_world.set_top_face_decoration(148, target.x + 1, target.y, target.z);
 
       // Perimeter
-      m_world.set_decoration(139, target.x, target.y, target.z);
-      m_world.set_decoration(140, target.x + 1, target.y, target.z);
-      m_world.set_decoration(141, target.x + 2, target.y, target.z);
-      m_world.set_decoration(142, target.x, target.y + 1, target.z);
-      m_world.set_decoration(144, target.x + 2, target.y + 1, target.z);
-      m_world.set_decoration(145, target.x, target.y + 2, target.z);
-      m_world.set_decoration(146, target.x + 1, target.y + 2, target.z);
-      m_world.set_decoration(147, target.x + 2, target.y + 2, target.z);
+      m_world.set_top_face_decoration(139, target.x, target.y, target.z);
+      m_world.set_top_face_decoration(140, target.x + 1, target.y, target.z);
+      m_world.set_top_face_decoration(141, target.x + 2, target.y, target.z);
+      m_world.set_top_face_decoration(142, target.x, target.y + 1, target.z);
+      m_world.set_top_face_decoration(144, target.x + 2, target.y + 1, target.z);
+      m_world.set_top_face_decoration(145, target.x, target.y + 2, target.z);
+      m_world.set_top_face_decoration(146, target.x + 1, target.y + 2, target.z);
+      m_world.set_top_face_decoration(147, target.x + 2, target.y + 2, target.z);
     }
     else if (hut_size == 4)
     {
       // Perimeter
-      m_world.set_decoration(149, target.x, target.y, target.z);
-      m_world.set_decoration(155, target.x + 3, target.y, target.z);
-      m_world.set_decoration(152, target.x, target.y + 1, target.z);
-      m_world.set_decoration(153, target.x + 3, target.y + 1, target.z);
-      m_world.set_decoration(175, target.x, target.y + 2, target.z);
-      m_world.set_decoration(181, target.x + 3, target.y + 2, target.z);
-      m_world.set_decoration(182, target.x, target.y + 3, target.z);
-      m_world.set_decoration(183, target.x + 1, target.y + 3, target.z);
-      m_world.set_decoration(187, target.x + 2, target.y + 3, target.z);
-      m_world.set_decoration(188, target.x + 3, target.y + 3, target.z);
+      m_world.set_top_face_decoration(149, target.x, target.y, target.z);
+      m_world.set_top_face_decoration(155, target.x + 3, target.y, target.z);
+      m_world.set_top_face_decoration(152, target.x, target.y + 1, target.z);
+      m_world.set_top_face_decoration(153, target.x + 3, target.y + 1, target.z);
+      m_world.set_top_face_decoration(175, target.x, target.y + 2, target.z);
+      m_world.set_top_face_decoration(181, target.x + 3, target.y + 2, target.z);
+      m_world.set_top_face_decoration(182, target.x, target.y + 3, target.z);
+      m_world.set_top_face_decoration(183, target.x + 1, target.y + 3, target.z);
+      m_world.set_top_face_decoration(187, target.x + 2, target.y + 3, target.z);
+      m_world.set_top_face_decoration(188, target.x + 3, target.y + 3, target.z);
 
       // Top
-      m_world.set_decoration(150, target.x + 1, target.y + 1, target.z + 1);
-      m_world.set_decoration(154, target.x + 2, target.y + 1, target.z + 1);
-      m_world.set_decoration(169, target.x + 1, target.y + 2, target.z + 1);
-      m_world.set_decoration(173, target.x + 2, target.y + 2, target.z + 1);
+      m_world.set_top_face_decoration(150, target.x + 1, target.y + 1, target.z + 1);
+      m_world.set_top_face_decoration(154, target.x + 2, target.y + 1, target.z + 1);
+      m_world.set_top_face_decoration(169, target.x + 1, target.y + 2, target.z + 1);
+      m_world.set_top_face_decoration(173, target.x + 2, target.y + 2, target.z + 1);
 
       // TODO: Add sprites for when top is not displayed
-      m_world.set_decoration(150, target.x + 1, target.y, target.z);
-      m_world.set_decoration(154, target.x + 2, target.y, target.z);
+      m_world.set_top_face_decoration(150, target.x + 1, target.y, target.z);
+      m_world.set_top_face_decoration(154, target.x + 2, target.y, target.z);
     }
     else
     {
       // Perimeter structure parts
-      m_world.set_decoration(149, target.x, target.y, target.z);
-      m_world.set_decoration(155, target.x + hut_size - 1, target.y, target.z);
-      m_world.set_decoration(156, target.x, target.y + 1, target.z);
-      m_world.set_decoration(159, target.x + hut_size - 1, target.y + 1, target.z);
+      m_world.set_top_face_decoration(149, target.x, target.y, target.z);
+      m_world.set_top_face_decoration(155, target.x + hut_size - 1, target.y, target.z);
+      m_world.set_top_face_decoration(156, target.x, target.y + 1, target.z);
+      m_world.set_top_face_decoration(159, target.x + hut_size - 1, target.y + 1, target.z);
 
-      m_world.set_decoration(168, target.x, target.y + hut_size - 3, target.z);
-      m_world.set_decoration(175, target.x, target.y + hut_size - 2, target.z);
-      m_world.set_decoration(174, target.x + hut_size - 1, target.y + hut_size - 3, target.z);
-      m_world.set_decoration(181, target.x + hut_size - 1, target.y + hut_size - 2, target.z);
-      m_world.set_decoration(182, target.x, target.y + hut_size - 1, target.z);
-      m_world.set_decoration(183, target.x + 1, target.y + hut_size - 1, target.z);
-      m_world.set_decoration(187, target.x + hut_size - 2, target.y + hut_size - 1, target.z);
-      m_world.set_decoration(188, target.x + hut_size - 1, target.y + hut_size - 1, target.z);
+      m_world.set_top_face_decoration(168, target.x, target.y + hut_size - 3, target.z);
+      m_world.set_top_face_decoration(175, target.x, target.y + hut_size - 2, target.z);
+      m_world.set_top_face_decoration(174, target.x + hut_size - 1, target.y + hut_size - 3, target.z);
+      m_world.set_top_face_decoration(181, target.x + hut_size - 1, target.y + hut_size - 2, target.z);
+      m_world.set_top_face_decoration(182, target.x, target.y + hut_size - 1, target.z);
+      m_world.set_top_face_decoration(183, target.x + 1, target.y + hut_size - 1, target.z);
+      m_world.set_top_face_decoration(187, target.x + hut_size - 2, target.y + hut_size - 1, target.z);
+      m_world.set_top_face_decoration(188, target.x + hut_size - 1, target.y + hut_size - 1, target.z);
 
       // Top structure parts
-      m_world.set_decoration(150, target.x + 1, target.y + 1, target.z + 1);
-      m_world.set_decoration(154, target.x + hut_size - 2, target.y + 1, target.z + 1);
-      m_world.set_decoration(169, target.x + 1, target.y + hut_size - 2, target.z + 1);
-      m_world.set_decoration(173, target.x + hut_size - 2, target.y + hut_size - 2, target.z + 1);
+      m_world.set_top_face_decoration(150, target.x + 1, target.y + 1, target.z + 1);
+      m_world.set_top_face_decoration(154, target.x + hut_size - 2, target.y + 1, target.z + 1);
+      m_world.set_top_face_decoration(169, target.x + 1, target.y + hut_size - 2, target.z + 1);
+      m_world.set_top_face_decoration(173, target.x + hut_size - 2, target.y + hut_size - 2, target.z + 1);
 
       // TODO: Draw specific sprites for when top is not displayed
-      m_world.set_decoration(150, target.x + 1, target.y, target.z);
-      m_world.set_decoration(154, target.x + hut_size - 2, target.y, target.z);
+      m_world.set_top_face_decoration(150, target.x + 1, target.y, target.z);
+      m_world.set_top_face_decoration(154, target.x + hut_size - 2, target.y, target.z);
 
       // Tiled parts
       for (uint32_t i = 2; i < hut_size - 2; ++i)
       {
         // Horizontal structure parts
-        m_world.set_decoration(151, target.x + i, target.y + 1, target.z + 1);
-        m_world.set_decoration(170, target.x + i, target.y + hut_size - 2, target.z + 1);
-        m_world.set_decoration(184, target.x + i, target.y + hut_size - 1, target.z);
+        m_world.set_top_face_decoration(151, target.x + i, target.y + 1, target.z + 1);
+        m_world.set_top_face_decoration(170, target.x + i, target.y + hut_size - 2, target.z + 1);
+        m_world.set_top_face_decoration(184, target.x + i, target.y + hut_size - 1, target.z);
 
         // TODO: Draw specific sprites for when top is not displayed
-        m_world.set_decoration(151, target.x + i, target.y, target.z);
+        m_world.set_top_face_decoration(151, target.x + i, target.y, target.z);
 
         // Vertical structure parts
-        m_world.set_decoration(157, target.x + 1, target.y + i, target.z + 1);
-        m_world.set_decoration(158, target.x + hut_size - 2, target.y + i, target.z + 1);
+        m_world.set_top_face_decoration(157, target.x + 1, target.y + i, target.z + 1);
+        m_world.set_top_face_decoration(158, target.x + hut_size - 2, target.y + i, target.z + 1);
 
         if (i < hut_size - 3)
         {
-          m_world.set_decoration(160, target.x, target.y + i, target.z);
-          m_world.set_decoration(163, target.x + hut_size - 1, target.y + i, target.z);
+          m_world.set_top_face_decoration(160, target.x, target.y + i, target.z);
+          m_world.set_top_face_decoration(163, target.x + hut_size - 1, target.y + i, target.z);
         }
       }
     }
@@ -359,31 +359,32 @@ void BuildHutSystem::update(entt::registry& registry)
     {
     case 3:
       // Top
-      m_world.set_decoration(199, home_position.x + 1, home_position.y + 1, home_position.z + 1);
+      m_world.set_top_face_decoration(199, home_position.x + 1, home_position.y + 1, home_position.z + 1);
 
       // TODO: Draw specific sprites for when top is not displayed
-      m_world.set_decoration(199, home_position.x + 1, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(199, home_position.x + 1, home_position.y, home_position.z);
 
       // Perimeter
-      m_world.set_decoration(190, home_position.x, home_position.y, home_position.z);
-      m_world.set_decoration(191, home_position.x + 1, home_position.y, home_position.z);
-      m_world.set_decoration(192, home_position.x + 2, home_position.y, home_position.z);
-      m_world.set_decoration(193, home_position.x, home_position.y + 1, home_position.z);
-      m_world.set_decoration(195, home_position.x + 2, home_position.y + 1, home_position.z);
-      m_world.set_decoration(196, home_position.x, home_position.y + 2, home_position.z);
-      m_world.set_decoration(197, home_position.x + 1, home_position.y + 2, home_position.z);
-      m_world.set_decoration(198, home_position.x + 2, home_position.y + 2, home_position.z);
+      m_world.set_top_face_decoration(190, home_position.x, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(191, home_position.x + 1, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(192, home_position.x + 2, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(193, home_position.x, home_position.y + 1, home_position.z);
+      m_world.set_top_face_decoration(195, home_position.x + 2, home_position.y + 1, home_position.z);
+      m_world.set_top_face_decoration(196, home_position.x, home_position.y + 2, home_position.z);
+      m_world.set_top_face_decoration(197, home_position.x + 1, home_position.y + 2, home_position.z);
+      m_world.set_top_face_decoration(198, home_position.x + 2, home_position.y + 2, home_position.z);
       break;
     default:
       // Top
-      m_world.set_decoration(201, home_position.x + 1, home_position.y + 1, home_position.z + 1);
-      m_world.set_decoration(205, home_position.x + hut_size - 2, home_position.y + 1, home_position.z + 1);
-      m_world.set_decoration(221, home_position.x + 1, home_position.y + hut_size - 2, home_position.z + 1);
-      m_world.set_decoration(225, home_position.x + hut_size - 2, home_position.y + hut_size - 2, home_position.z + 1);
+      m_world.set_top_face_decoration(201, home_position.x + 1, home_position.y + 1, home_position.z + 1);
+      m_world.set_top_face_decoration(205, home_position.x + hut_size - 2, home_position.y + 1, home_position.z + 1);
+      m_world.set_top_face_decoration(221, home_position.x + 1, home_position.y + hut_size - 2, home_position.z + 1);
+      m_world.set_top_face_decoration(
+          225, home_position.x + hut_size - 2, home_position.y + hut_size - 2, home_position.z + 1);
 
       // TODO: Draw specific sprites for when top is not displayed
-      m_world.set_decoration(201, home_position.x + 1, home_position.y, home_position.z);
-      m_world.set_decoration(205, home_position.x + hut_size - 2, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(201, home_position.x + 1, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(205, home_position.x + hut_size - 2, home_position.y, home_position.z);
 
       // Place center top parts if needed
       if (hut_size > 4)
@@ -394,42 +395,45 @@ void BuildHutSystem::update(entt::registry& registry)
         {
           for (int i = 0; i < center_size; ++i)
           {
-            m_world.set_decoration(209, home_position.x + 2 + i, home_position.y + 2 + j, home_position.z + 1);
+            m_world.set_top_face_decoration(209, home_position.x + 2 + i, home_position.y + 2 + j, home_position.z + 1);
           }
         }
       }
 
       // Perimeter
-      m_world.set_decoration(200, home_position.x, home_position.y, home_position.z);
-      m_world.set_decoration(206, home_position.x + hut_size - 1, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(200, home_position.x, home_position.y, home_position.z);
+      m_world.set_top_face_decoration(206, home_position.x + hut_size - 1, home_position.y, home_position.z);
 
-      m_world.set_decoration(207, home_position.x, home_position.y + 1, home_position.z);
-      m_world.set_decoration(211, home_position.x + hut_size - 1, home_position.y + 1, home_position.z);
+      m_world.set_top_face_decoration(207, home_position.x, home_position.y + 1, home_position.z);
+      m_world.set_top_face_decoration(211, home_position.x + hut_size - 1, home_position.y + 1, home_position.z);
 
-      m_world.set_decoration(227, home_position.x, home_position.y + hut_size - 2, home_position.z);
-      m_world.set_decoration(233, home_position.x + hut_size - 1, home_position.y + hut_size - 2, home_position.z);
+      m_world.set_top_face_decoration(227, home_position.x, home_position.y + hut_size - 2, home_position.z);
+      m_world.set_top_face_decoration(
+          233, home_position.x + hut_size - 1, home_position.y + hut_size - 2, home_position.z);
 
-      m_world.set_decoration(234, home_position.x, home_position.y + hut_size - 1, home_position.z);
-      m_world.set_decoration(235, home_position.x + 1, home_position.y + hut_size - 1, home_position.z);
-      m_world.set_decoration(239, home_position.x + hut_size - 2, home_position.y + hut_size - 1, home_position.z);
-      m_world.set_decoration(240, home_position.x + hut_size - 1, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_top_face_decoration(234, home_position.x, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_top_face_decoration(235, home_position.x + 1, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_top_face_decoration(
+          239, home_position.x + hut_size - 2, home_position.y + hut_size - 1, home_position.z);
+      m_world.set_top_face_decoration(
+          240, home_position.x + hut_size - 1, home_position.y + hut_size - 1, home_position.z);
 
       // Tiled parts
       for (int i = 2; i < hut_size - 2; ++i)
       {
         // Horizontal structure parts
-        m_world.set_decoration(202, home_position.x + i, home_position.y + 1, home_position.z + 1);
-        m_world.set_decoration(222, home_position.x + i, home_position.y + hut_size - 2, home_position.z + 1);
-        m_world.set_decoration(236, home_position.x + i, home_position.y + hut_size - 1, home_position.z);
+        m_world.set_top_face_decoration(202, home_position.x + i, home_position.y + 1, home_position.z + 1);
+        m_world.set_top_face_decoration(222, home_position.x + i, home_position.y + hut_size - 2, home_position.z + 1);
+        m_world.set_top_face_decoration(236, home_position.x + i, home_position.y + hut_size - 1, home_position.z);
 
         // TODO: Draw specific sprites for when top is not displayed
-        m_world.set_decoration(202, home_position.x + i, home_position.y, home_position.z);
+        m_world.set_top_face_decoration(202, home_position.x + i, home_position.y, home_position.z);
 
         // Vertical structure parts
-        m_world.set_decoration(208, home_position.x + 1, home_position.y + i, home_position.z + 1);
-        m_world.set_decoration(210, home_position.x + hut_size - 2, home_position.y + i, home_position.z + 1);
-        m_world.set_decoration(212, home_position.x, home_position.y + i, home_position.z);
-        m_world.set_decoration(215, home_position.x + hut_size - 1, home_position.y + i, home_position.z);
+        m_world.set_top_face_decoration(208, home_position.x + 1, home_position.y + i, home_position.z + 1);
+        m_world.set_top_face_decoration(210, home_position.x + hut_size - 2, home_position.y + i, home_position.z + 1);
+        m_world.set_top_face_decoration(212, home_position.x, home_position.y + i, home_position.z);
+        m_world.set_top_face_decoration(215, home_position.x + hut_size - 1, home_position.y + i, home_position.z);
       }
 
       break;

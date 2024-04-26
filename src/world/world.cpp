@@ -62,25 +62,25 @@ void World::generate_societies()
   m_societies[society.id] = std::move(society);
 }
 
-void World::set_terrain(const uint32_t tile_id, const int x, const int y, const int z)
+void World::set_top_face(const uint32_t tile_id, const int x, const int y, const int z)
 {
   auto& chunk = chunk_manager.at(x, y, z);
   chunk.tiles.set(
       tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 
-  if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z))
   {
     chunk.tiles.compute_visibility();
   }
 }
 
-void World::set_decoration(const uint32_t tile_id, const int x, const int y, const int z)
+void World::set_top_face_decoration(const uint32_t tile_id, const int x, const int y, const int z)
 {
   auto& chunk = chunk_manager.at(x, y, z);
-  chunk.tiles.set_decoration(
+  chunk.tiles.set_top_face_decoration(
       tile_id, std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 
-  if (!chunk.tiles.has_flags(DL_CELL_FLAG_VISIBLE, x, y, z))
+  if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z))
   {
     chunk.tiles.compute_visibility();
   }
@@ -90,21 +90,21 @@ void World::replace(const uint32_t from, const uint32_t to, const int x, const i
 {
   const auto& cell = cell_at(x, y, z);
 
-  if (cell.decoration == from && cell.terrain != to)
+  if (cell.top_face_decoration == from && cell.top_face != to)
   {
-    set_decoration(to, x, y, z);
+    set_top_face_decoration(to, x, y, z);
     return;
   }
-  // If the terrain already has the target tile, just assign the null tile to the over tile */
-  else if (cell.decoration == from && cell.terrain == to)
+  // If the top_face already has the target tile, just assign the null tile to the over tile */
+  else if (cell.top_face_decoration == from && cell.top_face == to)
   {
-    set_decoration(0, x, y, z);
+    set_top_face_decoration(0, x, y, z);
     return;
   }
 
-  if (cell.terrain == from)
+  if (cell.top_face == from)
   {
-    set_terrain(to, x, y, z);
+    set_top_face(to, x, y, z);
   }
 }
 
@@ -120,40 +120,40 @@ const Cell& World::cell_at(const Vector3i& position) const
   return cell_at(position.x, position.y, position.z);
 }
 
-uint32_t World::terrain_at(const int x, const int y, const int z) const
+uint32_t World::top_face_at(const int x, const int y, const int z) const
 {
   const auto& chunk = chunk_manager.at(x, y, z);
-  return chunk.tiles.terrain_at(
+  return chunk.tiles.top_face_at(
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
-uint32_t World::terrain_at(const Vector3i& position) const
+uint32_t World::top_face_at(const Vector3i& position) const
 {
-  return terrain_at(position.x, position.y, position.z);
+  return top_face_at(position.x, position.y, position.z);
 }
 
-uint32_t World::decoration_at(const int x, const int y, const int z) const
+uint32_t World::top_face_decoration_at(const int x, const int y, const int z) const
 {
   const auto& chunk = chunk_manager.at(x, y, z);
-  return chunk.tiles.decoration_at(
+  return chunk.tiles.top_face_decoration_at(
       std::abs(x - chunk.position.x), std::abs(y - chunk.position.y), std::abs(z - chunk.position.z));
 }
 
-uint32_t World::decoration_at(const Vector3i& position) const
+uint32_t World::top_face_decoration_at(const Vector3i& position) const
 {
-  return decoration_at(position.x, position.y, position.z);
+  return top_face_decoration_at(position.x, position.y, position.z);
 }
 
 const TileData& World::get(const int x, const int y, const int z) const
 {
   const auto& cell = cell_at(x, y, z);
 
-  if (cell.decoration != 0)
+  if (cell.top_face_decoration != 0)
   {
-    return tile_data.at(cell.decoration);
+    return tile_data.at(cell.top_face_decoration);
   }
 
-  return tile_data.at(cell.terrain);
+  return tile_data.at(cell.top_face);
 }
 
 const TileData& World::get(const Vector3i& position) const
@@ -164,7 +164,7 @@ const TileData& World::get(const Vector3i& position) const
 const WorldTile World::get_all(const int x, const int y, const int z) const
 {
   const auto& cell = cell_at(x, y, z);
-  return WorldTile{tile_data.at(cell.terrain), tile_data.at(cell.decoration)};
+  return WorldTile{tile_data.at(cell.top_face), tile_data.at(cell.top_face_decoration)};
 }
 
 const WorldTile World::get_all(const Vector3i& position) const
@@ -172,26 +172,26 @@ const WorldTile World::get_all(const Vector3i& position) const
   return get_all(position.x, position.y, position.z);
 }
 
-const TileData& World::get_terrain(const int x, const int y, const int z) const
+const TileData& World::get_top_face(const int x, const int y, const int z) const
 {
-  const auto tile_index = terrain_at(x, y, z);
+  const auto tile_index = top_face_at(x, y, z);
   return tile_data.at(tile_index);
 }
 
-const TileData& World::get_terrain(const Vector3i& position) const
+const TileData& World::get_top_face(const Vector3i& position) const
 {
-  return get_terrain(position.x, position.y, position.z);
+  return get_top_face(position.x, position.y, position.z);
 }
 
-const TileData& World::get_decoration(const int x, const int y, const int z) const
+const TileData& World::get_top_face_decoration(const int x, const int y, const int z) const
 {
-  const auto over_tile_index = decoration_at(x, y, z);
+  const auto over_tile_index = top_face_decoration_at(x, y, z);
   return tile_data.at(over_tile_index);
 }
 
-const TileData& World::get_decoration(const Vector3i& position) const
+const TileData& World::get_top_face_decoration(const Vector3i& position) const
 {
-  return get_decoration(position.x, position.y, position.z);
+  return get_top_face_decoration(position.x, position.y, position.z);
 }
 
 int World::get_elevation(const int x, const int y) const
@@ -386,7 +386,7 @@ bool World::is_walkable(const int x, const int y, const int z) const
 bool World::is_empty(const int x, const int y, const int z) const
 {
   const auto& cell = cell_at(x, y, z);
-  return cell.terrain == 0 && cell.decoration == 0;
+  return cell.top_face == 0 && cell.top_face_decoration == 0;
 }
 
 bool World::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const

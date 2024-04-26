@@ -6,44 +6,45 @@ namespace dl
 {
 const Cell Grid3D::null = Cell{};
 
-uint32_t Grid3D::terrain_at(const int x, const int y, const int z) const
+uint32_t Grid3D::top_face_at(const int x, const int y, const int z) const
 {
   if (!m_in_bounds(x, y, z))
   {
     return 0;
   }
 
-  return values[m_index(x, y, z)].terrain;
+  return values[m_index(x, y, z)].top_face;
 }
 
-uint32_t Grid3D::terrain_at(const Vector3i& position) const
+uint32_t Grid3D::top_face_at(const Vector3i& position) const
 {
-  return terrain_at(position.x, position.y, position.z);
+  return top_face_at(position.x, position.y, position.z);
 }
 
-uint32_t Grid3D::terrain_at(const Vector3& position) const
+uint32_t Grid3D::top_face_at(const Vector3& position) const
 {
-  return terrain_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+  return top_face_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
 }
 
-uint32_t Grid3D::decoration_at(const int x, const int y, const int z) const
+uint32_t Grid3D::top_face_decoration_at(const int x, const int y, const int z) const
 {
   if (!m_in_bounds(x, y, z))
   {
     return 0;
   }
 
-  return values[m_index(x, y, z)].decoration;
+  return values[m_index(x, y, z)].top_face_decoration;
 }
 
-uint32_t Grid3D::decoration_at(const Vector3i& position) const
+uint32_t Grid3D::top_face_decoration_at(const Vector3i& position) const
 {
-  return decoration_at(position.x, position.y, position.z);
+  return top_face_decoration_at(position.x, position.y, position.z);
 }
 
-uint32_t Grid3D::decoration_at(const Vector3& position) const
+uint32_t Grid3D::top_face_decoration_at(const Vector3& position) const
 {
-  return decoration_at(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+  return top_face_decoration_at(
+      static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
 }
 
 const Cell& Grid3D::cell_at(const int x, const int y, const int z) const
@@ -93,7 +94,7 @@ void Grid3D::set(const uint32_t id, const int x, const int y, const int z)
     return;
   }
 
-  values[m_index(x, y, z)].terrain = id;
+  values[m_index(x, y, z)].top_face = id;
 }
 
 void Grid3D::set(const uint32_t id, const Vector3i& position)
@@ -106,24 +107,24 @@ void Grid3D::set(const uint32_t id, const Vector3& position)
   set(id, static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
 }
 
-void Grid3D::set_decoration(const uint32_t id, const int x, const int y, const int z)
+void Grid3D::set_top_face_decoration(const uint32_t id, const int x, const int y, const int z)
 {
   if (!m_in_bounds(x, y, z))
   {
     return;
   }
 
-  values[m_index(x, y, z)].decoration = id;
+  values[m_index(x, y, z)].top_face_decoration = id;
 }
 
-void Grid3D::set_decoration(const uint32_t id, const Vector3i& position)
+void Grid3D::set_top_face_decoration(const uint32_t id, const Vector3i& position)
 {
-  set_decoration(id, position.x, position.y, position.z);
+  set_top_face_decoration(id, position.x, position.y, position.z);
 }
 
-void Grid3D::set_decoration(const uint32_t id, const Vector3& position)
+void Grid3D::set_top_face_decoration(const uint32_t id, const Vector3& position)
 {
-  set_decoration(id, static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
+  set_top_face_decoration(id, static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
 }
 
 void Grid3D::set_height(const int height, const int x, const int y)
@@ -226,10 +227,10 @@ void Grid3D::compute_visibility()
     {
       for (int x = 0; x < size.x; ++x)
       {
-        const auto terrain = terrain_at(x, y, z);
-        const auto decoration = decoration_at(x, y, z);
+        const auto top_face = top_face_at(x, y, z);
+        const auto top_face_decoration = top_face_decoration_at(x, y, z);
 
-        if (terrain == 0 && decoration == 0)
+        if (top_face == 0 && top_face_decoration == 0)
         {
           continue;
         }
@@ -242,7 +243,7 @@ void Grid3D::compute_visibility()
         }
 
         // Update visibility
-        set_flags(DL_CELL_FLAG_VISIBLE, x, y, z);
+        set_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z);
 
         // Update height map if needed
         if (height_at(x, y) < z)
@@ -258,34 +259,34 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
 {
   // Check visible tiles in 45deg top down view
   // Top tile
-  if (terrain_at(x, y, z + 1) == 0 && decoration_at(x, y, z + 1) == 0)
+  if (top_face_at(x, y, z + 1) == 0 && top_face_decoration_at(x, y, z + 1) == 0)
   {
     return true;
   }
   // Diagonal bottom tile
-  // if (terrain_at(x, y + 1, z + 1) == 0)
+  // if (top_face_at(x, y + 1, z + 1) == 0)
   // {
   //   return true;
   // }
 
   // TODO: After adding view rotation, check all the other directions
-  /* if (terrain_at(x, y + 1, z) == 0) */
+  /* if (top_face_at(x, y + 1, z) == 0) */
   /* { */
   /*   return true; */
   /* } */
-  /* if (terrain_at(x + 1, y, z) == 0) */
+  /* if (top_face_at(x + 1, y, z) == 0) */
   /* { */
   /*   return true; */
   /* } */
-  /* if (terrain_at(x - 1, y, z) == 0) */
+  /* if (top_face_at(x - 1, y, z) == 0) */
   /* { */
   /*   return true; */
   /* } */
-  /* if (terrain_at(x, y - 1, z) == 0) */
+  /* if (top_face_at(x, y - 1, z) == 0) */
   /* { */
   /*   return true; */
   /* } */
-  /* if (terrain_at(x, y, z - 1) == 0) */
+  /* if (top_face_at(x, y, z - 1) == 0) */
   /* { */
   /*   return true; */
   /* } */
@@ -295,7 +296,7 @@ bool Grid3D::m_is_any_neighbour_empty(const int x, const int y, const int z) con
 
 bool Grid3D::is_bottom_empty(const int x, const int y, const int z) const
 {
-  return terrain_at(x, y + 1, z) == 0;
+  return top_face_at(x, y + 1, z) == 0;
 }
 
 bool Grid3D::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& size, const Vector3i& position) const
@@ -315,12 +316,12 @@ bool Grid3D::has_pattern(const std::vector<uint32_t>& pattern, const Vector2i& s
 
       const auto& cell = cell_at(position.x + i, position.y + j, position.z);
 
-      if (cell.decoration == pattern_value)
+      if (cell.top_face_decoration == pattern_value)
       {
         continue;
       }
 
-      if (cell.terrain != pattern_value)
+      if (cell.top_face != pattern_value)
       {
         return false;
       }

@@ -58,7 +58,7 @@ class ChunkGenerator
 
   void m_select_tile(const std::vector<int>& terrain, const int x, const int y, const int z);
 
-  int m_select_decoration(const int terrain_id, const int x, const int y, const int z);
+  int m_select_top_face_decoration(const int terrain_id, const int x, const int y, const int z);
 
   uint32_t m_get_bitmask_4_sided(
       const std::vector<int>& terrain, const int x, const int y, const int z, const int neighbor);
