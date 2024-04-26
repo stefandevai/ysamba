@@ -248,19 +248,13 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 
   outfile.write(reinterpret_cast<const char*>(&terrain_ext::metadata_marker), sizeof(terrain_ext::metadata_marker));
 
-  outfile.write(reinterpret_cast<const char*>(&tiles.size.x), sizeof(tiles.size.x));
-  outfile.write(reinterpret_cast<const char*>(&tiles.size.y), sizeof(tiles.size.y));
-  outfile.write(reinterpret_cast<const char*>(&tiles.size.z), sizeof(tiles.size.z));
+  outfile.write(reinterpret_cast<const char*>(&tiles.size.x), sizeof(tiles.size));
 
   outfile.write(reinterpret_cast<const char*>(&terrain_ext::values_marker), sizeof(terrain_ext::values_marker));
 
   for (const auto& cell : tiles.values)
   {
-    outfile.write(reinterpret_cast<const char*>(&cell.top_face), sizeof(cell.top_face));
-    outfile.write(reinterpret_cast<const char*>(&cell.front_face), sizeof(cell.front_face));
-    outfile.write(reinterpret_cast<const char*>(&cell.top_face_decoration), sizeof(cell.top_face_decoration));
-    outfile.write(reinterpret_cast<const char*>(&cell.front_face_decoration), sizeof(cell.front_face_decoration));
-    outfile.write(reinterpret_cast<const char*>(&cell.flags), sizeof(cell.flags));
+    outfile.write(reinterpret_cast<const char*>(&cell.top_face), sizeof(Cell));
   }
 
   outfile.write(reinterpret_cast<const char*>(&terrain_ext::height_map_marker), sizeof(terrain_ext::height_map_marker));
@@ -381,7 +375,7 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
       for (int x = 0; x < tiles.size.x; ++x)
       {
         auto& cell = tiles.values[x + y * tiles.size.x + z * tiles.size.x * tiles.size.y];
-        fread(&cell.top_face, sizeof(uint32_t), 5, file);
+        fread(&cell.top_face, sizeof(Cell), 1, file);
       }
     }
   }
