@@ -14,6 +14,7 @@ class ChunkGenerator
 {
  public:
   Vector3i size{1, 1, 1};
+  std::vector<float> height_modifier_map;
   std::vector<float> vegetation_type;
   std::vector<float> vegetation_density;
   std::unique_ptr<Chunk> chunk = nullptr;

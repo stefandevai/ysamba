@@ -37,8 +37,17 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
     {
       const auto world_position = offset + Vector3i{i, j, 0};
 
-      const int k = m_sample_height_map(world_position);
       const auto biome = m_sample_biome(world_position);
+      int k = m_sample_height_map(world_position);
+
+      const auto height_modifier = height_modifier_map[j * m_padded_size.x + i];
+
+      if (height_modifier > 0.4f)
+      {
+        k += 1;
+      }
+
+      k = std::clamp(k, 0, size.z - 1);
 
       bool inside_chunk = false;
 
@@ -148,8 +157,12 @@ void ChunkGenerator::set_size(const Vector3i& size)
 
 void ChunkGenerator::m_generate_noise_data(const int seed, const Vector3i& offset)
 {
+  height_modifier_map.resize(m_padded_size.x * m_padded_size.y);
   vegetation_type.resize(size.x * size.y);
   vegetation_density.resize(size.x * size.y);
+
+  // Height modifier
+  utils::generate_height_modifier_map(height_modifier_map.data(), offset.x - 1, offset.y - 1, m_padded_size.x, m_padded_size.y, seed + 94);
 
   // Vegetation type lookup
   FastNoise::SmartNode<> vegetation_type_noise

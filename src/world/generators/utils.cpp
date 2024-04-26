@@ -90,4 +90,21 @@ void generate_temperature_map(float* data, int width, int height, const IslandNo
 
   remap->GenUniformGrid2D(data, 0, 0, width, height, params.frequency, seed);
 }
+
+void generate_height_modifier_map(float* data, int x, int y, int width, int height, int seed)
+{
+  const auto simplex = FastNoise::New<FastNoise::OpenSimplex2S>();
+  const auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+  fractal->SetSource(simplex);
+  fractal->SetOctaveCount(7);
+  fractal->SetLacunarity(1.19f);
+  fractal->SetGain(0.5f);
+  fractal->SetWeightedStrength(1.8f);
+
+  const auto remap = FastNoise::New<FastNoise::Remap>();
+  remap->SetSource(fractal);
+  remap->SetRemap(-1.0f, 1.0f, 0.0f, 1.0f);
+
+  remap->GenUniformGrid2D(data, x, y, width, height, 0.056, seed);
+}
 }  // namespace dl::utils
