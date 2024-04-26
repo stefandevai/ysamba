@@ -43,6 +43,35 @@ Rule create_rule(const nlohmann::json& rule, const RuleType type)
 
     return rule_object;
   }
+  case RuleType::RootAutotile4Sides:
+  {
+    RootAutoTile4SidesRule rule_object;
+
+    assert(rule.contains("input") && "Input not specified");
+    assert(rule.contains("label") && "Label not specified");
+    assert(rule.contains("neighbor") && "Neighbor not specified");
+    assert(rule.contains("output") && "Output not specified");
+    assert(rule.contains("front_face_id") && "Front face ID not specified");
+
+    rule_object.input = rule["input"].get<int>();
+    rule_object.label = rule["label"].get<std::string>();
+    rule_object.neighbor = rule["neighbor"].get<BlockType>();
+    rule_object.front_face_id = rule["front_face_id"].get<uint32_t>();
+
+    const auto& output = rule["output"];
+    for (const auto& transform : output)
+    {
+      assert(transform.contains("value") && "Transform value not specified");
+      assert(transform.contains("bitmask") && "Transform bitmask not specified");
+
+      const auto value = transform["value"].get<int>();
+      const auto index = transform["bitmask"].get<int>();
+
+      rule_object.output[index].value = value;
+    }
+
+    return rule_object;
+  }
   case RuleType::Autotile8Sides:
   {
     assert(rule.contains("input") && "Input not specified");
@@ -288,6 +317,10 @@ void TileRules::load()
     else if (rule["type"] == "uniform_distribution")
     {
       type = RuleType::UniformDistribution;
+    }
+    else if (rule["type"] == "root_autotile_4_sides")
+    {
+      type = RuleType::RootAutotile4Sides;
     }
     else
     {

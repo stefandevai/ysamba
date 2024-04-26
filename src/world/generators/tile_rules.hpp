@@ -15,6 +15,7 @@ enum class RuleType
   None,
   Identity,
   Autotile4Sides,
+  RootAutotile4Sides,
   Autotile8Sides,
   UniformDistribution,
 };
@@ -65,13 +66,20 @@ struct UniformDistributionRule : public RuleBase
   std::vector<UniformDistributionTransform> output;
 };
 
+struct RootAutoTile4SidesRule : public AutoTile4SidesRule
+{
+  uint32_t front_face_id;
+};
+
 using IdentityRule = RuleBase;
-using Rule = std::variant<IdentityRule, AutoTile4SidesRule, AutoTile8SidesRule, UniformDistributionRule>;
+using Rule = std::variant<IdentityRule, AutoTile4SidesRule, AutoTile8SidesRule, UniformDistributionRule, RootAutoTile4SidesRule>;
 
 struct TileValues
 {
   int top_face;
   int top_face_decoration;
+  int front_face;
+  int front_face_decoration;
 };
 
 class TileRules

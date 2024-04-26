@@ -43,7 +43,7 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
       if (height_modifier > 0.4f)
       {
-        k += 1;
+        k += 5;
       }
 
       k = std::clamp(k, 0, size.z - 1);
@@ -189,42 +189,53 @@ void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const 
     return;
   }
 
+  const bool top_face_visible = chunk->tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z);
+  const bool front_face_visible = chunk->tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, x, y, z);
+
   // TODO: Set non walkable block tile if not visible
-  if (!chunk->tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, x, y, z))
+  if (!top_face_visible && !front_face_visible)
   {
     chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = 1;
     return;
   }
 
-  const auto& root_rule = TileRules::get_root_rule(block_type);
+  Cell old_values = chunk->tiles.values[z * size.x * size.y + y * size.x + x];
+  Cell new_values = old_values;
 
-  TileValues old_values{0, 0};
-  TileValues new_values = m_apply_rule(root_rule, terrain, transposed_x, transposed_y, z);
+  const auto& root_rule = TileRules::get_root_rule(new_values.block_type);
+  m_apply_rule(root_rule, new_values, terrain, transposed_x, transposed_y, z);
 
-  do
+  if (top_face_visible)
   {
-    old_values.top_face = new_values.top_face;
-    old_values.top_face_decoration = new_values.top_face_decoration;
+    do
+    {
+      old_values.top_face = new_values.top_face;
+      old_values.top_face_decoration = new_values.top_face_decoration;
 
-    const auto& rule = TileRules::get_terrain_rule(old_values.top_face);
-    new_values = m_apply_rule(rule, terrain, transposed_x, transposed_y, z);
-  } while (new_values.top_face != 0);
+      const auto& rule = TileRules::get_terrain_rule(old_values.top_face);
+      m_apply_rule(rule, new_values, terrain, transposed_x, transposed_y, z);
+    } while (new_values.top_face != old_values.top_face || new_values.top_face_decoration != old_values.top_face_decoration);
 
-  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = old_values.top_face;
+    chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = old_values.top_face;
 
-  // Select vegetation
-  if (old_values.top_face_decoration == 0)
-  {
-    old_values.top_face_decoration = m_select_top_face_decoration(block_type, x, y, z);
+    // Select vegetation
+    if (new_values.top_face_decoration == 0)
+    {
+      new_values.top_face_decoration = m_select_top_face_decoration(new_values.block_type, x, y, z);
+    }
+
+    chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = new_values.top_face_decoration;
   }
-
-  chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = old_values.top_face_decoration;
+  if (front_face_visible)
+  {
+    // spdlog::debug("FROOOONT {}", new_values.front_face);
+    chunk->tiles.values[z * size.x * size.y + y * size.x + x].front_face = new_values.front_face;
+  }
 }
 
-TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vector<BlockType>& terrain, const int x, const int y, const int z)
+void ChunkGenerator::m_apply_rule(const Rule& rule_variant, Cell& values, const std::vector<BlockType>& terrain, const int x, const int y, const int z)
 {
   const auto index = rule_variant.index();
-  TileValues new_values{0, 0};
 
   switch (index)
   {
@@ -236,8 +247,17 @@ TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vec
   case 1:
   {
     const auto& rule = std::get<AutoTile4SidesRule>(rule_variant);
-    const auto bitmask = m_get_bitmask_4_sided(terrain, x, y, z, rule.neighbor);
-    new_values.top_face = rule.output[bitmask].value;
+    const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);
+    values.top_face = rule.output[bitmask].value;
+    break;
+  }
+
+  case 4:
+  {
+    const auto& rule = std::get<RootAutoTile4SidesRule>(rule_variant);
+    const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);
+    values.top_face = rule.output[bitmask].value;
+    values.front_face = rule.front_face_id;
     break;
   }
 
@@ -255,11 +275,11 @@ TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vec
       {
         if (transform.placement == PlacementType::Terrain)
         {
-          new_values.top_face = transform.value;
+          values.top_face = transform.value;
         }
         else
         {
-          new_values.top_face_decoration = transform.value;
+          values.top_face_decoration = transform.value;
         }
         break;
       }
@@ -270,7 +290,7 @@ TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vec
   case 2:
   {
     const auto& rule = std::get<AutoTile8SidesRule>(rule_variant);
-    const auto bitmask = m_get_bitmask_8_sided(terrain, x, y, z, rule.neighbor, static_cast<BlockType>(rule.input));
+    const auto bitmask = m_get_bitmask_8_sided_horizontal(terrain, x, y, z, rule.neighbor, static_cast<BlockType>(rule.input));
     int new_terrain_id = 0;
 
     switch (bitmask)
@@ -428,14 +448,12 @@ TileValues ChunkGenerator::m_apply_rule(const Rule& rule_variant, const std::vec
       spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
     }
 
-    new_values.top_face = new_terrain_id;
+    values.top_face = new_terrain_id;
     break;
   }
   default:
     break;
   }
-
-  return new_values;
 }
 
 int ChunkGenerator::m_select_top_face_decoration(const BlockType block_type, const int x, const int y, const int z)
@@ -493,7 +511,7 @@ int ChunkGenerator::m_select_top_face_decoration(const BlockType block_type, con
   return top_face_decoration;
 }
 
-uint32_t ChunkGenerator::m_get_bitmask_4_sided(
+uint32_t ChunkGenerator::m_get_bitmask_4_sided_horizontal(
     const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor)
 {
   uint32_t bitmask = 0;
@@ -524,7 +542,7 @@ uint32_t ChunkGenerator::m_get_bitmask_4_sided(
   return bitmask;
 }
 
-uint32_t ChunkGenerator::m_get_bitmask_8_sided(
+uint32_t ChunkGenerator::m_get_bitmask_8_sided_horizontal(
     const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor, const BlockType source)
 {
   if (!m_has_neighbor(terrain, x, y, z, neighbor))

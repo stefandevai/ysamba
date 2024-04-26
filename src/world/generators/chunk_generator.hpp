@@ -59,14 +59,14 @@ class ChunkGenerator
 
   void m_select_tile(const std::vector<BlockType>& terrain, const int x, const int y, const int z);
 
-  TileValues m_apply_rule(const Rule& rule_variant, const std::vector<BlockType>& terrain, int x, int y, int z);
+  void m_apply_rule(const Rule& rule_variant, Cell& values, const std::vector<BlockType>& terrain, int x, int y, int z);
 
   int m_select_top_face_decoration(const BlockType block_type, const int x, const int y, const int z);
 
-  uint32_t m_get_bitmask_4_sided(
+  uint32_t m_get_bitmask_4_sided_horizontal(
       const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);
 
-  uint32_t m_get_bitmask_8_sided(
+  uint32_t m_get_bitmask_8_sided_horizontal(
       const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor, const BlockType source);
 
   bool m_has_neighbor(const std::vector<BlockType>& terrain, const int x, const int y, const int z, const BlockType neighbor);

@@ -157,7 +157,8 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
 
             for (int z = height; z >= 0; --z)
             {
-              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z))
+              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z) &&
+                  !chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
               {
                 continue;
               }
@@ -165,8 +166,16 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
               const Vector3i local_position{local_i, local_j, z};
 
-              m_render_map_tile(chunk, cell.top_face, local_position);
-              m_render_map_tile(chunk, cell.top_face_decoration, local_position, 1);
+              if (chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z))
+              {
+                m_render_map_tile(chunk, cell.top_face, local_position);
+                m_render_map_tile(chunk, cell.top_face_decoration, local_position, 1);
+              }
+              if (chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
+              {
+                m_render_map_tile(chunk, cell.front_face, local_position);
+                m_render_map_tile(chunk, cell.front_face_decoration, local_position, 1);
+              }
             }
           }
         }
@@ -233,7 +242,8 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
 
             for (int z = height; z >= 0; --z)
             {
-              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z))
+              if (!chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z) &&
+                  !chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
               {
                 continue;
               }
@@ -241,8 +251,16 @@ void RenderSystem::m_render_map_tiles(const Camera& camera)
               const auto& cell = chunk.tiles.cell_at(local_i, local_j, z);
               const Vector3i local_position{local_i, local_j, z};
 
-              m_render_map_tile(chunk, cell.top_face, local_position);
-              m_render_map_tile(chunk, cell.top_face_decoration, local_position, 1);
+              if (chunk.tiles.has_flags(DL_CELL_FLAG_TOP_FACE_VISIBLE, local_i, local_j, z))
+              {
+                m_render_map_tile(chunk, cell.top_face, local_position);
+                m_render_map_tile(chunk, cell.top_face_decoration, local_position, 1);
+              }
+              if (chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, local_i, local_j, z))
+              {
+                m_render_map_tile(chunk, cell.front_face, local_position);
+                m_render_map_tile(chunk, cell.front_face_decoration, local_position, 1);
+              }
             }
           }
         }
@@ -264,6 +282,7 @@ void RenderSystem::m_render_map_tile(const Chunk& chunk,
   const auto& tile = m_tiles.at(tile_id);
   const Vector3i world_position = chunk.position + position;
 
+  // TODO: Add anchor and size to single type sprites so that we don't have to branch here
   if (tile.frame_data->sprite_type == SpriteType::Single)
   {
     m_batch.tile(tile,
@@ -272,26 +291,18 @@ void RenderSystem::m_render_map_tile(const Chunk& chunk,
                  world_position.z * m_tile_size.y + z_index * m_z_index_increment,
                  tile.frame_data->default_face);
 
-    // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
-    if (chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, position.x, position.y, position.z))
-    {
-      m_batch.tile(tile,
-                   world_position.x * m_tile_size.x,
-                   world_position.y * m_tile_size.y,
-                   (world_position.z - 1) * m_tile_size.y,
-                   DL_RENDER_FACE_FRONT);
-    }
+    // // TODO: Add neighbour chunk references to each chunk to be able to check tiles after the chunk bounds
+    // if (chunk.tiles.has_flags(DL_CELL_FLAG_FRONT_FACE_VISIBLE, position.x, position.y, position.z))
+    // {
+    //   m_batch.tile(tile,
+    //                world_position.x * m_tile_size.x,
+    //                world_position.y * m_tile_size.y,
+    //                (world_position.z - 1) * m_tile_size.y,
+    //                DL_RENDER_FACE_FRONT);
+    // }
   }
   else if (tile.frame_data->sprite_type == SpriteType::Multiple)
   {
-    const auto pattern_size = tile.frame_data->pattern_size;
-
-    if (pattern_size.x > 1 && pattern_size.y > 1
-        && !chunk.tiles.has_pattern(tile.frame_data->pattern, pattern_size, position))
-    {
-      return;
-    }
-
     m_batch.tile(tile,
                  (world_position.x - tile.frame_data->anchor_x) * m_tile_size.x,
                  (world_position.y - tile.frame_data->anchor_y) * m_tile_size.y,

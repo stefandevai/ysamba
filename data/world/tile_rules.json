@@ -60,8 +60,9 @@
       "label": "grass autotile",
       "category": "root",
       "input": 2,
-      "type": "autotile_4_sides",
+      "type": "root_autotile_4_sides",
       "neighbor": 0,
+      "front_face_id": 39,
       "output": [
         {
           "bitmask": 0,
@@ -332,8 +333,9 @@
       "label": "basalt autotile",
       "category": "root",
       "input": 4,
-      "type": "autotile_4_sides",
+      "type": "root_autotile_4_sides",
       "neighbor": 0,
+      "front_face_id": 39,
       "output": [
         {
           "bitmask": 0,
