@@ -1,59 +1,109 @@
 #pragma once
 
 #include <vector>
-#include <memory>
+#include <cstdint>
+#include "core/maths/vector.hpp"
 #include "world/cell.hpp"
+#include "world/chunk.hpp"
 
 namespace dl
 {
 struct TileProcedureData
 {
+  Cell& cell;
+  Vector3i& cell_position;
+  Vector3i& padded_size;
   std::vector<BlockType>& terrain;
-}
+};
 
-struct TileProcedureNode
+class TileProcedureNode
 {
-  TileProcedureData* data = nullptr;
-  std::vector<std::unique_ptr<TileProcedureNode>> children{};
-
+public:
   TileProcedureNode() = default;
   virtual ~TileProcedureNode() = default;
 
-  virtual void apply() = 0;
+  virtual void apply(TileProcedureData& data) = 0;
+};
 
-  void set_data(TileProcedureData* data)
+typedef enum
+{
+  DL_EDGE_NONE = 0,
+  DL_EDGE_TOP = 1,
+  DL_EDGE_RIGHT = 2,
+  DL_EDGE_BOTTOM = 4,
+  DL_EDGE_LEFT = 8,
+  DL_EDGE_TOP_LEFT = 16,
+  DL_EDGE_TOP_RIGHT = 32,
+  DL_EDGE_BOTTOM_RIGHT = 64,
+  DL_EDGE_BOTTOM_LEFT = 128,
+} Edge;
+
+class AutotileFourSidesHorizontal : public TileProcedureNode
+{
+public:
+  TileProcedureNode* source = nullptr;
+  BlockType neighbor = BlockType::None;
+  std::array<uint32_t, 16> bitmask_values{};
+
+  void set_source(TileProcedureNode* source)
   {
-    this->data = data;
+    this->source = source;
   }
 
-  void run()
+  void set_neighbor(BlockType neighbor)
   {
-    apply();
+    this->neighbor = neighbor;
+  }
 
-    for (auto& child : children)
+  void set_bitmask_values(std::array<uint32_t, 16> bitmask_values)
+  {
+    this->bitmask_values = std::move(bitmask_values);
+  }
+
+  void apply(TileProcedureData& data) override
+  {
+    if (source != nullptr)
     {
-      child->set_data(data);
-      child->apply();
-      child->run();
+      source->apply(data);
     }
-  }
-}
 
-struct IdentityProcedure : public TileProcedureNode
-{
-  void apply() override
+    const auto bitmask = m_get_bitmask(data);
+
+    data.cell.top_face = bitmask_values[bitmask];
+  }
+
+private:
+  uint32_t m_get_bitmask(TileProcedureData data)
   {
-    // Do nothing
+    uint32_t bitmask = 0;
+    const auto terrain = data.terrain;
+    const auto& padded_size = data.padded_size;
+    const auto& position = data.cell_position;
+
+    // Top
+    if (position.y > 0 && terrain[position.z * padded_size.x * padded_size.y + (position.y - 1) * padded_size.x + position.x] == neighbor)
+    {
+      bitmask |= DL_EDGE_TOP;
+    }
+    // Right
+    if (position.x < padded_size.x - 1
+        && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1] == neighbor)
+    {
+      bitmask |= DL_EDGE_RIGHT;
+    }
+    // Bottom
+    if (position.y < padded_size.y - 1
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y + 1) * padded_size.x + position.x] == neighbor)
+    {
+      bitmask |= DL_EDGE_BOTTOM;
+    }
+    // Left
+    if (position.x > 0 && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1] == neighbor)
+    {
+      bitmask |= DL_EDGE_LEFT;
+    }
+
+    return bitmask;
   }
-}
-
-struct AutotileFourSides : public TileProcedureNode
-{
-  BlockType neighbor;
-
-  void apply() override
-  {
-  }
-}
-
+};
 }

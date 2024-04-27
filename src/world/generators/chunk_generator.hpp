@@ -57,9 +57,9 @@ class ChunkGenerator
 
   BiomeType m_sample_biome(const Vector3i& world_position);
 
-  void m_select_tile(const std::vector<BlockType>& terrain, const int x, const int y, const int z);
+  void m_select_tile(std::vector<BlockType>& terrain, const int x, const int y, const int z);
 
-  void m_apply_rule(const Rule& rule_variant, Cell& values, const std::vector<BlockType>& terrain, int x, int y, int z);
+  void m_apply_rule(const Rule& rule_variant, Cell& values, std::vector<BlockType>& terrain, int x, int y, int z);
 
   int m_select_top_face_decoration(const BlockType block_type, const int x, const int y, const int z);
 

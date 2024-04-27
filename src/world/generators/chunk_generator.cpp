@@ -11,6 +11,8 @@
 #include "core/maths/utils.hpp"
 #include "world/chunk.hpp"
 #include "world/generators/utils.hpp"
+#include "world/generators/tile_procedure.hpp"
+#include "world/generators/tile_procedure_manager.hpp"
 #include "world/metadata.hpp"
 #include "world/utils.hpp"
 
@@ -136,6 +138,8 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   chunk->tiles.compute_visibility();
 
+  TileProcedureManager::init();
+
   for (int k = 0; k < size.z; ++k)
   {
     for (int j = 0; j < size.y; ++j)
@@ -176,7 +180,7 @@ void ChunkGenerator::m_generate_noise_data(const int seed, const Vector3i& offse
       vegetation_density.data(), offset.x, offset.y, size.x, size.y, 0.05f, seed + 50);
 }
 
-void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const int x, const int y, const int z)
+void ChunkGenerator::m_select_tile(std::vector<BlockType>& terrain, const int x, const int y, const int z)
 {
   const int transposed_x = x + m_padding;
   const int transposed_y = y + m_padding;
@@ -235,7 +239,7 @@ void ChunkGenerator::m_select_tile(const std::vector<BlockType>& terrain, const 
 
 void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
                                   Cell& values,
-                                  const std::vector<BlockType>& terrain,
+                                  std::vector<BlockType>& terrain,
                                   const int x,
                                   const int y,
                                   const int z)
@@ -259,9 +263,14 @@ void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
 
   case 4:
   {
+    auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
+    Vector3i cell_position = {x, y, z};
+    TileProcedureData data{values, cell_position, m_padded_size, terrain};
+    procedure->apply(data);
+     
     const auto& rule = std::get<RootAutoTile4SidesRule>(rule_variant);
-    const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);
-    values.top_face = rule.output[bitmask].value;
+    // const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);
+    // values.top_face = rule.output[bitmask].value;
     values.front_face = rule.front_face_id;
     break;
   }
