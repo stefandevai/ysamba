@@ -74,10 +74,10 @@ public:
   }
 
 private:
-  uint32_t m_get_bitmask(TileProcedureData data)
+  uint32_t m_get_bitmask(TileProcedureData& data)
   {
     uint32_t bitmask = 0;
-    const auto terrain = data.terrain;
+    const auto& terrain = data.terrain;
     const auto& padded_size = data.padded_size;
     const auto& position = data.cell_position;
 
