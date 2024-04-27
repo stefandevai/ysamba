@@ -203,38 +203,47 @@ void ChunkGenerator::m_select_tile(std::vector<BlockType>& terrain, const int x,
     return;
   }
 
-  Cell old_values = chunk->tiles.values[z * size.x * size.y + y * size.x + x];
-  Cell new_values = old_values;
+  // if (top_face_visible && block_type == BlockType::Grass)
+  // {
+    auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
+    Vector3i cell_position = {transposed_x, transposed_y, z};
+    TileProcedureData data{chunk->tiles.values[z * size.x * size.y + y * size.x + x], cell_position, m_padded_size, terrain};
+    procedure->apply(data);
+  //   return;
+  // }
 
-  const auto& root_rule = TileRules::get_root_rule(new_values.block_type);
-  m_apply_rule(root_rule, new_values, terrain, transposed_x, transposed_y, z);
-
-  if (top_face_visible)
-  {
-    do
-    {
-      old_values.top_face = new_values.top_face;
-      old_values.top_face_decoration = new_values.top_face_decoration;
-
-      const auto& rule = TileRules::get_terrain_rule(old_values.top_face);
-      m_apply_rule(rule, new_values, terrain, transposed_x, transposed_y, z);
-    } while (new_values.top_face != old_values.top_face
-             || new_values.top_face_decoration != old_values.top_face_decoration);
-
-    chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = old_values.top_face;
-
-    // Select vegetation
-    if (new_values.top_face_decoration == 0)
-    {
-      new_values.top_face_decoration = m_select_top_face_decoration(new_values.block_type, x, y, z);
-    }
-
-    chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = new_values.top_face_decoration;
-  }
-  if (front_face_visible)
-  {
-    chunk->tiles.values[z * size.x * size.y + y * size.x + x].front_face = new_values.front_face;
-  }
+  // Cell old_values = chunk->tiles.values[z * size.x * size.y + y * size.x + x];
+  // Cell new_values = old_values;
+  //
+  // const auto& root_rule = TileRules::get_root_rule(new_values.block_type);
+  // m_apply_rule(root_rule, new_values, terrain, transposed_x, transposed_y, z);
+  //
+  // if (top_face_visible)
+  // {
+  //   do
+  //   {
+  //     old_values.top_face = new_values.top_face;
+  //     old_values.top_face_decoration = new_values.top_face_decoration;
+  //
+  //     const auto& rule = TileRules::get_terrain_rule(old_values.top_face);
+  //     m_apply_rule(rule, new_values, terrain, transposed_x, transposed_y, z);
+  //   } while (new_values.top_face != old_values.top_face
+  //            || new_values.top_face_decoration != old_values.top_face_decoration);
+  //
+  //   chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face = old_values.top_face;
+  //
+  //   // Select vegetation
+  //   if (new_values.top_face_decoration == 0)
+  //   {
+  //     new_values.top_face_decoration = m_select_top_face_decoration(new_values.block_type, x, y, z);
+  //   }
+  //
+  //   chunk->tiles.values[z * size.x * size.y + y * size.x + x].top_face_decoration = new_values.top_face_decoration;
+  // }
+  // if (front_face_visible)
+  // {
+  //   chunk->tiles.values[z * size.x * size.y + y * size.x + x].front_face = new_values.front_face;
+  // }
 }
 
 void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
@@ -268,10 +277,10 @@ void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
     TileProcedureData data{values, cell_position, m_padded_size, terrain};
     procedure->apply(data);
      
-    const auto& rule = std::get<RootAutoTile4SidesRule>(rule_variant);
+    // const auto& rule = std::get<RootAutoTile4SidesRule>(rule_variant);
     // const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);
     // values.top_face = rule.output[bitmask].value;
-    values.front_face = rule.front_face_id;
+    // values.front_face = rule.front_face_id;
     break;
   }
 

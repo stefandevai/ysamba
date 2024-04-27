@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include "core/maths/vector.hpp"
+#include "core/maths/random.hpp"
 #include "world/cell.hpp"
 #include "world/chunk.hpp"
 
@@ -104,6 +105,103 @@ private:
     }
 
     return bitmask;
+  }
+};
+
+class SetFrontFace : public TileProcedureNode
+{
+public:
+  TileProcedureNode* source = nullptr;
+  uint32_t front_face_id = 0;
+
+  void set_source(TileProcedureNode* source)
+  {
+    this->source = source;
+  }
+
+  void set_front_face_id(uint32_t front_face_id)
+  {
+    this->front_face_id = front_face_id;
+  }
+
+  void apply(TileProcedureData& data) override
+  {
+    if (source != nullptr)
+    {
+      source->apply(data);
+    }
+
+    data.cell.front_face = front_face_id;
+  }
+};
+
+class ChooseByUniformDistribution : public TileProcedureNode
+{
+public:
+  enum class PlacementType
+  {
+    Terrain,
+    Decoration,
+  };
+
+  struct Candidate
+  {
+    int value;
+    double probability;
+    PlacementType placement;
+  };
+
+  TileProcedureNode* source = nullptr;
+  uint32_t top_face_input = 0;
+  std::vector<Candidate> candidates{};
+
+  void set_source(TileProcedureNode* source)
+  {
+    this->source = source;
+  }
+
+  void set_candidates(std::vector<Candidate> candidates)
+  {
+    this->candidates = std::move(candidates);
+  }
+
+  void set_top_face_input(uint32_t top_face_input)
+  {
+    this->top_face_input = top_face_input;
+  }
+
+  void apply(TileProcedureData& data) override
+  {
+    if (source != nullptr)
+    {
+      source->apply(data);
+    }
+
+    if (data.cell.top_face != top_face_input)
+    {
+      return;
+    }
+
+    const auto probability = random::get_real();
+    double cumulative_probability = 0.0;
+
+    for (const auto& candidate : candidates)
+    {
+      cumulative_probability += candidate.probability;
+
+      if (probability < cumulative_probability)
+      {
+        if (candidate.placement == PlacementType::Terrain)
+        {
+          data.cell.top_face = candidate.value;
+        }
+        else
+        {
+          data.cell.top_face_decoration = candidate.value;
+        }
+        return;
+      }
+    }
   }
 };
 }
