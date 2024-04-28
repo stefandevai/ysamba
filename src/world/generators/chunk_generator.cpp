@@ -10,9 +10,9 @@
 #include "core/maths/random.hpp"
 #include "core/maths/utils.hpp"
 #include "world/chunk.hpp"
-#include "world/generators/utils.hpp"
 #include "world/generators/tile_procedure.hpp"
 #include "world/generators/tile_procedure_manager.hpp"
+#include "world/generators/utils.hpp"
 #include "world/metadata.hpp"
 #include "world/utils.hpp"
 
@@ -205,10 +205,11 @@ void ChunkGenerator::m_select_tile(std::vector<BlockType>& terrain, const int x,
 
   // if (top_face_visible && block_type == BlockType::Grass)
   // {
-    auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
-    Vector3i cell_position = {transposed_x, transposed_y, z};
-    TileProcedureData data{chunk->tiles.values[z * size.x * size.y + y * size.x + x], cell_position, m_padded_size, terrain};
-    procedure->apply(data);
+  auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
+  Vector3i cell_position = {transposed_x, transposed_y, z};
+  TileProcedureData data{
+      chunk->tiles.values[z * size.x * size.y + y * size.x + x], cell_position, m_padded_size, terrain};
+  procedure->apply(data);
   //   return;
   // }
 
@@ -246,12 +247,8 @@ void ChunkGenerator::m_select_tile(std::vector<BlockType>& terrain, const int x,
   // }
 }
 
-void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
-                                  Cell& values,
-                                  std::vector<BlockType>& terrain,
-                                  const int x,
-                                  const int y,
-                                  const int z)
+void ChunkGenerator::m_apply_rule(
+    const Rule& rule_variant, Cell& values, std::vector<BlockType>& terrain, const int x, const int y, const int z)
 {
   const auto index = rule_variant.index();
 
@@ -276,7 +273,7 @@ void ChunkGenerator::m_apply_rule(const Rule& rule_variant,
     Vector3i cell_position = {x, y, z};
     TileProcedureData data{values, cell_position, m_padded_size, terrain};
     procedure->apply(data);
-     
+
     // const auto& rule = std::get<RootAutoTile4SidesRule>(rule_variant);
     // const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);
     // values.top_face = rule.output[bitmask].value;

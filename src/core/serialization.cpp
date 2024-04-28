@@ -50,8 +50,15 @@ constexpr uint8_t values_marker = 0x02;
 constexpr uint8_t height_map_marker = 0x03;
 constexpr uint8_t end_marker = 0x04;
 
-constexpr size_t marker_size = sizeof(uint8_t);
-constexpr size_t cell_size = sizeof(Cell);
+constexpr std::size_t magic_number_size = sizeof(terrain_ext::magic_number);
+constexpr std::size_t marker_size = sizeof(uint8_t);
+constexpr std::size_t cell_size = sizeof(Cell);
+constexpr std::size_t markers_size = marker_size * 4;
+constexpr std::size_t chunk_size_size = sizeof(Vector3i);
+constexpr std::size_t cell_values_size = cell_size * world::chunk_size.x * world::chunk_size.y * world::chunk_size.z;
+constexpr std::size_t height_map_size = sizeof(int) * world::chunk_size.x * world::chunk_size.y;
+constexpr std::size_t chunk_data_buffer_size
+    = magic_number_size + markers_size + chunk_size_size + cell_values_size + height_map_size;
 }  // namespace terrain_ext
 
 void initialize_directories()
@@ -82,6 +89,17 @@ void save_world_metadata(const WorldMetadata& metadata)
   if (!std::filesystem::exists(world_directory))
   {
     std::filesystem::create_directory(world_directory);
+  }
+
+  const auto chunks_directory = directory::worlds / metadata.id / directory::chunks;
+
+  if (!std::filesystem::exists(chunks_directory))
+  {
+    std::filesystem::create_directories(chunks_directory);
+  }
+  else if (!std::filesystem::is_directory(chunks_directory))
+  {
+    spdlog::critical("{} is not a directory", chunks_directory.string());
   }
 
   std::ofstream output{world_directory / filename::metadata};
@@ -220,52 +238,42 @@ bool chunk_exists(const Vector3i& position, const std::string& world_id)
 
 void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 {
-  const auto chunks_directory = directory::worlds / world_id / directory::chunks;
+  const auto chunk_file_path = fmt::format("{}/{}/{}/{}_{}_{}.chunk",
+                                           directory::worlds.string(),
+                                           world_id,
+                                           directory::chunks.string(),
+                                           chunk.position.x,
+                                           chunk.position.y,
+                                           chunk.position.z);
 
-  if (!std::filesystem::exists(chunks_directory))
-  {
-    std::filesystem::create_directories(chunks_directory);
-  }
-  else if (!std::filesystem::is_directory(chunks_directory))
-  {
-    spdlog::critical("{} is not a directory", chunks_directory.string());
-    return;
-  }
-
-  const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = chunks_directory / filename;
-  const auto& tiles = chunk.tiles;
-
-  std::ofstream outfile{full_path.c_str(), std::ios::binary | std::ios::out};
+  std::ofstream outfile{chunk_file_path.c_str(), std::ios::binary | std::ios::out};
 
   if (!outfile.is_open())
   {
-    spdlog::critical("Could not open file to save chunk: {}", full_path.string());
+    spdlog::critical("Could not open file to save chunk: {}", chunk_file_path);
     return;
   }
 
-  outfile.write(reinterpret_cast<const char*>(&terrain_ext::magic_number), sizeof(terrain_ext::magic_number));
+  char buffer[terrain_ext::chunk_data_buffer_size] = {0};
 
-  outfile.write(reinterpret_cast<const char*>(&terrain_ext::metadata_marker), sizeof(terrain_ext::metadata_marker));
+  std::size_t offset = 0;
+  memcpy(buffer, reinterpret_cast<const char*>(&terrain_ext::magic_number), terrain_ext::magic_number_size);
+  offset += terrain_ext::magic_number_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::metadata_marker), terrain_ext::markers_size);
+  offset += terrain_ext::markers_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&chunk.tiles.size), terrain_ext::chunk_size_size);
+  offset += terrain_ext::chunk_size_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::values_marker), terrain_ext::markers_size);
+  offset += terrain_ext::markers_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(chunk.tiles.values.data()), terrain_ext::cell_values_size);
+  offset += terrain_ext::cell_values_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::height_map_marker), terrain_ext::markers_size);
+  offset += terrain_ext::markers_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(chunk.tiles.height_map.data()), terrain_ext::height_map_size);
+  offset += terrain_ext::height_map_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::end_marker), terrain_ext::marker_size);
 
-  outfile.write(reinterpret_cast<const char*>(&tiles.size.x), sizeof(tiles.size));
-
-  outfile.write(reinterpret_cast<const char*>(&terrain_ext::values_marker), sizeof(terrain_ext::values_marker));
-
-  for (const auto& cell : tiles.values)
-  {
-    outfile.write(reinterpret_cast<const char*>(&cell.top_face), sizeof(Cell));
-  }
-
-  outfile.write(reinterpret_cast<const char*>(&terrain_ext::height_map_marker), sizeof(terrain_ext::height_map_marker));
-
-  for (const int value : tiles.height_map)
-  {
-    outfile.write(reinterpret_cast<const char*>(&value), sizeof(value));
-  }
-
-  outfile.write(reinterpret_cast<const char*>(&terrain_ext::end_marker), sizeof(terrain_ext::end_marker));
-
+  outfile.write(buffer, terrain_ext::chunk_data_buffer_size);
   outfile.close();
 }
 

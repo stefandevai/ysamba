@@ -1,9 +1,10 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
-#include "core/maths/vector.hpp"
+#include <vector>
+
 #include "core/maths/random.hpp"
+#include "core/maths/vector.hpp"
 #include "world/cell.hpp"
 #include "world/chunk.hpp"
 
@@ -19,7 +20,7 @@ struct TileProcedureData
 
 class TileProcedureNode
 {
-public:
+ public:
   TileProcedureNode() = default;
   virtual ~TileProcedureNode() = default;
 
@@ -41,25 +42,16 @@ typedef enum
 
 class AutotileFourSidesHorizontal : public TileProcedureNode
 {
-public:
+ public:
   TileProcedureNode* source = nullptr;
   BlockType neighbor = BlockType::None;
   std::array<uint32_t, 16> bitmask_values{};
 
-  void set_source(TileProcedureNode* source)
-  {
-    this->source = source;
-  }
+  void set_source(TileProcedureNode* source) { this->source = source; }
 
-  void set_neighbor(BlockType neighbor)
-  {
-    this->neighbor = neighbor;
-  }
+  void set_neighbor(BlockType neighbor) { this->neighbor = neighbor; }
 
-  void set_bitmask_values(std::array<uint32_t, 16> bitmask_values)
-  {
-    this->bitmask_values = std::move(bitmask_values);
-  }
+  void set_bitmask_values(std::array<uint32_t, 16> bitmask_values) { this->bitmask_values = std::move(bitmask_values); }
 
   void apply(TileProcedureData& data) override
   {
@@ -73,7 +65,7 @@ public:
     data.cell.top_face = bitmask_values[bitmask];
   }
 
-private:
+ private:
   uint32_t m_get_bitmask(TileProcedureData& data)
   {
     uint32_t bitmask = 0;
@@ -82,24 +74,30 @@ private:
     const auto& position = data.cell_position;
 
     // Top
-    if (position.y > 0 && terrain[position.z * padded_size.x * padded_size.y + (position.y - 1) * padded_size.x + position.x] == neighbor)
+    if (position.y > 0
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y - 1) * padded_size.x + position.x]
+               == neighbor)
     {
       bitmask |= DL_EDGE_TOP;
     }
     // Right
     if (position.x < padded_size.x - 1
-        && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1] == neighbor)
+        && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_RIGHT;
     }
     // Bottom
     if (position.y < padded_size.y - 1
-        && terrain[position.z * padded_size.x * padded_size.y + (position.y + 1) * padded_size.x + position.x] == neighbor)
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y + 1) * padded_size.x + position.x]
+               == neighbor)
     {
       bitmask |= DL_EDGE_BOTTOM;
     }
     // Left
-    if (position.x > 0 && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1] == neighbor)
+    if (position.x > 0
+        && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_LEFT;
     }
@@ -110,19 +108,13 @@ private:
 
 class SetFrontFace : public TileProcedureNode
 {
-public:
+ public:
   TileProcedureNode* source = nullptr;
   uint32_t front_face_id = 0;
 
-  void set_source(TileProcedureNode* source)
-  {
-    this->source = source;
-  }
+  void set_source(TileProcedureNode* source) { this->source = source; }
 
-  void set_front_face_id(uint32_t front_face_id)
-  {
-    this->front_face_id = front_face_id;
-  }
+  void set_front_face_id(uint32_t front_face_id) { this->front_face_id = front_face_id; }
 
   void apply(TileProcedureData& data) override
   {
@@ -137,7 +129,7 @@ public:
 
 class ChooseByUniformDistribution : public TileProcedureNode
 {
-public:
+ public:
   enum class PlacementType
   {
     Terrain,
@@ -155,20 +147,11 @@ public:
   uint32_t top_face_input = 0;
   std::vector<Candidate> candidates{};
 
-  void set_source(TileProcedureNode* source)
-  {
-    this->source = source;
-  }
+  void set_source(TileProcedureNode* source) { this->source = source; }
 
-  void set_candidates(std::vector<Candidate> candidates)
-  {
-    this->candidates = std::move(candidates);
-  }
+  void set_candidates(std::vector<Candidate> candidates) { this->candidates = std::move(candidates); }
 
-  void set_top_face_input(uint32_t top_face_input)
-  {
-    this->top_face_input = top_face_input;
-  }
+  void set_top_face_input(uint32_t top_face_input) { this->top_face_input = top_face_input; }
 
   void apply(TileProcedureData& data) override
   {
@@ -204,4 +187,4 @@ public:
     }
   }
 };
-}
+}  // namespace dl
