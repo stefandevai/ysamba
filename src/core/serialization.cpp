@@ -50,7 +50,7 @@ constexpr uint8_t values_marker = 0x02;
 constexpr uint8_t height_map_marker = 0x03;
 constexpr uint8_t end_marker = 0x04;
 
-constexpr std::size_t magic_number_size = sizeof(terrain_ext::magic_number);
+constexpr std::size_t magic_number_size = sizeof(uint32_t);
 constexpr std::size_t marker_size = sizeof(uint8_t);
 constexpr std::size_t cell_size = sizeof(Cell);
 constexpr std::size_t markers_size = marker_size * 4;
@@ -259,16 +259,16 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
   std::size_t offset = 0;
   memcpy(buffer, reinterpret_cast<const char*>(&terrain_ext::magic_number), terrain_ext::magic_number_size);
   offset += terrain_ext::magic_number_size;
-  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::metadata_marker), terrain_ext::markers_size);
-  offset += terrain_ext::markers_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::metadata_marker), terrain_ext::marker_size);
+  offset += terrain_ext::marker_size;
   memcpy(buffer + offset, reinterpret_cast<const char*>(&chunk.tiles.size), terrain_ext::chunk_size_size);
   offset += terrain_ext::chunk_size_size;
-  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::values_marker), terrain_ext::markers_size);
-  offset += terrain_ext::markers_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::values_marker), terrain_ext::marker_size);
+  offset += terrain_ext::marker_size;
   memcpy(buffer + offset, reinterpret_cast<const char*>(chunk.tiles.values.data()), terrain_ext::cell_values_size);
   offset += terrain_ext::cell_values_size;
-  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::height_map_marker), terrain_ext::markers_size);
-  offset += terrain_ext::markers_size;
+  memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::height_map_marker), terrain_ext::marker_size);
+  offset += terrain_ext::marker_size;
   memcpy(buffer + offset, reinterpret_cast<const char*>(chunk.tiles.height_map.data()), terrain_ext::height_map_size);
   offset += terrain_ext::height_map_size;
   memcpy(buffer + offset, reinterpret_cast<const char*>(&terrain_ext::end_marker), terrain_ext::marker_size);
@@ -279,24 +279,24 @@ void save_game_chunk(const Chunk& chunk, const std::string& world_id)
 
 void load_game_chunk(Chunk& chunk, const std::string& world_id)
 {
-  const auto filename = fmt::format("{}_{}_{}.chunk", chunk.position.x, chunk.position.y, chunk.position.z);
-  const auto full_path = directory::worlds / world_id / directory::chunks / filename;
+  const auto chunk_file_path = fmt::format("{}/{}/{}/{}_{}_{}.chunk",
+                                           directory::worlds.string(),
+                                           world_id,
+                                           directory::chunks.string(),
+                                           chunk.position.x,
+                                           chunk.position.y,
+                                           chunk.position.z);
 
-  if (!std::filesystem::exists(full_path))
+  if (!std::filesystem::exists(chunk_file_path))
   {
-    spdlog::critical("Chunk file doest not does not exist: {}", filename.c_str());
+    spdlog::critical("Chunk file doest not does not exist: {}", chunk_file_path.c_str());
     return;
   }
 
-  // Timer timer1{};
-  // Timer timer2{};
-  // Timer timer3{};
-  // timer1.start();
-
 #ifdef _WIN32
-  FILE* file = _wfopen(full_path.c_str(), L"r");
+  FILE* file = _wfopen(chunk_file_path.c_str(), L"r");
 #else
-  FILE* file = fopen(full_path.c_str(), "r");
+  FILE* file = fopen(chunk_file_path.c_str(), "r");
 #endif
 
   auto& tiles = chunk.tiles;
@@ -337,11 +337,6 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
 
   fread(&world_size.x, sizeof(uint32_t), 3, file);
 
-  // timer1.stop();
-  // timer2.start();
-
-  // spdlog::debug("World size: {} {} {}", world_size.x, world_size.y, world_size.z);
-
   assert(world_size.x >= tiles.size.x && world_size.y >= tiles.size.y && world_size.z >= tiles.size.z
          && "Chunk size is bigger than world size.");
 
@@ -357,13 +352,6 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
 
   const uint64_t values_pos = ftell(file);
   const uint64_t max_cell_pos = world_size.x * world_size.y * world_size.z * terrain_ext::cell_size;
-
-  // const auto& position = chunk.position;
-  // const uint64_t local_position =
-  //     ((position.x) + (position.y + 0) * world_size.x + (position.z + 0) * world_size.x * world_size.y) *
-  //     terrain_ext::cell_size;
-  //
-  // fseek(file, local_position, SEEK_CUR);
 
   for (int z = 0; z < tiles.size.z; ++z)
   {
@@ -388,9 +376,6 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
     }
   }
 
-  // timer2.stop();
-  // timer3.start();
-
   const auto pos_offset = ftell(file) - values_pos;
 
   fseek(file, max_cell_pos - pos_offset, SEEK_CUR);
@@ -405,10 +390,6 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
     return;
   }
 
-  // const uint64_t local_position2 = ((0 + 0) + (0 + 0) * world_size.x) * sizeof(int);
-  //
-  // fseek(file, local_position2, SEEK_CUR);
-
   for (int y = 0; y < tiles.size.y; ++y)
   {
     if (y > 0)
@@ -421,11 +402,6 @@ void load_game_chunk(Chunk& chunk, const std::string& world_id)
       fread(&tiles.height_map[x + y * tiles.size.x], sizeof(int), 1, file);
     }
   }
-
-  // timer3.stop();
-  // timer1.print("metadata");
-  // timer2.print("cells");
-  // timer3.print("height_map");
 
   fclose(file);
 }
