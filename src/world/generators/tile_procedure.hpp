@@ -12,10 +12,11 @@ namespace dl
 {
 struct TileProcedureData
 {
-  Cell& cell;
-  Vector3i& cell_position;
-  Vector3i& padded_size;
-  std::vector<BlockType>& terrain;
+  Chunk* chunk;
+  Cell* cell;
+  Vector3i* cell_position;
+  Vector3i* padded_size;
+  std::vector<BlockType>* terrain;
 };
 
 class TileProcedureNode
@@ -62,16 +63,16 @@ class AutotileFourSidesHorizontal : public TileProcedureNode
 
     const auto bitmask = m_get_bitmask(data);
 
-    data.cell.top_face = bitmask_values[bitmask];
+    data.cell->top_face = bitmask_values[bitmask];
   }
 
  private:
   uint32_t m_get_bitmask(TileProcedureData& data)
   {
     uint32_t bitmask = 0;
-    const auto& terrain = data.terrain;
-    const auto& padded_size = data.padded_size;
-    const auto& position = data.cell_position;
+    const auto& terrain = *data.terrain;
+    const auto& padded_size = *data.padded_size;
+    const auto& position = *data.cell_position;
 
     // Top
     if (position.y > 0
@@ -123,7 +124,7 @@ class SetFrontFace : public TileProcedureNode
       source->apply(data);
     }
 
-    data.cell.front_face = front_face_id;
+    data.cell->front_face = front_face_id;
   }
 };
 
@@ -160,7 +161,7 @@ class ChooseByUniformDistribution : public TileProcedureNode
       source->apply(data);
     }
 
-    if (data.cell.top_face != top_face_input)
+    if (data.cell->top_face != top_face_input)
     {
       return;
     }
@@ -176,15 +177,26 @@ class ChooseByUniformDistribution : public TileProcedureNode
       {
         if (candidate.placement == PlacementType::Terrain)
         {
-          data.cell.top_face = candidate.value;
+          data.cell->top_face = candidate.value;
         }
         else
         {
-          data.cell.top_face_decoration = candidate.value;
+          data.cell->top_face_decoration = candidate.value;
         }
         return;
       }
     }
   }
+};
+
+class GenerateTerrainChunk : public TileProcedureNode
+{
+ public:
+  TileProcedureNode* source = nullptr;
+  int padding = 1;
+
+  void set_source(TileProcedureNode* source);
+  void set_padding(const int padding);
+  void apply(TileProcedureData& data) override;
 };
 }  // namespace dl

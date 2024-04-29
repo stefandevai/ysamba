@@ -203,15 +203,21 @@ void ChunkGenerator::m_select_tile(std::vector<BlockType>& terrain, const int x,
     return;
   }
 
-  // if (top_face_visible && block_type == BlockType::Grass)
-  // {
-  auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
-  Vector3i cell_position = {transposed_x, transposed_y, z};
-  TileProcedureData data{
-      chunk->tiles.values[z * size.x * size.y + y * size.x + x], cell_position, m_padded_size, terrain};
-  procedure->apply(data);
-  //   return;
-  // }
+  // // if (top_face_visible && block_type == BlockType::Grass)
+  // // {
+  // auto& cell = chunk->tiles.values[z * size.x * size.y + y * size.x + x];
+  // auto procedure = TileProcedureManager::get_by_block(cell.block_type);
+  // Vector3i cell_position = {transposed_x, transposed_y, z};
+  // TileProcedureData data = {
+  //     .chunk = *chunk,
+  //     .cell = cell,
+  //     .cell_position = cell_position,
+  //     .padded_size = m_padded_size,
+  //     .terrain = terrain,
+  // };
+  // procedure->apply(data);
+  // //   return;
+  // // }
 
   // Cell old_values = chunk->tiles.values[z * size.x * size.y + y * size.x + x];
   // Cell new_values = old_values;
@@ -269,10 +275,10 @@ void ChunkGenerator::m_apply_rule(
 
   case 4:
   {
-    auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
-    Vector3i cell_position = {x, y, z};
-    TileProcedureData data{values, cell_position, m_padded_size, terrain};
-    procedure->apply(data);
+    // auto procedure = TileProcedureManager::get_by_block(BlockType::Grass);
+    // Vector3i cell_position = {x, y, z};
+    // TileProcedureData data{values, cell_position, m_padded_size, terrain};
+    // procedure->apply(data);
 
     // const auto& rule = std::get<RootAutoTile4SidesRule>(rule_variant);
     // const auto bitmask = m_get_bitmask_4_sided_horizontal(terrain, x, y, z, rule.neighbor);

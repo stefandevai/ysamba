@@ -43,6 +43,8 @@ void TileProcedureManager::init()
 
   block_procedures.insert({BlockType::Grass, choose.get()});
   block_procedures.insert({BlockType::Basalt, choose.get()});
+  block_procedures.insert({BlockType::Water, choose.get()});
+  block_procedures.insert({BlockType::Sand, choose.get()});
 
   m_procedures.push_back(std::move(choose));
   m_procedures.push_back(std::move(autotile));
