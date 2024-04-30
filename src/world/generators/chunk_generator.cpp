@@ -140,6 +140,8 @@ void ChunkGenerator::generate(const int seed, const Vector3i& offset)
 
   TileProcedureManager::init();
 
+  auto procedure = GenerateTerrainChunk();
+
   for (int k = 0; k < size.z; ++k)
   {
     for (int j = 0; j < size.y; ++j)
