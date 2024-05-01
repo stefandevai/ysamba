@@ -14,7 +14,7 @@ class TileProcedureManager
 {
  public:
   inline static std::unordered_map<uint32_t, TileProcedureNode*> procedures{};
-  inline static std::unordered_map<BlockType, TileProcedureNode*> block_procedures{};
+  inline static std::array<TileProcedureNode*, 6> block_procedures{};
 
   TileProcedureManager() = delete;
 

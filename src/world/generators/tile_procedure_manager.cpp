@@ -41,11 +41,16 @@ void TileProcedureManager::init()
       {61, 0.002, ChooseByUniformDistribution::PlacementType::Decoration},
   });
 
-  block_procedures.insert({BlockType::Grass, choose.get()});
-  block_procedures.insert({BlockType::Basalt, choose.get()});
-  block_procedures.insert({BlockType::Water, choose.get()});
-  block_procedures.insert({BlockType::Sand, choose.get()});
+  auto identity_procedure = std::make_unique<IdentityProcedure>();
 
+  block_procedures[static_cast<int>(BlockType::None)] = identity_procedure.get();
+  block_procedures[static_cast<int>(BlockType::Water)] = choose.get();
+  block_procedures[static_cast<int>(BlockType::Grass)] = choose.get();
+  block_procedures[static_cast<int>(BlockType::Basalt)] = choose.get();
+  block_procedures[static_cast<int>(BlockType::Sand)] = choose.get();
+  block_procedures[static_cast<int>(BlockType::Decoration)] = identity_procedure.get();
+
+  m_procedures.push_back(std::move(identity_procedure));
   m_procedures.push_back(std::move(choose));
   m_procedures.push_back(std::move(autotile));
   m_procedures.push_back(std::move(set_front_face));
@@ -55,7 +60,7 @@ void TileProcedureManager::init()
 
 TileProcedureNode* TileProcedureManager::get_by_block(const BlockType block_type)
 {
-  return block_procedures.at(block_type);
+  return block_procedures[static_cast<int>(block_type)];
 }
 
 TileProcedureNode* TileProcedureManager::get_by_id(const uint32_t id)

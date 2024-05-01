@@ -28,6 +28,12 @@ class TileProcedureNode
   virtual void apply(TileProcedureData& data) = 0;
 };
 
+class IdentityProcedure : public TileProcedureNode
+{
+ public:
+  void apply(TileProcedureData& data) override { (void)data; }
+};
+
 typedef enum
 {
   DL_EDGE_NONE = 0,
