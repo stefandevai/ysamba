@@ -113,6 +113,261 @@ class AutotileFourSidesHorizontal : public TileProcedureNode
   }
 };
 
+class AutotileEightSidesHorizontal : public TileProcedureNode
+{
+ public:
+  TileProcedureNode* source = nullptr;
+  BlockType neighbor = BlockType::None;
+  std::array<uint32_t, 47> bitmask_values{};
+
+  void set_source(TileProcedureNode* source) { this->source = source; }
+
+  void set_neighbor(BlockType neighbor) { this->neighbor = neighbor; }
+
+  void set_bitmask_values(std::array<uint32_t, 47> bitmask_values) { this->bitmask_values = std::move(bitmask_values); }
+
+  void apply(TileProcedureData& data) override
+  {
+    if (source != nullptr)
+    {
+      source->apply(data);
+    }
+
+    const auto bitmask = m_get_bitmask(data);
+
+    int new_terrain_id = 0;
+
+    switch (bitmask)
+    {
+    case DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[0].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[1].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[2].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[3].value;
+      break;
+    case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
+        | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[4].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[5].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[6].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[7].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
+      new_terrain_id = rule.output[8].value;
+      break;
+    case DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[9].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[10].value;
+      break;
+    case DL_EDGE_LEFT:
+      new_terrain_id = rule.output[11].value;
+      break;
+    case DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[12].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[13].value;
+      break;
+    case DL_EDGE_TOP:
+      new_terrain_id = rule.output[14].value;
+      break;
+    case DL_EDGE_NONE:
+      new_terrain_id = rule.output[15].value;
+      break;
+    case DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[16].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[17].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[18].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[19].value;
+      break;
+    case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
+      new_terrain_id = rule.output[20].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+        | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[21].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
+        | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[22].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[23].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[24].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
+        | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[25].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
+        | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[26].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[27].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[28].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
+      new_terrain_id = rule.output[29].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[30].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[31].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[32].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[33].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[34].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[35].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[36].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[37].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[38].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT:
+      new_terrain_id = rule.output[39].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[40].value;
+      break;
+    case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
+      new_terrain_id = rule.output[41].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[42].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[43].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[44].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
+      new_terrain_id = rule.output[45].value;
+      break;
+    case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
+      new_terrain_id = rule.output[46].value;
+      break;
+    }
+
+    if (new_terrain_id == 0)
+    {
+      spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
+    }
+
+    values.top_face = new_terrain_id;
+
+    data.cell->top_face = bitmask_values[bitmask];
+  }
+
+ private:
+  uint32_t m_get_bitmask(TileProcedureData& data)
+  {
+    uint32_t bitmask = 0;
+
+    // Top
+    if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == source)
+    {
+      bitmask |= DL_EDGE_TOP;
+    }
+    // Right
+    if (x < m_padded_size.x - 1 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == source)
+    {
+      bitmask |= DL_EDGE_RIGHT;
+    }
+    // Bottom
+    if (y < m_padded_size.y - 1
+        && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == source)
+    {
+      bitmask |= DL_EDGE_BOTTOM;
+    }
+    // Left
+    if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == source)
+    {
+      bitmask |= DL_EDGE_LEFT;
+    }
+    // Top Left
+    if (x > 0 && y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x - 1] == source)
+    {
+      bitmask |= DL_EDGE_TOP_LEFT;
+    }
+    // Top Right
+    if (x < m_padded_size.x - 1 && y > 0
+        && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == source)
+    {
+      bitmask |= DL_EDGE_TOP_RIGHT;
+    }
+    // Bottom Right
+    if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1
+        && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == source)
+    {
+      bitmask |= DL_EDGE_BOTTOM_RIGHT;
+    }
+    // Bottom Left
+    if (x > 0 && y < m_padded_size.y - 1
+        && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == source)
+    {
+      bitmask |= DL_EDGE_BOTTOM_LEFT;
+    }
+
+    if (!(bitmask & DL_EDGE_LEFT) || !(bitmask & DL_EDGE_TOP))
+    {
+      bitmask &= ~DL_EDGE_TOP_LEFT;
+    }
+    if (!(bitmask & DL_EDGE_LEFT) || !(bitmask & DL_EDGE_BOTTOM))
+    {
+      bitmask &= ~DL_EDGE_BOTTOM_LEFT;
+    }
+    if (!(bitmask & DL_EDGE_RIGHT) || !(bitmask & DL_EDGE_TOP))
+    {
+      bitmask &= ~DL_EDGE_TOP_RIGHT;
+    }
+    if (!(bitmask & DL_EDGE_RIGHT) || !(bitmask & DL_EDGE_BOTTOM))
+    {
+      bitmask &= ~DL_EDGE_BOTTOM_RIGHT;
+    }
+
+    return bitmask;
+  }
+};
+
 class SetFrontFace : public TileProcedureNode
 {
  public:
