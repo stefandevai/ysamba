@@ -140,150 +140,150 @@ class AutotileEightSidesHorizontal : public TileProcedureNode
     switch (bitmask)
     {
     case DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[0].value;
+      new_terrain_id = bitmask_values[0];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[1].value;
+      new_terrain_id = bitmask_values[1];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[2].value;
+      new_terrain_id = bitmask_values[2];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[3].value;
+      new_terrain_id = bitmask_values[3];
       break;
     case DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM
         | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[4].value;
+      new_terrain_id = bitmask_values[4];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[5].value;
+      new_terrain_id = bitmask_values[5];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[6].value;
+      new_terrain_id = bitmask_values[6];
       break;
     case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[7].value;
+      new_terrain_id = bitmask_values[7];
       break;
     case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
-      new_terrain_id = rule.output[8].value;
+      new_terrain_id = bitmask_values[8];
       break;
     case DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[9].value;
+      new_terrain_id = bitmask_values[9];
       break;
     case DL_EDGE_LEFT | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[10].value;
+      new_terrain_id = bitmask_values[10];
       break;
     case DL_EDGE_LEFT:
-      new_terrain_id = rule.output[11].value;
+      new_terrain_id = bitmask_values[11];
       break;
     case DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[12].value;
+      new_terrain_id = bitmask_values[12];
       break;
     case DL_EDGE_TOP | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[13].value;
+      new_terrain_id = bitmask_values[13];
       break;
     case DL_EDGE_TOP:
-      new_terrain_id = rule.output[14].value;
+      new_terrain_id = bitmask_values[14];
       break;
     case DL_EDGE_NONE:
-      new_terrain_id = rule.output[15].value;
+      new_terrain_id = bitmask_values[15];
       break;
     case DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[16].value;
+      new_terrain_id = bitmask_values[16];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[17].value;
+      new_terrain_id = bitmask_values[17];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[18].value;
+      new_terrain_id = bitmask_values[18];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[19].value;
+      new_terrain_id = bitmask_values[19];
       break;
     case DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP:
-      new_terrain_id = rule.output[20].value;
+      new_terrain_id = bitmask_values[20];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
         | DL_EDGE_TOP_LEFT:
-      new_terrain_id = rule.output[21].value;
+      new_terrain_id = bitmask_values[21];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_RIGHT | DL_EDGE_TOP_RIGHT | DL_EDGE_TOP
         | DL_EDGE_TOP_LEFT:
-      new_terrain_id = rule.output[22].value;
+      new_terrain_id = bitmask_values[22];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_LEFT | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[23].value;
+      new_terrain_id = bitmask_values[23];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[24].value;
+      new_terrain_id = bitmask_values[24];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT
         | DL_EDGE_TOP_LEFT:
-      new_terrain_id = rule.output[25].value;
+      new_terrain_id = bitmask_values[25];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT
         | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[26].value;
+      new_terrain_id = bitmask_values[26];
       break;
     case DL_EDGE_TOP | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[27].value;
+      new_terrain_id = bitmask_values[27];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[28].value;
+      new_terrain_id = bitmask_values[28];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP:
-      new_terrain_id = rule.output[29].value;
+      new_terrain_id = bitmask_values[29];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[30].value;
+      new_terrain_id = bitmask_values[30];
       break;
     case DL_EDGE_TOP | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[31].value;
+      new_terrain_id = bitmask_values[31];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[32].value;
+      new_terrain_id = bitmask_values[32];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
-      new_terrain_id = rule.output[33].value;
+      new_terrain_id = bitmask_values[33];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[34].value;
+      new_terrain_id = bitmask_values[34];
       break;
     case DL_EDGE_TOP | DL_EDGE_LEFT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[35].value;
+      new_terrain_id = bitmask_values[35];
       break;
     case DL_EDGE_LEFT | DL_EDGE_BOTTOM | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[36].value;
+      new_terrain_id = bitmask_values[36];
       break;
     case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[37].value;
+      new_terrain_id = bitmask_values[37];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[38].value;
+      new_terrain_id = bitmask_values[38];
       break;
     case DL_EDGE_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT:
-      new_terrain_id = rule.output[39].value;
+      new_terrain_id = bitmask_values[39];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[40].value;
+      new_terrain_id = bitmask_values[40];
       break;
     case DL_EDGE_LEFT | DL_EDGE_TOP_LEFT | DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM:
-      new_terrain_id = rule.output[41].value;
+      new_terrain_id = bitmask_values[41];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[42].value;
+      new_terrain_id = bitmask_values[42];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[43].value;
+      new_terrain_id = bitmask_values[43];
       break;
     case DL_EDGE_TOP | DL_EDGE_TOP_RIGHT | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[44].value;
+      new_terrain_id = bitmask_values[44];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_BOTTOM_LEFT | DL_EDGE_LEFT:
-      new_terrain_id = rule.output[45].value;
+      new_terrain_id = bitmask_values[45];
       break;
     case DL_EDGE_TOP | DL_EDGE_RIGHT | DL_EDGE_BOTTOM | DL_EDGE_LEFT | DL_EDGE_TOP_LEFT:
-      new_terrain_id = rule.output[46].value;
+      new_terrain_id = bitmask_values[46];
       break;
     }
 
@@ -292,57 +292,70 @@ class AutotileEightSidesHorizontal : public TileProcedureNode
       spdlog::warn("Could not find a matching tile for bitmask {}", bitmask);
     }
 
-    values.top_face = new_terrain_id;
-
-    data.cell->top_face = bitmask_values[bitmask];
+    data.cell->top_face = new_terrain_id;
   }
 
  private:
   uint32_t m_get_bitmask(TileProcedureData& data)
   {
     uint32_t bitmask = 0;
+    const auto& terrain = *data.terrain;
+    const auto& padded_size = *data.padded_size;
+    const auto& position = *data.cell_position;
 
     // Top
-    if (y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x] == source)
+    if (position.y > 0
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y - 1) * padded_size.x + position.x]
+               == neighbor)
     {
       bitmask |= DL_EDGE_TOP;
     }
     // Right
-    if (x < m_padded_size.x - 1 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x + 1] == source)
+    if (position.x < padded_size.x - 1
+        && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_RIGHT;
     }
     // Bottom
-    if (y < m_padded_size.y - 1
-        && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x] == source)
+    if (position.y < padded_size.y - 1
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y + 1) * padded_size.x + position.x]
+               == neighbor)
     {
       bitmask |= DL_EDGE_BOTTOM;
     }
     // Left
-    if (x > 0 && terrain[z * m_padded_size.x * m_padded_size.y + y * m_padded_size.x + x - 1] == source)
+    if (position.x > 0
+        && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_LEFT;
     }
     // Top Left
-    if (x > 0 && y > 0 && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x - 1] == source)
+    if (position.x > 0 && position.y > 0
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y - 1) * padded_size.x + position.x - 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_TOP_LEFT;
     }
     // Top Right
-    if (x < m_padded_size.x - 1 && y > 0
-        && terrain[z * m_padded_size.x * m_padded_size.y + (y - 1) * m_padded_size.x + x + 1] == source)
+    if (position.x < padded_size.x - 1 && position.y > 0
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y - 1) * padded_size.x + position.x + 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_TOP_RIGHT;
     }
     // Bottom Right
-    if (x < m_padded_size.x - 1 && y < m_padded_size.y - 1
-        && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x + 1] == source)
+    if (position.x < padded_size.x - 1 && position.y < padded_size.y - 1
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y + 1) * padded_size.x + position.x + 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_BOTTOM_RIGHT;
     }
     // Bottom Left
-    if (x > 0 && y < m_padded_size.y - 1
-        && terrain[z * m_padded_size.x * m_padded_size.y + (y + 1) * m_padded_size.x + x - 1] == source)
+    if (position.x > 0 && position.y < padded_size.y - 1
+        && terrain[position.z * padded_size.x * padded_size.y + (position.y + 1) * padded_size.x + position.x - 1]
+               == neighbor)
     {
       bitmask |= DL_EDGE_BOTTOM_LEFT;
     }
