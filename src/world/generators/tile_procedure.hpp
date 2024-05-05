@@ -126,45 +126,13 @@ class ChooseByUniformDistribution : public TileProcedureNode
   uint32_t top_face_input = 0;
   std::vector<Candidate> candidates{};
 
-  void set_source(TileProcedureNode* source) { this->source = source; }
+  void set_source(TileProcedureNode* source);
 
-  void set_candidates(std::vector<Candidate> candidates) { this->candidates = std::move(candidates); }
+  void set_candidates(std::vector<Candidate> candidates);
 
-  void set_top_face_input(uint32_t top_face_input) { this->top_face_input = top_face_input; }
+  void set_top_face_input(uint32_t top_face_input);
 
-  void apply(TileProcedureData& data) override
-  {
-    if (source != nullptr)
-    {
-      source->apply(data);
-    }
-
-    if (data.cell->top_face != top_face_input)
-    {
-      return;
-    }
-
-    const auto probability = random::get_real();
-    double cumulative_probability = 0.0;
-
-    for (const auto& candidate : candidates)
-    {
-      cumulative_probability += candidate.probability;
-
-      if (probability < cumulative_probability)
-      {
-        if (candidate.placement == PlacementType::Terrain)
-        {
-          data.cell->top_face = candidate.value;
-        }
-        else
-        {
-          data.cell->top_face_decoration = candidate.value;
-        }
-        return;
-      }
-    }
-  }
+  void apply(TileProcedureData& data) override;
 };
 
 class GenerateTerrainChunk : public TileProcedureNode

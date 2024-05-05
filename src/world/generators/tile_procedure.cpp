@@ -308,6 +308,46 @@ uint32_t AutotileEightSidesHorizontal::m_get_bitmask(TileProcedureData& data)
   return bitmask;
 }
 
+void ChooseByUniformDistribution::set_source(TileProcedureNode* source) { this->source = source; }
+
+void ChooseByUniformDistribution::set_candidates(std::vector<Candidate> candidates) { this->candidates = std::move(candidates); }
+
+void ChooseByUniformDistribution::set_top_face_input(uint32_t top_face_input) { this->top_face_input = top_face_input; }
+
+void ChooseByUniformDistribution::apply(TileProcedureData& data)
+{
+  if (source != nullptr)
+  {
+    source->apply(data);
+  }
+
+  if (data.cell->top_face != top_face_input)
+  {
+    return;
+  }
+
+  const auto probability = random::get_real();
+  double cumulative_probability = 0.0;
+
+  for (const auto& candidate : candidates)
+  {
+    cumulative_probability += candidate.probability;
+
+    if (probability < cumulative_probability)
+    {
+      if (candidate.placement == PlacementType::Terrain)
+      {
+        data.cell->top_face = candidate.value;
+      }
+      else
+      {
+        data.cell->top_face_decoration = candidate.value;
+      }
+      return;
+    }
+  }
+}
+
 void GenerateTerrainChunk::set_source(TileProcedureNode* source)
 {
   this->source = source;
