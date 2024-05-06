@@ -54,11 +54,11 @@ class AutotileFourSidesHorizontal : public TileProcedureNode
   BlockType neighbor = BlockType::None;
   std::array<uint32_t, 16> bitmask_values{};
 
-  void set_source(TileProcedureNode* source) { this->source = source; }
+  void set_source(TileProcedureNode* source);
 
-  void set_neighbor(BlockType neighbor) { this->neighbor = neighbor; }
+  void set_neighbor(BlockType neighbor);
 
-  void set_bitmask_values(std::array<uint32_t, 16> bitmask_values) { this->bitmask_values = std::move(bitmask_values); }
+  void set_bitmask_values(std::array<uint32_t, 16> bitmask_values);
 
   void apply(TileProcedureData& data) override;
 
@@ -73,11 +73,11 @@ class AutotileEightSidesHorizontal : public TileProcedureNode
   BlockType neighbor = BlockType::None;
   std::array<uint32_t, 47> bitmask_values{};
 
-  void set_source(TileProcedureNode* source) { this->source = source; }
+  void set_source(TileProcedureNode* source);
 
-  void set_neighbor(BlockType neighbor) { this->neighbor = neighbor; }
+  void set_neighbor(BlockType neighbor);
 
-  void set_bitmask_values(std::array<uint32_t, 47> bitmask_values) { this->bitmask_values = std::move(bitmask_values); }
+  void set_bitmask_values(std::array<uint32_t, 47> bitmask_values);
 
   void apply(TileProcedureData& data) override;
 
@@ -91,19 +91,11 @@ class SetFrontFace : public TileProcedureNode
   TileProcedureNode* source = nullptr;
   uint32_t front_face_id = 0;
 
-  void set_source(TileProcedureNode* source) { this->source = source; }
+  void set_source(TileProcedureNode* source);
 
-  void set_front_face_id(uint32_t front_face_id) { this->front_face_id = front_face_id; }
+  void set_front_face_id(uint32_t front_face_id);
 
-  void apply(TileProcedureData& data) override
-  {
-    if (source != nullptr)
-    {
-      source->apply(data);
-    }
-
-    data.cell->front_face = front_face_id;
-  }
+  void apply(TileProcedureData& data);
 };
 
 class ChooseByUniformDistribution : public TileProcedureNode

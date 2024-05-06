@@ -4,6 +4,21 @@
 
 namespace dl
 {
+void AutotileFourSidesHorizontal::set_source(TileProcedureNode* source)
+{
+  this->source = source;
+}
+
+void AutotileFourSidesHorizontal::set_neighbor(BlockType neighbor)
+{
+  this->neighbor = neighbor;
+}
+
+void AutotileFourSidesHorizontal::set_bitmask_values(std::array<uint32_t, 16> bitmask_values)
+{
+  this->bitmask_values = std::move(bitmask_values);
+}
+
 void AutotileFourSidesHorizontal::apply(TileProcedureData& data)
 {
   if (source != nullptr)
@@ -32,8 +47,7 @@ uint32_t AutotileFourSidesHorizontal::m_get_bitmask(TileProcedureData& data)
   }
   // Right
   if (position.x < padded_size.x - 1
-      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1]
-             == neighbor)
+      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1] == neighbor)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
@@ -46,13 +60,27 @@ uint32_t AutotileFourSidesHorizontal::m_get_bitmask(TileProcedureData& data)
   }
   // Left
   if (position.x > 0
-      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1]
-             == neighbor)
+      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1] == neighbor)
   {
     bitmask |= DL_EDGE_LEFT;
   }
 
   return bitmask;
+}
+
+void AutotileEightSidesHorizontal::set_source(TileProcedureNode* source)
+{
+  this->source = source;
+}
+
+void AutotileEightSidesHorizontal::set_neighbor(BlockType neighbor)
+{
+  this->neighbor = neighbor;
+}
+
+void AutotileEightSidesHorizontal::set_bitmask_values(std::array<uint32_t, 47> bitmask_values)
+{
+  this->bitmask_values = std::move(bitmask_values);
 }
 
 void AutotileEightSidesHorizontal::apply(TileProcedureData& data)
@@ -240,8 +268,7 @@ uint32_t AutotileEightSidesHorizontal::m_get_bitmask(TileProcedureData& data)
   }
   // Right
   if (position.x < padded_size.x - 1
-      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1]
-             == neighbor)
+      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x + 1] == neighbor)
   {
     bitmask |= DL_EDGE_RIGHT;
   }
@@ -254,8 +281,7 @@ uint32_t AutotileEightSidesHorizontal::m_get_bitmask(TileProcedureData& data)
   }
   // Left
   if (position.x > 0
-      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1]
-             == neighbor)
+      && terrain[position.z * padded_size.x * padded_size.y + position.y * padded_size.x + position.x - 1] == neighbor)
   {
     bitmask |= DL_EDGE_LEFT;
   }
@@ -308,11 +334,40 @@ uint32_t AutotileEightSidesHorizontal::m_get_bitmask(TileProcedureData& data)
   return bitmask;
 }
 
-void ChooseByUniformDistribution::set_source(TileProcedureNode* source) { this->source = source; }
+void SetFrontFace::set_source(TileProcedureNode* source)
+{
+  this->source = source;
+}
 
-void ChooseByUniformDistribution::set_candidates(std::vector<Candidate> candidates) { this->candidates = std::move(candidates); }
+void SetFrontFace::set_front_face_id(uint32_t front_face_id)
+{
+  this->front_face_id = front_face_id;
+}
 
-void ChooseByUniformDistribution::set_top_face_input(uint32_t top_face_input) { this->top_face_input = top_face_input; }
+void SetFrontFace::apply(TileProcedureData& data)
+{
+  if (source != nullptr)
+  {
+    source->apply(data);
+  }
+
+  data.cell->front_face = front_face_id;
+}
+
+void ChooseByUniformDistribution::set_source(TileProcedureNode* source)
+{
+  this->source = source;
+}
+
+void ChooseByUniformDistribution::set_candidates(std::vector<Candidate> candidates)
+{
+  this->candidates = std::move(candidates);
+}
+
+void ChooseByUniformDistribution::set_top_face_input(uint32_t top_face_input)
+{
+  this->top_face_input = top_face_input;
+}
 
 void ChooseByUniformDistribution::apply(TileProcedureData& data)
 {
