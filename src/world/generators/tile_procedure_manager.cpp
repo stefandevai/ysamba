@@ -1,4 +1,5 @@
 #include "world/generators/tile_procedure_manager.hpp"
+#include "world/generators/procedures/autotile.hpp"
 
 namespace dl
 {
